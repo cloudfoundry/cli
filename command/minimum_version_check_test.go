@@ -22,10 +22,25 @@ var _ = Describe("Minimum Version Check", func() {
 		It("does return an error", func() {
 			currentVersion := "1.0.0-alpha.5"
 			err := MinimumAPIVersionCheck(currentVersion, minimumVersion)
-			Expect(err).To(MatchError(MinimumAPIVersionError{
+			Expect(err).To(MatchError(MinimumAPIVersionNotMetError{
 				CurrentVersion: currentVersion,
 				MinimumVersion: minimumVersion,
 			}))
+		})
+	})
+
+	Context("current version is built from source", func() {
+		It("does not return an error", func() {
+			currentVersion := "BUILT_FROM_SOURCE"
+			err := MinimumAPIVersionCheck(currentVersion, minimumVersion)
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
+	Context("minimum version is empty", func() {
+		It("does not return an error", func() {
+			err := MinimumAPIVersionCheck("2.0.0", "")
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })

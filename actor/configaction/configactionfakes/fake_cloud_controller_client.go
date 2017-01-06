@@ -48,6 +48,12 @@ type FakeCloudControllerClient struct {
 	loggregatorEndpointReturns     struct {
 		result1 string
 	}
+	MinCLIVersionStub        func() string
+	minCLIVersionMutex       sync.RWMutex
+	minCLIVersionArgsForCall []struct{}
+	minCLIVersionReturns     struct {
+		result1 string
+	}
 	RoutingEndpointStub        func() string
 	routingEndpointMutex       sync.RWMutex
 	routingEndpointArgsForCall []struct{}
@@ -223,6 +229,31 @@ func (fake *FakeCloudControllerClient) LoggregatorEndpointReturns(result1 string
 	}{result1}
 }
 
+func (fake *FakeCloudControllerClient) MinCLIVersion() string {
+	fake.minCLIVersionMutex.Lock()
+	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("MinCLIVersion", []interface{}{})
+	fake.minCLIVersionMutex.Unlock()
+	if fake.MinCLIVersionStub != nil {
+		return fake.MinCLIVersionStub()
+	} else {
+		return fake.minCLIVersionReturns.result1
+	}
+}
+
+func (fake *FakeCloudControllerClient) MinCLIVersionCallCount() int {
+	fake.minCLIVersionMutex.RLock()
+	defer fake.minCLIVersionMutex.RUnlock()
+	return len(fake.minCLIVersionArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) MinCLIVersionReturns(result1 string) {
+	fake.MinCLIVersionStub = nil
+	fake.minCLIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeCloudControllerClient) RoutingEndpoint() string {
 	fake.routingEndpointMutex.Lock()
 	fake.routingEndpointArgsForCall = append(fake.routingEndpointArgsForCall, struct{}{})
@@ -288,6 +319,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.loggregatorEndpointMutex.RLock()
 	defer fake.loggregatorEndpointMutex.RUnlock()
+	fake.minCLIVersionMutex.RLock()
+	defer fake.minCLIVersionMutex.RUnlock()
 	fake.routingEndpointMutex.RLock()
 	defer fake.routingEndpointMutex.RUnlock()
 	fake.tokenEndpointMutex.RLock()

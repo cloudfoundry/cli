@@ -29,13 +29,14 @@ var _ = Describe("Targgeting", func() {
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedLoggregator, expectedDoppler, expectedUAA, expectedRouting string
+		var expectedAPI, expectedAPIVersion, expectedAuth, expectedLoggregator, expectedMinCLIVersion, expectedDoppler, expectedUAA, expectedRouting string
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
 			expectedAPIVersion = "2.59.0"
 			expectedAuth = "https://login.foo.com"
 			expectedLoggregator = "wss://log.foo.com"
+			expectedMinCLIVersion = "1.0.0"
 			expectedDoppler = "wss://doppler.foo.com"
 			expectedUAA = "https://uaa.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
@@ -46,6 +47,7 @@ var _ = Describe("Targgeting", func() {
 			fakeCloudControllerClient.APIVersionReturns(expectedAPIVersion)
 			fakeCloudControllerClient.AuthorizationEndpointReturns(expectedAuth)
 			fakeCloudControllerClient.LoggregatorEndpointReturns(expectedLoggregator)
+			fakeCloudControllerClient.MinCLIVersionReturns(expectedMinCLIVersion)
 			fakeCloudControllerClient.DopplerEndpointReturns(expectedDoppler)
 			fakeCloudControllerClient.TokenEndpointReturns(expectedUAA)
 			fakeCloudControllerClient.RoutingEndpointReturns(expectedRouting)
@@ -66,12 +68,13 @@ var _ = Describe("Targgeting", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, loggregator, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			api, apiVersion, auth, loggregator, minCLIVersion, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
 			Expect(api).To(Equal(expectedAPI))
 			Expect(apiVersion).To(Equal(expectedAPIVersion))
 			Expect(auth).To(Equal(expectedAuth))
 			Expect(loggregator).To(Equal(expectedLoggregator))
+			Expect(minCLIVersion).To(Equal(expectedMinCLIVersion))
 			Expect(doppler).To(Equal(expectedDoppler))
 			Expect(uaa).To(Equal(expectedUAA))
 			Expect(routing).To(Equal(expectedRouting))
@@ -115,12 +118,13 @@ var _ = Describe("Targgeting", func() {
 			actor.ClearTarget()
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, loggregator, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			api, apiVersion, auth, loggregator, minCLIVersion, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
 			Expect(api).To(BeEmpty())
 			Expect(apiVersion).To(BeEmpty())
 			Expect(auth).To(BeEmpty())
 			Expect(loggregator).To(BeEmpty())
+			Expect(minCLIVersion).To(BeEmpty())
 			Expect(doppler).To(BeEmpty())
 			Expect(uaa).To(BeEmpty())
 			Expect(routing).To(BeEmpty())

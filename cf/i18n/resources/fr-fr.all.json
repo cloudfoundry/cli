@@ -1680,6 +1680,10 @@
     "translation": "Recherche de la route..."
   },
   {
+    "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
     "translation": "La version de l'API Cloud Foundry {{.APIVer}} requiert la version d'interface de ligne de commande {{.CLIMin}}.  Vous utilisez actuellement la version {{.CLIVer}}. Pour mettre à niveau votre interface de ligne de commande, visitez le site https://github.com/cloudfoundry/cli#downloads."
   },

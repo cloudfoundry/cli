@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"errors"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -42,6 +43,42 @@ var _ = Describe("target Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when checking the minimum CLI version", func() {
+		var (
+			minCLIVersion string
+			binaryVersion string
+			apiVersion    string
+		)
+
+		BeforeEach(func() {
+			apiVersion = "6.0.0"
+			minCLIVersion = "1.0.0"
+			fakeConfig.APIVersionReturns(apiVersion)
+			fakeConfig.MinCLIVersionReturns(minCLIVersion)
+		})
+
+		Context("when the CLI version is less than the recommended minimum", func() {
+			BeforeEach(func() {
+				binaryVersion = "0.0.0"
+				fakeConfig.BinaryVersionReturns(binaryVersion)
+			})
+
+			It("displays a recommendation to update the CLI version", func() {
+				Expect(testUI.Out).To(Say(fmt.Sprintf("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion)))
+			})
+		})
+
+		Context("when an error is encountered while parsing the semver versions", func() {
+			BeforeEach(func() {
+				fakeConfig.BinaryVersionReturns("&#%")
+			})
+
+			It("does not recommend to update the CLI version", func() {
+				Consistently(testUI.Out).ShouldNot(Say(fmt.Sprintf("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion)))
+			})
+		})
 	})
 
 	Context("when the user is not logged in", func() {
@@ -264,6 +301,7 @@ var _ = Describe("target Command", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(orgName).To(Equal("some-org"))
 
+						Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 					})
 				})
@@ -291,6 +329,7 @@ var _ = Describe("target Command", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(orgName).To(Equal("some-org"))
 
+						Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
 						spaceGUID, spaceName, spaceAllowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
@@ -314,7 +353,7 @@ var _ = Describe("target Command", func() {
 						}, nil)
 					})
 
-					It("displays all warnings and sets the org", func() {
+					It("displays all warnings, sets the org, and clears the existing targetted space from the config", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(testUI.Err).To(Say("warning-1"))
@@ -325,11 +364,11 @@ var _ = Describe("target Command", func() {
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(orgName).To(Equal("some-org"))
 
+						Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 					})
 				})
 			})
-
 		})
 
 		Context("when org and space arguments are given and org is legit", func() {
@@ -348,6 +387,8 @@ var _ = Describe("target Command", func() {
 				orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
 				Expect(orgGUID).To(Equal("some-org-guid"))
 				Expect(orgName).To(Equal("some-org"))
+
+				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 			})
 
 			Context("when getting the space returns an error", func() {
@@ -386,7 +427,8 @@ var _ = Describe("target Command", func() {
 						}}, nil, nil)
 					})
 
-					It("does not target the space", func() {
+					It("does not auto target the space since space name was provided as an argument", func() {
+						// SetSpaceInformation does not get called from autoTargetSpace, and the call count is 0 because we intentionally exit early.
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 					})
 				})

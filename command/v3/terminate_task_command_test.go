@@ -51,8 +51,8 @@ var _ = Describe("Terminate Task Command", func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
 
-		It("returns a MinimumAPIVersionError", func() {
-			Expect(executeErr).To(MatchError(command.MinimumAPIVersionError{
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
 				MinimumVersion: "3.0.0",
 			}))

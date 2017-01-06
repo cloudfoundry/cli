@@ -44,6 +44,7 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	client.cloudControllerAPIVersion = info.APIVersion
 	client.dopplerEndpoint = info.DopplerEndpoint
 	client.loggregatorEndpoint = info.LoggregatorEndpoint
+	client.minCLIVersion = info.MinCLIVersion
 	client.routingEndpoint = info.RoutingEndpoint
 	client.tokenEndpoint = info.TokenEndpoint
 
