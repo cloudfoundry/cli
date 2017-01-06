@@ -119,7 +119,9 @@ var _ = Describe("run-task command", func() {
 					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
 					Expect(session.Out).To(Say(`OK
 
-Task 1 has been submitted successfully for execution.`,
+Task has been submitted successfully for execution.
+Task name:   .+
+Task id:     1`,
 					))
 				})
 			})
@@ -132,7 +134,9 @@ Task 1 has been submitted successfully for execution.`,
 					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
 					Expect(session.Out).To(Say(`OK
 
-Task 1 has been submitted successfully for execution.`,
+Task has been submitted successfully for execution.
+Task name:   some-task-name
+Task id:     1`,
 					))
 
 					Eventually(func() *Buffer {
@@ -175,7 +179,9 @@ Task 1 has been submitted successfully for execution.`,
 				Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
 				Expect(session.Out).To(Say(`OK
 
-Task 1 has been submitted successfully for execution.`,
+Task has been submitted successfully for execution.
+Task name:   .+
+Task id:     1`,
 				))
 			})
 		})

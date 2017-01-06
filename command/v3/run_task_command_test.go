@@ -134,13 +134,18 @@ var _ = Describe("RunTask Command", func() {
 							"get-application-warning-1",
 							"get-application-warning-2",
 						}, nil)
-					fakeActor.RunTaskReturns(v3action.Task{SequenceID: 3},
-						v3action.Warnings{
-							"get-application-warning-3",
-						}, nil)
 				})
 
 				Context("when the task name is not provided", func() {
+					BeforeEach(func() {
+						fakeActor.RunTaskReturns(v3action.Task{
+							Name:       "31337ddd",
+							SequenceID: 3,
+						},
+							v3action.Warnings{
+								"get-application-warning-3",
+							}, nil)
+					})
 					It("runs a new task and outputs all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
@@ -158,7 +163,10 @@ var _ = Describe("RunTask Command", func() {
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
 
-Task 3 has been submitted successfully for execution.`))
+Task has been submitted successfully for execution.
+Task name:   31337ddd
+Task id:     3
+`))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2
 get-application-warning-3`))
@@ -168,6 +176,14 @@ get-application-warning-3`))
 				Context("when the task name is provided", func() {
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"
+
+						fakeActor.RunTaskReturns(v3action.Task{
+							Name:       "some-task-name",
+							SequenceID: 3,
+						},
+							v3action.Warnings{
+								"get-application-warning-3",
+							}, nil)
 					})
 
 					It("runs a new task and outputs all warnings", func() {
@@ -187,7 +203,9 @@ get-application-warning-3`))
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
 
-Task 3 has been submitted successfully for execution.`,
+Task has been submitted successfully for execution.
+Task name:   some-task-name
+Task id:     3`,
 						))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2

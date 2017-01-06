@@ -5088,11 +5088,11 @@
     "translation": "已將目標空間設為 {{.SpaceName}}\n"
   },
   {
-    "id": "Task workers are unavailable.",
+    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
     "translation": ""
   },
   {
-    "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "id": "Task workers are unavailable.",
     "translation": ""
   },
   {
