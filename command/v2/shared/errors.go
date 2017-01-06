@@ -88,7 +88,7 @@ func (e GetOrgSpacesError) Translate(translate func(string, ...interface{}) stri
 }
 
 func (e SpaceTargetError) Error() string {
-	return "Unable to access space {{.SpaceName}}.\n{{.APIErr}}"
+	return "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}"
 }
 
 func (e SpaceTargetError) Translate(translate func(string, ...interface{}) string) string {

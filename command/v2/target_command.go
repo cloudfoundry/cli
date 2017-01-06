@@ -153,13 +153,9 @@ func (cmd *TargetCommand) setSpace() error {
 }
 
 func (cmd *TargetCommand) displayTargetTable(user configv3.User) error {
-	apiEndpoint := cmd.UI.TranslateText("{{.APIEndpoint}} (API version: {{.APIVersionString}})", map[string]interface{}{
-		"APIEndpoint":      cmd.Config.Target(),
-		"APIVersionString": cmd.Config.APIVersion(),
-	})
-
 	table := [][]string{
-		{cmd.UI.TranslateText("API endpoint:"), apiEndpoint},
+		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 		{cmd.UI.TranslateText("User:"), user.Name},
 	}
 

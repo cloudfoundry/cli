@@ -5536,6 +5536,10 @@
     "translation": "用户"
   },
   {
+    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
     "translation": "无法访问空间 {{.SpaceName}}。\n{{.APIErr}}"
   },
