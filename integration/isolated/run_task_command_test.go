@@ -19,6 +19,8 @@ var _ = Describe("run-task command", func() {
 			Expect(session.Out).To(Say("   run-task - Run a one-off task on an app"))
 			Expect(session.Out).To(Say("USAGE:"))
 			Expect(session.Out).To(Say("   cf run-task APP_NAME COMMAND [--name TASK_NAME]"))
+			Expect(session.Out).To(Say("TIP:"))
+			Expect(session.Out).To(Say("   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs."))
 			Expect(session.Out).To(Say("EXAMPLES:"))
 			Expect(session.Out).To(Say(`   cf run-task my-app "bundle exec rake db:migrate" --name migrate`))
 			Expect(session.Out).To(Say("ALIAS:"))
