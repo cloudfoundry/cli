@@ -20,6 +20,7 @@ type Config interface {
 	DialTimeout() time.Duration
 	Experimental() bool
 	Locale() string
+	MinCLIVersion() string
 	Plugins() map[string]configv3.Plugin
 	RefreshToken() string
 	PollingInterval() time.Duration
@@ -27,8 +28,9 @@ type Config interface {
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetSpaceInformation(guid string, name string, allowSSH bool)
+	UnsetSpaceInformation()
 	SetRefreshToken(token string)
-	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SkipSSLValidation() bool
 	Target() string

@@ -69,6 +69,7 @@ type Client struct {
 	loggregatorEndpoint       string
 	routingEndpoint           string
 	tokenEndpoint             string
+	minCLIVersion             string
 
 	router     *rata.RequestGenerator
 	connection cloudcontroller.Connection

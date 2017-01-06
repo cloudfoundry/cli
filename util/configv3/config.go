@@ -287,6 +287,11 @@ func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion
 }
 
+// MinCLIVersion returns the minimum CLI version requried by the CC
+func (config *Config) MinCLIVersion() string {
+	return config.ConfigFile.MinCLIVersion
+}
+
 // TargetedOrganization returns the currently targeted organization
 func (config *Config) TargetedOrganization() Organization {
 	return config.ConfigFile.TargetedOrganization
@@ -432,11 +437,12 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool) {
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
 	config.ConfigFile.LoggregatorEndpoint = loggregator
+	config.ConfigFile.MinCLIVersion = minCLIVersion
 	config.ConfigFile.DopplerEndpoint = doppler
 	config.ConfigFile.UAAEndpoint = uaa
 	config.ConfigFile.RoutingEndpoint = routing
@@ -461,4 +467,9 @@ func (config *Config) SetAccessToken(accessToken string) {
 // SetRefreshToken sets the current refresh token
 func (config *Config) SetRefreshToken(refreshToken string) {
 	config.ConfigFile.RefreshToken = refreshToken
+}
+
+// UnsetSpaceInformation resets the space values to default
+func (config *Config) UnsetSpaceInformation() {
+	config.SetSpaceInformation("", "", false)
 }

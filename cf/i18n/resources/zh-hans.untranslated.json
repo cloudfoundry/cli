@@ -1104,6 +1104,10 @@
     "translation": "COMMAND"
   },
   {
+    "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry command line tool",
     "translation": "Cloud Foundry command line tool"
   },

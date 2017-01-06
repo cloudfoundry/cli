@@ -12,6 +12,7 @@ type CloudControllerClient interface {
 	AuthorizationEndpoint() string
 	DopplerEndpoint() string
 	LoggregatorEndpoint() string
+	MinCLIVersion() string
 	RoutingEndpoint() string
 	TokenEndpoint() string
 }

@@ -346,6 +346,18 @@ var _ = Describe("Config", func() {
 			})
 		})
 
+		Describe("MinCLIVersion", func() {
+			It("returns the minimum CLI version the CC requires", func() {
+				config := Config{
+					ConfigFile: CFConfig{
+						MinCLIVersion: "1.0.0",
+					},
+				}
+
+				Expect(config.MinCLIVersion()).To(Equal("1.0.0"))
+			})
+		})
+
 		Describe("TargetedOrganization", func() {
 			It("returns the organization", func() {
 				organization := Organization{
@@ -519,6 +531,7 @@ var _ = Describe("Config", func() {
 					"2.59.31",
 					"https://login.foo.com",
 					"wws://loggregator.foo.com:443",
+					"2.0.0",
 					"wws://doppler.foo.com:443",
 					"https://uaa.foo.com",
 					"https://api.foo.com/routing",
@@ -529,6 +542,7 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.APIVersion).To(Equal("2.59.31"))
 				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
 				Expect(config.ConfigFile.LoggregatorEndpoint).To(Equal("wws://loggregator.foo.com:443"))
+				Expect(config.ConfigFile.MinCLIVersion).To(Equal("2.0.0"))
 				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
 				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
 				Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
@@ -580,13 +594,27 @@ var _ = Describe("Config", func() {
 		})
 
 		Describe("SetSpaceInformation", func() {
-			It("sets the organization GUID and name", func() {
+			It("sets the space GUID, name, and AllowSSH", func() {
 				config := Config{}
 				config.SetSpaceInformation("guid-value-1", "my-org-name", true)
 
 				Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal("guid-value-1"))
 				Expect(config.ConfigFile.TargetedSpace.Name).To(Equal("my-org-name"))
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeTrue())
+			})
+		})
+		Describe("UnsetSpaceInformation", func() {
+			config := Config{}
+			BeforeEach(func() {
+				config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+			})
+
+			It("resets the space GUID, name, and AllowSSH to default values", func() {
+				config.UnsetSpaceInformation()
+
+				Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal(""))
+				Expect(config.ConfigFile.TargetedSpace.Name).To(Equal(""))
+				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
 			})
 		})
 	})

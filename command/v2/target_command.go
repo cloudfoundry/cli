@@ -40,7 +40,21 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
+func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
+	err := command.MinimumAPIVersionCheck(cmd.Config.BinaryVersion(), cmd.Config.MinCLIVersion())
+	if _, ok := err.(command.MinimumAPIVersionNotMetError); ok {
+		cmd.UI.DisplayTextWithFlavor("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+			map[string]interface{}{
+				"APIVersion":    cmd.Config.APIVersion(),
+				"MinCLIVersion": cmd.Config.MinCLIVersion(),
+				"BinaryVersion": cmd.Config.BinaryVersion(),
+			})
+	}
+}
+
 func (cmd *TargetCommand) Execute(args []string) error {
+	cmd.notifyCLIUpdateIfNeeded()
+
 	err := command.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return err
@@ -111,6 +125,8 @@ func (cmd *TargetCommand) setOrg() error {
 	}
 
 	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
+
+	cmd.Config.UnsetSpaceInformation()
 
 	err = cmd.autoTargetSpace(org.GUID)
 	if err != nil {

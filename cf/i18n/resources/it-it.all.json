@@ -1680,6 +1680,10 @@
     "translation": "Controllo della rotta in corso..."
   },
   {
+    "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
     "translation": "La versione API Cloud Foundry {{.APIVer}} richiede la versione CLI {{.CLIMin}}.  Stai utilizzando la versione {{.CLIVer}}. Per aggiornare la tua CLI, visita: https://github.com/cloudfoundry/cli#downloads"
   },

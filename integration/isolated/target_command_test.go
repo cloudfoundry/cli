@@ -58,7 +58,25 @@ var _ = Describe("target command", func() {
 				helpers.LogoutCF()
 			})
 
-			Context("when trying to set the target", func() {
+			Context("when trying to target an org", func() {
+				It("fails with not logged in message", func() {
+					session := helpers.CF("target", "-o", "some-org")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when trying to target a space", func() {
+				It("fails with not logged in message", func() {
+					session := helpers.CF("target", "-s", "some-space")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when trying to target an org and space", func() {
 				It("fails with not logged in message", func() {
 					session := helpers.CF("target", "-o", "some-org", "-s", "some-space")
 					Eventually(session.Out).Should(Say("FAILED"))

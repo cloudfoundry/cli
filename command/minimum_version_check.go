@@ -3,6 +3,10 @@ package command
 import "github.com/blang/semver"
 
 func MinimumAPIVersionCheck(current string, minimum string) error {
+	if current == "BUILT_FROM_SOURCE" || minimum == "" {
+		return nil
+	}
+
 	currentSemvar, err := semver.Make(current)
 	if err != nil {
 		return err
@@ -14,7 +18,7 @@ func MinimumAPIVersionCheck(current string, minimum string) error {
 	}
 
 	if currentSemvar.Compare(minimumSemvar) == -1 {
-		return MinimumAPIVersionError{
+		return MinimumAPIVersionNotMetError{
 			CurrentVersion: current,
 			MinimumVersion: minimum,
 		}
