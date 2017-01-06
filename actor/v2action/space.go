@@ -12,12 +12,11 @@ type Space ccv2.Space
 // SpaceFoundError represents the scenario when the space searched for could
 // not be found.
 type SpaceNotFoundError struct {
-	OrgGUID   string
 	SpaceName string
 }
 
 func (e SpaceNotFoundError) Error() string {
-	return fmt.Sprintf("Space '%s' not found in organization '%s'", e.SpaceName, e.OrgGUID)
+	return fmt.Sprintf("Space '%s' not found.", e.SpaceName)
 }
 
 // MultipleSpacesFoundError represents the scenario when the cloud
@@ -53,7 +52,7 @@ func (actor Actor) GetSpaceByName(orgGUID string, spaceName string) (Space, Warn
 	}
 
 	if len(ccv2Spaces) == 0 {
-		return Space{}, Warnings(warnings), SpaceNotFoundError{OrgGUID: orgGUID, SpaceName: spaceName}
+		return Space{}, Warnings(warnings), SpaceNotFoundError{SpaceName: spaceName}
 	}
 
 	if len(ccv2Spaces) > 1 {

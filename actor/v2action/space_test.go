@@ -158,7 +158,6 @@ var _ = Describe("Space Actions", func() {
 				space, warnings, err := actor.GetSpaceByName("some-org-guid", "some-space")
 
 				Expect(err).To(MatchError(SpaceNotFoundError{
-					OrgGUID:   "some-org-guid",
 					SpaceName: "some-space",
 				}))
 				Expect(warnings).To(ConsistOf("get-spaces-warning"))

@@ -127,7 +127,8 @@ var _ = Describe("target Command", func() {
 				It("displays no org or space targeted", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("API endpoint:   some-api-target \\(API version: 1.2.3\\)"))
+					Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+					Expect(testUI.Out).To(Say("API version:    1.2.3"))
 					Expect(testUI.Out).To(Say("User:           some-user"))
 					Expect(testUI.Out).To(Say("No org or space targeted, use 'faceman target -o ORG -s SPACE'"))
 				})
@@ -145,7 +146,8 @@ var _ = Describe("target Command", func() {
 				It("displays the org and no space targeted ", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("API endpoint:   some-api-target \\(API version: 1.2.3\\)"))
+					Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+					Expect(testUI.Out).To(Say("API version:    1.2.3"))
 					Expect(testUI.Out).To(Say("User:           some-user"))
 					Expect(testUI.Out).To(Say("Org:            some-org"))
 					Expect(testUI.Out).To(Say("Space:          No space targeted, use 'faceman target -s SPACE'"))
@@ -167,7 +169,8 @@ var _ = Describe("target Command", func() {
 				It("displays the org and space targeted ", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("API endpoint:   some-api-target \\(API version: 1.2.3\\)"))
+					Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
+					Expect(testUI.Out).To(Say("API version:    1.2.3"))
 					Expect(testUI.Out).To(Say("User:           some-user"))
 					Expect(testUI.Out).To(Say("Org:            some-org"))
 					Expect(testUI.Out).To(Say("Space:          some-space"))
