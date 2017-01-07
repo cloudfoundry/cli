@@ -164,8 +164,8 @@
     "translation": ") esiste già."
   },
   {
-    "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
-    "translation": "**Attenzione: i plug-in sono binari scritti da autori potenzialmente non attendibili. L'installazione e l'utilizzo dei plug-in è a tuo proprio rischio.**\n\nVuoi installare il plug-in {{.Plugin}}? (y o n)"
+    "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}?",
+    "translation": "**Attenzione: i plug-in sono binari scritti da autori potenzialmente non attendibili. L'installazione e l'utilizzo dei plug-in è a tuo proprio rischio.**\n\nVuoi installare il plug-in {{.Plugin}}?"
   },
   {
     "id": "A command line tool to interact with Cloud Foundry",

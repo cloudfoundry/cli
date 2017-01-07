@@ -164,8 +164,8 @@
     "translation": ") 已存在。"
   },
   {
-    "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
-    "translation": "**注意: 插件是由可能不可信的作者编写的二进制文件。安装并使用插件所产生的风险，由您自行承担。\n\n要安装插件 {{.Plugin}} 吗？（y 或 n）"
+    "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}?",
+    "translation": "**注意: 插件是由可能不可信的作者编写的二进制文件。安装并使用插件所产生的风险，由您自行承担。\n\n要安装插件 {{.Plugin}} 吗？"
   },
   {
     "id": "A command line tool to interact with Cloud Foundry",
