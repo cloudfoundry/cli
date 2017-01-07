@@ -95,7 +95,7 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 func (cmd *PluginInstall) Execute(c flags.FlagContext) error {
 	if !cmd.confirmWithUser(
 		c,
-		T("**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
+		T("**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}?",
 			map[string]interface{}{
 				"Plugin": c.Args()[0],
 			}),
