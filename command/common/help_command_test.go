@@ -27,8 +27,7 @@ var _ = Describe("Help Command", func() {
 		fakeActor = new(commonfakes.FakeHelpActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
-		fakeConfig.BinaryVersionReturns("face2.0")
-		fakeConfig.BinaryBuildDateReturns("yesterday")
+		fakeConfig.BinaryVersionReturns("face2.0-yesterday")
 
 		cmd = HelpCommand{
 			UI:     testUI,

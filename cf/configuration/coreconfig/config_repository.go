@@ -346,7 +346,7 @@ func (c *ConfigRepository) SetCLIVersion(v string) {
 
 func (c *ConfigRepository) CLIVersion() string {
 	if c.CFCLIVersion == "" {
-		return version.BinaryVersion
+		return version.VersionString()
 	} else {
 		return c.CFCLIVersion
 	}
@@ -365,8 +365,8 @@ func (c *ConfigRepository) IsMinAPIVersion(requiredVersion semver.Version) bool 
 	return actualVersion.GTE(requiredVersion)
 }
 
-func (c *ConfigRepository) IsMinCLIVersion(version string) bool {
-	if version == "BUILT_FROM_SOURCE" {
+func (c *ConfigRepository) IsMinCLIVersion(checkVersion string) bool {
+	if checkVersion == version.DefaultVersion {
 		return true
 	}
 	var minCLIVersion string
@@ -377,7 +377,7 @@ func (c *ConfigRepository) IsMinCLIVersion(version string) bool {
 		return true
 	}
 
-	actualVersion, err := semver.Make(version)
+	actualVersion, err := semver.Make(checkVersion)
 	if err != nil {
 		return false
 	}

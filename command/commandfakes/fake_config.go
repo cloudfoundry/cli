@@ -22,12 +22,6 @@ type FakeConfig struct {
 	accessTokenReturns     struct {
 		result1 string
 	}
-	BinaryBuildDateStub        func() string
-	binaryBuildDateMutex       sync.RWMutex
-	binaryBuildDateArgsForCall []struct{}
-	binaryBuildDateReturns     struct {
-		result1 string
-	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct{}
@@ -252,31 +246,6 @@ func (fake *FakeConfig) AccessTokenCallCount() int {
 func (fake *FakeConfig) AccessTokenReturns(result1 string) {
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) BinaryBuildDate() string {
-	fake.binaryBuildDateMutex.Lock()
-	fake.binaryBuildDateArgsForCall = append(fake.binaryBuildDateArgsForCall, struct{}{})
-	fake.recordInvocation("BinaryBuildDate", []interface{}{})
-	fake.binaryBuildDateMutex.Unlock()
-	if fake.BinaryBuildDateStub != nil {
-		return fake.BinaryBuildDateStub()
-	} else {
-		return fake.binaryBuildDateReturns.result1
-	}
-}
-
-func (fake *FakeConfig) BinaryBuildDateCallCount() int {
-	fake.binaryBuildDateMutex.RLock()
-	defer fake.binaryBuildDateMutex.RUnlock()
-	return len(fake.binaryBuildDateArgsForCall)
-}
-
-func (fake *FakeConfig) BinaryBuildDateReturns(result1 string) {
-	fake.BinaryBuildDateStub = nil
-	fake.binaryBuildDateReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -988,8 +957,6 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
-	fake.binaryBuildDateMutex.RLock()
-	defer fake.binaryBuildDateMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()

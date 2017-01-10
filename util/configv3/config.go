@@ -414,11 +414,7 @@ func (config *Config) DialTimeout() time.Duration {
 }
 
 func (config *Config) BinaryVersion() string {
-	return version.BinaryVersion
-}
-
-func (config *Config) BinaryBuildDate() string {
-	return version.BinaryBuildDate
+	return version.VersionString()
 }
 
 // HasTargetedOrganization returns true if the organization is set

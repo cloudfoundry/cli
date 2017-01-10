@@ -40,7 +40,7 @@ var _ = Describe("Version", func() {
 			cmd.Execute(flagContext)
 
 			Expect(ui.Outputs()).To(Equal([]string{
-				"my-special-cf version BUILT_FROM_SOURCE-BUILT_AT_UNKNOWN_TIME",
+				"my-special-cf version 0.0.0-unknown-version",
 			}))
 		})
 	})

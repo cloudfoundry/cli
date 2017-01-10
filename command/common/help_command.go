@@ -83,9 +83,8 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("VERSION:")
-	cmd.UI.DisplayText("   {{.Version}}-{{.Time}}", map[string]interface{}{
+	cmd.UI.DisplayText("   {{.Version}}", map[string]interface{}{
 		"Version": cmd.Config.BinaryVersion(),
-		"Time":    cmd.Config.BinaryBuildDate(),
 	})
 	cmd.UI.DisplayNewline()
 }
@@ -94,12 +93,11 @@ func (cmd HelpCommand) displayCommonCommands() {
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
 	prefix := "  "
 
-	cmd.UI.DisplayText("{{.CommandName}} {{.VersionCommand}} {{.Version}}-{{.Time}}, {{.CLI}}",
+	cmd.UI.DisplayText("{{.CommandName}} {{.VersionCommand}} {{.Version}}, {{.CLI}}",
 		map[string]interface{}{
 			"CommandName":    cmd.Config.BinaryName(),
 			"VersionCommand": cmd.UI.TranslateText("version"),
 			"Version":        cmd.Config.BinaryVersion(),
-			"Time":           cmd.Config.BinaryBuildDate(),
 			"CLI":            cmd.UI.TranslateText("Cloud Foundry command line tool"),
 		})
 	cmd.UI.DisplayText("{{.Usage}} {{.CommandName}} {{.CommandUsage}}",

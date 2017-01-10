@@ -46,6 +46,6 @@ func (cmd *Version) Requirements(requirementsFactory requirements.Factory, conte
 }
 
 func (cmd *Version) Execute(context flags.FlagContext) error {
-	cmd.ui.Say(fmt.Sprintf("%s version %s-%s", cf.Name, version.BinaryVersion, version.BinaryBuildDate))
+	cmd.ui.Say(fmt.Sprintf("%s version %s", cf.Name, version.VersionString()))
 	return nil
 }

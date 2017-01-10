@@ -15,11 +15,11 @@ func (cmd *VersionCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd VersionCommand) Execute(args []string) error {
-	cmd.UI.DisplayText("{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}",
+	cmd.UI.DisplayText("{{.BinaryName}} version {{.VersionString}}",
 		map[string]interface{}{
-			"BinaryName":      cmd.Config.BinaryName(),
-			"BinaryVersion":   cmd.Config.BinaryVersion(),
-			"BinaryBuildDate": cmd.Config.BinaryBuildDate(),
+			"BinaryName":    cmd.Config.BinaryName(),
+			"VersionString": cmd.Config.BinaryVersion(),
 		})
+
 	return nil
 }

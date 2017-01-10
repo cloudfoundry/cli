@@ -17,7 +17,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/net"
-	"code.cloudfoundry.org/cli/cf/panicprinter"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
@@ -167,20 +166,6 @@ func suggestCommands(cmdName string, ui terminal.UI, cmdsList []string) {
 		for _, suggestion := range recommendedCmds {
 			ui.Say("      " + suggestion)
 		}
-	}
-}
-
-func handlePanics(args []string, printer terminal.Printer, logger trace.Printer) {
-	panicPrinter := panicprinter.NewPanicPrinter(terminal.NewUI(os.Stdin, Writer, printer, logger))
-
-	commandArgs := strings.Join(args, " ")
-	stackTrace := generateBacktrace()
-
-	err := recover()
-	panicPrinter.DisplayCrashDialog(err, commandArgs, stackTrace)
-
-	if err != nil {
-		os.Exit(1)
 	}
 }
 

@@ -10,4 +10,13 @@ if [[ $(git status --porcelain cf/i18n/resources) ]]; then
   $ROOT_DIR/bin/generate-language-resources
 fi
 
-go build -o $ROOT_DIR/out/cf .
+BUILD_VERSION=$(cat ci/VERSION)
+BUILD_SHA=$(git rev-parse --short HEAD)
+BUILD_DATE=$(date -u +"%Y-%m-%d")
+
+go build \
+  -o $ROOT_DIR/out/cf \
+  -ldflags "-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} \
+            -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} \
+            -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}" \
+  .

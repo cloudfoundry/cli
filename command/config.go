@@ -12,7 +12,6 @@ import (
 type Config interface {
 	APIVersion() string
 	AccessToken() string
-	BinaryBuildDate() string
 	BinaryName() string
 	BinaryVersion() string
 	ColorEnabled() configv3.ColorSetting

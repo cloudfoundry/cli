@@ -2,6 +2,7 @@ package command_test
 
 import (
 	. "code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/version"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,10 +30,9 @@ var _ = Describe("Minimum Version Check", func() {
 		})
 	})
 
-	Context("current version is built from source", func() {
+	Context("current version is the default version", func() {
 		It("does not return an error", func() {
-			currentVersion := "BUILT_FROM_SOURCE"
-			err := MinimumAPIVersionCheck(currentVersion, minimumVersion)
+			err := MinimumAPIVersionCheck(version.DefaultVersion, minimumVersion)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})

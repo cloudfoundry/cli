@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/configurationfakes"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 
 	. "github.com/onsi/ginkgo"
@@ -267,8 +268,8 @@ var _ = Describe("Configuration Repository", func() {
 	})
 
 	Describe("IsMinCLIVersion", func() {
-		It("returns true when the actual version is BUILT_FROM_SOURCE", func() {
-			Expect(config.IsMinCLIVersion("BUILT_FROM_SOURCE")).To(BeTrue())
+		It("returns true when the actual version is the default version string", func() {
+			Expect(config.IsMinCLIVersion(version.DefaultVersion)).To(BeTrue())
 		})
 
 		It("returns true when the MinCLIVersion is empty", func() {
