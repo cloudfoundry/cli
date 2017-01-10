@@ -59,6 +59,6 @@ run:
       "include_services": true,
       "include_ssh": $IS_DIEGO_ENABLED,
       "include_sso": false,
-      "include_tasks": $IS_DIEGO_ENABLED
+      "include_tasks": false
     }
     EOF
