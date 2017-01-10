@@ -236,7 +236,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: bosh-lites-dea-pool
+    - get: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       passed: [smoke-test-1]
       trigger: true
     - get: etcd-release
@@ -347,7 +348,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: bosh-lites-dea-pool
+    - get: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       passed: [smoke-test-2]
       trigger: true
     - get: etcd-release
@@ -466,7 +468,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: bosh-lites-dea-pool
+    - get: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       passed: [smoke-test-3]
       trigger: true
     - get: etcd-release
@@ -576,7 +579,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: bosh-lites-diego-pool
+    - get: bosh-lite-lock
+      resource: bosh-lites-diego-pool
       passed: [smoke-test-4]
       trigger: true
     - get: etcd-release
