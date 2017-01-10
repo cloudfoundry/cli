@@ -37,10 +37,15 @@ var _ = Describe("target Command", func() {
 		}
 
 		fakeConfig.BinaryNameReturns("faceman")
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	It("Displays the experimental warning message", func() {
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Describe("Cloud Controller minimum version warning", func() {
@@ -74,7 +79,7 @@ var _ = Describe("target Command", func() {
 				fakeConfig.BinaryVersionReturns(binaryVersion)
 			})
 
-			It("does not displays a recommendation to update the CLI version", func() {
+			It("does not display a recommendation to update the CLI version", func() {
 				Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 			})
 		})
@@ -99,19 +104,16 @@ var _ = Describe("target Command", func() {
 	})
 
 	Context("when getting the current user returns an error", func() {
-		var someError error
+		var someErr error
 
 		BeforeEach(func() {
-			someError = errors.New("some-current-user-error")
+			someErr = errors.New("some-current-user-error")
 			fakeConfig.AccessTokenReturns("some-access-token")
-			fakeConfig.CurrentUserReturns(configv3.User{}, someError)
+			fakeConfig.CurrentUserReturns(configv3.User{}, someErr)
 		})
 
-		It("returns a CurrentUserError", func() {
-			expectedError := shared.CurrentUserError{
-				Message: "some-current-user-error",
-			}
-			Expect(executeErr).To(MatchError(expectedError))
+		It("returns the same error", func() {
+			Expect(executeErr).To(MatchError(someErr))
 		})
 	})
 
@@ -216,7 +218,7 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when the space exists", func() {
+				Context("when the space does not exist", func() {
 					BeforeEach(func() {
 						fakeActor.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, v2action.Warnings{}, v2action.SpaceNotFoundError{Name: "some-space"})
 					})
@@ -231,7 +233,7 @@ var _ = Describe("target Command", func() {
 
 			Context("when no org is targeted", func() {
 				It("returns NoOrgTargeted error", func() {
-					Expect(executeErr).To(MatchError(shared.NoOrgTargetedError{}))
+					Expect(executeErr).To(MatchError(shared.NoOrganizationTargetedError{}))
 					Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 				})
 			})
@@ -251,7 +253,9 @@ var _ = Describe("target Command", func() {
 				})
 
 				It("displays all warnings and returns an org target error", func() {
-					Expect(executeErr).To(MatchError(shared.OrgNotFoundError{Name: "some-org"}))
+					Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+
+					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
 				})
 			})
 
@@ -292,6 +296,12 @@ var _ = Describe("target Command", func() {
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
 						Expect(testUI.Err).To(Say("warning-3"))
+
+						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+						orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(orgName).To(Equal("some-org"))
+						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 
 						Expect(executeErr).To(MatchError(err))
 					})
@@ -455,7 +465,7 @@ var _ = Describe("target Command", func() {
 				})
 
 				It("returns an error and keeps old target", func() {
-					Expect(executeErr).To(MatchError(shared.OrgNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
 
 					Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 					Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))

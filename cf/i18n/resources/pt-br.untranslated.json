@@ -1228,10 +1228,6 @@
     "translation": "Error removing plugin binary: "
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error running task: {{.CloudControllerMessage}}",
     "translation": ""
   },
@@ -1854,10 +1850,6 @@
   {
     "id": "URL",
     "translation": "URL"
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
-    "translation": ""
   },
   {
     "id": "Unable to retrieve information for bound application GUID ",

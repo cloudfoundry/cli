@@ -23,12 +23,12 @@ func (e SpaceNotFoundError) Error() string {
 // controller returns multiple spaces when filtering by name. This is a
 // far out edge case and should not happen.
 type MultipleSpacesFoundError struct {
-	SpaceName string
-	OrgGUID   string
+	Name    string
+	OrgGUID string
 }
 
 func (e MultipleSpacesFoundError) Error() string {
-	return fmt.Sprintf("Multiple spaces found matching organization GUID '%s' and name '%s'", e.OrgGUID, e.SpaceName)
+	return fmt.Sprintf("Multiple spaces found matching organization GUID '%s' and name '%s'", e.OrgGUID, e.Name)
 }
 
 // GetSpaceByOrganizationAndName returns an Space based on the org and name.
@@ -56,7 +56,7 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 	}
 
 	if len(ccv2Spaces) > 1 {
-		return Space{}, Warnings(warnings), MultipleSpacesFoundError{OrgGUID: orgGUID, SpaceName: spaceName}
+		return Space{}, Warnings(warnings), MultipleSpacesFoundError{OrgGUID: orgGUID, Name: spaceName}
 	}
 
 	return Space{

@@ -2620,10 +2620,6 @@
     "translation": "Erreur lors du redémarrage de l'application : {{.Error}}"
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "Erreur lors de l'extraction de la pile : "
   },
@@ -5538,10 +5534,6 @@
   {
     "id": "USERS",
     "translation": "UTILISATEURS"
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
-    "translation": ""
   },
   {
     "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",

@@ -41,11 +41,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JobTimeoutError", JobTimeoutError{}),
 
 		// Command errors.
-		Entry("CurrentUserError", CurrentUserError{}),
-		Entry("OrgTargetError", OrgTargetError{}),
-		Entry("NoOrgTargetedError", NoOrgTargetedError{}),
-		Entry("SpaceTargetError", SpaceTargetError{}),
-		Entry("OrgNotFoundError", OrgNotFoundError{}),
+		Entry("NoOrgTargetedError", NoOrganizationTargetedError{}),
+		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
 	)
 })

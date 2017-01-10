@@ -33,71 +33,25 @@ func (e JobTimeoutError) Translate(translate func(string, ...interface{}) string
 	})
 }
 
-type CurrentUserError struct {
-	Message string
-}
+type NoOrganizationTargetedError struct{}
 
-func (e CurrentUserError) Error() string {
-	return "Error retrieving current user:\n{{.Message}}"
-}
-
-func (e CurrentUserError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"Message": e.Message,
-	})
-}
-
-type OrgTargetError struct {
-	Message string
-}
-
-func (e OrgTargetError) Error() string {
-	return "Could not target org.\n{{.APIErr}}"
-}
-
-func (e OrgTargetError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"APIErr": e.Message,
-	})
-}
-
-type NoOrgTargetedError struct {
-	Message string
-}
-
-func (e NoOrgTargetedError) Error() string {
+func (e NoOrganizationTargetedError) Error() string {
 	return "An org must be targeted before targeting a space"
 }
 
-func (e NoOrgTargetedError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{})
+func (e NoOrganizationTargetedError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error())
 }
 
-type SpaceTargetError struct {
-	Message   string
-	SpaceName string
-}
-
-func (e SpaceTargetError) Error() string {
-	return "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}"
-}
-
-func (e SpaceTargetError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"APIErr":    e.Message,
-		"SpaceName": e.SpaceName,
-	})
-}
-
-type OrgNotFoundError struct {
+type OrganizationNotFoundError struct {
 	Name string
 }
 
-func (e OrgNotFoundError) Error() string {
+func (e OrganizationNotFoundError) Error() string {
 	return "Organization '{{.Name}}' not found."
 }
 
-func (e OrgNotFoundError) Translate(translate func(string, ...interface{}) string) string {
+func (e OrganizationNotFoundError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Name": e.Name,
 	})
