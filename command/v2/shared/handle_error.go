@@ -26,7 +26,7 @@ func HandleError(err error) error {
 	case v2action.ServiceInstanceNotFoundError:
 		return command.ServiceInstanceNotFoundError{Name: e.Name}
 	case v2action.OrganizationNotFoundError:
-		return OrgNotFoundError{Name: e.Name}
+		return OrganizationNotFoundError{Name: e.Name}
 	case v2action.SpaceNotFoundError:
 		return SpaceNotFoundError{Name: e.Name}
 	}

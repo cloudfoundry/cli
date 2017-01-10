@@ -2620,10 +2620,6 @@
     "translation": "重新啟動應用程式時發生錯誤: {{.Error}}"
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "擷取堆疊時發生錯誤: "
   },
@@ -5538,10 +5534,6 @@
   {
     "id": "USERS",
     "translation": "使用者"
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
-    "translation": ""
   },
   {
     "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",

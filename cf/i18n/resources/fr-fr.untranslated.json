@@ -772,10 +772,6 @@
     "translation": "Error removing plugin binary: "
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error running task: {{.CloudControllerMessage}}",
     "translation": ""
   },
@@ -1353,10 +1349,6 @@
   },
   {
     "id": "This is for backwards compatibility",
-    "translation": ""
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
     "translation": ""
   },
   {

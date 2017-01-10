@@ -2620,10 +2620,6 @@
     "translation": "Erro ao reiniciar o aplicativo: {{.Error}}"
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "Erro ao recuperar pilha: "
   },
@@ -5538,10 +5534,6 @@
   {
     "id": "USERS",
     "translation": "USUÁRIOS"
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
-    "translation": ""
   },
   {
     "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",

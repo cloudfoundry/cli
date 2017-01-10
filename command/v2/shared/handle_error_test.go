@@ -72,7 +72,7 @@ var _ = Describe("HandleError", func() {
 
 		Entry("v2action.OrganizationNotFoundError -> OrgNotFoundError", v2action.OrganizationNotFoundError{
 			Name: "some-org",
-		}, OrgNotFoundError{
+		}, OrganizationNotFoundError{
 			Name: "some-org",
 		}),
 

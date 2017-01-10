@@ -2620,10 +2620,6 @@
     "translation": "애플리케이션을 다시 시작하는 중에 오류 발생: {{.Error}}"
   },
   {
-    "id": "Error retrieving current user:\n{{.Message}}",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "스택을 검색하는 중에 오류 발생: "
   },
@@ -5538,10 +5534,6 @@
   {
     "id": "USERS",
     "translation": "사용자"
-  },
-  {
-    "id": "Unable to access space '{{.SpaceName}}'.\n{{.APIErr}}",
-    "translation": ""
   },
   {
     "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
