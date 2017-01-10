@@ -77,10 +77,7 @@ var _ = Describe("Tasks Command", func() {
 		BeforeEach(func() {
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-				GUID: "some-org-guid",
-				Name: "some-org",
-			})
+			fakeConfig.HasTargetedOrganizationReturns(true)
 		})
 
 		It("returns a NoTargetedSpaceError", func() {
@@ -92,10 +89,12 @@ var _ = Describe("Tasks Command", func() {
 		BeforeEach(func() {
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
+			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
 				Name: "some-org",
 			})
+			fakeConfig.HasTargetedSpaceReturns(true)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				GUID: "some-space-guid",
 				Name: "some-space",

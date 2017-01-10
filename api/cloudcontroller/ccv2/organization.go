@@ -10,18 +10,23 @@ import (
 // Organization represents a Cloud Controller Organization.
 type Organization struct {
 	GUID string
+	Name string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Organization response.
 func (org *Organization) UnmarshalJSON(data []byte) error {
 	var ccOrg struct {
 		Metadata internal.Metadata `json:"metadata"`
+		Entity   struct {
+			Name string `json:"name"`
+		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccOrg); err != nil {
 		return err
 	}
 
 	org.GUID = ccOrg.Metadata.GUID
+	org.Name = ccOrg.Entity.Name
 	return nil
 }
 

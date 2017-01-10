@@ -2520,10 +2520,6 @@
     "translation": "Errore durante il richiamo dei metadati del plug-in dal repository: "
   },
   {
-    "id": "Error getting spaces in organization.\n{{.APIErr}}",
-    "translation": ""
-  },
-  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Errore durante l'acquisizione dell'ubicazione reindirizzata: {{.Error}}"
   },
@@ -4020,6 +4016,10 @@
     "translation": "Organizzazione"
   },
   {
+    "id": "Organization '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "Origin for mapping a user account to a user in an external identity provider",
     "translation": ""
   },
@@ -4942,6 +4942,10 @@
   {
     "id": "Space",
     "translation": "Spazio"
+  },
+  {
+    "id": "Space '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Space Quota Definition {{.QuotaName}} already exists",

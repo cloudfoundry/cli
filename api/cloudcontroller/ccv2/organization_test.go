@@ -26,11 +26,17 @@ var _ = Describe("Organization", func() {
 						{
 							"metadata": {
 								"guid": "org-guid-1"
+							},
+							"entity": {
+								"name": "org-1"
 							}
 						},
 						{
 							"metadata": {
 								"guid": "org-guid-2"
+							},
+							"entity": {
+								"name": "org-2"
 							}
 						}
 					]
@@ -41,11 +47,17 @@ var _ = Describe("Organization", func() {
 						{
 							"metadata": {
 								"guid": "org-guid-3"
+							},
+							"entity": {
+								"name": "org-3"
 							}
 						},
 						{
 							"metadata": {
 								"guid": "org-guid-4"
+							},
+							"entity": {
+								"name": "org-4"
 							}
 						}
 					]
@@ -71,10 +83,10 @@ var _ = Describe("Organization", func() {
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(orgs).To(Equal([]Organization{
-						{GUID: "org-guid-1"},
-						{GUID: "org-guid-2"},
-						{GUID: "org-guid-3"},
-						{GUID: "org-guid-4"},
+						{GUID: "org-guid-1", Name: "org-1"},
+						{GUID: "org-guid-2", Name: "org-2"},
+						{GUID: "org-guid-3", Name: "org-3"},
+						{GUID: "org-guid-4", Name: "org-4"},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})

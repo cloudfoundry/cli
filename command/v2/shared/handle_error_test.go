@@ -70,6 +70,18 @@ var _ = Describe("HandleError", func() {
 			JobGUID: "some-job-guid",
 		}),
 
+		Entry("v2action.OrganizationNotFoundError -> OrgNotFoundError", v2action.OrganizationNotFoundError{
+			Name: "some-org",
+		}, OrgNotFoundError{
+			Name: "some-org",
+		}),
+
+		Entry("v2action.SpaceNotFoundError -> SpaceNotFoundError", v2action.SpaceNotFoundError{
+			Name: "some-space",
+		}, SpaceNotFoundError{
+			Name: "some-space",
+		}),
+
 		Entry("default case -> original error", err, err),
 	)
 })

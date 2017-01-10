@@ -46,6 +46,9 @@ var _ = Describe("Org Actions", func() {
 			})
 
 			It("returns the requested org", func() {
+				Expect(org).To(Equal(Organization{
+					GUID: "some-org-guid",
+				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				Expect(err).ToNot(HaveOccurred())
 

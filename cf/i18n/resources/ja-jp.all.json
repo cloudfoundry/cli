@@ -2520,10 +2520,6 @@
     "translation": "リポジトリーからプラグイン・メタデータを取得しようとしたときエラーが発生しました: "
   },
   {
-    "id": "Error getting spaces in organization.\n{{.APIErr}}",
-    "translation": ""
-  },
-  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "リダイレクトされたロケーションを取得中にエラーが発生しました: {{.Error}}"
   },
@@ -4020,6 +4016,10 @@
     "translation": "組織"
   },
   {
+    "id": "Organization '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "Origin for mapping a user account to a user in an external identity provider",
     "translation": ""
   },
@@ -4942,6 +4942,10 @@
   {
     "id": "Space",
     "translation": "スペース"
+  },
+  {
+    "id": "Space '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Space Quota Definition {{.QuotaName}} already exists",

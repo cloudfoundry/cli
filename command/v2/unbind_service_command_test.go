@@ -58,6 +58,8 @@ var _ = Describe("Unbind Service Command", func() {
 			fakeConfig.TargetReturns("some-url")
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
+			fakeConfig.HasTargetedOrganizationReturns(true)
+			fakeConfig.HasTargetedSpaceReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
 				Name: "some-org",

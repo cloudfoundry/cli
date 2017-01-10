@@ -73,18 +73,9 @@ func (e NoOrgTargetedError) Translate(translate func(string, ...interface{}) str
 	return translate(e.Error(), map[string]interface{}{})
 }
 
-type GetOrgSpacesError struct {
-	Message string
-}
-
-func (e GetOrgSpacesError) Error() string {
-	return "Error getting spaces in organization.\n{{.APIErr}}"
-}
-
-func (e GetOrgSpacesError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"APIErr": e.Message,
-	})
+type SpaceTargetError struct {
+	Message   string
+	SpaceName string
 }
 
 func (e SpaceTargetError) Error() string {
@@ -98,7 +89,30 @@ func (e SpaceTargetError) Translate(translate func(string, ...interface{}) strin
 	})
 }
 
-type SpaceTargetError struct {
-	Message   string
-	SpaceName string
+type OrgNotFoundError struct {
+	Name string
+}
+
+func (e OrgNotFoundError) Error() string {
+	return "Organization '{{.Name}}' not found."
+}
+
+func (e OrgNotFoundError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Name": e.Name,
+	})
+}
+
+type SpaceNotFoundError struct {
+	Name string
+}
+
+func (e SpaceNotFoundError) Error() string {
+	return "Space '{{.Name}}' not found."
+}
+
+func (e SpaceNotFoundError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Name": e.Name,
+	})
 }
