@@ -4,9 +4,9 @@ set -e
 
 xargs_func () {
   if [[ $(uname) == "Darwin" ]]; then
-    xargs -L 1 -P 4 $@
+    xargs -L 1 -P 7 $@
   else
-    xargs -L 1 -P 4 -r $@
+    xargs -L 1 -P 7 -r $@
   fi
 }
 
