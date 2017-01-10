@@ -23,19 +23,23 @@ run:
     go version
 
     pushd $GOPATH/src/code.cloudfoundry.org/cli
-      bin/replace-sha
+      BUILD_VERSION=$(cat ci/VERSION)
+      BUILD_SHA=$(git rev-parse --short HEAD)
+      BUILD_DATE=$(date -u +"%Y-%m-%d")
+
+      VERSION_LDFLAGS="-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}"
 
       echo "Building 32-bit Linux"
-      CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_i686 .
+      CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags "-extldflags \"-static\" ${VERSION_LDFLAGS}" -o out/cf-cli_linux_i686 .
 
       echo "Building 32-bit Windows"
-      GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe .
+      GOARCH=386 GOOS=windows go build -tags="forceposix" -ldflags "${VERSION_LDFLAGS}" -o out/cf-cli_win32.exe .
 
       echo "Building 64-bit Linux"
-      CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_x86-64 .
+      CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags "-extldflags \"-static\" ${VERSION_LDFLAGS}" -o out/cf-cli_linux_x86-64 .
 
       echo "Building 64-bit Windows"
-      GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe .
+      GOARCH=amd64 GOOS=windows go build -tags="forceposix" -ldflags "${VERSION_LDFLAGS}" -o out/cf-cli_winx64.exe .
 
       echo "Creating tarball"
       tar -cvzf $cwd/cross-compiled/cf-cli-binaries.tgz -C out .
