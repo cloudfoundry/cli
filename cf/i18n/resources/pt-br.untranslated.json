@@ -1212,10 +1212,6 @@
     "translation": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead."
   },
   {
-    "id": "Error getting spaces in organization.\n{{.APIErr}}",
-    "translation": ""
-  },
-  {
     "id": "Error parsing response",
     "translation": "Error parsing response"
   },
@@ -1396,6 +1392,10 @@
     "translation": "Org:"
   },
   {
+    "id": "Organization '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "Origin for mapping a user account to a user in an external identity provider",
     "translation": ""
   },
@@ -1518,6 +1518,10 @@
   {
     "id": "Set to port",
     "translation": "Set to port"
+  },
+  {
+    "id": "Space '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Space management:",

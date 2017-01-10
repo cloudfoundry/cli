@@ -3,7 +3,6 @@ package command_test
 import (
 	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -44,11 +43,7 @@ var _ = Describe("CheckTarget", func() {
 
 			DescribeTable("targeting organization check",
 				func(isOrgTargeted bool, checkForTargeted bool, expectedError error) {
-					if isOrgTargeted {
-						fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-							GUID: "some-org-guid",
-						})
-					}
+					fakeConfig.HasTargetedOrganizationReturns(isOrgTargeted)
 
 					err := CheckTarget(fakeConfig, checkForTargeted, false)
 
@@ -66,19 +61,10 @@ var _ = Describe("CheckTarget", func() {
 			)
 
 			Context("when the organization is targeted", func() {
-				BeforeEach(func() {
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-					})
-				})
-
 				DescribeTable("targeting space check",
 					func(isSpaceTargeted bool, checkForTargeted bool, expectedError error) {
-						if isSpaceTargeted {
-							fakeConfig.TargetedSpaceReturns(configv3.Space{
-								GUID: "some-space-guid",
-							})
-						}
+						fakeConfig.HasTargetedOrganizationReturns(true)
+						fakeConfig.HasTargetedSpaceReturns(isSpaceTargeted)
 
 						err := CheckTarget(fakeConfig, true, checkForTargeted)
 

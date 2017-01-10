@@ -421,6 +421,16 @@ func (config *Config) BinaryBuildDate() string {
 	return version.BinaryBuildDate
 }
 
+// HasTargetedOrganization returns true if the organization is set
+func (config *Config) HasTargetedOrganization() bool {
+	return config.ConfigFile.TargetedOrganization.GUID != ""
+}
+
+// HasTargetedSpace returns true if the space is set
+func (config *Config) HasTargetedSpace() bool {
+	return config.ConfigFile.TargetedSpace.GUID != ""
+}
+
 // SetOrganizationInformation sets the currently targeted organization
 func (config *Config) SetOrganizationInformation(guid string, name string) {
 	config.ConfigFile.TargetedOrganization.GUID = guid

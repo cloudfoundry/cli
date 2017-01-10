@@ -13,7 +13,7 @@ import (
 type TargetActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
-	GetSpaceByName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
+	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
 }
 
 type TargetCommand struct {
@@ -55,34 +55,53 @@ func (cmd *TargetCommand) Execute(args []string) error {
 		}
 	}
 
-	if cmd.Organization != "" {
+	switch {
+	case cmd.Organization != "" && cmd.Space != "":
+		err = cmd.setOrgAndSpace()
+		if err != nil {
+			return err
+		}
+	case cmd.Organization != "":
 		err = cmd.setOrg()
 		if err != nil {
 			return err
 		}
-
-		if cmd.Space == "" {
-			err = cmd.autoTargetSpace(cmd.Config.TargetedOrganization().GUID)
-			if err != nil {
-				return err
-			}
+		err = cmd.autoTargetSpace(cmd.Config.TargetedOrganization().GUID)
+		if err != nil {
+			return err
 		}
-	}
-
-	if cmd.Space != "" {
+	case cmd.Space != "":
 		err = cmd.setSpace()
 		if err != nil {
 			return err
 		}
 	}
 
-	return cmd.displayTargetTable(user)
+	cmd.displayTargetTable(user)
+
+	if !cmd.Config.HasTargetedOrganization() {
+		cmd.UI.DisplayText("No org or space targeted, use '{{.CFTargetCommand}}'",
+			map[string]interface{}{
+				"CFTargetCommand": fmt.Sprintf("%s target -o ORG -s SPACE", cmd.Config.BinaryName()),
+			})
+		return nil
+	}
+
+	if !cmd.Config.HasTargetedSpace() {
+		cmd.UI.DisplayText("No space targeted, use '{{.CFTargetCommand}}'",
+			map[string]interface{}{
+				"CFTargetCommand": fmt.Sprintf("%s target -s SPACE", cmd.Config.BinaryName()),
+			})
+	}
+
+	return nil
 }
 
 func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
 	err := command.MinimumAPIVersionCheck(cmd.Config.BinaryVersion(), cmd.Config.MinCLIVersion())
+
 	if _, ok := err.(command.MinimumAPIVersionNotMetError); ok {
-		cmd.UI.DisplayTextWithFlavor("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+		cmd.UI.DisplayWarning("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 			map[string]interface{}{
 				"APIVersion":    cmd.Config.APIVersion(),
 				"MinCLIVersion": cmd.Config.MinCLIVersion(),
@@ -91,19 +110,32 @@ func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
 	}
 }
 
-// Setting organization
-func (cmd *TargetCommand) setOrg() error {
-	var (
-		org      v2action.Organization
-		warnings v2action.Warnings
-	)
-
+// setOrgAndSpace sets organization and space
+func (cmd *TargetCommand) setOrgAndSpace() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.OrgTargetError{
-			Message: err.Error(),
-		}
+		return shared.HandleError(err)
+	}
+
+	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.Space)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
+	cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)
+
+	return nil
+}
+
+// setOrg sets organization
+func (cmd *TargetCommand) setOrg() error {
+	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
 	}
 
 	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
@@ -112,15 +144,13 @@ func (cmd *TargetCommand) setOrg() error {
 	return nil
 }
 
-// Auto-target the space if there is only one space in the org
+// autoTargetSpace targets the space if there is only one space in the org
 // and no space arg was provided.
 func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(orgGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.GetOrgSpacesError{
-			Message: err.Error(),
-		}
+		return shared.HandleError(err)
 	}
 
 	if len(spaces) == 1 {
@@ -131,20 +161,16 @@ func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 	return nil
 }
 
-// Setting space
+// setSpace sets space
 func (cmd *TargetCommand) setSpace() error {
-	emptyOrg := configv3.Organization{}
-	if cmd.Config.TargetedOrganization() == emptyOrg {
+	if !cmd.Config.HasTargetedOrganization() {
 		return shared.NoOrgTargetedError{}
 	}
 
-	space, warnings, err := cmd.Actor.GetSpaceByName(cmd.Config.TargetedOrganization().GUID, cmd.Space)
+	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.Space)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.SpaceTargetError{
-			Message:   err.Error(),
-			SpaceName: cmd.Space,
-		}
+		return shared.HandleError(err)
 	}
 
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)
@@ -152,48 +178,24 @@ func (cmd *TargetCommand) setSpace() error {
 	return nil
 }
 
-func (cmd *TargetCommand) displayTargetTable(user configv3.User) error {
+// displayTargetTable neatly displays target information.
+func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 	table := [][]string{
 		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
 		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 		{cmd.UI.TranslateText("User:"), user.Name},
 	}
 
-	emptyOrg := configv3.Organization{}
-	if cmd.Config.TargetedOrganization() == emptyOrg {
-		cmd.UI.DisplayTable("", table, 3)
-		command := fmt.Sprintf("%s target -o ORG -s SPACE", cmd.Config.BinaryName())
-
-		cmd.UI.DisplayTextWithFlavor("No org or space targeted, use '{{.CFTargetCommand}}'",
-			map[string]interface{}{
-				"CFTargetCommand": command,
-			})
-		return nil
+	if cmd.Config.HasTargetedOrganization() {
+		table = append(table, []string{
+			cmd.UI.TranslateText("Org:"), cmd.Config.TargetedOrganization().Name,
+		})
 	}
 
-	table = append(table, []string{
-		cmd.UI.TranslateText("Org:"), cmd.Config.TargetedOrganization().Name,
-	})
-
-	emptySpace := configv3.Space{}
-	if cmd.Config.TargetedSpace() == emptySpace {
-		spaceCommand := fmt.Sprintf("%s target -s SPACE", cmd.Config.BinaryName())
-
-		noSpaceTargeted := cmd.UI.TranslateText("No space targeted, use '{{.CFTargetCommand}}'",
-			map[string]interface{}{
-				"CFTargetCommand": spaceCommand,
-			})
-
-		table = append(table, []string{
-			cmd.UI.TranslateText("Space:"), noSpaceTargeted,
-		})
-	} else {
+	if cmd.Config.HasTargetedSpace() {
 		table = append(table, []string{
 			cmd.UI.TranslateText("Space:"), cmd.Config.TargetedSpace().Name,
 		})
 	}
-
 	cmd.UI.DisplayTable("", table, 3)
-
-	return nil
 }

@@ -93,7 +93,7 @@ var _ = Describe("Space Actions", func() {
 			})
 
 			It("returns all warnings and spaces", func() {
-				space, warnings, err := actor.GetSpaceByName("some-org-guid", "some-space")
+				space, warnings, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
 				Expect(space).To(Equal(Space{
 					GUID:     "some-space-guid",
@@ -126,7 +126,7 @@ var _ = Describe("Space Actions", func() {
 			})
 
 			It("return all warnings and the error", func() {
-				space, warnings, err := actor.GetSpaceByName("some-org-guid", "some-space")
+				space, warnings, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
 				Expect(err).To(MatchError(errors.New("cc-get-spaces-error")))
 				Expect(warnings).To(ConsistOf("get-spaces-warning"))
@@ -155,10 +155,10 @@ var _ = Describe("Space Actions", func() {
 			})
 
 			It("returns all warnings and a SpaceNotFoundError", func() {
-				space, warnings, err := actor.GetSpaceByName("some-org-guid", "some-space")
+				space, warnings, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
 				Expect(err).To(MatchError(SpaceNotFoundError{
-					SpaceName: "some-space",
+					Name: "some-space",
 				}))
 				Expect(warnings).To(ConsistOf("get-spaces-warning"))
 				Expect(space).To(Equal(Space{}))
@@ -197,7 +197,7 @@ var _ = Describe("Space Actions", func() {
 			})
 
 			It("returns all warnings and a MultipleSpacesFoundError", func() {
-				space, warnings, err := actor.GetSpaceByName("some-org-guid", "some-space")
+				space, warnings, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
 				Expect(err).To(MatchError(MultipleSpacesFoundError{
 					OrgGUID:   "some-org-guid",

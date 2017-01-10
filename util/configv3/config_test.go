@@ -129,6 +129,42 @@ var _ = Describe("Config", func() {
 		})
 	})
 
+	Describe("check functions", func() {
+		Describe("HasTargetedOrganization", func() {
+			Context("when an organization is targeted", func() {
+				It("returns true", func() {
+					config := Config{}
+					config.SetOrganizationInformation("guid-value-1", "my-org-name")
+					Expect(config.HasTargetedOrganization()).To(BeTrue())
+				})
+			})
+
+			Context("when an organization is not targeted", func() {
+				It("returns false", func() {
+					config := Config{}
+					Expect(config.HasTargetedOrganization()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("HasTargetedSpace", func() {
+			Context("when an space is targeted", func() {
+				It("returns true", func() {
+					config := Config{}
+					config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+					Expect(config.HasTargetedSpace()).To(BeTrue())
+				})
+			})
+
+			Context("when an space is not targeted", func() {
+				It("returns false", func() {
+					config := Config{}
+					Expect(config.HasTargetedSpace()).To(BeFalse())
+				})
+			})
+		})
+	})
+
 	Describe("getter functions", func() {
 		Describe("Target", func() {
 			var config *Config
@@ -603,6 +639,7 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeTrue())
 			})
 		})
+
 		Describe("UnsetSpaceInformation", func() {
 			config := Config{}
 			BeforeEach(func() {

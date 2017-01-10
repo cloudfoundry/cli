@@ -59,10 +59,8 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 			fakeConfig.TargetReturns("some-url")
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-				GUID: "some-org-guid",
-				Name: "some-org",
-			})
+			fakeConfig.HasTargetedOrganizationReturns(true)
+			fakeConfig.HasTargetedSpaceReturns(true)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{
 				GUID: "some-space-guid",
 				Name: "some-space",

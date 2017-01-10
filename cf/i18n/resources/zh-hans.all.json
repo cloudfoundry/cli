@@ -2520,10 +2520,6 @@
     "translation": "从存储库获取插件元数据时出错: "
   },
   {
-    "id": "Error getting spaces in organization.\n{{.APIErr}}",
-    "translation": ""
-  },
-  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "获取重定向的位置时出错: {{.Error}}"
   },
@@ -4020,6 +4016,10 @@
     "translation": "组织"
   },
   {
+    "id": "Organization '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "Origin for mapping a user account to a user in an external identity provider",
     "translation": ""
   },
@@ -4942,6 +4942,10 @@
   {
     "id": "Space",
     "translation": "空间"
+  },
+  {
+    "id": "Space '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Space Quota Definition {{.QuotaName}} already exists",

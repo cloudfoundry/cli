@@ -10,14 +10,14 @@ func CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpace
 	}
 
 	if targetedOrganizationRequired {
-		if config.TargetedOrganization().GUID == "" {
+		if !config.HasTargetedOrganization() {
 			return NoTargetedOrgError{
 				BinaryName: config.BinaryName(),
 			}
 		}
 
 		if targetedSpaceRequired {
-			if config.TargetedSpace().GUID == "" {
+			if !config.HasTargetedSpace() {
 				return NoTargetedSpaceError{
 					BinaryName: config.BinaryName(),
 				}

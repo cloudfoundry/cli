@@ -25,6 +25,10 @@ func HandleError(err error) error {
 		return JobTimeoutError{JobGUID: e.JobGUID}
 	case v2action.ServiceInstanceNotFoundError:
 		return command.ServiceInstanceNotFoundError{Name: e.Name}
+	case v2action.OrganizationNotFoundError:
+		return OrgNotFoundError{Name: e.Name}
+	case v2action.SpaceNotFoundError:
+		return SpaceNotFoundError{Name: e.Name}
 	}
 
 	return err

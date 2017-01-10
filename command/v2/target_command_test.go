@@ -2,7 +2,6 @@ package v2_test
 
 import (
 	"errors"
-	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -23,13 +22,11 @@ var _ = Describe("target Command", func() {
 		testUI     *ui.UI
 		fakeActor  *v2fakes.FakeTargetActor
 		fakeConfig *commandfakes.FakeConfig
-		input      *Buffer
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		input = NewBuffer()
-		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeTargetActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 
@@ -38,6 +35,7 @@ var _ = Describe("target Command", func() {
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
+
 		fakeConfig.BinaryNameReturns("faceman")
 	})
 
@@ -45,7 +43,7 @@ var _ = Describe("target Command", func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when checking the minimum CLI version", func() {
+	Describe("Cloud Controller minimum version warning", func() {
 		var (
 			minCLIVersion string
 			binaryVersion string
@@ -66,7 +64,18 @@ var _ = Describe("target Command", func() {
 			})
 
 			It("displays a recommendation to update the CLI version", func() {
-				Expect(testUI.Out).To(Say(fmt.Sprintf("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion)))
+				Expect(testUI.Err).To(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
+			})
+		})
+
+		Context("when the CLI version is greater or equal to the recommended minimum", func() {
+			BeforeEach(func() {
+				binaryVersion = "1.0.0"
+				fakeConfig.BinaryVersionReturns(binaryVersion)
+			})
+
+			It("does not displays a recommendation to update the CLI version", func() {
+				Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 			})
 		})
 
@@ -76,7 +85,7 @@ var _ = Describe("target Command", func() {
 			})
 
 			It("does not recommend to update the CLI version", func() {
-				Consistently(testUI.Out).ShouldNot(Say(fmt.Sprintf("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion)))
+				Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion))
 			})
 		})
 	})
@@ -89,7 +98,7 @@ var _ = Describe("target Command", func() {
 		})
 	})
 
-	Context("when config.CurrentUser returns an error", func() {
+	Context("when getting the current user returns an error", func() {
 		var someError error
 
 		BeforeEach(func() {
@@ -98,7 +107,7 @@ var _ = Describe("target Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{}, someError)
 		})
 
-		It("returns a current user error", func() {
+		It("returns a CurrentUserError", func() {
 			expectedError := shared.CurrentUserError{
 				Message: "some-current-user-error",
 			}
@@ -118,13 +127,8 @@ var _ = Describe("target Command", func() {
 		})
 
 		Context("when no arguments are given", func() {
-			Context("when no org or space is targeted", func() {
-				BeforeEach(func() {
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{})
-					fakeConfig.TargetedSpaceReturns(configv3.Space{})
-				})
-
-				It("displays no org or space targeted", func() {
+			Context("when no org or space are targeted", func() {
+				It("displays how to target an org and space", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
@@ -136,30 +140,32 @@ var _ = Describe("target Command", func() {
 
 			Context("when an org but no space is targeted", func() {
 				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(true)
 					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 						GUID: "some-org-guid",
 						Name: "some-org",
 					})
-					fakeConfig.TargetedSpaceReturns(configv3.Space{})
 				})
 
-				It("displays the org and no space targeted ", func() {
+				It("displays the org and tip to target space", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
 					Expect(testUI.Out).To(Say("API version:    1.2.3"))
 					Expect(testUI.Out).To(Say("User:           some-user"))
 					Expect(testUI.Out).To(Say("Org:            some-org"))
-					Expect(testUI.Out).To(Say("Space:          No space targeted, use 'faceman target -s SPACE'"))
+					Expect(testUI.Out).To(Say("No space targeted, use 'faceman target -s SPACE'"))
 				})
 			})
 
-			Context("when an org and space is targeted", func() {
+			Context("when an org and space are targeted", func() {
 				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(true)
 					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 						GUID: "some-org-guid",
 						Name: "some-org",
 					})
+					fakeConfig.HasTargetedSpaceReturns(true)
 					fakeConfig.TargetedSpaceReturns(configv3.Space{
 						GUID: "some-space-guid",
 						Name: "some-space",
@@ -178,31 +184,48 @@ var _ = Describe("target Command", func() {
 			})
 		})
 
-		Context("when just a space argument is given", func() {
+		Context("when space is provided", func() {
 			BeforeEach(func() {
 				cmd.Space = "some-space"
 			})
 
 			Context("when an org is already targeted", func() {
 				BeforeEach(func() {
-					fakeActor.GetSpaceByNameReturns(v2action.Space{
-						GUID:     "some-space-guid",
-						Name:     "some-space",
-						AllowSSH: true,
-					}, v2action.Warnings{}, nil)
+					fakeConfig.HasTargetedOrganizationReturns(true)
 					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 						GUID: "some-org-guid",
 					})
 				})
+				Context("when the space exists", func() {
+					BeforeEach(func() {
+						fakeActor.GetSpaceByOrganizationAndNameReturns(v2action.Space{
+							GUID:     "some-space-guid",
+							Name:     "some-space",
+							AllowSSH: true,
+						}, v2action.Warnings{}, nil)
+					})
 
-				It("sets the space in the config", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+					It("targets the space", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-					spaceGUID, spaceName, spaceAllowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-					Expect(spaceAllowSSH).To(Equal(true))
+						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+						spaceGUID, spaceName, spaceAllowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(spaceName).To(Equal("some-space"))
+						Expect(spaceAllowSSH).To(Equal(true))
+					})
+				})
+
+				Context("when the space exists", func() {
+					BeforeEach(func() {
+						fakeActor.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, v2action.Warnings{}, v2action.SpaceNotFoundError{Name: "some-space"})
+					})
+
+					It("returns a SpaceNotFoundError and does not set change the space", func() {
+						Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+
+						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
+					})
 				})
 			})
 
@@ -214,42 +237,31 @@ var _ = Describe("target Command", func() {
 			})
 		})
 
-		Context("when just an org argument is given", func() {
+		Context("when org is provided", func() {
 			BeforeEach(func() {
 				cmd.Organization = "some-org"
 			})
 
-			Context("when getting the org returns an error", func() {
-				var err error
-
+			Context("when the org does not exist", func() {
 				BeforeEach(func() {
-					err = errors.New("get-org-error")
 					fakeActor.GetOrganizationByNameReturns(
 						v2action.Organization{},
-						v2action.Warnings{
-							"warning-1",
-							"warning-2",
-						},
-						err)
+						nil,
+						v2action.OrganizationNotFoundError{Name: "some-org"})
 				})
 
 				It("displays all warnings and returns an org target error", func() {
-					Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
-					orgName := fakeActor.GetOrganizationByNameArgsForCall(0)
-					Expect(orgName).To(Equal("some-org"))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-
-					expectedError := shared.OrgTargetError{
-						Message: "get-org-error",
-					}
-					Expect(executeErr).To(MatchError(expectedError))
+					Expect(executeErr).To(MatchError(shared.OrgNotFoundError{Name: "some-org"}))
 				})
 			})
 
-			Context("when getting the org does not return an error", func() {
+			Context("when the org exists", func() {
 				BeforeEach(func() {
+					fakeConfig.HasTargetedOrganizationReturns(true)
+					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+						GUID: "some-org-guid",
+						Name: "some-org",
+					})
 					fakeActor.GetOrganizationByNameReturns(
 						v2action.Organization{
 							GUID: "some-org-guid",
@@ -259,13 +271,9 @@ var _ = Describe("target Command", func() {
 							"warning-2",
 						},
 						nil)
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
 				})
 
-				Context("when GetOrganizationSpaces returns an error", func() {
+				Context("when getting the organization's spaces returns an error", func() {
 					var err error
 					BeforeEach(func() {
 						err = errors.New("get-org-spaces-error")
@@ -276,7 +284,7 @@ var _ = Describe("target Command", func() {
 							}, err)
 					})
 
-					It("displays all warnings and returns a get org spaces error", func() {
+					It("displays all warnings and returns a Get org spaces error", func() {
 						Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
 						orgGUID := fakeActor.GetOrganizationSpacesArgsForCall(0)
 						Expect(orgGUID).To(Equal("some-org-guid"))
@@ -285,19 +293,20 @@ var _ = Describe("target Command", func() {
 						Expect(testUI.Err).To(Say("warning-2"))
 						Expect(testUI.Err).To(Say("warning-3"))
 
-						expectedError := shared.GetOrgSpacesError{
-							Message: "get-org-spaces-error",
-						}
-						Expect(executeErr).To(MatchError(expectedError))
+						Expect(executeErr).To(MatchError(err))
 					})
 				})
 
-				Context("when there are 0 spaces in the org", func() {
-					It("displays all warnings and sets the org in the config", func() {
+				Context("when there are no spaces in the targeted org", func() {
+					It("displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
+					})
+
+					It("sets the org and unsets the space in the config", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
 						orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
@@ -309,7 +318,7 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when there is only 1 space in the org", func() {
+				Context("when there is only 1 space in the targeted org", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationSpacesReturns([]v2action.Space{{
 							GUID:     "some-space-guid",
@@ -320,12 +329,16 @@ var _ = Describe("target Command", func() {
 						}, nil)
 					})
 
-					It("displays all warnings and sets the org and space in the config", func() {
+					It("displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
 						Expect(testUI.Err).To(Say("warning-3"))
+					})
+
+					It("targets the org and space", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
 						orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
@@ -333,6 +346,7 @@ var _ = Describe("target Command", func() {
 						Expect(orgName).To(Equal("some-org"))
 
 						Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
 						spaceGUID, spaceName, spaceAllowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
 						Expect(spaceGUID).To(Equal("some-space-guid"))
@@ -341,7 +355,7 @@ var _ = Describe("target Command", func() {
 					})
 				})
 
-				Context("when there are more than 1 spaces in the org", func() {
+				Context("when there are multiple spaces in the targeted org", func() {
 					BeforeEach(func() {
 						fakeActor.GetOrganizationSpacesReturns([]v2action.Space{{
 							GUID:     "some-space-guid",
@@ -374,101 +388,77 @@ var _ = Describe("target Command", func() {
 			})
 		})
 
-		Context("when org and space arguments are given and org is legit", func() {
+		Context("when org and space arguments are provided", func() {
 			BeforeEach(func() {
 				cmd.Space = "some-space"
 				cmd.Organization = "some-org"
-
-				fakeActor.GetOrganizationByNameReturns(
-					v2action.Organization{
-						GUID: "some-org-guid",
-					}, nil, nil)
 			})
 
-			It("targets the org correctly", func() {
-				Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
-				orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
-				Expect(orgGUID).To(Equal("some-org-guid"))
-				Expect(orgName).To(Equal("some-org"))
-
-				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
-			})
-
-			Context("when getting the space returns an error", func() {
+			Context("when the org exists", func() {
 				BeforeEach(func() {
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-						Name: "some-org",
-					})
-
-					fakeActor.GetSpaceByNameReturns(v2action.Space{
-						GUID: "some-space-guid",
-					},
-						v2action.Warnings{
+					fakeActor.GetOrganizationByNameReturns(
+						v2action.Organization{
+							GUID: "some-org-guid",
+							Name: "some-org",
+						}, v2action.Warnings{
 							"warning-1",
-							"warning-2",
-						}, errors.New("get-space-by-name-error"))
+						}, nil)
 				})
 
-				It("displays all warnings and returns a space target error", func() {
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-
-					expectedError := shared.SpaceTargetError{
-						Message:   "get-space-by-name-error",
-						SpaceName: "some-space",
-					}
-					Expect(executeErr).To(MatchError(expectedError))
-				})
-
-				Context("when there is 1 space in the org", func() {
+				Context("when the space exists", func() {
 					BeforeEach(func() {
-						fakeActor.GetOrganizationSpacesReturns([]v2action.Space{{
-							GUID:     "some-space-guid",
-							Name:     "some-space",
-							AllowSSH: true,
-						}}, nil, nil)
+						fakeActor.GetSpaceByOrganizationAndNameReturns(v2action.Space{
+							GUID: "some-space-guid",
+							Name: "some-space",
+						},
+							v2action.Warnings{
+								"warning-2",
+							}, nil)
 					})
 
-					It("does not auto target the space since space name was provided as an argument", func() {
-						// SetSpaceInformation does not get called from autoTargetSpace, and the call count is 0 because we intentionally exit early.
+					It("sets the target org and space", func() {
+						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(1))
+						orgGUID, orgName := fakeConfig.SetOrganizationInformationArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(orgName).To(Equal("some-org"))
+
+						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
+						spaceGUID, spaceName, allowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(spaceName).To(Equal("some-space"))
+						Expect(allowSSH).To(BeFalse())
+					})
+
+					It("displays all warnings", func() {
+						Expect(testUI.Err).To(Say("warning-1"))
+						Expect(testUI.Err).To(Say("warning-2"))
+					})
+				})
+
+				Context("when the space does not exist", func() {
+					BeforeEach(func() {
+						fakeActor.GetSpaceByOrganizationAndNameReturns(v2action.Space{}, nil, v2action.SpaceNotFoundError{Name: "some-space"})
+					})
+
+					It("returns an error and keeps old target", func() {
+						Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+
+						Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 						Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 					})
 				})
 			})
 
-			Context("when getting the space does not return an error", func() {
+			Context("when the org does not exist", func() {
 				BeforeEach(func() {
-					fakeActor.GetSpaceByNameReturns(v2action.Space{
-						GUID:     "some-space-guid",
-						Name:     "some-space",
-						AllowSSH: true,
-					},
-						v2action.Warnings{
-							"warning-1",
-							"warning-2",
-						}, nil)
-					fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-						GUID: "some-org-guid",
-					})
+					fakeActor.GetOrganizationByNameReturns(v2action.Organization{}, nil, v2action.OrganizationNotFoundError{Name: "some-org"})
 				})
 
-				It("displays all warnings and sets the space in the config", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				It("returns an error and keeps old target", func() {
+					Expect(executeErr).To(MatchError(shared.OrgNotFoundError{Name: "some-org"}))
 
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-
-					Expect(fakeActor.GetSpaceByNameCallCount()).To(Equal(1))
-					orgGUID, spaceName := fakeActor.GetSpaceByNameArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-
-					Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(1))
-					spaceGUID, spaceName, spaceAllowSSH := fakeConfig.SetSpaceInformationArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(spaceName).To(Equal("some-space"))
-					Expect(spaceAllowSSH).To(Equal(true))
+					Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
+					Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 				})
 			})
 		})

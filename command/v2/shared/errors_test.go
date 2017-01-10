@@ -44,7 +44,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("CurrentUserError", CurrentUserError{}),
 		Entry("OrgTargetError", OrgTargetError{}),
 		Entry("NoOrgTargetedError", NoOrgTargetedError{}),
-		Entry("GetOrgSpacesError", GetOrgSpacesError{}),
 		Entry("SpaceTargetError", SpaceTargetError{}),
+		Entry("OrgNotFoundError", OrgNotFoundError{}),
+		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
 	)
 })
