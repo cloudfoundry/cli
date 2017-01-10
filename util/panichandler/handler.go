@@ -54,7 +54,7 @@ func HandlePanic() {
 		templateErr := formattedTemplate.Execute(os.Stderr, map[string]interface{}{
 			"Binary":     os.Args[0],
 			"Command":    strings.Join(os.Args, " "),
-			"Version":    version.BinaryVersion,
+			"Version":    version.VersionString(),
 			"StackTrace": stackTrace,
 			"Error":      err,
 		})
@@ -66,7 +66,7 @@ func HandlePanic() {
 
 			fmt.Fprintf(os.Stderr,
 				"Version:%s\nCommand:%s\nOriginal Stack Trace:%s\nOriginal Error:%s\n",
-				version.BinaryVersion,
+				version.VersionString(),
 				strings.Join(os.Args, " "),
 				stackTrace,
 				err,

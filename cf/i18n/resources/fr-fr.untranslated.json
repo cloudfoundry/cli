@@ -1532,6 +1532,10 @@
     "translation": "version"
   },
   {
+    "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },

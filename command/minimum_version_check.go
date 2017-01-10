@@ -1,9 +1,12 @@
 package command
 
-import "github.com/blang/semver"
+import (
+	"code.cloudfoundry.org/cli/version"
+	"github.com/blang/semver"
+)
 
 func MinimumAPIVersionCheck(current string, minimum string) error {
-	if current == "BUILT_FROM_SOURCE" || minimum == "" {
+	if current == version.DefaultVersion || minimum == "" {
 		return nil
 	}
 

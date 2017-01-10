@@ -123,7 +123,7 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("sets the user agent header", func() {
-				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + version.BinaryVersion + " / " + runtime.GOOS))
+				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + version.VersionString() + " / " + runtime.GOOS))
 			})
 		})
 

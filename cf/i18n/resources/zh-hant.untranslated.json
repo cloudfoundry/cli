@@ -1960,6 +1960,10 @@
     "translation": "verbose and version flag"
   },
   {
+    "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": "{{.CFName}} api"
   },

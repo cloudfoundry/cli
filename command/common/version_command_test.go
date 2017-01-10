@@ -22,8 +22,7 @@ var _ = Describe("Version Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
-		fakeConfig.BinaryVersionReturns("face2.0")
-		fakeConfig.BinaryBuildDateReturns("yesterday")
+		fakeConfig.BinaryVersionReturns("0.0.0-invalid-version")
 
 		cmd = VersionCommand{
 			UI:     testUI,
@@ -34,6 +33,6 @@ var _ = Describe("Version Command", func() {
 	It("displays correct version", func() {
 		err = cmd.Execute(nil)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(testUI.Out).To(Say("faceman version face2.0-yesterday"))
+		Expect(testUI.Out).To(Say("faceman version 0.0.0-invalid-version"))
 	})
 })

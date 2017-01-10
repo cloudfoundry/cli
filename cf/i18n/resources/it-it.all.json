@@ -6520,6 +6520,10 @@
     "translation": "Limite istanze applicazione {{.AppInstanceLimit}}"
   },
   {
+    "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": "api {{.CFName}}"
   },
