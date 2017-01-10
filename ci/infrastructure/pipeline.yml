@@ -699,7 +699,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: bosh-lites-acceptance-pool
+    - get: bosh-lite-lock
+      resource: bosh-lites-acceptance-pool
       passed: [smoke-test]
       trigger: true
     - get: etcd-release
