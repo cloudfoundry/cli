@@ -117,7 +117,6 @@ var _ = Describe("target command", func() {
 		Context("when the org does not exist", func() {
 			It("displays org not found and exits 1", func() {
 				session := helpers.CF("target", "-o", orgName)
-				Eventually(session.Err).Should(Say("Could not target org."))
 				Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -162,7 +161,7 @@ var _ = Describe("target command", func() {
 					Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
 					Eventually(session.Out).Should(Say("User:           %s", username))
 					Eventually(session.Out).Should(Say("Org:            %s", orgName))
-					Eventually(session.Out).Should(Say("Space:          No space targeted, use 'cf target -s SPACE"))
+					Eventually(session.Out).Should(Say("No space targeted, use 'cf target -s SPACE"))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -174,7 +173,7 @@ var _ = Describe("target command", func() {
 
 					It("untargets the targetted space", func() {
 						session := helpers.CF("target", "-o", orgName)
-						Eventually(session.Out).Should(Say("Space:          No space targeted, use 'cf target -s SPACE"))
+						Eventually(session.Out).Should(Say("No space targeted, use 'cf target -s SPACE"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -210,7 +209,6 @@ var _ = Describe("target command", func() {
 			Context("when space does not exist", func() {
 				It("displays space not found and exits 1", func() {
 					session := helpers.CF("target", "-s", spaceName)
-					Eventually(session.Err).Should(Say("Unable to access space '%s'", spaceName))
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
@@ -232,7 +230,6 @@ var _ = Describe("target command", func() {
 		Context("when the org does not exist", func() {
 			It("displays org not found and exits 1", func() {
 				session := helpers.CF("target", "-o", orgName, "-s", spaceName)
-				Eventually(session.Err).Should(Say("Could not target org."))
 				Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -266,7 +263,6 @@ var _ = Describe("target command", func() {
 			Context("when the space does not exist", func() {
 				It("displays space not found and exits 1", func() {
 					session := helpers.CF("target", "-o", orgName, "-s", spaceName)
-					Eventually(session.Err).Should(Say("Unable to access space '%s'", spaceName))
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
