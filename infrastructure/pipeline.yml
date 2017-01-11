@@ -457,10 +457,6 @@ jobs:
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
       LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
-    ensure:
-      put: bosh-lites-dea-pool
-      params:
-        release: bosh-lite-lock
 
 - name: deploy-diego-release-3
   serial: true
