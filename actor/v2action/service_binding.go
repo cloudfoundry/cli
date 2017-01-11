@@ -6,8 +6,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
+// ServiceBinding represents the link between a service instance and an
+// application.
 type ServiceBinding ccv2.ServiceBinding
 
+// ServiceBindingNotFoundError is returned when a service binding cannot be
+// found.
 type ServiceBindingNotFoundError struct {
 	AppGUID             string
 	ServiceInstanceGUID string
@@ -17,6 +21,8 @@ func (e ServiceBindingNotFoundError) Error() string {
 	return fmt.Sprintf("Service binding for application GUID '%s', and service instance GUID '%s' not found.", e.AppGUID, e.ServiceInstanceGUID)
 }
 
+// GetServiceBindingByApplicationAndServiceInstance returns a service binding
+// given an application GUID and and service instance GUID.
 func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (ServiceBinding, Warnings, error) {
 	serviceBindings, warnings, err := actor.CloudControllerClient.GetServiceBindings([]ccv2.Query{
 		ccv2.Query{
@@ -45,6 +51,8 @@ func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID stri
 	return ServiceBinding(serviceBindings[0]), Warnings(warnings), err
 }
 
+// UnbindServiceBySpace deletes the service binding between an application and
+// service instance for a given space.
 func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (Warnings, error) {
 	var allWarnings Warnings
 

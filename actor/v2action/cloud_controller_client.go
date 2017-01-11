@@ -4,6 +4,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 //go:generate counterfeiter . CloudControllerClient
 
+// CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
 	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)

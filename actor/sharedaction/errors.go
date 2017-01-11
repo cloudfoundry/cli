@@ -2,6 +2,8 @@ package sharedaction
 
 import "fmt"
 
+// ErrorInvalidCommand represents an error that happens when help is called
+// with an invalid command.
 type ErrorInvalidCommand struct {
 	CommandName string
 }

@@ -17,6 +17,7 @@ func (e DomainNotFoundError) Error() string {
 	return "Domain not found."
 }
 
+// TODO: Move into own file or add function to CCV2/3
 func isResourceNotFoundError(err error) bool {
 	_, isResourceNotFound := err.(cloudcontroller.ResourceNotFoundError)
 	return isResourceNotFound
