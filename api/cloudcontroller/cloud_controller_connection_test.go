@@ -213,7 +213,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodGet, "/v2/foo"),
-							RespondWith(http.StatusNotFound, ccResponse),
+							RespondWith(http.StatusNotFound, ccResponse, http.Header{"X-Vcap-Request-Id": {"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95", "6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f"}}),
 						),
 					)
 				})
@@ -227,6 +227,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					Expect(err).To(MatchError(RawHTTPStatusError{
 						StatusCode:  http.StatusNotFound,
 						RawResponse: []byte(ccResponse),
+						RequestIDs:  []string{"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95", "6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f"},
 					}))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))

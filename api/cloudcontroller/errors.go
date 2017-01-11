@@ -39,6 +39,7 @@ func (e RequestError) Error() string {
 type RawHTTPStatusError struct {
 	StatusCode  int
 	RawResponse []byte
+	RequestIDs  []string
 }
 
 func (r RawHTTPStatusError) Error() string {
