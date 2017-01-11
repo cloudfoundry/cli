@@ -1,12 +1,14 @@
-Summary: Cloud Foundry command line client 
-Name: cf-cli 
+Summary: Cloud Foundry CLI
+Name: cf-cli
 Release: 1
-Group: Development/Tools 
-License: Apache 
+Group: Development/Tools
+License: ASL 2.0
+URL: https://github.com/cloudfoundry/cli
+BugUrl: https://github.com/cloudfoundry/cli/issues
 Source: %{expand:%%(pwd)}
 
 %description
-%{summary}
+Cloud Foundry CLI is the official command line client for Cloud Foundry.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
