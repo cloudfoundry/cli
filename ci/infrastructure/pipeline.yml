@@ -453,10 +453,6 @@ jobs:
       passed: [deploy-cf-release-3]
       trigger: true
     - get: cli
-    - put: bosh-lite-lock
-      resource: bosh-lites-dea-pool
-      params:
-        claim: {{lite-3-hostname}}
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
