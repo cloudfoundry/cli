@@ -123,6 +123,7 @@ func (*CloudControllerConnection) handleStatusCodes(response *http.Response, pas
 		return RawHTTPStatusError{
 			StatusCode:  response.StatusCode,
 			RawResponse: passedResponse.RawResponse,
+			RequestIDs:  response.Header["X-Vcap-Request-Id"],
 		}
 	}
 

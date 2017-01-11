@@ -19,6 +19,32 @@ var _ = Describe("Error Wrapper", func() {
 		client *Client
 	)
 
+	Describe("UnexpectedResponseError", func() {
+		Describe("Error", func() {
+			It("formats the error", func() {
+				err := UnexpectedResponseError{
+					ResponseCode: 123,
+					CCErrorResponse: CCErrorResponse{
+						Code:        456,
+						Description: "some-error-description",
+						ErrorCode:   "some-error-code",
+					},
+					RequestIDs: []string{
+						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+					},
+				}
+				Expect(err.Error()).To(Equal(`Unexpected Response
+Response Code: 123
+CC Code:       456
+CC ErrorCode:  some-error-code
+Description:   some-error-description
+Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95
+Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f`))
+			})
+		})
+	})
+
 	Describe("Make", func() {
 		BeforeEach(func() {
 			response = `{
@@ -34,7 +60,13 @@ var _ = Describe("Error Wrapper", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v2/apps"),
-					RespondWith(serverResponseCode, response),
+					RespondWith(serverResponseCode, response, http.Header{
+						"X-Vcap-Request-Id": {
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+						},
+					},
+					),
 				),
 			)
 		})
@@ -50,6 +82,10 @@ var _ = Describe("Error Wrapper", func() {
 				Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
+					RequestIDs: []string{
+						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+					},
 				}))
 			})
 		})
@@ -129,17 +165,6 @@ var _ = Describe("Error Wrapper", func() {
 				})
 			})
 
-			Context("(503) Service Unavailable", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusServiceUnavailable
-				})
-
-				It("returns a ServiceUnavailableError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.ServiceUnavailableError{Message: "SomeCC Error Message"}))
-				})
-			})
-
 			Context("unhandled Error Codes", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot
@@ -153,6 +178,10 @@ var _ = Describe("Error Wrapper", func() {
 							Code:        777,
 							Description: "SomeCC Error Message",
 							ErrorCode:   "CF-SomeError",
+						},
+						RequestIDs: []string{
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
 						},
 					}))
 				})

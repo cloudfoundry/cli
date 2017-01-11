@@ -24,8 +24,10 @@ type CCError struct {
 // UnexpectedResponseError is returned when the client gets an error that has
 // not been accounted for.
 type UnexpectedResponseError struct {
-	ResponseCode int
 	CCErrorResponse
+
+	ResponseCode int
+	RequestIDs   []string
 }
 
 func (e UnexpectedResponseError) Error() string {
@@ -33,6 +35,11 @@ func (e UnexpectedResponseError) Error() string {
 		"Unexpected Response",
 		fmt.Sprintf("Response Code: %d", e.ResponseCode),
 	}
+
+	for _, id := range e.RequestIDs {
+		messages = append(messages, fmt.Sprintf("Request ID:    %s", id))
+	}
+
 	for _, ccError := range e.CCErrorResponse.Errors {
 		messages = append(messages, fmt.Sprintf("Code: %d, Title: %s, Detail: %s", ccError.Code, ccError.Title, ccError.Detail))
 	}
@@ -111,6 +118,7 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
+			RequestIDs:      rawHTTPStatusErr.RequestIDs,
 			CCErrorResponse: errorResponse,
 		}
 	}

@@ -18,12 +18,18 @@ type CCErrorResponse struct {
 // UnexpectedResponseError is returned when the client gets an error that has
 // not been accounted for.
 type UnexpectedResponseError struct {
-	ResponseCode int
 	CCErrorResponse
+
+	RequestIDs   []string
+	ResponseCode int
 }
 
 func (e UnexpectedResponseError) Error() string {
-	return fmt.Sprintf("Unexpected Response\nResponse Code: %s\nCC Code: %i\nCC ErrorCode: %s\nDescription: %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
+	message := fmt.Sprintf("Unexpected Response\nResponse Code: %d\nCC Code:       %d\nCC ErrorCode:  %s\nDescription:   %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
+	for _, id := range e.RequestIDs {
+		message = fmt.Sprintf("%s\nRequest ID:    %s", message, id)
+	}
+	return message
 }
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
@@ -77,12 +83,11 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 		return cloudcontroller.ResourceNotFoundError{Message: errorResponse.Description}
 	case http.StatusUnprocessableEntity: // 422
 		return cloudcontroller.UnprocessableEntityError{Message: errorResponse.Description}
-	case http.StatusServiceUnavailable: // 503
-		return cloudcontroller.ServiceUnavailableError{Message: errorResponse.Description}
 	default:
 		return UnexpectedResponseError{
-			ResponseCode:    rawHTTPStatusErr.StatusCode,
 			CCErrorResponse: errorResponse,
+			RequestIDs:      rawHTTPStatusErr.RequestIDs,
+			ResponseCode:    rawHTTPStatusErr.StatusCode,
 		}
 	}
 	return nil
