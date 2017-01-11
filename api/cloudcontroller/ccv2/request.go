@@ -18,7 +18,9 @@ type requestOptions struct {
 	// RequestName is the name of the request (see routes)
 	RequestName string
 
-	URI    string
+	// URI is the URI of the request.
+	URI string
+	// Method is the HTTP method of the request.
 	Method string
 
 	// Body is the request body

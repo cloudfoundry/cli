@@ -15,6 +15,26 @@ type Route struct {
 	Port   int
 }
 
+// String formats the route in a human readable format.
+func (r Route) String() string {
+	routeString := r.Domain
+
+	if r.Port != 0 {
+		routeString = fmt.Sprintf("%s:%d", routeString, r.Port)
+		return routeString
+	}
+
+	if r.Host != "" {
+		routeString = fmt.Sprintf("%s.%s", r.Host, routeString)
+	}
+
+	if r.Path != "" {
+		routeString = fmt.Sprintf("%s%s", routeString, r.Path)
+	}
+
+	return routeString
+}
+
 // OrphanedRoutesNotFoundError is an error wrapper that represents the case
 // when no orphaned routes are found.
 type OrphanedRoutesNotFoundError struct{}
@@ -89,23 +109,4 @@ func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route
 func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.DeleteRoute(routeGUID)
 	return Warnings(warnings), err
-}
-
-func (r Route) String() string {
-	routeString := r.Domain
-
-	if r.Port != 0 {
-		routeString = fmt.Sprintf("%s:%d", routeString, r.Port)
-		return routeString
-	}
-
-	if r.Host != "" {
-		routeString = fmt.Sprintf("%s.%s", r.Host, routeString)
-	}
-
-	if r.Path != "" {
-		routeString = fmt.Sprintf("%s%s", routeString, r.Path)
-	}
-
-	return routeString
 }

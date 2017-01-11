@@ -6,8 +6,11 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
+// Application represents an application.
 type Application ccv2.Application
 
+// ApplicationNotFoundError is returned when a requested application is not
+// found.
 type ApplicationNotFoundError struct {
 	Name string
 }
@@ -16,6 +19,8 @@ func (e ApplicationNotFoundError) Error() string {
 	return fmt.Sprintf("Application '%s' not found.", e.Name)
 }
 
+// GetApplicationByNameAndSpace returns an application with matching name in
+// the space.
 func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
 		ccv2.Query{

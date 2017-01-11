@@ -4,6 +4,8 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 type TargetSettings ccv2.TargetSettings
 
+// SetTarget targets the Cloud Controller using the client and sets target
+// information in the actor based on the response.
 func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
@@ -30,6 +32,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 	return Warnings(warnings), nil
 }
 
+// ClearTarget clears target information from the actor.
 func (actor Actor) ClearTarget() {
 	actor.Config.SetTargetInformation("", "", "", "", "", "", "", "", false)
 	actor.Config.SetTokenInformation("", "", "")

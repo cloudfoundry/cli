@@ -12,15 +12,21 @@ type QueryFilter string
 type QueryOperator string
 
 const (
-	AppGUIDFilter             QueryFilter = "app_guid"
+	// AppGUIDFilter is the name of the App GUID filter.
+	AppGUIDFilter QueryFilter = "app_guid"
+	// ServiceInstanceGUIDFilter is the name of the service instance GUID filter.
 	ServiceInstanceGUIDFilter QueryFilter = "service_instance_guid"
-	SpaceGUIDFilter           QueryFilter = "space_guid"
-	OrganizationGUIDFilter    QueryFilter = "organization_guid"
+	// SpaceGUIDFilter is the name of the space GUID filter.
+	SpaceGUIDFilter QueryFilter = "space_guid"
+	// OrganizationGUIDFilter is the name of the organization GUID filter.
+	OrganizationGUIDFilter QueryFilter = "organization_guid"
 
+	// NameFilter is the name of the name filter.
 	NameFilter QueryFilter = "name"
 )
 
 const (
+	// EqualOperator is the query equal operator.
 	EqualOperator QueryOperator = ":"
 )
 
