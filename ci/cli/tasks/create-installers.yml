@@ -33,19 +33,20 @@ run:
         pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
-          cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
-
-          cp control.template cf/DEBIAN/control
-
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
-
           cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
+
+          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+
+          cp control.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
+
+          cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
 
           fakeroot dpkg --build cf cf-cli-installer_i686.deb
           mv cf-cli-installer_i686.deb $root/packaged
@@ -60,19 +61,20 @@ run:
         pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
-          cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
-
-          cp control.template cf/DEBIAN/control
-
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
-
           cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
+
+          cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+
+          cp control.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
+
+          cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
 
           fakeroot dpkg --build cf cf-cli-installer_x86-64.deb
           mv cf-cli-installer_x86-64.deb $root/packaged
@@ -83,6 +85,8 @@ run:
     (
       pushd cli-ci/ci/installers/rpm
         cp $root/extracted-binaries/cf-cli_linux_i686 cf
+        cp ../../license/NOTICE .
+        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
@@ -94,6 +98,8 @@ run:
     (
       pushd cli-ci/ci/installers/rpm
         cp $root/extracted-binaries/cf-cli_linux_x86-64 cf
+        cp ../../license/NOTICE .
+        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
