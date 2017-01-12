@@ -25,8 +25,8 @@ run:
 
     VERSION=$(cat cli/ci/VERSION)
 
-    cp cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-    cp cli/ci/license/NOTICE .
+    awk 'sub("$", "\r")' cli/ci/license/NOTICE > NOTICE
+    awk 'sub("$", "\r")' cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES > LICENSE
 
     mkdir win32 win64
     cp extracted-binaries/cf-cli_win32.exe win32/cf.exe
