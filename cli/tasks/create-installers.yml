@@ -36,7 +36,12 @@ run:
           cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
 
           cp control.template cf/DEBIAN/control
-          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/DEBIAN/copyright
+
+          cp copyright_preamble cf/DEBIAN/copyright
+          sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
+          cat copyright_comment_header >> cf/DEBIAN/copyright
+          sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+
           cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
@@ -58,7 +63,12 @@ run:
           cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
 
           cp control.template cf/DEBIAN/control
-          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/DEBIAN/copyright
+
+          cp copyright_preamble cf/DEBIAN/copyright
+          sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
+          cat copyright_comment_header >> cf/DEBIAN/copyright
+          sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
+
           cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
