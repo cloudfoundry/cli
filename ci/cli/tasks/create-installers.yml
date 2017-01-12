@@ -111,7 +111,8 @@ run:
         mkdir -p cf-cli/usr/local/bin
         mkdir -p cf-cli/usr/local/share/doc/cf-cli
         cp $root/extracted-binaries/cf-cli_osx cf-cli/usr/local/bin/cf
-        cp COPYING cf-cli/usr/local/share/doc/cf-cli
+        cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
+        cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf-cli/LICENSE
         chmod -R go-w cf-cli
         pushd cf-cli
           find usr | cpio -o --format=odc | gzip -c > ../Payload
