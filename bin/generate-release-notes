@@ -3,6 +3,10 @@
 VERSION=$(cat ci/VERSION)
 
 cat <<-NOTES
+Package Manager Installation
+----------
+- [apt-get, yum, homebrew](https://github.com/cloudfoundry/cli#installing-using-a-package-manager)
+
 Installers
 ----------
 - [Debian 32 bit](https://cli.run.pivotal.io/stable?release=debian32&version=$VERSION&source=github-rel)
