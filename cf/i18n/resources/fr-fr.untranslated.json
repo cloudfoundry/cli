@@ -12,10 +12,6 @@
     "translation": " does not exist as an available plugin repo."
   },
   {
-    "id": "'cf help -a' lists all commands with short descriptions. See 'cf help \u003ccommand\u003e' to read about a specific command.",
-    "translation": "'cf help -a' lists all commands with short descriptions. See 'cf help \u003ccommand\u003e' to read about a specific command."
-  },
-  {
     "id": "API URL to target",
     "translation": "API URL to target"
   },
@@ -1008,6 +1004,10 @@
     "translation": ""
   },
   {
+    "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
+    "translation": ""
+  },
+  {
     "id": "Service instance",
     "translation": "Service instance"
   },
@@ -1338,6 +1338,10 @@
   {
     "id": "The username",
     "translation": "The username"
+  },
+  {
+    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
+    "translation": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions."
   },
   {
     "id": "This command is in EXPERIMENTAL stage and may change without notice",

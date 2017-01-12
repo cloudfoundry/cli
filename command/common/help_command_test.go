@@ -354,7 +354,8 @@ var _ = Describe("Help Command", func() {
 			Expect(testUI.Out).To(Say("Global options:"))
 			Expect(testUI.Out).To(Say("--help, -h\\s+Show help"))
 
-			Expect(testUI.Out).To(Say("'cf help -a' lists all commands with short descriptions. See 'cf help <command>'"))
+			Expect(testUI.Out).To(Say("These are commonly used commands. Use 'cf help -a' to see all, with descriptions."))
+			Expect(testUI.Out).To(Say("See 'cf help <command>' to read about a specific command."))
 		})
 
 		Context("when there are multiple installed plugins", func() {
