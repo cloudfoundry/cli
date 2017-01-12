@@ -34,10 +34,11 @@ run:
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
           cp copyright_preamble cf/DEBIAN/copyright
-          sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
+          sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
-          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
+
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
 
@@ -62,10 +63,11 @@ run:
           mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
           cp copyright_preamble cf/DEBIAN/copyright
-          sed 's/^$/ ./'  ../../../LICENSE >> cf/DEBIAN/copyright
+          sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
           cat copyright_comment_header >> cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
-          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
+
+          cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
 
