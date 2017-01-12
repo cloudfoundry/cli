@@ -22,8 +22,7 @@ run:
 
     pushd extracted-binaries
       cp $root/cli/ci/license/NOTICE .
-      cp $root/cli/LICENSE .
-      cat $root/cli/ci/license/3RD-PARTY-LICENSES >> LICENSE
+      cp $root/cli/ci/license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
 
       tar --transform="flags=r;s|cf-cli_osx|cf|" -czf $root/archives/cf-cli_edge_osx.tgz LICENSE NOTICE cf-cli_osx
       tar --transform="flags=r;s|cf-cli_linux_i686|cf|" -czf $root/archives/cf-cli_edge_linux_i686.tgz LICENSE NOTICE cf-cli_linux_i686
