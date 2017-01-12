@@ -161,7 +161,7 @@ var _ = Describe("Job Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetJobCallCount()).To(Equal(3))
-				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(4))
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
 			})
 		})
 
@@ -170,28 +170,14 @@ var _ = Describe("Job Actions", func() {
 				var overallPollingTimeout time.Duration
 
 				BeforeEach(func() {
-					counter := 0
-					fakeCloudControllerClient.GetJobStub = func(guid string) (ccv2.Job, ccv2.Warnings, error) {
-						if counter == 0 {
-							counter += 1
-							return ccv2.Job{
-								Status: ccv2.JobStatusQueued,
-								GUID:   guid,
-							}, ccv2.Warnings{"warning-1"}, nil
-						} else if counter == 1 {
-							counter += 1
-							return ccv2.Job{
-								Status: ccv2.JobStatusRunning,
-								GUID:   guid,
-							}, ccv2.Warnings{"warning-2", "warning-3"}, nil
-						} else {
-							// Should never get here
-							return ccv2.Job{
-								Status: ccv2.JobStatusFinished,
-								GUID:   guid,
-							}, ccv2.Warnings{"warning-4"}, nil
-						}
-					}
+					fakeCloudControllerClient.GetJobReturns(
+						ccv2.Job{
+							Status: ccv2.JobStatusRunning,
+							GUID:   "some-job-guid",
+						},
+						ccv2.Warnings{},
+						nil,
+					)
 
 					overallPollingTimeout = 100 * time.Millisecond
 					fakeConfig.OverallPollingTimeoutReturns(overallPollingTimeout)
@@ -199,9 +185,8 @@ var _ = Describe("Job Actions", func() {
 				})
 
 				It("raises a JobTimeoutError", func() {
-					warnings, err := actor.PollJob(ccv2.Job{GUID: "some-job-guid"})
+					_, err := actor.PollJob(ccv2.Job{GUID: "some-job-guid"})
 
-					Expect(warnings).To(ContainElement("warning-1"))
 					Expect(err).To(MatchError(JobTimeoutError{
 						Timeout: overallPollingTimeout,
 						JobGUID: "some-job-guid",
@@ -217,6 +202,9 @@ var _ = Describe("Job Actions", func() {
 					actor.PollJob(ccv2.Job{GUID: "some-job-guid"})
 					endTime := time.Now()
 
+					// If the overallPollingTimeout is less than the PollingInterval,
+					// then the margin may be too small, we should install not allow the
+					// OverallPollingTimeout to be set to less than the PollingInterval
 					Expect(endTime).To(BeTemporally("~", startTime, 2*overallPollingTimeout))
 				})
 			})
