@@ -31,17 +31,20 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_i686 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
           cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
 
           cp control.template cf/DEBIAN/control
+          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/DEBIAN/copyright
+          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
 
           fakeroot dpkg --build cf cf-cli-installer_i686.deb
           mv cf-cli-installer_i686.deb $root/packaged
+          rm -rf cf
         popd
     )
 
@@ -50,11 +53,13 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_x86-64 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
 
           cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
 
           cp control.template cf/DEBIAN/control
+          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/DEBIAN/copyright
+          cat copyright_preamble ../../../LICENSE copyright_comment_header ../../license/3RD-PARTY-LICENSES > cf/usr/share/doc/cf-cli/copyright
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
