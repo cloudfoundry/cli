@@ -41,7 +41,8 @@ func (actor Actor) PollJob(job ccv2.Job) (Warnings, error) {
 		allWarnings Warnings
 	)
 
-	for timeSlept := 0 * time.Second; timeSlept < actor.Config.OverallPollingTimeout(); timeSlept += actor.Config.PollingInterval() {
+	startTime := time.Now()
+	for time.Now().Sub(startTime) < actor.Config.OverallPollingTimeout() {
 		job, warnings, err = actor.CloudControllerClient.GetJob(job.GUID)
 		allWarnings = append(allWarnings, Warnings(warnings)...)
 		if err != nil {
