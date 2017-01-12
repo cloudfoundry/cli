@@ -13,8 +13,8 @@ sed -i -e "s/CF_NOTICE/%ESCAPED_ROOT_DIR%\\NOTICE/" %ROOT_DIR%\cli-ci\ci\install
 sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 
-COPY %ROOT_DIR%\cli\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-COPY %ROOT_DIR%\cli\ci\license\NOTICE NOTICE
+COPY %ROOT_DIR%\cli-ci\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+COPY %ROOT_DIR%\cli-ci\ci\license\NOTICE NOTICE
 MOVE %ROOT_DIR%\extracted-binaries\cf-cli_winx64.exe cf.exe
 COPY %ROOT_DIR%\cli-ci\ci\installers\windows\cf.ico cf.ico
 
@@ -30,8 +30,8 @@ sed -i -e "s/CF_NOTICE/%ESCAPED_ROOT_DIR%\\NOTICE/" %ROOT_DIR%\cli-ci\ci\install
 sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 
-COPY %ROOT_DIR%\cli\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
-COPY %ROOT_DIR%\cli\ci\license\NOTICE NOTICE
+COPY %ROOT_DIR%\cli-ci\ci\license\LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+COPY %ROOT_DIR%\cli-ci\ci\license\NOTICE NOTICE
 MOVE %ROOT_DIR%\extracted-binaries\cf-cli_win32.exe cf.exe
 COPY %ROOT_DIR%\cli-ci\ci\installers\windows\cf.ico cf.ico
 
