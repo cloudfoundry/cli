@@ -25,11 +25,11 @@ type UnexpectedResponseError struct {
 }
 
 func (e UnexpectedResponseError) Error() string {
-	message := fmt.Sprintf("Unexpected Response\nResponse Code: %d\nCC Code:       %d\nCC ErrorCode:  %s\nDescription:   %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
+	message := fmt.Sprintf("Unexpected Response\nResponse code: %d\nCC code:       %d\nCC error code: %s", e.ResponseCode, e.Code, e.ErrorCode)
 	for _, id := range e.RequestIDs {
 		message = fmt.Sprintf("%s\nRequest ID:    %s", message, id)
 	}
-	return message
+	return fmt.Sprintf("%s\nDescription:   %s", message, e.Description)
 }
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status

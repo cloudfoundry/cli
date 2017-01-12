@@ -35,12 +35,12 @@ var _ = Describe("Error Wrapper", func() {
 					},
 				}
 				Expect(err.Error()).To(Equal(`Unexpected Response
-Response Code: 123
-CC Code:       456
-CC ErrorCode:  some-error-code
-Description:   some-error-description
+Response code: 123
+CC code:       456
+CC error code: some-error-code
 Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95
-Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f`))
+Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f
+Description:   some-error-description`))
 			})
 		})
 	})
