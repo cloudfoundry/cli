@@ -3056,6 +3056,10 @@
     "translation": "TYPE_DIAGNOSTIC_INTEGRITE"
   },
   {
+    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "translation": ""
+  },
+  {
     "id": "HOST",
     "translation": "HOTE"
   },
@@ -4820,11 +4824,7 @@
     "translation": "Définir ou afficher l'organisation ou l'espace ciblé"
   },
   {
-    "id": "Set to none",
-    "translation": ""
-  },
-  {
-    "id": "Set to port",
+    "id": "Set to 'port' or 'none'",
     "translation": ""
   },
   {

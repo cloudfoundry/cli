@@ -3056,6 +3056,10 @@
     "translation": ""
   },
   {
+    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "translation": ""
+  },
+  {
     "id": "HOST",
     "translation": "호스트"
   },
@@ -4820,11 +4824,7 @@
     "translation": "대상 지정된 조직이나 영역 설정 또는 보기"
   },
   {
-    "id": "Set to none",
-    "translation": ""
-  },
-  {
-    "id": "Set to port",
+    "id": "Set to 'port' or 'none'",
     "translation": ""
   },
   {

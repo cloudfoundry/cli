@@ -792,6 +792,10 @@
     "translation": "Global options:"
   },
   {
+    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
@@ -1024,12 +1028,8 @@
     "translation": "Services integration:"
   },
   {
-    "id": "Set to none",
-    "translation": "Set to none"
-  },
-  {
-    "id": "Set to port",
-    "translation": "Set to port"
+    "id": "Set to 'port' or 'none'",
+    "translation": ""
   },
   {
     "id": "Space '{{.Name}}' not found.",

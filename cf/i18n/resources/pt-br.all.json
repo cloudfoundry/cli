@@ -3056,6 +3056,10 @@
     "translation": ""
   },
   {
+    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "translation": ""
+  },
+  {
     "id": "HOST",
     "translation": ""
   },
@@ -4820,11 +4824,7 @@
     "translation": "Configurar ou visualizar a organização ou o espaço destinado"
   },
   {
-    "id": "Set to none",
-    "translation": ""
-  },
-  {
-    "id": "Set to port",
+    "id": "Set to 'port' or 'none'",
     "translation": ""
   },
   {

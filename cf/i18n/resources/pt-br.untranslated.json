@@ -1252,6 +1252,10 @@
     "translation": "HEALTH_CHECK_TYPE"
   },
   {
+    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "translation": ""
+  },
+  {
     "id": "HOST",
     "translation": "HOST"
   },
@@ -1508,12 +1512,8 @@
     "translation": "Services integration:"
   },
   {
-    "id": "Set to none",
-    "translation": "Set to none"
-  },
-  {
-    "id": "Set to port",
-    "translation": "Set to port"
+    "id": "Set to 'port' or 'none'",
+    "translation": ""
   },
   {
     "id": "Space '{{.Name}}' not found.",
