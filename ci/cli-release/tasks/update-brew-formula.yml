@@ -46,6 +46,8 @@ run:
 
       def install
         bin.install 'cf'
+        doc.install 'LICENSE'
+        doc.install 'NOTICE'
       end
 
       test do
