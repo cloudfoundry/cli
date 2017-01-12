@@ -28,6 +28,11 @@ run:
       tar --transform="flags=r;s|cf-cli_linux_i686|cf|" -czf $root/archives/cf-cli_edge_linux_i686.tgz LICENSE NOTICE cf-cli_linux_i686
       tar --transform="flags=r;s|cf-cli_linux_x86-64|cf|" -czf $root/archives/cf-cli_edge_linux_x86-64.tgz LICENSE NOTICE cf-cli_linux_x86-64
 
+      awk 'sub("$", "\r")' NOTICE > NOTICE-WINDOWS
+      awk 'sub("$", "\r")' LICENSE > LICENSE-WINDOWS
+      mv NOTICE{-WINDOWS,}
+      mv LICENSE{-WINDOWS,}
+
       mkdir win32 win64
       mv cf-cli_win32.exe win32/cf.exe
       mv cf-cli_winx64.exe win64/cf.exe
