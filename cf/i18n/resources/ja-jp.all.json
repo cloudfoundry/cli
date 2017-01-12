@@ -148,10 +148,6 @@
     "translation": "' は登録済みコマンドではありません。 'cf help' を参照してください"
   },
   {
-    "id": "'cf help -a' lists all commands with short descriptions. See 'cf help \u003ccommand\u003e' to read about a specific command.",
-    "translation": ""
-  },
-  {
     "id": "'routes' should be a list",
     "translation": "'routes' はリストである必要があります"
   },
@@ -4712,6 +4708,10 @@
     "translation": "セキュリティー・グループ {{.security_group}} {{.error_message}}"
   },
   {
+    "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
+    "translation": ""
+  },
+  {
     "id": "Select a space (or press enter to skip):",
     "translation": "スペースを選択します (または Enter キーを押してスキップします):"
   },
@@ -5426,6 +5426,10 @@
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
     "translation": "'{{.RepoURL}}' で要求を実行したときエラーが発生しました: {{.Error}}\n{{.Tip}}"
+  },
+  {
+    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
+    "translation": ""
   },
   {
     "id": "This command",

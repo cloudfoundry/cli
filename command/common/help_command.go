@@ -162,7 +162,8 @@ func (cmd HelpCommand) displayCommonCommands() {
 			"Description": cmd.UI.TranslateText("Print API request diagnostics to stdout"),
 		})
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("'cf help -a' lists all commands with short descriptions. See 'cf help <command>' to read about a specific command.")
+	cmd.UI.DisplayText("These are commonly used commands. Use 'cf help -a' to see all, with descriptions.")
+	cmd.UI.DisplayText("See 'cf help <command>' to read about a specific command.")
 }
 
 func (cmd HelpCommand) displayAllCommands() {

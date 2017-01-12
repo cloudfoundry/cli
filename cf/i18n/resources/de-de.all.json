@@ -148,10 +148,6 @@
     "translation": "' ist kein registrierter Befehl. Siehe 'cf help'"
   },
   {
-    "id": "'cf help -a' lists all commands with short descriptions. See 'cf help \u003ccommand\u003e' to read about a specific command.",
-    "translation": ""
-  },
-  {
     "id": "'routes' should be a list",
     "translation": "'routes' muss eine Liste sein"
   },
@@ -4712,6 +4708,10 @@
     "translation": "Sicherheitsgruppe {{.security_group}} {{.error_message}}"
   },
   {
+    "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
+    "translation": ""
+  },
+  {
     "id": "Select a space (or press enter to skip):",
     "translation": "Bereich auswählen (oder zum Überspringen die Eingabetaste drücken):"
   },
@@ -5426,6 +5426,10 @@
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
     "translation": "Bei der Ausführung der Anforderung für '{{.RepoURL}}' trat ein Fehler auf: {{.Error}}\n{{.Tip}}"
+  },
+  {
+    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
+    "translation": ""
   },
   {
     "id": "This command",

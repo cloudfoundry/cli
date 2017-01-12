@@ -148,10 +148,6 @@
     "translation": "' 不是注册的命令。请参阅 'cf help'"
   },
   {
-    "id": "'cf help -a' lists all commands with short descriptions. See 'cf help \u003ccommand\u003e' to read about a specific command.",
-    "translation": ""
-  },
-  {
     "id": "'routes' should be a list",
     "translation": "'routes' 应为一个列表"
   },
@@ -4712,6 +4708,10 @@
     "translation": "安全组 {{.security_group}} {{.error_message}}"
   },
   {
+    "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
+    "translation": ""
+  },
+  {
     "id": "Select a space (or press enter to skip):",
     "translation": "选择空间（或按 Enter 键跳过）: "
   },
@@ -5426,6 +5426,10 @@
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
     "translation": "对 '{{.RepoURL}}' 执行请求时发生错误: {{.Error}}\n{{.Tip}}"
+  },
+  {
+    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
+    "translation": ""
   },
   {
     "id": "This command",
