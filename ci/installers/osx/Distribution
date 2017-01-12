@@ -7,6 +7,7 @@
     </pkg-ref>
     <title>Cloud Foundry CLI</title>
     <options customize="never" require-scripts="false" hostArchitectures="x86_64"/>
+    <license file="LICENSE" mime-type="text/plain"/>
     <volume-check>
         <allowed-os-versions>
             <os-version min="10.7"/>
