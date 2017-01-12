@@ -41,6 +41,7 @@ run:
           cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
           cp control.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
@@ -70,6 +71,7 @@ run:
           cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
+          cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
           cp control.template cf/DEBIAN/control
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
