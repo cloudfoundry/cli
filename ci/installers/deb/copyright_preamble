@@ -1,0 +1,10 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Cloud Foundry CLI
+Source: https://github.com/cloudfoundry/cli
+
+Files: *
+Copyright: Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc.
+           Copyright (c) 2013-2015 Pivotal Software, Inc.
+License: Apache-2.0
+
+License: Apache-2.0

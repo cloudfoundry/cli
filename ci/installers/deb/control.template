@@ -4,4 +4,4 @@ Source: cf-cli
 Homepage: https://github.com/cloudfoundry/cli
 Section: misc
 Priority: optional
-Description: Cloud Foundry command line client
+Description: Cloud Foundry CLI is the official command line client for Cloud Foundry.
