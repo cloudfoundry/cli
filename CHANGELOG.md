@@ -1,3 +1,67 @@
+## 6.23.1
+* Bump version to 6.23.1
+* reset author when amending commit
+* add LICENSE-WITH-3RD-PARTY-LICENSES to /usr/share/doc/cf-cli/LICENSE
+* /usr/share/doc/cf-cli/copyright has newlines replaced with .
+* fix line endings for windows
+* display CF icon on windows executables
+* change text that explains cf help -a in cf help output
+* update windows tasks to include LICENSE and NOTICE
+* adding LICENSE and notice to deb and RPMs
+* polling for job status in real time instead
+* added LICENSE and NOTICE to brew formula and deleted unnecessary formula
+* added NOTICE and LICENSE to osx installers
+* added NOTICE file and 3RD-PARTY-LICENSES to windows installers
+* add package manager installation to release notes
+* replace empty lines in DEBIAN/copyright with .
+* hidding the 'tt' flag since goflags has an issue supporting it
+* fix Debian licenses
+* move description to end of unexpected response message
+* add NOTICE file and 3RD-PARTY-LICENSES for apache dependencies to binaries
+* update RPM metadata
+* add godoc for actors and API
+* revert to full license (incl. appendix)
+* display X-Vcap-Request-Id for 5XX HTTP errors
+* backfilled integration tests
+* cleaned up the command and api tests to be more succint
+* remove extra lock from smoke-test-3
+* set binary version, sha and build date from ldflags
+* acceptance deploy-diego-release job requires bosh-lite-lock input
+* Revert "run tasks CATs if diego is enabled"
+* increase xargs parallelism
+* deploy jobs require bosh-lite-lock input
+* deploy diego requires bosh-lite-lock input
+* run tasks CATs if diego is enabled
+* hold lock until deployment is finished
+* update integration tests to match new error handling
+* add/switch additional error handling for the target command
+* integration tests check stderr for failure messages
+* improved readability by moving checks to the calling function
+* added CLI version validation to target command
+* add the api layer for target command
+* integration tests, command and actor for target command refactor
+* add task name to run-task output
+* add tip to run-task help
+* corrected cygwin limitation to password prompts, not other (confirmation) prompts
+* replaced issue # with proper hyperlink
+* job polling does not use goroutines
+* first draft, based on CONTRIBUTING.md steps
+* completed contribution steps
+* Merge pull request #1040 from afeld/patch-1
+* clean up the issue template
+* add pagination code from v2 into v3
+* create routing engine to generate base HTTP requests
+* move into ccv2 since v3 pagination is different
+* due to timing issues, the k+1th request is never guaranteed
+* run this test on windows again!
+* generic pagination!
+* add validations to delete-org, rename version test
+* split the organization lookup from delete org
+* handle data race
+* update error message
+* add polling to delete org
+* use ci so we don't accidently make a separate commit
+
 ## 6.23.0
 * Bump version to 6.23.0
 * increase the dial timeout
