@@ -14,6 +14,12 @@ import (
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
+const (
+	commonCommandsIndent string = "  "
+	allCommandsIndent    string = "   "
+	commandIndent        string = "   "
+)
+
 //go:generate counterfeiter . HelpActor
 
 // HelpActor handles the business logic of the help command
@@ -67,7 +73,7 @@ func (cmd HelpCommand) displayFullHelp() {
 
 func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayHeader("NAME:")
-	cmd.UI.DisplayText("   {{.CommandName}} - {{.CommandDescription}}",
+	cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}} - {{.CommandDescription}}",
 		map[string]interface{}{
 			"CommandName":        cmd.Config.BinaryName(),
 			"CommandDescription": cmd.UI.TranslateText("A command line tool to interact with Cloud Foundry"),
@@ -75,7 +81,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("USAGE:")
-	cmd.UI.DisplayText("   {{.CommandName}} {{.CommandUsage}}",
+	cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}} {{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandName":  cmd.Config.BinaryName(),
 			"CommandUsage": cmd.UI.TranslateText("[global options] command [arguments...] [command options]"),
@@ -83,15 +89,55 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("VERSION:")
-	cmd.UI.DisplayText("   {{.Version}}", map[string]interface{}{
-		"Version": cmd.Config.BinaryVersion(),
-	})
+	cmd.UI.DisplayText(allCommandsIndent + cmd.Config.BinaryVersion())
 	cmd.UI.DisplayNewline()
+}
+
+func (cmd HelpCommand) displayAllCommands() {
+	pluginCommands := cmd.getSortedPluginCommands()
+	cmdInfo := cmd.Actor.CommandInfos(Commands)
+	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
+
+	for _, category := range internal.HelpCategoryList {
+		cmd.UI.DisplayHeader(category.CategoryName)
+
+		for _, row := range category.CommandList {
+			for _, command := range row {
+				cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}",
+					map[string]interface{}{
+						"CommandName":        cmdInfo[command].Name,
+						"CommandDescription": cmd.UI.TranslateText(cmdInfo[command].Description),
+						"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
+					})
+			}
+
+			cmd.UI.DisplayNewline()
+		}
+	}
+
+	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
+	for _, pluginCommand := range pluginCommands {
+		cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
+			"CommandName":        pluginCommand.Name,
+			"CommandDescription": pluginCommand.HelpText,
+			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
+		})
+	}
+	cmd.UI.DisplayNewline()
+}
+
+func (cmd HelpCommand) displayHelpFooter() {
+	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
+	cmd.UI.DisplayTable(allCommandsIndent, cmd.environmentalVariablesTableData(), 1)
+
+	cmd.UI.DisplayNewline()
+
+	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
+	cmd.UI.DisplayTable(allCommandsIndent, cmd.globalOptionsTableData(), 25)
 }
 
 func (cmd HelpCommand) displayCommonCommands() {
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	prefix := "  "
 
 	cmd.UI.DisplayText("{{.CommandName}} {{.VersionCommand}} {{.Version}}, {{.CLI}}",
 		map[string]interface{}{
@@ -121,19 +167,18 @@ func (cmd HelpCommand) displayCommonCommands() {
 					if len(info.Alias) > 0 {
 						separator = ","
 					}
-					finalRow = append(finalRow, fmt.Sprintf("%s%s%s", info.Name, separator, info.Alias))
+					finalRow = append(finalRow, fmt.Sprint(info.Name, separator, info.Alias))
 				}
 			}
 
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayTable(prefix, table, 4)
+		cmd.UI.DisplayTable(commonCommandsIndent, table, 4)
 		cmd.UI.DisplayNewline()
 	}
 
 	pluginCommands := cmd.getSortedPluginCommands()
-	cmd.UI.DisplayHeader("Commands offered by installed plugins:")
 
 	size := int(math.Ceil(float64(len(pluginCommands)) / 3))
 	table := make([][]string, size)
@@ -147,108 +192,16 @@ func (cmd HelpCommand) displayCommonCommands() {
 		}
 	}
 
-	cmd.UI.DisplayTable(prefix, table, 4)
+	cmd.UI.DisplayHeader("Commands offered by installed plugins:")
+	cmd.UI.DisplayTable(commonCommandsIndent, table, 4)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("Global options:")
-	cmd.UI.DisplayText(prefix+"{{.ENVName}}                         {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "--help, -h",
-			"Description": cmd.UI.TranslateText("Show help"),
-		})
-	cmd.UI.DisplayText(prefix+"{{.ENVName}}                                 {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "-v",
-			"Description": cmd.UI.TranslateText("Print API request diagnostics to stdout"),
-		})
+	cmd.UI.DisplayTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
 	cmd.UI.DisplayNewline()
+
 	cmd.UI.DisplayText("These are commonly used commands. Use 'cf help -a' to see all, with descriptions.")
 	cmd.UI.DisplayText("See 'cf help <command>' to read about a specific command.")
-}
-
-func (cmd HelpCommand) displayAllCommands() {
-	pluginCommands := cmd.getSortedPluginCommands()
-	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
-
-	for _, category := range internal.HelpCategoryList {
-		cmd.UI.DisplayHeader(category.CategoryName)
-
-		for _, row := range category.CommandList {
-			for _, command := range row {
-				cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}",
-					map[string]interface{}{
-						"CommandName":        cmdInfo[command].Name,
-						"CommandDescription": cmd.UI.TranslateText(cmdInfo[command].Description),
-						"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
-					})
-			}
-
-			cmd.UI.DisplayNewline()
-		}
-	}
-
-	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
-	for _, pluginCommand := range pluginCommands {
-		cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
-			"CommandName":        pluginCommand.Name,
-			"CommandDescription": pluginCommand.HelpText,
-			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
-		})
-	}
-	cmd.UI.DisplayNewline()
-}
-
-func (cmd HelpCommand) displayHelpFooter() {
-	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
-	cmd.UI.DisplayText("   {{.ENVName}}                     {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_COLOR=false",
-			"Description": cmd.UI.TranslateText("Do not colorize output"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}                  {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_DIAL_TIMEOUT=5",
-			"Description": cmd.UI.TranslateText("Max wait time to establish a connection, including name resolution, in seconds"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}               {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_HOME=path/to/dir/",
-			"Description": cmd.UI.TranslateText("Override path to default config directory"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}        {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_PLUGIN_HOME=path/to/dir/",
-			"Description": cmd.UI.TranslateText("Override path to default plugin config directory"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}                      {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_TRACE=true",
-			"Description": cmd.UI.TranslateText("Print API request diagnostics to stdout"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}         {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "CF_TRACE=path/to/trace.log",
-			"Description": cmd.UI.TranslateText("Append API request diagnostics to a log file"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}} {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "https_proxy=proxy.example.com:8080",
-			"Description": cmd.UI.TranslateText("Enable HTTP proxying for API requests"),
-		})
-	cmd.UI.DisplayNewline()
-
-	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
-	cmd.UI.DisplayText("   {{.ENVName}}                         {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "--help, -h",
-			"Description": cmd.UI.TranslateText("Show help"),
-		})
-	cmd.UI.DisplayText("   {{.ENVName}}                                 {{.Description}}",
-		map[string]interface{}{
-			"ENVName":     "-v",
-			"Description": cmd.UI.TranslateText("Print API request diagnostics to stdout"),
-		})
 }
 
 func (cmd HelpCommand) displayCommand() error {
@@ -265,7 +218,7 @@ func (cmd HelpCommand) displayCommand() error {
 	}
 
 	cmd.UI.DisplayText("NAME:")
-	cmd.UI.DisplayText("   {{.CommandName}} - {{.CommandDescription}}",
+	cmd.UI.DisplayText(commandIndent+"{{.CommandName}} - {{.CommandDescription}}",
 		map[string]interface{}{
 			"CommandName":        cmdInfo.Name,
 			"CommandDescription": cmd.UI.TranslateText(cmdInfo.Description),
@@ -274,7 +227,7 @@ func (cmd HelpCommand) displayCommand() error {
 	cmd.UI.DisplayNewline()
 	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", cmd.Config.BinaryName(), -1)
 	cmd.UI.DisplayText("USAGE:")
-	cmd.UI.DisplayText("   {{.CommandUsage}}",
+	cmd.UI.DisplayText(commandIndent+"{{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandUsage": cmd.UI.TranslateText(usageString),
 		})
@@ -282,7 +235,7 @@ func (cmd HelpCommand) displayCommand() error {
 	if cmdInfo.Alias != "" {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("ALIAS:")
-		cmd.UI.DisplayText("   {{.Alias}}",
+		cmd.UI.DisplayText(commandIndent+"{{.Alias}}",
 			map[string]interface{}{
 				"Alias": cmdInfo.Alias,
 			})
@@ -302,7 +255,7 @@ func (cmd HelpCommand) displayCommand() error {
 				name = "--" + flag.Long
 			}
 
-			cmd.UI.DisplayText("   {{.Flags}}{{.Spaces}}{{.Description}}",
+			cmd.UI.DisplayText(commandIndent+"{{.Flags}}{{.Spaces}}{{.Description}}",
 				map[string]interface{}{
 					"Flags":       name,
 					"Spaces":      strings.Repeat(" ", nameWidth-len(name)),
@@ -315,7 +268,7 @@ func (cmd HelpCommand) displayCommand() error {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("ENVIRONMENT:")
 		for _, envVar := range cmdInfo.Environment {
-			cmd.UI.DisplayText("   {{.EnvVar}}{{.Description}}",
+			cmd.UI.DisplayText(commandIndent+"{{.EnvVar}}{{.Description}}",
 				map[string]interface{}{
 					"EnvVar":      fmt.Sprintf("%-29s", fmt.Sprintf("%s=%s", envVar.Name, envVar.DefaultValue)),
 					"Description": cmd.UI.TranslateText(envVar.Description),
@@ -326,13 +279,29 @@ func (cmd HelpCommand) displayCommand() error {
 	if len(cmdInfo.RelatedCommands) > 0 {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("SEE ALSO:")
-		cmd.UI.DisplayText("   {{.RelatedCommands}}",
-			map[string]interface{}{
-				"RelatedCommands": strings.Join(cmdInfo.RelatedCommands, ", "),
-			})
+		cmd.UI.DisplayText(commandIndent + strings.Join(cmdInfo.RelatedCommands, ", "))
 	}
 
 	return nil
+}
+
+func (cmd HelpCommand) environmentalVariablesTableData() [][]string {
+	return [][]string{
+		{"CF_COLOR=false", cmd.UI.TranslateText("Do not colorize output")},
+		{"CF_DIAL_TIMEOUT=5", cmd.UI.TranslateText("Max wait time to establish a connection, including name resolution, in seconds")},
+		{"CF_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default config directory")},
+		{"CF_PLUGIN_HOME=path/to/dir/", cmd.UI.TranslateText("Override path to default plugin config directory")},
+		{"CF_TRACE=true", cmd.UI.TranslateText("Print API request diagnostics to stdout")},
+		{"CF_TRACE=path/to/trace.log", cmd.UI.TranslateText("Append API request diagnostics to a log file")},
+		{"https_proxy=proxy.example.com:8080", cmd.UI.TranslateText("Enable HTTP proxying for API requests")},
+	}
+}
+
+func (cmd HelpCommand) globalOptionsTableData() [][]string {
+	return [][]string{
+		{"--help, -h", cmd.UI.TranslateText("Show help")},
+		{"-v", cmd.UI.TranslateText("Print API request diagnostics to stdout")},
+	}
 }
 
 func (cmd HelpCommand) findPlugin() (sharedaction.CommandInfo, bool) {
