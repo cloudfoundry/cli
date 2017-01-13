@@ -19,6 +19,7 @@ var _ = Describe("target command", func() {
 
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.RandomName()
+		helpers.RunIfExperimental("target command refactor is still experimental")
 	})
 
 	Context("help", func() {
