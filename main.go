@@ -140,7 +140,13 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer configv3.WriteConfig(cfConfig)
+
+	defer func() {
+		configWriteErr := configv3.WriteConfig(cfConfig)
+		if configWriteErr != nil {
+			fmt.Fprintf(os.Stderr, "Error writing config: %s", configWriteErr.Error())
+		}
+	}()
 
 	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
 		commandUI, err := ui.NewUI(cfConfig)
