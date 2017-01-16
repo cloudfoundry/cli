@@ -15,7 +15,7 @@ func TurnOffColors() {
 
 func SetHomeDir() string {
 	var err error
-	homeDir, err := ioutil.TempDir("", "cli-gats-test")
+	homeDir, err := ioutil.TempDir("", "cli-integration-test")
 	Expect(err).NotTo(HaveOccurred())
 
 	os.Setenv("CF_HOME", homeDir)
