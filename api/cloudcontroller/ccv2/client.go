@@ -50,6 +50,7 @@ package ccv2
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"github.com/tedsuo/rata"
@@ -67,19 +68,39 @@ type Client struct {
 	cloudControllerURL        string
 	dopplerEndpoint           string
 	loggregatorEndpoint       string
+	minCLIVersion             string
 	routingEndpoint           string
 	tokenEndpoint             string
-	minCLIVersion             string
 
-	router     *rata.RequestGenerator
+	jobPollingInterval time.Duration
+	jobPollingTimeout  time.Duration
+
 	connection cloudcontroller.Connection
+	router     *rata.RequestGenerator
 	userAgent  string
 }
 
+// Config allows the Client to be configured
+type Config struct {
+	// AppName is the name of the application/process using the client.
+	AppName string
+
+	// AppVersion is the version of the application/process using the client.
+	AppVersion string
+
+	// JobPollingTimeout is the maximum amount of time a job polls for.
+	JobPollingTimeout time.Duration
+
+	// JobPollingInterval is the wait time between job polls.
+	JobPollingInterval time.Duration
+}
+
 // NewClient returns a new Cloud Controller Client.
-func NewClient(appName string, appVersion string) *Client {
-	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", appName, appVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
+func NewClient(config Config) *Client {
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return &Client{
-		userAgent: userAgent,
+		userAgent:          userAgent,
+		jobPollingInterval: config.JobPollingInterval,
+		jobPollingTimeout:  config.JobPollingTimeout,
 	}
 }

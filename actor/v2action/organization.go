@@ -79,8 +79,10 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 		return allWarnings, err
 	}
 
-	warnings, err = actor.PollJob(job)
-	allWarnings = append(allWarnings, warnings...)
+	ccWarnings, err := actor.CloudControllerClient.PollJob(job)
+	for _, warning := range ccWarnings {
+		allWarnings = append(allWarnings, warning)
+	}
 
 	return allWarnings, err
 }

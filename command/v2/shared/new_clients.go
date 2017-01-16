@@ -17,7 +17,12 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 		}
 	}
 
-	ccClient := ccv2.NewClient(config.BinaryName(), config.BinaryVersion())
+	ccClient := ccv2.NewClient(ccv2.Config{
+		AppName:            config.BinaryName(),
+		AppVersion:         config.BinaryVersion(),
+		JobPollingTimeout:  config.OverallPollingTimeout(),
+		JobPollingInterval: config.PollingInterval(),
+	})
 	_, err := ccClient.TargetCF(ccv2.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
