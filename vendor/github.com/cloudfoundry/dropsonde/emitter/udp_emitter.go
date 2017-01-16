@@ -4,12 +4,12 @@ import (
 	"net"
 )
 
-type udpEmitter struct {
+type UDPEmitter struct {
 	udpAddr *net.UDPAddr
 	udpConn net.PacketConn
 }
 
-func NewUdpEmitter(remoteAddr string) (*udpEmitter, error) {
+func NewUdpEmitter(remoteAddr string) (*UDPEmitter, error) {
 	addr, err := net.ResolveUDPAddr("udp4", remoteAddr)
 	if err != nil {
 		return nil, err
@@ -20,19 +20,19 @@ func NewUdpEmitter(remoteAddr string) (*udpEmitter, error) {
 		return nil, err
 	}
 
-	emitter := &udpEmitter{udpAddr: addr, udpConn: conn}
+	emitter := &UDPEmitter{udpAddr: addr, udpConn: conn}
 	return emitter, nil
 }
 
-func (e *udpEmitter) Emit(data []byte) error {
+func (e *UDPEmitter) Emit(data []byte) error {
 	_, err := e.udpConn.WriteTo(data, e.udpAddr)
 	return err
 }
 
-func (e *udpEmitter) Close() {
+func (e *UDPEmitter) Close() {
 	e.udpConn.Close()
 }
 
-func (e *udpEmitter) Address() net.Addr {
+func (e *UDPEmitter) Address() net.Addr {
 	return e.udpConn.LocalAddr()
 }

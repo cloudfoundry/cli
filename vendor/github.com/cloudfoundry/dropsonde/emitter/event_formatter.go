@@ -19,12 +19,6 @@ func Wrap(event events.Event, origin string) (*events.Envelope, error) {
 	envelope := &events.Envelope{Origin: proto.String(origin), Timestamp: proto.Int64(time.Now().UnixNano())}
 
 	switch event := event.(type) {
-	case *events.HttpStart:
-		envelope.EventType = events.Envelope_HttpStart.Enum()
-		envelope.HttpStart = event
-	case *events.HttpStop:
-		envelope.EventType = events.Envelope_HttpStop.Enum()
-		envelope.HttpStop = event
 	case *events.HttpStartStop:
 		envelope.EventType = events.Envelope_HttpStartStop.Enum()
 		envelope.HttpStartStop = event

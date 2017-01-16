@@ -24,7 +24,7 @@ type Params map[string]string
 // Currently, the properties used for matching are Method and Path.
 //
 // Method can be one of the following:
-//  GET PUT POST DELETE
+//  GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE
 //
 // Path conforms to Pat-style pattern matching. The following docs are taken from
 // http://godoc.org/github.com/bmizerany/pat#PatternServeMux
@@ -61,7 +61,7 @@ type Route struct {
 	// Name is a key specifying which HTTP handler the router
 	// should associate with the endpoint at runtime.
 	Name string
-	// Method is one of the following: GET,PUT,POST,DELETE
+	// Method is any valid HTTP method
 	Method string
 	// Path contains a path pattern
 	Path string

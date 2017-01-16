@@ -430,16 +430,36 @@ func fromForm(req *http.Request) ([]byte, bool) {
 	return nil, false
 }
 
-// ParseFromRequest tries to find the JWS in an http.Request.
-// This method will call ParseMultipartForm if there's no token in the header.
-func ParseFromRequest(req *http.Request, format Format, u ...json.Unmarshaler) (JWS, error) {
+// ParseFromHeader tries to find the JWS in an http.Request header.
+func ParseFromHeader(req *http.Request, format Format, u ...json.Unmarshaler) (JWS, error) {
 	if b, ok := fromHeader(req); ok {
 		return parseJumpTable[format](b, u...)
 	}
+	return nil, ErrNoTokenInRequest
+}
+
+// ParseFromForm tries to find the JWS in an http.Request form request.
+func ParseFromForm(req *http.Request, format Format, u ...json.Unmarshaler) (JWS, error) {
 	if b, ok := fromForm(req); ok {
 		return parseJumpTable[format](b, u...)
 	}
 	return nil, ErrNoTokenInRequest
+}
+
+// ParseFromRequest tries to find the JWS in an http.Request.
+// This method will call ParseMultipartForm if there's no token in the header.
+func ParseFromRequest(req *http.Request, format Format, u ...json.Unmarshaler) (JWS, error) {
+	token, err := ParseFromHeader(req, format, u...)
+	if err == nil {
+		return token, nil
+	}
+
+	token, err = ParseFromForm(req, format, u...)
+	if err == nil {
+		return token, nil
+	}
+
+	return nil, err
 }
 
 // IgnoreDupes should be set to true if the internal duplicate header key check

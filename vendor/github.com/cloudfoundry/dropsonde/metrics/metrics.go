@@ -21,10 +21,32 @@ package metrics
 
 import (
 	"github.com/cloudfoundry/dropsonde/metric_sender"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
-var metricSender metric_sender.MetricSender
-var metricBatcher MetricBatcher
+var (
+	metricSender  MetricSender
+	metricBatcher MetricBatcher
+)
+
+//go:generate hel --type MetricSender --output mock_metric_sender_test.go
+
+type MetricSender interface {
+	Send(event events.Event) error
+
+	// new chanining functions
+	Value(name string, value float64, unit string) metric_sender.ValueChainer
+	ContainerMetric(appID string, instance int32, cpu float64, mem, disk uint64) metric_sender.ContainerMetricChainer
+	Counter(name string) metric_sender.CounterChainer
+
+	// legacy functions
+	SendValue(name string, value float64, unit string) error
+	IncrementCounter(name string) error
+	AddToCounter(name string, delta uint64) error
+	SendContainerMetric(applicationId string, instanceIndex int32, cpuPercentage float64, memoryBytes uint64, diskBytes uint64) error
+}
+
+//go:generate hel --type MetricBatcher --output mock_metric_batcher_test.go
 
 type MetricBatcher interface {
 	BatchIncrementCounter(name string)
@@ -33,7 +55,7 @@ type MetricBatcher interface {
 }
 
 // Initialize prepares the metrics package for use with the automatic Emitter.
-func Initialize(ms metric_sender.MetricSender, mb MetricBatcher) {
+func Initialize(ms MetricSender, mb MetricBatcher) {
 	if metricBatcher != nil {
 		metricBatcher.Close()
 	}
@@ -44,6 +66,11 @@ func Initialize(ms metric_sender.MetricSender, mb MetricBatcher) {
 // Closes the metrics system and flushes any batch metrics.
 func Close() {
 	metricBatcher.Close()
+}
+
+// Send sends an events.Event.
+func Send(ev events.Event) error {
+	return metricSender.Send(ev)
 }
 
 // SendValue sends a value event for the named metric. See
@@ -105,4 +132,31 @@ func SendContainerMetric(applicationId string, instanceIndex int32, cpuPercentag
 	}
 
 	return metricSender.SendContainerMetric(applicationId, instanceIndex, cpuPercentage, memoryBytes, diskBytes)
+}
+
+// Value creates a value metric that can be manipulated via cascading calls
+// and then sent.
+func Value(name string, value float64, unit string) metric_sender.ValueChainer {
+	if metricSender == nil {
+		return nil
+	}
+	return metricSender.Value(name, value, unit)
+}
+
+// ContainerMetric creates a container metric that can be manipulated via
+// cascading calls and then sent.
+func ContainerMetric(appID string, instance int32, cpu float64, mem, disk uint64) metric_sender.ContainerMetricChainer {
+	if metricSender == nil {
+		return nil
+	}
+	return metricSender.ContainerMetric(appID, instance, cpu, mem, disk)
+}
+
+// Counter creates a counter event that can be manipulated via cascading calls
+// and then sent via Increment or Add.
+func Counter(name string) metric_sender.CounterChainer {
+	if metricSender == nil {
+		return nil
+	}
+	return metricSender.Counter(name)
 }

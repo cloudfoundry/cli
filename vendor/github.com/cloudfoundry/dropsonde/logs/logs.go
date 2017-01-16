@@ -19,13 +19,22 @@ import (
 	"io"
 
 	"github.com/cloudfoundry/dropsonde/log_sender"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
-var logSender log_sender.LogSender
+type LogSender interface {
+	SendAppLog(appID, message, sourceType, sourceInstance string) error
+	SendAppErrorLog(appID, message, sourceType, sourceInstance string) error
+	ScanLogStream(appID, sourceType, sourceInstance string, reader io.Reader)
+	ScanErrorLogStream(appID, sourceType, sourceInstance string, reader io.Reader)
+	LogMessage(msg []byte, msgType events.LogMessage_MessageType) log_sender.LogChainer
+}
+
+var logSender LogSender
 
 // Initialize prepares the logs package for use with the automatic Emitter
 // from dropsonde.
-func Initialize(ls log_sender.LogSender) {
+func Initialize(ls LogSender) {
 	logSender = ls
 }
 
@@ -65,4 +74,10 @@ func ScanErrorLogStream(appID, sourceType, sourceInstance string, reader io.Read
 		return
 	}
 	logSender.ScanErrorLogStream(appID, sourceType, sourceInstance, reader)
+}
+
+// LogMessage creates a log message that can be manipulated via cascading calls
+// and then sent.
+func LogMessage(msg []byte, msgType events.LogMessage_MessageType) log_sender.LogChainer {
+	return logSender.LogMessage(msg, msgType)
 }

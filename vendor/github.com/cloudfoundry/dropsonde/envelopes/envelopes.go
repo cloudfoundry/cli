@@ -12,16 +12,16 @@
 //
 package envelopes
 
-import (
-	"github.com/cloudfoundry/dropsonde/envelope_sender"
+import "github.com/cloudfoundry/sonde-go/events"
 
-	"github.com/cloudfoundry/sonde-go/events"
-)
+type EnvelopeSender interface {
+	SendEnvelope(*events.Envelope) error
+}
 
-var envelopeSender envelope_sender.EnvelopeSender
+var envelopeSender EnvelopeSender
 
 // Initialize prepares the envelopes package for use with the automatic Emitter.
-func Initialize(es envelope_sender.EnvelopeSender) {
+func Initialize(es EnvelopeSender) {
 	envelopeSender = es
 }
 

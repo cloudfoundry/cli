@@ -4,11 +4,16 @@ import (
 	"bufio"
 	"io"
 	"sync"
+
+	"github.com/cloudfoundry/dropsonde/log_sender"
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type FakeLogSender struct {
-	logs        []Log
-	ReturnError error
+	logs          []Log
+	logMessages   []LogMessage
+	ReturnError   error
+	ReturnChainer log_sender.LogChainer
 	sync.RWMutex
 }
 
@@ -18,6 +23,11 @@ type Log struct {
 	SourceType     string
 	SourceInstance string
 	MessageType    string
+}
+
+type LogMessage struct {
+	Message     []byte
+	MessageType events.LogMessage_MessageType
 }
 
 func NewFakeLogSender() *FakeLogSender {
@@ -83,11 +93,34 @@ func (fls *FakeLogSender) ScanErrorLogStream(appId, sourceType, sourceInstance s
 	}
 }
 
+func (fls *FakeLogSender) LogMessage(msg []byte, msgType events.LogMessage_MessageType) log_sender.LogChainer {
+	fls.Lock()
+	defer fls.Unlock()
+	fls.logMessages = append(fls.logMessages, LogMessage{
+		Message:     msg,
+		MessageType: msgType,
+	})
+
+	if fls.ReturnChainer != nil {
+		c := fls.ReturnChainer
+		fls.ReturnChainer = nil
+		return c
+	}
+	return nil
+}
+
 func (fls *FakeLogSender) GetLogs() []Log {
 	fls.RLock()
 	defer fls.RUnlock()
 
 	return fls.logs
+}
+
+func (fls *FakeLogSender) GetLogMessages() []LogMessage {
+	fls.RLock()
+	defer fls.RUnlock()
+
+	return fls.logMessages
 }
 
 func (fls *FakeLogSender) Reset() {

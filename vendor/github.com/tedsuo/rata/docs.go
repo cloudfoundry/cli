@@ -17,10 +17,10 @@ like to include the owner_id and pet_id as part of the URL path.
 
 First off, the routes might look like this:
   petRoutes := rata.Routes{
-    {Name: "get_pet",    Method: "GET",    Path: "/people/:owner_id/pets/:pet_id"},
-    {Name: "create_pet", Method: "POST",   Path: "/people/:owner_id/pets"},
-    {Name: "update_pet", Method: "PUT",    Path: "/people/:owner_id/pets/:pet_id"},
-    {Name: "delete_pet", Method: "DELETE", Path: "/people/:owner_id/pets/:pet_id"},
+    {Name: "get_pet",    Method: rata.GET,    Path: "/people/:owner_id/pets/:pet_id"},
+    {Name: "create_pet", Method: rata.POST,   Path: "/people/:owner_id/pets"},
+    {Name: "update_pet", Method: rata.PUT,    Path: "/people/:owner_id/pets/:pet_id"},
+    {Name: "delete_pet", Method: rata.DELETE, Path: "/people/:owner_id/pets/:pet_id"},
   }
 
 

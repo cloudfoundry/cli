@@ -39,34 +39,30 @@ func init() {
 
 // A DropsondeMarshaller is an self-instrumenting tool for converting dropsonde
 // Envelopes to binary (Protocol Buffer) messages.
-type DropsondeMarshaller interface {
-	Run(inputChan <-chan *events.Envelope, outputChan chan<- []byte)
-}
-
-// NewDropsondeMarshaller instantiates a DropsondeMarshaller and logs to the
-// provided logger.
-func NewDropsondeMarshaller(logger *gosteno.Logger) DropsondeMarshaller {
-	messageCounts := make(map[events.Envelope_EventType]*uint64)
-	for key := range events.Envelope_EventType_name {
-		var count uint64
-		messageCounts[events.Envelope_EventType(key)] = &count
-	}
-	return &dropsondeMarshaller{
-		logger:        logger,
-		messageCounts: messageCounts,
-	}
-}
-
-type dropsondeMarshaller struct {
+type DropsondeMarshaller struct {
 	logger            *gosteno.Logger
 	messageCounts     map[events.Envelope_EventType]*uint64
 	marshalErrorCount uint64
 }
 
+// NewDropsondeMarshaller instantiates a DropsondeMarshaller and logs to the
+// provided logger.
+func NewDropsondeMarshaller(logger *gosteno.Logger) *DropsondeMarshaller {
+	messageCounts := make(map[events.Envelope_EventType]*uint64)
+	for key := range events.Envelope_EventType_name {
+		var count uint64
+		messageCounts[events.Envelope_EventType(key)] = &count
+	}
+	return &DropsondeMarshaller{
+		logger:        logger,
+		messageCounts: messageCounts,
+	}
+}
+
 // Run reads Envelopes from inputChan, marshals them to Protocol Buffer format,
 // and emits the binary messages onto outputChan. It operates one message at a
 // time, and will block if outputChan is not read.
-func (u *dropsondeMarshaller) Run(inputChan <-chan *events.Envelope, outputChan chan<- []byte) {
+func (u *DropsondeMarshaller) Run(inputChan <-chan *events.Envelope, outputChan chan<- []byte) {
 	for message := range inputChan {
 
 		messageBytes, err := proto.Marshal(message)
@@ -81,7 +77,7 @@ func (u *dropsondeMarshaller) Run(inputChan <-chan *events.Envelope, outputChan 
 	}
 }
 
-func (u *dropsondeMarshaller) incrementMessageCount(eventType events.Envelope_EventType) {
+func (u *DropsondeMarshaller) incrementMessageCount(eventType events.Envelope_EventType) {
 	metricName := metricNames[eventType]
 	if metricName == "" {
 		metricName = "dropsondeMarshaller.unknownEventTypeReceived"
