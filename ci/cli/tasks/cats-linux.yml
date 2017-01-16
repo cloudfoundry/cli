@@ -23,8 +23,6 @@ run:
     export PATH="${GOPATH}/bin":${PATH}
     export CONFIG=$PWD/cats-config/integration_config.json
 
-    curl ifconfig.co/json
-
     mkdir -p cf-release-repo/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
