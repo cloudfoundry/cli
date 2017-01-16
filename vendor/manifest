@@ -5,7 +5,7 @@
 			"importpath": "code.cloudfoundry.org/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
-			"revision": "a3d710cd04a82f94d69378b03a3ba1851dede932",
+			"revision": "18cdb3586e7fca967680b3330d9c21e3f7d3e767",
 			"branch": "master",
 			"path": "/server",
 			"notests": true
@@ -14,7 +14,7 @@
 			"importpath": "code.cloudfoundry.org/diego-ssh/test_helpers",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
-			"revision": "46bd01f4f8219bd02f3c2e02c2565f7095dc4a2f",
+			"revision": "18cdb3586e7fca967680b3330d9c21e3f7d3e767",
 			"branch": "master",
 			"path": "test_helpers",
 			"notests": true
@@ -23,7 +23,7 @@
 			"importpath": "code.cloudfoundry.org/gofileutils/fileutils",
 			"repository": "https://github.com/cloudfoundry/gofileutils",
 			"vcs": "git",
-			"revision": "9cc1c2584bed48590cb019b4ac5b962b2a81278a",
+			"revision": "4d0c80011a0f37da1711c184028bc40137cd45af",
 			"branch": "master",
 			"path": "/fileutils",
 			"notests": true
@@ -48,7 +48,7 @@
 			"importpath": "github.com/SermoDigital/jose",
 			"repository": "https://github.com/SermoDigital/jose",
 			"vcs": "git",
-			"revision": "5d7fcbc3e492ba754c75700fbfa18bc498a705db",
+			"revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
 			"branch": "master",
 			"notests": true
 		},
@@ -56,7 +56,7 @@
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
-			"revision": "881bee4e20a5d11a6a88a5667c6f292072ac1963",
+			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
 			"branch": "master",
 			"notests": true
 		},
@@ -64,7 +64,7 @@
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
-			"revision": "60ec3488bfea7cca02b021d106d9911120d25fe9",
+			"revision": "3a37c301dda64cbe17f16f661b4c976803c0e2d2",
 			"branch": "master",
 			"notests": true
 		},
@@ -80,7 +80,7 @@
 			"importpath": "github.com/cloudfoundry-incubator/cli-plugin-repo/web",
 			"repository": "https://github.com/cloudfoundry-incubator/cli-plugin-repo",
 			"vcs": "git",
-			"revision": "5aeeebfb703035071dc11df9d75d51abca9836e0",
+			"revision": "c617dd749bce96b5357933bfde859cb9a01c6012",
 			"branch": "master",
 			"path": "/web",
 			"notests": true
@@ -89,7 +89,7 @@
 			"importpath": "github.com/cloudfoundry/dropsonde",
 			"repository": "https://github.com/cloudfoundry/dropsonde",
 			"vcs": "git",
-			"revision": "00385820dd1849bea823c7bbd78cb0b99b577f40",
+			"revision": "01bc88882911289a6eaa67311ac0d06f77196c4f",
 			"branch": "master",
 			"notests": true
 		},
@@ -123,7 +123,7 @@
 			"importpath": "github.com/cloudfoundry/loggregator_consumer",
 			"repository": "https://github.com/cloudfoundry/loggregator_consumer",
 			"vcs": "git",
-			"revision": "a763160649643d5c2299ead471a9837a17ae4186",
+			"revision": "eef2afce51e4fa4d56ed94eb02c9bba38d7b4572",
 			"branch": "master",
 			"notests": true
 		},
@@ -131,7 +131,7 @@
 			"importpath": "github.com/cloudfoundry/loggregatorlib/logmessage",
 			"repository": "https://github.com/cloudfoundry/loggregatorlib",
 			"vcs": "git",
-			"revision": "03bfd6ee4743a1a21433092663292b65aa4ee14e",
+			"revision": "89ede302e272352e4c8e011c3f8b5615a1ec859a",
 			"branch": "master",
 			"path": "/logmessage",
 			"notests": true
@@ -140,7 +140,7 @@
 			"importpath": "github.com/cloudfoundry/loggregatorlib/signature",
 			"repository": "https://github.com/cloudfoundry/loggregatorlib",
 			"vcs": "git",
-			"revision": "03bfd6ee4743a1a21433092663292b65aa4ee14e",
+			"revision": "89ede302e272352e4c8e011c3f8b5615a1ec859a",
 			"branch": "master",
 			"path": "signature",
 			"notests": true
@@ -149,7 +149,7 @@
 			"importpath": "github.com/cloudfoundry/noaa",
 			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
-			"revision": "1939b6e4d6d76b2ee8541befd6a8fb8aa076933e",
+			"revision": "5a1ef880e4cc4f6081ab42bdd9ce79ecd13636d5",
 			"branch": "master",
 			"notests": true
 		},
@@ -166,7 +166,7 @@
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "39473dad5425d734fdc73df0a678c6edc3d4054b",
+			"revision": "a7c3389a8223449ed72d796b33a667e603811db8",
 			"branch": "master",
 			"path": "/pkg/term",
 			"notests": true
@@ -175,7 +175,7 @@
 			"importpath": "github.com/fatih/color",
 			"repository": "https://github.com/fatih/color",
 			"vcs": "git",
-			"revision": "bf82308e8c8546dc2b945157173eb8a959ae9505",
+			"revision": "42c364ba490082e4815b5222728711b3440603eb",
 			"branch": "master",
 			"notests": true
 		},
@@ -183,7 +183,7 @@
 			"importpath": "github.com/gogo/protobuf/gogoproto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "06ec6c31ff1bac6ed4e205a547a3d72934813ef3",
+			"revision": "f9114dace7bd920b32f943b3c73fafbcbab2bf31",
 			"branch": "master",
 			"path": "/gogoproto",
 			"notests": true
@@ -192,7 +192,7 @@
 			"importpath": "github.com/gogo/protobuf/proto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "06ec6c31ff1bac6ed4e205a547a3d72934813ef3",
+			"revision": "f9114dace7bd920b32f943b3c73fafbcbab2bf31",
 			"branch": "master",
 			"path": "proto",
 			"notests": true
@@ -219,7 +219,7 @@
 			"importpath": "github.com/google/go-querystring/query",
 			"repository": "https://github.com/google/go-querystring",
 			"vcs": "git",
-			"revision": "9235644dd9e52eeae6fa48efd539fdc351a0af53",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
 			"branch": "master",
 			"path": "/query",
 			"notests": true
@@ -228,15 +228,7 @@
 			"importpath": "github.com/gorilla/websocket",
 			"repository": "https://github.com/gorilla/websocket",
 			"vcs": "git",
-			"revision": "0868951cdb8e69bc42df4598bdc6164ff2f1a072",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/jessevdk/go-flags",
-			"repository": "https://github.com/jessevdk/go-flags",
-			"vcs": "git",
-			"revision": "a8cab0163d48558ffd77076c9c99388529766f63",
+			"revision": "bb547c6c5c59732c29a3266d7125a84f6c3fce32",
 			"branch": "master",
 			"notests": true
 		},
@@ -268,7 +260,7 @@
 			"importpath": "github.com/nicksnyder/go-i18n/i18n",
 			"repository": "https://github.com/nicksnyder/go-i18n",
 			"vcs": "git",
-			"revision": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3",
+			"revision": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb",
 			"branch": "master",
 			"path": "/i18n",
 			"notests": true
@@ -285,7 +277,7 @@
 			"importpath": "github.com/onsi/ginkgo",
 			"repository": "https://github.com/onsi/ginkgo",
 			"vcs": "git",
-			"revision": "00054c0bb96fc880d4e0be1b90937fad438c5290",
+			"revision": "a23f924ce96d61f963fb6219b8ff069d8d768cc2",
 			"branch": "master",
 			"notests": true
 		},
@@ -293,7 +285,7 @@
 			"importpath": "github.com/onsi/gomega",
 			"repository": "https://github.com/onsi/gomega",
 			"vcs": "git",
-			"revision": "f1f0f388b31eca4e2cbe7a6dd8a3a1dfddda5b1c",
+			"revision": "e85f63af4302dc0e4277c6008ecf803f1d80e4f0",
 			"branch": "master",
 			"notests": true
 		},
@@ -309,7 +301,7 @@
 			"importpath": "github.com/stretchr/testify/assert",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
-			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
 			"branch": "master",
 			"path": "/assert",
 			"notests": true
@@ -318,7 +310,7 @@
 			"importpath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
-			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
 			"branch": "master",
 			"path": "vendor/github.com/davecgh/go-spew/spew",
 			"notests": true
@@ -327,7 +319,7 @@
 			"importpath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
 			"repository": "https://github.com/stretchr/testify",
 			"vcs": "git",
-			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
 			"branch": "master",
 			"path": "vendor/github.com/pmezard/go-difflib/difflib",
 			"notests": true
@@ -344,7 +336,7 @@
 			"importpath": "github.com/tedsuo/rata",
 			"repository": "https://github.com/tedsuo/rata",
 			"vcs": "git",
-			"revision": "b15ebd8bd97ae9202eb00c076d59b2f2824bce37",
+			"revision": "0649c23705dfb45a9693b668c4fc1c0666f485d9",
 			"branch": "master",
 			"notests": true
 		},
@@ -360,7 +352,7 @@
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "9a6f0a01987842989747adff311d80750ba25530",
+			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
 			"branch": "master",
 			"path": "curve25519",
 			"notests": true
@@ -369,7 +361,7 @@
 			"importpath": "golang.org/x/crypto/ed25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "9a6f0a01987842989747adff311d80750ba25530",
+			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
 			"branch": "master",
 			"path": "ed25519",
 			"notests": true
@@ -378,7 +370,7 @@
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "d8e61c69ab46ca38328da2f4995abaf93b252290",
+			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
 			"branch": "master",
 			"path": "/ssh",
 			"notests": true
@@ -387,7 +379,7 @@
 			"importpath": "golang.org/x/net/websocket",
 			"repository": "https://go.googlesource.com/net",
 			"vcs": "git",
-			"revision": "cfae461cedfdcab6e261a26eb77db53695623303",
+			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
 			"branch": "master",
 			"path": "/websocket",
 			"notests": true

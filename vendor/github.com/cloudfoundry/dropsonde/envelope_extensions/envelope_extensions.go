@@ -9,10 +9,6 @@ import (
 
 const SystemAppId = "system"
 
-type hasAppId interface {
-	GetApplicationId() *events.UUID
-}
-
 func GetAppId(envelope *events.Envelope) string {
 	if envelope.GetEventType() == events.Envelope_LogMessage {
 		return envelope.GetLogMessage().GetAppId()
@@ -24,10 +20,6 @@ func GetAppId(envelope *events.Envelope) string {
 
 	var event hasAppId
 	switch envelope.GetEventType() {
-	case events.Envelope_HttpStart:
-		event = envelope.GetHttpStart()
-	case events.Envelope_HttpStop:
-		event = envelope.GetHttpStop()
 	case events.Envelope_HttpStartStop:
 		event = envelope.GetHttpStartStop()
 	default:
@@ -39,6 +31,10 @@ func GetAppId(envelope *events.Envelope) string {
 		return formatUUID(uuid)
 	}
 	return SystemAppId
+}
+
+type hasAppId interface {
+	GetApplicationId() *events.UUID
 }
 
 func formatUUID(uuid *events.UUID) string {

@@ -28,21 +28,24 @@ import (
 	"github.com/cloudfoundry/dropsonde/metricbatcher"
 	"github.com/cloudfoundry/dropsonde/metrics"
 	"github.com/cloudfoundry/dropsonde/runtime_stats"
-	"github.com/cloudfoundry/gosteno"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
-var autowiredEmitter emitter.EventEmitter
+type EventEmitter interface {
+	Emit(events.Event) error
+	EmitEnvelope(*events.Envelope) error
+	Origin() string
+}
+
+var (
+	DefaultEmitter EventEmitter = &NullEventEmitter{}
+)
 
 const (
 	statsInterval        = 10 * time.Second
 	defaultBatchInterval = 5 * time.Second
 	originDelimiter      = "/"
 )
-
-func init() {
-	autowiredEmitter = &NullEventEmitter{}
-}
 
 // Initialize creates default emitters and instruments the default HTTP
 // transport.
@@ -56,11 +59,11 @@ func init() {
 func Initialize(destination string, origin ...string) error {
 	emitter, err := createDefaultEmitter(strings.Join(origin, originDelimiter), destination)
 	if err != nil {
-		autowiredEmitter = &NullEventEmitter{}
+		DefaultEmitter = &NullEventEmitter{}
 		return err
 	}
 
-	autowiredEmitter = emitter
+	DefaultEmitter = emitter
 	initialize()
 
 	return nil
@@ -68,26 +71,26 @@ func Initialize(destination string, origin ...string) error {
 
 // InitializeWithEmitter sets up Dropsonde with the passed emitter, instead of
 // creating one.
-func InitializeWithEmitter(emitter emitter.EventEmitter) {
-	autowiredEmitter = emitter
+func InitializeWithEmitter(emitter EventEmitter) {
+	DefaultEmitter = emitter
 	initialize()
 }
 
 // AutowiredEmitter exposes the emitter used by Dropsonde after its initialization.
-func AutowiredEmitter() emitter.EventEmitter {
-	return autowiredEmitter
+func AutowiredEmitter() EventEmitter {
+	return DefaultEmitter
 }
 
 // InstrumentedHandler returns a Handler pre-configured to emit HTTP server
 // request metrics to AutowiredEmitter.
 func InstrumentedHandler(handler http.Handler) http.Handler {
-	return instrumented_handler.InstrumentedHandler(handler, autowiredEmitter)
+	return instrumented_handler.InstrumentedHandler(handler, DefaultEmitter)
 }
 
 // InstrumentedRoundTripper returns a RoundTripper pre-configured to emit
 // HTTP client request metrics to AutowiredEmitter.
 func InstrumentedRoundTripper(roundTripper http.RoundTripper) http.RoundTripper {
-	return instrumented_round_tripper.InstrumentedRoundTripper(roundTripper, autowiredEmitter)
+	return instrumented_round_tripper.InstrumentedRoundTripper(roundTripper, DefaultEmitter)
 }
 
 func initialize() {
@@ -95,13 +98,13 @@ func initialize() {
 	sender := metric_sender.NewMetricSender(emitter)
 	batcher := metricbatcher.New(sender, defaultBatchInterval)
 	metrics.Initialize(sender, batcher)
-	logs.Initialize(log_sender.NewLogSender(AutowiredEmitter(), gosteno.NewLogger("dropsonde/logs")))
+	logs.Initialize(log_sender.NewLogSender(AutowiredEmitter()))
 	envelopes.Initialize(envelope_sender.NewEnvelopeSender(emitter))
-	go runtime_stats.NewRuntimeStats(autowiredEmitter, statsInterval).Run(nil)
+	go runtime_stats.NewRuntimeStats(DefaultEmitter, statsInterval).Run(nil)
 	http.DefaultTransport = InstrumentedRoundTripper(http.DefaultTransport)
 }
 
-func createDefaultEmitter(origin, destination string) (emitter.EventEmitter, error) {
+func createDefaultEmitter(origin, destination string) (EventEmitter, error) {
 	if len(origin) == 0 {
 		return nil, errors.New("Failed to initialize dropsonde: origin variable not set")
 	}
@@ -121,6 +124,11 @@ func createDefaultEmitter(origin, destination string) (emitter.EventEmitter, err
 // NullEventEmitter is used when no event emission is desired. See
 // http://en.wikipedia.org/wiki/Null_Object_pattern.
 type NullEventEmitter struct{}
+
+// Origin returns the origin that is set on the event.Envelope
+func (*NullEventEmitter) Origin() string {
+	return ""
+}
 
 // Emit is called to send an event to a remote host. On NullEventEmitter,
 // it is a no-op.

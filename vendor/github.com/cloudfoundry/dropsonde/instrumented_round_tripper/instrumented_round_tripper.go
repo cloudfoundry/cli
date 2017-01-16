@@ -5,27 +5,28 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloudfoundry/dropsonde/emitter"
 	"github.com/cloudfoundry/dropsonde/factories"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+type EventEmitter interface {
+	Emit(events.Event) error
+}
+
 type instrumentedRoundTripper struct {
 	roundTripper http.RoundTripper
-	emitter      emitter.EventEmitter
+	emitter      EventEmitter
 }
 
 type instrumentedCancelableRoundTripper struct {
 	instrumentedRoundTripper *instrumentedRoundTripper
 }
 
-/*
-InstrumentedRoundTripper is a helper for creating a "net/http".RoundTripper
-which will delegate to the given RoundTripper
-*/
-func InstrumentedRoundTripper(roundTripper http.RoundTripper, emitter emitter.EventEmitter) http.RoundTripper {
+// InstrumentedRoundTripper is a helper for creating a "net/http".RoundTripper
+// which will delegate to the given RoundTripper.
+func InstrumentedRoundTripper(roundTripper http.RoundTripper, emitter EventEmitter) http.RoundTripper {
 	irt := &instrumentedRoundTripper{roundTripper, emitter}
 
 	_, ok := roundTripper.(canceler)
@@ -38,12 +39,12 @@ func InstrumentedRoundTripper(roundTripper http.RoundTripper, emitter emitter.Ev
 	return irt
 }
 
-/*
-RoundTrip wraps the RoundTrip function of the given RoundTripper.
-Will provide accounting metrics for the http.Request / http.Response life-cycle
-Callers of RoundTrip are responsible for setting the ‘X-Vcap-Request-Id’ field in the request header if they have one.
-Callers are also responsible for setting the ‘X-CF-ApplicationID’ and ‘X-CF-InstanceIndex’ fields in the request header if they are known.
-*/
+// RoundTrip wraps the RoundTrip function of the given RoundTripper.  It
+// provides accounting metrics for the http.Request / http.Response life-cycle.
+// Callers of RoundTrip are responsible for setting the ‘X-Vcap-Request-Id’
+// field in the request header if they have one.  Callers are also responsible
+// for setting the ‘X-CF-ApplicationID’ and ‘X-CF-InstanceIndex’ fields in the
+// request header if they are known.
 func (irt *instrumentedRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	startTime := time.Now()
 	requestId := req.Header.Get("X-Vcap-Request-Id")

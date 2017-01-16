@@ -35,6 +35,8 @@ Additional features specific to Windows:
     Options with long names (/verbose)
     Windows-style options with arguments use a colon as the delimiter
     Modify generated help message with Windows-style / options
+    Windows style options can be disabled at build time using the "forceposix"
+    build tag
 
 
 Basic usage
@@ -107,7 +109,7 @@ The following is a list of tags for struct fields supported by go-flags:
     value-name:     the name of the argument value (to be shown in the help)
                     (optional)
     choice:         limits the values for an option to a set of values.
-                    This tag can be specified mltiple times (optional)
+                    This tag can be specified multiple times (optional)
     hidden:         the option is not visible in the help or man page.
 
     base: a base (radix) used to convert strings to integer values, the

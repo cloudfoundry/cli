@@ -15,13 +15,19 @@ type FakeEventEmitter struct {
 	ReturnError error
 	messages    []Message
 	envelopes   []*events.Envelope
-	Origin      string
+	origin      string
 	isClosed    bool
 	sync.RWMutex
 }
 
 func NewFakeEventEmitter(origin string) *FakeEventEmitter {
-	return &FakeEventEmitter{Origin: origin}
+	return &FakeEventEmitter{
+		origin: origin,
+	}
+}
+
+func (f *FakeEventEmitter) Origin() string {
+	return f.origin
 }
 
 func (f *FakeEventEmitter) Emit(e events.Event) error {
@@ -35,7 +41,7 @@ func (f *FakeEventEmitter) Emit(e events.Event) error {
 		return err
 	}
 
-	f.messages = append(f.messages, Message{e, f.Origin})
+	f.messages = append(f.messages, Message{e, f.Origin()})
 	return nil
 }
 
@@ -98,6 +104,7 @@ func (f *FakeEventEmitter) Reset() {
 	defer f.Unlock()
 
 	f.isClosed = false
-	f.messages = []Message{}
+	f.messages = nil
+	f.envelopes = nil
 	f.ReturnError = nil
 }

@@ -5,20 +5,23 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/cloudfoundry/dropsonde/emitter"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 )
 
-type RuntimeStats struct {
-	eventEmitter emitter.EventEmitter
-	interval     time.Duration
+type EventEmitter interface {
+	Emit(events.Event) error
 }
 
-func NewRuntimeStats(eventEmitter emitter.EventEmitter, interval time.Duration) *RuntimeStats {
+type RuntimeStats struct {
+	emitter  EventEmitter
+	interval time.Duration
+}
+
+func NewRuntimeStats(emitter EventEmitter, interval time.Duration) *RuntimeStats {
 	return &RuntimeStats{
-		eventEmitter: eventEmitter,
-		interval:     interval,
+		emitter:  emitter,
+		interval: interval,
 	}
 }
 
@@ -51,7 +54,7 @@ func (rs *RuntimeStats) emitMemMetrics() {
 }
 
 func (rs *RuntimeStats) emit(name string, value float64) {
-	err := rs.eventEmitter.Emit(&events.ValueMetric{
+	err := rs.emitter.Emit(&events.ValueMetric{
 		Name:  &name,
 		Value: &value,
 		Unit:  proto.String("count"),

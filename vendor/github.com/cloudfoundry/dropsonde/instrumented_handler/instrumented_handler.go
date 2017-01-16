@@ -7,29 +7,29 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloudfoundry/dropsonde/emitter"
 	"github.com/cloudfoundry/dropsonde/factories"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 	uuid "github.com/nu7hatch/gouuid"
 )
 
-type instrumentedHandler struct {
-	handler http.Handler
-	emitter emitter.EventEmitter
+type EventEmitter interface {
+	Emit(events.Event) error
 }
 
-/*
-Helper for creating an Instrumented Handler which will delegate to the given http.Handler.
-*/
-func InstrumentedHandler(handler http.Handler, emitter emitter.EventEmitter) http.Handler {
+type instrumentedHandler struct {
+	handler http.Handler
+	emitter EventEmitter
+}
+
+// InstrumentedHandler is a helper for creating an instrumented http.Handler
+// which will delegate to the given http.Handler.
+func InstrumentedHandler(handler http.Handler, emitter EventEmitter) http.Handler {
 	return &instrumentedHandler{handler, emitter}
 }
 
-/*
-Wraps the given http.Handler ServerHTTP function
-Will provide accounting metrics for the http.Request / http.Response life-cycle
-*/
+// ServeHTTP wraps the given http.Handler ServerHTTP function.  It provides
+// accounting metrics for the http.Request / http.Response life-cycle
 func (ih *instrumentedHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	requestId, err := uuid.ParseHex(req.Header.Get("X-Vcap-Request-Id"))
 	if err != nil {

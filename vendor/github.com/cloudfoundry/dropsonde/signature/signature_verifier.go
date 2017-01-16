@@ -8,9 +8,9 @@ package signature
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"log"
 
 	"github.com/cloudfoundry/dropsonde/metrics"
-	"github.com/cloudfoundry/gosteno"
 )
 
 const SIGNATURE_LENGTH = 32
@@ -18,15 +18,13 @@ const SIGNATURE_LENGTH = 32
 // A SignatureVerifier is a self-instrumenting pipeline object that validates
 // and removes signatures.
 type Verifier struct {
-	logger       *gosteno.Logger
 	sharedSecret string
 }
 
-// NewSignatureVerifier returns a SignatureVerifier with the provided logger and
+// NewSignatureVerifier returns a SignatureVerifier with the provided
 // shared signing secret.
-func NewVerifier(logger *gosteno.Logger, sharedSecret string) *Verifier {
+func NewVerifier(sharedSecret string) *Verifier {
 	return &Verifier{
-		logger:       logger,
 		sharedSecret: sharedSecret,
 	}
 }
@@ -41,8 +39,7 @@ func NewVerifier(logger *gosteno.Logger, sharedSecret string) *Verifier {
 func (v *Verifier) Run(inputChan <-chan []byte, outputChan chan<- []byte) {
 	for signedMessage := range inputChan {
 		if len(signedMessage) < SIGNATURE_LENGTH {
-			v.logger.Warn("signatureVerifier: missing signature")
-			metrics.BatchIncrementCounter("signatureVerifier.missingSignatureErrors")
+			log.Print("signatureVerifier: missing signature")
 			continue
 		}
 
@@ -51,8 +48,7 @@ func (v *Verifier) Run(inputChan <-chan []byte, outputChan chan<- []byte) {
 			outputChan <- message
 			metrics.BatchIncrementCounter("signatureVerifier.validSignatures")
 		} else {
-			v.logger.Warn("signatureVerifier: invalid signature")
-			metrics.BatchIncrementCounter("signatureVerifier.invalidSignatureErrors")
+			log.Print("signatureVerifier: invalid signature")
 		}
 	}
 }

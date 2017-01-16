@@ -1,26 +1,23 @@
 package envelope_sender
 
-import (
-	"github.com/cloudfoundry/dropsonde/emitter"
-	"github.com/cloudfoundry/sonde-go/events"
-)
+import "github.com/cloudfoundry/sonde-go/events"
+
+type EnvelopeEmitter interface {
+	EmitEnvelope(*events.Envelope) error
+}
 
 // A EnvelopeSender emits envelopes.
-type EnvelopeSender interface {
-	SendEnvelope(*events.Envelope) error
+type EnvelopeSender struct {
+	emitter EnvelopeEmitter
 }
 
-type envelopeSender struct {
-	eventEmitter emitter.EventEmitter
-}
-
-// NewEnvelopeSender instantiates a envelopeSender with the given EventEmitter.
-func NewEnvelopeSender(eventEmitter emitter.EventEmitter) EnvelopeSender {
-	return &envelopeSender{eventEmitter: eventEmitter}
+// NewEnvelopeSender instantiates a EnvelopeSender with the given EventEmitter.
+func NewEnvelopeSender(emitter EnvelopeEmitter) *EnvelopeSender {
+	return &EnvelopeSender{emitter: emitter}
 }
 
 // SendEnvelope sends the given envelope.
 // Returns an error if one occurs while sending the envelope.
-func (ms *envelopeSender) SendEnvelope(envelope *events.Envelope) error {
-	return ms.eventEmitter.EmitEnvelope(envelope)
+func (ms *EnvelopeSender) SendEnvelope(envelope *events.Envelope) error {
+	return ms.emitter.EmitEnvelope(envelope)
 }
