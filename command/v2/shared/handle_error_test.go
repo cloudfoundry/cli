@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
 
@@ -58,13 +59,13 @@ var _ = Describe("HandleError", func() {
 			Name: "some-service-instance",
 		}),
 
-		Entry("v2action.JobFailedError -> JobFailedError", v2action.JobFailedError{
+		Entry("ccv2.JobFailedError -> JobFailedError", ccv2.JobFailedError{
 			JobGUID: "some-job-guid",
 		}, JobFailedError{
 			JobGUID: "some-job-guid",
 		}),
 
-		Entry("v2action.JobTimeoutError -> JobTimeoutError", v2action.JobTimeoutError{
+		Entry("ccv2.JobTimeoutError -> JobTimeoutError", ccv2.JobTimeoutError{
 			JobGUID: "some-job-guid",
 		}, JobTimeoutError{
 			JobGUID: "some-job-guid",

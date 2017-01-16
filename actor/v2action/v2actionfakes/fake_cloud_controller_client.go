@@ -129,16 +129,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpacesStub        func(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
-	getSpacesMutex       sync.RWMutex
-	getSpacesArgsForCall []struct {
-		queries []ccv2.Query
-	}
-	getSpacesReturns struct {
-		result1 []ccv2.Space
-		result2 ccv2.Warnings
-		result3 error
-	}
 	GetSpaceServiceInstancesStub        func(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	getSpaceServiceInstancesMutex       sync.RWMutex
 	getSpaceServiceInstancesArgsForCall []struct {
@@ -151,6 +141,16 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetSpacesStub        func(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
+	getSpacesMutex       sync.RWMutex
+	getSpacesArgsForCall []struct {
+		queries []ccv2.Query
+	}
+	getSpacesReturns struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}
 	NewUserStub        func(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	newUserMutex       sync.RWMutex
 	newUserArgsForCall []struct {
@@ -160,6 +160,15 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.User
 		result2 ccv2.Warnings
 		result3 error
+	}
+	PollJobStub        func(job ccv2.Job) (ccv2.Warnings, error)
+	pollJobMutex       sync.RWMutex
+	pollJobArgsForCall []struct {
+		job ccv2.Job
+	}
+	pollJobReturns struct {
+		result1 ccv2.Warnings
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -615,46 +624,6 @@ func (fake *FakeCloudControllerClient) GetSpaceRoutesReturns(result1 []ccv2.Rout
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaces(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
-	fake.getSpacesMutex.Lock()
-	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
-		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetSpaces", []interface{}{queriesCopy})
-	fake.getSpacesMutex.Unlock()
-	if fake.GetSpacesStub != nil {
-		return fake.GetSpacesStub(queries)
-	} else {
-		return fake.getSpacesReturns.result1, fake.getSpacesReturns.result2, fake.getSpacesReturns.result3
-	}
-}
-
-func (fake *FakeCloudControllerClient) GetSpacesCallCount() int {
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
-	return len(fake.getSpacesArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) GetSpacesArgsForCall(i int) []ccv2.Query {
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
-	return fake.getSpacesArgsForCall[i].queries
-}
-
-func (fake *FakeCloudControllerClient) GetSpacesReturns(result1 []ccv2.Space, result2 ccv2.Warnings, result3 error) {
-	fake.GetSpacesStub = nil
-	fake.getSpacesReturns = struct {
-		result1 []ccv2.Space
-		result2 ccv2.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeCloudControllerClient) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
 	var queriesCopy []ccv2.Query
 	if queries != nil {
@@ -697,6 +666,46 @@ func (fake *FakeCloudControllerClient) GetSpaceServiceInstancesReturns(result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpaces(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error) {
+	var queriesCopy []ccv2.Query
+	if queries != nil {
+		queriesCopy = make([]ccv2.Query, len(queries))
+		copy(queriesCopy, queries)
+	}
+	fake.getSpacesMutex.Lock()
+	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
+		queries []ccv2.Query
+	}{queriesCopy})
+	fake.recordInvocation("GetSpaces", []interface{}{queriesCopy})
+	fake.getSpacesMutex.Unlock()
+	if fake.GetSpacesStub != nil {
+		return fake.GetSpacesStub(queries)
+	} else {
+		return fake.getSpacesReturns.result1, fake.getSpacesReturns.result2, fake.getSpacesReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesCallCount() int {
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	return len(fake.getSpacesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesArgsForCall(i int) []ccv2.Query {
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	return fake.getSpacesArgsForCall[i].queries
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesReturns(result1 []ccv2.Space, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpacesStub = nil
+	fake.getSpacesReturns = struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error) {
 	fake.newUserMutex.Lock()
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
@@ -732,6 +741,40 @@ func (fake *FakeCloudControllerClient) NewUserReturns(result1 ccv2.User, result2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) PollJob(job ccv2.Job) (ccv2.Warnings, error) {
+	fake.pollJobMutex.Lock()
+	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
+		job ccv2.Job
+	}{job})
+	fake.recordInvocation("PollJob", []interface{}{job})
+	fake.pollJobMutex.Unlock()
+	if fake.PollJobStub != nil {
+		return fake.PollJobStub(job)
+	} else {
+		return fake.pollJobReturns.result1, fake.pollJobReturns.result2
+	}
+}
+
+func (fake *FakeCloudControllerClient) PollJobCallCount() int {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return len(fake.pollJobArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) PollJobArgsForCall(i int) ccv2.Job {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return fake.pollJobArgsForCall[i].job
+}
+
+func (fake *FakeCloudControllerClient) PollJobReturns(result1 ccv2.Warnings, result2 error) {
+	fake.PollJobStub = nil
+	fake.pollJobReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -759,12 +802,14 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSharedDomainMutex.RUnlock()
 	fake.getSpaceRoutesMutex.RLock()
 	defer fake.getSpaceRoutesMutex.RUnlock()
-	fake.getSpacesMutex.RLock()
-	defer fake.getSpacesMutex.RUnlock()
 	fake.getSpaceServiceInstancesMutex.RLock()
 	defer fake.getSpaceServiceInstancesMutex.RUnlock()
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
 	fake.newUserMutex.RLock()
 	defer fake.newUserMutex.RUnlock()
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
 	return fake.invocations
 }
 

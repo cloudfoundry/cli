@@ -2,11 +2,35 @@ package ccv2
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
+
+// JobFailedError represents a failed Cloud Controller Job. It wraps the error
+// returned back from the Cloud Controller.
+type JobFailedError struct {
+	JobGUID string
+	Message string
+}
+
+func (e JobFailedError) Error() string {
+	return fmt.Sprintf("Job (%s) failed: %s", e.JobGUID, e.Message)
+}
+
+// JobTimeoutError is returned from PollJob when the OverallPollingTimeout has
+// been reached.
+type JobTimeoutError struct {
+	JobGUID string
+	Timeout time.Duration
+}
+
+func (e JobTimeoutError) Error() string {
+	return fmt.Sprintf("Job (%s) polling has reached the maximum timeout of %s seconds", e.JobGUID, e.Timeout)
+}
 
 // JobStatus is the current state of a job.
 type JobStatus string
@@ -79,6 +103,46 @@ func (client *Client) GetJob(jobGUID string) (Job, Warnings, error) {
 
 	err = client.connection.Make(request, &response)
 	return job, response.Warnings, err
+}
+
+// PollJob will keep polling the given job until the job has terminated, an
+// error is encountered, or config.OverallPollingTimeout is reached. In the
+// last case, a JobTimeoutError is returned.
+func (client *Client) PollJob(job Job) (Warnings, error) {
+	originalJobGUID := job.GUID
+
+	var (
+		err         error
+		warnings    Warnings
+		allWarnings Warnings
+	)
+
+	startTime := time.Now()
+	for time.Now().Sub(startTime) < client.jobPollingTimeout {
+		job, warnings, err = client.GetJob(job.GUID)
+		allWarnings = append(allWarnings, Warnings(warnings)...)
+		if err != nil {
+			return allWarnings, err
+		}
+
+		if job.Failed() {
+			return allWarnings, JobFailedError{
+				JobGUID: originalJobGUID,
+				Message: job.Error,
+			}
+		}
+
+		if job.Finished() {
+			return allWarnings, nil
+		}
+
+		time.Sleep(client.jobPollingInterval)
+	}
+
+	return allWarnings, JobTimeoutError{
+		JobGUID: originalJobGUID,
+		Timeout: client.jobPollingTimeout,
+	}
 }
 
 // DeleteOrganization deletes the Organization associated with the provided

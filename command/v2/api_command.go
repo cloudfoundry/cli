@@ -31,7 +31,13 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = configaction.NewActor(config, ccv2.NewClient(config.BinaryName(), config.BinaryVersion()))
+	ccClient := ccv2.NewClient(ccv2.Config{
+		AppName:            config.BinaryName(),
+		AppVersion:         config.BinaryVersion(),
+		JobPollingTimeout:  config.OverallPollingTimeout(),
+		JobPollingInterval: config.PollingInterval(),
+	})
+	cmd.Actor = configaction.NewActor(config, ccClient)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil

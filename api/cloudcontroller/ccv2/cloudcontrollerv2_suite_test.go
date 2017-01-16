@@ -39,9 +39,19 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestClient() *Client {
+func NewTestClient(passed ...Config) *Client {
 	SetupV2InfoResponse()
-	client := NewClient("CF CLI API V2 Test", "Unknown")
+
+	var config Config
+	if len(passed) > 0 {
+		config = passed[0]
+	} else {
+		config = Config{}
+	}
+	config.AppName = "CF CLI API V2 Test"
+	config.AppVersion = "Unknown"
+
+	client := NewClient(config)
 	warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
 		URL:               server.URL(),
