@@ -19,7 +19,7 @@ var _ = Describe("Application Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
 	Describe("GetApplicationBySpace", func() {

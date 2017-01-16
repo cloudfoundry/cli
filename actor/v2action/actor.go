@@ -8,14 +8,12 @@ type Warnings []string
 type Actor struct {
 	CloudControllerClient CloudControllerClient
 	UAAClient             UAAClient
-	Config                Config
 }
 
 // NewActor returns a new actor.
-func NewActor(ccClient CloudControllerClient, uaaClient UAAClient, config Config) Actor {
+func NewActor(ccClient CloudControllerClient, uaaClient UAAClient) Actor {
 	return Actor{
 		CloudControllerClient: ccClient,
-		Config:                config,
 		UAAClient:             uaaClient,
 	}
 }

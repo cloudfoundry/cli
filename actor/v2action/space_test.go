@@ -18,7 +18,7 @@ var _ = Describe("Space Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
 	Describe("GetOrganizationSpaces", func() {

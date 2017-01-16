@@ -19,7 +19,7 @@ var _ = Describe("Service Binding Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
 	Describe("GetServiceBindingByApplicationAndServiceInstance", func() {
