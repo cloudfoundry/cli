@@ -13,8 +13,17 @@ import (
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
+	RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error)
+}
+
+//go:generate counterfeiter . TokenCache
+
+// TokenCache is where the UAA token information is stored.
+type TokenCache interface {
 	AccessToken() string
-	RefreshToken() error
+	RefreshToken() string
+	SetAccessToken(token string)
+	SetRefreshToken(token string)
 }
 
 // UAAAuthentication wraps connections and adds authentication headers to all
@@ -22,13 +31,15 @@ type UAAClient interface {
 type UAAAuthentication struct {
 	connection uaa.Connection
 	client     UAAClient
+	cache      TokenCache
 }
 
 // NewUAAAuthentication returns a pointer to a UAAAuthentication wrapper with
-// the client set as the AuthenticationStore
-func NewUAAAuthentication(client UAAClient) *UAAAuthentication {
+// the client and token cache.
+func NewUAAAuthentication(client UAAClient, cache TokenCache) *UAAAuthentication {
 	return &UAAAuthentication{
 		client: client,
+		cache:  cache,
 	}
 }
 
@@ -61,19 +72,23 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 		}
 	}
 
-	request.Header.Set("Authorization", t.client.AccessToken())
+	request.Header.Set("Authorization", t.cache.AccessToken())
 
 	err = t.connection.Make(request, passedResponse)
 	if _, ok := err.(uaa.InvalidAuthTokenError); ok {
-		err = t.client.RefreshToken()
+		var token uaa.RefreshToken
+		token, err = t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
 		}
 
+		t.cache.SetAccessToken(token.AuthorizationToken())
+		t.cache.SetRefreshToken(token.RefreshToken)
+
 		if rawRequestBody != nil {
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 		}
-		request.Header.Set("Authorization", t.client.AccessToken())
+		request.Header.Set("Authorization", t.cache.AccessToken())
 		return t.connection.Make(request, passedResponse)
 	}
 

@@ -4,83 +4,63 @@ package wrapperfakes
 import (
 	"sync"
 
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/wrapper"
 )
 
 type FakeUAAClient struct {
-	AccessTokenStub        func() string
-	accessTokenMutex       sync.RWMutex
-	accessTokenArgsForCall []struct{}
-	accessTokenReturns     struct {
-		result1 string
+	RefreshAccessTokenStub        func(refreshToken string) (uaa.RefreshToken, error)
+	refreshAccessTokenMutex       sync.RWMutex
+	refreshAccessTokenArgsForCall []struct {
+		refreshToken string
 	}
-	RefreshTokenStub        func() error
-	refreshTokenMutex       sync.RWMutex
-	refreshTokenArgsForCall []struct{}
-	refreshTokenReturns     struct {
-		result1 error
+	refreshAccessTokenReturns struct {
+		result1 uaa.RefreshToken
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) AccessToken() string {
-	fake.accessTokenMutex.Lock()
-	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
-	fake.recordInvocation("AccessToken", []interface{}{})
-	fake.accessTokenMutex.Unlock()
-	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub()
+func (fake *FakeUAAClient) RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error) {
+	fake.refreshAccessTokenMutex.Lock()
+	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
+		refreshToken string
+	}{refreshToken})
+	fake.recordInvocation("RefreshAccessToken", []interface{}{refreshToken})
+	fake.refreshAccessTokenMutex.Unlock()
+	if fake.RefreshAccessTokenStub != nil {
+		return fake.RefreshAccessTokenStub(refreshToken)
 	} else {
-		return fake.accessTokenReturns.result1
+		return fake.refreshAccessTokenReturns.result1, fake.refreshAccessTokenReturns.result2
 	}
 }
 
-func (fake *FakeUAAClient) AccessTokenCallCount() int {
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	return len(fake.accessTokenArgsForCall)
+func (fake *FakeUAAClient) RefreshAccessTokenCallCount() int {
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
+	return len(fake.refreshAccessTokenArgsForCall)
 }
 
-func (fake *FakeUAAClient) AccessTokenReturns(result1 string) {
-	fake.AccessTokenStub = nil
-	fake.accessTokenReturns = struct {
-		result1 string
-	}{result1}
+func (fake *FakeUAAClient) RefreshAccessTokenArgsForCall(i int) string {
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
+	return fake.refreshAccessTokenArgsForCall[i].refreshToken
 }
 
-func (fake *FakeUAAClient) RefreshToken() error {
-	fake.refreshTokenMutex.Lock()
-	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
-	fake.recordInvocation("RefreshToken", []interface{}{})
-	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub()
-	} else {
-		return fake.refreshTokenReturns.result1
-	}
-}
-
-func (fake *FakeUAAClient) RefreshTokenCallCount() int {
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	return len(fake.refreshTokenArgsForCall)
-}
-
-func (fake *FakeUAAClient) RefreshTokenReturns(result1 error) {
-	fake.RefreshTokenStub = nil
-	fake.refreshTokenReturns = struct {
-		result1 error
-	}{result1}
+func (fake *FakeUAAClient) RefreshAccessTokenReturns(result1 uaa.RefreshToken, result2 error) {
+	fake.RefreshAccessTokenStub = nil
+	fake.refreshAccessTokenReturns = struct {
+		result1 uaa.RefreshToken
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
 	return fake.invocations
 }
 

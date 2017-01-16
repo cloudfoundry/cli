@@ -6,7 +6,6 @@ import (
 	"runtime"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,12 +14,11 @@ import (
 
 var _ = Describe("UAA Client", func() {
 	var (
-		client    *Client
-		fakeStore *uaafakes.FakeAuthenticationStore
+		client *Client
 	)
 
 	BeforeEach(func() {
-		client, fakeStore = NewTestUAAClientAndStore()
+		client = NewTestUAAClientAndStore()
 	})
 
 	Describe("Request Headers", func() {
@@ -41,7 +39,7 @@ var _ = Describe("UAA Client", func() {
 			})
 
 			It("adds the User-Agent header to requests", func() {
-				err := client.RefreshToken()
+				_, err := client.RefreshAccessToken("")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(server.ReceivedRequests()).To(HaveLen(1))
@@ -59,7 +57,7 @@ var _ = Describe("UAA Client", func() {
 			})
 
 			It("forcefully closes the connection after each request", func() {
-				err := client.RefreshToken()
+				_, err := client.RefreshAccessToken("")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(server.ReceivedRequests()).To(HaveLen(1))

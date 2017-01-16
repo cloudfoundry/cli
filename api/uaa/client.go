@@ -14,37 +14,46 @@ import (
 	"github.com/tedsuo/rata"
 )
 
-//go:generate counterfeiter . AuthenticationStore
-
-// AuthenticationStore represents the storage the UAA client
-type AuthenticationStore interface {
-	UAAOAuthClient() string
-	UAAOAuthClientSecret() string
-
-	AccessToken() string
-	RefreshToken() string
-	SetAccessToken(token string)
-	SetRefreshToken(token string)
-}
-
 // Client is the UAA client
 type Client struct {
-	URL       string
-	store     AuthenticationStore
-	userAgent string
+	URL    string
+	id     string
+	secret string
 
-	router     *rata.RequestGenerator
 	connection Connection
+	router     *rata.RequestGenerator
+	userAgent  string
 }
 
 // Config allows the Client to be configured
 type Config struct {
-	AppName           string
-	AppVersion        string
-	DialTimeout       time.Duration
+	// AppName is the name of the application/process using the client.
+	AppName string
+
+	// AppVersion is the version of the application/process using the client.
+	AppVersion string
+
+	// DialTimeout is the DNS lookup timeout for the client. If not set, it is
+	// infinite.
+	DialTimeout time.Duration
+
+	// ClientID is the UAA client ID the client will use.
+	ClientID string
+
+	// ClientSecret is the UAA client secret the client will use.
+	ClientSecret string
+
+	// SkipSSLValidation controls whether a client verifies the server's
+	// certificate chain and host name. If SkipSSLValidation is true, TLS accepts
+	// any certificate presented by the server and any host name in that
+	// certificate for *all* client requests going forward.
+	//
+	// In this mode, TLS is susceptible to man-in-the-middle attacks. This should
+	// be used only for testing.
 	SkipSSLValidation bool
-	Store             AuthenticationStore
-	URL               string
+
+	// URL is the api URL for the UAA target.
+	URL string
 }
 
 // NewClient returns a new UAA Client with the provided configuration
@@ -56,12 +65,14 @@ func NewClient(config Config) *Client {
 		runtime.GOARCH,
 		runtime.GOOS,
 	)
+
 	return &Client{
-		URL:       config.URL,
-		store:     config.Store,
-		userAgent: userAgent,
+		URL:    config.URL,
+		id:     config.ClientID,
+		secret: config.ClientSecret,
 
 		router:     rata.NewRequestGenerator(config.URL, internal.Routes),
 		connection: NewConnection(config.SkipSSLValidation, config.DialTimeout),
+		userAgent:  userAgent,
 	}
 }
