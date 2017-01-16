@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -12,12 +11,11 @@ import (
 
 var _ = Describe("User", func() {
 	var (
-		client    *Client
-		fakeStore *uaafakes.FakeAuthenticationStore
+		client *Client
 	)
 
 	BeforeEach(func() {
-		client, fakeStore = NewTestUAAClientAndStore()
+		client = NewTestUAAClientAndStore()
 	})
 
 	Describe("NewUser", func() {

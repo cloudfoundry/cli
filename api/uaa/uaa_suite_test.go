@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	"code.cloudfoundry.org/cli/api/uaa/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -37,15 +36,15 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestUAAClientAndStore() (*Client, *uaafakes.FakeAuthenticationStore) {
-	fakeStore := new(uaafakes.FakeAuthenticationStore)
+func NewTestUAAClientAndStore() *Client {
 	client := NewClient(Config{
-		URL:               server.URL(),
-		SkipSSLValidation: true,
-		Store:             fakeStore,
 		AppName:           "CF CLI UAA API Test",
 		AppVersion:        "Unknown",
+		ClientID:          "client-id",
+		ClientSecret:      "client-secret",
+		SkipSSLValidation: true,
+		URL:               server.URL(),
 	})
 	client.WrapConnection(wrapper.NewErrorWrapper())
-	return client, fakeStore
+	return client
 }

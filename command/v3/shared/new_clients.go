@@ -30,9 +30,10 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 	uaaClient := uaa.NewClient(uaa.Config{
 		AppName:           config.BinaryName(),
 		AppVersion:        config.BinaryVersion(),
+		ClientID:          config.UAAOAuthClient(),
+		ClientSecret:      config.UAAOAuthClientSecret(),
 		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
-		Store:             config,
 		URL:               ccClient.UAA(),
 	})
 
@@ -48,7 +49,7 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(command.NewRequestLoggerFileWriter(ui, location)))
 	}
 
-	ccClient.WrapConnection(ccWrapper.NewUAAAuthentication(uaaClient))
+	ccClient.WrapConnection(ccWrapper.NewUAAAuthentication(uaaClient, config))
 	ccClient.WrapConnection(ccWrapper.NewRetryRequest(2))
 
 	return ccClient, nil

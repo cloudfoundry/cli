@@ -2,7 +2,6 @@ package wrapper_test
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -11,6 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
+	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/wrapper/util"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +21,7 @@ var _ = Describe("UAA Authentication", func() {
 	var (
 		fakeConnection *cloudcontrollerfakes.FakeConnection
 		fakeClient     *wrapperfakes.FakeUAAClient
+		inMemoryCache  *util.InMemoryCache
 
 		wrapper cloudcontroller.Connection
 		request *http.Request
@@ -28,9 +30,10 @@ var _ = Describe("UAA Authentication", func() {
 	BeforeEach(func() {
 		fakeConnection = new(cloudcontrollerfakes.FakeConnection)
 		fakeClient = new(wrapperfakes.FakeUAAClient)
-		fakeClient.AccessTokenReturns("foobar")
+		inMemoryCache = util.NewInMemoryTokenCache()
+		inMemoryCache.SetAccessToken("a-ok")
 
-		inner := NewUAAAuthentication(fakeClient)
+		inner := NewUAAAuthentication(fakeClient, inMemoryCache)
 		wrapper = inner.Wrap(fakeConnection)
 
 		request = &http.Request{
@@ -46,7 +49,7 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
 				headers := authenticatedRequest.Header
-				Expect(headers["Authorization"]).To(ConsistOf([]string{"foobar"}))
+				Expect(headers["Authorization"]).To(ConsistOf([]string{"a-ok"}))
 			})
 
 			Context("when the request already has headers", func() {
@@ -102,25 +105,34 @@ var _ = Describe("UAA Authentication", func() {
 					}
 				}
 
-				count := 0
-				fakeClient.AccessTokenStub = func() string {
-					count = count + 1
-					return fmt.Sprintf("foobar-%d", count)
-				}
+				inMemoryCache.SetAccessToken("what")
+
+				fakeClient.RefreshAccessTokenReturns(
+					uaa.RefreshToken{
+						AccessToken:  "foobar-2",
+						RefreshToken: "bananananananana",
+						Type:         "bearer",
+					},
+					nil,
+				)
 
 				err := wrapper.Make(request, nil)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("should refresh the token", func() {
-				Expect(fakeClient.RefreshTokenCallCount()).To(Equal(1))
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(1))
 			})
 
 			It("should resend the request", func() {
 				Expect(fakeConnection.MakeCallCount()).To(Equal(2))
 
 				request, _ := fakeConnection.MakeArgsForCall(1)
-				Expect(request.Header.Get("Authorization")).To(Equal("foobar-2"))
+				Expect(request.Header.Get("Authorization")).To(Equal("bearer foobar-2"))
+			})
+
+			It("should save the refresh token", func() {
+				Expect(inMemoryCache.RefreshToken()).To(Equal("bananananananana"))
 			})
 		})
 	})
