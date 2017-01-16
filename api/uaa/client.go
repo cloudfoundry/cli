@@ -66,7 +66,7 @@ func NewClient(config Config) *Client {
 		runtime.GOOS,
 	)
 
-	return &Client{
+	client := Client{
 		URL:    config.URL,
 		id:     config.ClientID,
 		secret: config.ClientSecret,
@@ -75,4 +75,7 @@ func NewClient(config Config) *Client {
 		connection: NewConnection(config.SkipSSLValidation, config.DialTimeout),
 		userAgent:  userAgent,
 	}
+	client.WrapConnection(NewErrorWrapper())
+
+	return &client
 }

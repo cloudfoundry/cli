@@ -37,8 +37,6 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		URL:               ccClient.UAA(),
 	})
 
-	uaaClient.WrapConnection(uaaWrapper.NewErrorWrapper())
-
 	verbose, location := config.Verbose()
 	if verbose {
 		ccClient.WrapConnection(ccWrapper.NewRequestLogger(command.NewRequestLoggerTerminalDisplay(ui)))
