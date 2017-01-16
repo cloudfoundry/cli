@@ -2,7 +2,6 @@ package v2action_test
 
 import (
 	"errors"
-	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
@@ -19,9 +18,7 @@ var _ = Describe("Org Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		fakeConfig := new(v2actionfakes.FakeConfig)
-		fakeConfig.OverallPollingTimeoutReturns(time.Second)
-		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
 	Describe("GetOrganizationByName", func() {
