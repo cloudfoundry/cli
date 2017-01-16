@@ -1,11 +1,10 @@
-package wrapper_test
+package uaa_test
 
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/uaa"
+	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
-	. "code.cloudfoundry.org/cli/api/uaa/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -13,19 +12,19 @@ import (
 var _ = Describe("Error Wrapper", func() {
 	var (
 		fakeConnection    *uaafakes.FakeConnection
-		wrapper           uaa.Connection
+		wrapper           Connection
 		request           *http.Request
-		response          *uaa.Response
+		response          *Response
 		makeErr           error
-		fakeConnectionErr uaa.RawHTTPStatusError
+		fakeConnectionErr RawHTTPStatusError
 	)
 
 	BeforeEach(func() {
 		fakeConnection = new(uaafakes.FakeConnection)
 		wrapper = NewErrorWrapper().Wrap(fakeConnection)
 		request = &http.Request{}
-		response = &uaa.Response{}
-		fakeConnectionErr = uaa.RawHTTPStatusError{}
+		response = &Response{}
+		fakeConnectionErr = RawHTTPStatusError{}
 	})
 
 	JustBeforeEach(func() {
@@ -81,7 +80,7 @@ var _ = Describe("Error Wrapper", func() {
 					It("returns an InvalidAuthTokenError", func() {
 						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
-						Expect(makeErr).To(MatchError(uaa.InvalidSCIMResourceError{Message: "A username must be provided"}))
+						Expect(makeErr).To(MatchError(InvalidSCIMResourceError{Message: "A username must be provided"}))
 					})
 				})
 			})
@@ -116,7 +115,7 @@ var _ = Describe("Error Wrapper", func() {
 					It("returns an InvalidAuthTokenError", func() {
 						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
-						Expect(makeErr).To(MatchError(uaa.InvalidAuthTokenError{Message: "your token is invalid!"}))
+						Expect(makeErr).To(MatchError(InvalidAuthTokenError{Message: "your token is invalid!"}))
 					})
 				})
 			})
@@ -145,7 +144,7 @@ var _ = Describe("Error Wrapper", func() {
 							{
 								"error": "insufficient_scope",
 								"error_description": "Insufficient scope for this resource",
-								"scope": "uaa.admin scim.write scim.create zones.uaa.admin"
+								"scope": "admin scim.write scim.create zones.admin"
 							}
 `)
 						fakeConnection.MakeReturns(fakeConnectionErr)
@@ -154,7 +153,7 @@ var _ = Describe("Error Wrapper", func() {
 					It("returns an InsufficientScopeError", func() {
 						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
-						Expect(makeErr).To(MatchError(uaa.InsufficientScopeError{Message: "Insufficient scope for this resource"}))
+						Expect(makeErr).To(MatchError(InsufficientScopeError{Message: "Insufficient scope for this resource"}))
 					})
 				})
 			})
@@ -172,7 +171,7 @@ var _ = Describe("Error Wrapper", func() {
 				It("returns a ConflictError", func() {
 					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
-					Expect(makeErr).To(MatchError(uaa.ConflictError{Message: "Username already in use: some-user"}))
+					Expect(makeErr).To(MatchError(ConflictError{Message: "Username already in use: some-user"}))
 				})
 			})
 

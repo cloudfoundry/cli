@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/api/uaa/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -45,6 +44,5 @@ func NewTestUAAClientAndStore() *Client {
 		SkipSSLValidation: true,
 		URL:               server.URL(),
 	})
-	client.WrapConnection(wrapper.NewErrorWrapper())
 	return client
 }
