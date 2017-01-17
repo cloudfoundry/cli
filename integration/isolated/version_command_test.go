@@ -61,14 +61,14 @@ var _ = Describe("version command", func() {
 			CleanupBuildArtifacts()
 		},
 
-		Entry("when passed no ldflags", "", "", "", "cli version 0.0.0-unknown-version"),
-		Entry("when passed just a build-sha", "", "deadbeef", "", "cli version 0.0.0-unknown-version\\+deadbeef"),
-		Entry("when passed just a build-date", "", "", "2001-01-01", "cli version 0.0.0-unknown-version\\+2001-01-01"),
-		Entry("when passed a sha and build-date", "", "deadbeef", "2001-01-01", "cli version 0.0.0-unknown-version\\+deadbeef.2001-01-01"),
-		Entry("when passed just a version", "1.1.1", "", "", "cli version 1.1.1"),
-		Entry("when passed a version and build-sha", "1.1.1", "deadbeef", "", "cli version 1.1.1\\+deadbeef"),
-		Entry("when passed a version and a build-date", "1.1.1", "", "2001-01-01", "cli version 1.1.1\\+2001-01-01"),
-		Entry("when passed a version, build-sha, and build-date", "1.1.1", "deadbeef", "2001-01-01", "cli version 1.1.1\\+deadbeef.2001-01-01"),
-		Entry("when passed a wacky version", "#$%{@+&*!", "deadbeef", "2001-01-01", "cli version 0.0.0-unknown-version\\+deadbeef.2001-01-01"),
+		Entry("when passed no ldflags", "", "", "", "cli(\\.exe)? version 0.0.0-unknown-version"),
+		Entry("when passed just a build-sha", "", "deadbeef", "", "cli(\\.exe)? version 0.0.0-unknown-version\\+deadbeef"),
+		Entry("when passed just a build-date", "", "", "2001-01-01", "cli(\\.exe)? version 0.0.0-unknown-version\\+2001-01-01"),
+		Entry("when passed a sha and build-date", "", "deadbeef", "2001-01-01", "cli(\\.exe)? version 0.0.0-unknown-version\\+deadbeef.2001-01-01"),
+		Entry("when passed just a version", "1.1.1", "", "", "cli(\\.exe)? version 1.1.1"),
+		Entry("when passed a version and build-sha", "1.1.1", "deadbeef", "", "cli(\\.exe)? version 1.1.1\\+deadbeef"),
+		Entry("when passed a version and a build-date", "1.1.1", "", "2001-01-01", "cli(\\.exe)? version 1.1.1\\+2001-01-01"),
+		Entry("when passed a version, build-sha, and build-date", "1.1.1", "deadbeef", "2001-01-01", "cli(\\.exe)? version 1.1.1\\+deadbeef.2001-01-01"),
+		Entry("when passed a wacky version", "#$%{@+&*!", "deadbeef", "2001-01-01", "cli(\\.exe)? version 0.0.0-unknown-version\\+deadbeef.2001-01-01"),
 	)
 })
