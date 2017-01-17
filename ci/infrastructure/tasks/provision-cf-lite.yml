@@ -31,5 +31,6 @@ run:
     export BOSH_LITE_PRIVATE_KEY=$PWD/bosh-lite-private-key
 
     pushd bosh-lite
+      sed -i.back -e 's/9000\.137\.0/9000.131.0/' Vagrantfile
       vagrant up --provider aws --destroy-on-error
     popd
