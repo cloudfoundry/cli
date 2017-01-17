@@ -8,7 +8,6 @@ params:
 
 inputs:
 - name: bosh-lite-lock
-- name: etcd-release
 - name: garden-runc-release
 - name: diego-release
 - name: diego-repo
@@ -24,7 +23,6 @@ run:
     bosh -n target $LITE_IP_ADDRESS
     bosh login admin admin
     bosh upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
-    bosh upload release etcd-release/release.tgz --skip-if-exists
     bosh upload release garden-runc-release/release.tgz --skip-if-exists
     bosh upload release diego-release/release.tgz --skip-if-exists
 

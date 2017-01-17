@@ -121,11 +121,6 @@ resources:
     uri: https://github.com/cloudfoundry/diego-release.git
     branch: master
 
-- name: etcd-release
-  type: bosh-io-release
-  source:
-    repository: cloudfoundry-incubator/etcd-release
-
 - name: garden-runc-release
   type: bosh-io-release
   source:
@@ -240,7 +235,6 @@ jobs:
       resource: bosh-lites-dea-pool
       passed: [smoke-test-1]
       trigger: true
-    - get: etcd-release
     - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
@@ -353,7 +347,6 @@ jobs:
       resource: bosh-lites-dea-pool
       passed: [smoke-test-2]
       trigger: true
-    - get: etcd-release
     - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
@@ -466,7 +459,6 @@ jobs:
       resource: bosh-lites-dea-pool
       passed: [smoke-test-3]
       trigger: true
-    - get: etcd-release
     - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
@@ -578,7 +570,6 @@ jobs:
       resource: bosh-lites-diego-pool
       passed: [smoke-test-4]
       trigger: true
-    - get: etcd-release
     - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
@@ -695,7 +686,6 @@ jobs:
       resource: bosh-lites-acceptance-pool
       passed: [smoke-test]
       trigger: true
-    - get: etcd-release
     - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
