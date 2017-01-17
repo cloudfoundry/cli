@@ -1,8 +1,9 @@
 package isolated
 
 import (
-	"os"
 	"path/filepath"
+	"runtime"
+	"syscall"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -12,6 +13,12 @@ import (
 )
 
 var _ = Describe("writing the config after command execution", func() {
+	BeforeEach(func() {
+		if runtime.GOOS == "windows" {
+			Skip("no way to make the config readable but not writable on Windows")
+		}
+	})
+
 	Context("when an error occurs writing to the config", func() {
 		BeforeEach(func() {
 			homeDir := helpers.SetHomeDir()
@@ -22,14 +29,15 @@ var _ = Describe("writing the config after command execution", func() {
 
 			configFilepath := filepath.Join(homeDir, ".cf", "config.json")
 
-			// Make the config read-only so reading it succeeds but writing fails.
-			err := os.Chmod(configFilepath, 0400)
+			// Make the config file immutable. Chmod is not enough because root can
+			// write a read-only file.
+			err := syscall.Chflags(configFilepath, 2) // UF_IMMUTABLE
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("displays the error to stderr", func() {
 			session := helpers.CF("api")
-			Eventually(session.Err).Should(Say("Error writing config: open .+/.cf/config.json: permission denied"))
+			Eventually(session.Err).Should(Say("Error writing config: open .+/.cf/config.json: operation not permitted"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
