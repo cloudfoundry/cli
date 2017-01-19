@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/configaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
-//go:generate counterfeiter . APIConfigActor
+//go:generate counterfeiter . APIActor
 
-type APIConfigActor interface {
-	ClearTarget()
-	SetTarget(settings configaction.TargetSettings) (configaction.Warnings, error)
+type APIActor interface {
+	ClearTarget(config v2action.Config)
+	SetTarget(config v2action.Config, settings v2action.TargetSettings) (v2action.Warnings, error)
 }
 
 type ApiCommand struct {
@@ -26,7 +26,7 @@ type ApiCommand struct {
 	relatedCommands   interface{}    `related_commands:"auth, login, target"`
 
 	UI     command.UI
-	Actor  APIConfigActor
+	Actor  APIActor
 	Config command.Config
 }
 
@@ -37,7 +37,7 @@ func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
 		JobPollingTimeout:  config.OverallPollingTimeout(),
 		JobPollingInterval: config.PollingInterval(),
 	})
-	cmd.Actor = configaction.NewActor(config, ccClient)
+	cmd.Actor = v2action.NewActor(ccClient, nil)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil
@@ -78,7 +78,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 
 func (cmd *ApiCommand) ClearTarget() error {
 	cmd.UI.DisplayTextWithFlavor("Unsetting api endpoint...")
-	cmd.Actor.ClearTarget()
+	cmd.Actor.ClearTarget(cmd.Config)
 	cmd.UI.DisplayOK()
 	return nil
 }
@@ -90,7 +90,7 @@ func (cmd *ApiCommand) setAPI() error {
 
 	apiURL := processURL(cmd.OptionalArgs.URL)
 
-	_, err := cmd.Actor.SetTarget(configaction.TargetSettings{
+	_, err := cmd.Actor.SetTarget(cmd.Config, v2action.TargetSettings{
 		URL:               apiURL,
 		SkipSSLValidation: cmd.SkipSSLValidation,
 		DialTimeout:       cmd.Config.DialTimeout(),

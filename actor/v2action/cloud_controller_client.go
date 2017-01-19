@@ -22,4 +22,14 @@ type CloudControllerClient interface {
 	GetSpaces(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
 	NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
+	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
+
+	API() string
+	APIVersion() string
+	AuthorizationEndpoint() string
+	DopplerEndpoint() string
+	LoggregatorEndpoint() string
+	MinCLIVersion() string
+	RoutingEndpoint() string
+	TokenEndpoint() string
 }

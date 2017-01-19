@@ -1,4 +1,4 @@
-package configaction
+package v2action
 
 import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
@@ -6,8 +6,8 @@ type TargetSettings ccv2.TargetSettings
 
 // SetTarget targets the Cloud Controller using the client and sets target
 // information in the actor based on the response.
-func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
-	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
+func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, error) {
+	if config.Target() == settings.URL && config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
 
@@ -16,7 +16,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		return Warnings(warnings), err
 	}
 
-	actor.Config.SetTargetInformation(
+	config.SetTargetInformation(
 		actor.CloudControllerClient.API(),
 		actor.CloudControllerClient.APIVersion(),
 		actor.CloudControllerClient.AuthorizationEndpoint(),
@@ -27,13 +27,13 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		actor.CloudControllerClient.RoutingEndpoint(),
 		settings.SkipSSLValidation,
 	)
-	actor.Config.SetTokenInformation("", "", "")
+	config.SetTokenInformation("", "", "")
 
 	return Warnings(warnings), nil
 }
 
 // ClearTarget clears target information from the actor.
-func (actor Actor) ClearTarget() {
-	actor.Config.SetTargetInformation("", "", "", "", "", "", "", "", false)
-	actor.Config.SetTokenInformation("", "", "")
+func (actor Actor) ClearTarget(config Config) {
+	config.SetTargetInformation("", "", "", "", "", "", "", "", false)
+	config.SetTokenInformation("", "", "")
 }
