@@ -560,7 +560,7 @@ FOO: child-global
 			})
 		})
 
-		FContext("when the child has applications and global properties; and the parent has global properties", func() {
+		Context("when the child has applications and global properties; and the parent has global properties", func() {
 			BeforeEach(func() {
 				pushHelloWorldAppWithManifests([]string{
 					fmt.Sprintf(`
@@ -662,8 +662,230 @@ FOO: child-app
 				Eventually(session).Should(Exit(0))
 			})
 		})
-		Context("when the child has applications and global properties; and the parent has applications properties", func() {})
-		Context("when the child has applications properties; and the parent has applications and global properties", func() {})
+		FContext("when the child has applications and global properties; and the parent has applications properties", func() {
+			BeforeEach(func() {
+				pushHelloWorldAppWithManifests([]string{
+					fmt.Sprintf(`
+---
+inherit: {some-parent}
+memory: 128M
+disk_quota: 128M
+path: {some-dir}
+routes:
+- route: child-global-1.%s
+- route: child-global-2.%s
+env:
+  FOO: child-global
+  FIZ: child-global
+applications:
+- name: %s
+  disk_quota: 64M
+  path: {some-dir}
+  routes:
+  - route: child-app-1.%s
+  - route: child-app-2.%s
+  env:
+    BAR: child-app
+    FOO: child-app
+- name: %s
+  disk_quota: 64M
+  path: {some-dir}
+  routes:
+  - route: child-app-1.%s
+  - route: child-app-2.%s
+  env:
+    BAR: child-app
+    FOO: child-app
+`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+					fmt.Sprintf(`
+---
+buildpack: staticfile_buildpack
+applications:
+- name: %s
+  memory: 256M
+  disk_quota: 256M
+  path: {some-dir}
+  routes:
+  - route: parent-app-1.%s
+  - route: parent-app-2.%s
+  env:
+    BAR: parent-app
+    FOO: parent-app
+    FIZ: parent-app
+    BAZ: parent-app
+- name: %s
+  memory: 256M
+  disk_quota: 256M
+  path: {some-dir}
+  routes:
+  - route: parent-app-1.%s
+  - route: parent-app-2.%s
+  env:
+    BAR: parent-app
+    FOO: parent-app
+    FIZ: parent-app
+    BAZ: parent-app
+`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+				})
+			})
+
+			It("pushes with child application taking precedence over child global over parent application", func() {
+				session := helpers.CF("env", app1Name)
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+				Eventually(session.Out).Should(Say(`"disk": 64`))
+				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+
+`))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("env", app2Name)
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+				Eventually(session.Out).Should(Say(`"disk": 64`))
+				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+
+`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+		Context("when the child has applications properties; and the parent has applications and global properties", func() {
+			BeforeEach(func() {
+				pushHelloWorldAppWithManifests([]string{
+					fmt.Sprintf(`
+---
+inherit: {some-parent}
+memory: 128M
+disk_quota: 128M
+path: {some-dir}
+routes:
+- route: child-global-1.%s
+- route: child-global-2.%s
+env:
+  FOO: child-global
+  FIZ: child-global
+applications:
+- name: %s
+  memory: 64M
+  disk_quota: 64M
+  path: {some-dir}
+  routes:
+  - route: child-app-1.%s
+  - route: child-app-2.%s
+  env:
+    BAR: child-app
+    FOO: child-app
+- name: %s
+  memory: 64M
+  disk_quota: 64M
+  path: {some-dir}
+  routes:
+  - route: child-app-1.%s
+  - route: child-app-2.%s
+  env:
+    BAR: child-app
+    FOO: child-app
+`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+					fmt.Sprintf(`
+---
+buildpack: staticfile_buildpack
+applications:
+- name: %s
+  memory: 256M
+  disk_quota: 256M
+  path: {some-dir}
+  routes:
+  - route: parent-app-1.%s
+  - route: parent-app-2.%s
+  env:
+    BAR: parent-app
+    FOO: parent-app
+    FIZ: parent-app
+    BAZ: parent-app
+- name: %s
+  memory: 256M
+  disk_quota: 256M
+  path: {some-dir}
+  routes:
+  - route: parent-app-1.%s
+  - route: parent-app-2.%s
+  env:
+    BAR: parent-app
+    FOO: parent-app
+    FIZ: parent-app
+    BAZ: parent-app
+`, domainName, domainName, app1Name, app2Name),
+				})
+			})
+
+			It("pushes with child application taking precedence over parent application over child global", func() {
+				session := helpers.CF("env", app1Name)
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+				Eventually(session.Out).Should(Say(`"disk": 64`))
+				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-global
+FIZ: parent-app
+FOO: child-app
+
+`))
+				Eventually(session).Should(Exit(0))
+
+				session = helpers.CF("env", app2Name)
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+				Eventually(session.Out).Should(Say(`"disk": 64`))
+				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-global
+FIZ: parent-app
+FOO: child-app
+
+`))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 		Context("when the child has global properties; and the parent has applications and global properties", func() {})
 
 		Context("when the child has applications and global properties; and the parent has applications and global properties", func() {})
