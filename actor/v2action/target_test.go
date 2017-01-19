@@ -1,8 +1,8 @@
-package configaction_test
+package v2action_test
 
 import (
-	. "code.cloudfoundry.org/cli/actor/configaction"
-	"code.cloudfoundry.org/cli/actor/configaction/configactionfakes"
+	. "code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,15 +13,15 @@ var _ = Describe("Targgeting", func() {
 		actor             Actor
 		skipSSLValidation bool
 
-		fakeCloudControllerClient *configactionfakes.FakeCloudControllerClient
-		fakeConfig                *configactionfakes.FakeConfig
+		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeConfig                *v2actionfakes.FakeConfig
 		settings                  TargetSettings
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(configactionfakes.FakeCloudControllerClient)
-		fakeConfig = new(configactionfakes.FakeConfig)
-		actor = NewActor(fakeConfig, fakeCloudControllerClient)
+		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
+		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil)
 
 		settings = TargetSettings{
 			SkipSSLValidation: skipSSLValidation,
@@ -54,7 +54,7 @@ var _ = Describe("Targgeting", func() {
 		})
 
 		It("targets the passed API", func() {
-			_, err := actor.SetTarget(settings)
+			_, err := actor.SetTarget(fakeConfig, settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
@@ -64,7 +64,7 @@ var _ = Describe("Targgeting", func() {
 		})
 
 		It("sets all the target information", func() {
-			_, err := actor.SetTarget(settings)
+			_, err := actor.SetTarget(fakeConfig, settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
@@ -82,7 +82,7 @@ var _ = Describe("Targgeting", func() {
 		})
 
 		It("clears all the token information", func() {
-			_, err := actor.SetTarget(settings)
+			_, err := actor.SetTarget(fakeConfig, settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
@@ -104,7 +104,7 @@ var _ = Describe("Targgeting", func() {
 			})
 
 			It("does not make any API calls", func() {
-				warnings, err := actor.SetTarget(settings)
+				warnings, err := actor.SetTarget(fakeConfig, settings)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(BeNil())
 
@@ -115,7 +115,7 @@ var _ = Describe("Targgeting", func() {
 
 	Describe("ClearTarget", func() {
 		It("clears all the target information", func() {
-			actor.ClearTarget()
+			actor.ClearTarget(fakeConfig)
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
 			api, apiVersion, auth, loggregator, minCLIVersion, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
@@ -132,7 +132,7 @@ var _ = Describe("Targgeting", func() {
 		})
 
 		It("clears all the token information", func() {
-			actor.ClearTarget()
+			actor.ClearTarget(fakeConfig)
 
 			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
 			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
