@@ -3,24 +3,11 @@ package v2actionfakes
 
 import (
 	"sync"
-	"time"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 )
 
 type FakeConfig struct {
-	OverallPollingTimeoutStub        func() time.Duration
-	overallPollingTimeoutMutex       sync.RWMutex
-	overallPollingTimeoutArgsForCall []struct{}
-	overallPollingTimeoutReturns     struct {
-		result1 time.Duration
-	}
-	PollingIntervalStub        func() time.Duration
-	pollingIntervalMutex       sync.RWMutex
-	pollingIntervalArgsForCall []struct{}
-	pollingIntervalReturns     struct {
-		result1 time.Duration
-	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
 	setTargetInformationArgsForCall []struct {
@@ -55,56 +42,6 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeConfig) OverallPollingTimeout() time.Duration {
-	fake.overallPollingTimeoutMutex.Lock()
-	fake.overallPollingTimeoutArgsForCall = append(fake.overallPollingTimeoutArgsForCall, struct{}{})
-	fake.recordInvocation("OverallPollingTimeout", []interface{}{})
-	fake.overallPollingTimeoutMutex.Unlock()
-	if fake.OverallPollingTimeoutStub != nil {
-		return fake.OverallPollingTimeoutStub()
-	} else {
-		return fake.overallPollingTimeoutReturns.result1
-	}
-}
-
-func (fake *FakeConfig) OverallPollingTimeoutCallCount() int {
-	fake.overallPollingTimeoutMutex.RLock()
-	defer fake.overallPollingTimeoutMutex.RUnlock()
-	return len(fake.overallPollingTimeoutArgsForCall)
-}
-
-func (fake *FakeConfig) OverallPollingTimeoutReturns(result1 time.Duration) {
-	fake.OverallPollingTimeoutStub = nil
-	fake.overallPollingTimeoutReturns = struct {
-		result1 time.Duration
-	}{result1}
-}
-
-func (fake *FakeConfig) PollingInterval() time.Duration {
-	fake.pollingIntervalMutex.Lock()
-	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct{}{})
-	fake.recordInvocation("PollingInterval", []interface{}{})
-	fake.pollingIntervalMutex.Unlock()
-	if fake.PollingIntervalStub != nil {
-		return fake.PollingIntervalStub()
-	} else {
-		return fake.pollingIntervalReturns.result1
-	}
-}
-
-func (fake *FakeConfig) PollingIntervalCallCount() int {
-	fake.pollingIntervalMutex.RLock()
-	defer fake.pollingIntervalMutex.RUnlock()
-	return len(fake.pollingIntervalArgsForCall)
-}
-
-func (fake *FakeConfig) PollingIntervalReturns(result1 time.Duration) {
-	fake.PollingIntervalStub = nil
-	fake.pollingIntervalReturns = struct {
-		result1 time.Duration
-	}{result1}
 }
 
 func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
@@ -218,10 +155,6 @@ func (fake *FakeConfig) TargetReturns(result1 string) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.overallPollingTimeoutMutex.RLock()
-	defer fake.overallPollingTimeoutMutex.RUnlock()
-	fake.pollingIntervalMutex.RLock()
-	defer fake.pollingIntervalMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
