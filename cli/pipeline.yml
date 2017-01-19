@@ -44,6 +44,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cf-release
     branch: master
+    tag_filter: "v*"
 
 - name: cf-cli-binaries
   type: s3
