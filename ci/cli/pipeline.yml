@@ -25,12 +25,6 @@ resources:
     - bin
     - ci
 
-- name: cli-acceptance-tests
-  type: git
-  source:
-    uri: https://github.com/cloudfoundry/cli-acceptance-tests
-    branch: master
-
 - name: cli-integration
   type: git
   source:
@@ -301,7 +295,6 @@ jobs:
       depth: 3
     - get: cf-cli-binaries
       passed: [build-binaries]
-    - get: cli-acceptance-tests
     - get: cli-ci
       depth: 3
     - get: cli-integration
