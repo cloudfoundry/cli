@@ -51,6 +51,14 @@ resources:
     password: admin
     deployment: cf-warden
 
+- name: bosh-lite-5-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-5-public-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
 - name: bosh-lites-acceptance-pool
   type: pool
   source:
@@ -154,6 +162,11 @@ groups:
   - smoke-test-4
   - deploy-diego-release-4
   - deploy-routing-release-4
+  - provision-bosh-lite-5
+  - deploy-cf-release-5
+  - smoke-test-5
+  - deploy-diego-release-5
+  - deploy-routing-release-5
 - name: dies-lite
   jobs:
   - provision-bosh-lite
@@ -616,6 +629,119 @@ jobs:
     params:
       LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
   - put: bosh-lites-diego-pool
+    params:
+      release: bosh-lite-lock
+
+- name: provision-bosh-lite-5
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lite
+    - get: cli
+    - put: bosh-lites-dea-pool
+      params:
+        claim: {{lite-5-hostname}}
+  - do:
+    - task: destroy
+      file: cli/ci/infrastructure/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-5
+    - task: provision
+      file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        BOSH_LITE_NAME: bosh-lite-5
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        BOSH_LITE_ELASTIC_IP: {{lite-5-public-ip-address}}
+        BOSH_LITE_KEYPAIR: {{lite-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
+        BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
+        LITE_PRIVATE_KEY: {{bosh-lite-private-key}}
+
+- name: deploy-cf-release-5
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [provision-bosh-lite-5]
+      trigger: true
+    - get: cli
+    - get: cf-release-repo
+    - get: cf-release
+    - get: bosh-lite-stemcell
+  - do:
+    - task: create-cf-manifest
+      file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
+      params:
+        LITE_IP_ADDRESS: {{lite-5-public-ip-address}}
+        LITE_HOSTNAME: {{lite-5-hostname}}
+        LITE_EXTRA_STUB: 'properties: { dea_next : { memory_mb : 20480 } }'
+    - put: bosh-lite-5-deploy-cf
+      params:
+        manifest: bosh-lite-cf-manifest/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
+
+- name: smoke-test-5
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-cf-release-5]
+      trigger: true
+    - get: cli
+  - task: run-smoke-tests
+    file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
+    params:
+      LITE_IP_ADDRESS: {{lite-5-public-ip-address}}
+
+- name: deploy-diego-release-5
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      passed: [smoke-test-5]
+      trigger: true
+    - get: garden-runc-release
+    - get: diego-release
+    - get: diego-repo
+    - get: cflinuxfs2-rootfs-release
+    - get: netman-release
+    - get: cli
+  - task: deploy-diego
+    file: cli/ci/infrastructure/tasks/deploy-diego.yml
+    params:
+      LITE_IP_ADDRESS: {{lite-5-public-ip-address}}
+
+- name: deploy-routing-release-5
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      passed: [deploy-diego-release-5]
+      trigger: true
+    - get: cf-routing-release
+    - get: cf-routing-release-repo
+    - get: cf-release-repo
+    - get: cli
+  - task: deploy-routing
+    file: cli/ci/infrastructure/tasks/deploy-routing.yml
+    params:
+      LITE_IP_ADDRESS: {{lite-5-public-ip-address}}
+      LITE_HOSTNAME: {{lite-5-hostname}}
+  - task: test-routing
+    file: cli/ci/infrastructure/tasks/test-routing.yml
+    params:
+      LITE_IP_ADDRESS: {{lite-5-public-ip-address}}
+  - put: bosh-lites-dea-pool
     params:
       release: bosh-lite-lock
 
