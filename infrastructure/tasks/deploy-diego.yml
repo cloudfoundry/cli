@@ -12,6 +12,7 @@ inputs:
 - name: diego-release
 - name: diego-repo
 - name: cflinuxfs2-rootfs-release
+- name: netman-release
 
 run:
   path: bash
@@ -25,6 +26,7 @@ run:
     bosh upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
     bosh upload release garden-runc-release/release.tgz --skip-if-exists
     bosh upload release diego-release/release.tgz --skip-if-exists
+    bosh upload release netman-release/release.tgz --skip-if-exists
 
     pushd diego-repo
       bosh download manifest cf-warden cf.yml

@@ -126,6 +126,11 @@ resources:
   source:
     repository: cloudfoundry/garden-runc-release
 
+- name: netman-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/netman-release
+
 groups:
 - name: bosh-lites
   jobs:
@@ -239,6 +244,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
+    - get: netman-release
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -351,6 +357,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
+    - get: netman-release
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -463,6 +470,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
+    - get: netman-release
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -574,6 +582,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
+    - get: netman-release
     - get: cli
   - do:
     - task: deploy-diego
