@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	CFEventuallyTimeout = 60 * time.Second
+	CFEventuallyTimeout = 300 * time.Second
 )
 
 var (

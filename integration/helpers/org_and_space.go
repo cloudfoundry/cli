@@ -1,6 +1,9 @@
 package helpers
 
 import (
+	"fmt"
+	"strings"
+
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
@@ -31,4 +34,13 @@ func CreateOrg(org string) {
 
 func CreateSpace(space string) {
 	Eventually(CF("create-space", space)).Should(Exit(0))
+}
+
+func QuickDeleteOrg(orgName string) {
+	session := CF("org", "--guid", orgName)
+	Eventually(session).Should(Exit(0))
+	guid := strings.TrimSpace(string(session.Out.Contents()))
+	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
+	session = CF("curl", "-X", "DELETE", url)
+	Eventually(session).Should(Exit(0))
 }
