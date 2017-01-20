@@ -825,6 +825,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
+    - get: netman-release
     - get: cli
   - do:
     - task: deploy-diego
