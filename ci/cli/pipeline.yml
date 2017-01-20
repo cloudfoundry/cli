@@ -210,7 +210,8 @@ groups:
   jobs:
   - units
   - build-binaries
-  - integration
+  - integration-windows
+  - integration-linux
   - cats-linux
   - cats-diego
   - cats-windows
@@ -285,7 +286,7 @@ jobs:
     params:
       file: compiled/cf-cli-binaries.tgz
 
-- name: integration
+- name: integration-windows
   serial: true
   plan:
   - aggregate:
@@ -306,12 +307,7 @@ jobs:
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: linux-integration
-      file: cli-ci/ci/cli/tasks/integration-linux.yml
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: windows-integration
+    - task: integration
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       ensure:
         task: cleanup-integration
@@ -320,7 +316,43 @@ jobs:
        put: slack-alert
        params:
          channel: '#cli-firehose'
-         text: "integration failed OR errored :("
+         text: "window integration failed OR errored :("
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: integration-linux
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [build-binaries]
+      depth: 3
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+    - get: cli-ci
+      depth: 3
+    - get: cli-integration
+      depth: 3
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "linux integration failed OR errored :("
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -466,10 +498,10 @@ jobs:
   - aggregate:
     - get: cli
       trigger: true
-      passed: [cats-linux, cats-windows, cats-diego, integration]
+      passed: [cats-linux, cats-windows, cats-diego, integration-windows, integration-linux]
       depth: 3
     - get: cf-cli-binaries
-      passed: [cats-linux, cats-windows, cats-diego, integration]
+      passed: [cats-linux, cats-windows, cats-diego, integration-windows, integration-linux]
     - get: cli-ci
       depth: 3
   - task: extract-binaries
