@@ -383,7 +383,7 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
         BACKEND: dea
-        INCLUDE_V3: true
+        INCLUDE_V3: false
         BROKER_START_TIMEOUT: 330
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
@@ -428,7 +428,7 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
         BACKEND: diego
-        INCLUDE_V3: true
+        INCLUDE_V3: false
         BROKER_START_TIMEOUT: 330
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
