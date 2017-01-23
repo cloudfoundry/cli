@@ -13,6 +13,7 @@ import (
 
 type DeleteOrganizationActor interface {
 	DeleteOrganization(orgName string) (v2action.Warnings, error)
+	ClearOrganizationAndSpace(config v2action.Config)
 }
 
 type DeleteOrgCommand struct {
@@ -77,6 +78,10 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 		default:
 			return shared.HandleError(err)
 		}
+	}
+
+	if cmd.Config.TargetedOrganization().Name == cmd.RequiredArgs.Organization {
+		cmd.Actor.ClearOrganizationAndSpace(cmd.Config)
 	}
 
 	cmd.UI.DisplayOK()

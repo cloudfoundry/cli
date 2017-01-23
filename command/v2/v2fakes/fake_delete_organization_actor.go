@@ -18,6 +18,11 @@ type FakeDeleteOrganizationActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	ClearOrganizationAndSpaceStub        func(config v2action.Config)
+	clearOrganizationAndSpaceMutex       sync.RWMutex
+	clearOrganizationAndSpaceArgsForCall []struct {
+		config v2action.Config
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -56,11 +61,37 @@ func (fake *FakeDeleteOrganizationActor) DeleteOrganizationReturns(result1 v2act
 	}{result1, result2}
 }
 
+func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpace(config v2action.Config) {
+	fake.clearOrganizationAndSpaceMutex.Lock()
+	fake.clearOrganizationAndSpaceArgsForCall = append(fake.clearOrganizationAndSpaceArgsForCall, struct {
+		config v2action.Config
+	}{config})
+	fake.recordInvocation("ClearOrganizationAndSpace", []interface{}{config})
+	fake.clearOrganizationAndSpaceMutex.Unlock()
+	if fake.ClearOrganizationAndSpaceStub != nil {
+		fake.ClearOrganizationAndSpaceStub(config)
+	}
+}
+
+func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpaceCallCount() int {
+	fake.clearOrganizationAndSpaceMutex.RLock()
+	defer fake.clearOrganizationAndSpaceMutex.RUnlock()
+	return len(fake.clearOrganizationAndSpaceArgsForCall)
+}
+
+func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpaceArgsForCall(i int) v2action.Config {
+	fake.clearOrganizationAndSpaceMutex.RLock()
+	defer fake.clearOrganizationAndSpaceMutex.RUnlock()
+	return fake.clearOrganizationAndSpaceArgsForCall[i].config
+}
+
 func (fake *FakeDeleteOrganizationActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.deleteOrganizationMutex.RLock()
 	defer fake.deleteOrganizationMutex.RUnlock()
+	fake.clearOrganizationAndSpaceMutex.RLock()
+	defer fake.clearOrganizationAndSpaceMutex.RUnlock()
 	return fake.invocations
 }
 

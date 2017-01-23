@@ -632,6 +632,20 @@ var _ = Describe("Config", func() {
 			})
 		})
 
+		Describe("UnsetOrganizationInformation", func() {
+			config := Config{}
+			BeforeEach(func() {
+				config.SetOrganizationInformation("some-org-guid", "some-org")
+			})
+
+			It("resets the org GUID and name", func() {
+				config.UnsetOrganizationInformation()
+
+				Expect(config.ConfigFile.TargetedOrganization.GUID).To(Equal(""))
+				Expect(config.ConfigFile.TargetedOrganization.Name).To(Equal(""))
+			})
+		})
+
 		Describe("UnsetSpaceInformation", func() {
 			config := Config{}
 			BeforeEach(func() {

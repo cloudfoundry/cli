@@ -142,4 +142,13 @@ var _ = Describe("Targgeting", func() {
 			Expect(sshOAuthClient).To(BeEmpty())
 		})
 	})
+
+	Describe("ClearOrganizationAndSpace", func() {
+		It("clears all organization and space information", func() {
+			actor.ClearOrganizationAndSpace(fakeConfig)
+
+			Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
+			Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+		})
+	})
 })

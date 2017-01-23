@@ -37,3 +37,9 @@ func (actor Actor) ClearTarget(config Config) {
 	config.SetTargetInformation("", "", "", "", "", "", "", "", false)
 	config.SetTokenInformation("", "", "")
 }
+
+// ClearTarget clears the targeted org and space in the config.
+func (actor Actor) ClearOrganizationAndSpace(config Config) {
+	config.UnsetOrganizationInformation()
+	config.UnsetSpaceInformation()
+}

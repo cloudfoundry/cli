@@ -186,13 +186,16 @@ type FakeConfig struct {
 	uAAOAuthClientSecretReturns     struct {
 		result1 string
 	}
-	UnsetSpaceInformationStub        func()
-	unsetSpaceInformationMutex       sync.RWMutex
-	unsetSpaceInformationArgsForCall []struct{}
-	VerboseStub                      func() (bool, []string)
-	verboseMutex                     sync.RWMutex
-	verboseArgsForCall               []struct{}
-	verboseReturns                   struct {
+	UnsetSpaceInformationStub               func()
+	unsetSpaceInformationMutex              sync.RWMutex
+	unsetSpaceInformationArgsForCall        []struct{}
+	UnsetOrganizationInformationStub        func()
+	unsetOrganizationInformationMutex       sync.RWMutex
+	unsetOrganizationInformationArgsForCall []struct{}
+	VerboseStub                             func() (bool, []string)
+	verboseMutex                            sync.RWMutex
+	verboseArgsForCall                      []struct{}
+	verboseReturns                          struct {
 		result1 bool
 		result2 []string
 	}
@@ -924,6 +927,22 @@ func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
 	return len(fake.unsetSpaceInformationArgsForCall)
 }
 
+func (fake *FakeConfig) UnsetOrganizationInformation() {
+	fake.unsetOrganizationInformationMutex.Lock()
+	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetOrganizationInformation", []interface{}{})
+	fake.unsetOrganizationInformationMutex.Unlock()
+	if fake.UnsetOrganizationInformationStub != nil {
+		fake.UnsetOrganizationInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	return len(fake.unsetOrganizationInformationArgsForCall)
+}
+
 func (fake *FakeConfig) Verbose() (bool, []string) {
 	fake.verboseMutex.Lock()
 	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct{}{})
@@ -1011,6 +1030,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	return fake.invocations

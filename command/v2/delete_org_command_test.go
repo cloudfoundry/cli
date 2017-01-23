@@ -229,5 +229,28 @@ var _ = Describe("delete-org Command", func() {
 				})
 			})
 		})
+
+		Context("when the user deletes a targeted org", func() {
+			BeforeEach(func() {
+				cmd.Force = true
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
+			})
+
+			It("clears the targeted org and space", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.ClearOrganizationAndSpaceCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("when the user deletes an org that's not targeted", func() {
+			BeforeEach(func() {
+				cmd.Force = true
+			})
+
+			It("does not clear the targeted org and space", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.ClearOrganizationAndSpaceCallCount()).To(Equal(0))
+			})
+		})
 	})
 })

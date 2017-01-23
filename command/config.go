@@ -39,5 +39,6 @@ type Config interface {
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
 	UnsetSpaceInformation()
+	UnsetOrganizationInformation()
 	Verbose() (bool, []string)
 }
