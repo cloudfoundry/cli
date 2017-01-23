@@ -454,8 +454,8 @@ func (config *Config) SetTargetInformation(api string, apiVersion string, auth s
 	config.ConfigFile.RoutingEndpoint = routing
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
-	config.SetOrganizationInformation("", "")
-	config.SetSpaceInformation("", "", false)
+	config.UnsetOrganizationInformation()
+	config.UnsetSpaceInformation()
 }
 
 // SetTokenInformation sets the current token/user information
@@ -478,4 +478,9 @@ func (config *Config) SetRefreshToken(refreshToken string) {
 // UnsetSpaceInformation resets the space values to default
 func (config *Config) UnsetSpaceInformation() {
 	config.SetSpaceInformation("", "", false)
+}
+
+// UnsetOrganizationInformation resets the organization values to default
+func (config *Config) UnsetOrganizationInformation() {
+	config.SetOrganizationInformation("", "")
 }

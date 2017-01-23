@@ -152,4 +152,47 @@ var _ = Describe("delete-org command", func() {
 			})
 		})
 	})
+
+	Context("when deleting an org that is targeted", func() {
+		var orgName string
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+
+			orgName = helpers.NewOrgName()
+			spaceName := helpers.PrefixedRandomName("space")
+			helpers.CreateOrgAndSpace(orgName, spaceName)
+			helpers.TargetOrgAndSpace(orgName, spaceName)
+		})
+
+		It("clears the targeted org and space", func() {
+			session := helpers.CF("delete-org", orgName, "-f")
+			Eventually(session).Should(Exit(0))
+
+			session = helpers.CF("target")
+			Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	Context("when deleting an org that is not targeted", func() {
+		var orgName string
+
+		BeforeEach(func() {
+			helpers.LoginCF()
+
+			orgName = helpers.NewOrgName()
+			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+		})
+
+		It("does not clear the targeted org and space", func() {
+			session := helpers.CF("delete-org", orgName, "-f")
+			Eventually(session).Should(Exit(0))
+
+			session = helpers.CF("target")
+			Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
+			Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+			Eventually(session).Should(Exit(0))
+		})
+	})
 })

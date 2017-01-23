@@ -8,9 +8,15 @@ import (
 )
 
 type FakeConfig struct {
-	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
-	setTargetInformationMutex       sync.RWMutex
-	setTargetInformationArgsForCall []struct {
+	UnsetOrganizationInformationStub        func()
+	unsetOrganizationInformationMutex       sync.RWMutex
+	unsetOrganizationInformationArgsForCall []struct{}
+	UnsetSpaceInformationStub               func()
+	unsetSpaceInformationMutex              sync.RWMutex
+	unsetSpaceInformationArgsForCall        []struct{}
+	SetTargetInformationStub                func(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	setTargetInformationMutex               sync.RWMutex
+	setTargetInformationArgsForCall         []struct {
 		api               string
 		apiVersion        string
 		auth              string
@@ -42,6 +48,38 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConfig) UnsetOrganizationInformation() {
+	fake.unsetOrganizationInformationMutex.Lock()
+	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetOrganizationInformation", []interface{}{})
+	fake.unsetOrganizationInformationMutex.Unlock()
+	if fake.UnsetOrganizationInformationStub != nil {
+		fake.UnsetOrganizationInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	return len(fake.unsetOrganizationInformationArgsForCall)
+}
+
+func (fake *FakeConfig) UnsetSpaceInformation() {
+	fake.unsetSpaceInformationMutex.Lock()
+	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
+	fake.unsetSpaceInformationMutex.Unlock()
+	if fake.UnsetSpaceInformationStub != nil {
+		fake.UnsetSpaceInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
+	return len(fake.unsetSpaceInformationArgsForCall)
 }
 
 func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
@@ -155,6 +193,10 @@ func (fake *FakeConfig) TargetReturns(result1 string) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
