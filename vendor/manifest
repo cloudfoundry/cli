@@ -120,32 +120,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry/loggregator_consumer",
-			"repository": "https://github.com/cloudfoundry/loggregator_consumer",
-			"vcs": "git",
-			"revision": "eef2afce51e4fa4d56ed94eb02c9bba38d7b4572",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry/loggregatorlib/logmessage",
-			"repository": "https://github.com/cloudfoundry/loggregatorlib",
-			"vcs": "git",
-			"revision": "89ede302e272352e4c8e011c3f8b5615a1ec859a",
-			"branch": "master",
-			"path": "/logmessage",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry/loggregatorlib/signature",
-			"repository": "https://github.com/cloudfoundry/loggregatorlib",
-			"vcs": "git",
-			"revision": "89ede302e272352e4c8e011c3f8b5615a1ec859a",
-			"branch": "master",
-			"path": "signature",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/cloudfoundry/noaa",
 			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
@@ -294,41 +268,6 @@
 			"repository": "https://github.com/sajari/fuzzy",
 			"vcs": "git",
 			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/stretchr/testify/assert",
-			"repository": "https://github.com/stretchr/testify",
-			"vcs": "git",
-			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
-			"branch": "master",
-			"path": "/assert",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
-			"repository": "https://github.com/stretchr/testify",
-			"vcs": "git",
-			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
-			"branch": "master",
-			"path": "vendor/github.com/davecgh/go-spew/spew",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
-			"repository": "https://github.com/stretchr/testify",
-			"vcs": "git",
-			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
-			"branch": "master",
-			"path": "vendor/github.com/pmezard/go-difflib/difflib",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/tedsuo/ifrit",
-			"repository": "https://github.com/tedsuo/ifrit",
-			"vcs": "git",
-			"revision": "6711154296c2b3fc5cd1932f0638c8ca0ce8a8a7",
 			"branch": "master",
 			"notests": true
 		},

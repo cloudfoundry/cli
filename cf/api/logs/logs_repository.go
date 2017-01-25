@@ -2,6 +2,7 @@ package logs
 
 import "time"
 
+//go:generate counterfeiter . Loggable
 type Loggable interface {
 	ToLog(loc *time.Location) string
 	ToSimpleLog() string

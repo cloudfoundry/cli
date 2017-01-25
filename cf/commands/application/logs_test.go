@@ -1,8 +1,6 @@
 package application_test
 
 import (
-	"time"
-
 	"code.cloudfoundry.org/cli/cf/api/logs"
 	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -12,9 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	testcmd "code.cloudfoundry.org/cli/util/testhelpers/commands"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
-	testlogs "code.cloudfoundry.org/cli/util/testhelpers/logs"
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
@@ -86,15 +82,21 @@ var _ = Describe("logs command", func() {
 			app.Name = "my-app"
 			app.GUID = "my-app-guid"
 
-			currentTime := time.Now()
+			message1 := logsfakes.FakeLoggable{}
+			message1.ToLogReturns("Log Line 1")
+
+			message2 := logsfakes.FakeLoggable{}
+			message2.ToLogReturns("Log Line 2")
+
 			recentLogs := []logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
-				testlogs.NewLogMessage("Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+				&message1,
+				&message2,
 			}
 
-			appLogs := []logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
-			}
+			message3 := logsfakes.FakeLoggable{}
+			message3.ToLogReturns("Log Line 1")
+
+			appLogs := []logs.Loggable{&message3}
 
 			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
 			applicationReq.GetApplicationReturns(app)
@@ -126,9 +128,11 @@ var _ = Describe("logs command", func() {
 
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
-				logsRepo.RecentLogsForReturns([]logs.Loggable{
-					testlogs.NewLogMessage("hello%2Bworld%v", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
-				}, nil)
+				message := logsfakes.FakeLoggable{}
+				message.ToLogReturns("hello%2Bworld%v")
+
+				logsRepo.RecentLogsForReturns([]logs.Loggable{&message},
+					nil)
 			})
 
 			It("does not treat them as format strings", func() {
