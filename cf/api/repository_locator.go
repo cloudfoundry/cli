@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/appevents"
 	api_appfiles "code.cloudfoundry.org/cli/cf/api/appfiles"
 	"code.cloudfoundry.org/cli/cf/api/appinstances"
@@ -34,9 +33,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/cf/v3/repository"
-	"github.com/blang/semver"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
-	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
@@ -111,8 +108,6 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
 
-	apiVersion, _ := semver.Make(config.APIVersion())
-
 	var noaaRetryTimeout time.Duration
 	convertedTime, err := strconv.Atoi(envDialTimeout)
 	if err != nil {
@@ -121,15 +116,9 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 		noaaRetryTimeout = time.Duration(convertedTime) * 3 * time.Second
 	}
 
-	if apiVersion.GTE(cf.NoaaMinimumAPIVersion) {
-		consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo, noaaRetryTimeout)
-	} else {
-		consumer := loggregator_consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-		loc.logsRepo = logs.NewLoggregatorLogsRepository(config, consumer, loc.authRepo)
-	}
+	consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+	consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
+	loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo, noaaRetryTimeout)
 
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerRepository(config, uaaGateway)

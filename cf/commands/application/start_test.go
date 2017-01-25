@@ -14,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
 	"code.cloudfoundry.org/cli/cf/api/appinstances/appinstancesfakes"
 	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
@@ -22,7 +21,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
 	testcmd "code.cloudfoundry.org/cli/util/testhelpers/commands"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
-	testlogs "code.cloudfoundry.org/cli/util/testhelpers/logs"
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 
 	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
@@ -182,8 +180,8 @@ var _ = Describe("start command", func() {
 
 	callStartWithLoggingTimeout := func(args []string) bool {
 
-		logRepoWithTimeout := new(logsfakes.FakeLogsRepositoryWithTimeout)
-		updateCommandDependency(logRepoWithTimeout)
+		logRepoWithTimeout := logsfakes.FakeRepository{}
+		updateCommandDependency(&logRepoWithTimeout)
 
 		cmd := commandregistry.Commands.FindCommand("start").(*Start)
 		cmd.LogServerConnectionTimeout = 100 * time.Millisecond
@@ -476,15 +474,25 @@ var _ = Describe("start command", func() {
 			appRepo.UpdateReturns(defaultAppForStart, nil)
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
-			currentTime := time.Now()
-			wrongSourceName := "DEA"
-			correctSourceName := "STG"
+			message1 := logsfakes.FakeLoggable{}
+			message1.ToSimpleLogReturns("Log Line 1")
+
+			message2 := logsfakes.FakeLoggable{}
+			message2.GetSourceNameReturns("STG")
+			message2.ToSimpleLogReturns("Log Line 2")
+
+			message3 := logsfakes.FakeLoggable{}
+			message3.GetSourceNameReturns("STG")
+			message3.ToSimpleLogReturns("Log Line 3")
+
+			message4 := logsfakes.FakeLoggable{}
+			message4.ToSimpleLogReturns("Log Line 4")
 
 			logMessages.Store([]logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.GUID, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 4", defaultAppForStart.GUID, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
+				&message1,
+				&message2,
+				&message3,
+				&message4,
 			})
 
 			callStart([]string{"my-app"})
@@ -507,12 +515,24 @@ var _ = Describe("start command", func() {
 				onConnect()
 
 				go func() {
-					logChan <- testlogs.NewLogMessage("Before close", appGUID, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					message1 := logsfakes.FakeLoggable{}
+					message1.ToSimpleLogReturns("Before close")
+					message1.GetSourceNameReturns("STG")
+
+					logChan <- &message1
 
 					closeWait.Wait()
 
-					logChan <- testlogs.NewLogMessage("After close 1", "", LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
-					logChan <- testlogs.NewLogMessage("After close 2", "", LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					message2 := logsfakes.FakeLoggable{}
+					message2.ToSimpleLogReturns("After close 1")
+					message2.GetSourceNameReturns("STG")
+
+					message3 := logsfakes.FakeLoggable{}
+					message3.ToSimpleLogReturns("After close 2")
+					message3.GetSourceNameReturns("STG")
+
+					logChan <- &message2
+					logChan <- &message3
 
 					close(logChan)
 				}()

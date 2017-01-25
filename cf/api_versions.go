@@ -10,7 +10,6 @@ var (
 	SetRolesByUsernameMinimumAPIVersion, _              = semver.Make("2.37.0")
 	RoutePathMinimumAPIVersion, _                       = semver.Make("2.36.0")
 	OrgAppInstanceLimitMinimumAPIVersion, _             = semver.Make("2.33.0")
-	NoaaMinimumAPIVersion, _                            = semver.Make("2.29.0")
 	ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion, _ = semver.Make("2.21.0")
 	UpdateServicePlanMinimumAPIVersion, _               = semver.Make("2.16.0")
 
