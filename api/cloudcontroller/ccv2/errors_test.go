@@ -91,6 +91,45 @@ Description:   some-error-description`))
 		})
 
 		Context("when the error is from the cloud controller", func() {
+			Context("(400) Bad Request", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusBadRequest
+				})
+
+				Context("generic 400", func() {
+					BeforeEach(func() {
+						response = `{
+							"description": "bad request",
+							"error_code": "CF-BadRequest"
+						}`
+					})
+
+					It("returns a BadRequestError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(cloudcontroller.BadRequestError{
+							Message: "bad request",
+						}))
+					})
+				})
+
+				Context("getting stats for a stopped app", func() {
+					BeforeEach(func() {
+						response = `{
+							"code": 200003,
+							"description": "Could not fetch stats for stopped app: some-app",
+							"error_code": "CF-AppStoppedStatsError"
+						}`
+					})
+
+					It("returns an AppStoppedStatsError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(AppStoppedStatsError{
+							Message: "Could not fetch stats for stopped app: some-app",
+						}))
+					})
+				})
+			})
+
 			Context("(401) Unauthorized", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusUnauthorized

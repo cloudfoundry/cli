@@ -46,6 +46,15 @@ func (r RawHTTPStatusError) Error() string {
 	return fmt.Sprintf("Error Code: %d\nRaw Response: %s", r.StatusCode, r.RawResponse)
 }
 
+// BadRequestError is returned when the server says the request was bad.
+type BadRequestError struct {
+	Message string
+}
+
+func (e BadRequestError) Error() string {
+	return e.Message
+}
+
 // UnauthorizedError is returned when the client does not have the correct
 // permissions to execute the request.
 type UnauthorizedError struct {
