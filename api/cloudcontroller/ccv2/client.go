@@ -57,6 +57,14 @@
 // controller errors should exist in errors.go, all generic HTTP errors should
 // exist in the cloudcontroller's errors.go. Errors related to the individaul
 // operation should exist at the top of that operation's file.
+//
+// No 'inline-relations-depth' and '/summary' Endpoints
+//
+// This package will not use ever use 'inline-relations-depth' or the
+// '/summary' endpoints for any operations. These requests can be extremely
+// taxing on the Cloud Controller and are avoided at all costs. Additionally,
+// the objects returned back from these requests can become extremely
+// inconsistant across versions and are problematic to deal with in general.
 package ccv2
 
 import (
