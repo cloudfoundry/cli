@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	AppInstanceStats              = "AppInstanceStats"
 	AppsFromRouteRequest          = "AppsFromRoute"
 	AppsRequest                   = "Apps"
 	DeleteOrganizationRequest     = "DeleteOrganization"
@@ -23,12 +24,14 @@ const (
 	SharedDomainRequest           = "SharedDomain"
 	SpaceServiceInstancesRequest  = "SpaceServiceInstances"
 	SpacesRequest                 = "Spaces"
+	StackRequest                  = "Stack"
 	UsersRequest                  = "Users"
 )
 
 // APIRoutes is a list of routes used by the rata library to construct request
 // URLs.
 var APIRoutes = rata.Routes{
+	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: AppInstanceStats},
 	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: JobRequest},
@@ -45,5 +48,6 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces", Method: http.MethodGet, Name: SpacesRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: SpaceServiceInstancesRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: RoutesFromSpaceRequest},
+	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: StackRequest},
 	{Path: "/v2/users", Method: http.MethodPost, Name: UsersRequest},
 }

@@ -2,6 +2,7 @@ package ccv2_test
 
 import (
 	"net/http"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -28,7 +29,16 @@ var _ = Describe("Application", func() {
 							"updated_at": null
 						},
 						"entity": {
-							"name": "app-name-1"
+							"buildpack": "ruby 1.6.29",
+							"detected_start_command": "echo 'I am a banana'",
+							"disk_quota": 586,
+							"detected_buildpack": null,
+							"instances": 13,
+							"memory": 1024,
+							"name": "app-name-1",
+							"package_updated_at": "2015-03-10T23:11:54Z",
+							"stack_guid": "some-stack-guid",
+							"state": "STOPPED"
 						}
 					},
 					{
@@ -37,7 +47,9 @@ var _ = Describe("Application", func() {
 							"updated_at": null
 						},
 						"entity": {
-							"name": "app-name-2"
+							"name": "app-name-2",
+							"detected_buildpack": "ruby 1.6.29",
+							"package_updated_at": null
 						}
 					}
 				]
@@ -87,9 +99,25 @@ var _ = Describe("Application", func() {
 					Value:    "some-space-guid",
 				}})
 				Expect(err).NotTo(HaveOccurred())
+
+				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+				Expect(err).NotTo(HaveOccurred())
+
 				Expect(apps).To(ConsistOf([]Application{
-					{Name: "app-name-1", GUID: "app-guid-1"},
-					{Name: "app-name-2", GUID: "app-guid-2"},
+					{
+						Buildpack:            "ruby 1.6.29",
+						DetectedBuildpack:    "",
+						DetectedStartCommand: "echo 'I am a banana'",
+						DiskQuota:            586,
+						GUID:                 "app-guid-1",
+						Instances:            13,
+						Memory:               1024,
+						Name:                 "app-name-1",
+						PackageUpdatedAt:     updatedAt,
+						StackGUID:            "some-stack-guid",
+						State:                ApplicationStopped,
+					},
+					{Name: "app-name-2", GUID: "app-guid-2", DetectedBuildpack: "ruby 1.6.29"},
 					{Name: "app-name-3", GUID: "app-guid-3"},
 					{Name: "app-name-4", GUID: "app-guid-4"},
 				}))

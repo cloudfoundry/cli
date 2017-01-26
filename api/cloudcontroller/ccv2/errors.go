@@ -32,6 +32,16 @@ func (e UnexpectedResponseError) Error() string {
 	return fmt.Sprintf("%s\nDescription:   %s", message, e.Description)
 }
 
+// AppStoppedStatsError is returned when requesting instance information from a
+// stopped app.
+type AppStoppedStatsError struct {
+	Message string
+}
+
+func (e AppStoppedStatsError) Error() string {
+	return e.Message
+}
+
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
 type errorWrapper struct {
@@ -72,6 +82,11 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	}
 
 	switch rawHTTPStatusErr.StatusCode {
+	case http.StatusBadRequest: // 400
+		if errorResponse.ErrorCode == "CF-AppStoppedStatsError" {
+			return AppStoppedStatsError{Message: errorResponse.Description}
+		}
+		return cloudcontroller.BadRequestError{Message: errorResponse.Description}
 	case http.StatusUnauthorized: // 401
 		if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
 			return cloudcontroller.InvalidAuthTokenError{Message: errorResponse.Description}

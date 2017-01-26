@@ -7,10 +7,13 @@ import (
 	"net/url"
 )
 
+// Params represents URI parameters for a request.
+type Params map[string]string
+
 // requestOptions contains all the options to create an HTTP request.
 type requestOptions struct {
 	// URIParams are the list URI route parameters
-	URIParams map[string]string
+	URIParams Params
 
 	// Query is a list of HTTP query parameters
 	Query url.Values
@@ -41,7 +44,7 @@ func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request
 	} else {
 		request, err = client.router.CreateRequest(
 			passedRequest.RequestName,
-			passedRequest.URIParams,
+			map[string]string(passedRequest.URIParams),
 			passedRequest.Body,
 		)
 		if err == nil {
