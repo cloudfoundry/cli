@@ -58,7 +58,7 @@
 // exist in the cloudcontroller's errors.go. Errors related to the individaul
 // operation should exist at the top of that operation's file.
 //
-// No 'inline-relations-depth' and '/summary' Endpoints
+// No inline-relations-depth And summary Endpoints
 //
 // This package will not use ever use 'inline-relations-depth' or the
 // '/summary' endpoints for any operations. These requests can be extremely
