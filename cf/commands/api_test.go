@@ -50,7 +50,6 @@ var _ = Describe("Api", func() {
 			return &coreconfig.CCInfo{
 				APIVersion:               config.APIVersion(),
 				AuthorizationEndpoint:    config.AuthenticationEndpoint(),
-				LoggregatorEndpoint:      "log/endpoint",
 				MinCLIVersion:            config.MinCLIVersion(),
 				MinRecommendedCLIVersion: config.MinRecommendedCLIVersion(),
 				SSHOAuthClient:           config.SSHOAuthClient(),

@@ -1,7 +1,6 @@
 package coreconfig
 
 import (
-	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/configuration"
@@ -22,7 +21,6 @@ type ConfigRepository struct {
 type CCInfo struct {
 	APIVersion               string `json:"api_version"`
 	AuthorizationEndpoint    string `json:"authorization_endpoint"`
-	LoggregatorEndpoint      string `json:"logging_endpoint"`
 	DopplerEndpoint          string `json:"doppler_logging_endpoint"`
 	MinCLIVersion            string `json:"min_cli_version"`
 	MinRecommendedCLIVersion string `json:"min_recommended_cli_version"`
@@ -62,7 +60,6 @@ type Reader interface {
 	HasAPIEndpoint() bool
 
 	AuthenticationEndpoint() string
-	LoggregatorEndpoint() string
 	DopplerEndpoint() string
 	UaaEndpoint() string
 	RoutingAPIEndpoint() string
@@ -109,7 +106,6 @@ type ReadWriter interface {
 	SetMinCLIVersion(string)
 	SetMinRecommendedCLIVersion(string)
 	SetAuthenticationEndpoint(string)
-	SetLoggregatorEndpoint(string)
 	SetDopplerEndpoint(string)
 	SetUaaEndpoint(string)
 	SetRoutingAPIEndpoint(string)
@@ -193,23 +189,11 @@ func (c *ConfigRepository) AuthenticationEndpoint() (authEndpoint string) {
 	return
 }
 
-func (c *ConfigRepository) LoggregatorEndpoint() (logEndpoint string) {
-	c.read(func() {
-		logEndpoint = c.data.LoggregatorEndPoint
-	})
-	return
-}
-
 func (c *ConfigRepository) DopplerEndpoint() (dopplerEndpoint string) {
-	//revert this in v7.0, once CC advertise doppler endpoint, and
-	//everyone has migrated from loggregator to doppler
 	c.read(func() {
 		dopplerEndpoint = c.data.DopplerEndPoint
 	})
 
-	if dopplerEndpoint == "" {
-		return strings.Replace(c.LoggregatorEndpoint(), "loggregator", "doppler", 1)
-	}
 	return
 }
 
@@ -475,12 +459,6 @@ func (c *ConfigRepository) SetMinRecommendedCLIVersion(version string) {
 func (c *ConfigRepository) SetAuthenticationEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.AuthorizationEndpoint = endpoint
-	})
-}
-
-func (c *ConfigRepository) SetLoggregatorEndpoint(endpoint string) {
-	c.write(func() {
-		c.data.LoggregatorEndPoint = endpoint
 	})
 }
 

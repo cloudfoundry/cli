@@ -101,9 +101,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 			cmd.Requirements(factory, flagContext)
 
 			endpointRepo.GetCCInfoReturns(
-				&coreconfig.CCInfo{
-					LoggregatorEndpoint: "loggregator/endpoint",
-				},
+				&coreconfig.CCInfo{},
 				"some-endpoint",
 				nil,
 			)
@@ -123,7 +121,6 @@ var _ = Describe("OneTimeSSHCode", func() {
 			ccInfo := &coreconfig.CCInfo{
 				APIVersion:               "some-version",
 				AuthorizationEndpoint:    "auth/endpoint",
-				LoggregatorEndpoint:      "loggregator/endpoint",
 				MinCLIVersion:            "min-cli-version",
 				MinRecommendedCLIVersion: "min-rec-cli-version",
 				SSHOAuthClient:           "some-client",

@@ -10,7 +10,6 @@ type APIInformation struct {
 	APIVersion                   string `json:"api_version"`
 	AuthorizationEndpoint        string `json:"authorization_endpoint"`
 	DopplerEndpoint              string `json:"doppler_logging_endpoint"`
-	LoggregatorEndpoint          string `json:"logging_endpoint"`
 	MinCLIVersion                string `json:"min_cli_version"`
 	MinimumRecommendedCLIVersion string `json:"min_recommended_cli_version"`
 	Name                         string `json:"name"`
@@ -39,12 +38,6 @@ func (client *Client) AuthorizationEndpoint() string {
 // Controller.
 func (client *Client) DopplerEndpoint() string {
 	return client.dopplerEndpoint
-}
-
-// LoggregatorEndpoint returns the Loggregator endpoint for the targeted Cloud
-// Controller.
-func (client *Client) LoggregatorEndpoint() string {
-	return client.loggregatorEndpoint
 }
 
 // MinCLIVersion returns the minimum CLI version required for the targeted

@@ -558,7 +558,6 @@ var _ = Describe("Config", func() {
 					"https://api.foo.com",
 					"2.59.31",
 					"https://login.foo.com",
-					"wws://loggregator.foo.com:443",
 					"2.0.0",
 					"wws://doppler.foo.com:443",
 					"https://uaa.foo.com",
@@ -569,7 +568,6 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
 				Expect(config.ConfigFile.APIVersion).To(Equal("2.59.31"))
 				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
-				Expect(config.ConfigFile.LoggregatorEndpoint).To(Equal("wws://loggregator.foo.com:443"))
 				Expect(config.ConfigFile.MinCLIVersion).To(Equal("2.0.0"))
 				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
 				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))

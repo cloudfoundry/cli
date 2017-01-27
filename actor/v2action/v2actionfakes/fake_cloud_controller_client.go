@@ -203,12 +203,6 @@ type FakeCloudControllerClient struct {
 	dopplerEndpointReturns     struct {
 		result1 string
 	}
-	LoggregatorEndpointStub        func() string
-	loggregatorEndpointMutex       sync.RWMutex
-	loggregatorEndpointArgsForCall []struct{}
-	loggregatorEndpointReturns     struct {
-		result1 string
-	}
 	MinCLIVersionStub        func() string
 	minCLIVersionMutex       sync.RWMutex
 	minCLIVersionArgsForCall []struct{}
@@ -966,31 +960,6 @@ func (fake *FakeCloudControllerClient) DopplerEndpointReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeCloudControllerClient) LoggregatorEndpoint() string {
-	fake.loggregatorEndpointMutex.Lock()
-	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
-	fake.recordInvocation("LoggregatorEndpoint", []interface{}{})
-	fake.loggregatorEndpointMutex.Unlock()
-	if fake.LoggregatorEndpointStub != nil {
-		return fake.LoggregatorEndpointStub()
-	} else {
-		return fake.loggregatorEndpointReturns.result1
-	}
-}
-
-func (fake *FakeCloudControllerClient) LoggregatorEndpointCallCount() int {
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
-	return len(fake.loggregatorEndpointArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) LoggregatorEndpointReturns(result1 string) {
-	fake.LoggregatorEndpointStub = nil
-	fake.loggregatorEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeCloudControllerClient) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct{}{})
@@ -1111,8 +1080,6 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.authorizationEndpointMutex.RUnlock()
 	fake.dopplerEndpointMutex.RLock()
 	defer fake.dopplerEndpointMutex.RUnlock()
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.routingEndpointMutex.RLock()

@@ -166,7 +166,6 @@ type CFConfig struct {
 	Target                   string        `json:"Target"`
 	APIVersion               string        `json:"APIVersion"`
 	AuthorizationEndpoint    string        `json:"AuthorizationEndpoint"`
-	LoggregatorEndpoint      string        `json:"LoggregatorEndPoint"`
 	DopplerEndpoint          string        `json:"DopplerEndPoint"`
 	UAAEndpoint              string        `json:"UaaEndpoint"`
 	RoutingEndpoint          string        `json:"RoutingAPIEndpoint"`
@@ -443,11 +442,10 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
-	config.ConfigFile.LoggregatorEndpoint = loggregator
 	config.ConfigFile.MinCLIVersion = minCLIVersion
 	config.ConfigFile.DopplerEndpoint = doppler
 	config.ConfigFile.UAAEndpoint = uaa

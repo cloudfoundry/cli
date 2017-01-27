@@ -3,7 +3,6 @@
   "Target": "",
   "ApiVersion": "",
   "AuthorizationEndpoint": "",
-  "LoggregatorEndPoint": "",
   "UaaEndpoint": "",
   "AccessToken": "",
   "RefreshToken": "",
