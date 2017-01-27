@@ -23,7 +23,6 @@ type Data struct {
 	Target                   string
 	APIVersion               string
 	AuthorizationEndpoint    string
-	LoggregatorEndPoint      string
 	DopplerEndPoint          string
 	UaaEndpoint              string
 	RoutingAPIEndpoint       string

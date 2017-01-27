@@ -3616,10 +3616,6 @@
     "translation": "正在注销..."
   },
   {
-    "id": "Loggregator endpoint missing from config file",
-    "translation": "配置文件中缺少 Loggregator 端点"
-  },
-  {
     "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
     "translation": "正在存储库 '{{.repoName}}' 中查找 '{{.filePath}}'"
   },
@@ -3778,6 +3774,10 @@
   {
     "id": "No domains found",
     "translation": "找不到域"
+  },
+  {
+    "id": "No doppler loggregator endpoint found. Cannot retrieve logs.",
+    "translation": "配置文件中缺少 Loggregator 端点"
   },
   {
     "id": "No events for app {{.AppName}}",

@@ -20,7 +20,6 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 		actor.CloudControllerClient.API(),
 		actor.CloudControllerClient.APIVersion(),
 		actor.CloudControllerClient.AuthorizationEndpoint(),
-		actor.CloudControllerClient.LoggregatorEndpoint(),
 		actor.CloudControllerClient.MinCLIVersion(),
 		actor.CloudControllerClient.DopplerEndpoint(),
 		actor.CloudControllerClient.TokenEndpoint(),
@@ -34,7 +33,7 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 
 // ClearTarget clears target information from the actor.
 func (actor Actor) ClearTarget(config Config) {
-	config.SetTargetInformation("", "", "", "", "", "", "", "", false)
+	config.SetTargetInformation("", "", "", "", "", "", "", false)
 	config.SetTokenInformation("", "", "")
 }
 

@@ -34,12 +34,6 @@ type FakeReadWriter struct {
 	authenticationEndpointReturns     struct {
 		result1 string
 	}
-	LoggregatorEndpointStub        func() string
-	loggregatorEndpointMutex       sync.RWMutex
-	loggregatorEndpointArgsForCall []struct{}
-	loggregatorEndpointReturns     struct {
-		result1 string
-	}
 	DopplerEndpointStub        func() string
 	dopplerEndpointMutex       sync.RWMutex
 	dopplerEndpointArgsForCall []struct{}
@@ -234,11 +228,6 @@ type FakeReadWriter struct {
 	setAuthenticationEndpointArgsForCall []struct {
 		arg1 string
 	}
-	SetLoggregatorEndpointStub        func(string)
-	setLoggregatorEndpointMutex       sync.RWMutex
-	setLoggregatorEndpointArgsForCall []struct {
-		arg1 string
-	}
 	SetDopplerEndpointStub        func(string)
 	setDopplerEndpointMutex       sync.RWMutex
 	setDopplerEndpointArgsForCall []struct {
@@ -429,31 +418,6 @@ func (fake *FakeReadWriter) AuthenticationEndpointCallCount() int {
 func (fake *FakeReadWriter) AuthenticationEndpointReturns(result1 string) {
 	fake.AuthenticationEndpointStub = nil
 	fake.authenticationEndpointReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeReadWriter) LoggregatorEndpoint() string {
-	fake.loggregatorEndpointMutex.Lock()
-	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
-	fake.recordInvocation("LoggregatorEndpoint", []interface{}{})
-	fake.loggregatorEndpointMutex.Unlock()
-	if fake.LoggregatorEndpointStub != nil {
-		return fake.LoggregatorEndpointStub()
-	} else {
-		return fake.loggregatorEndpointReturns.result1
-	}
-}
-
-func (fake *FakeReadWriter) LoggregatorEndpointCallCount() int {
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
-	return len(fake.loggregatorEndpointArgsForCall)
-}
-
-func (fake *FakeReadWriter) LoggregatorEndpointReturns(result1 string) {
-	fake.LoggregatorEndpointStub = nil
-	fake.loggregatorEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1285,30 +1249,6 @@ func (fake *FakeReadWriter) SetAuthenticationEndpointArgsForCall(i int) string {
 	return fake.setAuthenticationEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetLoggregatorEndpoint(arg1 string) {
-	fake.setLoggregatorEndpointMutex.Lock()
-	fake.setLoggregatorEndpointArgsForCall = append(fake.setLoggregatorEndpointArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("SetLoggregatorEndpoint", []interface{}{arg1})
-	fake.setLoggregatorEndpointMutex.Unlock()
-	if fake.SetLoggregatorEndpointStub != nil {
-		fake.SetLoggregatorEndpointStub(arg1)
-	}
-}
-
-func (fake *FakeReadWriter) SetLoggregatorEndpointCallCount() int {
-	fake.setLoggregatorEndpointMutex.RLock()
-	defer fake.setLoggregatorEndpointMutex.RUnlock()
-	return len(fake.setLoggregatorEndpointArgsForCall)
-}
-
-func (fake *FakeReadWriter) SetLoggregatorEndpointArgsForCall(i int) string {
-	fake.setLoggregatorEndpointMutex.RLock()
-	defer fake.setLoggregatorEndpointMutex.RUnlock()
-	return fake.setLoggregatorEndpointArgsForCall[i].arg1
-}
-
 func (fake *FakeReadWriter) SetDopplerEndpoint(arg1 string) {
 	fake.setDopplerEndpointMutex.Lock()
 	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
@@ -1752,8 +1692,6 @@ func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	defer fake.hasAPIEndpointMutex.RUnlock()
 	fake.authenticationEndpointMutex.RLock()
 	defer fake.authenticationEndpointMutex.RUnlock()
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
 	fake.dopplerEndpointMutex.RLock()
 	defer fake.dopplerEndpointMutex.RUnlock()
 	fake.uaaEndpointMutex.RLock()
@@ -1820,8 +1758,6 @@ func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
 	fake.setAuthenticationEndpointMutex.RLock()
 	defer fake.setAuthenticationEndpointMutex.RUnlock()
-	fake.setLoggregatorEndpointMutex.RLock()
-	defer fake.setLoggregatorEndpointMutex.RUnlock()
 	fake.setDopplerEndpointMutex.RLock()
 	defer fake.setDopplerEndpointMutex.RUnlock()
 	fake.setUaaEndpointMutex.RLock()

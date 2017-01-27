@@ -5,7 +5,7 @@ package v2action
 type Config interface {
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
-	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SkipSSLValidation() bool
 	Target() string

@@ -65,7 +65,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
-		errChan <- errors.New(T("Loggregator endpoint missing from config file"))
+		errChan <- errors.New(T("No doppler loggregator endpoint found. Cannot retrieve logs."))
 		return
 	}
 

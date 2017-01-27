@@ -109,7 +109,6 @@ var _ = Describe("Endpoints Repository", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(config.AuthorizationEndpoint).To(Equal("https://login.example.com"))
-				Expect(config.LoggregatorEndpoint).To(Equal("wss://loggregator.foo.example.org:443"))
 				Expect(config.DopplerEndpoint).To(Equal("wss://doppler.foo.example.org:4443"))
 				Expect(endpoint).To(Equal(testServer.URL))
 				Expect(config.SSHOAuthClient).To(Equal("ssh-client-id"))

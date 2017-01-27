@@ -60,7 +60,6 @@ var _ = Describe("Info", func() {
 			Expect(info.APIVersion).To(Equal("2.59.0"))
 			Expect(info.AuthorizationEndpoint).To(MatchRegexp("https://login.%s", serverAPIURL))
 			Expect(info.DopplerEndpoint).To(MatchRegexp("wss://doppler.%s", serverAPIURL))
-			Expect(info.LoggregatorEndpoint).To(MatchRegexp("wss://loggregator.%s", serverAPIURL))
 			Expect(info.MinCLIVersion).To(Equal("6.22.1"))
 			Expect(info.MinimumRecommendedCLIVersion).To(BeEmpty())
 			Expect(info.Name).To(Equal("faceman test server"))

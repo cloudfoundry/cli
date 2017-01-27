@@ -61,21 +61,6 @@ var _ = Describe("Configuration Repository", func() {
 		Eventually(finishReadCh).Should(BeClosed())
 	})
 
-	Context("when the doppler endpoint does not exist", func() {
-		It("should regex the loggregator endpoint value", func() {
-			config.SetLoggregatorEndpoint("http://loggregator.the-endpoint")
-			Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
-		})
-	})
-
-	Context("when the doppler endpoint does not exist", func() {
-		It("should regex the loggregator endpoint value", func() {
-			config.SetLoggregatorEndpoint("http://loggregator.the-endpointffff")
-			config.SetDopplerEndpoint("http://doppler.the-endpoint")
-			Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
-		})
-	})
-
 	It("has acccessor methods for all config fields", func() {
 		config.SetAPIEndpoint("http://api.the-endpoint")
 		Expect(config.APIEndpoint()).To(Equal("http://api.the-endpoint"))
@@ -85,9 +70,6 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetAuthenticationEndpoint("http://auth.the-endpoint")
 		Expect(config.AuthenticationEndpoint()).To(Equal("http://auth.the-endpoint"))
-
-		config.SetLoggregatorEndpoint("http://loggregator.the-endpoint")
-		Expect(config.LoggregatorEndpoint()).To(Equal("http://loggregator.the-endpoint"))
 
 		config.SetUaaEndpoint("http://uaa.the-endpoint")
 		Expect(config.UaaEndpoint()).To(Equal("http://uaa.the-endpoint"))
@@ -103,6 +85,9 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetSSHOAuthClient("oauth-client-id")
 		Expect(config.SSHOAuthClient()).To(Equal("oauth-client-id"))
+
+		config.SetDopplerEndpoint("doppler.the-endpoint")
+		Expect(config.DopplerEndpoint()).To(Equal("doppler.the-endpoint"))
 
 		config.SetRefreshToken("the-token")
 		Expect(config.RefreshToken()).To(Equal("the-token"))

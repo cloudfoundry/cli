@@ -66,7 +66,6 @@ var _ = Describe("Target", func() {
 						Expect(client.APIVersion()).To(Equal("2.59.0"))
 						Expect(client.AuthorizationEndpoint()).To(MatchRegexp("https://login.%s", serverAPIURL))
 						Expect(client.DopplerEndpoint()).To(MatchRegexp("wss://doppler.%s", serverAPIURL))
-						Expect(client.LoggregatorEndpoint()).To(MatchRegexp("wss://loggregator.%s", serverAPIURL))
 						Expect(client.RoutingEndpoint()).To(MatchRegexp("https://%s/routing", serverAPIURL))
 						Expect(client.TokenEndpoint()).To(MatchRegexp("https://uaa.%s", serverAPIURL))
 					})

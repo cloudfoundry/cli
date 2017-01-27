@@ -3616,10 +3616,6 @@
     "translation": "Logging out..."
   },
   {
-    "id": "Loggregator endpoint missing from config file",
-    "translation": "Loggregator endpoint missing from config file"
-  },
-  {
     "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
     "translation": "Looking up '{{.filePath}}' from repository '{{.repoName}}'"
   },
@@ -3778,6 +3774,10 @@
   {
     "id": "No domains found",
     "translation": "No domains found"
+  },
+  {
+    "id": "No doppler loggregator endpoint found. Cannot retrieve logs.",
+    "translation": "No doppler loggregator endpoint found. Cannot retrieve logs."
   },
   {
     "id": "No events for app {{.AppName}}",

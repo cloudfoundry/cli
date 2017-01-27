@@ -106,7 +106,7 @@ var _ = Describe("Login Command", func() {
 				return &coreconfig.CCInfo{
 					APIVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
-					LoggregatorEndpoint:      "loggregator/endpoint",
+					DopplerEndpoint:          "doppler/endpoint",
 					MinCLIVersion:            minCLIVersion,
 					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
@@ -174,7 +174,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
-				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
 				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
 
@@ -528,7 +527,7 @@ var _ = Describe("Login Command", func() {
 				return &coreconfig.CCInfo{
 					APIVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
-					LoggregatorEndpoint:      "loggregator/endpoint",
+					DopplerEndpoint:          "doppler/endpoint",
 					MinCLIVersion:            minCLIVersion,
 					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
@@ -812,7 +811,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
-				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
 				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
 

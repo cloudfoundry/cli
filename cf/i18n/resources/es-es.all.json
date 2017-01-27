@@ -3616,10 +3616,6 @@
     "translation": "Cerrando sesión..."
   },
   {
-    "id": "Loggregator endpoint missing from config file",
-    "translation": "Falta el punto final de loggregator en el archivo de configuración"
-  },
-  {
     "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
     "translation": "Búsqueda de '{{.filePath}}' del repositorio '{{.repoName}}'"
   },
@@ -3778,6 +3774,10 @@
   {
     "id": "No domains found",
     "translation": "No se han encontrado dominios"
+  },
+  {
+    "id": "No doppler loggregator endpoint found. Cannot retrieve logs.",
+    "translation": "Falta el punto final de loggregator en el archivo de configuración"
   },
   {
     "id": "No events for app {{.AppName}}",

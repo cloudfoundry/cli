@@ -643,7 +643,6 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns the LoggregatorEndpoint() and DopplerEndpoint() setting in config", func() {
-					config.SetLoggregatorEndpoint("loggregator-endpoint-sample")
 					config.SetDopplerEndpoint("doppler-endpoint-sample")
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
@@ -652,7 +651,7 @@ var _ = Describe("Server", func() {
 					var result string
 					err = client.Call("CliRpcCmd.LoggregatorEndpoint", "", &result)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("loggregator-endpoint-sample"))
+					Expect(result).To(Equal(""))
 
 					err = client.Call("CliRpcCmd.DopplerEndpoint", "", &result)
 					Expect(err).ToNot(HaveOccurred())

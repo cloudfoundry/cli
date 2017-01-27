@@ -87,7 +87,6 @@ type Client struct {
 	cloudControllerAPIVersion string
 	cloudControllerURL        string
 	dopplerEndpoint           string
-	loggregatorEndpoint       string
 	minCLIVersion             string
 	routingEndpoint           string
 	tokenEndpoint             string

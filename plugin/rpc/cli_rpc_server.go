@@ -282,7 +282,7 @@ func (cmd *CliRpcCmd) ApiVersion(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.LoggregatorEndpoint()
+	*retVal = ""
 
 	return nil
 }
