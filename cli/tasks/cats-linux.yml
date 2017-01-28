@@ -48,6 +48,10 @@ run:
     # Remove trailing |
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
 
+    # remove when this CATS pull request merges: https://github.com/cloudfoundry/cf-acceptance-tests/pull/181
+    sed -i 's/LoggregatorEndpoint string/DopplerEndPoint string/g' apps/loggregator.go
+    sed -i 's/return strings.Replace(getCfHomeConfig().LoggregatorEndpoint, "loggregator", "doppler", -1)/return getCfHomeConfig().DopplerEndPoint/g' apps/loggregator.go
+
     ./bin/test \
       -flakeAttempts=2 -slowSpecThreshold=120 -randomizeAllSpecs \
       -nodes "${NODES}" \
