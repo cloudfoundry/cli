@@ -263,7 +263,7 @@ var _ = Describe("plugin API", func() {
 
 	Describe("LoggregatorEndpoint", func() {
 		It("gets Loggregator Endpoint", func() {
-			confirmTestPluginOutput("LoggregatorEndpoint", "wss://loggregator")
+			confirmTestPluginOutput("LoggregatorEndpoint", "")
 		})
 	})
 
