@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -18,14 +19,16 @@ type DeleteOrphanedRoutesCommand struct {
 	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]"`
 	relatedCommands interface{} `related_commands:"delete-route, routes"`
 
-	UI     command.UI
-	Actor  DeleteOrphanedRoutesActor
-	Config command.Config
+	UI          command.UI
+	Actor       DeleteOrphanedRoutesActor
+	SharedActor SharedActor
+	Config      command.Config
 }
 
 func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -37,7 +40,12 @@ func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.
 }
 
 func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
-	err := command.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
@@ -51,11 +59,6 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		if !deleteOrphanedRoutes {
 			return nil
 		}
-	}
-
-	user, err := cmd.Config.CurrentUser()
-	if err != nil {
-		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting routes as {{.CurrentUser}} ...", map[string]interface{}{

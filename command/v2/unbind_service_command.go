@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -18,14 +19,16 @@ type UnbindServiceCommand struct {
 	usage           interface{}          `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
 	relatedCommands interface{}          `related_commands:"apps, delete-service, services"`
 
-	UI     command.UI
-	Actor  UnbindServiceActor
-	Config command.Config
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       UnbindServiceActor
 }
 
 func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -37,9 +40,9 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd UnbindServiceCommand) Execute(args []string) error {
-	err := command.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	space := cmd.Config.TargetedSpace()

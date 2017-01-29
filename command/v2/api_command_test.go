@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("API Command", func() {
+var _ = Describe("api Command", func() {
 	var (
 		cmd        ApiCommand
 		testUI     *ui.UI

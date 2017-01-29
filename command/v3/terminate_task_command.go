@@ -1,6 +1,7 @@
 package v3
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -21,14 +22,16 @@ type TerminateTaskCommand struct {
 	usage           interface{}            `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`
 	relatedCommands interface{}            `related_commands:"tasks"`
 
-	UI     command.UI
-	Actor  TerminateTaskActor
-	Config command.Config
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       TerminateTaskActor
 }
 
 func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	client, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -53,9 +56,9 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.CheckTarget(cmd.Config, true, true)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	space := cmd.Config.TargetedSpace()

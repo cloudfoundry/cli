@@ -1,11 +1,18 @@
 package v3
 
 import (
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
+
+//go:generate counterfeiter . SharedActor
+
+type SharedActor interface {
+	CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error
+}
 
 //go:generate counterfeiter . RunTaskActor
 
@@ -21,14 +28,16 @@ type RunTaskCommand struct {
 	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
 	relatedCommands interface{}      `related_commands:"logs, tasks, terminate-task"`
 
-	UI     command.UI
-	Actor  RunTaskActor
-	Config command.Config
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       RunTaskActor
 }
 
 func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	client, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -45,9 +54,9 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.CheckTarget(cmd.Config, true, true)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	space := cmd.Config.TargetedSpace()

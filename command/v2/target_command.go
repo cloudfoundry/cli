@@ -4,12 +4,19 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
+
+//go:generate counterfeiter . SharedActor
+
+type SharedActor interface {
+	CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error
+}
 
 //go:generate counterfeiter . TargetActor
 type TargetActor interface {
@@ -24,14 +31,16 @@ type TargetCommand struct {
 	usage           interface{} `usage:"CF_NAME target [-o ORG] [-s SPACE]"`
 	relatedCommands interface{} `related_commands:"create-org, create-space, login, orgs, spaces"`
 
-	Config command.Config
-	Actor  TargetActor
-	UI     command.UI
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       TargetActor
 }
 
 func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -53,9 +62,9 @@ func (cmd *TargetCommand) Execute(args []string) error {
 
 	cmd.notifyCLIUpdateIfNeeded()
 
-	err := command.CheckTarget(cmd.Config, false, false)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	user, err := cmd.Config.CurrentUser()
