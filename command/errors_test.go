@@ -34,7 +34,7 @@ var _ = Describe("Translatable Errors", func() {
 
 		// Command prerequisite errors.
 		Entry("NoAPISetError", NoAPISetError{}),
-		Entry("NoTargetedOrgError", NoTargetedOrgError{}),
+		Entry("NoTargetedOrganizationError", NoTargetedOrganizationError{}),
 		Entry("NoTargetedSpaceError", NoTargetedSpaceError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
 

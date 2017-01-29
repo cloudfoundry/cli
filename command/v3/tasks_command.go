@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -31,14 +32,16 @@ type TasksCommand struct {
 	usage           interface{}  `usage:"CF_NAME tasks APP_NAME"`
 	relatedCommands interface{}  `related_commands:"apps, logs, run-task, terminate-task"`
 
-	UI     command.UI
-	Actor  TasksActor
-	Config command.Config
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       TasksActor
 }
 
 func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	client, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -55,9 +58,9 @@ func (cmd TasksCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = command.CheckTarget(cmd.Config, true, true)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	space := cmd.Config.TargetedSpace()

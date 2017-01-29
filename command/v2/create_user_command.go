@@ -3,6 +3,7 @@ package v2
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
@@ -22,14 +23,16 @@ type CreateUserCommand struct {
 	usage           interface{}     `usage:"CF_NAME create-user USERNAME PASSWORD\n   CF_NAME create-user USERNAME --origin ORIGIN\n\nEXAMPLES:\n   cf create-user j.smith@example.com S3cr3t                  # internal user\n   cf create-user j.smith@example.com --origin ldap           # LDAP user\n   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"`
 	relatedCommands interface{}     `related_commands:"passwd, set-org-role, set-space-role"`
 
-	UI     command.UI
-	Config command.Config
-	Actor  CreateUserActor
+	UI          command.UI
+	Config      command.Config
+	SharedActor SharedActor
+	Actor       CreateUserActor
 }
 
 func (cmd *CreateUserCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -58,9 +61,9 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		password = ""
 	}
 
-	err := command.CheckTarget(cmd.Config, false, false)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{

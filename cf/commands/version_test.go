@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Version", func() {
+var _ = Describe("version Command", func() {
 	var (
 		ui  *testterm.FakeUI
 		cmd commandregistry.Command

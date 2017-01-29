@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Help Command", func() {
+var _ = Describe("help Command", func() {
 	var (
 		testUI     *ui.UI
 		fakeActor  *commonfakes.FakeHelpActor

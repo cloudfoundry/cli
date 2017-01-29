@@ -1,12 +1,23 @@
 package sharedaction
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/util/sorting"
 )
+
+// ErrorInvalidCommand represents an error that happens when help is called
+// with an invalid command.
+type ErrorInvalidCommand struct {
+	CommandName string
+}
+
+func (err ErrorInvalidCommand) Error() string {
+	return fmt.Sprintf("'%s' is not a registered command. See 'cf help'", err.CommandName)
+}
 
 // CommandInfo contains the help details of a command
 type CommandInfo struct {

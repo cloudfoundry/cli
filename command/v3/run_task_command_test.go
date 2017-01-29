@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/command"
@@ -11,40 +12,48 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("RunTask Command", func() {
+var _ = Describe("run-task Command", func() {
 	var (
-		cmd        v3.RunTaskCommand
-		testUI     *ui.UI
-		fakeActor  *v3fakes.FakeRunTaskActor
-		fakeConfig *commandfakes.FakeConfig
-		executeErr error
+		cmd             v3.RunTaskCommand
+		testUI          *ui.UI
+		fakeConfig      *commandfakes.FakeConfig
+		fakeSharedActor *v3fakes.FakeSharedActor
+		fakeActor       *v3fakes.FakeRunTaskActor
+		binaryName      string
+		executeErr      error
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v3fakes.FakeRunTaskActor)
-		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.ExperimentalReturns(true)
+		fakeSharedActor = new(v3fakes.FakeSharedActor)
+		fakeActor = new(v3fakes.FakeRunTaskActor)
 
 		cmd = v3.RunTaskCommand{
-			UI:     testUI,
-			Actor:  fakeActor,
-			Config: fakeConfig,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
+
+		cmd.RequiredArgs.AppName = "some-app-name"
+		cmd.RequiredArgs.Command = "some command"
+
+		binaryName = "faceman"
+		fakeConfig.BinaryNameReturns(binaryName)
+		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
 	})
 
-	Context("when the API version is too small", func() {
+	Context("when the API version is below the minimum", func() {
 		BeforeEach(func() {
 			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
 		})
@@ -57,39 +66,18 @@ var _ = Describe("RunTask Command", func() {
 		})
 	})
 
-	Context("when the user is not logged in", func() {
-		It("returns a NotLoggedInError", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{}))
+	Context("when checking target fails", func() {
+		BeforeEach(func() {
+			fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
+		})
+
+		It("returns an error", func() {
+			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
 		})
 	})
 
-	Context("when an organization is not targetted", func() {
+	Context("when the user is logged in, and a space and org are targeted", func() {
 		BeforeEach(func() {
-			fakeConfig.AccessTokenReturns("some-access-token")
-			fakeConfig.RefreshTokenReturns("some-refresh-token")
-		})
-
-		It("returns a NoTargetedOrgError", func() {
-			Expect(executeErr).To(MatchError(command.NoTargetedOrgError{}))
-		})
-	})
-
-	Context("when a space is not targetted", func() {
-		BeforeEach(func() {
-			fakeConfig.AccessTokenReturns("some-access-token")
-			fakeConfig.RefreshTokenReturns("some-refresh-token")
-			fakeConfig.HasTargetedOrganizationReturns(true)
-		})
-
-		It("returns a NoTargetedSpaceError", func() {
-			Expect(executeErr).To(MatchError(command.NoTargetedSpaceError{}))
-		})
-	})
-
-	Context("when the user is logged in, and a space and an org is targetted", func() {
-		BeforeEach(func() {
-			fakeConfig.AccessTokenReturns("some-access-token")
-			fakeConfig.RefreshTokenReturns("some-refresh-token")
 			fakeConfig.HasTargetedOrganizationReturns(true)
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				GUID: "some-org-guid",
@@ -102,50 +90,48 @@ var _ = Describe("RunTask Command", func() {
 			})
 		})
 
-		Context("when getting the logged in user results in an error", func() {
+		Context("when getting the current user returns an error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
 				expectedErr = errors.New("got bananapants??")
-				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+				fakeConfig.CurrentUserReturns(
+					configv3.User{},
+					expectedErr)
 			})
 
-			It("returns the same error", func() {
+			It("returns the error", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			})
 		})
 
-		Context("when getting the logged in user does not result in an error", func() {
+		Context("when getting the current user does not return an error", func() {
 			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{
-					Name: "some-user",
-				}, nil)
+				fakeConfig.CurrentUserReturns(
+					configv3.User{Name: "some-user"},
+					nil)
 			})
 
 			Context("when provided a valid application name", func() {
 				BeforeEach(func() {
-					cmd.RequiredArgs.AppName = "some-app-name"
-					cmd.RequiredArgs.Command = "fake command"
-
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3action.Application{GUID: "some-app-guid"},
-						v3action.Warnings{
-							"get-application-warning-1",
-							"get-application-warning-2",
-						}, nil)
+						v3action.Warnings{"get-application-warning-1", "get-application-warning-2"},
+						nil)
 				})
 
 				Context("when the task name is not provided", func() {
 					BeforeEach(func() {
-						fakeActor.RunTaskReturns(v3action.Task{
-							Name:       "31337ddd",
-							SequenceID: 3,
-						},
-							v3action.Warnings{
-								"get-application-warning-3",
-							}, nil)
+						fakeActor.RunTaskReturns(
+							v3action.Task{
+								Name:       "31337ddd",
+								SequenceID: 3,
+							},
+							v3action.Warnings{"get-application-warning-3"},
+							nil)
 					})
-					It("runs a new task and outputs all warnings", func() {
+
+					It("creates a new task and displays all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -156,7 +142,7 @@ var _ = Describe("RunTask Command", func() {
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, command, name := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("fake command"))
+						Expect(command).To(Equal("some command"))
 						Expect(name).To(Equal(""))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
@@ -175,17 +161,16 @@ get-application-warning-3`))
 				Context("when the task name is provided", func() {
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"
-
-						fakeActor.RunTaskReturns(v3action.Task{
-							Name:       "some-task-name",
-							SequenceID: 3,
-						},
-							v3action.Warnings{
-								"get-application-warning-3",
-							}, nil)
+						fakeActor.RunTaskReturns(
+							v3action.Task{
+								Name:       "some-task-name",
+								SequenceID: 3,
+							},
+							v3action.Warnings{"get-application-warning-3"},
+							nil)
 					})
 
-					It("runs a new task and outputs all warnings", func() {
+					It("creates a new task and outputs all warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -196,7 +181,7 @@ get-application-warning-3`))
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
 						appGUID, command, name := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("fake command"))
+						Expect(command).To(Equal("some command"))
 						Expect(name).To(Equal("some-task-name"))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
@@ -214,8 +199,8 @@ get-application-warning-3`))
 			})
 
 			Context("when there are errors", func() {
-				Context("when a translated error is returned", func() {
-					Context("when GetApplicationByNameAndSpace returns a translatable error", func() {
+				Context("when the error is translatable", func() {
+					Context("when getting the app returns the error", func() {
 						var (
 							returnedErr error
 							expectedErr error
@@ -223,9 +208,7 @@ get-application-warning-3`))
 
 						BeforeEach(func() {
 							expectedErr = errors.New("request-error")
-							returnedErr = cloudcontroller.RequestError{
-								Err: expectedErr,
-							}
+							returnedErr = cloudcontroller.RequestError{Err: expectedErr}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
 								nil,
@@ -237,7 +220,7 @@ get-application-warning-3`))
 						})
 					})
 
-					Context("when RunTask returns a translatable error", func() {
+					Context("when running the task returns the error", func() {
 						var returnedErr error
 
 						BeforeEach(func() {
@@ -258,20 +241,19 @@ get-application-warning-3`))
 					})
 				})
 
-				Context("when an untranslatable error is returned", func() {
-					Context("when GetApplicationByNameAndSpace returns an error", func() {
+				Context("when the error is not translatable", func() {
+					Context("when getting the app returns the error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
-								v3action.Warnings{
-									"get-application-warning-1",
-									"get-application-warning-2",
-								}, expectedErr)
+							fakeActor.GetApplicationByNameAndSpaceReturns(
+								v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{"get-application-warning-1", "get-application-warning-2"},
+								expectedErr)
 						})
 
-						It("return the same error and outputs the warnings", func() {
+						It("return the error and all warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
 							Expect(testUI.Err).To(Say("get-application-warning-1"))
@@ -279,24 +261,22 @@ get-application-warning-3`))
 						})
 					})
 
-					Context("when RunTask returns an error", func() {
+					Context("when running the task returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
-								v3action.Warnings{
-									"get-application-warning-1",
-									"get-application-warning-2",
-								}, nil)
-							fakeActor.RunTaskReturns(v3action.Task{},
-								v3action.Warnings{
-									"run-task-warning-1",
-									"run-task-warning-2",
-								}, expectedErr)
+							fakeActor.GetApplicationByNameAndSpaceReturns(
+								v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{"get-application-warning-1", "get-application-warning-2"},
+								nil)
+							fakeActor.RunTaskReturns(
+								v3action.Task{},
+								v3action.Warnings{"run-task-warning-1", "run-task-warning-2"},
+								expectedErr)
 						})
 
-						It("returns the same error and outputs all warnings", func() {
+						It("returns the error and all warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
 							Expect(testUI.Err).To(Say("get-application-warning-1"))

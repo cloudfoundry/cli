@@ -3,6 +3,7 @@ package v2
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -21,14 +22,16 @@ type DeleteOrgCommand struct {
 	Force        bool              `short:"f" description:"Force deletion without confirmation"`
 	usage        interface{}       `usage:"CF_NAME delete-org ORG [-f]"`
 
-	Config command.Config
-	UI     command.UI
-	Actor  DeleteOrganizationActor
+	Config      command.Config
+	UI          command.UI
+	SharedActor SharedActor
+	Actor       DeleteOrganizationActor
 }
 
 func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -40,9 +43,9 @@ func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *DeleteOrgCommand) Execute(args []string) error {
-	err := command.CheckTarget(cmd.Config, false, false)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	user, err := cmd.Config.CurrentUser()

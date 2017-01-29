@@ -73,15 +73,15 @@ func (e NotLoggedInError) Translate(translate func(string, ...interface{}) strin
 	})
 }
 
-type NoTargetedOrgError struct {
+type NoTargetedOrganizationError struct {
 	BinaryName string
 }
 
-func (e NoTargetedOrgError) Error() string {
+func (e NoTargetedOrganizationError) Error() string {
 	return "No org targeted, use '{{.Command}}' to target an org."
 }
 
-func (e NoTargetedOrgError) Translate(translate func(string, ...interface{}) string) string {
+func (e NoTargetedOrganizationError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Command": fmt.Sprintf("%s target -o ORG", e.BinaryName),
 	})
