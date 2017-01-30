@@ -341,14 +341,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "gopkg.in/check.v1",
-			"repository": "https://gopkg.in/check.v1",
-			"vcs": "git",
-			"revision": "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec",
-			"branch": "v1",
-			"notests": true
-		},
-		{
 			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"vcs": "git",
