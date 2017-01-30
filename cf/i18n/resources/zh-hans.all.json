@@ -520,6 +520,10 @@
     "translation": "Buildpack {{.BuildpackName}} 不存在。"
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
     "translation": "字节数量必须是带计量单位（例如，M、MB、G 或 GB）的整数"
   },
@@ -1608,6 +1612,10 @@
     "translation": ""
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "无法供应付费服务套餐的实例"
   },
@@ -2238,6 +2246,10 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "不允许对空间进行 SSH 访问"
+  },
+  {
+    "id": "Disk",
+    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3364,6 +3376,10 @@
     "translation": "实例必须为非负整数"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "来自服务器的 JSON 响应无效"
   },
@@ -3486,6 +3502,10 @@
   {
     "id": "Last Operation",
     "translation": "上次操作"
+  },
+  {
+    "id": "Last uploaded:",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3692,6 +3712,10 @@
     "translation": "CLI 等待应用程序启动的最长时间（秒），其他服务器端超时可能适用"
   },
   {
+    "id": "Memory",
+    "translation": ""
+  },
+  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "内存限制（例如，256M、1024M、1G）"
   },
@@ -3733,6 +3757,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -4596,6 +4624,10 @@
     "translation": "仅在指定的路由器组上配置此域的路径"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Rules",
     "translation": "规则"
   },
@@ -4924,6 +4956,10 @@
     "translation": "正在以 {{.Username}} 身份显示组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 的运行状况和状态..."
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "跳过为用户分配组织角色"
   },
@@ -4974,6 +5010,10 @@
   {
     "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "要使用的堆栈（堆栈是一种可以运行应用程序的预构建文件系统，包括操作系统）"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Staging Environment Variable Groups:",
@@ -6582,6 +6622,10 @@
   {
     "id": "{{.MemoryLimit}}M memory limit",
     "translation": "{{.MemoryLimit}}M 内存限制"
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",

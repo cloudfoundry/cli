@@ -76,6 +76,10 @@
     "translation": "Before getting started:"
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "CANCELING",
     "translation": ""
   },
@@ -1104,6 +1108,10 @@
     "translation": "CLI plugin management:"
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
     "translation": ""
   },
@@ -1145,6 +1153,10 @@
   },
   {
     "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
+    "id": "Disk",
     "translation": ""
   },
   {
@@ -1236,6 +1248,10 @@
     "translation": "Incorrect usage: invalid healthcheck type"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
     "translation": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
   },
@@ -1252,6 +1268,10 @@
     "translation": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
   },
   {
+    "id": "Last uploaded:",
+    "translation": ""
+  },
+  {
     "id": "List tasks of an app",
     "translation": ""
   },
@@ -1262,6 +1282,10 @@
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
     "translation": "Max wait time to establish a connection, including name resolution, in seconds"
+  },
+  {
+    "id": "Memory",
+    "translation": ""
   },
   {
     "id": "NAME",
@@ -1277,6 +1301,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -1420,6 +1448,10 @@
     "translation": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Run a one-off task on an app",
     "translation": ""
   },
@@ -1484,12 +1516,20 @@
     "translation": ""
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Space '{{.Name}}' not found.",
     "translation": ""
   },
   {
     "id": "Space management:",
     "translation": "Space management:"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Status: {{.State}}",
@@ -1953,6 +1993,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
     "translation": ""
   },
   {

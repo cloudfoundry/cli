@@ -520,6 +520,10 @@
     "translation": "O buildpack {{.BuildpackName}} não existe."
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
     "translation": "A quantidade de byte deve ser um número inteiro com uma unidade de medida como M, MB, G ou GB"
   },
@@ -1608,6 +1612,10 @@
     "translation": ""
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Não é possível provisionar instâncias de planos de serviços pagos"
   },
@@ -2238,6 +2246,10 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "Desaprovar acesso SSH para o espaço"
+  },
+  {
+    "id": "Disk",
+    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3364,6 +3376,10 @@
     "translation": "A instância deve ser um número inteiro não negativo"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "Resposta JSON inválida do servidor"
   },
@@ -3486,6 +3502,10 @@
   {
     "id": "Last Operation",
     "translation": "Última Operação"
+  },
+  {
+    "id": "Last uploaded:",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3692,6 +3712,10 @@
     "translation": "Tempo máximo (em segundos) para a CLI aguardar o início do aplicativo, outros tempos limite do lado do servidor podem ser aplicados"
   },
   {
+    "id": "Memory",
+    "translation": ""
+  },
+  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "Limite de memória (por exemplo, 256 M, 1024 M, 1 G)"
   },
@@ -3733,6 +3757,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -4596,6 +4624,10 @@
     "translation": "As rotas para este domínio serão configuradas somente no grupo de roteadores especificado"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Rules",
     "translation": "Regras"
   },
@@ -4924,6 +4956,10 @@
     "translation": "Mostrando funcionamento e status do app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Ignorar a designação de função de organização para o usuário"
   },
@@ -4974,6 +5010,10 @@
   {
     "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "Pilha a ser usada (uma pilha é um sistema de arquivos pré-construído, incluindo um sistema operacional, que pode executar apps)"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Staging Environment Variable Groups:",
@@ -6582,6 +6622,10 @@
   {
     "id": "{{.MemoryLimit}}M memory limit",
     "translation": "{{.MemoryLimit}} limite de memória"
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",

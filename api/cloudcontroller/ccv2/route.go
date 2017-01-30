@@ -39,6 +39,34 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// GetApplicationRoutes returns a list of Routes associated with the provided Application
+// GUID, and filtered by the provided queries.
+func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) ([]Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.RoutesFromApplicationRequest,
+		URIParams:   map[string]string{"app_guid": appGUID},
+		Query:       FormatQueryParameters(queryParams),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullRoutesList []Route
+	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
+		if route, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, route)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Route{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullRoutesList, warnings, err
+}
+
 // GetSpaceRoutes returns a list of Routes associated with the provided Space
 // GUID, and filtered by the provided queries.
 func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {

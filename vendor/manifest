@@ -86,6 +86,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/cloudfoundry/bytefmt",
+			"repository": "https://github.com/cloudfoundry/bytefmt",
+			"vcs": "git",
+			"revision": "b12c1522f4cbb5f35861bd5dd2c39a4fa996441a",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/cloudfoundry/dropsonde",
 			"repository": "https://github.com/cloudfoundry/dropsonde",
 			"vcs": "git",

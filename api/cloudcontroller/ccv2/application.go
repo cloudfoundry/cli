@@ -47,7 +47,7 @@ type Application struct {
 	// StackGUID is the GUID for the Stack the application is running on.
 	StackGUID string
 
-	// State is the current state of the application.
+	// State is the desired state of the application.
 	State ApplicationState
 }
 

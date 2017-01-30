@@ -10,14 +10,14 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Application Instance", func() {
+var _ = Describe("Application Instance Status", func() {
 	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetApplicationInstancesByApplication", func() {
+	Describe("GetApplicationInstanceStatusesByApplication", func() {
 		Context("when the app is found", func() {
 			BeforeEach(func() {
 
@@ -75,11 +75,11 @@ var _ = Describe("Application Instance", func() {
 			})
 
 			It("returns the app instances and warnings", func() {
-				instances, warnings, err := client.GetApplicationInstancesByApplication("some-app-guid")
+				instances, warnings, err := client.GetApplicationInstanceStatusesByApplication("some-app-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(instances).To(HaveLen(2))
 
-				Expect(instances[0]).To(Equal(ApplicationInstance{
+				Expect(instances[0]).To(Equal(ApplicationInstanceStatus{
 					CPU:         0.13511219703079957,
 					Disk:        66392064,
 					DiskQuota:   1073741824,
@@ -91,7 +91,7 @@ var _ = Describe("Application Instance", func() {
 				},
 				))
 
-				Expect(instances[1]).To(Equal(ApplicationInstance{
+				Expect(instances[1]).To(Equal(ApplicationInstanceStatus{
 					CPU:         0.13511219703079957,
 					Disk:        66392064,
 					DiskQuota:   1073741824,
@@ -123,7 +123,7 @@ var _ = Describe("Application Instance", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				_, warnings, err := client.GetApplicationInstancesByApplication("some-app-guid")
+				_, warnings, err := client.GetApplicationInstanceStatusesByApplication("some-app-guid")
 				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
 					Message: "The app could not be found: some-app-guid",
 				}))

@@ -68,6 +68,10 @@
     "translation": "Before getting started:"
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "CANCELING",
     "translation": ""
   },
@@ -1096,6 +1100,10 @@
     "translation": "CLI plugin management:"
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
     "translation": ""
   },
@@ -1137,6 +1145,10 @@
   },
   {
     "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
+    "id": "Disk",
     "translation": ""
   },
   {
@@ -1224,6 +1236,10 @@
     "translation": "Incorrect usage: invalid healthcheck type"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
     "translation": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
   },
@@ -1238,6 +1254,10 @@
   {
     "id": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information.",
     "translation": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
+  },
+  {
+    "id": "Last uploaded:",
+    "translation": ""
   },
   {
     "id": "List tasks of an app",
@@ -1256,6 +1276,10 @@
     "translation": "Max wait time to establish a connection, including name resolution, in seconds"
   },
   {
+    "id": "Memory",
+    "translation": ""
+  },
+  {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
   },
@@ -1265,6 +1289,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -1388,6 +1416,10 @@
     "translation": "Route and domain management:"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Run a one-off task on an app",
     "translation": ""
   },
@@ -1428,12 +1460,20 @@
     "translation": ""
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Space '{{.Name}}' not found.",
     "translation": ""
   },
   {
     "id": "Space management:",
     "translation": "Space management:"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
@@ -1885,6 +1925,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
     "translation": ""
   },
   {

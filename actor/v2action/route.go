@@ -77,6 +77,20 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 	return orphanedRoutes, allWarnings, nil
 }
 
+// GetApplicationRoutes returns a list of routes associated with the provided Application GUID
+func (actor Actor) GetApplicationRoutes(applicationGUID string, query []ccv2.Query) ([]Route, Warnings, error) {
+	var allWarnings Warnings
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(applicationGUID, query)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	routes, domainWarnings, err := actor.applyDomain(ccv2Routes)
+
+	return routes, append(allWarnings, domainWarnings...), err
+}
+
 // GetSpaceRoutes returns a list of routes associated with the provided Space GUID
 func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route, Warnings, error) {
 	var allWarnings Warnings
@@ -86,7 +100,21 @@ func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route
 		return nil, allWarnings, err
 	}
 
+	routes, domainWarnings, err := actor.applyDomain(ccv2Routes)
+
+	return routes, append(allWarnings, domainWarnings...), err
+}
+
+// DeleteRoute deletes the Route associated with the provided Route GUID.
+func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.DeleteRoute(routeGUID)
+	return Warnings(warnings), err
+}
+
+func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, error) {
 	var routes []Route
+	var allWarnings Warnings
+
 	for _, ccv2Route := range ccv2Routes {
 		domain, warnings, err := actor.GetDomain(ccv2Route.DomainGUID)
 		allWarnings = append(allWarnings, warnings...)
@@ -103,10 +131,4 @@ func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route
 	}
 
 	return routes, allWarnings, nil
-}
-
-// DeleteRoute deletes the Route associated with the provided Route GUID.
-func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.DeleteRoute(routeGUID)
-	return Warnings(warnings), err
 }
