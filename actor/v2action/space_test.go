@@ -64,8 +64,8 @@ var _ = Describe("Space Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
 					[]ccv2.Query{
 						{
-							Filter:   "organization_guid",
-							Operator: ":",
+							Filter:   ccv2.OrganizationGUIDFilter,
+							Operator: ccv2.EqualOperator,
 							Value:    "some-org-guid",
 						},
 					}))
@@ -123,13 +123,13 @@ var _ = Describe("Space Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
 					[]ccv2.Query{
 						{
-							Filter:   "organization_guid",
-							Operator: ":",
+							Filter:   ccv2.OrganizationGUIDFilter,
+							Operator: ccv2.EqualOperator,
 							Value:    "some-org-guid",
 						},
 						{
-							Filter:   "name",
-							Operator: ":",
+							Filter:   ccv2.NameFilter,
+							Operator: ccv2.EqualOperator,
 							Value:    "some-space",
 						},
 					}))

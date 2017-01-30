@@ -17,6 +17,168 @@ var _ = Describe("Route", func() {
 		client = NewTestClient()
 	})
 
+	Describe("GetApplicationRoutes", func() {
+		Context("when there are routes in this space", func() {
+			BeforeEach(func() {
+				response1 := `{
+				"next_url": "/v2/apps/some-app-guid/routes?q=organization_guid:some-org-guid&page=2",
+				"resources": [
+					{
+						"metadata": {
+							"guid": "route-guid-1",
+							"updated_at": null
+						},
+						"entity": {
+							"host": "host-1",
+							"path": "path",
+							"port": null,
+							"domain_guid": "some-http-domain"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "route-guid-2",
+							"updated_at": null
+						},
+						"entity": {
+							"host": "host-2",
+							"path": "",
+							"port": 3333,
+							"domain_guid": "some-tcp-domain"
+						}
+					}
+				]
+			}`
+				response2 := `{
+				"next_url": null,
+				"resources": [
+					{
+						"metadata": {
+							"guid": "route-guid-3",
+							"updated_at": null
+						},
+						"entity": {
+							"host": "host-3",
+							"path": "path",
+							"port": null,
+							"domain_guid": "some-http-domain"
+						}
+					},
+					{
+						"metadata": {
+							"guid": "route-guid-4",
+							"updated_at": null
+						},
+						"entity": {
+							"host": "host-4",
+							"path": "",
+							"port": 333,
+							"domain_guid": "some-tcp-domain"
+						}
+					}
+				]
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/apps/some-app-guid/routes", "q=organization_guid:some-org-guid"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/apps/some-app-guid/routes", "q=organization_guid:some-org-guid&page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns all the routes and all warnings", func() {
+				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", []Query{{
+					Filter:   OrganizationGUIDFilter,
+					Operator: EqualOperator,
+					Value:    "some-org-guid",
+				}})
+				Expect(err).NotTo(HaveOccurred())
+				Expect(routes).To(ConsistOf([]Route{
+					{
+						GUID:       "route-guid-1",
+						Host:       "host-1",
+						Path:       "path",
+						Port:       0,
+						DomainGUID: "some-http-domain",
+					},
+					{
+						GUID:       "route-guid-2",
+						Host:       "host-2",
+						Path:       "",
+						Port:       3333,
+						DomainGUID: "some-tcp-domain",
+					},
+					{
+						GUID:       "route-guid-3",
+						Host:       "host-3",
+						Path:       "path",
+						Port:       0,
+						DomainGUID: "some-http-domain",
+					},
+					{
+						GUID:       "route-guid-4",
+						Host:       "host-4",
+						Path:       "",
+						Port:       333,
+						DomainGUID: "some-tcp-domain",
+					},
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
+			})
+		})
+
+		Context("when there are no routes bound to the app", func() {
+			BeforeEach(func() {
+				response := `{
+				"next_url": "",
+				"resources": []
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/apps/some-app-guid/routes"),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+			})
+
+			It("returns an empty list of routes", func() {
+				routes, _, err := client.GetApplicationRoutes("some-app-guid", nil)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(routes).To(BeEmpty())
+			})
+		})
+
+		Context("when the app is not found", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10000,
+					"description": "The app could not be found: some-app-guid",
+					"error_code": "CF-AppNotFound"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/apps/some-app-guid/routes"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				routes, _, err := client.GetApplicationRoutes("some-app-guid", nil)
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+					Message: "The app could not be found: some-app-guid",
+				}))
+				Expect(routes).To(BeEmpty())
+			})
+		})
+	})
+
 	Describe("GetSpaceRoutes", func() {
 		Context("when there are routes in this space", func() {
 			BeforeEach(func() {

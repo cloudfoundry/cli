@@ -22,6 +22,42 @@ var _ = Describe("Application Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
+	Describe("Application", func() {
+		var app Application
+		BeforeEach(func() {
+			app = Application{}
+		})
+
+		Describe("CalculatedBuildpack", func() {
+			Context("when buildpack is set", func() {
+				BeforeEach(func() {
+					app.Buildpack = "foo"
+					app.DetectedBuildpack = "bar"
+				})
+
+				It("returns back the buildpack", func() {
+					Expect(app.CalculatedBuildpack()).To(Equal("foo"))
+				})
+			})
+
+			Context("only detected buildpack is set", func() {
+				BeforeEach(func() {
+					app.DetectedBuildpack = "bar"
+				})
+
+				It("returns back the detected buildpack", func() {
+					Expect(app.CalculatedBuildpack()).To(Equal("bar"))
+				})
+			})
+
+			Context("neither buildpack or detected buildpack is set", func() {
+				It("returns an empty string", func() {
+					Expect(app.CalculatedBuildpack()).To(BeEmpty())
+				})
+			})
+		})
+	})
+
 	Describe("GetApplicationBySpace", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
@@ -136,8 +172,8 @@ var _ = Describe("Application Actions", func() {
 			It("passes the query to the client", func() {
 				expectedQuery := []ccv2.Query{
 					{
-						Filter:   "route_guid",
-						Operator: ":",
+						Filter:   ccv2.RouteGUIDFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "route-guid",
 					}}
 

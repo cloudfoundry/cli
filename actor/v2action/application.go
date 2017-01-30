@@ -9,6 +9,15 @@ import (
 // Application represents an application.
 type Application ccv2.Application
 
+// CalculatedBuildpack returns the buildpack that will be used.
+func (application *Application) CalculatedBuildpack() string {
+	if application.Buildpack != "" {
+		return application.Buildpack
+	}
+
+	return application.DetectedBuildpack
+}
+
 // ApplicationNotFoundError is returned when a requested application is not
 // found.
 type ApplicationNotFoundError struct {

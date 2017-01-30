@@ -520,6 +520,10 @@
     "translation": "{{.BuildpackName}} 빌드팩이 없습니다."
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
     "translation": "바이트 양은 M, MB, G 또는 GB와 같은 측정 단위를 사용하는 정수여야 함"
   },
@@ -1608,6 +1612,10 @@
     "translation": "명령"
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "유료 서비스 플랜의 인스턴스를 프로비저닝할 수 없음"
   },
@@ -2238,6 +2246,10 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용 안 함"
+  },
+  {
+    "id": "Disk",
+    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3364,6 +3376,10 @@
     "translation": "인스턴스는 음수가 아닌 정수여야 함"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "서버에서 올바르지 않은 JSON 응답"
   },
@@ -3486,6 +3502,10 @@
   {
     "id": "Last Operation",
     "translation": "마지막 조작"
+  },
+  {
+    "id": "Last uploaded:",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3692,6 +3712,10 @@
     "translation": "CLI가 애플리케이션이 시작되도록 대기하는 최대 시간(초)입니다. 다른 서버 측 제한시간이 적용될 수 있습니다."
   },
   {
+    "id": "Memory",
+    "translation": ""
+  },
+  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "메모리 한계(예: 256M, 1024M, 1G)"
   },
@@ -3733,6 +3757,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -4596,6 +4624,10 @@
     "translation": "이 도메인에 대한 라우트는 지정된 라우트 그룹에서만 구성됨"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Rules",
     "translation": "규칙"
   },
@@ -4924,6 +4956,10 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 상태 표시 중..."
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "사용자에게 조직 역할 지정 건너뛰기"
   },
@@ -4974,6 +5010,10 @@
   {
     "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "사용할 스택(스택은 앱을 실행할 수 있는 운영 체제를 비롯한 사전 빌드된 파일 시스템)"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Staging Environment Variable Groups:",
@@ -6582,6 +6622,10 @@
   {
     "id": "{{.MemoryLimit}}M memory limit",
     "translation": "{{.MemoryLimit}}M 메모리 한계"
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",

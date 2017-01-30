@@ -2,6 +2,7 @@ package ui_test
 
 import (
 	"errors"
+	"time"
 
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
@@ -72,6 +73,12 @@ var _ = Describe("UI", func() {
 				expected := ui.TranslateText("   View allowable quotas with 'CF_NAME quotas'")
 				Expect(expected).To(Equal("   Affichez les quotas pouvant être alloués avec 'CF_NAME quotas'"))
 			})
+		})
+	})
+
+	Describe("UserFriendlyDate", func() {
+		It("formats a time into an ISO8601 string", func() {
+			Expect(ui.UserFriendlyDate(time.Unix(0, 0))).To(Equal("1970-01-01T00:00:00Z"))
 		})
 	})
 

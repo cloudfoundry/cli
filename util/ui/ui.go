@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
@@ -95,6 +96,11 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 // templateValues substituted in. Only the first map in templateValues is used.
 func (ui *UI) TranslateText(template string, templateValues ...map[string]interface{}) string {
 	return ui.translate(template, getFirstSet(templateValues))
+}
+
+// UserFriendlyDate converts the time to UTC and then formats it to ISO8601.
+func (ui *UI) UserFriendlyDate(input time.Time) string {
+	return input.UTC().Format(time.RFC3339)
 }
 
 // DisplayOK outputs a bold green translated "OK" to UI.Out.

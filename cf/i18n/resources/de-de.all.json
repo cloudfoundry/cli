@@ -520,6 +520,10 @@
     "translation": "Buildpack {{.BuildpackName}} ist nicht vorhanden."
   },
   {
+    "id": "Buildpack:",
+    "translation": ""
+  },
+  {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
     "translation": "Die Bytemenge muss eine ganze Zahl mit einer Maßeinheit wie M, MB, G oder GB sein"
   },
@@ -1608,6 +1612,10 @@
     "translation": "BEFEHL"
   },
   {
+    "id": "CPU",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
@@ -2238,6 +2246,10 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "SSH-Zugriff für diesen Bereich nicht zulassen"
+  },
+  {
+    "id": "Disk",
+    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3364,6 +3376,10 @@
     "translation": "Instanz muss eine positive ganze Zahl sein"
   },
   {
+    "id": "Instances:",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "Ungültige JSON-Antwort vom Server"
   },
@@ -3486,6 +3502,10 @@
   {
     "id": "Last Operation",
     "translation": "Letzte Operation"
+  },
+  {
+    "id": "Last uploaded:",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3692,6 +3712,10 @@
     "translation": "Maximale Zeitdauer (in Sekunden), die die CLI auf den Start der Anwendung wartet. Es können andere Zeitlimitüberschreitung seitens des Servers auftreten"
   },
   {
+    "id": "Memory",
+    "translation": ""
+  },
+  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "Speicherbegrenzung (z.B. 256M, 1024M, 1G)"
   },
@@ -3733,6 +3757,10 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
+    "translation": ""
+  },
+  {
+    "id": "Name:",
     "translation": ""
   },
   {
@@ -4596,6 +4624,10 @@
     "translation": "Routen für diese Domäne werden nur in der angegebenen Routergruppe konfiguriert"
   },
   {
+    "id": "Routes:",
+    "translation": ""
+  },
+  {
     "id": "Rules",
     "translation": "Regeln"
   },
@@ -4924,6 +4956,10 @@
     "translation": "Anzeigen von Zustand und Status für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
   {
+    "id": "Since",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Zuordnen einer Organisationsrolle zu Benutzer überspringen"
   },
@@ -4974,6 +5010,10 @@
   {
     "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
     "translation": "Zu verwendender Stack (ein Stack ist ein vordefiniertes Dateisystem einschließlich Betriebssystem, das Apps ausführen kann)"
+  },
+  {
+    "id": "Stack:",
+    "translation": ""
   },
   {
     "id": "Staging Environment Variable Groups:",
@@ -6582,6 +6622,10 @@
   {
     "id": "{{.MemoryLimit}}M memory limit",
     "translation": "{{.MemoryLimit}}M - Speicherbegrenzung"
+  },
+  {
+    "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",

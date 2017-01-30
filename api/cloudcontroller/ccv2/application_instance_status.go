@@ -9,39 +9,40 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-// ApplicationInstanceState reflects the state of the individual app instance.
-type ApplicationInstanceState string
+// ApplicationInstanceStatusState reflects the state of the individual app
+// instance.
+type ApplicationInstanceStatusState string
 
 const (
-	ApplicationInstanceCrashed  ApplicationInstanceState = "CRASHED"
-	ApplicationInstanceDown                              = "DOWN"
-	ApplicationInstanceRunning                           = "RUNNING"
-	ApplicationInstanceStarting                          = "STARTING"
-	ApplicationInstanceUnknown                           = "UNKNOWN"
+	ApplicationInstanceCrashed  ApplicationInstanceStatusState = "CRASHED"
+	ApplicationInstanceDown                                    = "DOWN"
+	ApplicationInstanceRunning                                 = "RUNNING"
+	ApplicationInstanceStarting                                = "STARTING"
+	ApplicationInstanceUnknown                                 = "UNKNOWN"
 )
 
-// ApplicationInstance represents a Cloud Controller Application Instance.
-type ApplicationInstance struct {
+// ApplicationInstanceStatus represents a Cloud Controller Application Instance.
+type ApplicationInstanceStatus struct {
 	// CPU is the instance's CPU utilization percentage.
 	CPU float64
 
-	// Disk is the instance's disk usage in megabytes.
+	// Disk is the instance's disk usage in bytes.
 	Disk int
 
-	// DiskQuota is the instance's allowed disk usage in megabytes.
+	// DiskQuota is the instance's allowed disk usage in bytes.
 	DiskQuota int
 
 	// ID is the instance ID.
 	ID int
 
-	// Memory is the instance's memory usage in megabytes.
+	// Memory is the instance's memory usage in bytes.
 	Memory int
 
-	// MemoryQuota is the instance's allowed memory usage in megabytes.
+	// MemoryQuota is the instance's allowed memory usage in bytes.
 	MemoryQuota int
 
 	// State is the instance's state.
-	State ApplicationInstanceState
+	State ApplicationInstanceStatusState
 
 	// Uptime is the number of seconds the instance has been running.
 	Uptime int
@@ -49,7 +50,7 @@ type ApplicationInstance struct {
 
 // UnmarshalJSON helps unmarshal a Cloud Controller application instance
 // response.
-func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
+func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	var ccInstance struct {
 		State string `json:"state"`
 		Stats struct {
@@ -72,16 +73,16 @@ func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
 	instance.DiskQuota = ccInstance.Stats.DiskQuota
 	instance.Memory = ccInstance.Stats.Usage.Memory
 	instance.MemoryQuota = ccInstance.Stats.MemoryQuota
-	instance.State = ApplicationInstanceState(ccInstance.State)
+	instance.State = ApplicationInstanceStatusState(ccInstance.State)
 	instance.Uptime = ccInstance.Stats.Uptime
 
 	return nil
 }
 
-// GetApplicationInstancesByApplication returns a list of ApplicationInstance
-// for a given application. Given the state of an application, it might skip
-// some application instances.
-func (client *Client) GetApplicationInstancesByApplication(guid string) ([]ApplicationInstance, Warnings, error) {
+// GetApplicationInstanceStatusesByApplication returns a list of
+// ApplicationInstance for a given application. Given the state of an
+// application, it might skip some application instances.
+func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) ([]ApplicationInstanceStatus, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.AppInstanceStats,
 		URIParams:   Params{"app_guid": guid},
@@ -90,7 +91,7 @@ func (client *Client) GetApplicationInstancesByApplication(guid string) ([]Appli
 		return nil, nil, err
 	}
 
-	var instances map[string]ApplicationInstance
+	var instances map[string]ApplicationInstanceStatus
 	response := cloudcontroller.Response{
 		Result: &instances,
 	}
@@ -105,7 +106,7 @@ func (client *Client) GetApplicationInstancesByApplication(guid string) ([]Appli
 		return nil, response.Warnings, err
 	}
 
-	var sortedInstances []ApplicationInstance
+	var sortedInstances []ApplicationInstanceStatus
 	for _, instanceID := range sortedIDs {
 		instance := instances[strconv.Itoa(instanceID)]
 		instance.ID = instanceID
@@ -115,7 +116,7 @@ func (client *Client) GetApplicationInstancesByApplication(guid string) ([]Appli
 	return sortedInstances, response.Warnings, err
 }
 
-func (client *Client) sortedInstanceKeys(instances map[string]ApplicationInstance) ([]int, error) {
+func (client *Client) sortedInstanceKeys(instances map[string]ApplicationInstanceStatus) ([]int, error) {
 	var keys []int
 	for key, _ := range instances {
 		id, err := strconv.Atoi(key)

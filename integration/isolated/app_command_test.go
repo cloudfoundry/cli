@@ -212,6 +212,7 @@ applications:
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
 					// TODO: remove OK
+					// TODO: display "there are no running instances" instead of table
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Say("requested state: started"))
 					Eventually(session).Should(Say("instances: 0/0"))
