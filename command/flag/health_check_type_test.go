@@ -20,8 +20,7 @@ var _ = Describe("HealthCheckType", func() {
 			It("sets port to true", func() {
 				err := healthCheck.UnmarshalFlag("port")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(healthCheck.Port).To(BeTrue())
-				Expect(healthCheck.None).To(BeFalse())
+				Expect(healthCheck.Type).To(Equal("port"))
 			})
 		})
 
@@ -29,8 +28,7 @@ var _ = Describe("HealthCheckType", func() {
 			It("sets port to true", func() {
 				err := healthCheck.UnmarshalFlag("pOrt")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(healthCheck.Port).To(BeTrue())
-				Expect(healthCheck.None).To(BeFalse())
+				Expect(healthCheck.Type).To(Equal("port"))
 			})
 		})
 
@@ -38,8 +36,7 @@ var _ = Describe("HealthCheckType", func() {
 			It("sets none to true", func() {
 				err := healthCheck.UnmarshalFlag("none")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(healthCheck.Port).To(BeFalse())
-				Expect(healthCheck.None).To(BeTrue())
+				Expect(healthCheck.Type).To(Equal("none"))
 			})
 		})
 
@@ -47,8 +44,7 @@ var _ = Describe("HealthCheckType", func() {
 			It("sets none to true", func() {
 				err := healthCheck.UnmarshalFlag("nOne")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(healthCheck.Port).To(BeFalse())
-				Expect(healthCheck.None).To(BeTrue())
+				Expect(healthCheck.Type).To(Equal("none"))
 			})
 		})
 
@@ -59,8 +55,7 @@ var _ = Describe("HealthCheckType", func() {
 					Type:    flags.ErrRequired,
 					Message: `HEALTH_CHECK_TYPE must be "port" or "none"`,
 				}))
-				Expect(healthCheck.Port).To(BeFalse())
-				Expect(healthCheck.None).To(BeFalse())
+				Expect(healthCheck.Type).To(BeEmpty())
 			})
 		})
 	})
