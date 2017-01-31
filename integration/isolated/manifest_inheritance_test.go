@@ -1124,7 +1124,7 @@ applications:
 
 			It("pushes with parent application taking precedence over child global", func() {
 				session := helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app1Name)
 				Eventually(session.Out).Should(Say("OK"))
@@ -1151,7 +1151,7 @@ ZOOM: parent-global
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("app", app2Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app2Name)
 				Eventually(session.Out).Should(Say("OK"))
@@ -1247,7 +1247,7 @@ env:
 
 			It("pushes with child application taking precedence over child global over parent global over super-parent global", func() {
 				session := helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app1Name)
 				Eventually(session.Out).Should(Say("OK"))
@@ -1274,7 +1274,7 @@ ZOOM: parent-global
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("app", app2Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app2Name)
 				Eventually(session.Out).Should(Say("OK"))
@@ -1370,7 +1370,7 @@ env:
 
 			It("pushes with child application taking precedence over child global over parent global over super-parent global", func() {
 				session := helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app1Name)
 				Eventually(session.Out).Should(Say("OK"))
@@ -1398,7 +1398,7 @@ ZOOM: parent-global
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
+				Eventually(session.Out).Should(Say("Instances.*2"))
 
 				session = helpers.CF("env", app2Name)
 				Eventually(session.Out).Should(Say("OK"))
