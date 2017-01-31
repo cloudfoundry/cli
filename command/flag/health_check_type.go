@@ -7,18 +7,16 @@ import (
 )
 
 type HealthCheckType struct {
-	Port bool
-	None bool
+	Type string
 }
 
 func (m *HealthCheckType) UnmarshalFlag(val string) error {
-	if strings.EqualFold(val, "port") {
-		m.Port = true
-		return nil
-	} else if strings.EqualFold(val, "none") {
-		m.None = true
+	valLower := strings.ToLower(val)
+	if valLower == "none" || valLower == "port" {
+		m.Type = valLower
 		return nil
 	}
+
 	return &flags.Error{
 		Type:    flags.ErrRequired,
 		Message: `HEALTH_CHECK_TYPE must be "port" or "none"`,
