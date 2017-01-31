@@ -32,6 +32,9 @@ type Application struct {
 	// GUID is the unique application identifier.
 	GUID string
 
+	// HealthCheckType is the type of health check that will be done to the app.
+	HealthCheckType string
+
 	// Instances is the total number of app instances.
 	Instances int
 
@@ -60,6 +63,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			DetectedBuildpack    string     `json:"detected_buildpack"`
 			DetectedStartCommand string     `json:"detected_start_command"`
 			DiskQuota            int        `json:"disk_quota"`
+			HealthCheckType      string     `json:"health_check_type"`
 			Instances            int        `json:"instances"`
 			Memory               int        `json:"memory"`
 			Name                 string     `json:"name"`
@@ -77,6 +81,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.DetectedBuildpack = ccApp.Entity.DetectedBuildpack
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
+	application.HealthCheckType = ccApp.Entity.HealthCheckType
 	application.Instances = ccApp.Entity.Instances
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name
