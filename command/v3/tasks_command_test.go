@@ -22,7 +22,7 @@ var _ = Describe("tasks Command", func() {
 		cmd             v3.TasksCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *v3fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeTasksActor
 		binaryName      string
 		executeErr      error
@@ -31,7 +31,7 @@ var _ = Describe("tasks Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeSharedActor = new(v3fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeTasksActor)
 
 		cmd = v3.TasksCommand{

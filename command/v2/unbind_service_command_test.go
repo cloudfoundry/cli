@@ -21,7 +21,7 @@ var _ = Describe("unbind-service Command", func() {
 		cmd             UnbindServiceCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *v2fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeUnbindServiceActor
 		binaryName      string
 		executeErr      error
@@ -30,7 +30,7 @@ var _ = Describe("unbind-service Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeSharedActor = new(v2fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeUnbindServiceActor)
 
 		cmd = UnbindServiceCommand{

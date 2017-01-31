@@ -21,7 +21,7 @@ type UnbindServiceCommand struct {
 
 	UI          command.UI
 	Config      command.Config
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Actor       UnbindServiceActor
 }
 

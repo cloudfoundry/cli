@@ -8,12 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . SharedActor
-
-type SharedActor interface {
-	CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error
-}
-
 //go:generate counterfeiter . RunTaskActor
 
 type RunTaskActor interface {
@@ -30,7 +24,7 @@ type RunTaskCommand struct {
 
 	UI          command.UI
 	Config      command.Config
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Actor       RunTaskActor
 }
 
