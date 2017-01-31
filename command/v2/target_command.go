@@ -12,12 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
-//go:generate counterfeiter . SharedActor
-
-type SharedActor interface {
-	CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error
-}
-
 //go:generate counterfeiter . TargetActor
 type TargetActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
@@ -33,7 +27,7 @@ type TargetCommand struct {
 
 	UI          command.UI
 	Config      command.Config
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Actor       TargetActor
 }
 

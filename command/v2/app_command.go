@@ -29,7 +29,7 @@ type AppCommand struct {
 	relatedCommands interface{}  `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 
 	Config      command.Config
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Actor       AppActor
 	UI          command.UI
 }

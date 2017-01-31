@@ -21,7 +21,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 		cmd             v2.DeleteOrphanedRoutesCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *v2fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeDeleteOrphanedRoutesActor
 		input           *Buffer
 		binaryName      string
@@ -32,7 +32,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeSharedActor = new(v2fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeDeleteOrphanedRoutesActor)
 
 		cmd = v2.DeleteOrphanedRoutesCommand{

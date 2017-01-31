@@ -24,7 +24,7 @@ type DeleteOrgCommand struct {
 
 	Config      command.Config
 	UI          command.UI
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Actor       DeleteOrganizationActor
 }
 

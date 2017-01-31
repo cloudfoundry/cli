@@ -22,7 +22,7 @@ var _ = Describe("App Command", func() {
 	var (
 		cmd             v2.AppCommand
 		testUI          *ui.UI
-		fakeSharedActor *v2fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeAppActor
 		fakeConfig      *commandfakes.FakeConfig
 		binaryName      string
@@ -31,7 +31,7 @@ var _ = Describe("App Command", func() {
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
-		fakeSharedActor = new(v2fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeAppActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 

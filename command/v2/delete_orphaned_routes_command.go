@@ -21,7 +21,7 @@ type DeleteOrphanedRoutesCommand struct {
 
 	UI          command.UI
 	Actor       DeleteOrphanedRoutesActor
-	SharedActor SharedActor
+	SharedActor command.SharedActor
 	Config      command.Config
 }
 

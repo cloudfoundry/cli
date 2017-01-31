@@ -21,7 +21,7 @@ var _ = Describe("create-user Command", func() {
 		cmd             v2.CreateUserCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *v2fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeCreateUserActor
 		binaryName      string
 		executeErr      error
@@ -30,7 +30,7 @@ var _ = Describe("create-user Command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeSharedActor = new(v2fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeCreateUserActor)
 
 		cmd = v2.CreateUserCommand{

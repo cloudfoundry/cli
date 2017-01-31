@@ -21,7 +21,7 @@ var _ = Describe("delete-org Command", func() {
 		cmd             v2.DeleteOrgCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *v2fakes.FakeSharedActor
+		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeDeleteOrganizationActor
 		input           *Buffer
 		binaryName      string
@@ -32,7 +32,7 @@ var _ = Describe("delete-org Command", func() {
 		input = NewBuffer()
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeSharedActor = new(v2fakes.FakeSharedActor)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeDeleteOrganizationActor)
 
 		cmd = v2.DeleteOrgCommand{
