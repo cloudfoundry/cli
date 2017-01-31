@@ -16,6 +16,10 @@ import (
 )
 
 var _ = Describe("app command", func() {
+	BeforeEach(func() {
+		helpers.SkipIfExperimental("Skipping until story #126256629 is finished")
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -85,8 +89,7 @@ var _ = Describe("app command", func() {
 				session := helpers.CF("app", "wut")
 				Eventually(session).Should(Exit(1))
 				Expect(session).To(Say("FAILED"))
-				// TODO: change 'cf target -s' to 'cf target -s SPACE'
-				Expect(session).To(Say("No space targeted, use 'cf target -s' to target a space."))
+				Expect(session).To(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 			})
 		})
 	})
@@ -167,17 +170,16 @@ applications:
 			Context("when the app is started and has 2 instances", func() {
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					// TODO: remove OK
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("requested state: started"))
-					Eventually(session).Should(Say("instances: 2/2"))
-					Eventually(session).Should(Say("usage: 128M x 2 instances"))
-					Eventually(session).Should(Say("urls: %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
-					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack: cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack: staticfile_buildpack"))
+					Eventually(session).Should(Say("Name:            %s", appName))
+					Eventually(session).Should(Say("Requested state: started"))
+					Eventually(session).Should(Say("Instances:       2/2"))
+					Eventually(session).Should(Say("Usage:           128M x 2 instances"))
+					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Last uploaded:"))
+					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
 
-					Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+					Eventually(session).Should(Say("State\\s+Since\\s+Cpu\\s+Memory\\s+Disk\\s+Details"))
 					Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 					Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 				})
@@ -190,15 +192,14 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					// TODO: remove OK
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("requested state: stopped"))
-					Eventually(session).Should(Say("instances: 0/2"))
-					Eventually(session).Should(Say("usage: 128M x 2 instances"))
-					Eventually(session).Should(Say("urls: %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
-					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack: cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack: staticfile_buildpack"))
+					Eventually(session).Should(Say("Name:            %s", appName))
+					Eventually(session).Should(Say("Requested state: stopped"))
+					Eventually(session).Should(Say("Instances:       0/2"))
+					Eventually(session).Should(Say("Usage:           128M x 2 instances"))
+					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Last uploaded:"))
+					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
 				})
@@ -211,18 +212,16 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					// TODO: remove OK
-					// TODO: display "there are no running instances" instead of table
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("requested state: started"))
-					Eventually(session).Should(Say("instances: 0/0"))
-					Eventually(session).Should(Say("usage: 128M x 0 instances"))
-					Eventually(session).Should(Say("urls: %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
-					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack: cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack: staticfile_buildpack"))
+					Eventually(session).Should(Say("Name:            %s", appName))
+					Eventually(session).Should(Say("Requested state: started"))
+					Eventually(session).Should(Say("Instances:       0/0"))
+					Eventually(session).Should(Say("Usage:           128M x 0 instances"))
+					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Last uploaded:"))
+					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
 
-					Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+					Eventually(session).Should(Say("There are no running instances of this app."))
 				})
 
 			})
