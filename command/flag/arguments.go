@@ -206,7 +206,7 @@ type SetSpaceQuotaArgs struct {
 
 type SetHealthCheckArgs struct {
 	AppName     string          `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
-	HealthCheck HealthCheckType `positional:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
+	HealthCheck HealthCheckType `positional-arg-name:"HEALTH_CHECK_TYPE" required:"true" description:"Set to 'port' or 'none'"`
 }
 
 type CreateBuildpackArgs struct {
