@@ -15,7 +15,7 @@ var _ = Describe("target command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("target command refactor is still experimental")
+		Skip("skip until #126256621 is complete")
 		helpers.LoginCF()
 
 		orgName = helpers.NewOrgName()
