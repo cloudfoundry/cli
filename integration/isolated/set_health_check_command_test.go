@@ -164,6 +164,10 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Say("Updating health check type to 'none' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+
+					getSession := helpers.CF("get-health-check", appName)
+					Eventually(getSession).Should(Say("health_check_type is none"))
+					Eventually(getSession).Should(Exit(0))
 				})
 			})
 
@@ -179,6 +183,10 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Say("Updating health check type to 'port' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+
+					getSession := helpers.CF("get-health-check", appName)
+					Eventually(getSession).Should(Say("health_check_type is port"))
+					Eventually(getSession).Should(Exit(0))
 				})
 			})
 		})
