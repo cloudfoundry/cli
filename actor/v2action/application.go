@@ -57,7 +57,8 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 	return Application(app[0]), Warnings(warnings), nil
 }
 
-// GetRouteApplications returns a list of apps associated with the provided Route GUID
+// GetRouteApplications returns a list of apps associated with the provided
+// Route GUID.
 func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([]Application, Warnings, error) {
 	apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(routeGUID, query)
 	if err != nil {
@@ -68,4 +69,30 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 		allApplications = append(allApplications, Application(app))
 	}
 	return allApplications, Warnings(warnings), nil
+}
+
+// SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
+// check type if it is not already the desired type.
+func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string) (Warnings, error) {
+	var allWarnings Warnings
+
+	app, warnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	if app.HealthCheckType != healthCheckType {
+		var apiWarnings ccv2.Warnings
+
+		_, apiWarnings, err = actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			GUID:            app.GUID,
+			HealthCheckType: healthCheckType,
+		})
+
+		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
+	}
+
+	return allWarnings, err
 }

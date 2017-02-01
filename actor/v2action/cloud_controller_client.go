@@ -26,6 +26,7 @@ type CloudControllerClient interface {
 	NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
+	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 
 	API() string
 	APIVersion() string

@@ -1,6 +1,7 @@
 package ccv2
 
 import (
+	"bytes"
 	"encoding/json"
 	"time"
 
@@ -18,40 +19,40 @@ const (
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
-	Buildpack string
+	Buildpack string `json:"-"`
 
 	// DetectedBuildpack is the buildpack automatically detected.
-	DetectedBuildpack string
+	DetectedBuildpack string `json:"-"`
 
 	// DetectedStartCommand is the command used to start the application.
-	DetectedStartCommand string
+	DetectedStartCommand string `json:"-"`
 
 	// DiskQuota is the disk given to each instance, in megabytes.
-	DiskQuota int
+	DiskQuota int `json:"-"`
 
 	// GUID is the unique application identifier.
-	GUID string
+	GUID string `json:"-"`
 
 	// HealthCheckType is the type of health check that will be done to the app.
-	HealthCheckType string
+	HealthCheckType string `json:"health_check_type,omitempty"`
 
 	// Instances is the total number of app instances.
-	Instances int
+	Instances int `json:"-"`
 
 	// Memory is the memory given to each instance, in megabytes.
-	Memory int
+	Memory int `json:"-"`
 
 	// Name is the name given to the application.
-	Name string
+	Name string `json:"-"`
 
 	// PackageUpdatedAt is the last time the app bits were updated. In RFC3339.
-	PackageUpdatedAt time.Time
+	PackageUpdatedAt time.Time `json:"-"`
 
 	// StackGUID is the GUID for the Stack the application is running on.
-	StackGUID string
+	StackGUID string `json:"-"`
 
 	// State is the desired state of the application.
-	State ApplicationState
+	State ApplicationState `json:"-"`
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Application response.
@@ -119,6 +120,30 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 	})
 
 	return fullAppsList, warnings, err
+}
+
+func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
+	body, err := json.Marshal(app)
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.UpdateAppRequest,
+		URIParams:   Params{"app_guid": app.GUID},
+		Body:        bytes.NewBuffer(body),
+	})
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	var updatedApp Application
+	response := cloudcontroller.Response{
+		Result: &updatedApp,
+	}
+
+	err = client.connection.Make(request, &response)
+	return updatedApp, response.Warnings, err
 }
 
 // GetRouteApplications returns a list of Applications associated with a route
