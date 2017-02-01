@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("app command", func() {
 	BeforeEach(func() {
-		helpers.SkipIfExperimental("Skipping until story #126256629 is finished")
+		Skip("skipping until story #126256629 is finished")
 	})
 
 	Describe("help", func() {
