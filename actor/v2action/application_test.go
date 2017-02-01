@@ -184,4 +184,105 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 	})
+
+	Describe("SetApplicationHealthCheckTypeByNameAndSpace", func() {
+		Context("when the app exists", func() {
+			Context("when the desired health check type is different", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturns(
+						[]ccv2.Application{
+							{GUID: "some-app-guid"},
+						},
+						ccv2.Warnings{"get application warning"},
+						nil,
+					)
+					fakeCloudControllerClient.UpdateApplicationReturns(
+						ccv2.Application{},
+						ccv2.Warnings{"update warnings"},
+						nil,
+					)
+				})
+
+				It("sets the desired health check type and returns the warnings", func() {
+					warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+						"some-app", "some-space-guid", "some-health-check-type")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
+
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(app).To(Equal(ccv2.Application{
+						GUID:            "some-app-guid",
+						HealthCheckType: "some-health-check-type",
+					}))
+				})
+			})
+
+			Context("when the application health check type is already set to the desired type", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturns(
+						[]ccv2.Application{
+							{
+								GUID:            "some-app-guid",
+								HealthCheckType: "some-health-check-type",
+							},
+						},
+						ccv2.Warnings{"get application warning"},
+						nil,
+					)
+				})
+
+				It("does not update the health check type", func() {
+					warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+						"some-app", "some-space-guid", "some-health-check-type")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get application warning"))
+
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Context("when getting the application returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{}, ccv2.Warnings{"get application warning"}, errors.New("get application error"))
+			})
+
+			It("returns the error and warnings", func() {
+				warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+					"some-app", "some-space-guid", "some-health-check-type")
+
+				Expect(warnings).To(ConsistOf("get application warning"))
+				Expect(err).To(MatchError("get application error"))
+			})
+		})
+
+		Context("when updating the application returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("foo bar")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv2.Warnings{"get application warning"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv2.Application{},
+					ccv2.Warnings{"update warnings"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+					"some-app", "some-space-guid", "some-health-check-type")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
+			})
+		})
+	})
 })

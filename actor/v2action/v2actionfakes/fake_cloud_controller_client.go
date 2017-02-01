@@ -210,6 +210,16 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	UpdateApplicationStub        func(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
+	updateApplicationMutex       sync.RWMutex
+	updateApplicationArgsForCall []struct {
+		app ccv2.Application
+	}
+	updateApplicationReturns struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
 	APIStub        func() string
 	aPIMutex       sync.RWMutex
 	aPIArgsForCall []struct{}
@@ -1002,6 +1012,41 @@ func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv2.Warnings, re
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error) {
+	fake.updateApplicationMutex.Lock()
+	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
+		app ccv2.Application
+	}{app})
+	fake.recordInvocation("UpdateApplication", []interface{}{app})
+	fake.updateApplicationMutex.Unlock()
+	if fake.UpdateApplicationStub != nil {
+		return fake.UpdateApplicationStub(app)
+	} else {
+		return fake.updateApplicationReturns.result1, fake.updateApplicationReturns.result2, fake.updateApplicationReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationCallCount() int {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	return len(fake.updateApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationArgsForCall(i int) ccv2.Application {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	return fake.updateApplicationArgsForCall[i].app
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationReturns(result1 ccv2.Application, result2 ccv2.Warnings, result3 error) {
+	fake.UpdateApplicationStub = nil
+	fake.updateApplicationReturns = struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) API() string {
 	fake.aPIMutex.Lock()
 	fake.aPIArgsForCall = append(fake.aPIArgsForCall, struct{}{})
@@ -1220,6 +1265,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.pollJobMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
 	fake.aPIMutex.RLock()
 	defer fake.aPIMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()
