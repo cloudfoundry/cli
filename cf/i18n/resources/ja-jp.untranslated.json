@@ -1832,6 +1832,10 @@
     "translation": "Updating a plan"
   },
   {
+    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Usage:",
     "translation": "Usage:"
   },

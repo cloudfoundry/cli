@@ -5760,6 +5760,10 @@
     "translation": "Aggiornamento del pacchetto di build {{.BuildpackName}} in corso..."
   },
   {
+    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
     "translation": "Aggiornamento della quota {{.QuotaName}} come {{.Username}} in corso..."
   },

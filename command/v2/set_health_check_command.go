@@ -49,12 +49,13 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+	cmd.UI.DisplayTextWithFlavor("Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
-			"AppName":   cmd.RequiredArgs.AppName,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"Username":  user.Name,
+			"AppName":         cmd.RequiredArgs.AppName,
+			"HealthCheckType": cmd.RequiredArgs.HealthCheck.Type,
+			"OrgName":         cmd.Config.TargetedOrganization().Name,
+			"SpaceName":       cmd.Config.TargetedSpace().Name,
+			"Username":        user.Name,
 		})
 
 	warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(

@@ -5760,6 +5760,10 @@
     "translation": "{{.BuildpackName}} 빌드팩 업데이트 중..."
   },
   {
+    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.QuotaName}} 할당량 업데이트 중..."
   },

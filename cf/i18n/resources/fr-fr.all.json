@@ -5760,6 +5760,10 @@
     "translation": "Mise à jour du pack de construction {{.BuildpackName}}..."
   },
   {
+    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
     "translation": "Mise à jour du quota {{.QuotaName}} en tant que {{.Username}}..."
   },

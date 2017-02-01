@@ -161,7 +161,7 @@ var _ = Describe("set-health-check command", func() {
 					session := helpers.CF("set-health-check", appName, "none")
 
 					username, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Updating app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("Updating health check type to 'none' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -176,7 +176,7 @@ var _ = Describe("set-health-check command", func() {
 					session := helpers.CF("set-health-check", appName, "port")
 
 					username, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Updating app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("Updating health check type to 'port' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
