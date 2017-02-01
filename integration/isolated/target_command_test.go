@@ -3,6 +3,7 @@ package isolated
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -55,62 +56,55 @@ var _ = Describe("target command", func() {
 		})
 
 		Context("when not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			Context("when trying to target an org", func() {
-				It("fails with not logged in message", func() {
-					session := helpers.CF("target", "-o", "some-org")
+			DescribeTable("fails with not logged in message",
+				func(args ...string) {
+					helpers.LogoutCF()
+					cmd := append([]string{"target"}, args...)
+					session := helpers.CF(cmd...)
+					// TODO: Decide if we want to uncomment this or delete them
+					// Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
+					// Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
 					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
-				})
-			})
+				},
 
-			Context("when trying to target a space", func() {
-				It("fails with not logged in message", func() {
-					session := helpers.CF("target", "-s", "some-space")
-					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			Context("when trying to target an org and space", func() {
-				It("fails with not logged in message", func() {
-					session := helpers.CF("target", "-o", "some-org", "-s", "some-space")
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			Context("when trying to get the target", func() {
-				It("fails with not logged in message", func() {
-					session := helpers.CF("target")
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
-					Eventually(session).Should(Exit(1))
-				})
-			})
+				Entry("when trying to target an org", "-o", "some-org"),
+				Entry("when trying to target a space", "-s", "some-space"),
+				Entry("when trying to target an org and space", "-o", "some-org", "-s", "some-space"),
+				Entry("when trying to get the target"),
+			)
 		})
 	})
 
 	Context("when no arguments are provided", func() {
-		BeforeEach(func() {
-			setupCF(ReadOnlyOrg, ReadOnlySpace)
+		Context("when *no* org and space are targeted", func() {
+			It("displays current target information", func() {
+				username, _ := helpers.GetCredentials()
+				session := helpers.CF("target")
+				Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
+				Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
+				Eventually(session.Out).Should(Say("User:           %s", username))
+				Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
-		It("displays current target information", func() {
-			username, _ := helpers.GetCredentials()
-			session := helpers.CF("target")
-			Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
-			Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
-			Eventually(session.Out).Should(Say("User:           %s", username))
-			Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-			Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
-			Eventually(session).Should(Exit(0))
+		Context("when targeted to an org and space", func() {
+			BeforeEach(func() {
+				setupCF(ReadOnlyOrg, ReadOnlySpace)
+			})
+
+			It("displays current target information", func() {
+				username, _ := helpers.GetCredentials()
+				session := helpers.CF("target")
+				Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
+				Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
+				Eventually(session.Out).Should(Say("User:           %s", username))
+				Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
+				Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 
