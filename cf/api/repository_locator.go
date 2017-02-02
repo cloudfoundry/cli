@@ -26,7 +26,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/spacequotas"
 	"code.cloudfoundry.org/cli/cf/api/spaces"
 	"code.cloudfoundry.org/cli/cf/api/stacks"
-	"code.cloudfoundry.org/cli/cf/api/strategy"
 	"code.cloudfoundry.org/cli/cf/appfiles"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -84,8 +83,6 @@ type RepositoryLocator struct {
 const noaaRetryDefaultTimeout = 5 * time.Second
 
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer, envDialTimeout string) (loc RepositoryLocator) {
-	strategy := strategy.NewEndpointStrategy(config.APIVersion())
-
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingAPIGateway := gatewaysByName["routing-api"]
 	uaaGateway := gatewaysByName["uaa"]
@@ -96,14 +93,14 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	loc.appBitsRepo = applicationbits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
-	loc.appEventsRepo = appevents.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
+	loc.appEventsRepo = appevents.NewCloudControllerAppEventsRepository(config, cloudControllerGateway)
 	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = applications.NewCloudControllerRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = appinstances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
-	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
+	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())

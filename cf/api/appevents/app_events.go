@@ -1,8 +1,9 @@
 package appevents
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/api/strategy"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -15,16 +16,14 @@ type Repository interface {
 }
 
 type CloudControllerAppEventsRepository struct {
-	config   coreconfig.Reader
-	gateway  net.Gateway
-	strategy strategy.EndpointStrategy
+	config  coreconfig.Reader
+	gateway net.Gateway
 }
 
-func NewCloudControllerAppEventsRepository(config coreconfig.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerAppEventsRepository {
+func NewCloudControllerAppEventsRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerAppEventsRepository {
 	return CloudControllerAppEventsRepository{
-		config:   config,
-		gateway:  gateway,
-		strategy: strategy,
+		config:  config,
+		gateway: gateway,
 	}
 }
 
@@ -41,10 +40,11 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGUID string, limi
 }
 
 func (repo CloudControllerAppEventsRepository) listEvents(appGUID string, limit int64, cb func(models.EventFields) bool) error {
+	path := fmt.Sprintf("/v2/events?results-per-page=%d&order-direction=desc&q=actee:%s", limit, appGUID)
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		repo.strategy.EventsURL(appGUID, limit),
-		repo.strategy.EventsResource(),
+		path,
+		resources.EventResourceNewV2{},
 
 		func(resource interface{}) bool {
 			return cb(resource.(resources.EventResource).ToFields())
