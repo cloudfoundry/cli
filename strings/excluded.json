@@ -551,6 +551,8 @@
     "unbind-service",
     "set-health-check",
     "cf api",
+    "process",
+    "http",
 
     "\rDone uploading",
     ". Process to uninstall ...",

@@ -9,34 +9,37 @@ import (
 )
 
 type FakeSetHealthCheckActor struct {
-	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(name string, spaceGUID string, healthCheckType string) (v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
 	setApplicationHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationHealthCheckTypeByNameAndSpaceArgsForCall []struct {
 		name            string
 		spaceGUID       string
 		healthCheckType string
+		httpEndpoint    string
 	}
 	setApplicationHealthCheckTypeByNameAndSpaceReturns struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string) (v2action.Warnings, error) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
 	fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall, struct {
 		name            string
 		spaceGUID       string
 		healthCheckType string
-	}{name, spaceGUID, healthCheckType})
-	fake.recordInvocation("SetApplicationHealthCheckTypeByNameAndSpace", []interface{}{name, spaceGUID, healthCheckType})
+		httpEndpoint    string
+	}{name, spaceGUID, healthCheckType, httpEndpoint})
+	fake.recordInvocation("SetApplicationHealthCheckTypeByNameAndSpace", []interface{}{name, spaceGUID, healthCheckType, httpEndpoint})
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Unlock()
 	if fake.SetApplicationHealthCheckTypeByNameAndSpaceStub != nil {
-		return fake.SetApplicationHealthCheckTypeByNameAndSpaceStub(name, spaceGUID, healthCheckType)
+		return fake.SetApplicationHealthCheckTypeByNameAndSpaceStub(name, spaceGUID, healthCheckType, httpEndpoint)
 	} else {
-		return fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result1, fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result2
+		return fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result1, fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result2, fake.setApplicationHealthCheckTypeByNameAndSpaceReturns.result3
 	}
 }
 
@@ -46,18 +49,19 @@ func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace
 	return len(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string, string) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RUnlock()
-	return fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].name, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType
+	return fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].name, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].httpEndpoint
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceReturns(result1 v2action.Application, result2 v2action.Warnings, result3 error) {
 	fake.SetApplicationHealthCheckTypeByNameAndSpaceStub = nil
 	fake.setApplicationHealthCheckTypeByNameAndSpaceReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeSetHealthCheckActor) Invocations() map[string][][]interface{} {

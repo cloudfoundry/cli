@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
@@ -15,9 +16,10 @@ var _ = Describe("set-health-check command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("set-health-check", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("set-health-check - Set health_check_type flag to either 'port' or 'none'"))
+				Eventually(session).Should(Say("set-health-check - Change type of health check performed on an app"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf set-health-check APP_NAME \\('port' \\| 'none'\\)"))
+				Eventually(session).Should(Say("cf set-health-check APP_NAME \\(process \\| port \\| http\\)"))
+				Eventually(session).Should(Say("TIP: 'none' has been deprecated but is accepted for 'process'."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -80,40 +82,19 @@ var _ = Describe("set-health-check command", func() {
 		})
 	})
 
-	Context("when app-name and health-check-type are not passed in", func() {
-		It("fails with incorrect ussage error message and displays help", func() {
-			session := helpers.CF("set-health-check")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `APP_NAME` and `HEALTH_CHECK_TYPE` were not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("set-health-check - Set health_check_type flag to either 'port' or 'none'"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf set-health-check APP_NAME \\('port' \\| 'none'\\)"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	Context("when health-check-type is not passed in", func() {
-		It("fails with incorrect usage error message and displays help", func() {
-			session := helpers.CF("set-health-check", "some-app")
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `HEALTH_CHECK_TYPE` was not provided"))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("set-health-check - Set health_check_type flag to either 'port' or 'none'"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf set-health-check APP_NAME \\('port' \\| 'none'\\)"))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	Context("when health-check-type is invalid", func() {
-		It("fails with incorrect usage error message and displays help", func() {
-			session := helpers.CF("set-health-check", "some-app", "wut")
-			Eventually(session.Err).Should(Say(`Incorrect Usage: HEALTH_CHECK_TYPE must be "port" or "none"`))
-			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("set-health-check - Set health_check_type flag to either 'port' or 'none'"))
-			Eventually(session).Should(Say("USAGE:"))
-			Eventually(session).Should(Say("cf set-health-check APP_NAME \\('port' \\| 'none'\\)"))
-			Eventually(session).Should(Exit(1))
-		})
+	Context("when the input is invalid", func() {
+		DescribeTable("fails with incorrect usage method",
+			func(args ...string) {
+				cmd := append([]string{"set-health-check"}, args...)
+				session := helpers.CF(cmd...)
+				Eventually(session.Err).Should(Say("Incorrect Usage:"))
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Exit(1))
+			},
+			Entry("when app-name and health-check-type are not passed in"),
+			Entry("when health-check-type is not passed in", "some-app"),
+			Entry("when health-check-type is invalid", "some-app", "wut"),
+		)
 	})
 
 	Context("when the environment is set up correctly", func() {
@@ -141,53 +122,45 @@ var _ = Describe("set-health-check command", func() {
 		})
 
 		Context("when the app exists", func() {
-			var (
-				appName string
+			var appName string
+
+			DescribeTable("Updates health-check-type and exits 0",
+				func(settingType string, expectedType string) {
+					appName = helpers.PrefixedRandomName("app")
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+					})
+
+					session := helpers.CF("set-health-check", appName, settingType)
+
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Updating health check type to '%s' for app %s in org %s / space %s as %s", expectedType, appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					getSession := helpers.CF("get-health-check", appName)
+					Eventually(getSession).Should(Say("health_check_type is %s", expectedType))
+					Eventually(getSession).Should(Exit(0))
+				},
+				Entry("when setting the health-check-type to 'none'", "none", "process"),
+				Entry("when setting the health-check-type to 'process'", "process", "process"),
+				Entry("when setting the health-check-type to 'port'", "port", "port"),
+				Entry("when setting the health-check-type to 'http'", "http", "http"),
 			)
-
-			BeforeEach(func() {
-				appName = helpers.PrefixedRandomName("app")
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
-				})
-			})
-
-			Context("when setting the health-check-type to 'none'", func() {
+			Context("when the app is started", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("set-health-check", appName, "port")).Should(Exit(0))
+					appName = helpers.PrefixedRandomName("app")
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
 				})
 
-				It("updates the new health-check-type and exits 0", func() {
-					session := helpers.CF("set-health-check", appName, "none")
-
-					username, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Updating health check type to 'none' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Exit(0))
-
-					getSession := helpers.CF("get-health-check", appName)
-					Eventually(getSession).Should(Say("health_check_type is none"))
-					Eventually(getSession).Should(Exit(0))
-				})
-			})
-
-			Context("when setting the health-check-type to 'port'", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("set-health-check", appName, "none")).Should(Exit(0))
-				})
-
-				It("updates the new health-check-type and exits 0", func() {
+				It("displays tip to restart the app", func() {
 					session := helpers.CF("set-health-check", appName, "port")
-
-					username, _ := helpers.GetCredentials()
-					Eventually(session).Should(Say("Updating health check type to 'port' for app %s in org %s / space %s as %s", appName, orgName, spaceName, username))
-					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("TIP: An app restart is required for the change to take affect."))
 					Eventually(session).Should(Exit(0))
-
-					getSession := helpers.CF("get-health-check", appName)
-					Eventually(getSession).Should(Say("health_check_type is port"))
-					Eventually(getSession).Should(Exit(0))
 				})
+
 			})
 		})
 	})
