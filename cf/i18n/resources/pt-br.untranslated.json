@@ -800,8 +800,8 @@
     "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'"
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME ('port' | 'none')",
-    "translation": "CF_NAME set-health-check APP_NAME ('port' | 'none')"
+    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
+    "translation": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'."
   },
   {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
@@ -1144,10 +1144,6 @@
     "translation": "Cloud Foundry command line tool"
   },
   {
-    "id": "Comma delimited list of ports the application may listen on\" hidden:\"true",
-    "translation": "Comma delimited list of ports the application may listen on\" hidden:\"true"
-  },
-  {
     "id": "Commands offered by installed plugins:",
     "translation": "Commands offered by installed plugins:"
   },
@@ -1260,8 +1256,8 @@
     "translation": "HEALTH_CHECK_TYPE"
   },
   {
-    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
-    "translation": ""
+    "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
+    "translation": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\""
   },
   {
     "id": "HOST",
