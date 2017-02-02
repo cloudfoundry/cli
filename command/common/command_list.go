@@ -39,7 +39,7 @@ type commandList struct {
 	CopySource                         v2.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
 	CreateAppManifest                  v2.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Get the health_check_type value of an app"`
-	SetHealthCheck                     v2.SetHealthCheckCommand                     `command:"set-health-check" description:"Set health_check_type flag to either 'port' or 'none'"`
+	SetHealthCheck                     v2.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app"`
 	EnableSSH                          v2.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	DisableSSH                         v2.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	SSHEnabled                         v2.SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`

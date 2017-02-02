@@ -36,6 +36,9 @@ type Application struct {
 	// HealthCheckType is the type of health check that will be done to the app.
 	HealthCheckType string `json:"health_check_type,omitempty"`
 
+	// HealthCheckHTTPEndpoint is the url of the http health check endpoint.
+	HealthCheckHTTPEndpoint string `json:"health_check_http_endpoint,omitempty"`
+
 	// Instances is the total number of app instances.
 	Instances int `json:"-"`
 
@@ -60,17 +63,18 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	var ccApp struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Buildpack            string     `json:"buildpack"`
-			DetectedBuildpack    string     `json:"detected_buildpack"`
-			DetectedStartCommand string     `json:"detected_start_command"`
-			DiskQuota            int        `json:"disk_quota"`
-			HealthCheckType      string     `json:"health_check_type"`
-			Instances            int        `json:"instances"`
-			Memory               int        `json:"memory"`
-			Name                 string     `json:"name"`
-			PackageUpdatedAt     *time.Time `json:"package_updated_at"`
-			StackGUID            string     `json:"stack_guid"`
-			State                string     `json:"state"`
+			Buildpack               string     `json:"buildpack"`
+			DetectedBuildpack       string     `json:"detected_buildpack"`
+			DetectedStartCommand    string     `json:"detected_start_command"`
+			DiskQuota               int        `json:"disk_quota"`
+			HealthCheckType         string     `json:"health_check_type"`
+			HealthCheckHTTPEndpoint string     `json:"health_check_http_endpoint"`
+			Instances               int        `json:"instances"`
+			Memory                  int        `json:"memory"`
+			Name                    string     `json:"name"`
+			PackageUpdatedAt        *time.Time `json:"package_updated_at"`
+			StackGUID               string     `json:"stack_guid"`
+			State                   string     `json:"state"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccApp); err != nil {
@@ -83,6 +87,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
 	application.HealthCheckType = ccApp.Entity.HealthCheckType
+	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.Instances = ccApp.Entity.Instances
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name

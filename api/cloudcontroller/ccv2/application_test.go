@@ -34,6 +34,7 @@ var _ = Describe("Application", func() {
 							"disk_quota": 586,
 							"detected_buildpack": null,
 							"health_check_type": "port",
+							"health_check_http_endpoint": "/",
 							"instances": 13,
 							"memory": 1024,
 							"name": "app-name-1",
@@ -106,18 +107,19 @@ var _ = Describe("Application", func() {
 
 				Expect(apps).To(ConsistOf([]Application{
 					{
-						Buildpack:            "ruby 1.6.29",
-						DetectedBuildpack:    "",
-						DetectedStartCommand: "echo 'I am a banana'",
-						DiskQuota:            586,
-						GUID:                 "app-guid-1",
-						HealthCheckType:      "port",
-						Instances:            13,
-						Memory:               1024,
-						Name:                 "app-name-1",
-						PackageUpdatedAt:     updatedAt,
-						StackGUID:            "some-stack-guid",
-						State:                ApplicationStopped,
+						Buildpack:               "ruby 1.6.29",
+						DetectedBuildpack:       "",
+						DetectedStartCommand:    "echo 'I am a banana'",
+						DiskQuota:               586,
+						GUID:                    "app-guid-1",
+						HealthCheckType:         "port",
+						HealthCheckHTTPEndpoint: "/",
+						Instances:               13,
+						Memory:                  1024,
+						Name:                    "app-name-1",
+						PackageUpdatedAt:        updatedAt,
+						StackGUID:               "some-stack-guid",
+						State:                   ApplicationStopped,
 					},
 					{Name: "app-name-2", GUID: "app-guid-2", DetectedBuildpack: "ruby 1.6.29"},
 					{Name: "app-name-3", GUID: "app-guid-3"},
@@ -130,8 +132,9 @@ var _ = Describe("Application", func() {
 
 	Describe("UpdateApplication", func() {
 		Context("when the update is successful", func() {
-			BeforeEach(func() {
-				response1 := `{
+			Context("when updating all fields", func() { //are we encoding everything correctly?
+				BeforeEach(func() {
+					response1 := `{
 				"metadata": {
 					"guid": "some-app-guid",
 					"updated_at": null
@@ -142,6 +145,7 @@ var _ = Describe("Application", func() {
 					"disk_quota": 586,
 					"detected_buildpack": null,
 					"health_check_type": "some-health-check-type",
+					"health_check_http_endpoint": "/anything",
 					"instances": 13,
 					"memory": 1024,
 					"name": "app-name-1",
@@ -150,40 +154,108 @@ var _ = Describe("Application", func() {
 					"state": "STOPPED"
 				}
 			}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid"),
-						VerifyBody([]byte(`{"health_check_type":"some-health-check-type"}`)),
-						RespondWith(http.StatusCreated, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+					expectedBody := map[string]string{
+						"health_check_http_endpoint": "/anything",
+						"health_check_type":          "some-health-check-type",
+					}
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusCreated, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the updated object and warnings and sends all updated field", func() {
+					app, warnings, err := client.UpdateApplication(Application{
+						GUID:                    "some-app-guid",
+						HealthCheckType:         "some-health-check-type",
+						HealthCheckHTTPEndpoint: "/anything",
+					})
+					Expect(err).NotTo(HaveOccurred())
+
+					updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(app).To(Equal(Application{
+						Buildpack:               "ruby 1.6.29",
+						DetectedBuildpack:       "",
+						DetectedStartCommand:    "echo 'I am a banana'",
+						DiskQuota:               586,
+						GUID:                    "some-app-guid",
+						HealthCheckType:         "some-health-check-type",
+						HealthCheckHTTPEndpoint: "/anything",
+						Instances:               13,
+						Memory:                  1024,
+						Name:                    "app-name-1",
+						PackageUpdatedAt:        updatedAt,
+						StackGUID:               "some-stack-guid",
+						State:                   ApplicationStopped,
+					}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 
-			It("returns the updated object and warnings", func() {
-				app, warnings, err := client.UpdateApplication(Application{
-					GUID:            "some-app-guid",
-					HealthCheckType: "some-health-check-type",
+			Context("when only updating one field", func() { // are we **only** encoding the things we want
+				BeforeEach(func() {
+					response1 := `{
+				"metadata": {
+					"guid": "some-app-guid",
+					"updated_at": null
+				},
+				"entity": {
+					"buildpack": "ruby 1.6.29",
+					"detected_start_command": "echo 'I am a banana'",
+					"disk_quota": 586,
+					"detected_buildpack": null,
+					"health_check_type": "some-health-check-type",
+					"health_check_http_endpoint": "/",
+					"instances": 13,
+					"memory": 1024,
+					"name": "app-name-1",
+					"package_updated_at": "2015-03-10T23:11:54Z",
+					"stack_guid": "some-stack-guid",
+					"state": "STOPPED"
+				}
+			}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid"),
+							VerifyBody([]byte(`{"health_check_type":"some-health-check-type"}`)),
+							RespondWith(http.StatusCreated, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
 				})
-				Expect(err).NotTo(HaveOccurred())
 
-				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
-				Expect(err).NotTo(HaveOccurred())
+				It("returns the updated object and warnings and sends only updated field", func() {
+					app, warnings, err := client.UpdateApplication(Application{
+						GUID:            "some-app-guid",
+						HealthCheckType: "some-health-check-type",
+					})
+					Expect(err).NotTo(HaveOccurred())
 
-				Expect(app).To(Equal(Application{
-					Buildpack:            "ruby 1.6.29",
-					DetectedBuildpack:    "",
-					DetectedStartCommand: "echo 'I am a banana'",
-					DiskQuota:            586,
-					GUID:                 "some-app-guid",
-					HealthCheckType:      "some-health-check-type",
-					Instances:            13,
-					Memory:               1024,
-					Name:                 "app-name-1",
-					PackageUpdatedAt:     updatedAt,
-					StackGUID:            "some-stack-guid",
-					State:                ApplicationStopped,
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+					updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(app).To(Equal(Application{
+						Buildpack:               "ruby 1.6.29",
+						DetectedBuildpack:       "",
+						DetectedStartCommand:    "echo 'I am a banana'",
+						DiskQuota:               586,
+						GUID:                    "some-app-guid",
+						HealthCheckType:         "some-health-check-type",
+						HealthCheckHTTPEndpoint: "/",
+						Instances:               13,
+						Memory:                  1024,
+						Name:                    "app-name-1",
+						PackageUpdatedAt:        updatedAt,
+						StackGUID:               "some-stack-guid",
+						State:                   ApplicationStopped,
+					}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 		})
 

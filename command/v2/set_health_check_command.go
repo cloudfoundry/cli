@@ -11,12 +11,13 @@ import (
 
 //go:generate counterfeiter . SetHealthCheckActor
 type SetHealthCheckActor interface {
-	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string) (v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
 }
 
 type SetHealthCheckCommand struct {
 	RequiredArgs flag.SetHealthCheckArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME ('port' | 'none')"`
+	HTTPEndpoint string                  `long:"endpoint" description:"Path on the app" hidden:"true" default:"/"`
+	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME (process | port | http)\n\nTIP: 'none' has been deprecated but is accepted for 'process'."`
 
 	UI          command.UI
 	Config      command.Config
@@ -58,10 +59,11 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 			"Username":        user.Name,
 		})
 
-	warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(
+	app, warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.RequiredArgs.HealthCheck.Type,
+		cmd.HTTPEndpoint,
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -69,5 +71,11 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+
+	if app.Started() {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("TIP: An app restart is required for the change to take affect.")
+	}
+
 	return nil
 }

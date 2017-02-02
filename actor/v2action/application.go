@@ -10,12 +10,17 @@ import (
 type Application ccv2.Application
 
 // CalculatedBuildpack returns the buildpack that will be used.
-func (application *Application) CalculatedBuildpack() string {
+func (application Application) CalculatedBuildpack() string {
 	if application.Buildpack != "" {
 		return application.Buildpack
 	}
 
 	return application.DetectedBuildpack
+}
+
+// Started returns true when the application is started.
+func (application Application) Started() bool {
+	return application.State == ccv2.ApplicationStarted
 }
 
 // ApplicationNotFoundError is returned when a requested application is not
@@ -73,26 +78,32 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 
 // SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
 // check type if it is not already the desired type.
-func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string) (Warnings, error) {
+func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
 	var allWarnings Warnings
 
 	app, warnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
-		return allWarnings, err
+		return Application{}, allWarnings, err
 	}
 
-	if app.HealthCheckType != healthCheckType {
-		var apiWarnings ccv2.Warnings
+	if app.HealthCheckType != healthCheckType ||
+		healthCheckType == "http" && app.HealthCheckHTTPEndpoint != httpEndpoint {
+		var healthCheckHttpEndpoint string
+		if healthCheckType == "http" {
+			healthCheckHttpEndpoint = httpEndpoint
+		}
 
-		_, apiWarnings, err = actor.CloudControllerClient.UpdateApplication(ccv2.Application{
-			GUID:            app.GUID,
-			HealthCheckType: healthCheckType,
+		app, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			GUID:                    app.GUID,
+			HealthCheckType:         healthCheckType,
+			HealthCheckHTTPEndpoint: healthCheckHttpEndpoint,
 		})
 
 		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
+		return Application(app), allWarnings, err
 	}
 
-	return allWarnings, err
+	return app, allWarnings, nil
 }

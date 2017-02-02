@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v2"
@@ -84,7 +85,7 @@ var _ = Describe("set-health-check Command", func() {
 
 			expectedErr = errors.New("set health check error")
 			fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceReturns(
-				v2action.Warnings{"warning-1"}, expectedErr)
+				v2action.Application{}, v2action.Warnings{"warning-1"}, expectedErr)
 		})
 
 		It("displays warnings and returns the error", func() {
@@ -97,9 +98,10 @@ var _ = Describe("set-health-check Command", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.AppName = "some-app"
 			cmd.RequiredArgs.HealthCheck.Type = "some-health-check-type"
+			cmd.HTTPEndpoint = "/"
 
 			fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceReturns(
-				v2action.Warnings{"warning-1"}, nil)
+				v2action.Application{}, v2action.Warnings{"warning-1"}, nil)
 		})
 
 		It("informs the user and displays warnings", func() {
@@ -109,10 +111,26 @@ var _ = Describe("set-health-check Command", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
 			Expect(fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceCallCount()).To(Equal(1))
-			name, spaceGUID, healthCheckType := fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(0)
+			name, spaceGUID, healthCheckType, healthCheckHTTPEndpoint := fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(0)
 			Expect(name).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 			Expect(healthCheckType).To(Equal("some-health-check-type"))
+			Expect(healthCheckHTTPEndpoint).To(Equal("/"))
 		})
 	})
+
+	Context("when the app is started", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs.AppName = "some-app"
+			cmd.RequiredArgs.HealthCheck.Type = "some-health-check-type"
+
+			fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceReturns(
+				v2action.Application{State: ccv2.ApplicationStarted}, v2action.Warnings{"warning-1"}, nil)
+		})
+
+		It("displays a tip to restart the app", func() {
+			Expect(testUI.Out).To(Say("TIP: An app restart is required for the change to take affect."))
+		})
+	})
+
 })
