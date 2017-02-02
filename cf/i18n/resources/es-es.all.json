@@ -1276,7 +1276,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME ('port' | 'none')",
+    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
     "translation": ""
   },
   {
@@ -1672,6 +1672,10 @@
     "translation": "Cambiar el plan de servicio para una instancia de servicio"
   },
   {
+    "id": "Change type of health check performed on an app",
+    "translation": "Change type of health check performed on an app"
+  },
+  {
     "id": "Change user password",
     "translation": "Cambiar contraseña de usuario"
   },
@@ -1698,10 +1702,6 @@
   {
     "id": "Comma delimited list of ports the application may listen on",
     "translation": "Lista de puertos delimitados por coma en los que la aplicación puede escuchar"
-  },
-  {
-    "id": "Comma delimited list of ports the application may listen on\" hidden:\"true",
-    "translation": ""
   },
   {
     "id": "Command Help",
@@ -3064,7 +3064,7 @@
     "translation": ""
   },
   {
-    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": ""
   },
   {
@@ -4116,6 +4116,10 @@
     "translation": "Vía de acceso no permitida en la ruta TCP {{.RouteName}}"
   },
   {
+    "id": "Path on the app",
+    "translation": "Path on the app"
+  },
+  {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
     "translation": "Vía de acceso a un directorio de app o a un archivo zip del contenido del directorio de la app"
   },
@@ -5082,6 +5086,10 @@
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
     "translation": "CONSEJO:\n   Utilice 'CF_NAME create-user-provided-service' para que los servicios proporcionados por el usuario estén disponibles para las app de CF"
+  },
+  {
+    "id": "TIP: An app restart is required for the change to take affect.",
+    "translation": "TIP: An app restart is required for the change to take affect."
   },
   {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",

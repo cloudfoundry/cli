@@ -1276,7 +1276,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME ('port' | 'none')",
+    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
     "translation": ""
   },
   {
@@ -1672,6 +1672,10 @@
     "translation": "サービス・インスタンスのサービス・プランを変更します"
   },
   {
+    "id": "Change type of health check performed on an app",
+    "translation": "Change type of health check performed on an app"
+  },
+  {
     "id": "Change user password",
     "translation": "ユーザー・パスワードを変更します"
   },
@@ -1698,10 +1702,6 @@
   {
     "id": "Comma delimited list of ports the application may listen on",
     "translation": "アプリケーションが listen することができるポートのコンマ区切りリスト"
-  },
-  {
-    "id": "Comma delimited list of ports the application may listen on\" hidden:\"true",
-    "translation": ""
   },
   {
     "id": "Command Help",
@@ -3064,7 +3064,7 @@
     "translation": ""
   },
   {
-    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": ""
   },
   {
@@ -4116,6 +4116,10 @@
     "translation": "パスは TCP 経路 {{.RouteName}} で許可されません"
   },
   {
+    "id": "Path on the app",
+    "translation": "Path on the app"
+  },
+  {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
     "translation": "アプリ・ディレクトリーまたはアプリ・ディレクトリーの内容の zip ファイルへのパス"
   },
@@ -5082,6 +5086,10 @@
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
     "translation": "ヒント:\n   ユーザー提供のサービスを CF アプリが使用できるようにするには、'CF_NAME create-user-provided-service' を使用します"
+  },
+  {
+    "id": "TIP: An app restart is required for the change to take affect.",
+    "translation": "TIP: An app restart is required for the change to take affect."
   },
   {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",

@@ -1276,7 +1276,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME ('port' | 'none')",
+    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
     "translation": ""
   },
   {
@@ -1672,6 +1672,10 @@
     "translation": "서비스 인스턴스의 서비스 플랜 변경"
   },
   {
+    "id": "Change type of health check performed on an app",
+    "translation": "Change type of health check performed on an app"
+  },
+  {
     "id": "Change user password",
     "translation": "사용자 비밀번호 변경"
   },
@@ -1698,10 +1702,6 @@
   {
     "id": "Comma delimited list of ports the application may listen on",
     "translation": "애플리케이션이 청취할 수 있는 포트를 쉼표로 구분한 목록"
-  },
-  {
-    "id": "Comma delimited list of ports the application may listen on\" hidden:\"true",
-    "translation": ""
   },
   {
     "id": "Command Help",
@@ -3064,7 +3064,7 @@
     "translation": ""
   },
   {
-    "id": "HEALTH_CHECK_TYPE must be \"port\" or \"none\"",
+    "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": ""
   },
   {
@@ -4116,6 +4116,10 @@
     "translation": "TCP 라우트 {{.RouteName}}에서 경로가 허용되지 않음"
   },
   {
+    "id": "Path on the app",
+    "translation": "Path on the app"
+  },
+  {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
     "translation": "앱 디렉토리 또는 앱 디렉토리 컨텐츠의 zip 파일에 대한 경로"
   },
@@ -5082,6 +5086,10 @@
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
     "translation": "팁:\n  'CF_NAME create-user-provided-service'를 사용하여 CF 앱에서 사용자 제공 서비스를 사용할 수 있도록 설정하십시오."
+  },
+  {
+    "id": "TIP: An app restart is required for the change to take affect.",
+    "translation": "TIP: An app restart is required for the change to take affect."
   },
   {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",

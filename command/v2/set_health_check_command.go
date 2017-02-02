@@ -16,7 +16,7 @@ type SetHealthCheckActor interface {
 
 type SetHealthCheckCommand struct {
 	RequiredArgs flag.SetHealthCheckArgs `positional-args:"yes"`
-	HTTPEndpoint string                  `long:"endpoint" description:"Path on the app" hidden:"true" default:"/"`
+	HTTPEndpoint string                  `long:"endpoint" hidden:"true" default:"/" description:"Path on the app"`
 	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME (process | port | http)\n\nTIP: 'none' has been deprecated but is accepted for 'process'."`
 
 	UI          command.UI
