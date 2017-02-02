@@ -47,16 +47,6 @@ type FakeUserRepository struct {
 		result1 []models.UserFields
 		result2 error
 	}
-	ListUsersInSpaceForRoleStub        func(spaceGUID string, role models.Role) ([]models.UserFields, error)
-	listUsersInSpaceForRoleMutex       sync.RWMutex
-	listUsersInSpaceForRoleArgsForCall []struct {
-		spaceGUID string
-		role      models.Role
-	}
-	listUsersInSpaceForRoleReturns struct {
-		result1 []models.UserFields
-		result2 error
-	}
 	ListUsersInSpaceForRoleWithNoUAAStub        func(spaceGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInSpaceForRoleWithNoUAAMutex       sync.RWMutex
 	listUsersInSpaceForRoleWithNoUAAArgsForCall []struct {
@@ -303,41 +293,6 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAAArgsForCall(i int)
 func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAAReturns(result1 []models.UserFields, result2 error) {
 	fake.ListUsersInOrgForRoleWithNoUAAStub = nil
 	fake.listUsersInOrgForRoleWithNoUAAReturns = struct {
-		result1 []models.UserFields
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeUserRepository) ListUsersInSpaceForRole(spaceGUID string, role models.Role) ([]models.UserFields, error) {
-	fake.listUsersInSpaceForRoleMutex.Lock()
-	fake.listUsersInSpaceForRoleArgsForCall = append(fake.listUsersInSpaceForRoleArgsForCall, struct {
-		spaceGUID string
-		role      models.Role
-	}{spaceGUID, role})
-	fake.recordInvocation("ListUsersInSpaceForRole", []interface{}{spaceGUID, role})
-	fake.listUsersInSpaceForRoleMutex.Unlock()
-	if fake.ListUsersInSpaceForRoleStub != nil {
-		return fake.ListUsersInSpaceForRoleStub(spaceGUID, role)
-	} else {
-		return fake.listUsersInSpaceForRoleReturns.result1, fake.listUsersInSpaceForRoleReturns.result2
-	}
-}
-
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleCallCount() int {
-	fake.listUsersInSpaceForRoleMutex.RLock()
-	defer fake.listUsersInSpaceForRoleMutex.RUnlock()
-	return len(fake.listUsersInSpaceForRoleArgsForCall)
-}
-
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleArgsForCall(i int) (string, models.Role) {
-	fake.listUsersInSpaceForRoleMutex.RLock()
-	defer fake.listUsersInSpaceForRoleMutex.RUnlock()
-	return fake.listUsersInSpaceForRoleArgsForCall[i].spaceGUID, fake.listUsersInSpaceForRoleArgsForCall[i].role
-}
-
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleReturns(result1 []models.UserFields, result2 error) {
-	fake.ListUsersInSpaceForRoleStub = nil
-	fake.listUsersInSpaceForRoleReturns = struct {
 		result1 []models.UserFields
 		result2 error
 	}{result1, result2}
@@ -738,8 +693,6 @@ func (fake *FakeUserRepository) Invocations() map[string][][]interface{} {
 	defer fake.listUsersInOrgForRoleMutex.RUnlock()
 	fake.listUsersInOrgForRoleWithNoUAAMutex.RLock()
 	defer fake.listUsersInOrgForRoleWithNoUAAMutex.RUnlock()
-	fake.listUsersInSpaceForRoleMutex.RLock()
-	defer fake.listUsersInSpaceForRoleMutex.RUnlock()
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.RLock()
 	defer fake.listUsersInSpaceForRoleWithNoUAAMutex.RUnlock()
 	fake.createMutex.RLock()

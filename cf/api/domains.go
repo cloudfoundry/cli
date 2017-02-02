@@ -3,11 +3,12 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"net/url"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 
 	"code.cloudfoundry.org/cli/cf/api/resources"
-	"code.cloudfoundry.org/cli/cf/api/strategy"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
@@ -29,25 +30,24 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config   coreconfig.Reader
-	gateway  net.Gateway
-	strategy strategy.EndpointStrategy
+	config  coreconfig.Reader
+	gateway net.Gateway
 }
 
-func NewCloudControllerDomainRepository(config coreconfig.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerDomainRepository {
+func NewCloudControllerDomainRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerDomainRepository {
 	return CloudControllerDomainRepository{
-		config:   config,
-		gateway:  gateway,
-		strategy: strategy,
+		config:  config,
+		gateway: gateway,
 	}
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGUID string, cb func(models.DomainFields) bool) error {
-	err := repo.listDomains(repo.strategy.PrivateDomainsByOrgURL(orgGUID), cb)
+	path := fmt.Sprintf("/v2/organizations/%s/private_domains", orgGUID)
+	err := repo.listDomains(path, cb)
 	if err != nil {
 		return err
 	}
-	err = repo.listDomains(repo.strategy.SharedDomainsURL(), cb)
+	err = repo.listDomains("/v2/shared_domains?inline-relations-depth=1", cb)
 	return err
 }
 
@@ -66,15 +66,18 @@ func (repo CloudControllerDomainRepository) isOrgDomain(orgGUID string, domain m
 }
 
 func (repo CloudControllerDomainRepository) FindSharedByName(name string) (domain models.DomainFields, apiErr error) {
-	return repo.findOneWithPath(repo.strategy.SharedDomainURL(name), name)
+	path := fmt.Sprintf("/v2/shared_domains?inline-relations-depth=1&q=name:%s", url.QueryEscape(name))
+	return repo.findOneWithPath(path, name)
 }
 
 func (repo CloudControllerDomainRepository) FindPrivateByName(name string) (domain models.DomainFields, apiErr error) {
-	return repo.findOneWithPath(repo.strategy.PrivateDomainURL(name), name)
+	path := fmt.Sprintf("/v2/private_domains?inline-relations-depth=1&q=name:%s", url.QueryEscape(name))
+	return repo.findOneWithPath(path, name)
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGUID string) (models.DomainFields, error) {
-	domain, err := repo.findOneWithPath(repo.strategy.OrgDomainURL(orgGUID, name), name)
+	path := fmt.Sprintf("/v2/organizations/%s/private_domains?inline-relations-depth=1&q=name:%s", orgGUID, url.QueryEscape(name))
+	domain, err := repo.findOneWithPath(path, name)
 
 	switch err.(type) {
 	case *errors.ModelNotFoundError:
@@ -121,7 +124,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	resource := new(resources.DomainResource)
 	err = repo.gateway.CreateResource(
 		repo.config.APIEndpoint(),
-		repo.strategy.PrivateDomainsURL(),
+		"/v2/private_domains",
 		bytes.NewReader(data),
 		resource)
 
@@ -145,21 +148,23 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 	return repo.gateway.CreateResource(
 		repo.config.APIEndpoint(),
-		repo.strategy.SharedDomainsURL(),
+		"/v2/shared_domains",
 		bytes.NewReader(data),
 	)
 }
 
 func (repo CloudControllerDomainRepository) Delete(domainGUID string) error {
+	path := fmt.Sprintf("/v2/private_domains/%s?recursive=true", domainGUID)
 	return repo.gateway.DeleteResource(
 		repo.config.APIEndpoint(),
-		repo.strategy.DeleteDomainURL(domainGUID))
+		path)
 }
 
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGUID string) error {
+	path := fmt.Sprintf("/v2/shared_domains/%s?recursive=true", domainGUID)
 	return repo.gateway.DeleteResource(
 		repo.config.APIEndpoint(),
-		repo.strategy.DeleteSharedDomainURL(domainGUID))
+		path)
 }
 
 func (repo CloudControllerDomainRepository) FirstOrDefault(orgGUID string, name *string) (domain models.DomainFields, error error) {

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	. "code.cloudfoundry.org/cli/cf/api/appevents"
-	"code.cloudfoundry.org/cli/cf/api/strategy"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
@@ -34,9 +33,8 @@ var _ = Describe("App Events Repo", func() {
 	})
 
 	JustBeforeEach(func() {
-		strategy := strategy.NewEndpointStrategy(config.APIVersion())
 		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
-		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
+		repo = NewCloudControllerAppEventsRepository(config, gateway)
 	})
 
 	AfterEach(func() {

@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/actors/userprint"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/api/spaces"
@@ -88,7 +87,7 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 	if cmd.pluginCall {
 		return userprint.NewSpaceUsersPluginPrinter(
 			cmd.pluginModel,
-			cmd.userLister(),
+			cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA,
 			roles,
 		)
 	}
@@ -102,7 +101,7 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 
 	return &userprint.SpaceUsersUIPrinter{
 		UI:         cmd.ui,
-		UserLister: cmd.userLister(),
+		UserLister: cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA,
 		Roles:      roles,
 		RoleDisplayNames: map[models.Role]string{
 			models.RoleSpaceManager:   T("SPACE MANAGER"),
@@ -110,11 +109,4 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 			models.RoleSpaceAuditor:   T("SPACE AUDITOR"),
 		},
 	}
-}
-
-func (cmd *SpaceUsers) userLister() func(spaceGUID string, role models.Role) ([]models.UserFields, error) {
-	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
-		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
-	}
-	return cmd.userRepo.ListUsersInSpaceForRole
 }
