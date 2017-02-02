@@ -101,7 +101,7 @@ $ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=githu
 $ mv cf /usr/local/bin
 # ...and to confirm your cf CLI version
 $ cf --version
-cf version x.y.z-...
+cf version x.y.z+...
 ```
 
 #### Edge binaries
