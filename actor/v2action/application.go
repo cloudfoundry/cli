@@ -95,14 +95,14 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 			healthCheckHttpEndpoint = httpEndpoint
 		}
 
-		app, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:                    app.GUID,
 			HealthCheckType:         healthCheckType,
 			HealthCheckHTTPEndpoint: healthCheckHttpEndpoint,
 		})
 
 		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
-		return Application(app), allWarnings, err
+		return Application(updatedApp), allWarnings, err
 	}
 
 	return app, allWarnings, nil
