@@ -2388,6 +2388,10 @@
     "translation": "Aktivieren von SSH-Unterstützung für Bereich '{{.SpaceName}}'..."
   },
   {
+    "id": "Endpoint (for http type):",
+    "translation": "Endpoint (for http type):"
+  },
+  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -2900,12 +2904,12 @@
     "translation": "Abrufen von Dateien für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
   {
-    "id": "Getting health_check_type value for ",
-    "translation": "Abrufen des Werts für health_check_type für "
+    "id": "Getting health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Getting health_check_type value for {{.AppName}}"
   },
   {
-    "id": "Getting health_check_type value for {{.AppName}}",
-    "translation": "Getting health_check_type value for {{.AppName}}"
+    "id": "Getting health_check_type value for ",
+    "translation": "Abrufen des Werts für health_check_type für "
   },
   {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
@@ -3090,6 +3094,10 @@
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
     "translation": "HTTP-Methode (GET, POST, PUT, DELETE etc.)"
+  },
+  {
+    "id": "Health check type:",
+    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "Hostname (e.g. my-subdomain)",
@@ -4964,6 +4972,10 @@
     "translation": "Bereichsbenutzer nach Rolle anzeigen"
   },
   {
+    "id": "Show the type of health check performed on an app",
+    "translation": "Show the type of health check performed on an app"
+  },
+  {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Anzeigen der aktuellen Skalierung von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
@@ -6170,10 +6182,6 @@
   {
     "id": "health_check_type is not set to ",
     "translation": "Für health_check_type ist folgender Wert nicht festgelegt: "
-  },
-  {
-    "id": "health_check_type is {{.HealthCheckType}}",
-    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "host",

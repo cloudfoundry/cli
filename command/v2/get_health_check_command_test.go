@@ -49,6 +49,7 @@ var _ = Describe("get-health-check Command", func() {
 			GUID: "some-space-guid",
 			Name: "some-space",
 		})
+		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -64,6 +65,19 @@ var _ = Describe("get-health-check Command", func() {
 		It("returns a wrapped error", func() {
 			Expect(executeErr).To(MatchError(
 				command.NotLoggedInError{BinaryName: binaryName}))
+		})
+	})
+
+	Context("when getting the user returns an error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = errors.New("current user error")
+			fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
+		})
+
+		It("returns a wrapped error", func() {
+			Expect(executeErr).To(MatchError(expectedErr))
 		})
 	})
 
@@ -85,34 +99,61 @@ var _ = Describe("get-health-check Command", func() {
 	})
 
 	Context("when getting the application is successful", func() {
-		BeforeEach(func() {
-			cmd.RequiredArgs.AppName = "some-app"
+		Context("when the health check type is not http", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.AppName = "some-app"
 
-			fakeActor.GetApplicationByNameAndSpaceReturns(
-				v2action.Application{
-					HealthCheckType: "some-health-check-type",
-				}, v2action.Warnings{"warning-1"}, nil)
+				fakeActor.GetApplicationByNameAndSpaceReturns(
+					v2action.Application{
+						HealthCheckType:         "some-health-check-type",
+						HealthCheckHTTPEndpoint: "/some-endpoint",
+					}, v2action.Warnings{"warning-1"}, nil)
+			})
+
+			It("show a blank endpoint and displays warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("Getting health check type for app some-app in org some-org / space some-space as some-user..."))
+				Expect(testUI.Out).To(Say("\n\n"))
+				Expect(testUI.Out).To(Say("Health check type:          some-health-check-type"))
+				Expect(testUI.Out).To(Say("Endpoint \\(for http type\\):   \n"))
+
+				Expect(testUI.Err).To(Say("warning-1"))
+
+				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+				config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
+				Expect(config).To(Equal(fakeConfig))
+				Expect(targetedOrganizationRequired).To(Equal(true))
+				Expect(targetedSpaceRequired).To(Equal(true))
+
+				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+
+				Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+				name, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+				Expect(name).To(Equal("some-app"))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+			})
 		})
 
-		It("informs the user and displays warnings", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
+		Context("when the health check type is http", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.AppName = "some-app"
 
-			Expect(testUI.Out).To(Say("Getting health_check_type value for some-app"))
-			Expect(testUI.Out).To(Say("\n\n"))
-			Expect(testUI.Out).To(Say("health_check_type is some-health-check-type"))
+				fakeActor.GetApplicationByNameAndSpaceReturns(
+					v2action.Application{
+						HealthCheckType:         "http",
+						HealthCheckHTTPEndpoint: "/some-endpoint",
+					}, v2action.Warnings{"warning-1"}, nil)
+			})
 
-			Expect(testUI.Err).To(Say("warning-1"))
+			It("shows the endpoint", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(config).To(Equal(fakeConfig))
-			Expect(targetedOrganizationRequired).To(Equal(true))
-			Expect(targetedSpaceRequired).To(Equal(true))
-
-			Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-			name, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-			Expect(name).To(Equal("some-app"))
-			Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(testUI.Out).To(Say("Getting health check type for app some-app in org some-org / space some-space as some-user..."))
+				Expect(testUI.Out).To(Say("\n\n"))
+				Expect(testUI.Out).To(Say("Health check type:          http"))
+				Expect(testUI.Out).To(Say("Endpoint \\(for http type\\):   /some-endpoint"))
+			})
 		})
 	})
 })

@@ -57,6 +57,37 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
+		Describe("CalculatedHealthCheckEndpoint", func() {
+			var application Application
+
+			Context("when the health check type is http", func() {
+				BeforeEach(func() {
+					application = Application{
+						HealthCheckType:         "http",
+						HealthCheckHTTPEndpoint: "/some-endpoint",
+					}
+				})
+
+				It("returns the endpoint field", func() {
+					Expect(application.CalculatedHealthCheckEndpoint()).To(Equal(
+						"/some-endpoint"))
+				})
+			})
+
+			Context("when the health check type is not http", func() {
+				BeforeEach(func() {
+					application = Application{
+						HealthCheckType:         "process",
+						HealthCheckHTTPEndpoint: "/some-endpoint",
+					}
+				})
+
+				It("returns the empty string", func() {
+					Expect(application.CalculatedHealthCheckEndpoint()).To(Equal(""))
+				})
+			})
+		})
+
 		Describe("Started", func() {
 			Context("when app is started", func() {
 				It("returns true", func() {

@@ -2388,6 +2388,10 @@
     "translation": "'{{.SpaceName}}' 영역에 대한 SSH 지원 사용 설정 중..."
   },
   {
+    "id": "Endpoint (for http type):",
+    "translation": "Endpoint (for http type):"
+  },
+  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -2900,12 +2904,12 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에 사용할 파일을 가져오는 중..."
   },
   {
-    "id": "Getting health_check_type value for ",
-    "translation": "health_check_type 값을 가져올 대상 "
+    "id": "Getting health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Getting health_check_type value for {{.AppName}}"
   },
   {
-    "id": "Getting health_check_type value for {{.AppName}}",
-    "translation": "Getting health_check_type value for {{.AppName}}"
+    "id": "Getting health_check_type value for ",
+    "translation": "health_check_type 값을 가져올 대상 "
   },
   {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
@@ -3090,6 +3094,10 @@
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
     "translation": "HTTP 메소드(GET, POST, PUT, DELETE 등)"
+  },
+  {
+    "id": "Health check type:",
+    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "Hostname (e.g. my-subdomain)",
@@ -4964,6 +4972,10 @@
     "translation": "역할순으로 영역 사용자 표시"
   },
   {
+    "id": "Show the type of health check performed on an app",
+    "translation": "Show the type of health check performed on an app"
+  },
+  {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 현재 스케일 표시 중..."
   },
@@ -6170,10 +6182,6 @@
   {
     "id": "health_check_type is not set to ",
     "translation": "health_check_type이 설정되지 않음 "
-  },
-  {
-    "id": "health_check_type is {{.HealthCheckType}}",
-    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "host",

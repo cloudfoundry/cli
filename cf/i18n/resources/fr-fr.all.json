@@ -2388,6 +2388,10 @@
     "translation": "Activation du support ssh pour l'espace '{{.SpaceName}}'..."
   },
   {
+    "id": "Endpoint (for http type):",
+    "translation": "Endpoint (for http type):"
+  },
+  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -2900,12 +2904,12 @@
     "translation": "Obtention des fichiers pour l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.Username}}..."
   },
   {
-    "id": "Getting health_check_type value for ",
-    "translation": "Obtention de la valeur du type de diagnostic d'intégrité pour "
+    "id": "Getting health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Getting health_check_type value for {{.AppName}}"
   },
   {
-    "id": "Getting health_check_type value for {{.AppName}}",
-    "translation": "Getting health_check_type value for {{.AppName}}"
+    "id": "Getting health_check_type value for ",
+    "translation": "Obtention de la valeur du type de diagnostic d'intégrité pour "
   },
   {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
@@ -3090,6 +3094,10 @@
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
     "translation": "Méthode HTTP (GET,POST,PUT,DELETE,etc)"
+  },
+  {
+    "id": "Health check type:",
+    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "Hostname (e.g. my-subdomain)",
@@ -4964,6 +4972,10 @@
     "translation": "Afficher les utilisateurs de l'espace par rôle"
   },
   {
+    "id": "Show the type of health check performed on an app",
+    "translation": "Show the type of health check performed on an app"
+  },
+  {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Affichage de l'échelle en cours de l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.CurrentUser}}..."
   },
@@ -6170,10 +6182,6 @@
   {
     "id": "health_check_type is not set to ",
     "translation": "Le type de diagnostic d'intégrité n'est pas associé à "
-  },
-  {
-    "id": "health_check_type is {{.HealthCheckType}}",
-    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "host",
