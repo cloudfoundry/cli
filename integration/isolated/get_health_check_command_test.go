@@ -34,7 +34,7 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", "some-app")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -48,7 +48,7 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", "some-app")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -63,7 +63,7 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", "some-app")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -79,7 +79,7 @@ var _ = Describe("get-health-check command", func() {
 				session := helpers.CF("get-health-check", "some-app")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No space targeted, use 'cf target -s' to target a space\\."))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -110,11 +110,13 @@ var _ = Describe("get-health-check command", func() {
 			})
 
 			Context("when there too many arguments", func() {
-				It("outputs the usage and exits 1", func() {
-					session := helpers.CF("get-health-check", "some-app", "extra")
+				It("ignores the extra arguments", func() {
+					appName := helpers.PrefixedRandomName("app")
+					session := helpers.CF("get-health-check", appName, "extra")
 
-					Eventually(session.Out).Should(Say("Incorrect Usage"))
-					Eventually(session.Out).Should(Say("NAME:"))
+					Eventually(session.Out).Should(Say("Getting health_check_type value for %s", appName))
+					Eventually(session.Err).Should(Say("App %s not found", appName))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -125,8 +127,9 @@ var _ = Describe("get-health-check command", func() {
 				appName := helpers.PrefixedRandomName("app")
 				session := helpers.CF("get-health-check", appName)
 
+				Eventually(session.Out).Should(Say("Getting health_check_type value for %s", appName))
+				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Exit(1))
 			})
 		})
