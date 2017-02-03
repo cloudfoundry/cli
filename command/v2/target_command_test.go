@@ -49,18 +49,10 @@ var _ = Describe("target Command", func() {
 		fakeConfig.APIVersionReturns(apiVersion)
 		minCLIVersion = "1.0.0"
 		fakeConfig.MinCLIVersionReturns(minCLIVersion)
-
-		// TODO: remove when experimental flag is removed
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	// TODO: remove when experimental flag is removed
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when a cloud controller API endpoint is set", func() {
