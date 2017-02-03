@@ -255,11 +255,19 @@ func (cmd HelpCommand) displayCommand() error {
 				name = "--" + flag.Long
 			}
 
-			cmd.UI.DisplayText(commandIndent+"{{.Flags}}{{.Spaces}}{{.Description}}",
+			defaultText := ""
+			if flag.Default != "" {
+				defaultText = cmd.UI.TranslateText(" (Default: {{.DefaultValue}})", map[string]interface{}{
+					"DefaultValue": flag.Default,
+				})
+			}
+
+			cmd.UI.DisplayText(commandIndent+"{{.Flags}}{{.Spaces}}{{.Description}}{{.Default}}",
 				map[string]interface{}{
 					"Flags":       name,
 					"Spaces":      strings.Repeat(" ", nameWidth-len(name)),
 					"Description": cmd.UI.TranslateText(flag.Description),
+					"Default":     defaultText,
 				})
 		}
 	}

@@ -96,6 +96,10 @@
     "translation": "   'CF_NAME 할당량'에서 허용 가능한 할당량 보기"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " 다른 이름으로 추가됨 '"
   },

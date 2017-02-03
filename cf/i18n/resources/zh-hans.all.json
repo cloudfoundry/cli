@@ -96,6 +96,10 @@
     "translation": "   通过 'CF_NAME quotas' 查看允许的配额"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " 已添加为"
   },
