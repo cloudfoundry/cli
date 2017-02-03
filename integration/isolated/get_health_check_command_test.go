@@ -113,8 +113,9 @@ var _ = Describe("get-health-check command", func() {
 				It("ignores the extra arguments", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("get-health-check", appName, "extra")
+					username, _ := helpers.GetCredentials()
 
-					Eventually(session.Out).Should(Say("Getting health_check_type value for %s", appName))
+					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
 					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
