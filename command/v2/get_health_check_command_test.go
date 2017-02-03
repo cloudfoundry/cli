@@ -1,0 +1,118 @@
+package v2_test
+
+import (
+	"errors"
+
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v2/v2fakes"
+	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/ui"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+)
+
+var _ = Describe("get-health-check Command", func() {
+	var (
+		cmd             v2.GetHealthCheckCommand
+		testUI          *ui.UI
+		fakeConfig      *commandfakes.FakeConfig
+		fakeSharedActor *commandfakes.FakeSharedActor
+		fakeActor       *v2fakes.FakeGetHealthCheckActor
+		binaryName      string
+		executeErr      error
+	)
+
+	BeforeEach(func() {
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		fakeConfig = new(commandfakes.FakeConfig)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
+		fakeActor = new(v2fakes.FakeGetHealthCheckActor)
+
+		cmd = v2.GetHealthCheckCommand{
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
+		}
+
+		binaryName = "faceman"
+		fakeConfig.BinaryNameReturns(binaryName)
+		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+			Name: "some-org",
+		})
+		fakeConfig.TargetedSpaceReturns(configv3.Space{
+			GUID: "some-space-guid",
+			Name: "some-space",
+		})
+	})
+
+	JustBeforeEach(func() {
+		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when checking the target fails", func() {
+		BeforeEach(func() {
+			fakeSharedActor.CheckTargetReturns(
+				sharedaction.NotLoggedInError{BinaryName: binaryName})
+		})
+
+		It("returns a wrapped error", func() {
+			Expect(executeErr).To(MatchError(
+				command.NotLoggedInError{BinaryName: binaryName}))
+		})
+	})
+
+	Context("when getting the application returns an error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			cmd.RequiredArgs.AppName = "some-app"
+
+			expectedErr = errors.New("get health check error")
+			fakeActor.GetApplicationByNameAndSpaceReturns(
+				v2action.Application{}, v2action.Warnings{"warning-1"}, expectedErr)
+		})
+
+		It("displays warnings and returns the error", func() {
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(executeErr).To(MatchError(expectedErr))
+		})
+	})
+
+	Context("when getting the application is successful", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs.AppName = "some-app"
+
+			fakeActor.GetApplicationByNameAndSpaceReturns(
+				v2action.Application{
+					HealthCheckType: "some-health-check-type",
+				}, v2action.Warnings{"warning-1"}, nil)
+		})
+
+		It("informs the user and displays warnings", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(testUI.Out).To(Say("Getting health_check_type value for some-app"))
+			Expect(testUI.Out).To(Say("\n\n"))
+			Expect(testUI.Out).To(Say("health_check_type is some-health-check-type"))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(config).To(Equal(fakeConfig))
+			Expect(targetedOrganizationRequired).To(Equal(true))
+			Expect(targetedSpaceRequired).To(Equal(true))
+
+			Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+			name, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(name).To(Equal("some-app"))
+			Expect(spaceGUID).To(Equal("some-space-guid"))
+		})
+	})
+})

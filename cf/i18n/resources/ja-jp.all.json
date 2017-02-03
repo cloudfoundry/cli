@@ -2904,6 +2904,10 @@
     "translation": "次のものの health_check_type 値を取得しています: "
   },
   {
+    "id": "Getting health_check_type value for {{.AppName}}",
+    "translation": "Getting health_check_type value for {{.AppName}}"
+  },
+  {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
     "translation": "{{.Username}} として組織 {{.OrgName}} の情報を取得しています..."
   },
@@ -6166,6 +6170,10 @@
   {
     "id": "health_check_type is not set to ",
     "translation": "health_check_type は次のものに設定されていません: "
+  },
+  {
+    "id": "health_check_type is {{.HealthCheckType}}",
+    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "host",
