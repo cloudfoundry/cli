@@ -13,7 +13,7 @@ type ApplicationState string
 
 const (
 	ApplicationStarted ApplicationState = "STARTED"
-	ApplicationStopped                  = "STOPPED"
+	ApplicationStopped ApplicationState = "STOPPED"
 )
 
 // Application represents a Cloud Controller Application.

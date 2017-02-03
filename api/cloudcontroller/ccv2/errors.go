@@ -42,6 +42,26 @@ func (e AppStoppedStatsError) Error() string {
 	return e.Message
 }
 
+// NotStagedError is returned when requesting instance information from a
+// not staged app.
+type NotStagedError struct {
+	Message string
+}
+
+func (e NotStagedError) Error() string {
+	return e.Message
+}
+
+// InstancesError is returned when requesting instance information encounters
+// an error.
+type InstancesError struct {
+	Message string
+}
+
+func (e InstancesError) Error() string {
+	return e.Message
+}
+
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
 type errorWrapper struct {
@@ -83,15 +103,9 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusBadRequest: // 400
-		if errorResponse.ErrorCode == "CF-AppStoppedStatsError" {
-			return AppStoppedStatsError{Message: errorResponse.Description}
-		}
-		return cloudcontroller.BadRequestError{Message: errorResponse.Description}
+		return handleBadRequest(errorResponse)
 	case http.StatusUnauthorized: // 401
-		if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
-			return cloudcontroller.InvalidAuthTokenError{Message: errorResponse.Description}
-		}
-		return cloudcontroller.UnauthorizedError{Message: errorResponse.Description}
+		return handleUnauthorized(errorResponse)
 	case http.StatusForbidden: // 403
 		return cloudcontroller.ForbiddenError{Message: errorResponse.Description}
 	case http.StatusNotFound: // 404
@@ -106,4 +120,25 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 		}
 	}
 	return nil
+}
+
+func handleBadRequest(errorResponse CCErrorResponse) error {
+	switch errorResponse.ErrorCode {
+	case "CF-AppStoppedStatsError":
+		return AppStoppedStatsError{Message: errorResponse.Description}
+	case "CF-InstancesError":
+		return InstancesError{Message: errorResponse.Description}
+	case "CF-NotStaged":
+		return NotStagedError{Message: errorResponse.Description}
+	default:
+		return cloudcontroller.BadRequestError{Message: errorResponse.Description}
+	}
+}
+
+func handleUnauthorized(errorResponse CCErrorResponse) error {
+	if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
+		return cloudcontroller.InvalidAuthTokenError{Message: errorResponse.Description}
+	}
+
+	return cloudcontroller.UnauthorizedError{Message: errorResponse.Description}
 }

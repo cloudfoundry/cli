@@ -2,23 +2,10 @@ package ccv2
 
 import (
 	"encoding/json"
-	"sort"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-)
-
-// ApplicationInstanceStatusState reflects the state of the individual app
-// instance.
-type ApplicationInstanceStatusState string
-
-const (
-	ApplicationInstanceCrashed  ApplicationInstanceStatusState = "CRASHED"
-	ApplicationInstanceDown                                    = "DOWN"
-	ApplicationInstanceRunning                                 = "RUNNING"
-	ApplicationInstanceStarting                                = "STARTING"
-	ApplicationInstanceUnknown                                 = "UNKNOWN"
 )
 
 // ApplicationInstanceStatus represents a Cloud Controller Application Instance.
@@ -42,7 +29,7 @@ type ApplicationInstanceStatus struct {
 	MemoryQuota int
 
 	// State is the instance's state.
-	State ApplicationInstanceStatusState
+	State ApplicationInstanceState
 
 	// Uptime is the number of seconds the instance has been running.
 	Uptime int
@@ -73,7 +60,7 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	instance.DiskQuota = ccInstance.Stats.DiskQuota
 	instance.Memory = ccInstance.Stats.Usage.Memory
 	instance.MemoryQuota = ccInstance.Stats.MemoryQuota
-	instance.State = ApplicationInstanceStatusState(ccInstance.State)
+	instance.State = ApplicationInstanceState(ccInstance.State)
 	instance.Uptime = ccInstance.Stats.Uptime
 
 	return nil
@@ -82,7 +69,7 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 // GetApplicationInstanceStatusesByApplication returns a list of
 // ApplicationInstance for a given application. Given the state of an
 // application, it might skip some application instances.
-func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) ([]ApplicationInstanceStatus, Warnings, error) {
+func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) (map[int]ApplicationInstanceStatus, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.AppInstanceStats,
 		URIParams:   Params{"app_guid": guid},
@@ -101,31 +88,15 @@ func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) (
 		return nil, response.Warnings, err
 	}
 
-	sortedIDs, err := client.sortedInstanceKeys(instances)
-	if err != nil {
-		return nil, response.Warnings, err
-	}
-
-	var sortedInstances []ApplicationInstanceStatus
-	for _, instanceID := range sortedIDs {
-		instance := instances[strconv.Itoa(instanceID)]
-		instance.ID = instanceID
-		sortedInstances = append(sortedInstances, instance)
-	}
-
-	return sortedInstances, response.Warnings, err
-}
-
-func (client *Client) sortedInstanceKeys(instances map[string]ApplicationInstanceStatus) ([]int, error) {
-	var keys []int
-	for key, _ := range instances {
-		id, err := strconv.Atoi(key)
+	returnedInstances := map[int]ApplicationInstanceStatus{}
+	for instanceID, instance := range instances {
+		id, err := strconv.Atoi(instanceID)
 		if err != nil {
-			return nil, err
+			return nil, response.Warnings, err
 		}
-		keys = append(keys, id)
+		instance.ID = id
+		returnedInstances[id] = instance
 	}
-	sort.Ints(keys)
 
-	return keys, nil
+	return returnedInstances, response.Warnings, err
 }

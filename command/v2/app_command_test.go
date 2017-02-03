@@ -1,6 +1,7 @@
 package v2_test
 
 import (
+	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -22,34 +23,42 @@ var _ = Describe("App Command", func() {
 	var (
 		cmd             v2.AppCommand
 		testUI          *ui.UI
+		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeAppActor
-		fakeConfig      *commandfakes.FakeConfig
 		binaryName      string
 		executeErr      error
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeAppActor)
-		fakeConfig = new(commandfakes.FakeConfig)
 
 		cmd = v2.AppCommand{
 			UI:          testUI,
+			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			Config:      fakeConfig,
 		}
+
+		cmd.RequiredArgs.AppName = "some-app"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
+		// TODO: remove when experimental flag is removed
 		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	// TODO: remove when experimental flag is removed
+	It("Displays the experimental warning message", func() {
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking target fails", func() {
@@ -67,164 +76,245 @@ var _ = Describe("App Command", func() {
 		})
 	})
 
-	Context("when a cloud controller API endpoint is set", func() {
-		Context("when the user is logged in, and org and space are targeted", func() {
+	Context("when the user is logged in, and org and space are targeted", func() {
+		BeforeEach(func() {
+			fakeConfig.HasTargetedOrganizationReturns(true)
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
+			fakeConfig.HasTargetedSpaceReturns(true)
+			fakeConfig.TargetedSpaceReturns(configv3.Space{
+				GUID: "some-space-guid",
+				Name: "some-space"})
+			fakeConfig.CurrentUserReturns(
+				configv3.User{Name: "some-user"},
+				nil)
+		})
+
+		Context("when getting the current user returns an error", func() {
+			var expectedErr error
+
 			BeforeEach(func() {
-				fakeConfig.HasTargetedOrganizationReturns(true)
-				fakeConfig.HasTargetedSpaceReturns(true)
-				fakeConfig.TargetedSpaceReturns(configv3.Space{
-					GUID: "some-space-guid",
-					Name: "some-space",
-				})
-				fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
-				cmd.RequiredArgs.AppName = "some-app"
+				expectedErr = errors.New("getting current user error")
+				fakeConfig.CurrentUserReturns(
+					configv3.User{},
+					expectedErr)
 			})
 
-			It("displays app flavor text", func() {
-				Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+			})
+		})
+
+		It("displays flavor text", func() {
+			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+		})
+
+		Context("when the --guid flag is provided", func() {
+			BeforeEach(func() {
+				cmd.GUID = true
 			})
 
-			Context("when the passed the --guid flag", func() {
+			Context("when no errors occur", func() {
 				BeforeEach(func() {
-					cmd.GUID = true
+					fakeActor.GetApplicationByNameAndSpaceReturns(
+						v2action.Application{GUID: "some-guid"},
+						v2action.Warnings{"warning-1", "warning-2"},
+						nil)
 				})
 
-				Context("when retrieving the app information fails", func() {
+				It("displays the application guid and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("some-guid"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+				})
+			})
+
+			Context("when an error is encountered getting the app", func() {
+				Context("when the error is translatable", func() {
 					BeforeEach(func() {
-						warnings := v2action.Warnings{"warning-1", "warning-2"}
-						fakeActor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, warnings, v2action.ApplicationNotFoundError{Name: "some-app"})
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v2action.Application{},
+							v2action.Warnings{"warning-1", "warning-2"},
+							v2action.ApplicationNotFoundError{Name: "some-app"})
 					})
 
-					It("returns the err", func() {
-						Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: "some-app"}))
-					})
+					It("returns a translatable error and all warnings", func() {
+						Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
 
-					It("sends all warnings to stderr", func() {
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
 					})
 				})
 
-				Context("when no errors occur", func() {
+				Context("when the error is not translatable", func() {
+					var expectedErr error
+
 					BeforeEach(func() {
-						warnings := v2action.Warnings{"warning-1", "warning-2"}
-						fakeActor.GetApplicationByNameAndSpaceReturns(v2action.Application{GUID: "some-guid"}, warnings, nil)
+						expectedErr = errors.New("get app summary error")
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v2action.Application{},
+							v2action.Warnings{"warning-1", "warning-2"},
+							expectedErr)
 					})
 
-					It("displays the application guid", func() {
-						Expect(testUI.Out).To(Say("some-guid"))
-					})
+					It("returns the error and all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
 
-					It("sends all warnings to stderr", func() {
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
 					})
 				})
 			})
+		})
 
-			Context("when no flags are passed", func() {
-				Context("when retrieving application summary fails", func() {
+		Context("when the --guid flag is not provided", func() {
+			Context("when no errors occur", func() {
+				var (
+					applicationSummary v2action.ApplicationSummary
+					warnings           []string
+				)
+
+				BeforeEach(func() {
+					applicationSummary = v2action.ApplicationSummary{
+						Application: v2action.Application{
+							Name:              "some-app",
+							GUID:              "some-app-guid",
+							Instances:         3,
+							Memory:            128,
+							PackageUpdatedAt:  time.Unix(0, 0),
+							DetectedBuildpack: "some-buildpack",
+							State:             "STARTED",
+						},
+						Stack: v2action.Stack{
+							Name: "potatos",
+						},
+						Routes: []v2action.Route{
+							{
+								Host:   "banana",
+								Domain: "fruit.com",
+								Path:   "/hi",
+							},
+							{
+								Domain: "foobar.com",
+								Port:   13,
+							},
+						},
+					}
+					warnings = []string{"app-summary-warning"}
+				})
+
+				Context("when the app does not have running instances", func() {
 					BeforeEach(func() {
-						warnings := v2action.Warnings{"warning-1", "warning-2"}
-						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v2action.ApplicationSummary{}, warnings, v2action.ApplicationNotFoundError{Name: "some-app"})
+						applicationSummary.RunningInstances = []v2action.ApplicationInstance{}
+						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("returns the err", func() {
-						Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: "some-app"}))
+					It("displays the app summary, 'no running instances' message, and all warnings", func() {
+						Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say(""))
+						Expect(testUI.Out).To(Say("Name:\\s+some-app"))
+						Expect(testUI.Out).To(Say("Requested state:\\s+started"))
+						Expect(testUI.Out).To(Say("Instances:\\s+0\\/3"))
+						Expect(testUI.Out).To(Say("Usage:\\s+128M x 3 instances"))
+						Expect(testUI.Out).To(Say("Routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+						Expect(testUI.Out).To(Say("Last uploaded:\\s+1970-01-01T00:00:00Z"))
+						Expect(testUI.Out).To(Say("Stack:\\s+potatos"))
+						Expect(testUI.Out).To(Say("Buildpack:\\s+some-buildpack"))
+						Expect(testUI.Out).To(Say(""))
+						Expect(testUI.Out).To(Say("There are no running instances of this app"))
+
+						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})
 
-					It("sends all warnings to stderr", func() {
-						Expect(testUI.Err).To(Say("warning-1"))
-						Expect(testUI.Err).To(Say("warning-2"))
+					It("should not display the instance table", func() {
+						Expect(testUI.Out).NotTo(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk"))
 					})
 				})
 
-				Context("when no errors occur", func() {
+				Context("when the app has running instances", func() {
 					BeforeEach(func() {
-						warnings := v2action.Warnings{"warning-1", "warning-2"}
-						applicationSummary := v2action.ApplicationSummary{
-							Application: v2action.Application{
-								Name:              "some-app",
-								GUID:              "some-guid",
-								Instances:         3,
-								Memory:            128,
-								PackageUpdatedAt:  time.Unix(0, 0),
-								DetectedBuildpack: "some-buildpack",
+						applicationSummary.RunningInstances = []v2action.ApplicationInstance{
+							{
+								ID:          0,
+								State:       v2action.ApplicationInstanceState(ccv2.ApplicationInstanceRunning),
+								Since:       1403140717.984577,
+								CPU:         0.73,
+								Disk:        50 * bytefmt.MEGABYTE,
+								DiskQuota:   2048 * bytefmt.MEGABYTE,
+								Memory:      100 * bytefmt.MEGABYTE,
+								MemoryQuota: 128 * bytefmt.MEGABYTE,
+								Details:     "info from the backend",
 							},
-							Stack: v2action.Stack{
-								Name: "potatos",
-							},
-							RunningInstances: []v2action.ApplicationInstance{
-								{
-									CPU:         0.73,
-									DiskQuota:   2048 * bytefmt.MEGABYTE,
-									Disk:        50 * bytefmt.MEGABYTE,
-									ID:          0,
-									Memory:      100 * bytefmt.MEGABYTE,
-									MemoryQuota: 128 * bytefmt.MEGABYTE,
-									State:       ccv2.ApplicationInstanceRunning,
-									Uptime:      0,
-								},
-								{
-									CPU:         0.37,
-									DiskQuota:   2048 * bytefmt.MEGABYTE,
-									Disk:        50 * bytefmt.MEGABYTE,
-									ID:          1,
-									Memory:      100 * bytefmt.MEGABYTE,
-									MemoryQuota: 128 * bytefmt.MEGABYTE,
-									State:       ccv2.ApplicationInstanceCrashed,
-									Uptime:      0,
-								},
-							},
-							Routes: []v2action.Route{
-								{
-									Host:   "banana",
-									Domain: "fruit.com",
-									Path:   "/hi",
-								},
-								{
-									Domain: "foobar.com",
-									Port:   13,
-								},
+							{
+								ID:          1,
+								State:       v2action.ApplicationInstanceState(ccv2.ApplicationInstanceCrashed),
+								Since:       1403100000.900000,
+								CPU:         0.37,
+								Disk:        50 * bytefmt.MEGABYTE,
+								DiskQuota:   2048 * bytefmt.MEGABYTE,
+								Memory:      100 * bytefmt.MEGABYTE,
+								MemoryQuota: 128 * bytefmt.MEGABYTE,
+								Details:     "potato",
 							},
 						}
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("displays the health and status header", func() {
-						Expect(testUI.Out).To(Say(
-							"Showing health and status for app some-app in org some-org / space some-space as some-user..."))
-					})
-
-					It("sends all warnings to stderr", func() {
-						Expect(testUI.Err).To(Say("warning-1"))
-						Expect(testUI.Err).To(Say("warning-2"))
-					})
-
-					It("shows the app summary", func() {
+					It("displays app summary, instance table, and all warnings", func() {
+						Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+						Expect(testUI.Out).To(Say(""))
 						Expect(testUI.Out).To(Say("Name:\\s+some-app"))
+						Expect(testUI.Out).To(Say("Requested state:\\s+started"))
 						Expect(testUI.Out).To(Say("Instances:\\s+2\\/3"))
 						Expect(testUI.Out).To(Say("Usage:\\s+128M x 3 instances"))
 						Expect(testUI.Out).To(Say("Routes:\\s+banana.fruit.com/hi, foobar.com:13"))
 						Expect(testUI.Out).To(Say("Last uploaded:\\s+1970-01-01T00:00:00Z"))
 						Expect(testUI.Out).To(Say("Stack:\\s+potatos"))
 						Expect(testUI.Out).To(Say("Buildpack:\\s+some-buildpack"))
+						Expect(testUI.Out).To(Say(""))
+						Expect(testUI.Out).To(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
+						Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+						Expect(testUI.Out).To(Say(`#1\s+crashed\s+2014-06-18T14:00:00Z\s+37.0%\s+100M of 128M\s+50M of 2G\s+potato`))
 
-						timeFormat := testUI.UserFriendlyDate(time.Now())
-						Expect(testUI.Out).To(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk"))
-						Expect(testUI.Out).To(Say("#0\\s+running\\s+%s\\s+73.0%%\\s+100M of 128M\\s+50M of 2G", timeFormat))
-						Expect(testUI.Out).To(Say("#1\\s+crashed\\s+%s\\s+37.0%%\\s+100M of 128M\\s+50M of 2G", timeFormat))
+						Expect(testUI.Err).To(Say("app-summary-warning"))
 
 						Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
 						appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
 						Expect(appName).To(Equal("some-app"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 					})
+				})
+			})
 
-					//TODO: 0/1 instances
-					//TODO: 0/0 instances
-					//TODO: unknown buildpack
+			Context("when an error is encountered getting app summary", func() {
+				Context("when the error is not translatable", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("get app summary error")
+						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+							v2action.ApplicationSummary{},
+							nil,
+							expectedErr)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+					})
+				})
+
+				Context("when the error is translatable", func() {
+					BeforeEach(func() {
+						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+							v2action.ApplicationSummary{},
+							nil,
+							v2action.ApplicationNotFoundError{Name: "some-app"})
+					})
+
+					It("returns a translatable error", func() {
+						Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
+					})
 				})
 			})
 		})

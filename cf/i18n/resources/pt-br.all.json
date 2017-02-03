@@ -2188,6 +2188,10 @@
     "translation": "Descrição: {{.ServiceDescription}}"
   },
   {
+    "id": "Details",
+    "translation": ""
+  },
+  {
     "id": "Did you mean?",
     "translation": "Você quis dizer?"
   },
@@ -4494,6 +4498,10 @@
   {
     "id": "Request pseudo-tty allocation",
     "translation": "Solicitar alocação de pseudo-tty"
+  },
+  {
+    "id": "Requested state:",
+    "translation": ""
   },
   {
     "id": "Requires SOURCE-APP TARGET-APP as arguments",
