@@ -1,11 +1,7 @@
 package v2
 
 import (
-	"fmt"
 	"os"
-	"strings"
-
-	"github.com/cloudfoundry/bytefmt"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -28,15 +24,15 @@ type AppCommand struct {
 	usage           interface{}  `usage:"CF_NAME app APP_NAME"`
 	relatedCommands interface{}  `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 
+	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       AppActor
-	UI          command.UI
 }
 
 func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Config = config
 	cmd.UI = ui
+	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
@@ -62,48 +58,15 @@ func (cmd AppCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	user, err := cmd.Config.CurrentUser()
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-		map[string]interface{}{
-			"AppName":   cmd.RequiredArgs.AppName,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"Username":  user.Name,
-		})
-	cmd.UI.DisplayNewline()
-
 	if cmd.GUID {
-		return cmd.DisplayAppGUID()
+		return cmd.displayAppGUID()
 	}
 
-	appSummary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(
-		cmd.RequiredArgs.AppName,
-		cmd.Config.TargetedSpace().GUID,
-	)
-
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	err = ShowApp(appSummary, cmd.UI)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	return nil
+	return cmd.displayAppSummary()
 }
 
-func (cmd *AppCommand) DisplayAppGUID() error {
-	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(
-		cmd.RequiredArgs.AppName,
-		cmd.Config.TargetedSpace().GUID,
-	)
-
+func (cmd AppCommand) displayAppGUID() error {
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
@@ -113,52 +76,29 @@ func (cmd *AppCommand) DisplayAppGUID() error {
 	return nil
 }
 
-func ShowApp(appSummary v2action.ApplicationSummary, ui command.UI) error {
-	// Application Summary Table
-	instances := fmt.Sprintf("%d/%d", len(appSummary.RunningInstances), appSummary.Instances)
+func (cmd AppCommand) displayAppSummary() error {
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return shared.HandleError(err)
+	}
 
-	usage := ui.TranslateText("{{.MemorySize}} x {{.NumInstances}} instances",
+	cmd.UI.DisplayTextWithFlavor(
+		"Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
-			"MemorySize":   bytefmt.ByteSize(uint64(appSummary.Memory) * bytefmt.MEGABYTE),
-			"NumInstances": appSummary.Instances,
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
 		})
+	cmd.UI.DisplayNewline()
 
-	formattedRoutes := []string{}
-	for _, route := range appSummary.Routes {
-		formattedRoutes = append(formattedRoutes, route.String())
-	}
-	routes := strings.Join(formattedRoutes, ", ")
-
-	table := [][]string{
-		{ui.TranslateText("Name:"), appSummary.Name},
-		{ui.TranslateText("Instances:"), instances},
-		{ui.TranslateText("Usage:"), usage},
-		{ui.TranslateText("Routes:"), routes},
-		{ui.TranslateText("Last uploaded:"), ui.UserFriendlyDate(appSummary.PackageUpdatedAt)},
-		{ui.TranslateText("Stack:"), appSummary.Stack.Name},
-		{ui.TranslateText("Buildpack:"), appSummary.Application.CalculatedBuildpack()},
+	appSummary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
 	}
 
-	ui.DisplayTable("", table, 3)
-	ui.DisplayNewline()
-
-	// Instance List Table
-	table = [][]string{
-		{"", "State", "Since", "CPU", "Memory", "Disk"},
-	}
-
-	for _, instance := range appSummary.RunningInstances {
-		table = append(table,
-			[]string{
-				fmt.Sprintf("#%d", instance.ID),
-				ui.TranslateText(strings.ToLower(string(instance.State))),
-				ui.UserFriendlyDate(instance.StartTime()),
-				fmt.Sprintf("%.1f%%", instance.CPU*100),
-				fmt.Sprintf("%s of %s", bytefmt.ByteSize(uint64(instance.Memory)), bytefmt.ByteSize(uint64(instance.MemoryQuota))),
-				fmt.Sprintf("%s of %s", bytefmt.ByteSize(uint64(instance.Disk)), bytefmt.ByteSize(uint64(instance.DiskQuota))),
-			})
-	}
-	ui.DisplayTable("", table, 3)
+	shared.DisplayAppSummary(cmd.UI, appSummary)
 
 	return nil
 }

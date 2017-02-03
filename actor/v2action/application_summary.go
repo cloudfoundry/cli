@@ -18,11 +18,11 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	applicationSummary := ApplicationSummary{
-		Application: app,
-	}
+	applicationSummary := ApplicationSummary{Application: app}
 
-	if app.State != ccv2.ApplicationStopped {
+	// cloud controller calls the instance reporter only when the desired
+	// application state is STARTED
+	if app.State == ccv2.ApplicationStarted {
 		var instances []ApplicationInstance
 		instances, warnings, err = actor.GetApplicationInstancesByApplication(app.GUID)
 		allWarnings = append(allWarnings, warnings...)
@@ -30,8 +30,8 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 		switch err.(type) {
 		case nil:
 			applicationSummary.RunningInstances = instances
-		case ccv2.AppStoppedStatsError:
-			// Don't do anything
+		case ApplicationInstancesNotFoundError:
+			// don't set instances in summary
 		default:
 			return ApplicationSummary{}, allWarnings, err
 		}

@@ -17,22 +17,22 @@ import (
 
 var _ = Describe("app command", func() {
 	BeforeEach(func() {
-		Skip("skipping until story #126256629 is finished")
+		helpers.RunIfExperimental("target command refactor is still experimental")
 	})
 
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("app", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("app - Display health and status for app"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say("cf app APP_NAME"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("--guid      Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("apps, events, logs, map-route, push, unmap-route"))
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("NAME:"))
-				Expect(session).To(Say("app - Display health and status for app"))
-				Expect(session).To(Say("USAGE:"))
-				Expect(session).To(Say("cf app APP_NAME"))
-				Expect(session).To(Say("OPTIONS:"))
-				Expect(session).To(Say("--guid      Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."))
-				Expect(session).To(Say("SEE ALSO:"))
-				Expect(session).To(Say("apps, events, logs, map-route, push, unmap-route"))
 			})
 		})
 	})
@@ -45,9 +45,9 @@ var _ = Describe("app command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("app", "wut")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
-				Expect(session).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -58,13 +58,13 @@ var _ = Describe("app command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("app", "wut")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
-				Expect(session).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
-		Context("when there is no org and space set", func() {
+		Context("when there is no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -72,9 +72,9 @@ var _ = Describe("app command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("app", "wut")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
-				Expect(session).To(Say("No org and space targeted, use 'cf target -o ORG -s SPACE' to target an org and space"))
 			})
 		})
 
@@ -87,9 +87,9 @@ var _ = Describe("app command", func() {
 
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("app", "wut")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
-				Expect(session).To(Say("FAILED"))
-				Expect(session).To(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 			})
 		})
 	})
@@ -113,8 +113,8 @@ var _ = Describe("app command", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", appName)
 
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("App %s not found", appName))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -124,8 +124,8 @@ var _ = Describe("app command", func() {
 					appName := helpers.PrefixedRandomName("app")
 					session := helpers.CF("app", "--guid", appName)
 
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Say("App %s not found", appName))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("App %s not found", appName))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -158,7 +158,7 @@ applications:
 					err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
-					// Create manifest and add big numbers
+					// Create manifest
 					Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
@@ -168,18 +168,18 @@ applications:
 			})
 
 			Context("when the app is started and has 2 instances", func() {
-				It("displays the app information", func() {
+				It("displays the app information with instances table", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("Name:            %s", appName))
-					Eventually(session).Should(Say("Requested state: started"))
-					Eventually(session).Should(Say("Instances:       2/2"))
-					Eventually(session).Should(Say("Usage:           128M x 2 instances"))
-					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Name:              %s", appName))
+					Eventually(session).Should(Say("Requested state:   started"))
+					Eventually(session).Should(Say("Instances:         2/2"))
+					Eventually(session).Should(Say("Usage:             128M x 2 instances"))
+					Eventually(session).Should(Say("Routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("Last uploaded:"))
-					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
-					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
+					Eventually(session).Should(Say("Stack:             cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
-					Eventually(session).Should(Say("State\\s+Since\\s+Cpu\\s+Memory\\s+Disk\\s+Details"))
+					Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
 					Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 					Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 				})
@@ -192,14 +192,14 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("Name:            %s", appName))
-					Eventually(session).Should(Say("Requested state: stopped"))
-					Eventually(session).Should(Say("Instances:       0/2"))
-					Eventually(session).Should(Say("Usage:           128M x 2 instances"))
-					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Name:              %s", appName))
+					Eventually(session).Should(Say("Requested state:   stopped"))
+					Eventually(session).Should(Say("Instances:         0/2"))
+					Eventually(session).Should(Say("Usage:             128M x 2 instances"))
+					Eventually(session).Should(Say("Routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("Last uploaded:"))
-					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
-					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
+					Eventually(session).Should(Say("Stack:             cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
 				})
@@ -212,14 +212,14 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("Name:            %s", appName))
-					Eventually(session).Should(Say("Requested state: started"))
-					Eventually(session).Should(Say("Instances:       0/0"))
-					Eventually(session).Should(Say("Usage:           128M x 0 instances"))
-					Eventually(session).Should(Say("Routes:          %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("Name:              %s", appName))
+					Eventually(session).Should(Say("Requested state:   started"))
+					Eventually(session).Should(Say("Instances:         0/0"))
+					Eventually(session).Should(Say("Usage:             128M x 0 instances"))
+					Eventually(session).Should(Say("Routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("Last uploaded:"))
-					Eventually(session).Should(Say("Stack:           cflinuxfs2"))
-					Eventually(session).Should(Say("Buildpack:       staticfile_buildpack"))
+					Eventually(session).Should(Say("Stack:             cflinuxfs2"))
+					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
 				})
@@ -247,7 +247,7 @@ applications:
 					appGUID = AppInfo.Resources[0].Metadata.GUID
 				})
 
-				It("displays the app information", func() {
+				It("displays the app guid", func() {
 					session := helpers.CF("app", "--guid", appName)
 					Eventually(session).Should(Say(appGUID))
 				})
