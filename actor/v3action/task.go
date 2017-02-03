@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -36,7 +35,7 @@ func (e TaskNotFoundError) Error() string {
 func (actor Actor) RunTask(appGUID string, command string, name string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.NewTask(appGUID, command, name)
 	if err != nil {
-		if e, ok := err.(cloudcontroller.TaskWorkersUnavailableError); ok {
+		if e, ok := err.(ccv3.TaskWorkersUnavailableError); ok {
 			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}
 		}
 	}

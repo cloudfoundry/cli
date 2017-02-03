@@ -105,16 +105,6 @@ func (e UnprocessableEntityError) Error() string {
 	return e.Message
 }
 
-// TaskWorkersUnavailableError represents the case when no Diego workers are
-// available.
-type TaskWorkersUnavailableError struct {
-	Message string
-}
-
-func (e TaskWorkersUnavailableError) Error() string {
-	return e.Message
-}
-
 // ServiceUnavailableError wraps a http 503 error.
 type ServiceUnavailableError struct {
 	Message string
