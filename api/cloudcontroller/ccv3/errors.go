@@ -47,6 +47,16 @@ func (e UnexpectedResponseError) Error() string {
 	return strings.Join(messages, "\n")
 }
 
+// TaskWorkersUnavailableError represents the case when no Diego workers are
+// available.
+type TaskWorkersUnavailableError struct {
+	Message string
+}
+
+func (e TaskWorkersUnavailableError) Error() string {
+	return e.Message
+}
+
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
 type errorWrapper struct {
@@ -112,7 +122,7 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 		return cloudcontroller.UnprocessableEntityError{Message: firstErr.Detail}
 	case http.StatusServiceUnavailable: // 503
 		if firstErr.Title == "CF-TaskWorkersUnavailable" {
-			return cloudcontroller.TaskWorkersUnavailableError{Message: firstErr.Detail}
+			return TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
 		return cloudcontroller.ServiceUnavailableError{Message: firstErr.Detail}
 	default:

@@ -6,7 +6,6 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -81,7 +80,7 @@ var _ = Describe("Task Actions", func() {
 					fakeCloudControllerClient.NewTaskReturns(
 						ccv3.Task{},
 						nil,
-						cloudcontroller.TaskWorkersUnavailableError{Message: "banana babans"},
+						ccv3.TaskWorkersUnavailableError{Message: "banana babans"},
 					)
 				})
 
