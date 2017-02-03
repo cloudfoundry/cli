@@ -10,11 +10,11 @@ import (
 	"io"
 	"os"
 	"strings"
-	"text/tabwriter"
 	"time"
 
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
+	runewidth "github.com/mattn/go-runewidth"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"github.com/vito/go-interact/interact"
 )
@@ -128,13 +128,36 @@ func (ui *UI) DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, erro
 // DisplayTable outputs a matrix of strings as a table to UI.Out. Prefix will
 // be prepended to each row and padding adds the specified number of spaces
 // between columns.
-func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) error {
-	tw := tabwriter.NewWriter(ui.Out, 0, 1, padding, ' ', 0)
-	for _, row := range table {
-		fmt.Fprint(tw, prefix)
-		fmt.Fprintln(tw, strings.Join(row, "\t"))
+func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
+	if len(table) == 0 {
+		return
 	}
-	return tw.Flush()
+
+	var columnPadding []int
+
+	rows := len(table)
+	columns := len(table[0])
+	for col := 0; col < columns; col++ {
+		var max int
+		for row := 0; row < rows; row++ {
+			if strLen := runewidth.StringWidth(table[row][col]); max < strLen {
+				max = strLen
+			}
+		}
+		columnPadding = append(columnPadding, max+padding)
+	}
+
+	for row := 0; row < rows; row++ {
+		fmt.Fprintf(ui.Out, prefix)
+		for col := 0; col < columns; col++ {
+			var addedPadding int
+			if col+1 != columns {
+				addedPadding = columnPadding[col] - runewidth.StringWidth(table[row][col])
+			}
+			fmt.Fprintf(ui.Out, "%s%s", table[row][col], strings.Repeat(" ", addedPadding))
+		}
+		fmt.Fprintf(ui.Out, "\n")
+	}
 }
 
 // DisplayText translates the template, substitutes in templateValues, and

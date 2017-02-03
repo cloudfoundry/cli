@@ -12,7 +12,7 @@ type UI interface {
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})
-	DisplayTable(prefix string, table [][]string, padding int) error
+	DisplayTable(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
