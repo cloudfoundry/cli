@@ -62,7 +62,7 @@ func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName stri
 		return allWarnings, err
 	}
 
-	serviceInstance, warnings, err := actor.GetSpaceServiceInstanceByName(spaceGUID, serviceInstanceName)
+	serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return allWarnings, err

@@ -22,72 +22,6 @@ var _ = Describe("Service Instance Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
-	Describe("GetServiceInstanceBySpace", func() {
-		Context("when the service instance exists", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstancesReturns(
-					[]ccv2.ServiceInstance{
-						{
-							GUID: "some-service-instance-guid",
-							Name: "some-service-instance",
-						},
-					},
-					ccv2.Warnings{"foo"},
-					nil,
-				)
-			})
-
-			It("returns the service instance and warnings", func() {
-				serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(serviceInstance).To(Equal(ServiceInstance{
-					GUID: "some-service-instance-guid",
-					Name: "some-service-instance",
-				}))
-				Expect(warnings).To(Equal(Warnings{"foo"}))
-
-				Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf([]ccv2.Query{
-					ccv2.Query{
-						Filter:   ccv2.NameFilter,
-						Operator: ccv2.EqualOperator,
-						Value:    "some-service-instance",
-					},
-					ccv2.Query{
-						Filter:   ccv2.SpaceGUIDFilter,
-						Operator: ccv2.EqualOperator,
-						Value:    "some-space-guid",
-					},
-				}))
-			})
-		})
-
-		Context("when the service instance does not exists", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstancesReturns([]ccv2.ServiceInstance{}, nil, nil)
-			})
-
-			It("returns a ServiceInstanceNotFoundError", func() {
-				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
-				Expect(err).To(MatchError(ServiceInstanceNotFoundError{Name: "some-service-instance"}))
-			})
-		})
-
-		Context("when the cloud controller client returns an error", func() {
-			var expectedError error
-
-			BeforeEach(func() {
-				expectedError = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.GetServiceInstancesReturns([]ccv2.ServiceInstance{}, nil, expectedError)
-			})
-
-			It("returns the error", func() {
-				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
-				Expect(err).To(MatchError(expectedError))
-			})
-		})
-	})
-
 	Describe("GetSpaceServiceInstanceByName", func() {
 		Context("when the service instance exists", func() {
 			BeforeEach(func() {
@@ -104,7 +38,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the service instance and warnings", func() {
-				serviceInstance, warnings, err := actor.GetSpaceServiceInstanceByName("some-space-guid", "some-service-instance")
+				serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(serviceInstance).To(Equal(ServiceInstance{
 					GUID: "some-service-instance-guid",
@@ -133,7 +67,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns a ServiceInstanceNotFoundError", func() {
-				_, _, err := actor.GetSpaceServiceInstanceByName("some-space-guid", "some-service-instance")
+				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).To(MatchError(ServiceInstanceNotFoundError{Name: "some-service-instance"}))
 			})
 		})
@@ -147,7 +81,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := actor.GetSpaceServiceInstanceByName("some-space-guid", "some-service-instance")
+				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).To(MatchError(expectedError))
 			})
 		})
