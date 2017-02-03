@@ -38,7 +38,7 @@ type commandList struct {
 	Stack                              v2.StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	CopySource                         v2.CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
 	CreateAppManifest                  v2.CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
-	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Get the health_check_type value of an app"`
+	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	SetHealthCheck                     v2.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app"`
 	EnableSSH                          v2.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	DisableSSH                         v2.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`

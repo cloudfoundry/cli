@@ -2388,6 +2388,10 @@
     "translation": "Ativando o suporte ssh para o espaço '{{.SpaceName}}'..."
   },
   {
+    "id": "Endpoint (for http type):",
+    "translation": "Endpoint (for http type):"
+  },
+  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -2900,12 +2904,12 @@
     "translation": "Obtendo arquivos para o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}..."
   },
   {
-    "id": "Getting health_check_type value for ",
-    "translation": "Obtendo o valor health_check_type para "
+    "id": "Getting health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Getting health_check_type value for {{.AppName}}"
   },
   {
-    "id": "Getting health_check_type value for {{.AppName}}",
-    "translation": "Getting health_check_type value for {{.AppName}}"
+    "id": "Getting health_check_type value for ",
+    "translation": "Obtendo o valor health_check_type para "
   },
   {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
@@ -3090,6 +3094,10 @@
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
     "translation": "Método de HTTP (GET,POST,PUT,DELETE,etc.)"
+  },
+  {
+    "id": "Health check type:",
+    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "Hostname (e.g. my-subdomain)",
@@ -4964,6 +4972,10 @@
     "translation": "Mostrar usuários do espaço por função"
   },
   {
+    "id": "Show the type of health check performed on an app",
+    "translation": "Show the type of health check performed on an app"
+  },
+  {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Mostrando escala atual do app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },
@@ -6170,10 +6182,6 @@
   {
     "id": "health_check_type is not set to ",
     "translation": "health_check_type não está configurada como "
-  },
-  {
-    "id": "health_check_type is {{.HealthCheckType}}",
-    "translation": "health_check_type is {{.HealthCheckType}}"
   },
   {
     "id": "host",

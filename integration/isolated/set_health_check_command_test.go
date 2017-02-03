@@ -139,7 +139,7 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Exit(0))
 
 					getSession := helpers.CF("get-health-check", appName)
-					Eventually(getSession).Should(Say("health_check_type is %s", expectedType))
+					Eventually(getSession).Should(Say("Health check type:\\s+%s", expectedType))
 					Eventually(getSession).Should(Exit(0))
 				},
 				Entry("when setting the health-check-type to 'none'", "none", "process"),

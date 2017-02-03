@@ -18,6 +18,16 @@ func (application Application) CalculatedBuildpack() string {
 	return application.DetectedBuildpack
 }
 
+// CalculatedHealthCheckEndpoint returns the health check endpoint.
+// If the health check type is not http it will return the empty string.
+func (application Application) CalculatedHealthCheckEndpoint() string {
+	if application.HealthCheckType == "http" {
+		return application.HealthCheckHTTPEndpoint
+	}
+
+	return ""
+}
+
 // Started returns true when the application is started.
 func (application Application) Started() bool {
 	return application.State == ccv2.ApplicationStarted
