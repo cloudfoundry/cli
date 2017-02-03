@@ -53,6 +53,9 @@ type CommandFlag struct {
 
 	// Description is the description of the flag
 	Description string
+
+	// Default is the flag's default value
+	Default string
 }
 
 // Environment contains env vars specific for this command
@@ -110,6 +113,7 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 				Short:       fieldTag.Get("short"),
 				Long:        fieldTag.Get("long"),
 				Description: fieldTag.Get("description"),
+				Default:     fieldTag.Get("default"),
 			})
 		}
 

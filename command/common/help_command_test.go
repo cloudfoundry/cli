@@ -159,6 +159,12 @@ var _ = Describe("help Command", func() {
 									Short:       "n",
 									Description: "Hostname (e.g. my-subdomain)",
 								},
+								{
+									Long:        "force",
+									Short:       "f",
+									Description: "do it",
+									Default:     "yes",
+								},
 							},
 						}
 						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
@@ -203,6 +209,15 @@ var _ = Describe("help Command", func() {
 							Expect(err).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).ToNot(Say("--app-ports"))
+						})
+					})
+
+					Context("has a default for an option", func() {
+						It("displays the default", func() {
+							err := cmd.Execute(nil)
+							Expect(err).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("do it \\(Default: yes\\)"))
 						})
 					})
 				})

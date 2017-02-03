@@ -96,6 +96,10 @@
     "translation": "   Zulässige Größenbeschränkungen mit 'CF_NAME quotas' anzeigen"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " hinzugefügt als '"
   },

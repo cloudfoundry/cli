@@ -96,6 +96,10 @@
     "translation": "   Affichez les quotas pouvant être alloués avec 'CF_NAME quotas'"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " ajouté en tant que"
   },

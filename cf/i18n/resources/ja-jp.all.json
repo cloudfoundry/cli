@@ -96,6 +96,10 @@
     "translation": "   許容割り当て量を 'CF_NAME quotas' で表示します"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " 次のものとして追加されました: '"
   },

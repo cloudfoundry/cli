@@ -14,7 +14,7 @@ type commandList struct {
 }
 
 type appCommand struct {
-	GUID            bool        `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
+	GUID            bool        `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed." default:"some-default"`
 	usage           interface{} `usage:"CF_NAME app APP_NAME"`
 	relatedCommands interface{} `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 }
@@ -51,6 +51,7 @@ var _ = Describe("Help Actions", func() {
 						Short:       "",
 						Long:        "guid",
 						Description: "Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.",
+						Default:     "some-default",
 					}))
 					Expect(commandInfo.RelatedCommands).To(Equal([]string{
 						"apps", "events", "logs", "map-route", "push", "unmap-route",

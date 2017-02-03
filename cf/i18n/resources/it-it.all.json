@@ -96,6 +96,10 @@
     "translation": "   Visualizza quote ammesse con 'CF_NAME quotas'"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " aggiunto come '"
   },

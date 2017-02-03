@@ -96,6 +96,10 @@
     "translation": "   View allowable quotas with 'CF_NAME quotas'"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " added as '"
   },

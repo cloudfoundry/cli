@@ -96,6 +96,10 @@
     "translation": "   Visualizar cotas permitidas com 'CF_NAME quotas'"
   },
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": " (Default: {{.DefaultValue}})"
+  },
+  {
     "id": " added as '",
     "translation": " incluído como '"
   },
