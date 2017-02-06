@@ -1280,8 +1280,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
-    "translation": ""
+    "id": "CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.\\n\\nEXAMPLES:\\n   cf set-health-check worker-app process\\n   cf set-health-check my-web-app http --endpoint /foo",
+    "translation": "CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.\\n\\nEXAMPLES:\\n   cf set-health-check worker-app process\\n   cf set-health-check my-web-app http --endpoint /foo"
   },
   {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
@@ -3098,6 +3098,10 @@
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
     "translation": "HTTP 方法（GET、POST、PUT、DELETE 等）"
+  },
+  {
+    "id": "Health check type must be 'http' to set a health check HTTP endpoint.",
+    "translation": "Health check type must be 'http' to set a health check HTTP endpoint."
   },
   {
     "id": "Health check type:",
@@ -5796,7 +5800,7 @@
     "translation": "正在更新建置套件 {{.BuildpackName}}..."
   },
   {
-    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {

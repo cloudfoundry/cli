@@ -13,16 +13,13 @@ type HealthCheckType struct {
 func (m *HealthCheckType) UnmarshalFlag(val string) error {
 	valLower := strings.ToLower(val)
 	switch valLower {
-	case "port", "process", "http":
+	case "port", "process", "http", "none":
 		m.Type = valLower
-		return nil
-	case "none": // Deprecated
-		m.Type = "process"
-		return nil
+	default:
+		return &flags.Error{
+			Type:    flags.ErrRequired,
+			Message: `HEALTH_CHECK_TYPE must be "port", "process", or "http"`,
+		}
 	}
-
-	return &flags.Error{
-		Type:    flags.ErrRequired,
-		Message: `HEALTH_CHECK_TYPE must be "port", "process", or "http"`,
-	}
+	return nil
 }

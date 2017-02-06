@@ -70,3 +70,14 @@ func (e SpaceNotFoundError) Translate(translate func(string, ...interface{}) str
 		"Name": e.Name,
 	})
 }
+
+type HTTPHealthCheckInvalidError struct {
+}
+
+func (e HTTPHealthCheckInvalidError) Error() string {
+	return "Health check type must be 'http' to set a health check HTTP endpoint."
+}
+
+func (e HTTPHealthCheckInvalidError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error())
+}

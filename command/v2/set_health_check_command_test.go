@@ -105,7 +105,7 @@ var _ = Describe("set-health-check Command", func() {
 		})
 
 		It("informs the user and displays warnings", func() {
-			Expect(testUI.Out).To(Say("Updating health check type to 'some-health-check-type' for app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Out).To(Say("Updating health check type for app some-app in org some-org / space some-space as some-user..."))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Out).To(Say("OK"))
 			Expect(executeErr).ToNot(HaveOccurred())

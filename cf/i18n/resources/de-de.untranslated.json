@@ -780,10 +780,6 @@
     "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'"
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
-    "translation": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'."
-  },
-  {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
     "translation": "CF_NAME set-org-role USERNAME ORG ROLE\n\n"
   },
@@ -1880,8 +1876,8 @@
     "translation": "Updating a plan"
   },
   {
-    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
+    "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
     "id": "Usage:",

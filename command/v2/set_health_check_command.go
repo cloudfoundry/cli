@@ -16,13 +16,12 @@ type SetHealthCheckActor interface {
 
 type SetHealthCheckCommand struct {
 	RequiredArgs flag.SetHealthCheckArgs `positional-args:"yes"`
-	HTTPEndpoint string                  `long:"endpoint" hidden:"true" default:"/" description:"Path on the app"`
-	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME (process | port | http)\n\nTIP: 'none' has been deprecated but is accepted for 'process'."`
-
-	UI          command.UI
-	Config      command.Config
-	SharedActor command.SharedActor
-	Actor       SetHealthCheckActor
+	HTTPEndpoint string                  `long:"endpoint" default:"/" description:"Path on the app"`
+	usage        interface{}             `usage:"CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\n\nTIP: 'none' has been deprecated but is accepted for 'process'.\n\nEXAMPLES:\n   cf set-health-check worker-app process\n   cf set-health-check my-web-app http --endpoint /foo"`
+	UI           command.UI
+	Config       command.Config
+	SharedActor  command.SharedActor
+	Actor        SetHealthCheckActor
 }
 
 func (cmd *SetHealthCheckCommand) Setup(config command.Config, ui command.UI) error {
@@ -50,13 +49,12 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+	cmd.UI.DisplayTextWithFlavor("Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
-			"AppName":         cmd.RequiredArgs.AppName,
-			"HealthCheckType": cmd.RequiredArgs.HealthCheck.Type,
-			"OrgName":         cmd.Config.TargetedOrganization().Name,
-			"SpaceName":       cmd.Config.TargetedSpace().Name,
-			"Username":        user.Name,
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
 		})
 
 	app, warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(

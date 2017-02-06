@@ -25,7 +25,7 @@ var _ = Describe("HealthCheckType", func() {
 			},
 			Entry("sets 'port' when passed 'port'", "port", "port"),
 			Entry("sets 'port' when passed 'pOrt'", "pOrt", "port"),
-			Entry("sets 'process' when passed 'none'", "none", "process"),
+			Entry("sets 'process' when passed 'none'", "none", "none"),
 			Entry("sets 'process' when passed 'process'", "process", "process"),
 			Entry("sets 'http' when passed 'http'", "http", "http"),
 		)

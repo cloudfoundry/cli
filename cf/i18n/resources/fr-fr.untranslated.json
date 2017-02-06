@@ -500,10 +500,6 @@
     "translation": "CF_NAME services"
   },
   {
-    "id": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.",
-    "translation": "CF_NAME set-health-check APP_NAME (process | port | http)\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'."
-  },
-  {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\\n\\nROLES:\\n   'OrgManager' - Invite and manage users, select and change plans, and set spending limits\\n   'BillingManager' - Create and manage the billing account and payment info\\n   'OrgAuditor' - Read-only access to org info and reports",
     "translation": "CF_NAME set-org-role USERNAME ORG ROLE\\n\\nROLES:\\n   'OrgManager' - Invite and manage users, select and change plans, and set spending limits\\n   'BillingManager' - Create and manage the billing account and payment info\\n   'OrgAuditor' - Read-only access to org info and reports"
   },
@@ -1416,8 +1412,8 @@
     "translation": "Updating a plan"
   },
   {
-    "id": "Updating health check type to '{{.HealthCheckType}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
+    "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
     "id": "Usage:",

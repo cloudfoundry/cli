@@ -43,6 +43,15 @@ func (e ApplicationNotFoundError) Error() string {
 	return fmt.Sprintf("Application '%s' not found.", e.Name)
 }
 
+// HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a
+// health check type that is not HTTP.
+type HTTPHealthCheckInvalidError struct {
+}
+
+func (e HTTPHealthCheckInvalidError) Error() string {
+	return "Health check type must be 'http' to set a health check HTTP endpoint"
+}
+
 // GetApplicationByNameAndSpace returns an application with matching name in
 // the space.
 func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (Application, Warnings, error) {
@@ -89,6 +98,10 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 // SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
 // check type if it is not already the desired type.
 func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
+	if httpEndpoint != "/" && healthCheckType != "http" {
+		return Application{}, nil, HTTPHealthCheckInvalidError{}
+	}
+
 	var allWarnings Warnings
 
 	app, warnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
