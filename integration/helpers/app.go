@@ -4,8 +4,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 )
 
 // WithHelloWorldApp creates a simple application to use with your CLI command
@@ -38,4 +40,11 @@ func WithBananaPantsApp(f func(dir string)) {
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
+}
+
+// AppGUID returns the GUID for an app in the currently targeted space.
+func AppGUID(appName string) string {
+	session := CF("app", appName, "--guid")
+	Eventually(session).Should(gexec.Exit(0))
+	return strings.TrimSpace(string(session.Out.Contents()))
 }
