@@ -63,6 +63,8 @@ The API package handles the HTTP requests to the API. The functions in this pack
 The CLI uses [GVT](https://github.com/FiloSottile/gvt) to manage vendored
 dependencies. Refer to the GVT documentation for managing dependencies.
 
+If you are vendoring a new dependency, please read [License and Notice Files](https://github.com/cloudfoundry/cli/wiki/License-and-Notice-Files) to abide by third party licenses.
+
 # Compiling for Other Operating Systems and Architectures
 
 The supported platforms for the CF CLI are Linux (32-bit and 64-bit), Windows
