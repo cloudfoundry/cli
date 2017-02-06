@@ -39,6 +39,8 @@ func HandleError(err error) error {
 		return command.ServiceInstanceNotFoundError{Name: e.Name}
 	case v2action.SpaceNotFoundError:
 		return SpaceNotFoundError{Name: e.Name}
+	case v2action.HTTPHealthCheckInvalidError:
+		return HTTPHealthCheckInvalidError{}
 	}
 
 	return err

@@ -39,6 +39,7 @@ var _ = Describe("Translatable Errors", func() {
 		// Actor errors.
 		Entry("JobFailedError", JobFailedError{}),
 		Entry("JobTimeoutError", JobTimeoutError{}),
+		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 
 		// Command errors.
 		Entry("NoOrgTargetedError", NoOrganizationTargetedError{}),

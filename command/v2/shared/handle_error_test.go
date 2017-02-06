@@ -75,6 +75,11 @@ var _ = Describe("HandleError", func() {
 			sharedaction.NoTargetedSpaceError{BinaryName: "faceman"},
 			command.NoTargetedSpaceError{BinaryName: "faceman"}),
 
+		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
+			v2action.HTTPHealthCheckInvalidError{},
+			HTTPHealthCheckInvalidError{},
+		),
+
 		Entry("default case -> original error",
 			err,
 			err),
