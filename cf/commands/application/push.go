@@ -68,7 +68,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply")}
 	fs["docker-image"] = &flags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("Docker-image to be used (e.g. user/docker-image-name)")}
-	fs["health-check-type"] = &flags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (e.g. 'port' or 'none')")}
+	fs["health-check-type"] = &flags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')")}
 	fs["no-hostname"] = &flags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &flags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
 	fs["no-route"] = &flags.BoolFlag{Name: "no-route", Usage: T("Do not map a route to this app and remove routes from previous pushes of this app")}
@@ -99,7 +99,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-p %s] ", T("PATH")),
 			fmt.Sprintf("[-s %s] ", T("STACK")),
 			fmt.Sprintf("[-t %s] ", T("TIMEOUT")),
-			fmt.Sprintf("[-u %s] ", T("HEALTH_CHECK_TYPE")),
+			fmt.Sprintf("[-u %s] ", T("(process | port | http)")),
 			fmt.Sprintf("[--route-path %s] ", T("ROUTE_PATH")),
 			"\n   ",
 			// Commented to hide app-ports for release #117189491
@@ -246,6 +246,10 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 						(*appParams.EnvironmentVars)[key] = val
 					}
 				}
+			}
+
+			if appParams.HealthCheckType != nil && *appParams.HealthCheckType == "http" && existingApp.HealthCheckType == "http" {
+				appParams.HealthCheckHTTPEndpoint = &existingApp.HealthCheckHTTPEndpoint
 			}
 
 			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
@@ -783,13 +787,19 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 		appParams.HealthCheckTimeout = &timeout
 	}
 
-	if healthCheckType := c.String("u"); healthCheckType != "" {
-		if healthCheckType != "port" && healthCheckType != "none" {
-			return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
-				map[string]interface{}{"healthCheckType": healthCheckType})))
-		}
-
+	healthCheckType := c.String("u")
+	switch healthCheckType {
+	case "":
+		// do nothing
+	case "http":
 		appParams.HealthCheckType = &healthCheckType
+		healthCheckHTTPEndpoint := "/"
+		appParams.HealthCheckHTTPEndpoint = &healthCheckHTTPEndpoint
+	case "none", "port", "process":
+		appParams.HealthCheckType = &healthCheckType
+	default:
+		return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
+			map[string]interface{}{"healthCheckType": healthCheckType})))
 	}
 
 	return appParams, nil

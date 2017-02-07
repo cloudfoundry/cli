@@ -863,6 +863,31 @@ var _ = Describe("Push Command", func() {
 						})
 					})
 
+					Context("when the value is 'http'", func() {
+						BeforeEach(func() {
+							args = []string{"app-name", "--health-check-type", "http"}
+						})
+
+						It("does not show error", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+						})
+
+						It("sets the HTTP health check endpoint to /", func() {
+							params := appRepo.CreateArgsForCall(0)
+							Expect(*params.HealthCheckHTTPEndpoint).To(Equal("/"))
+						})
+					})
+
+					Context("when the value is 'none'", func() {
+						BeforeEach(func() {
+							args = []string{"app-name", "--health-check-type", "none"}
+						})
+
+						It("does not show error", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+						})
+					})
+
 					Context("when the value is 'port'", func() {
 						BeforeEach(func() {
 							args = []string{"app-name", "--health-check-type", "port"}
@@ -873,9 +898,9 @@ var _ = Describe("Push Command", func() {
 						})
 					})
 
-					Context("when the value is 'none'", func() {
+					Context("when the value is 'process'", func() {
 						BeforeEach(func() {
-							args = []string{"app-name", "--health-check-type", "none"}
+							args = []string{"app-name", "--health-check-type", "process"}
 						})
 
 						It("does not show error", func() {

@@ -160,6 +160,10 @@
     "translation": "Sono accettate anche '{{.VersionShort}}' e '{{.VersionLong}}'."
   },
   {
+    "id": "(process | port | http)",
+    "translation": "(process | port | http)"
+  },
+  {
     "id": ") already exists.",
     "translation": ") esiste già."
   },
@@ -344,7 +348,7 @@
     "translation": "Aggiungi diagnostica della richiesta API in un file di log"
   },
   {
-    "id": "Application health check type (e.g. 'port' or 'none')",
+    "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
     "translation": "Tipo di verifica integrità dell'applicazione (ad es. 'port' o 'none')"
   },
   {
@@ -3076,10 +3080,6 @@
     "translation": ""
   },
   {
-    "id": "HEALTH_CHECK_TYPE",
-    "translation": "TIPO_CONTROLLO_INTEGRITÀ"
-  },
-  {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": ""
   },
@@ -4296,7 +4296,7 @@
     "translation": "Distribuisci una singola applicazione (con o senza un manifest)"
   },
   {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {

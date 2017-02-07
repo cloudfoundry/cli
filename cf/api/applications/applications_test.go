@@ -536,6 +536,7 @@ var updateApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.Te
 		"docker_image":"",
 		"memory":2048,
 		"health_check_type":"none",
+		"health_check_http_endpoint":"",
 		"disk_quota":512,
 		"space_guid":"some-space-guid",
 		"state":"STARTED",

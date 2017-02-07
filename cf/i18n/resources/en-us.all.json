@@ -160,6 +160,10 @@
     "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
   },
   {
+    "id": "(process | port | http)",
+    "translation": "(process | port | http)"
+  },
+  {
     "id": ") already exists.",
     "translation": ") already exists."
   },
@@ -344,8 +348,8 @@
     "translation": "Append API request diagnostics to a log file"
   },
   {
-    "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Application health check type (e.g. 'port' or 'none')"
+    "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
+    "translation": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"
   },
   {
     "id": "Application instance index",
@@ -3076,10 +3080,6 @@
     "translation": "Global options:"
   },
   {
-    "id": "HEALTH_CHECK_TYPE",
-    "translation": "HEALTH_CHECK_TYPE"
-  },
-  {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\""
   },
@@ -4296,8 +4296,8 @@
     "translation": "Push a single app (with or without a manifest)"
   },
   {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
-    "translation": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]"
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "translation": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]"
   },
   {
     "id": "Push multiple apps with a manifest",

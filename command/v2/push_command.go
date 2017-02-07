@@ -14,7 +14,7 @@ type PushCommand struct {
 	Domain               string      `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage          string      `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
 	PathToManifest       string      `short:"f" description:"Path to manifest"` //TODO: Custom Path flag that does validation
-	HealthCheckType      string      `long:"health-check-type" short:"u" description:"Application health check type (e.g. 'port' or 'none')"`
+	HealthCheckType      string      `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	Hostname             string      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
 	NumInstances         int         `short:"i" description:"Number of instances"`
 	DiskLimit            string      `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
@@ -28,7 +28,7 @@ type PushCommand struct {
 	RoutePath            string      `long:"route-path" description:"Path for the route"`
 	Stack                string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	ApplicationStartTime int         `short:"t" description:"Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply"`
-	usage                interface{} `usage:"Push a single app (with or without a manifest):\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n   Push multiple apps with a manifest:\n   cf push [-f MANIFEST_PATH]"`
+	usage                interface{} `usage:"Push a single app (with or without a manifest):\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n   Push multiple apps with a manifest:\n   cf push [-f MANIFEST_PATH]"`
 	envCFStagingTimeout  interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout  interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 	relatedCommands      interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`

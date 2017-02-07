@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Push with health check", func() {
 	Context("help", func() {
-		Context("when --help flag is set", func() {
+		Context("when displaying help in the refactor", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("push", "--help")
 				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
@@ -39,6 +39,14 @@ var _ = Describe("Push with health check", func() {
 			appName = helpers.PrefixedRandomName("app")
 		})
 
+		Context("when displaying help in the old code", func() {
+			It("Displays command usage to output", func() {
+				session := helpers.CF("push")
+				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		Context("setting the health check", func() {
 			DescribeTable("displays the correct health check type",
 				func(healthCheckType string, endpoint string) {
@@ -59,46 +67,70 @@ var _ = Describe("Push with health check", func() {
 			)
 		})
 
-		Context("when the health check is changed from another type to http", func() {
+		Context("when the health check type is not 'http'", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "port")).Should(Exit(0))
 				})
 			})
 
-			It("sets the endpoint to /", func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+			Context("when the health check type is set to 'http'", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+					})
 				})
 
-				session := helpers.CF("get-health-check", appName)
-				Eventually(session.Out).Should(Say("Endpoint (for http type):\\s+/\n"))
-				Eventually(session).Should(Exit(0))
+				It("sets the endpoint to /", func() {
+					session := helpers.CF("get-health-check", appName)
+					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+\\/\n"))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
-		Context("when the health check is changed from http to another type", func() {
+		Context("when the app has a health check 'http' endpoint set", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
 				})
+
 				Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
-			})
 
-			It("preserves the current endpoint", func() {
 				appGUID := helpers.AppGUID(appName)
-
 				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
 				Eventually(session).Should(Exit(0))
 				Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+			})
 
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "port")).Should(Exit(0))
+			Context("when the health check type is set to 'http'", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+					})
 				})
 
-				session = helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-				Eventually(session).Should(Exit(0))
-				Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+				It("preserves the existing endpoint", func() {
+					appGUID := helpers.AppGUID(appName)
+					session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+					Eventually(session).Should(Exit(0))
+					Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+				})
+			})
+
+			Context("when the health check type is set to something other than 'http'", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "port")).Should(Exit(0))
+					})
+				})
+
+				It("preserves the existing endpoint", func() {
+					appGUID := helpers.AppGUID(appName)
+					session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+					Eventually(session).Should(Exit(0))
+					Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+				})
 			})
 		})
 	})

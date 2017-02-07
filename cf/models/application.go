@@ -25,18 +25,19 @@ func (model Application) HasRoute(route Route) bool {
 func (model Application) ToParams() AppParams {
 	state := strings.ToUpper(model.State)
 	params := AppParams{
-		GUID:            &model.GUID,
-		Name:            &model.Name,
-		BuildpackURL:    &model.BuildpackURL,
-		Command:         &model.Command,
-		DiskQuota:       &model.DiskQuota,
-		InstanceCount:   &model.InstanceCount,
-		HealthCheckType: &model.HealthCheckType,
-		Memory:          &model.Memory,
-		State:           &state,
-		SpaceGUID:       &model.SpaceGUID,
-		EnvironmentVars: &model.EnvironmentVars,
-		DockerImage:     &model.DockerImage,
+		GUID:                    &model.GUID,
+		Name:                    &model.Name,
+		BuildpackURL:            &model.BuildpackURL,
+		Command:                 &model.Command,
+		DiskQuota:               &model.DiskQuota,
+		InstanceCount:           &model.InstanceCount,
+		HealthCheckType:         &model.HealthCheckType,
+		HealthCheckHTTPEndpoint: &model.HealthCheckHTTPEndpoint,
+		Memory:                  &model.Memory,
+		State:                   &state,
+		SpaceGUID:               &model.SpaceGUID,
+		EnvironmentVars:         &model.EnvironmentVars,
+		DockerImage:             &model.DockerImage,
 	}
 
 	if model.Stack != nil {
@@ -47,30 +48,31 @@ func (model Application) ToParams() AppParams {
 }
 
 type ApplicationFields struct {
-	GUID                 string
-	Name                 string
-	BuildpackURL         string
-	Command              string
-	Diego                bool
-	DetectedStartCommand string
-	DiskQuota            int64 // in Megabytes
-	EnvironmentVars      map[string]interface{}
-	InstanceCount        int
-	Memory               int64 // in Megabytes
-	RunningInstances     int
-	HealthCheckType      string
-	HealthCheckTimeout   int
-	State                string
-	SpaceGUID            string
-	StackGUID            string
-	PackageUpdatedAt     *time.Time
-	PackageState         string
-	StagingFailedReason  string
-	Buildpack            string
-	DetectedBuildpack    string
-	DockerImage          string
-	EnableSSH            bool
-	AppPorts             []int
+	GUID                    string
+	Name                    string
+	BuildpackURL            string
+	Command                 string
+	Diego                   bool
+	DetectedStartCommand    string
+	DiskQuota               int64 // in Megabytes
+	EnvironmentVars         map[string]interface{}
+	InstanceCount           int
+	Memory                  int64 // in Megabytes
+	RunningInstances        int
+	HealthCheckType         string
+	HealthCheckHTTPEndpoint string
+	HealthCheckTimeout      int
+	State                   string
+	SpaceGUID               string
+	StackGUID               string
+	PackageUpdatedAt        *time.Time
+	PackageState            string
+	StagingFailedReason     string
+	Buildpack               string
+	DetectedBuildpack       string
+	DockerImage             string
+	EnableSSH               bool
+	AppPorts                []int
 }
 
 const (
@@ -84,35 +86,36 @@ const (
 )
 
 type AppParams struct {
-	BuildpackURL       *string
-	Command            *string
-	DiskQuota          *int64
-	Domains            []string
-	EnvironmentVars    *map[string]interface{}
-	GUID               *string
-	HealthCheckType    *string
-	HealthCheckTimeout *int
-	DockerImage        *string
-	Diego              *bool
-	EnableSSH          *bool
-	Hosts              []string
-	RoutePath          *string
-	InstanceCount      *int
-	Memory             *int64
-	Name               *string
-	NoHostname         *bool
-	NoRoute            bool
-	UseRandomRoute     bool
-	UseRandomPort      bool
-	Path               *string
-	ServicesToBind     []string
-	SpaceGUID          *string
-	StackGUID          *string
-	StackName          *string
-	State              *string
-	PackageUpdatedAt   *time.Time
-	AppPorts           *[]int
-	Routes             []ManifestRoute
+	BuildpackURL            *string
+	Command                 *string
+	DiskQuota               *int64
+	Domains                 []string
+	EnvironmentVars         *map[string]interface{}
+	GUID                    *string
+	HealthCheckType         *string
+	HealthCheckHTTPEndpoint *string
+	HealthCheckTimeout      *int
+	DockerImage             *string
+	Diego                   *bool
+	EnableSSH               *bool
+	Hosts                   []string
+	RoutePath               *string
+	InstanceCount           *int
+	Memory                  *int64
+	Name                    *string
+	NoHostname              *bool
+	NoRoute                 bool
+	UseRandomRoute          bool
+	UseRandomPort           bool
+	Path                    *string
+	ServicesToBind          []string
+	SpaceGUID               *string
+	StackGUID               *string
+	StackName               *string
+	State                   *string
+	PackageUpdatedAt        *time.Time
+	AppPorts                *[]int
+	Routes                  []ManifestRoute
 }
 
 func (app *AppParams) Merge(other *AppParams) {
@@ -145,6 +148,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.HealthCheckType != nil {
 		app.HealthCheckType = other.HealthCheckType
+	}
+	if other.HealthCheckHTTPEndpoint != nil {
+		app.HealthCheckHTTPEndpoint = other.HealthCheckHTTPEndpoint
 	}
 	if other.HealthCheckTimeout != nil {
 		app.HealthCheckTimeout = other.HealthCheckTimeout
