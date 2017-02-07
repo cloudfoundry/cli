@@ -44,6 +44,7 @@ var _ = Describe("Application resources", func() {
 
 			diskQuota, memory                 int64
 			healthCheckTimeout, instanceCount int
+			healthCheckHTTPEndpoint           string
 			diego, enableSSH                  bool
 			packageUpdatedAt                  time.Time
 			appPorts                          []int
@@ -69,6 +70,7 @@ var _ = Describe("Application resources", func() {
 			}
 			healthCheckType = "none"
 			healthCheckTimeout = 5
+			healthCheckHTTPEndpoint = "/some-endpoint"
 			dockerImage = "docker-image"
 			diego = true
 			enableSSH = true
@@ -82,23 +84,24 @@ var _ = Describe("Application resources", func() {
 			appPorts = []int{9090, 123}
 
 			appParams = models.AppParams{
-				BuildpackURL:       &buildpackURL,
-				Command:            &command,
-				DiskQuota:          &diskQuota,
-				EnvironmentVars:    &environmentVars,
-				HealthCheckType:    &healthCheckType,
-				HealthCheckTimeout: &healthCheckTimeout,
-				DockerImage:        &dockerImage,
-				Diego:              &diego,
-				EnableSSH:          &enableSSH,
-				InstanceCount:      &instanceCount,
-				Memory:             &memory,
-				Name:               &name,
-				SpaceGUID:          &spaceGUID,
-				StackGUID:          &stackGUID,
-				State:              &state,
-				PackageUpdatedAt:   &packageUpdatedAt,
-				AppPorts:           &appPorts,
+				BuildpackURL:            &buildpackURL,
+				Command:                 &command,
+				DiskQuota:               &diskQuota,
+				EnvironmentVars:         &environmentVars,
+				HealthCheckType:         &healthCheckType,
+				HealthCheckTimeout:      &healthCheckTimeout,
+				HealthCheckHTTPEndpoint: &healthCheckHTTPEndpoint,
+				DockerImage:             &dockerImage,
+				Diego:                   &diego,
+				EnableSSH:               &enableSSH,
+				InstanceCount:           &instanceCount,
+				Memory:                  &memory,
+				Name:                    &name,
+				SpaceGUID:               &spaceGUID,
+				StackGUID:               &stackGUID,
+				State:                   &state,
+				PackageUpdatedAt:        &packageUpdatedAt,
+				AppPorts:                &appPorts,
 			}
 		})
 
@@ -114,6 +117,7 @@ var _ = Describe("Application resources", func() {
 			Expect(*entity.Command).To(Equal(command))
 			Expect(*entity.HealthCheckType).To(Equal(healthCheckType))
 			Expect(*entity.HealthCheckTimeout).To(Equal(healthCheckTimeout))
+			Expect(*entity.HealthCheckHTTPEndpoint).To(Equal(healthCheckHTTPEndpoint))
 			Expect(*entity.DockerImage).To(Equal(dockerImage))
 			Expect(*entity.Diego).To(Equal(diego))
 			Expect(*entity.EnableSSH).To(Equal(enableSSH))

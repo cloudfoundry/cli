@@ -44,29 +44,30 @@ type ApplicationResource struct {
 }
 
 type ApplicationEntity struct {
-	Name                 *string                 `json:"name,omitempty"`
-	Command              *string                 `json:"command,omitempty"`
-	DetectedStartCommand *string                 `json:"detected_start_command,omitempty"`
-	State                *string                 `json:"state,omitempty"`
-	SpaceGUID            *string                 `json:"space_guid,omitempty"`
-	Instances            *int                    `json:"instances,omitempty"`
-	Memory               *int64                  `json:"memory,omitempty"`
-	DiskQuota            *int64                  `json:"disk_quota,omitempty"`
-	StackGUID            *string                 `json:"stack_guid,omitempty"`
-	Stack                *StackResource          `json:"stack,omitempty"`
-	Routes               *[]AppRouteResource     `json:"routes,omitempty"`
-	Buildpack            *string                 `json:"buildpack,omitempty"`
-	DetectedBuildpack    *string                 `json:"detected_buildpack,omitempty"`
-	EnvironmentJSON      *map[string]interface{} `json:"environment_json,omitempty"`
-	HealthCheckType      *string                 `json:"health_check_type,omitempty"`
-	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
-	PackageState         *string                 `json:"package_state,omitempty"`
-	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
-	Diego                *bool                   `json:"diego,omitempty"`
-	DockerImage          *string                 `json:"docker_image,omitempty"`
-	EnableSSH            *bool                   `json:"enable_ssh,omitempty"`
-	PackageUpdatedAt     *time.Time              `json:"package_updated_at,omitempty"`
-	AppPorts             *[]int                  `json:"ports,omitempty"`
+	Name                    *string                 `json:"name,omitempty"`
+	Command                 *string                 `json:"command,omitempty"`
+	DetectedStartCommand    *string                 `json:"detected_start_command,omitempty"`
+	State                   *string                 `json:"state,omitempty"`
+	SpaceGUID               *string                 `json:"space_guid,omitempty"`
+	Instances               *int                    `json:"instances,omitempty"`
+	Memory                  *int64                  `json:"memory,omitempty"`
+	DiskQuota               *int64                  `json:"disk_quota,omitempty"`
+	StackGUID               *string                 `json:"stack_guid,omitempty"`
+	Stack                   *StackResource          `json:"stack,omitempty"`
+	Routes                  *[]AppRouteResource     `json:"routes,omitempty"`
+	Buildpack               *string                 `json:"buildpack,omitempty"`
+	DetectedBuildpack       *string                 `json:"detected_buildpack,omitempty"`
+	EnvironmentJSON         *map[string]interface{} `json:"environment_json,omitempty"`
+	HealthCheckType         *string                 `json:"health_check_type,omitempty"`
+	HealthCheckHTTPEndpoint *string                 `json:"health_check_http_endpoint,omitempty"`
+	HealthCheckTimeout      *int                    `json:"health_check_timeout,omitempty"`
+	PackageState            *string                 `json:"package_state,omitempty"`
+	StagingFailedReason     *string                 `json:"staging_failed_reason,omitempty"`
+	Diego                   *bool                   `json:"diego,omitempty"`
+	DockerImage             *string                 `json:"docker_image,omitempty"`
+	EnableSSH               *bool                   `json:"enable_ssh,omitempty"`
+	PackageUpdatedAt        *time.Time              `json:"package_updated_at,omitempty"`
+	AppPorts                *[]int                  `json:"ports,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
@@ -92,21 +93,22 @@ func (resource AppFileResource) ToIntegrityFields() IntegrityFields {
 
 func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	entity := ApplicationEntity{
-		Buildpack:          app.BuildpackURL,
-		Name:               app.Name,
-		SpaceGUID:          app.SpaceGUID,
-		Instances:          app.InstanceCount,
-		Memory:             app.Memory,
-		DiskQuota:          app.DiskQuota,
-		StackGUID:          app.StackGUID,
-		Command:            app.Command,
-		HealthCheckType:    app.HealthCheckType,
-		HealthCheckTimeout: app.HealthCheckTimeout,
-		DockerImage:        app.DockerImage,
-		Diego:              app.Diego,
-		EnableSSH:          app.EnableSSH,
-		PackageUpdatedAt:   app.PackageUpdatedAt,
-		AppPorts:           app.AppPorts,
+		Buildpack:               app.BuildpackURL,
+		Name:                    app.Name,
+		SpaceGUID:               app.SpaceGUID,
+		Instances:               app.InstanceCount,
+		Memory:                  app.Memory,
+		DiskQuota:               app.DiskQuota,
+		StackGUID:               app.StackGUID,
+		Command:                 app.Command,
+		HealthCheckType:         app.HealthCheckType,
+		HealthCheckTimeout:      app.HealthCheckTimeout,
+		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
+		DockerImage:             app.DockerImage,
+		Diego:                   app.Diego,
+		EnableSSH:               app.EnableSSH,
+		PackageUpdatedAt:        app.PackageUpdatedAt,
+		AppPorts:                app.AppPorts,
 	}
 
 	if app.State != nil {
@@ -169,6 +171,9 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	}
 	if entity.HealthCheckType != nil {
 		app.HealthCheckType = *entity.HealthCheckType
+	}
+	if entity.HealthCheckHTTPEndpoint != nil {
+		app.HealthCheckHTTPEndpoint = *entity.HealthCheckHTTPEndpoint
 	}
 	if entity.Diego != nil {
 		app.Diego = *entity.Diego

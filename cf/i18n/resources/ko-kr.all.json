@@ -160,6 +160,10 @@
     "translation": "'{{.VersionShort}}' 및 '{{.VersionLong}}'도 허용됩니다. "
   },
   {
+    "id": "(process | port | http)",
+    "translation": "(process | port | http)"
+  },
+  {
     "id": ") already exists.",
     "translation": ")이(가) 이미 있습니다."
   },
@@ -344,7 +348,7 @@
     "translation": "로그 파일에 API 요청 진단 추가"
   },
   {
-    "id": "Application health check type (e.g. 'port' or 'none')",
+    "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
     "translation": "애플리케이션 상태 확인 유형(예: '포트' 또는 '없음')"
   },
   {
@@ -3076,10 +3080,6 @@
     "translation": ""
   },
   {
-    "id": "HEALTH_CHECK_TYPE",
-    "translation": ""
-  },
-  {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
     "translation": ""
   },
@@ -4296,7 +4296,7 @@
     "translation": "단일 앱 푸시(Manifest 사용 또는 사용 안 함)"
   },
   {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
