@@ -182,6 +182,7 @@ applications:
 					Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
 					Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 					Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -202,6 +203,7 @@ applications:
 					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -222,6 +224,7 @@ applications:
 					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
+					Eventually(session).Should(Exit(0))
 				})
 
 			})
@@ -250,6 +253,7 @@ applications:
 				It("displays the app guid", func() {
 					session := helpers.CF("app", "--guid", appName)
 					Eventually(session).Should(Say(appGUID))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
