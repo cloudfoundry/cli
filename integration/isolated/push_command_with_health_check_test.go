@@ -140,7 +140,7 @@ var _ = Describe("Push with health check", func() {
 
 		Context("when pushing with manifest", func() {
 			Context("when the health type is http and an endpoint is provided", func() {
-				FIt("sets the health check type and endpoint", func() {
+				It("sets the health check type and endpoint", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -165,7 +165,7 @@ applications:
 			})
 
 			Context("when the health type is not http and an endpoint is provided", func() {
-				FIt("displays an error", func() {
+				It("displays an error", func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---
