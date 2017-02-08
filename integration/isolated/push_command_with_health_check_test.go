@@ -102,8 +102,8 @@ var _ = Describe("Push with health check", func() {
 
 					appGUID := helpers.AppGUID(appName)
 					session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-					Eventually(session).Should(Exit(0))
 					Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+					Eventually(session).Should(Exit(0))
 				})
 
 				Context("when the health check type is set to 'http'", func() {
@@ -116,8 +116,8 @@ var _ = Describe("Push with health check", func() {
 					It("preserves the existing endpoint", func() {
 						appGUID := helpers.AppGUID(appName)
 						session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-						Eventually(session).Should(Exit(0))
 						Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 
@@ -131,65 +131,137 @@ var _ = Describe("Push with health check", func() {
 					It("preserves the existing endpoint", func() {
 						appGUID := helpers.AppGUID(appName)
 						session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-						Eventually(session).Should(Exit(0))
 						Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
 		})
 
 		Context("when pushing with manifest", func() {
-			Context("when setting the health check", func() {
-				DescribeTable("displays the correct health check type",
-					func(healthCheckType string, endpoint string) {
-						helpers.WithHelloWorldApp(func(appDir string) {
-							manifestContents := []byte(fmt.Sprintf(`
+			Context("when the health type is http and an endpoint is provided", func() {
+				FIt("sets the health check type and endpoint", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  memory: 128M
+  health-check-type: http
+  health-check-http-endpoint: /some-endpoint
+`, appName))
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
+
+					session := helpers.CF("get-health-check", appName)
+					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
+					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/some-endpoint\n"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the health type is not http and an endpoint is provided", func() {
+				FIt("displays an error", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  memory: 128M
+  health-check-type: port
+  health-check-http-endpoint: /some-endpoint
+`, appName))
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")
+						Eventually(session.Out).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when passing an 'http' health check type with the -u option", func() {
+				It("resets the endpoint to the default", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  memory: 128M
+  health-check-type: http
+  health-check-http-endpoint: /some-endpoint
+`, appName))
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+					})
+
+					session := helpers.CF("get-health-check", appName)
+					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
+					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/\n"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		Context("when the manifest contains the health check type attribute", func() {
+			DescribeTable("displays the correct health check type",
+				func(healthCheckType string, endpoint string) {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   memory: 128M
   health-check-type: %s
 `, appName, healthCheckType))
-							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
-							Expect(err).ToNot(HaveOccurred())
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
-						})
+						Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+					})
 
-						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+%s", healthCheckType))
-						Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+%s\n", endpoint))
-						Eventually(session).Should(Exit(0))
-					},
+					session := helpers.CF("get-health-check", appName)
+					Eventually(session.Out).Should(Say("Health check type:\\s+%s", healthCheckType))
+					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+%s\n", endpoint))
+					Eventually(session).Should(Exit(0))
+				},
 
-					Entry("when the health check type is none", "none", ""),
-					Entry("when the health check type is process", "process", ""),
-					Entry("when the health check type is port", "port", ""),
-					Entry("when the health check type is http", "http", "/"),
-				)
+				Entry("when the health check type is none", "none", ""),
+				Entry("when the health check type is process", "process", ""),
+				Entry("when the health check type is port", "port", ""),
+				Entry("when the health check type is http", "http", "/"),
+			)
 
-				Context("when passing a health check type with the -u option", func() {
-					It("overrides any health check types in the manifest", func() {
-						helpers.WithHelloWorldApp(func(appDir string) {
-							manifestContents := []byte(fmt.Sprintf(`
+			Context("when passing a health check type with the -u option", func() {
+				It("overrides any health check types in the manifest", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   memory: 128M
   health-check-type: port
 `, appName))
-							manifestPath := filepath.Join(appDir, "manifest.yml")
-							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
-							Expect(err).ToNot(HaveOccurred())
+						manifestPath := filepath.Join(appDir, "manifest.yml")
+						err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-							Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
-						})
-
-						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-						Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
 					})
+
+					session := helpers.CF("get-health-check", appName)
+					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})

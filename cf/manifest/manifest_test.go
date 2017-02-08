@@ -315,47 +315,45 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].UseRandomRoute).To(BeTrue())
 	})
 
-	It("sets http-health-check-endpoint to '/' when the health-check-type is 'http'", func() {
-		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
-			"applications": []interface{}{
-				map[interface{}]interface{}{
-					"buildpack":         "my-buildpack",
-					"disk_quota":        "512M",
-					"domain":            "my-domain",
-					"domains":           []interface{}{"domain1.test", "domain2.test"},
-					"host":              "my-hostname",
-					"hosts":             []interface{}{"host-1", "host-2"},
-					"name":              "my-app-name",
-					"stack":             "my-stack",
-					"memory":            "256M",
-					"health-check-type": "http",
-					"instances":         1,
-					"timeout":           11,
-					"no-route":          true,
-					"no-hostname":       true,
-					"random-route":      true,
-				},
-			},
-		}))
+	Context("when the health-check-type is 'http'", func() {
+		Context("when health-check-http-endpoint is NOT provided", func() {
+			It("sets http-health-check-endpoint to '/'", func() {
+				m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						map[interface{}]interface{}{
+							"health-check-type": "http",
+						},
+					},
+				}))
 
-		apps, err := m.Applications()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(len(apps)).To(Equal(1))
+				apps, err := m.Applications()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(apps)).To(Equal(1))
 
-		Expect(*apps[0].BuildpackURL).To(Equal("my-buildpack"))
-		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
-		Expect(apps[0].Domains).To(ConsistOf([]string{"domain1.test", "domain2.test", "my-domain"}))
-		Expect(apps[0].Hosts).To(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
-		Expect(*apps[0].Name).To(Equal("my-app-name"))
-		Expect(*apps[0].StackName).To(Equal("my-stack"))
-		Expect(*apps[0].HealthCheckType).To(Equal("http"))
-		Expect(*apps[0].HealthCheckHTTPEndpoint).To(Equal("/"))
-		Expect(*apps[0].Memory).To(Equal(int64(256)))
-		Expect(*apps[0].InstanceCount).To(Equal(1))
-		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
-		Expect(apps[0].NoRoute).To(BeTrue())
-		Expect(*apps[0].NoHostname).To(BeTrue())
-		Expect(apps[0].UseRandomRoute).To(BeTrue())
+				Expect(*apps[0].HealthCheckType).To(Equal("http"))
+				Expect(*apps[0].HealthCheckHTTPEndpoint).To(Equal("/"))
+			})
+		})
+
+		Context("when health-check-http-endpoint IS provided", func() {
+			It("sets http-health-check-endpoint to the provided endpoint", func() {
+				m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						map[interface{}]interface{}{
+							"health-check-type":          "http",
+							"health-check-http-endpoint": "/some-endpoint",
+						},
+					},
+				}))
+
+				apps, err := m.Applications()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(len(apps)).To(Equal(1))
+
+				Expect(*apps[0].HealthCheckType).To(Equal("http"))
+				Expect(*apps[0].HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
+			})
+		})
 	})
 
 	It("removes duplicated values in 'hosts' and 'domains'", func() {

@@ -399,6 +399,26 @@ var _ = Describe("Push Actor", func() {
 	Describe("ValidateAppParams", func() {
 		var apps []models.AppParams
 
+		Context("when HealthCheckType is not http", func() {
+			Context("when HealthCheckHTTPEndpoint is provided", func() {
+				BeforeEach(func() {
+					healthCheckType := "port"
+					endpoint := "/some-endpoint"
+					apps = []models.AppParams{
+						models.AppParams{
+							HealthCheckType:         &healthCheckType,
+							HealthCheckHTTPEndpoint: &endpoint,
+						},
+					}
+				})
+				It("displays error", func() {
+					errs := actor.ValidateAppParams(apps)
+					Expect(errs).To(HaveLen(1))
+					Expect(errs[0].Error()).To(Equal("Health check type must be 'http' to set a health check HTTP endpoint."))
+				})
+			})
+		})
+
 		Context("when 'routes' is provided", func() {
 			BeforeEach(func() {
 				appName := "my-app"
