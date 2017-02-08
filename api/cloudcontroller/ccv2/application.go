@@ -9,11 +9,22 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// ApplicationState is the running state of an application.
 type ApplicationState string
 
 const (
 	ApplicationStarted ApplicationState = "STARTED"
 	ApplicationStopped ApplicationState = "STOPPED"
+)
+
+// ApplicationPackageState is the staging state of application bits.
+type ApplicationPackageState string
+
+const (
+	ApplicationPackageStaged  ApplicationPackageState = "STAGED"
+	ApplicationPackagePending ApplicationPackageState = "PENDING"
+	ApplicationPackageFailed  ApplicationPackageState = "FAILED"
+	ApplicationPackageUnknown ApplicationPackageState = "UNKNOWN"
 )
 
 // Application represents a Cloud Controller Application.
@@ -48,11 +59,17 @@ type Application struct {
 	// Name is the name given to the application.
 	Name string `json:"-"`
 
+	// PackageState represents the staging state of the application bits.
+	PackageState ApplicationPackageState `json:"-"`
+
 	// PackageUpdatedAt is the last time the app bits were updated. In RFC3339.
 	PackageUpdatedAt time.Time `json:"-"`
 
 	// StackGUID is the GUID for the Stack the application is running on.
 	StackGUID string `json:"-"`
+
+	// StagingFailedReason is the reason why the package failed to stage.
+	StagingFailedReason string `json:"-"`
 
 	// State is the desired state of the application.
 	State ApplicationState `json:"-"`
@@ -72,8 +89,10 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			Instances               int        `json:"instances"`
 			Memory                  int        `json:"memory"`
 			Name                    string     `json:"name"`
+			PackageState            string     `json:"package_state"`
 			PackageUpdatedAt        *time.Time `json:"package_updated_at"`
 			StackGUID               string     `json:"stack_guid"`
+			StagingFailedReason     string     `json:"staging_failed_reason"`
 			State                   string     `json:"state"`
 		} `json:"entity"`
 	}
@@ -91,7 +110,9 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.Instances = ccApp.Entity.Instances
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name
+	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)
 	application.StackGUID = ccApp.Entity.StackGUID
+	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
 	application.State = ApplicationState(ccApp.Entity.State)
 
 	if ccApp.Entity.PackageUpdatedAt != nil {
