@@ -248,10 +248,6 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 				}
 			}
 
-			if appParams.HealthCheckType != nil && *appParams.HealthCheckType == "http" && existingApp.HealthCheckType == "http" {
-				appParams.HealthCheckHTTPEndpoint = &existingApp.HealthCheckHTTPEndpoint
-			}
-
 			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
 			if err != nil {
 				return err
