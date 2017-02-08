@@ -38,8 +38,10 @@ var _ = Describe("Application", func() {
 							"instances": 13,
 							"memory": 1024,
 							"name": "app-name-1",
+							"package_state": "FAILED",
 							"package_updated_at": "2015-03-10T23:11:54Z",
 							"stack_guid": "some-stack-guid",
+							"staging_failed_reason": "some-reason",
 							"state": "STOPPED"
 						}
 					},
@@ -117,8 +119,10 @@ var _ = Describe("Application", func() {
 						Instances:               13,
 						Memory:                  1024,
 						Name:                    "app-name-1",
+						PackageState:            ApplicationPackageFailed,
 						PackageUpdatedAt:        updatedAt,
 						StackGUID:               "some-stack-guid",
+						StagingFailedReason:     "some-reason",
 						State:                   ApplicationStopped,
 					},
 					{Name: "app-name-2", GUID: "app-guid-2", DetectedBuildpack: "ruby 1.6.29"},
