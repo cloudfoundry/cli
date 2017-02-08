@@ -204,6 +204,12 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.ServicesToBind = sliceOrNil(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)
+
+	if appParams.HealthCheckType != nil && *appParams.HealthCheckType == "http" {
+		healthCheckHTTPEndpoint := "/"
+		appParams.HealthCheckHTTPEndpoint = &healthCheckHTTPEndpoint
+	}
+
 	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
 	appParams.Routes = parseRoutes(yamlMap, &errs)
 
