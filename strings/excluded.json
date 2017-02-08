@@ -300,6 +300,7 @@
     "no-start",
     "security-group-rules",
     "health-check-type",
+    "health-check-http-endpoint",
     "disallow-paid-service-plans",
     "map-route",
     "delete-quota",

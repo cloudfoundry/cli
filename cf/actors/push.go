@@ -185,6 +185,10 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 	for _, app := range apps {
 		appName := app.Name
 
+		if app.HealthCheckType != nil && *app.HealthCheckType != "http" && app.HealthCheckHTTPEndpoint != nil {
+			errs = append(errs, fmt.Errorf(T("Health check type must be 'http' to set a health check HTTP endpoint.")))
+		}
+
 		if app.Routes != nil {
 			if app.Hosts != nil {
 				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'", map[string]interface{}{"AppName": appName})))
