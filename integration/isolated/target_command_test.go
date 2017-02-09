@@ -115,15 +115,14 @@ var _ = Describe("target command", func() {
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 			})
 
-			It("displays org not found, exits 1, and preserves existing target", func() {
+			It("displays org not found, exits 1, and clears existing targets", func() {
 				session := helpers.CF("target", "-o", orgName)
 				Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 
 				session = helpers.CF("target")
-				Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-				Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+				Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -234,15 +233,14 @@ var _ = Describe("target command", func() {
 			})
 
 			Context("when the space does not exist", func() {
-				It("displays space not found, exits 1, and preserves existing target", func() {
+				It("displays space not found, exits 1, and clears existing targets", func() {
 					session := helpers.CF("target", "-s", spaceName)
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 
 					session = helpers.CF("target")
-					Eventually(session.Out).Should(Say("Org:            %s", existingOrg))
-					Eventually(session.Out).Should(Say("Space:          %s", existingSpace))
+					Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -266,15 +264,14 @@ var _ = Describe("target command", func() {
 		})
 
 		Context("when the org does not exist", func() {
-			It("displays org not found, exits 1, and preserves existing targets", func() {
+			It("displays org not found, exits 1, and clears existing targets", func() {
 				session := helpers.CF("target", "-o", orgName, "-s", spaceName)
 				Eventually(session.Err).Should(Say("Organization '%s' not found", orgName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 
 				session = helpers.CF("target")
-				Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-				Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+				Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -304,15 +301,14 @@ var _ = Describe("target command", func() {
 			})
 
 			Context("when the space does not exist", func() {
-				It("displays space not found, exits 1, and preserves existing targets", func() {
+				It("displays space not found, exits 1, and clears the existing targets", func() {
 					session := helpers.CF("target", "-o", orgName, "-s", spaceName)
 					Eventually(session.Err).Should(Say("Space '%s' not found.", spaceName))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 
 					session = helpers.CF("target")
-					Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-					Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+					Eventually(session.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
