@@ -48,11 +48,13 @@ func (cmd *TargetCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
+		cmd.clearTargets()
 		return shared.HandleError(err)
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
+		cmd.clearTargets()
 		return shared.HandleError(err)
 	}
 
@@ -60,20 +62,24 @@ func (cmd *TargetCommand) Execute(args []string) error {
 	case cmd.Organization != "" && cmd.Space != "":
 		err = cmd.setOrgAndSpace()
 		if err != nil {
+			cmd.clearTargets()
 			return err
 		}
 	case cmd.Organization != "":
 		err = cmd.setOrg()
 		if err != nil {
+			cmd.clearTargets()
 			return err
 		}
 		err = cmd.autoTargetSpace(cmd.Config.TargetedOrganization().GUID)
 		if err != nil {
+			cmd.clearTargets()
 			return err
 		}
 	case cmd.Space != "":
 		err = cmd.setSpace()
 		if err != nil {
+			cmd.clearTargets()
 			return err
 		}
 	}
@@ -109,6 +115,11 @@ func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
 				"BinaryVersion": cmd.Config.BinaryVersion(),
 			})
 	}
+}
+
+func (cmd TargetCommand) clearTargets() {
+	cmd.Config.UnsetOrganizationInformation()
+	cmd.Config.UnsetSpaceInformation()
 }
 
 // setOrgAndSpace sets organization and space
