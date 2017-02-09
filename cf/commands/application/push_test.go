@@ -851,7 +851,7 @@ var _ = Describe("Push Command", func() {
 				})
 
 				Context("when health-check-type '-u' or '--health-check-type' is set", func() {
-					Context("when the value is not 'port' or 'none'", func() {
+					Context("when the value is not 'http', 'none', 'port', or 'process'", func() {
 						BeforeEach(func() {
 							args = []string{"app-name", "-u", "bad-value"}
 						})

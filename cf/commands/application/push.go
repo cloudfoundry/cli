@@ -248,6 +248,16 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 				}
 			}
 
+			// if the user did not provide a health-check-http-endpoint
+			// and one doesn't exist already in the cloud
+			// set to default
+			if appParams.HealthCheckType != nil && *appParams.HealthCheckType == "http" {
+				if appParams.HealthCheckHTTPEndpoint == nil && existingApp.HealthCheckHTTPEndpoint == "" {
+					endpoint := "/"
+					appParams.HealthCheckHTTPEndpoint = &endpoint
+				}
+			}
+
 			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
 			if err != nil {
 				return err
@@ -263,6 +273,14 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 					"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 					"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
+			// if the user did not provide a health-check-http-endpoint
+			// set to default
+			if appParams.HealthCheckType != nil && *appParams.HealthCheckType == "http" {
+				if appParams.HealthCheckHTTPEndpoint == nil {
+					endpoint := "/"
+					appParams.HealthCheckHTTPEndpoint = &endpoint
+				}
+			}
 			app, err = cmd.appRepo.Create(appParams)
 			if err != nil {
 				return err
@@ -787,11 +805,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	switch healthCheckType {
 	case "":
 		// do nothing
-	case "http":
-		appParams.HealthCheckType = &healthCheckType
-		healthCheckHTTPEndpoint := "/"
-		appParams.HealthCheckHTTPEndpoint = &healthCheckHTTPEndpoint
-	case "none", "port", "process":
+	case "http", "none", "port", "process":
 		appParams.HealthCheckType = &healthCheckType
 	default:
 		return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
