@@ -25,6 +25,10 @@ fi
 
 cf auth $CF_USERNAME $CF_PASSWORD
 
+# we don't want the pipeline job to fail because there's a high chance of
+# failure when running commands in parallel
+set +e
+
 cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
 cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
 
