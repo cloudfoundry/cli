@@ -445,6 +445,114 @@ var _ = Describe("CreateAppManifest", func() {
 					Expect(quota).To(Equal(int64(1024)))
 				})
 			})
+
+			Context("when the app has health check type", func() {
+				Context("when the health check type is port", func() {
+					BeforeEach(func() {
+						application.HealthCheckType = "port"
+						appSummaryRepo.GetSummaryReturns(application, nil)
+					})
+
+					It("does not set the health check type nor the endpoint", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
+
+						Expect(fakeManifest.HealthCheckTypeCallCount()).To(Equal(0))
+						Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the health check type is process", func() {
+					BeforeEach(func() {
+						application.HealthCheckType = "process"
+						appSummaryRepo.GetSummaryReturns(application, nil)
+					})
+
+					It("sets the health check type but not the endpoint", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
+
+						Expect(fakeManifest.HealthCheckTypeCallCount()).To(Equal(1))
+						name, healthCheckType := fakeManifest.HealthCheckTypeArgsForCall(0)
+						Expect(name).To(Equal("app-name"))
+						Expect(healthCheckType).To(Equal("process"))
+						Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the health check type is none", func() {
+					BeforeEach(func() {
+						application.HealthCheckType = "none"
+						appSummaryRepo.GetSummaryReturns(application, nil)
+					})
+
+					It("sets the health check type but not the endpoint", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
+
+						Expect(fakeManifest.HealthCheckTypeCallCount()).To(Equal(1))
+						name, healthCheckType := fakeManifest.HealthCheckTypeArgsForCall(0)
+						Expect(name).To(Equal("app-name"))
+						Expect(healthCheckType).To(Equal("none"))
+						Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the health check type is http", func() {
+					BeforeEach(func() {
+						application.HealthCheckType = "http"
+						appSummaryRepo.GetSummaryReturns(application, nil)
+					})
+
+					It("sets the health check type", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
+
+						Expect(fakeManifest.HealthCheckTypeCallCount()).To(Equal(1))
+						name, healthCheckType := fakeManifest.HealthCheckTypeArgsForCall(0)
+						Expect(name).To(Equal("app-name"))
+						Expect(healthCheckType).To(Equal("http"))
+					})
+
+					Context("when the health check endpoint is the empty string", func() {
+						BeforeEach(func() {
+							application.HealthCheckHTTPEndpoint = ""
+							appSummaryRepo.GetSummaryReturns(application, nil)
+						})
+
+						It("does not set the health check endpoint", func() {
+							Expect(runCLIErr).NotTo(HaveOccurred())
+
+							Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when the health check endpoint is /", func() {
+						BeforeEach(func() {
+							application.HealthCheckHTTPEndpoint = "/"
+							appSummaryRepo.GetSummaryReturns(application, nil)
+						})
+
+						It("does not set the health check endpoint", func() {
+							Expect(runCLIErr).NotTo(HaveOccurred())
+
+							Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when the health check endpoint is not /", func() {
+						BeforeEach(func() {
+							application.HealthCheckHTTPEndpoint = "/some-endpoint"
+							appSummaryRepo.GetSummaryReturns(application, nil)
+						})
+
+						It("sets the health check endpoint", func() {
+							Expect(runCLIErr).NotTo(HaveOccurred())
+
+							Expect(fakeManifest.HealthCheckHTTPEndpointCallCount()).To(Equal(1))
+							name, healthCheckHTTPEndpoint := fakeManifest.HealthCheckHTTPEndpointArgsForCall(0)
+							Expect(name).To(Equal("app-name"))
+							Expect(healthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
+						})
+					})
+				})
+			})
 		})
 	})
 })

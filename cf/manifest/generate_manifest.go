@@ -23,6 +23,8 @@ type App interface {
 	StartCommand(string, string)
 	EnvironmentVars(string, string, string)
 	HealthCheckTimeout(string, int)
+	HealthCheckType(string, string)
+	HealthCheckHTTPEndpoint(string, string)
 	Instances(string, int)
 	Route(string, string, string, string, int)
 	GetContents() []models.Application
@@ -32,19 +34,21 @@ type App interface {
 }
 
 type Application struct {
-	Name      string                 `yaml:"name"`
-	Instances int                    `yaml:"instances,omitempty"`
-	Memory    string                 `yaml:"memory,omitempty"`
-	DiskQuota string                 `yaml:"disk_quota,omitempty"`
-	AppPorts  []int                  `yaml:"app-ports,omitempty"`
-	Routes    []map[string]string    `yaml:"routes,omitempty"`
-	NoRoute   bool                   `yaml:"no-route,omitempty"`
-	Buildpack string                 `yaml:"buildpack,omitempty"`
-	Command   string                 `yaml:"command,omitempty"`
-	Env       map[string]interface{} `yaml:"env,omitempty"`
-	Services  []string               `yaml:"services,omitempty"`
-	Stack     string                 `yaml:"stack,omitempty"`
-	Timeout   int                    `yaml:"timeout,omitempty"`
+	Name                    string                 `yaml:"name"`
+	Instances               int                    `yaml:"instances,omitempty"`
+	Memory                  string                 `yaml:"memory,omitempty"`
+	DiskQuota               string                 `yaml:"disk_quota,omitempty"`
+	AppPorts                []int                  `yaml:"app-ports,omitempty"`
+	Routes                  []map[string]string    `yaml:"routes,omitempty"`
+	NoRoute                 bool                   `yaml:"no-route,omitempty"`
+	Buildpack               string                 `yaml:"buildpack,omitempty"`
+	Command                 string                 `yaml:"command,omitempty"`
+	Env                     map[string]interface{} `yaml:"env,omitempty"`
+	Services                []string               `yaml:"services,omitempty"`
+	Stack                   string                 `yaml:"stack,omitempty"`
+	Timeout                 int                    `yaml:"timeout,omitempty"`
+	HealthCheckType         string                 `yaml:"health-check-type,omitempty"`
+	HealthCheckHTTPEndpoint string                 `yaml:"health-check-http-endpoint,omitempty"`
 }
 
 type Applications struct {
@@ -89,6 +93,16 @@ func (m *appManifest) BuildpackURL(appName string, url string) {
 func (m *appManifest) HealthCheckTimeout(appName string, timeout int) {
 	i := m.findOrCreateApplication(appName)
 	m.contents[i].HealthCheckTimeout = timeout
+}
+
+func (m *appManifest) HealthCheckType(appName string, healthCheckType string) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].HealthCheckType = healthCheckType
+}
+
+func (m *appManifest) HealthCheckHTTPEndpoint(appName string, healthCheckHTTPEndpoint string) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].HealthCheckHTTPEndpoint = healthCheckHTTPEndpoint
 }
 
 func (m *appManifest) Instances(appName string, instances int) {
@@ -158,18 +172,20 @@ func generateAppMap(app models.Application) (Application, error) {
 		routes = append(routes, buildRoute(routeSummary))
 	}
 	m := Application{
-		Name:      app.Name,
-		Services:  services,
-		Buildpack: app.BuildpackURL,
-		Memory:    fmt.Sprintf("%dM", app.Memory),
-		Command:   app.Command,
-		Env:       app.EnvironmentVars,
-		Timeout:   app.HealthCheckTimeout,
-		Instances: app.InstanceCount,
-		DiskQuota: fmt.Sprintf("%dM", app.DiskQuota),
-		Stack:     app.Stack.Name,
-		AppPorts:  app.AppPorts,
-		Routes:    routes,
+		Name:                    app.Name,
+		Services:                services,
+		Buildpack:               app.BuildpackURL,
+		Memory:                  fmt.Sprintf("%dM", app.Memory),
+		Command:                 app.Command,
+		Env:                     app.EnvironmentVars,
+		Timeout:                 app.HealthCheckTimeout,
+		Instances:               app.InstanceCount,
+		DiskQuota:               fmt.Sprintf("%dM", app.DiskQuota),
+		Stack:                   app.Stack.Name,
+		AppPorts:                app.AppPorts,
+		Routes:                  routes,
+		HealthCheckType:         app.HealthCheckType,
+		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
 	}
 
 	if len(app.Routes) == 0 {

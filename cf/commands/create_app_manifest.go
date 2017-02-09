@@ -144,6 +144,16 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) error {
 		cmd.manifest.HealthCheckTimeout(app.Name, app.HealthCheckTimeout)
 	}
 
+	if app.HealthCheckType != "port" {
+		cmd.manifest.HealthCheckType(app.Name, app.HealthCheckType)
+	}
+
+	if app.HealthCheckType == "http" &&
+		app.HealthCheckHTTPEndpoint != "" &&
+		app.HealthCheckHTTPEndpoint != "/" {
+		cmd.manifest.HealthCheckHTTPEndpoint(app.Name, app.HealthCheckHTTPEndpoint)
+	}
+
 	if len(app.EnvironmentVars) > 0 {
 		sorted := sortEnvVar(app.EnvironmentVars)
 		for _, envVarKey := range sorted {
