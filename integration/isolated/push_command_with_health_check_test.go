@@ -17,9 +17,15 @@ import (
 var _ = Describe("Push with health check", func() {
 	Context("help", func() {
 		Context("when displaying help in the refactor", func() {
-			It("Displays command usage to output", func() {
+			It("displays command usage to output", func() {
 				session := helpers.CF("push", "--help")
-				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session.Out).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("displays health check timeout (-t) flag description", func() {
+				session := helpers.CF("push", "--help")
+				Eventually(session.Out).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -42,9 +48,15 @@ var _ = Describe("Push with health check", func() {
 		})
 
 		Context("when displaying help in the old code", func() {
-			It("Displays command usage to output", func() {
+			It("displays command usage to output", func() {
 				session := helpers.CF("push")
-				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session.Out).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session).Should(Exit(1))
+			})
+
+			It("displays health check timeout (-t) flag description", func() {
+				session := helpers.CF("push")
+				Eventually(session.Out).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

@@ -3732,10 +3732,6 @@
     "translation": "予約されたポートで作成される可能性のある経路の最大数 (デフォルト: 0)"
   },
   {
-    "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
-    "translation": "CLI がアプリケーションの開始を待つ最大時間 (秒)、他のサーバー・サイド・タイムアウトが適用されることもあります"
-  },
-  {
     "id": "Memory",
     "translation": ""
   },
@@ -5546,6 +5542,10 @@
   {
     "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
     "translation": "このため、このアプリは再始動されます。 {{.AppName}} をスケーリングしますか?"
+  },
+  {
+    "id": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app",
+    "translation": "CLI がアプリケーションの開始を待つ最大時間 (秒)、他のサーバー・サイド・タイムアウトが適用されることもあります"
   },
   {
     "id": "Timeout for async HTTP requests",

@@ -3732,10 +3732,6 @@
     "translation": "예약된 포트에서 작성될 수 있는 최대 라우트 수(기본값: 0)"
   },
   {
-    "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
-    "translation": "CLI가 애플리케이션이 시작되도록 대기하는 최대 시간(초)입니다. 다른 서버 측 제한시간이 적용될 수 있습니다."
-  },
-  {
     "id": "Memory",
     "translation": ""
   },
@@ -5546,6 +5542,10 @@
   {
     "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
     "translation": "앱이 다시 시작되도록 합니다. {{.AppName}}을(를) 스케일링하시겠습니까?"
+  },
+  {
+    "id": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app",
+    "translation": "CLI가 애플리케이션이 시작되도록 대기하는 최대 시간(초)입니다. 다른 서버 측 제한시간이 적용될 수 있습니다."
   },
   {
     "id": "Timeout for async HTTP requests",
