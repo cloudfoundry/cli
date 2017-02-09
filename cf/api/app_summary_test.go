@@ -129,6 +129,8 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
 			Expect(app.StackGUID).To(Equal("the-stack-guid"))
+			Expect(app.HealthCheckType).To(Equal("some-health-check-type"))
+			Expect(app.HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
 		})
 	})
 
@@ -244,5 +246,7 @@ const getAppSummaryResponseBody string = `
 		"service_names":[
 			"my-service-instance"
 		],
-		"package_updated_at":"2014-10-24T19:54:00+00:00"
+		"package_updated_at":"2014-10-24T19:54:00+00:00",
+		"health_check_type":"some-health-check-type",
+		"health_check_http_endpoint":"/some-endpoint"
 }`

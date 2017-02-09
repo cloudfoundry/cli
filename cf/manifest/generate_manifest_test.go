@@ -54,6 +54,8 @@ var _ = Describe("generate_manifest", func() {
 				m.Memory("app2", 2048)
 				m.Instances("app2", 3)
 				m.DiskQuota("app2", 2048)
+				m.HealthCheckType("app2", "some-health-check-type")
+				m.HealthCheckHTTPEndpoint("app2", "/some-endpoint")
 				m.Save(f)
 
 				applications := getYaml(f).Applications
@@ -63,6 +65,8 @@ var _ = Describe("generate_manifest", func() {
 				Expect(applications[1].DiskQuota).To(Equal("2048M"))
 				Expect(applications[1].Stack).To(Equal("stack-name"))
 				Expect(applications[1].Instances).To(Equal(3))
+				Expect(applications[1].HealthCheckType).To(Equal("some-health-check-type"))
+				Expect(applications[1].HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
 			})
 
 			Context("when an application has app-ports", func() {
@@ -311,19 +315,21 @@ type YManifest struct {
 }
 
 type YApplication struct {
-	Name      string                 `yaml:"name"`
-	Services  []string               `yaml:"services"`
-	Buildpack string                 `yaml:"buildpack"`
-	Memory    string                 `yaml:"memory"`
-	Command   string                 `yaml:"command"`
-	Env       map[string]interface{} `yaml:"env"`
-	Timeout   int                    `yaml:"timeout"`
-	Instances int                    `yaml:"instances"`
-	Routes    []map[string]string    `yaml:"routes"`
-	NoRoute   bool                   `yaml:"no-route"`
-	DiskQuota string                 `yaml:"disk_quota"`
-	Stack     string                 `yaml:"stack"`
-	AppPorts  []int                  `yaml:"app-ports"`
+	Name                    string                 `yaml:"name"`
+	Services                []string               `yaml:"services"`
+	Buildpack               string                 `yaml:"buildpack"`
+	Memory                  string                 `yaml:"memory"`
+	Command                 string                 `yaml:"command"`
+	Env                     map[string]interface{} `yaml:"env"`
+	Timeout                 int                    `yaml:"timeout"`
+	Instances               int                    `yaml:"instances"`
+	Routes                  []map[string]string    `yaml:"routes"`
+	NoRoute                 bool                   `yaml:"no-route"`
+	DiskQuota               string                 `yaml:"disk_quota"`
+	Stack                   string                 `yaml:"stack"`
+	AppPorts                []int                  `yaml:"app-ports"`
+	HealthCheckType         string                 `yaml:"health-check-type"`
+	HealthCheckHTTPEndpoint string                 `yaml:"health-check-http-endpoint"`
 }
 
 func getYaml(f *bytes.Buffer) YManifest {

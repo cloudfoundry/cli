@@ -53,6 +53,18 @@ type FakeApp struct {
 		arg1 string
 		arg2 int
 	}
+	HealthCheckTypeStub        func(string, string)
+	healthCheckTypeMutex       sync.RWMutex
+	healthCheckTypeArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	HealthCheckHTTPEndpointStub        func(string, string)
+	healthCheckHTTPEndpointMutex       sync.RWMutex
+	healthCheckHTTPEndpointArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
 	InstancesStub        func(string, int)
 	instancesMutex       sync.RWMutex
 	instancesArgsForCall []struct {
@@ -274,6 +286,56 @@ func (fake *FakeApp) HealthCheckTimeoutArgsForCall(i int) (string, int) {
 	return fake.healthCheckTimeoutArgsForCall[i].arg1, fake.healthCheckTimeoutArgsForCall[i].arg2
 }
 
+func (fake *FakeApp) HealthCheckType(arg1 string, arg2 string) {
+	fake.healthCheckTypeMutex.Lock()
+	fake.healthCheckTypeArgsForCall = append(fake.healthCheckTypeArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("HealthCheckType", []interface{}{arg1, arg2})
+	fake.healthCheckTypeMutex.Unlock()
+	if fake.HealthCheckTypeStub != nil {
+		fake.HealthCheckTypeStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeApp) HealthCheckTypeCallCount() int {
+	fake.healthCheckTypeMutex.RLock()
+	defer fake.healthCheckTypeMutex.RUnlock()
+	return len(fake.healthCheckTypeArgsForCall)
+}
+
+func (fake *FakeApp) HealthCheckTypeArgsForCall(i int) (string, string) {
+	fake.healthCheckTypeMutex.RLock()
+	defer fake.healthCheckTypeMutex.RUnlock()
+	return fake.healthCheckTypeArgsForCall[i].arg1, fake.healthCheckTypeArgsForCall[i].arg2
+}
+
+func (fake *FakeApp) HealthCheckHTTPEndpoint(arg1 string, arg2 string) {
+	fake.healthCheckHTTPEndpointMutex.Lock()
+	fake.healthCheckHTTPEndpointArgsForCall = append(fake.healthCheckHTTPEndpointArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("HealthCheckHTTPEndpoint", []interface{}{arg1, arg2})
+	fake.healthCheckHTTPEndpointMutex.Unlock()
+	if fake.HealthCheckHTTPEndpointStub != nil {
+		fake.HealthCheckHTTPEndpointStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeApp) HealthCheckHTTPEndpointCallCount() int {
+	fake.healthCheckHTTPEndpointMutex.RLock()
+	defer fake.healthCheckHTTPEndpointMutex.RUnlock()
+	return len(fake.healthCheckHTTPEndpointArgsForCall)
+}
+
+func (fake *FakeApp) HealthCheckHTTPEndpointArgsForCall(i int) (string, string) {
+	fake.healthCheckHTTPEndpointMutex.RLock()
+	defer fake.healthCheckHTTPEndpointMutex.RUnlock()
+	return fake.healthCheckHTTPEndpointArgsForCall[i].arg1, fake.healthCheckHTTPEndpointArgsForCall[i].arg2
+}
+
 func (fake *FakeApp) Instances(arg1 string, arg2 int) {
 	fake.instancesMutex.Lock()
 	fake.instancesArgsForCall = append(fake.instancesArgsForCall, struct {
@@ -457,6 +519,10 @@ func (fake *FakeApp) Invocations() map[string][][]interface{} {
 	defer fake.environmentVarsMutex.RUnlock()
 	fake.healthCheckTimeoutMutex.RLock()
 	defer fake.healthCheckTimeoutMutex.RUnlock()
+	fake.healthCheckTypeMutex.RLock()
+	defer fake.healthCheckTypeMutex.RUnlock()
+	fake.healthCheckHTTPEndpointMutex.RLock()
+	defer fake.healthCheckHTTPEndpointMutex.RUnlock()
 	fake.instancesMutex.RLock()
 	defer fake.instancesMutex.RUnlock()
 	fake.routeMutex.RLock()
