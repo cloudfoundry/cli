@@ -3732,10 +3732,6 @@
     "translation": "可以使用保留埠建立的路徑數目上限（預設值: 0）"
   },
   {
-    "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
-    "translation": "CLI 等待應用程式啟動的時間上限（以秒為單位），可能會套用其他伺服器端逾時"
-  },
-  {
     "id": "Memory",
     "translation": ""
   },
@@ -5546,6 +5542,10 @@
   {
     "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
     "translation": "這會導致重新啟動應用程式。您確定要調整 {{.AppName}} 嗎？"
+  },
+  {
+    "id": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app",
+    "translation": "CLI 等待應用程式啟動的時間上限（以秒為單位），可能會套用其他伺服器端逾時"
   },
   {
     "id": "Timeout for async HTTP requests",

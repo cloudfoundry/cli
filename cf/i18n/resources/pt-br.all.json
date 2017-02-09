@@ -3732,10 +3732,6 @@
     "translation": "Número máximo de rotas que podem ser criadas com portas reservadas (Padrão: 0)"
   },
   {
-    "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
-    "translation": "Tempo máximo (em segundos) para a CLI aguardar o início do aplicativo, outros tempos limite do lado do servidor podem ser aplicados"
-  },
-  {
     "id": "Memory",
     "translation": ""
   },
@@ -5546,6 +5542,10 @@
   {
     "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
     "translation": "Isso fará com que o app seja reiniciado. Tem certeza de que deseja escalar {{.AppName}}?"
+  },
+  {
+    "id": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app",
+    "translation": "Tempo máximo (em segundos) para a CLI aguardar o início do aplicativo, outros tempos limite do lado do servidor podem ser aplicados"
   },
   {
     "id": "Timeout for async HTTP requests",
