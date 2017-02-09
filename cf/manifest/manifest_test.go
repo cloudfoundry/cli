@@ -316,25 +316,6 @@ var _ = Describe("Manifests", func() {
 	})
 
 	Context("when the health-check-type is 'http'", func() {
-		Context("when health-check-http-endpoint is NOT provided", func() {
-			It("sets http-health-check-endpoint to '/'", func() {
-				m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
-					"applications": []interface{}{
-						map[interface{}]interface{}{
-							"health-check-type": "http",
-						},
-					},
-				}))
-
-				apps, err := m.Applications()
-				Expect(err).NotTo(HaveOccurred())
-				Expect(len(apps)).To(Equal(1))
-
-				Expect(*apps[0].HealthCheckType).To(Equal("http"))
-				Expect(*apps[0].HealthCheckHTTPEndpoint).To(Equal("/"))
-			})
-		})
-
 		Context("when health-check-http-endpoint IS provided", func() {
 			It("sets http-health-check-endpoint to the provided endpoint", func() {
 				m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
