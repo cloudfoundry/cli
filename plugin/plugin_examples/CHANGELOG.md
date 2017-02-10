@@ -1,5 +1,8 @@
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/DOC.md)
 
+# Changes in v6.24.0
+- API `LoggregatorEndpoint()` is deprecated and now always returns the empty string. Use `DopplerEndpoint()` instead to obtain logs.
+
 # Changes in v6.17.0
 - `-v` is now a global flag to enable verbose logging of API calls, equivalent to `CF_TRACE=true`. This means that the `-v` flag will no longer be passed to plugins.
 
@@ -63,7 +66,7 @@ Added the following commands to cli_connection.go:
 
 # Changes in v6.10.0
 [CF-Community Plugin Repository](https://github.com/cloudfoundry-incubator/cli-plugin-repo) introduced.
-- Plugin developers can submit any open-source plugins 
+- Plugin developers can submit any open-source plugins
 - Plugins in the community repo can be browsed and installed from the CLI
 
 # Changes in v6.9.0
