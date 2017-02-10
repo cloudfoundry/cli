@@ -1,3 +1,100 @@
+## 6.24.0
+* Bump version to 6.24.0
+* Revert "Bump version to 6.24.0"
+* Bump version to 6.24.0
+* do not clear the existing target when targeting space only fails
+* don't fail for commands running in parallel
+* clears existing target information when the target command fails
+* improved flag description for health check timeout in push command
+* create-app-manifest stores health check type and endpoint fields
+* cf push accepts manifests with attribute to set endpoint on http health checks
+* don't overwrite http endpoint with previous endpoint
+* remove focus
+* add health-check-http-endpoint to app manifest
+* app manifests take process and http health check types on `cf push`
+* include package_state and staging_failed_reason in application
+* check exit values in app integration tests
+* create bridge between UAA client and NOAA client
+* added health check types process and http to cf push arguments
+* integration tests for push with health check type
+* update integration tests to reflect change in get-health-check command
+* Update CONTRIBUTING.md
+* add port and http health check types on cf-set-health-check
+* display option defaults in help
+* deleted unused code and renamed function
+* moved v3 api error
+* custom written table printer due to multibyte characters
+* show endpoint in get-health-check output
+* refactor get-health-check command
+* integration test for get-health-check
+* removed experimental flag from target command
+* added details and application instance information
+* remove any code specific to CF 203 or earlier
+* remove shadows
+* update translations for set-health-check
+* add http health check type and deprecate none
+* updated version output format
+* added integration tests for target command
+* skip the app and target integration tests
+* add get-health-check after setting in integration tests
+* change updating health check output
+* refactor set-health-check
+* add HealthCheckType field to Application struct
+* HealthCheckType uses string field instead of bools
+* fix positional-arg-name in SetHealthCheckArgs
+* integration tests for set-health-check command
+* update manifest inheritance integration tests to display updated app
+* fixed integration tests for the app command - skipping until refactor work is done
+* make sure CheckTarget gets called with the right args
+* move v2 and v3 SharedActor to the command package
+* refactor app command
+* removed unused dependency: gopkg.in/check.v1
+* move check target logic from command to sharedaction
+* plugin API test expects loggregator endpoint to be empty
+* fixing CATS-linux (deprecated loggregator)
+* remove loggregatorlib from NOTICE
+* deleted loggregator endpoint from config
+* removed the loggregator library and respective dependencies
+* fix header
+* inline-relations-depth/summary warning godoc
+* godoc for error handling, pre-alpha warning, and missing explainations
+* API methods for app command refactor
+* integration tests for cf app
+* clarified CF_TRACE issue does not affect all plugins
+* when deleting targeted org, delete-org clears org and space from target
+* removed v3 cats from diego and linux
+* add netman-release to dies-lite pipeline
+* -randomizeSuites -> -randomizeAllSpecs, there's a difference
+* split integration into windows and linux
+* adding extra bosh-lite to pipeline
+* added integration tests around push manifest inheritance
+* added some more integration tests
+* started integration tests for manifest inheritance in cf push
+* add netman dependancy for CF251
+* tests have been deprecated, don't poll this resource.
+* remove unused config interface methods
+* move configaction into v2action
+* set bosh-lite kernel back to 3.19
+* on windows the default binary name is cli.exe
+* exit script if any suite fails
+* giving up on testing config write failure
+* use chattr instead of chmod to make config unwriteable
+* no more etcd!
+* change temp home dir prefix from gats to integration
+* write errors to stderr if deferred config write fails
+* update vendored dependencies
+* move job polling into API layer
+* v2action/space_test do not need config
+* setup error wrapper in new UAA client creation
+* move config out of UAA client into UAAAuthentication wrapper
+* pull in NOTICE files in dependencies using patched gvt
+* better org name in target command integration test
+* added known issue with CF trace and plugins
+* move skip to the first line to avoid unnecessary login
+* only run target tests if CF_CLI_EXPERIMENTAL=true
+* refactored some display code to use `ui.DisplayTable`
+* clean up create-installers-windows task
+
 ## 6.23.1
 * Bump version to 6.23.1
 * reset author when amending commit
