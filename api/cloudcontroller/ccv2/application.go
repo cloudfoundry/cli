@@ -72,7 +72,7 @@ type Application struct {
 	StagingFailedReason string `json:"-"`
 
 	// State is the desired state of the application.
-	State ApplicationState `json:"-"`
+	State ApplicationState `json:"state,omitempty"`
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Application response.
@@ -119,6 +119,25 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		application.PackageUpdatedAt = *ccApp.Entity.PackageUpdatedAt
 	}
 	return nil
+}
+
+// GetApplication returns back an Application.
+func (client *Client) GetApplication(guid string) (Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.AppRequest,
+		URIParams:   Params{"app_guid": guid},
+	})
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	var app Application
+	response := cloudcontroller.Response{
+		Result: &app,
+	}
+
+	err = client.connection.Make(request, &response)
+	return app, response.Warnings, err
 }
 
 // GetApplications returns back a list of Applications based off of the

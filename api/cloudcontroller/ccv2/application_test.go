@@ -18,6 +18,68 @@ var _ = Describe("Application", func() {
 		client = NewTestClient()
 	})
 
+	Describe("GetApplication", func() {
+		BeforeEach(func() {
+			response := `{
+						"metadata": {
+							"guid": "app-guid-1",
+							"updated_at": null
+						},
+						"entity": {
+							"buildpack": "ruby 1.6.29",
+							"detected_start_command": "echo 'I am a banana'",
+							"disk_quota": 586,
+							"detected_buildpack": null,
+							"health_check_type": "port",
+							"health_check_http_endpoint": "/",
+							"instances": 13,
+							"memory": 1024,
+							"name": "app-name-1",
+							"package_state": "FAILED",
+							"package_updated_at": "2015-03-10T23:11:54Z",
+							"stack_guid": "some-stack-guid",
+							"staging_failed_reason": "some-reason",
+							"state": "STOPPED"
+						}
+			}`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/apps/app-guid-1"),
+					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+		})
+
+		Context("when apps exist", func() {
+			It("returns the app", func() {
+				app, warnings, err := client.GetApplication("app-guid-1")
+				Expect(err).NotTo(HaveOccurred())
+
+				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(app).To(Equal(Application{
+					Buildpack:               "ruby 1.6.29",
+					DetectedBuildpack:       "",
+					DetectedStartCommand:    "echo 'I am a banana'",
+					DiskQuota:               586,
+					GUID:                    "app-guid-1",
+					HealthCheckType:         "port",
+					HealthCheckHTTPEndpoint: "/",
+					Instances:               13,
+					Memory:                  1024,
+					Name:                    "app-name-1",
+					PackageState:            ApplicationPackageFailed,
+					PackageUpdatedAt:        updatedAt,
+					StackGUID:               "some-stack-guid",
+					StagingFailedReason:     "some-reason",
+					State:                   ApplicationStopped,
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetApplications", func() {
 		BeforeEach(func() {
 			response1 := `{
@@ -155,12 +217,13 @@ var _ = Describe("Application", func() {
 					"name": "app-name-1",
 					"package_updated_at": "2015-03-10T23:11:54Z",
 					"stack_guid": "some-stack-guid",
-					"state": "STOPPED"
+					"state": "STARTED"
 				}
 			}`
 					expectedBody := map[string]string{
 						"health_check_http_endpoint": "/anything",
 						"health_check_type":          "some-health-check-type",
+						"state":                      "STARTED",
 					}
 
 					server.AppendHandlers(
@@ -177,6 +240,7 @@ var _ = Describe("Application", func() {
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/anything",
+						State: ApplicationStarted,
 					})
 					Expect(err).NotTo(HaveOccurred())
 
@@ -196,7 +260,7 @@ var _ = Describe("Application", func() {
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,
 						StackGUID:               "some-stack-guid",
-						State:                   ApplicationStopped,
+						State:                   ApplicationStarted,
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
