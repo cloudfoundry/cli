@@ -101,7 +101,7 @@ var _ = Describe("target Command", func() {
 				fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
 			})
 
-			It("returns an error and clears the existing targets", func() {
+			It("returns an error", func() {
 				Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
@@ -109,8 +109,8 @@ var _ = Describe("target Command", func() {
 				Expect(checkTargetedOrg).To(BeFalse())
 				Expect(checkTargetedSpace).To(BeFalse())
 
-				Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+				Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
+				Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(0))
 			})
 		})
 
@@ -123,11 +123,11 @@ var _ = Describe("target Command", func() {
 					fakeConfig.CurrentUserReturns(configv3.User{}, someErr)
 				})
 
-				It("returns the same error and clears the existing targets", func() {
+				It("returns the same error", func() {
 					Expect(executeErr).To(MatchError(someErr))
 
-					Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
-					Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
+					Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
+					Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(0))
 				})
 			})
 
@@ -238,22 +238,22 @@ var _ = Describe("target Command", func() {
 									v2action.SpaceNotFoundError{Name: "some-space"})
 							})
 
-							It("returns a SpaceNotFoundError and clears existing targets", func() {
+							It("returns a SpaceNotFoundError and clears existing space", func() {
 								Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
-								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
+								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 							})
 						})
 					})
 
 					Context("when no org is targeted", func() {
-						It("returns NoOrgTargeted error and clears existing targets", func() {
+						It("returns NoOrgTargeted error and clears existing space", func() {
 							Expect(executeErr).To(MatchError(shared.NoOrganizationTargetedError{}))
 
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
-							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
+							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))
 						})
 					})

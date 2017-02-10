@@ -48,7 +48,6 @@ func (cmd *TargetCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
-		cmd.clearTargets()
 		return shared.HandleError(err)
 	}
 
@@ -118,8 +117,12 @@ func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
 }
 
 func (cmd TargetCommand) clearTargets() {
-	cmd.Config.UnsetOrganizationInformation()
-	cmd.Config.UnsetSpaceInformation()
+	if cmd.Organization != "" {
+		cmd.Config.UnsetOrganizationInformation()
+		cmd.Config.UnsetSpaceInformation()
+	} else if cmd.Space != "" {
+		cmd.Config.UnsetSpaceInformation()
+	}
 }
 
 // setOrgAndSpace sets organization and space
