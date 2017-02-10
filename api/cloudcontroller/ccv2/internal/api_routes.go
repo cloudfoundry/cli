@@ -9,6 +9,7 @@ import (
 const (
 	AppInstances                  = "AppInstances"
 	AppInstanceStats              = "AppInstanceStats"
+	AppRequest                    = "App"
 	AppsFromRouteRequest          = "AppsFromRoute"
 	AppsRequest                   = "Apps"
 	DeleteOrganizationRequest     = "DeleteOrganization"
@@ -35,9 +36,10 @@ const (
 // URLs.
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
+	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: AppRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: UpdateAppRequest},
-	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: RoutesFromApplicationRequest},
 	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: AppInstances},
+	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: RoutesFromApplicationRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: AppInstanceStats},
 	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: JobRequest},
