@@ -21,7 +21,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
 [![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
 
-**Cloud Foundry CLI** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
+***Cloud Foundry CLI*** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
 Further documentation is at the [docs page for the
 CLI](https://docs.cloudfoundry.org/cf-cli).  
