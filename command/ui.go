@@ -13,7 +13,7 @@ type UI interface {
 	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
 	DisplayError(err error)
 	DisplayHeader(text string)
-	DisplayLogMessage(message ui.LogMessage)
+	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})

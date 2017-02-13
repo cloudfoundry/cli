@@ -441,26 +441,53 @@ some-prefixgg          hh            ii`))
 			message.SourceInstanceReturns("12")
 		})
 
-		Context("single line log message", func() {
-			It("prints out a single line to STDOUT", func() {
-				ui.DisplayLogMessage(message)
-				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is a log message\n"))
+		Context("with header", func() {
+			Context("single line log message", func() {
+				It("prints out a single line to STDOUT", func() {
+					ui.DisplayLogMessage(message, true)
+					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is a log message\n"))
+				})
+			})
+
+			Context("multi-line log message", func() {
+				BeforeEach(func() {
+					var err error
+					ui.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
+					Expect(err).NotTo(HaveOccurred())
+
+					message.MessageReturns("This is a log message\nThis is also a log message")
+				})
+
+				It("prints out mutliple lines to STDOUT", func() {
+					ui.DisplayLogMessage(message, true)
+					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is a log message\n"))
+					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is also a log message\n"))
+				})
 			})
 		})
 
-		Context("multi-line log message", func() {
-			BeforeEach(func() {
-				var err error
-				ui.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
-				Expect(err).NotTo(HaveOccurred())
-
-				message.MessageReturns("This is a log message\nThis is also a log message")
+		Context("without header", func() {
+			Context("single line log message", func() {
+				It("prints out a single line to STDOUT", func() {
+					ui.DisplayLogMessage(message, false)
+					Expect(ui.Out).To(Say("This is a log message\n"))
+				})
 			})
 
-			It("prints out mutliple lines to STDOUT", func() {
-				ui.DisplayLogMessage(message)
-				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is a log message\n"))
-				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is also a log message\n"))
+			Context("multi-line log message", func() {
+				BeforeEach(func() {
+					var err error
+					ui.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
+					Expect(err).NotTo(HaveOccurred())
+
+					message.MessageReturns("This is a log message\nThis is also a log message")
+				})
+
+				It("prints out mutliple lines to STDOUT", func() {
+					ui.DisplayLogMessage(message, false)
+					Expect(ui.Out).To(Say("This is a log message\n"))
+					Expect(ui.Out).To(Say("This is also a log message\n"))
+				})
 			})
 		})
 	})
