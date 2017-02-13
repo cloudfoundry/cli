@@ -292,13 +292,14 @@ var _ = Describe("Start Command", func() {
 					BeforeEach(func() {
 						applicationSummary = v2action.ApplicationSummary{
 							Application: v2action.Application{
-								Name:              "some-app",
-								GUID:              "some-app-guid",
-								Instances:         3,
-								Memory:            128,
-								PackageUpdatedAt:  time.Unix(0, 0),
-								DetectedBuildpack: "some-buildpack",
-								State:             "STARTED",
+								Name:                 "some-app",
+								GUID:                 "some-app-guid",
+								Instances:            3,
+								Memory:               128,
+								PackageUpdatedAt:     time.Unix(0, 0),
+								DetectedBuildpack:    "some-buildpack",
+								State:                "STARTED",
+								DetectedStartCommand: "some start command",
 							},
 							Stack: v2action.Stack{
 								Name: "potatos",
@@ -344,6 +345,7 @@ var _ = Describe("Start Command", func() {
 						Expect(testUI.Out).To(Say("Last uploaded:\\s+1970-01-01T00:00:00Z"))
 						Expect(testUI.Out).To(Say("Stack:\\s+potatos"))
 						Expect(testUI.Out).To(Say("Buildpack:\\s+some-buildpack"))
+						Expect(testUI.Out).To(Say("Start command:\\s+some start command"))
 
 						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})

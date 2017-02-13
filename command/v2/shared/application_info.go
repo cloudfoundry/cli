@@ -9,8 +9,9 @@ import (
 	"github.com/cloudfoundry/bytefmt"
 )
 
-// DisplayAppSummary displays the application summary to the UI.
-func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary) {
+// DisplayAppSummary displays the application summary to the UI, and optionally
+// the command to start the app.
+func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, displayStartCommand bool) {
 	instances := fmt.Sprintf("%d/%d", len(appSummary.RunningInstances), appSummary.Instances)
 
 	usage := ui.TranslateText(
@@ -35,6 +36,10 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary) {
 		{ui.TranslateText("Last uploaded:"), ui.UserFriendlyDate(appSummary.PackageUpdatedAt)},
 		{ui.TranslateText("Stack:"), appSummary.Stack.Name},
 		{ui.TranslateText("Buildpack:"), appSummary.Application.CalculatedBuildpack()},
+	}
+
+	if displayStartCommand {
+		table = append(table, []string{ui.TranslateText("Start command:"), appSummary.Application.DetectedStartCommand})
 	}
 
 	ui.DisplayTable("", table, 3)
