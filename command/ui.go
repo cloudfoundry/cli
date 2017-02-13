@@ -1,6 +1,10 @@
 package command
 
-import "time"
+import (
+	"time"
+
+	"code.cloudfoundry.org/cli/util/ui"
+)
 
 // Custom fake was written for this under customv2fakes
 
@@ -9,6 +13,7 @@ type UI interface {
 	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
 	DisplayError(err error)
 	DisplayHeader(text string)
+	DisplayLogMessage(message ui.LogMessage)
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})

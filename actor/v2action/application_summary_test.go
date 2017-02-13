@@ -86,7 +86,7 @@ var _ = Describe("Application Summary Actions", func() {
 								Name:  "some-app",
 								State: ccv2.ApplicationStarted,
 							},
-							RunningInstances: []ApplicationInstance{
+							RunningInstances: []ApplicationInstanceWithStats{
 								{ID: 0},
 								{ID: 1},
 							},

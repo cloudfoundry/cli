@@ -5,7 +5,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 type ApplicationSummary struct {
 	Application
 	Stack            Stack
-	RunningInstances []ApplicationInstance
+	RunningInstances []ApplicationInstanceWithStats
 	Routes           []Route
 }
 
@@ -23,8 +23,8 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 	// cloud controller calls the instance reporter only when the desired
 	// application state is STARTED
 	if app.State == ccv2.ApplicationStarted {
-		var instances []ApplicationInstance
-		instances, warnings, err = actor.GetApplicationInstancesByApplication(app.GUID)
+		var instances []ApplicationInstanceWithStats
+		instances, warnings, err = actor.GetApplicationInstancesWithStatsByApplication(app.GUID)
 		allWarnings = append(allWarnings, warnings...)
 
 		switch err.(type) {
