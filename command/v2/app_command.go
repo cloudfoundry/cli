@@ -98,7 +98,7 @@ func (cmd AppCommand) displayAppSummary() error {
 		return shared.HandleError(err)
 	}
 
-	shared.DisplayAppSummary(cmd.UI, appSummary)
+	shared.DisplayAppSummary(cmd.UI, appSummary, false)
 
 	return nil
 }
