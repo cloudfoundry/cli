@@ -2,6 +2,7 @@ package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -37,6 +38,23 @@ var _ = Describe("target command", func() {
 			Eventually(session.Out).Should(Say("SEE ALSO:"))
 			Eventually(session.Out).Should(Say("   create-org, create-space, login, orgs, spaces"))
 			Eventually(session).Should(Exit(0))
+		})
+	})
+
+	Context("when both the access and refresh tokens are invalid", func() {
+		BeforeEach(func() {
+			helpers.SetConfig(func(conf *configv3.Config) {
+				conf.SetAccessToken("bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImtleS0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJlNzQyMjg1NjNjZjc0ZGQ0YTU5YTA1NTUyMWVlYzlhNCIsInN1YiI6IjhkN2IxZjRlLTJhNGQtNGQwNy1hYWE0LTdjOTVlZDFhN2YzNCIsInNjb3BlIjpbInJvdXRpbmcucm91dGVyX2dyb3Vwcy5yZWFkIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwib3BlbmlkIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwidWFhLnVzZXIiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjhkN2IxZjRlLTJhNGQtNGQwNy1hYWE0LTdjOTVlZDFhN2YzNCIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsInJldl9zaWciOiI2ZjZkM2Y1YyIsImlhdCI6MTQ4Njc2NDQxNywiZXhwIjoxNDg2NzY1MDE3LCJpc3MiOiJodHRwczovL3VhYS5ib3NoLWxpdGUuY29tL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbImNsb3VkX2NvbnRyb2xsZXIiLCJzY2ltIiwicGFzc3dvcmQiLCJjZiIsInVhYSIsIm9wZW5pZCIsImRvcHBsZXIiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiXX0.AhQI_-u9VzkQ1Z7yzibq7dBWbb5ucTDtwaXjeCf4rakl7hJvQYWI1meO9PSUI8oVbArBgOu0aOU6mfzDE8dSyZ1qAD0mhL5_c2iLGXdqUaPlXrX9vxuJZh_8vMTlxAnJ02c6ixbWaPWujvEIuiLb-QWa0NTbR9RDNyw1MbOQkdQ")
+
+				conf.SetRefreshToken("bb8f7b209ff74409877974bce5752412-r")
+			})
+		})
+
+		It("tells the user to login and exits with 1", func() {
+			session := helpers.CF("target", "-o", "some-org", "-s", "some-space")
+			Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate."))
+			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 

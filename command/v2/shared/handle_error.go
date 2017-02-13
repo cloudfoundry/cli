@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 )
 
@@ -23,6 +24,9 @@ func HandleError(err error) error {
 		return JobFailedError{JobGUID: e.JobGUID}
 	case ccv2.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
+
+	case uaa.InvalidAuthTokenError:
+		return InvalidRefreshTokenError{}
 
 	case sharedaction.NotLoggedInError:
 		return command.NotLoggedInError{BinaryName: e.BinaryName}
