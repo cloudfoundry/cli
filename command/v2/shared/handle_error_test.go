@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
 	. "github.com/onsi/ginkgo"
@@ -78,6 +79,11 @@ var _ = Describe("HandleError", func() {
 		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
 			v2action.HTTPHealthCheckInvalidError{},
 			HTTPHealthCheckInvalidError{},
+		),
+
+		Entry("uaa.InvalidAuthTokenError -> InvalidRefreshTokenError",
+			uaa.InvalidAuthTokenError{},
+			InvalidRefreshTokenError{},
 		),
 
 		Entry("default case -> original error",

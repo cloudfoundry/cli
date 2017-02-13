@@ -5472,6 +5472,10 @@
     "translation": "The token"
   },
   {
+    "id": "The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate.",
+    "translation": "The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate."
+  },
+  {
     "id": "The token label",
     "translation": "The token label"
   },
