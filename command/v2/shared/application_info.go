@@ -47,7 +47,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary) {
 	}
 }
 
-func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance) {
+func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstanceWithStats) {
 	table := [][]string{
 		{"", "State", "Since", "CPU", "Memory", "Disk", "Details"},
 	}

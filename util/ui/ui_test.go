@@ -30,6 +30,11 @@ var _ = Describe("UI", func() {
 		ui.Err = NewBuffer()
 	})
 
+	It("sets the TimezoneLocation to the local timezone", func() {
+		location := time.Now().Location()
+		Expect(ui.TimezoneLocation).To(Equal(location))
+	})
+
 	Describe("TranslateText", func() {
 		It("returns the template", func() {
 			Expect(ui.TranslateText("some-template")).To(Equal("some-template"))
@@ -415,6 +420,47 @@ some-prefixgg          hh            ii`))
 				ui.DisplayError(errors.New("I am a BANANA!"))
 				Expect(ui.Err).To(Say("I am a BANANA!\n"))
 				Expect(ui.Out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
+			})
+		})
+	})
+
+	Describe("DisplayLogMessage", func() {
+		var message *uifakes.FakeLogMessage
+
+		BeforeEach(func() {
+			var err error
+			ui.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
+			Expect(err).NotTo(HaveOccurred())
+
+			message = new(uifakes.FakeLogMessage)
+			message.MessageReturns("This is a log message\r\n")
+			message.TypeReturns("OUT")
+			message.TimestampReturns(time.Unix(1468969692, 0)) // "2016-07-19T16:08:12-07:00"
+			message.ApplicationIDReturns("app-guid")
+			message.SourceTypeReturns("APP/PROC/WEB")
+			message.SourceInstanceReturns("12")
+		})
+
+		Context("single line log message", func() {
+			It("prints out a single line to STDOUT", func() {
+				ui.DisplayLogMessage(message)
+				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is a log message\n"))
+			})
+		})
+
+		Context("multi-line log message", func() {
+			BeforeEach(func() {
+				var err error
+				ui.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
+				Expect(err).NotTo(HaveOccurred())
+
+				message.MessageReturns("This is a log message\nThis is also a log message")
+			})
+
+			It("prints out mutliple lines to STDOUT", func() {
+				ui.DisplayLogMessage(message)
+				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is a log message\n"))
+				Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\]\x1b\\[0m OUT This is also a log message\n"))
 			})
 		})
 	})

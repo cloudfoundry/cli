@@ -68,6 +68,16 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetApplicationStub        func(guid string) (ccv2.Application, ccv2.Warnings, error)
+	getApplicationMutex       sync.RWMutex
+	getApplicationArgsForCall []struct {
+		guid string
+	}
+	getApplicationReturns struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetApplicationsStub        func(queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
 	getApplicationsMutex       sync.RWMutex
 	getApplicationsArgsForCall []struct {
@@ -485,6 +495,41 @@ func (fake *FakeCloudControllerClient) GetApplicationRoutesReturns(result1 []ccv
 	fake.GetApplicationRoutesStub = nil
 	fake.getApplicationRoutesReturns = struct {
 		result1 []ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error) {
+	fake.getApplicationMutex.Lock()
+	fake.getApplicationArgsForCall = append(fake.getApplicationArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("GetApplication", []interface{}{guid})
+	fake.getApplicationMutex.Unlock()
+	if fake.GetApplicationStub != nil {
+		return fake.GetApplicationStub(guid)
+	} else {
+		return fake.getApplicationReturns.result1, fake.getApplicationReturns.result2, fake.getApplicationReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationCallCount() int {
+	fake.getApplicationMutex.RLock()
+	defer fake.getApplicationMutex.RUnlock()
+	return len(fake.getApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationArgsForCall(i int) string {
+	fake.getApplicationMutex.RLock()
+	defer fake.getApplicationMutex.RUnlock()
+	return fake.getApplicationArgsForCall[i].guid
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationReturns(result1 ccv2.Application, result2 ccv2.Warnings, result3 error) {
+	fake.GetApplicationStub = nil
+	fake.getApplicationReturns = struct {
+		result1 ccv2.Application
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1282,6 +1327,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationInstancesByApplicationMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
+	fake.getApplicationMutex.RLock()
+	defer fake.getApplicationMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()
 	defer fake.getApplicationsMutex.RUnlock()
 	fake.getJobMutex.RLock()

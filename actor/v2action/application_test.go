@@ -2,11 +2,14 @@ package v2action_test
 
 import (
 	"errors"
+	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
+	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -88,6 +91,38 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
+		Describe("StagingCompleted", func() {
+			Context("when staging the application completes", func() {
+				It("returns true", func() {
+					app.PackageState = ccv2.ApplicationPackageStaged
+					Expect(app.StagingCompleted()).To(BeTrue())
+				})
+			})
+
+			Context("when the application is *not* staged", func() {
+				It("returns false", func() {
+					app.PackageState = ccv2.ApplicationPackageFailed
+					Expect(app.StagingCompleted()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("StagingFailed", func() {
+			Context("when staging the application fails", func() {
+				It("returns true", func() {
+					app.PackageState = ccv2.ApplicationPackageFailed
+					Expect(app.StagingFailed()).To(BeTrue())
+				})
+			})
+
+			Context("when staging the application does *not* fail", func() {
+				It("returns false", func() {
+					app.PackageState = ccv2.ApplicationPackageStaged
+					Expect(app.StagingFailed()).To(BeFalse())
+				})
+			})
+		})
+
 		Describe("Started", func() {
 			Context("when app is started", func() {
 				It("returns true", func() {
@@ -103,7 +138,46 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("GetApplicationBySpace", func() {
+	Describe("GetApplication", func() {
+		Context("when the application exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationReturns(
+					ccv2.Application{
+						GUID: "some-app-guid",
+						Name: "some-app",
+					},
+					ccv2.Warnings{"foo"},
+					nil,
+				)
+			})
+
+			It("returns the application and warnings", func() {
+				app, warnings, err := actor.GetApplication("some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(app).To(Equal(Application{
+					GUID: "some-app-guid",
+					Name: "some-app",
+				}))
+				Expect(warnings).To(Equal(Warnings{"foo"}))
+
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when the application does not exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationReturns(ccv2.Application{}, nil, cloudcontroller.ResourceNotFoundError{})
+			})
+
+			It("returns an ApplicationNotFoundError", func() {
+				_, _, err := actor.GetApplication("some-app-guid")
+				Expect(err).To(MatchError(ApplicationNotFoundError{GUID: "some-app-guid"}))
+			})
+		})
+	})
+
+	Describe("GetApplicationByNameSpace", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
@@ -226,6 +300,298 @@ var _ = Describe("Application Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 				_, query := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
 				Expect(query).To(Equal(expectedQuery))
+			})
+		})
+	})
+
+	Describe("StartApplication", func() {
+		var (
+			app            Application
+			fakeNOAAClient *v2actionfakes.FakeNOAAClient
+			fakeConfig     *v2actionfakes.FakeConfig
+
+			messages <-chan *LogMessage
+			logErrs  <-chan error
+			warnings <-chan string
+			errs     <-chan error
+
+			eventStream chan *events.LogMessage
+			errStream   chan error
+		)
+
+		BeforeEach(func() {
+			fakeConfig = new(v2actionfakes.FakeConfig)
+			fakeConfig.StagingTimeoutReturns(time.Minute)
+			fakeConfig.StartupTimeoutReturns(time.Minute)
+
+			app = Application{
+				GUID:      "some-app-guid",
+				Name:      "some-app",
+				Instances: 0,
+			}
+
+			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
+			fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+				eventStream = make(chan *events.LogMessage)
+				errStream = make(chan error)
+				return eventStream, errStream
+			}
+			fakeNOAAClient.CloseStub = func() error {
+				close(errStream)
+				close(eventStream)
+				return nil
+			}
+
+			fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+				Instances: 0,
+				Name:      "some-app",
+			}, ccv2.Warnings{"update-warning"}, nil)
+
+			appCount := 0
+			fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+				if appCount == 0 {
+					appCount += 1
+					return ccv2.Application{
+						GUID:         "some-app-guid",
+						Instances:    0,
+						Name:         "some-app",
+						PackageState: ccv2.ApplicationPackagePending,
+					}, ccv2.Warnings{"app-warnings-1"}, nil
+				}
+
+				return ccv2.Application{
+					GUID:         "some-app-guid",
+					Name:         "some-app",
+					Instances:    2,
+					PackageState: ccv2.ApplicationPackageStaged,
+				}, ccv2.Warnings{"app-warnings-2"}, nil
+			}
+
+			instanceCount := 0
+			fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+				if instanceCount == 0 {
+					instanceCount += 1
+					return map[int]ccv2.ApplicationInstance{
+						0: {State: ccv2.ApplicationInstanceStarting},
+						1: {State: ccv2.ApplicationInstanceStarting},
+					}, ccv2.Warnings{"app-instance-warnings-1"}, nil
+				}
+
+				return map[int]ccv2.ApplicationInstance{
+					0: {State: ccv2.ApplicationInstanceStarting},
+					1: {State: ccv2.ApplicationInstanceRunning},
+				}, ccv2.Warnings{"app-instance-warnings-2"}, nil
+			}
+		})
+
+		AfterEach(func() {
+			Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(1))
+
+			Eventually(messages).Should(BeClosed())
+			Eventually(logErrs).Should(BeClosed())
+			Eventually(warnings).Should(BeClosed())
+			Eventually(errs).Should(BeClosed())
+		})
+
+		It("starts and polls the app instance", func() {
+			messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+			Eventually(<-warnings).Should(Equal("update-warning"))
+			Eventually(<-warnings).Should(Equal("app-warnings-1"))
+			Eventually(<-warnings).Should(Equal("app-warnings-2"))
+			Eventually(<-warnings).Should(Equal("app-instance-warnings-1"))
+			Eventually(<-warnings).Should(Equal("app-instance-warnings-2"))
+
+			Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+
+			Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+			app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+			Expect(app).To(Equal(ccv2.Application{
+				GUID:  "some-app-guid",
+				State: ccv2.ApplicationStarted,
+			}))
+
+			Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
+			Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+		})
+
+		Context("when updating the application fails", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("I am a banana!!!!")
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"update-warning"}, expectedErr)
+			})
+
+			It("sends the update error and never polls", func() {
+				messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+				Eventually(<-warnings).Should(Equal("update-warning"))
+				Eventually(<-errs).Should(MatchError(expectedErr))
+
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+			})
+		})
+
+		Context("staging issues", func() {
+			Context("when polling fails", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("I am a banana!!!!")
+					fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+						return ccv2.Application{}, ccv2.Warnings{"app-warnings-1"}, expectedErr
+					}
+				})
+
+				It("sends the error and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-errs).Should(MatchError(expectedErr))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the application fails to stage", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+						return ccv2.Application{
+							GUID:                "some-app-guid",
+							Name:                "some-app",
+							Instances:           2,
+							PackageState:        ccv2.ApplicationPackageFailed,
+							StagingFailedReason: "OhNoes",
+						}, ccv2.Warnings{"app-warnings-1"}, nil
+					}
+				})
+
+				It("sends a staging error and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-errs).Should(MatchError(StagingFailedError{Reason: "OhNoes"}))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the application takes too long to stage", func() {
+				BeforeEach(func() {
+					fakeConfig.StagingTimeoutReturns(0)
+				})
+
+				It("sends a timeout error and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-errs).Should(MatchError(StagingTimeoutError{Name: "some-app"}))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Context("starting issues", func() {
+			Context("when polling fails", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("I am a banana!!!!")
+					fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						return nil, ccv2.Warnings{"app-instance-warnings-1"}, expectedErr
+					}
+				})
+
+				It("sends the error and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-warnings).Should(Equal("app-warnings-2"))
+					Eventually(<-warnings).Should(Equal("app-instance-warnings-1"))
+					Eventually(<-errs).Should(MatchError(expectedErr))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("when the application takes too long to start", func() {
+				BeforeEach(func() {
+					fakeConfig.StartupTimeoutReturns(0)
+				})
+
+				It("sends a timeout error and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-warnings).Should(Equal("app-warnings-2"))
+					Eventually(<-errs).Should(MatchError(StartupTimeoutError{Name: "some-app"}))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the application crashes", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						return map[int]ccv2.ApplicationInstance{
+							0: {State: ccv2.ApplicationInstanceCrashed},
+						}, ccv2.Warnings{"app-instance-warnings-1"}, nil
+					}
+				})
+
+				It("returns an ApplicationInstanceCrashedError and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-warnings).Should(Equal("app-warnings-2"))
+					Eventually(<-warnings).Should(Equal("app-instance-warnings-1"))
+					Eventually(<-errs).Should(MatchError(ApplicationInstanceCrashedError{Name: "some-app"}))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("when the application flaps", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						return map[int]ccv2.ApplicationInstance{
+							0: {State: ccv2.ApplicationInstanceFlapping},
+						}, ccv2.Warnings{"app-instance-warnings-1"}, nil
+					}
+				})
+
+				It("returns an ApplicationInstanceFlappingError and stops polling", func() {
+					messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+					Eventually(<-warnings).Should(Equal("update-warning"))
+					Eventually(<-warnings).Should(Equal("app-warnings-1"))
+					Eventually(<-warnings).Should(Equal("app-warnings-2"))
+					Eventually(<-warnings).Should(Equal("app-instance-warnings-1"))
+					Eventually(<-errs).Should(MatchError(ApplicationInstanceFlappingError{Name: "some-app"}))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+					Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+				})
 			})
 		})
 	})

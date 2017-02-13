@@ -3,20 +3,21 @@ package v2actionfakes
 
 import (
 	"sync"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 )
 
 type FakeConfig struct {
-	UnsetOrganizationInformationStub        func()
-	unsetOrganizationInformationMutex       sync.RWMutex
-	unsetOrganizationInformationArgsForCall []struct{}
-	UnsetSpaceInformationStub               func()
-	unsetSpaceInformationMutex              sync.RWMutex
-	unsetSpaceInformationArgsForCall        []struct{}
-	SetTargetInformationStub                func(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
-	setTargetInformationMutex               sync.RWMutex
-	setTargetInformationArgsForCall         []struct {
+	PollingIntervalStub        func() time.Duration
+	pollingIntervalMutex       sync.RWMutex
+	pollingIntervalArgsForCall []struct{}
+	pollingIntervalReturns     struct {
+		result1 time.Duration
+	}
+	SetTargetInformationStub        func(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	setTargetInformationMutex       sync.RWMutex
+	setTargetInformationArgsForCall []struct {
 		api               string
 		apiVersion        string
 		auth              string
@@ -39,46 +40,57 @@ type FakeConfig struct {
 	skipSSLValidationReturns     struct {
 		result1 bool
 	}
+	StagingTimeoutStub        func() time.Duration
+	stagingTimeoutMutex       sync.RWMutex
+	stagingTimeoutArgsForCall []struct{}
+	stagingTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	StartupTimeoutStub        func() time.Duration
+	startupTimeoutMutex       sync.RWMutex
+	startupTimeoutArgsForCall []struct{}
+	startupTimeoutReturns     struct {
+		result1 time.Duration
+	}
 	TargetStub        func() string
 	targetMutex       sync.RWMutex
 	targetArgsForCall []struct{}
 	targetReturns     struct {
 		result1 string
 	}
-	invocations      map[string][][]interface{}
-	invocationsMutex sync.RWMutex
+	UnsetOrganizationInformationStub        func()
+	unsetOrganizationInformationMutex       sync.RWMutex
+	unsetOrganizationInformationArgsForCall []struct{}
+	UnsetSpaceInformationStub               func()
+	unsetSpaceInformationMutex              sync.RWMutex
+	unsetSpaceInformationArgsForCall        []struct{}
+	invocations                             map[string][][]interface{}
+	invocationsMutex                        sync.RWMutex
 }
 
-func (fake *FakeConfig) UnsetOrganizationInformation() {
-	fake.unsetOrganizationInformationMutex.Lock()
-	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetOrganizationInformation", []interface{}{})
-	fake.unsetOrganizationInformationMutex.Unlock()
-	if fake.UnsetOrganizationInformationStub != nil {
-		fake.UnsetOrganizationInformationStub()
+func (fake *FakeConfig) PollingInterval() time.Duration {
+	fake.pollingIntervalMutex.Lock()
+	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct{}{})
+	fake.recordInvocation("PollingInterval", []interface{}{})
+	fake.pollingIntervalMutex.Unlock()
+	if fake.PollingIntervalStub != nil {
+		return fake.PollingIntervalStub()
+	} else {
+		return fake.pollingIntervalReturns.result1
 	}
 }
 
-func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
-	fake.unsetOrganizationInformationMutex.RLock()
-	defer fake.unsetOrganizationInformationMutex.RUnlock()
-	return len(fake.unsetOrganizationInformationArgsForCall)
+func (fake *FakeConfig) PollingIntervalCallCount() int {
+	fake.pollingIntervalMutex.RLock()
+	defer fake.pollingIntervalMutex.RUnlock()
+	return len(fake.pollingIntervalArgsForCall)
 }
 
-func (fake *FakeConfig) UnsetSpaceInformation() {
-	fake.unsetSpaceInformationMutex.Lock()
-	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
-	fake.unsetSpaceInformationMutex.Unlock()
-	if fake.UnsetSpaceInformationStub != nil {
-		fake.UnsetSpaceInformationStub()
-	}
-}
-
-func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
-	fake.unsetSpaceInformationMutex.RLock()
-	defer fake.unsetSpaceInformationMutex.RUnlock()
-	return len(fake.unsetSpaceInformationArgsForCall)
+func (fake *FakeConfig) PollingIntervalReturns(result1 time.Duration) {
+	fake.PollingIntervalStub = nil
+	fake.pollingIntervalReturns = struct {
+		result1 time.Duration
+	}{result1}
 }
 
 func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
@@ -163,6 +175,56 @@ func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) StagingTimeout() time.Duration {
+	fake.stagingTimeoutMutex.Lock()
+	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StagingTimeout", []interface{}{})
+	fake.stagingTimeoutMutex.Unlock()
+	if fake.StagingTimeoutStub != nil {
+		return fake.StagingTimeoutStub()
+	} else {
+		return fake.stagingTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) StagingTimeoutCallCount() int {
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
+	return len(fake.stagingTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StagingTimeoutReturns(result1 time.Duration) {
+	fake.StagingTimeoutStub = nil
+	fake.stagingTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) StartupTimeout() time.Duration {
+	fake.startupTimeoutMutex.Lock()
+	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StartupTimeout", []interface{}{})
+	fake.startupTimeoutMutex.Unlock()
+	if fake.StartupTimeoutStub != nil {
+		return fake.StartupTimeoutStub()
+	} else {
+		return fake.startupTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) StartupTimeoutCallCount() int {
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
+	return len(fake.startupTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StartupTimeoutReturns(result1 time.Duration) {
+	fake.StartupTimeoutStub = nil
+	fake.startupTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) Target() string {
 	fake.targetMutex.Lock()
 	fake.targetArgsForCall = append(fake.targetArgsForCall, struct{}{})
@@ -188,21 +250,59 @@ func (fake *FakeConfig) TargetReturns(result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) UnsetOrganizationInformation() {
+	fake.unsetOrganizationInformationMutex.Lock()
+	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetOrganizationInformation", []interface{}{})
+	fake.unsetOrganizationInformationMutex.Unlock()
+	if fake.UnsetOrganizationInformationStub != nil {
+		fake.UnsetOrganizationInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	return len(fake.unsetOrganizationInformationArgsForCall)
+}
+
+func (fake *FakeConfig) UnsetSpaceInformation() {
+	fake.unsetSpaceInformationMutex.Lock()
+	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
+	fake.unsetSpaceInformationMutex.Unlock()
+	if fake.UnsetSpaceInformationStub != nil {
+		fake.UnsetSpaceInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
+	return len(fake.unsetSpaceInformationArgsForCall)
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.unsetOrganizationInformationMutex.RLock()
-	defer fake.unsetOrganizationInformationMutex.RUnlock()
-	fake.unsetSpaceInformationMutex.RLock()
-	defer fake.unsetSpaceInformationMutex.RUnlock()
+	fake.pollingIntervalMutex.RLock()
+	defer fake.pollingIntervalMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
 	fake.targetMutex.RLock()
 	defer fake.targetMutex.RUnlock()
+	fake.unsetOrganizationInformationMutex.RLock()
+	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
 	return fake.invocations
 }
 

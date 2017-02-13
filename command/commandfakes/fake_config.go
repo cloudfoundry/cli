@@ -149,6 +149,18 @@ type FakeConfig struct {
 		refreshToken   string
 		sshOAuthClient string
 	}
+	StagingTimeoutStub        func() time.Duration
+	stagingTimeoutMutex       sync.RWMutex
+	stagingTimeoutArgsForCall []struct{}
+	stagingTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	StartupTimeoutStub        func() time.Duration
+	startupTimeoutMutex       sync.RWMutex
+	startupTimeoutArgsForCall []struct{}
+	startupTimeoutReturns     struct {
+		result1 time.Duration
+	}
 	SkipSSLValidationStub        func() bool
 	skipSSLValidationMutex       sync.RWMutex
 	skipSSLValidationArgsForCall []struct{}
@@ -759,6 +771,56 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 	return fake.setTokenInformationArgsForCall[i].accessToken, fake.setTokenInformationArgsForCall[i].refreshToken, fake.setTokenInformationArgsForCall[i].sshOAuthClient
 }
 
+func (fake *FakeConfig) StagingTimeout() time.Duration {
+	fake.stagingTimeoutMutex.Lock()
+	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StagingTimeout", []interface{}{})
+	fake.stagingTimeoutMutex.Unlock()
+	if fake.StagingTimeoutStub != nil {
+		return fake.StagingTimeoutStub()
+	} else {
+		return fake.stagingTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) StagingTimeoutCallCount() int {
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
+	return len(fake.stagingTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StagingTimeoutReturns(result1 time.Duration) {
+	fake.StagingTimeoutStub = nil
+	fake.stagingTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) StartupTimeout() time.Duration {
+	fake.startupTimeoutMutex.Lock()
+	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StartupTimeout", []interface{}{})
+	fake.startupTimeoutMutex.Unlock()
+	if fake.StartupTimeoutStub != nil {
+		return fake.StartupTimeoutStub()
+	} else {
+		return fake.startupTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) StartupTimeoutCallCount() int {
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
+	return len(fake.startupTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StartupTimeoutReturns(result1 time.Duration) {
+	fake.StartupTimeoutStub = nil
+	fake.startupTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) SkipSSLValidation() bool {
 	fake.skipSSLValidationMutex.Lock()
 	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
@@ -1014,6 +1076,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.targetMutex.RLock()

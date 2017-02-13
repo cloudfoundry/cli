@@ -206,7 +206,7 @@ var _ = Describe("App Command", func() {
 
 				Context("when the app does not have running instances", func() {
 					BeforeEach(func() {
-						applicationSummary.RunningInstances = []v2action.ApplicationInstance{}
+						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{}
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
@@ -234,7 +234,7 @@ var _ = Describe("App Command", func() {
 
 				Context("when the app has running instances", func() {
 					BeforeEach(func() {
-						applicationSummary.RunningInstances = []v2action.ApplicationInstance{
+						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{
 							{
 								ID:          0,
 								State:       v2action.ApplicationInstanceState(ccv2.ApplicationInstanceRunning),

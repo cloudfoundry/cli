@@ -24,8 +24,8 @@ const (
 	green                 = color.FgGreen
 	// yellow                         = color.FgYellow
 	// magenta                        = color.FgMagenta
-	cyan = color.FgCyan
-	// grey                           = color.FgWhite
+	cyan           = color.FgCyan
+	white          = color.FgWhite
 	defaultFgColor = 38
 )
 
@@ -49,6 +49,18 @@ type TranslatableError interface {
 	Translate(func(string, ...interface{}) string) string
 }
 
+//go:generate counterfeiter . LogMessage
+
+// LogMessage is a log response representing one to many joined lines of a log
+// message.
+type LogMessage interface {
+	Message() string
+	Type() string
+	Timestamp() time.Time
+	SourceType() string
+	SourceInstance() string
+}
+
 // UI is interface to interact with the user
 type UI struct {
 	// In is the input buffer
@@ -60,6 +72,8 @@ type UI struct {
 
 	colorEnabled configv3.ColorSetting
 	translate    i18n.TranslateFunc
+
+	TimezoneLocation *time.Location
 }
 
 // NewUI will return a UI object where Out is set to STDOUT, In is set to
@@ -70,12 +84,15 @@ func NewUI(c Config) (*UI, error) {
 		return nil, err
 	}
 
+	location := time.Now().Location()
+
 	return &UI{
-		In:           os.Stdin,
-		Out:          color.Output,
-		Err:          os.Stderr,
-		colorEnabled: c.ColorEnabled(),
-		translate:    translateFunc,
+		In:               os.Stdin,
+		Out:              color.Output,
+		Err:              os.Stderr,
+		colorEnabled:     c.ColorEnabled(),
+		translate:        translateFunc,
+		TimezoneLocation: location,
 	}, nil
 }
 
@@ -217,6 +234,26 @@ func (ui *UI) DisplayError(err error) {
 	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText("FAILED"), red, true))
 }
 
+const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
+
+// DisplayLogMessage formats and outputs a given log message.
+func (ui *UI) DisplayLogMessage(message LogMessage) {
+	time := message.Timestamp().In(ui.TimezoneLocation).Format(LogTimestampFormat)
+	header := fmt.Sprintf("%s [%s/%s]",
+		time,
+		message.SourceType(),
+		message.SourceInstance(),
+	)
+
+	for _, line := range strings.Split(message.Message(), "\n") {
+		fmt.Fprintf(ui.Out, "%s %s %s\n",
+			ui.addFlavor(header, white, true),
+			message.Type(),
+			strings.TrimRight(line, "\r\n"),
+		)
+	}
+}
+
 // addFlavor adds the provided text color and bold style to the text.
 func (ui *UI) addFlavor(text string, textColor color.Attribute, isBold bool) string {
 	colorPrinter := color.New(textColor)
@@ -232,8 +269,7 @@ func (ui *UI) addFlavor(text string, textColor color.Attribute, isBold bool) str
 		colorPrinter = colorPrinter.Add(color.Bold)
 	}
 
-	printer := colorPrinter.SprintFunc()
-	return printer(text)
+	return colorPrinter.SprintFunc()(text)
 }
 
 // getFirstSet returns the first map if 1 or more maps are provided. Otherwise
