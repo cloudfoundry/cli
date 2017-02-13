@@ -101,7 +101,7 @@ dance:
 			if !ok {
 				break dance
 			}
-			cmd.UI.DisplayLogMessage(message)
+			cmd.UI.DisplayLogMessage(message, false)
 		case warning, ok := <-apiWarnings:
 			if !ok {
 				break dance

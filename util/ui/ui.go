@@ -237,18 +237,22 @@ func (ui *UI) DisplayError(err error) {
 const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
 
 // DisplayLogMessage formats and outputs a given log message.
-func (ui *UI) DisplayLogMessage(message LogMessage) {
-	time := message.Timestamp().In(ui.TimezoneLocation).Format(LogTimestampFormat)
-	header := fmt.Sprintf("%s [%s/%s]",
-		time,
-		message.SourceType(),
-		message.SourceInstance(),
-	)
+func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
+	var header string
+	if displayHeader {
+		time := message.Timestamp().In(ui.TimezoneLocation).Format(LogTimestampFormat)
+
+		header = fmt.Sprintf("%s [%s/%s] %s ",
+			time,
+			message.SourceType(),
+			message.SourceInstance(),
+			message.Type(),
+		)
+	}
 
 	for _, line := range strings.Split(message.Message(), "\n") {
-		fmt.Fprintf(ui.Out, "%s %s %s\n",
+		fmt.Fprintf(ui.Out, "%s%s\n",
 			ui.addFlavor(header, white, true),
-			message.Type(),
 			strings.TrimRight(line, "\r\n"),
 		)
 	}
@@ -256,6 +260,10 @@ func (ui *UI) DisplayLogMessage(message LogMessage) {
 
 // addFlavor adds the provided text color and bold style to the text.
 func (ui *UI) addFlavor(text string, textColor color.Attribute, isBold bool) string {
+	if len(text) == 0 {
+		return text
+	}
+
 	colorPrinter := color.New(textColor)
 
 	switch ui.colorEnabled {
