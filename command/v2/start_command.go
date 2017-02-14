@@ -116,6 +116,12 @@ dance:
 			if !ok {
 				break dance
 			}
+			if stgErr, ok := apiErr.(v2action.StagingFailedError); ok {
+				return shared.StagingFailedError{
+					BinaryName: cmd.Config.BinaryName(),
+					Message:    stgErr.Error(),
+				}
+			}
 			return shared.HandleError(apiErr)
 		}
 	}

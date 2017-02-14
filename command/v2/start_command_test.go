@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -256,30 +257,57 @@ var _ = Describe("Start Command", func() {
 				})
 
 				Context("when passed an API err", func() {
-					var expectedErr error
+					Describe("an unexpected error", func() {
+						var expectedErr error
 
-					BeforeEach(func() {
-						expectedErr = errors.New("err log message")
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
-							messages := make(chan *v2action.LogMessage)
-							logErrs := make(chan error)
-							warnings := make(chan string)
-							errs := make(chan error)
+						BeforeEach(func() {
+							expectedErr = errors.New("err log message")
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
+								warnings := make(chan string)
+								errs := make(chan error)
 
-							go func() {
-								errs <- expectedErr
-								close(messages)
-								close(logErrs)
-								close(warnings)
-								close(errs)
-							}()
+								go func() {
+									errs <- expectedErr
+									close(messages)
+									close(logErrs)
+									close(warnings)
+									close(errs)
+								}()
 
-							return messages, logErrs, warnings, errs
-						}
+								return messages, logErrs, warnings, errs
+							}
+						})
+
+						It("stops logging and returns the error", func() {
+							Expect(executeErr).To(MatchError(expectedErr))
+						})
 					})
 
-					It("stops logging and returns the error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
+					Describe("staging error", func() {
+						BeforeEach(func() {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
+								warnings := make(chan string)
+								errs := make(chan error)
+
+								go func() {
+									errs <- v2action.StagingFailedError{Reason: "Something, but not nothing"}
+									close(messages)
+									close(logErrs)
+									close(warnings)
+									close(errs)
+								}()
+
+								return messages, logErrs, warnings, errs
+							}
+						})
+
+						It("stops logging and returns StagingFailedError", func() {
+							Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
+						})
 					})
 				})
 
