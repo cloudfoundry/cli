@@ -20,11 +20,36 @@ var _ = Describe("help command", func() {
 			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session).Should(Say("Cloud Foundry command line tool"))
-			Eventually(session).Should(Say("\\[global options\\] command \\[arguments...\\] \\[command options\\]"))
-			Eventually(session).Should(Say("Before getting started:"))
-			Eventually(session).Should(Say("config\\s+login,l\\s+target,t"))
-			Eventually(session).Should(Say("Global options:"))
+			Eventually(session.Out).Should(Say("Cloud Foundry command line tool"))
+			Eventually(session.Out).Should(Say("\\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+			Eventually(session.Out).Should(Say("Before getting started:"))
+			Eventually(session.Out).Should(Say("  config\\s+login,l\\s+target,t"))
+			Eventually(session.Out).Should(Say("Application lifecycle:"))
+			Eventually(session.Out).Should(Say("  apps,a\\s+run-task,rt\\s+events"))
+			Eventually(session.Out).Should(Say("  restage,rg\\s+scale"))
+
+			Eventually(session.Out).Should(Say("Services integration:"))
+			Eventually(session.Out).Should(Say("  marketplace,m\\s+create-user-provided-service,cups"))
+			Eventually(session.Out).Should(Say("  services,s\\s+update-user-provided-service,uups"))
+
+			Eventually(session.Out).Should(Say("Route and domain management:"))
+			Eventually(session.Out).Should(Say("  routes,r\\s+delete-route\\s+create-domain"))
+			Eventually(session.Out).Should(Say("  domains\\s+map-route"))
+
+			Eventually(session.Out).Should(Say("Space management:"))
+			Eventually(session.Out).Should(Say("  spaces\\s+create-space\\s+set-space-role"))
+
+			Eventually(session.Out).Should(Say("Org management:"))
+			Eventually(session.Out).Should(Say("  orgs,o\\s+set-org-role"))
+
+			Eventually(session.Out).Should(Say("CLI plugin management:"))
+			Eventually(session.Out).Should(Say("  install-plugin    list-plugin-repos"))
+			Eventually(session.Out).Should(Say("Global options:"))
+			Eventually(session.Out).Should(Say("  --help, -h                         Show help"))
+			Eventually(session.Out).Should(Say("  -v                                 Print API request diagnostics to stdout"))
+
+			Eventually(session.Out).Should(Say("These are commonly used commands. Use 'cf help -a' to see all, with descriptions."))
+			Eventually(session.Out).Should(Say("See 'cf help <command>' to read about a specific command."))
 			Eventually(session).Should(Exit(0))
 		},
 
