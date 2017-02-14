@@ -12,12 +12,12 @@ var CommonHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "Application lifecycle:",
 		CommandList: [][]string{
-			{"apps", "logs", "set-env"},
-			{"push", "ssh", "create-app-manifest"},
-			{"start", "app", ""},
-			{"stop", "env", ""},
-			{"restart", "scale", ""},
-			{"restage", "events", ""},
+			{"apps", "run-task", "events"},
+			{"push", "logs", "set-env"},
+			{"start", "ssh", "create-app-manifest"},
+			{"stop", "app", ""},
+			{"restart", "env", ""},
+			{"restage", "scale", ""},
 		},
 	},
 

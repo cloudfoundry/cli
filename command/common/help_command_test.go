@@ -347,7 +347,8 @@ var _ = Describe("help Command", func() {
 			Expect(testUI.Out).To(Say("  help,h    logout,lo"))
 
 			Expect(testUI.Out).To(Say("Application lifecycle:"))
-			Expect(testUI.Out).To(Say("  apps,a\\s+logs\\s+set-env,se"))
+			Expect(testUI.Out).To(Say("  apps,a\\s+run-task,rt\\s+events"))
+			Expect(testUI.Out).To(Say("  restage,rg\\s+scale"))
 
 			Expect(testUI.Out).To(Say("Services integration:"))
 			Expect(testUI.Out).To(Say("  marketplace,m\\s+create-user-provided-service,cups"))
