@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("start command", func() {
+var _ = Describe("start command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("start command refactor is still experimental")
 	})
