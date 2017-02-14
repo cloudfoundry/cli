@@ -460,8 +460,8 @@
     "translation": "CF_NAME routes [--orglevel]"
   },
   {
-    "id": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\\n\\nTIP:\\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate",
-    "translation": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\\n\\nTIP:\\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate"
+    "id": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME] [-m TASK_MEMORY]\\n\\nTIP:\\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate",
+    "translation": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME] [-m TASK_MEMORY]\\n\\nTIP:\\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate"
   },
   {
     "id": "CF_NAME running-environment-variable-group",
