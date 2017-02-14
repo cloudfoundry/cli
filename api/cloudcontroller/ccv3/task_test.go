@@ -42,7 +42,7 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "")
+					task, warnings, err := client.NewTask("some-app-guid", "some command", "", 0)
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{SequenceID: 3}))
@@ -62,7 +62,27 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "some-task-name")
+					task, warnings, err := client.NewTask("some-app-guid", "some command", "some-task-name", 0)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(task).To(Equal(Task{SequenceID: 3}))
+					Expect(warnings).To(ConsistOf("warning"))
+				})
+			})
+
+			Context("when the memory is 0", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
+							VerifyJSON(`{"command":"some command"}`),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						),
+					)
+				})
+
+				It("omits the memory", func() {
+					task, warnings, err := client.NewTask("some-app-guid", "some command", "", 0)
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{SequenceID: 3}))
@@ -71,28 +91,27 @@ var _ = Describe("Task", func() {
 			})
 		})
 
-		Context("when the application does not exist", func() {
+		Context("when the memory is not 0", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10010,
-      "detail": "App not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
+  "memory_in_mb": 123,
+  "sequence_id": 3
 }`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
-						RespondWith(http.StatusNotFound, response),
+						VerifyJSON(`{"command":"some command", "memory_in_mb": 123}`),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 					),
 				)
 			})
 
-			It("returns a ResourceNotFoundError", func() {
-				_, _, err := client.NewTask("some-app-guid", "some command", "")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "App not found"}))
+			It("creates and returns the task and all warnings with the provided memory", func() {
+				task, warnings, err := client.NewTask("some-app-guid", "some command", "", uint64(123))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(task).To(Equal(Task{MemoryInMb: uint64(123), SequenceID: 3}))
+				Expect(warnings).To(ConsistOf("warning"))
 			})
 		})
 
@@ -121,7 +140,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.NewTask("some-app-guid", "some command", "")
+				_, warnings, err := client.NewTask("some-app-guid", "some command", "", 0)
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{

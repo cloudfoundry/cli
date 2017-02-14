@@ -37,12 +37,13 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	NewTaskStub        func(appGUID string, command string, name string) (ccv3.Task, ccv3.Warnings, error)
+	NewTaskStub        func(appGUID string, command string, name string, memory uint64) (ccv3.Task, ccv3.Warnings, error)
 	newTaskMutex       sync.RWMutex
 	newTaskArgsForCall []struct {
 		appGUID string
 		command string
 		name    string
+		memory  uint64
 	}
 	newTaskReturns struct {
 		result1 ccv3.Task
@@ -159,17 +160,18 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturns(result1 []ccv3.App
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) NewTask(appGUID string, command string, name string) (ccv3.Task, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) NewTask(appGUID string, command string, name string, memory uint64) (ccv3.Task, ccv3.Warnings, error) {
 	fake.newTaskMutex.Lock()
 	fake.newTaskArgsForCall = append(fake.newTaskArgsForCall, struct {
 		appGUID string
 		command string
 		name    string
-	}{appGUID, command, name})
-	fake.recordInvocation("NewTask", []interface{}{appGUID, command, name})
+		memory  uint64
+	}{appGUID, command, name, memory})
+	fake.recordInvocation("NewTask", []interface{}{appGUID, command, name, memory})
 	fake.newTaskMutex.Unlock()
 	if fake.NewTaskStub != nil {
-		return fake.NewTaskStub(appGUID, command, name)
+		return fake.NewTaskStub(appGUID, command, name, memory)
 	} else {
 		return fake.newTaskReturns.result1, fake.newTaskReturns.result2, fake.newTaskReturns.result3
 	}
@@ -181,10 +183,10 @@ func (fake *FakeCloudControllerClient) NewTaskCallCount() int {
 	return len(fake.newTaskArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) NewTaskArgsForCall(i int) (string, string, string) {
+func (fake *FakeCloudControllerClient) NewTaskArgsForCall(i int) (string, string, string, uint64) {
 	fake.newTaskMutex.RLock()
 	defer fake.newTaskMutex.RUnlock()
-	return fake.newTaskArgsForCall[i].appGUID, fake.newTaskArgsForCall[i].command, fake.newTaskArgsForCall[i].name
+	return fake.newTaskArgsForCall[i].appGUID, fake.newTaskArgsForCall[i].command, fake.newTaskArgsForCall[i].name, fake.newTaskArgsForCall[i].memory
 }
 
 func (fake *FakeCloudControllerClient) NewTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {

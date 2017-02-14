@@ -20,12 +20,13 @@ type FakeRunTaskActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	RunTaskStub        func(appGUID string, command string, name string) (v3action.Task, v3action.Warnings, error)
+	RunTaskStub        func(appGUID string, command string, name string, memory uint64) (v3action.Task, v3action.Warnings, error)
 	runTaskMutex       sync.RWMutex
 	runTaskArgsForCall []struct {
 		appGUID string
 		command string
 		name    string
+		memory  uint64
 	}
 	runTaskReturns struct {
 		result1 v3action.Task
@@ -78,17 +79,18 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturns(result1 v3acti
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRunTaskActor) RunTask(appGUID string, command string, name string) (v3action.Task, v3action.Warnings, error) {
+func (fake *FakeRunTaskActor) RunTask(appGUID string, command string, name string, memory uint64) (v3action.Task, v3action.Warnings, error) {
 	fake.runTaskMutex.Lock()
 	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
 		appGUID string
 		command string
 		name    string
-	}{appGUID, command, name})
-	fake.recordInvocation("RunTask", []interface{}{appGUID, command, name})
+		memory  uint64
+	}{appGUID, command, name, memory})
+	fake.recordInvocation("RunTask", []interface{}{appGUID, command, name, memory})
 	fake.runTaskMutex.Unlock()
 	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(appGUID, command, name)
+		return fake.RunTaskStub(appGUID, command, name, memory)
 	} else {
 		return fake.runTaskReturns.result1, fake.runTaskReturns.result2, fake.runTaskReturns.result3
 	}
@@ -100,10 +102,10 @@ func (fake *FakeRunTaskActor) RunTaskCallCount() int {
 	return len(fake.runTaskArgsForCall)
 }
 
-func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, string, string) {
+func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, string, string, uint64) {
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
-	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command, fake.runTaskArgsForCall[i].name
+	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command, fake.runTaskArgsForCall[i].name, fake.runTaskArgsForCall[i].memory
 }
 
 func (fake *FakeRunTaskActor) RunTaskReturns(result1 v3action.Task, result2 v3action.Warnings, result3 error) {

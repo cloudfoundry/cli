@@ -19,20 +19,23 @@ type Task struct {
 	Command    string `json:"command"`
 	State      string `json:"state"`
 	CreatedAt  string `json:"created_at"`
+	MemoryInMb uint64 `json:"memory_in_mb"`
 }
 
 // NewTaskBody represents the body of the request to create a Task.
 type NewTaskBody struct {
-	Command string `json:"command"`
-	Name    string `json:"name,omitempty"`
+	Command    string `json:"command"`
+	Name       string `json:"name,omitempty"`
+	MemoryInMb uint64 `json:"memory_in_mb,omitempty"`
 }
 
 // NewTask runs a command in the Application environment associated with the
 // provided Application GUID.
-func (client *Client) NewTask(appGUID string, command string, name string) (Task, Warnings, error) {
+func (client *Client) NewTask(appGUID string, command string, name string, memory uint64) (Task, Warnings, error) {
 	bodyBytes, err := json.Marshal(NewTaskBody{
-		Command: command,
-		Name:    name,
+		Command:    command,
+		Name:       name,
+		MemoryInMb: memory,
 	})
 	if err != nil {
 		return Task{}, nil, err
