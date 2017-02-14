@@ -146,11 +146,12 @@ var _ = Describe("run-task Command", func() {
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, memory := fakeActor.RunTaskArgsForCall(0)
+						appGUID, command, name, memory, disk := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
 						Expect(command).To(Equal("some command"))
 						Expect(name).To(Equal(""))
 						Expect(memory).To(BeEquivalentTo(0))
+						Expect(disk).To(BeEquivalentTo(0))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
@@ -186,11 +187,10 @@ get-application-warning-3`))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, memory := fakeActor.RunTaskArgsForCall(0)
+						appGUID, command, name, _, _ := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
 						Expect(command).To(Equal("some command"))
 						Expect(name).To(Equal("some-task-name"))
-						Expect(memory).To(BeEquivalentTo(0))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
@@ -205,10 +205,10 @@ get-application-warning-3`))
 					})
 				})
 
-				Context("when task memory is provided", func() {
+				Context("when task disk space is provided", func() {
 					BeforeEach(func() {
 						cmd.Name = "some-task-name"
-						cmd.Megabytes = flag.Megabytes{uint64(123)}
+						cmd.Disk = flag.Megabytes{uint64(321)}
 						fakeActor.RunTaskReturns(
 							v3action.Task{
 								Name:       "some-task-name",
@@ -227,7 +227,48 @@ get-application-warning-3`))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, memory := fakeActor.RunTaskArgsForCall(0)
+						appGUID, command, name, _, disk := fakeActor.RunTaskArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(command).To(Equal("some command"))
+						Expect(name).To(Equal("some-task-name"))
+						Expect(disk).To(BeEquivalentTo(321))
+
+						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
+OK
+
+Task has been submitted successfully for execution.
+Task name:   some-task-name
+Task id:     3`,
+						))
+						Expect(testUI.Err).To(Say(`get-application-warning-1
+get-application-warning-2
+get-application-warning-3`))
+					})
+				})
+
+				Context("when task memory is provided", func() {
+					BeforeEach(func() {
+						cmd.Name = "some-task-name"
+						cmd.Memory = flag.Megabytes{uint64(123)}
+						fakeActor.RunTaskReturns(
+							v3action.Task{
+								Name:       "some-task-name",
+								SequenceID: 3,
+							},
+							v3action.Warnings{"get-application-warning-3"},
+							nil)
+					})
+
+					It("creates a new task and outputs all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(appName).To(Equal("some-app-name"))
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+
+						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
+						appGUID, command, name, memory, _ := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
 						Expect(command).To(Equal("some command"))
 						Expect(name).To(Equal("some-task-name"))

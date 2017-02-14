@@ -32,8 +32,8 @@ func (e TaskNotFoundError) Error() string {
 
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
-func (actor Actor) RunTask(appGUID string, command string, name string, memory uint64) (Task, Warnings, error) {
-	task, warnings, err := actor.CloudControllerClient.NewTask(appGUID, command, name, memory)
+func (actor Actor) RunTask(appGUID string, command string, name string, memory uint64, disk uint64) (Task, Warnings, error) {
+	task, warnings, err := actor.CloudControllerClient.NewTask(appGUID, command, name, memory, disk)
 	if err != nil {
 		if e, ok := err.(ccv3.TaskWorkersUnavailableError); ok {
 			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}
