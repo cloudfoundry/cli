@@ -28,7 +28,8 @@ var _ = Describe("Organization", func() {
 								"guid": "org-guid-1"
 							},
 							"entity": {
-								"name": "org-1"
+								"name": "org-1",
+								"quota_definition_guid": "some-quota-guid"
 							}
 						},
 						{
@@ -36,7 +37,8 @@ var _ = Describe("Organization", func() {
 								"guid": "org-guid-2"
 							},
 							"entity": {
-								"name": "org-2"
+								"name": "org-2",
+								"quota_definition_guid": "some-quota-guid"
 							}
 						}
 					]
@@ -49,7 +51,8 @@ var _ = Describe("Organization", func() {
 								"guid": "org-guid-3"
 							},
 							"entity": {
-								"name": "org-3"
+								"name": "org-3",
+								"quota_definition_guid": "some-quota-guid"
 							}
 						},
 						{
@@ -57,7 +60,8 @@ var _ = Describe("Organization", func() {
 								"guid": "org-guid-4"
 							},
 							"entity": {
-								"name": "org-4"
+								"name": "org-4",
+								"quota_definition_guid": "some-quota-guid"
 							}
 						}
 					]
@@ -83,10 +87,10 @@ var _ = Describe("Organization", func() {
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(orgs).To(Equal([]Organization{
-						{GUID: "org-guid-1", Name: "org-1"},
-						{GUID: "org-guid-2", Name: "org-2"},
-						{GUID: "org-guid-3", Name: "org-3"},
-						{GUID: "org-guid-4", Name: "org-4"},
+						{GUID: "org-guid-1", Name: "org-1", QuotaDefinitionGUID: "some-quota-guid"},
+						{GUID: "org-guid-2", Name: "org-2", QuotaDefinitionGUID: "some-quota-guid"},
+						{GUID: "org-guid-3", Name: "org-3", QuotaDefinitionGUID: "some-quota-guid"},
+						{GUID: "org-guid-4", Name: "org-4", QuotaDefinitionGUID: "some-quota-guid"},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
