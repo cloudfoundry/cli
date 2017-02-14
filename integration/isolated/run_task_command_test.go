@@ -18,7 +18,7 @@ var _ = Describe("run-task command", func() {
 			Expect(session.Out).To(Say("NAME:"))
 			Expect(session.Out).To(Say("   run-task - Run a one-off task on an app"))
 			Expect(session.Out).To(Say("USAGE:"))
-			Expect(session.Out).To(Say("   cf run-task APP_NAME COMMAND \\[--name TASK_NAME\\] \\[-m TASK_MEMORY\\]"))
+			Expect(session.Out).To(Say("   cf run-task APP_NAME COMMAND \\[--name TASK_NAME\\] \\[-m TASK_MEMORY\\] \\[-k TASK_DISK]"))
 			Expect(session.Out).To(Say("TIP:"))
 			Expect(session.Out).To(Say("   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs."))
 			Expect(session.Out).To(Say("EXAMPLES:"))
@@ -27,7 +27,8 @@ var _ = Describe("run-task command", func() {
 			Expect(session.Out).To(Say("   rt"))
 			Expect(session.Out).To(Say("OPTIONS:"))
 			Expect(session.Out).To(Say("   --name      Name to give the task \\(generated if omitted\\)"))
-			Expect(session.Out).To(Say("   -m          Memory limit \\(e.g. 256M, 1024M, 1G\\)"))
+			Expect(session.Out).To(Say("   -m          Memory limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
+			Expect(session.Out).To(Say("   -k          Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
 			Expect(session.Out).To(Say("SEE ALSO:"))
 			Expect(session.Out).To(Say("   logs, tasks, terminate-task"))
 		})
@@ -145,6 +146,29 @@ Task id:     1`,
 						Eventually(taskSession).Should(Exit(0))
 						return taskSession.Out
 					}).Should(Say("1\\s+some-task-name"))
+				})
+			})
+
+			Context("when disk space is provided", func() {
+				Context("when the provided disk space is invalid", func() {
+					It("displays error and exits 1", func() {
+						session := helpers.CF("run-task", appName, "echo hi", "-k", "invalid")
+						Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
+
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when the provided disk space is valid", func() {
+					It("runs the task with the provided disk space", func() {
+						diskSpace := 123
+						session := helpers.CF("run-task", appName, "echo hi", "-k", fmt.Sprintf("%dM", diskSpace))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("tasks", appName, "-v")
+						Eventually(session.Out).Should(Say("\"disk_in_mb\": %d", diskSpace))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 

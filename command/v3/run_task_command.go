@@ -12,15 +12,16 @@ import (
 
 type RunTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	RunTask(appGUID string, command string, name string, memory uint64) (v3action.Task, v3action.Warnings, error)
+	RunTask(appGUID string, command string, name string, memory uint64, disk uint64) (v3action.Task, v3action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
 type RunTaskCommand struct {
 	RequiredArgs    flag.RunTaskArgs `positional-args:"yes"`
 	Name            string           `long:"name" description:"Name to give the task (generated if omitted)"`
-	Megabytes       flag.Megabytes   `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME] [-m TASK_MEMORY]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
+	Memory          flag.Megabytes   `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Disk            flag.Megabytes   `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME] [-m TASK_MEMORY] [-k TASK_DISK]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
 	relatedCommands interface{}      `related_commands:"logs, tasks, terminate-task"`
 
 	UI          command.UI
@@ -74,7 +75,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command, cmd.Name, cmd.Megabytes.Size)
+	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command, cmd.Name, cmd.Memory.Size, cmd.Disk.Size)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
