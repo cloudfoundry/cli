@@ -18,10 +18,10 @@ type RunTaskActor interface {
 
 type RunTaskCommand struct {
 	RequiredArgs    flag.RunTaskArgs `positional-args:"yes"`
-	Name            string           `long:"name" description:"Name to give the task (generated if omitted)"`
-	Memory          flag.Megabytes   `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	Disk            flag.Megabytes   `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME] [-m TASK_MEMORY] [-k TASK_DISK]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
+	Memory          flag.Megabytes   `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Name            string           `long:"name" description:"Name to give the task (generated if omitted)"`
+	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [-k DISK] [-m MEMORY] [--name TASK_NAME]\n\nTIP:\n   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs.\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
 	relatedCommands interface{}      `related_commands:"logs, tasks, terminate-task"`
 
 	UI          command.UI
