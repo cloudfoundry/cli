@@ -251,10 +251,11 @@ func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
 	}
 
 	for _, line := range strings.Split(message.Message(), "\n") {
-		fmt.Fprintf(ui.Out, "%s%s\n",
-			ui.addFlavor(header, white, true),
-			strings.TrimRight(line, "\r\n"),
-		)
+		logLine := fmt.Sprintf("%s%s", header, strings.TrimRight(line, "\r\n"))
+		if message.Type() == "ERR" {
+			logLine = ui.addFlavor(logLine, red, false)
+		}
+		fmt.Fprintf(ui.Out, "%s\n", logLine)
 	}
 }
 

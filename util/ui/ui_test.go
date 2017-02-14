@@ -445,7 +445,7 @@ some-prefixgg          hh            ii`))
 			Context("single line log message", func() {
 				It("prints out a single line to STDOUT", func() {
 					ui.DisplayLogMessage(message, true)
-					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is a log message\n"))
+					Expect(ui.Out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is a log message\n"))
 				})
 			})
 
@@ -460,8 +460,8 @@ some-prefixgg          hh            ii`))
 
 				It("prints out mutliple lines to STDOUT", func() {
 					ui.DisplayLogMessage(message, true)
-					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is a log message\n"))
-					Expect(ui.Out).To(Say("\x1b\\[37;1m2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT \x1b\\[0mThis is also a log message\n"))
+					Expect(ui.Out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is a log message\n"))
+					Expect(ui.Out).To(Say("2016-07-19T16:08:12.00-0700 \\[APP/PROC/WEB/12\\] OUT This is also a log message\n"))
 				})
 			})
 		})
@@ -488,6 +488,16 @@ some-prefixgg          hh            ii`))
 					Expect(ui.Out).To(Say("This is a log message\n"))
 					Expect(ui.Out).To(Say("This is also a log message\n"))
 				})
+			})
+		})
+
+		Context("error log lines", func() {
+			BeforeEach(func() {
+				message.TypeReturns("ERR")
+			})
+			It("colors the line red", func() {
+				ui.DisplayLogMessage(message, false)
+				Expect(ui.Out).To(Say("\x1b\\[31mThis is a log message\x1b\\[0m\n"))
 			})
 		})
 	})
