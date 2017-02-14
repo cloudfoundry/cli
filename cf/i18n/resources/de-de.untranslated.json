@@ -56,6 +56,10 @@
     "translation": ""
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -1532,6 +1536,10 @@
     "translation": ""
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Status: {{.State}}",
     "translation": "Status: {{.State}}"
   },
@@ -2005,6 +2013,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   }
 ]

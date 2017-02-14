@@ -340,6 +340,10 @@
     "translation": "应用程序 {{.AppName}} 已绑定到 {{.ServiceName}}。"
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -5060,6 +5064,10 @@
     "translation": "启动应用程序超时\n\n提示: 应用程序必须在侦听正确的端口。不要对端口硬编码，而是使用 $PORT 环境变量。"
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
     "translation": "启动成功\n\n提示: 使用 '{{.Command}}' 可获取更多信息"
   },
@@ -6677,6 +6685,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {

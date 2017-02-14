@@ -340,6 +340,10 @@
     "translation": "App {{.AppName}} ist bereits an {{.ServiceName}} gebunden."
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -5060,6 +5064,10 @@
     "translation": "Zeitlimit beim Starten einer App\n\nTIP: Die Anwendung muss auf dem richtigen Port empfangsbereit sein. Verwenden Sie die Umgebungsvariable $PORT anstatt den Port fest zu codieren."
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
     "translation": "Start nicht erfolgreich\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten"
   },
@@ -6677,6 +6685,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {

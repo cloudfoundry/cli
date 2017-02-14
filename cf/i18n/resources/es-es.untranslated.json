@@ -64,6 +64,10 @@
     "translation": ""
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -1536,6 +1540,10 @@
     "translation": ""
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
     "translation": ""
   },
@@ -2037,6 +2045,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   }
 ]
