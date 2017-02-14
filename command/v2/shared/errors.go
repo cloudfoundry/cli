@@ -1,6 +1,9 @@
 package shared
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type JobFailedError struct {
 	JobGUID string
@@ -91,4 +94,20 @@ func (e InvalidRefreshTokenError) Error() string {
 
 func (e InvalidRefreshTokenError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error())
+}
+
+type StagingFailedError struct {
+	Message    string
+	BinaryName string
+}
+
+func (e StagingFailedError) Error() string {
+	return `{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.`
+}
+
+func (e StagingFailedError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Message":          e.Message,
+		"BuildpackCommand": fmt.Sprintf("%s buildpacks", e.BinaryName),
+	})
 }
