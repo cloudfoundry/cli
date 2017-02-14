@@ -340,6 +340,10 @@
     "translation": "{{.AppName}} 앱이 이미 {{.ServiceName}}에 바인딩되어 있습니다."
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -5060,6 +5064,10 @@
     "translation": "앱 시작 제한시간 초과\n\n팁: 애플리케이션이 올바른 포트에서 청취 중이어야 합니다. 포트를 하드 코딩하는 대신 $PORT 환경 변수를 사용하십시오."
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
     "translation": "시작 실패\n\n팁: 자세한 정보는 '{{.Command}}'을(를) 사용하십시오."
   },
@@ -6677,6 +6685,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {

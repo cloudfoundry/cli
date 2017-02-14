@@ -340,6 +340,10 @@
     "translation": "La app {{.AppName}} ya está enlazada a {{.ServiceName}}."
   },
   {
+    "id": "App {{.AppName}} is already started",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -5060,6 +5064,10 @@
     "translation": "Iniciar tiempo de espera de la app\n\nCONSEJO: La aplicación debe estar a la escucha en el puerto derecho. En lugar de codificar permanentemente el puerto, utilice la variable de entorno $PORT."
   },
   {
+    "id": "Start command:",
+    "translation": ""
+  },
+  {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
     "translation": "Inicio incorrecto\n\nCONSEJO: utilice '{{.Command}}' para obtener más información"
   },
@@ -6677,6 +6685,10 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
