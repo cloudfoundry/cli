@@ -31,7 +31,7 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_i686 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
@@ -39,6 +39,8 @@ run:
           sed 's/^$/ ./' ../../license/3RD-PARTY-LICENSES >> cf/DEBIAN/copyright
 
           cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
+
+          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
 
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
           cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
@@ -61,7 +63,7 @@ run:
         SIZE="$(BLOCKSIZE=1000 du $root/extracted-binaries/cf-cli_linux_x86-64 | cut -f 1)"
 
         pushd cli-ci/ci/installers/deb
-          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN
+          mkdir -p cf/usr/bin cf/usr/share/doc/cf-cli/ cf/DEBIAN cf/usr/share/bash-completion/completions
 
           cp copyright_preamble cf/DEBIAN/copyright
           sed 's/^$/ ./' ../../../LICENSE >> cf/DEBIAN/copyright
@@ -77,6 +79,8 @@ run:
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
+
+          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
 
           cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
 
