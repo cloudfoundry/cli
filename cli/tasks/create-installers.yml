@@ -40,8 +40,6 @@ run:
 
           cp cf/DEBIAN/copyright cf/usr/share/doc/cf-cli/copyright
 
-          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
-
           cp ../../license/NOTICE cf/usr/share/doc/cf-cli
           cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf/usr/share/doc/cf-cli/LICENSE
 
@@ -49,6 +47,8 @@ run:
           echo "Installed-Size: ${SIZE}" >> cf/DEBIAN/control
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
+
+          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
 
           cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
 
@@ -122,8 +122,10 @@ run:
       pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
-        mkdir -p cf-cli/usr/local/bin
-        mkdir -p cf-cli/usr/local/share/doc/cf-cli
+        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli cf-cli/usr/local/etc/bash-completion.d
+
+        cp ../completion/cf-cli cf-cli/usr/local/etc/bash-completion.d/cf-cli
+
         cp $root/extracted-binaries/cf-cli_osx cf-cli/usr/local/bin/cf
         cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES cf-cli/usr/local/share/doc/cf-cli/LICENSE
