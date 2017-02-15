@@ -48,7 +48,7 @@ run:
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: i386" >> cf/DEBIAN/control
 
-          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
+          cp ../completion/cf cf/usr/share/bash-completion/completions/cf
 
           cp $root/extracted-binaries/cf-cli_linux_i686 cf/usr/bin/cf
 
@@ -80,7 +80,7 @@ run:
           echo "Version: ${VERSION}" >> cf/DEBIAN/control
           echo "Architecture: amd64" >> cf/DEBIAN/control
 
-          cp ../completion/cf-cli cf/usr/share/bash-completion/completions/cf-cli
+          cp ../completion/cf cf/usr/share/bash-completion/completions/cf
 
           cp $root/extracted-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
 
@@ -122,9 +122,7 @@ run:
       pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
-        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli cf-cli/usr/local/etc/bash-completion.d
-
-        cp ../completion/cf-cli cf-cli/usr/local/etc/bash-completion.d/cf-cli
+        mkdir -p cf-cli/usr/local/bin cf-cli/usr/local/share/doc/cf-cli
 
         cp $root/extracted-binaries/cf-cli_osx cf-cli/usr/local/bin/cf
         cp ../../license/NOTICE cf-cli/usr/local/share/doc/cf-cli
