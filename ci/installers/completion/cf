@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# bash completion for Cloud Foundry CLI
 
 _cf-cli() {
     # All arguments except the first one
