@@ -3,8 +3,15 @@ package v2action
 import (
 	"time"
 
+	noaaErrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 )
+
+type NOAATimeoutError struct{}
+
+func (e NOAATimeoutError) Error() string {
+	return "Timeout trying to connect to NOAA"
+}
 
 type LogMessage struct {
 	message        string
@@ -47,7 +54,7 @@ func NewLogMessage(message string, messageType int, timestamp time.Time, sourceT
 	}
 }
 
-func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
+func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error) {
 	// Do not pass in token because client should have a TokenRefresher set
 	eventStream, errStream := client.TailingLogs(appGUID, "")
 
@@ -77,6 +84,11 @@ func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *
 				if !ok {
 					break dance
 				}
+
+				if _, ok := err.(noaaErrors.RetryError); ok {
+					break
+				}
+
 				errs <- err
 			}
 		}

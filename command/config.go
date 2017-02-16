@@ -10,8 +10,8 @@ import (
 
 // Config a way of getting basic CF configuration
 type Config interface {
-	APIVersion() string
 	AccessToken() string
+	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
 	ColorEnabled() configv3.ColorSetting
@@ -32,15 +32,15 @@ type Config interface {
 	SetSpaceInformation(guid string, name string, allowSSH bool)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SkipSSLValidation() bool
 	StagingTimeout() time.Duration
 	StartupTimeout() time.Duration
-	SkipSSLValidation() bool
 	Target() string
 	TargetedOrganization() configv3.Organization
 	TargetedSpace() configv3.Space
 	UAAOAuthClient() string
 	UAAOAuthClientSecret() string
-	UnsetSpaceInformation()
 	UnsetOrganizationInformation()
+	UnsetSpaceInformation()
 	Verbose() (bool, []string)
 }

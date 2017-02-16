@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	noaaErrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,10 +16,12 @@ var _ = Describe("Logging Actions", func() {
 	var (
 		actor          Actor
 		fakeNOAAClient *v2actionfakes.FakeNOAAClient
+		fakeConfig     *v2actionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
+		fakeConfig = new(v2actionfakes.FakeConfig)
 		actor = NewActor(nil, nil)
 	})
 
@@ -48,6 +51,10 @@ var _ = Describe("Logging Actions", func() {
 
 			Eventually(messages).Should(BeClosed())
 			Eventually(errs).Should(BeClosed())
+		})
+
+		JustBeforeEach(func() {
+			messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient, fakeConfig)
 		})
 
 		Context("when receiving events", func() {
@@ -87,8 +94,6 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			It("converts them to log messages and passes them through the messages channel", func() {
-				messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient)
-
 				message := <-messages
 				Expect(message.Message()).To(Equal("message-1"))
 				Expect(message.Type()).To(Equal("OUT"))
@@ -108,28 +113,75 @@ var _ = Describe("Logging Actions", func() {
 		Context("when receiving errors", func() {
 			var err1, err2 error
 
-			BeforeEach(func() {
-				err1 = errors.New("ZOMG")
-				err2 = errors.New("Fiddlesticks")
+			Describe("unexpected error", func() {
+				BeforeEach(func() {
+					err1 = errors.New("ZOMG")
+					err2 = errors.New("Fiddlesticks")
 
-				fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
-					go func() {
-						errStream <- err1
-						errStream <- err2
-					}()
+					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+						go func() {
+							errStream <- err1
+							errStream <- err2
+						}()
 
-					return eventStream, errStream
-				}
+						return eventStream, errStream
+					}
+				})
+
+				It("passes them through the errors channel", func() {
+					Eventually(errs).Should(Receive(Equal(err1)))
+					Eventually(errs).Should(Receive(Equal(err2)))
+				})
 			})
 
-			It("passes them through the errors channel", func() {
-				messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient)
+			Describe("NOAA's RetryError", func() {
+				Context("when NOAA is able to recover", func() {
+					BeforeEach(func() {
+						fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+							go func() {
+								errStream <- noaaErrors.NewRetryError(errors.New("error 1"))
 
-				err := <-errs
-				Expect(err).To(MatchError(err1))
+								outMessage := events.LogMessage_OUT
+								ts1 := int64(10)
+								sourceType := "some-source-type"
+								sourceInstance := "some-source-instance"
 
-				err = <-errs
-				Expect(err).To(MatchError(err2))
+								eventStream <- &events.LogMessage{
+									Message:        []byte("message-1"),
+									MessageType:    &outMessage,
+									Timestamp:      &ts1,
+									SourceType:     &sourceType,
+									SourceInstance: &sourceInstance,
+								}
+							}()
+
+							return eventStream, errStream
+						}
+					})
+
+					It("continues without issue", func() {
+						Eventually(messages).Should(Receive())
+						Consistently(errs).ShouldNot(Receive())
+					})
+				})
+
+				Context("when NOAA is unable to recover", func() {
+					BeforeEach(func() {
+						Skip("waiting on NOAA #140000891")
+						fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+							go func() {
+								errStream <- noaaErrors.NewRetryError(errors.New("error 1"))
+								errStream <- noaaErrors.NewRetryError(errors.New("error 2"))
+							}()
+
+							return eventStream, errStream
+						}
+					})
+
+					It("returns a NOAATimeoutError", func() {
+						Eventually(errs).Should(Receive(MatchError(NOAATimeoutError{})))
+					})
+				})
 			})
 		})
 	})
