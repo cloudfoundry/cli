@@ -18,7 +18,7 @@ import (
 type StartActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-	StartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error)
+	StartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error)
 }
 
 type StartCommand struct {
@@ -91,9 +91,9 @@ func (cmd StartCommand) Execute(args []string) error {
 		return nil
 	}
 
-	messages, logErrs, apiWarnings, errs := cmd.Actor.StartApplication(app, cmd.NOAAClient, cmd.Config)
+	messages, logErrs, appStarting, apiWarnings, errs := cmd.Actor.StartApplication(app, cmd.NOAAClient, cmd.Config)
 	cmd.UI.DisplayNewline()
-	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, apiWarnings, errs)
+	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
 	if err != nil {
 		return err
 	}

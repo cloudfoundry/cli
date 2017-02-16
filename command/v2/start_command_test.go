@@ -56,20 +56,22 @@ var _ = Describe("Start Command", func() {
 		testUI.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
 		Expect(err).NotTo(HaveOccurred())
 
-		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 			messages := make(chan *v2action.LogMessage)
 			logErrs := make(chan error)
+			appStart := make(chan bool)
 			warnings := make(chan string)
 			errs := make(chan error)
 
 			go func() {
 				close(messages)
 				close(logErrs)
+				close(appStart)
 				close(warnings)
 				close(errs)
 			}()
 
-			return messages, logErrs, warnings, errs
+			return messages, logErrs, appStart, warnings, errs
 		}
 	})
 
@@ -172,11 +174,44 @@ var _ = Describe("Start Command", func() {
 					Expect(config).To(Equal(fakeConfig))
 				})
 
-				Context("when passed a log message", func() {
+				Context("when passed an appStarting message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
+							appStart := make(chan bool)
+							warnings := make(chan string)
+							errs := make(chan error)
+
+							go func() {
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "APP", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
+								appStart <- true
+								close(messages)
+								close(logErrs)
+								close(appStart)
+								close(warnings)
+								close(errs)
+							}()
+
+							return messages, logErrs, appStart, warnings, errs
+						}
+					})
+
+					It("displays the log", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("log message 1"))
+						Expect(testUI.Out).To(Say("log message 2"))
+						Expect(testUI.Out).To(Say("Waiting for app to start..."))
+					})
+				})
+
+				Context("when passed a log message", func() {
+					BeforeEach(func() {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
+							appStart := make(chan bool)
 							warnings := make(chan string)
 							errs := make(chan error)
 
@@ -185,11 +220,12 @@ var _ = Describe("Start Command", func() {
 								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
 								close(messages)
 								close(logErrs)
+								close(appStart)
 								close(warnings)
 								close(errs)
 							}()
 
-							return messages, logErrs, warnings, errs
+							return messages, logErrs, appStart, warnings, errs
 						}
 					})
 
@@ -203,9 +239,10 @@ var _ = Describe("Start Command", func() {
 				Context("when passed an log err", func() {
 					Context("NOAA connection times out/closes", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
+								appStart := make(chan bool)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -216,11 +253,12 @@ var _ = Describe("Start Command", func() {
 									logErrs <- v2action.NOAATimeoutError{}
 									close(messages)
 									close(logErrs)
+									close(appStart)
 									close(warnings)
 									close(errs)
 								}()
 
-								return messages, logErrs, warnings, errs
+								return messages, logErrs, appStart, warnings, errs
 							}
 
 							applicationSummary := v2action.ApplicationSummary{
@@ -271,9 +309,10 @@ var _ = Describe("Start Command", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("err log message")
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
+								appStart := make(chan bool)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -281,11 +320,12 @@ var _ = Describe("Start Command", func() {
 									logErrs <- expectedErr
 									close(messages)
 									close(logErrs)
+									close(appStart)
 									close(warnings)
 									close(errs)
 								}()
 
-								return messages, logErrs, warnings, errs
+								return messages, logErrs, appStart, warnings, errs
 							}
 						})
 
@@ -298,9 +338,10 @@ var _ = Describe("Start Command", func() {
 				Context("when passed a warning", func() {
 					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
+								appStart := make(chan bool)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -309,11 +350,12 @@ var _ = Describe("Start Command", func() {
 									warnings <- "warning 2"
 									close(messages)
 									close(logErrs)
+									close(appStart)
 									close(warnings)
 									close(errs)
 								}()
 
-								return messages, logErrs, warnings, errs
+								return messages, logErrs, appStart, warnings, errs
 							}
 						})
 
@@ -326,9 +368,10 @@ var _ = Describe("Start Command", func() {
 
 					Context("while NOAA is no longer logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
+								appStart := make(chan bool)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -340,11 +383,12 @@ var _ = Describe("Start Command", func() {
 									close(logErrs)
 									warnings <- "warning 3"
 									warnings <- "warning 4"
+									close(appStart)
 									close(warnings)
 									close(errs)
 								}()
 
-								return messages, logErrs, warnings, errs
+								return messages, logErrs, appStart, warnings, errs
 							}
 						})
 
@@ -366,9 +410,10 @@ var _ = Describe("Start Command", func() {
 
 							BeforeEach(func() {
 								expectedErr = errors.New("err log message")
-								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 									messages := make(chan *v2action.LogMessage)
 									logErrs := make(chan error)
+									appStart := make(chan bool)
 									warnings := make(chan string)
 									errs := make(chan error)
 
@@ -376,11 +421,12 @@ var _ = Describe("Start Command", func() {
 										errs <- expectedErr
 										close(messages)
 										close(logErrs)
+										close(appStart)
 										close(warnings)
 										close(errs)
 									}()
 
-									return messages, logErrs, warnings, errs
+									return messages, logErrs, appStart, warnings, errs
 								}
 							})
 
@@ -391,9 +437,10 @@ var _ = Describe("Start Command", func() {
 
 						Describe("staging error", func() {
 							BeforeEach(func() {
-								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 									messages := make(chan *v2action.LogMessage)
 									logErrs := make(chan error)
+									appStart := make(chan bool)
 									warnings := make(chan string)
 									errs := make(chan error)
 
@@ -401,11 +448,12 @@ var _ = Describe("Start Command", func() {
 										errs <- v2action.StagingFailedError{Reason: "Something, but not nothing"}
 										close(messages)
 										close(logErrs)
+										close(appStart)
 										close(warnings)
 										close(errs)
 									}()
 
-									return messages, logErrs, warnings, errs
+									return messages, logErrs, appStart, warnings, errs
 								}
 							})
 

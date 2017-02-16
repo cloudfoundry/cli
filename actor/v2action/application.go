@@ -171,16 +171,18 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 }
 
 // StartApplication starts a given application.
-func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan string, <-chan error) {
+func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
+	appStarting := make(chan bool)
 	allWarnings := make(chan string)
 	errs := make(chan error)
 	go func() {
+		defer close(appStarting)
 		defer close(allWarnings)
 		defer close(errs)
 		defer client.Close()
-		// start app
+
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
 			State: ccv2.ApplicationStarted,
@@ -204,14 +206,16 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 			return
 		}
 
+		client.Close()
+		appStarting <- true
+
 		err = actor.pollStartup(app, config, allWarnings)
 		if err != nil {
 			errs <- err
 		}
-
 	}()
 
-	return messages, logErrs, allWarnings, errs
+	return messages, logErrs, appStarting, allWarnings, errs
 }
 
 func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<- string) error {
