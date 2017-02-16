@@ -201,63 +201,72 @@ var _ = Describe("Start Command", func() {
 				})
 
 				Context("when passed an log err", func() {
-					var expectedErr error
+					Context("NOAA connection times out/closes", func() {
+						BeforeEach(func() {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
+								warnings := make(chan string)
+								errs := make(chan error)
 
-					BeforeEach(func() {
-						expectedErr = errors.New("err log message")
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
-							messages := make(chan *v2action.LogMessage)
-							logErrs := make(chan error)
-							warnings := make(chan string)
-							errs := make(chan error)
+								go func() {
+									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "APP", "1")
+									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
+									messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "APP", "1")
+									logErrs <- v2action.NOAATimeoutError{}
+									close(messages)
+									close(logErrs)
+									close(warnings)
+									close(errs)
+								}()
 
-							go func() {
-								logErrs <- expectedErr
-								close(messages)
-								close(logErrs)
-								close(warnings)
-								close(errs)
-							}()
+								return messages, logErrs, warnings, errs
+							}
 
-							return messages, logErrs, warnings, errs
-						}
+							applicationSummary := v2action.ApplicationSummary{
+								Application: v2action.Application{
+									Name:                 "some-app",
+									GUID:                 "some-app-guid",
+									Instances:            3,
+									Memory:               128,
+									PackageUpdatedAt:     time.Unix(0, 0),
+									DetectedBuildpack:    "some-buildpack",
+									State:                "STARTED",
+									DetectedStartCommand: "some start command",
+								},
+								Stack: v2action.Stack{
+									Name: "potatos",
+								},
+								Routes: []v2action.Route{
+									{
+										Host:   "banana",
+										Domain: "fruit.com",
+										Path:   "/hi",
+									},
+									{
+										Domain: "foobar.com",
+										Port:   13,
+									},
+								},
+							}
+							warnings := []string{"app-summary-warning"}
+
+							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{}
+
+							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+						})
+
+						It("displays a warning and continues until app has started", func() {
+							Expect(executeErr).To(BeNil())
+							Expect(testUI.Out).To(Say("message 1"))
+							Expect(testUI.Out).To(Say("message 2"))
+							Expect(testUI.Out).To(Say("message 3"))
+							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
+							Expect(testUI.Out).To(Say("Name:\\s+some-app"))
+						})
 					})
 
-					It("stops logging and returns the error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
-					})
-				})
-
-				Context("when passed a warning", func() {
-					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
-							messages := make(chan *v2action.LogMessage)
-							logErrs := make(chan error)
-							warnings := make(chan string)
-							errs := make(chan error)
-
-							go func() {
-								warnings <- "warning 1"
-								warnings <- "warning 2"
-								close(messages)
-								close(logErrs)
-								close(warnings)
-								close(errs)
-							}()
-
-							return messages, logErrs, warnings, errs
-						}
-					})
-
-					It("displays the warnings to STDERR", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Err).To(Say("warning 1"))
-						Expect(testUI.Err).To(Say("warning 2"))
-					})
-				})
-
-				Context("when passed an API err", func() {
-					Describe("an unexpected error", func() {
+					Context("an unexpected error occurs", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
@@ -269,7 +278,7 @@ var _ = Describe("Start Command", func() {
 								errs := make(chan error)
 
 								go func() {
-									errs <- expectedErr
+									logErrs <- expectedErr
 									close(messages)
 									close(logErrs)
 									close(warnings)
@@ -284,8 +293,10 @@ var _ = Describe("Start Command", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 						})
 					})
+				})
 
-					Describe("staging error", func() {
+				Context("when passed a warning", func() {
+					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
 							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
@@ -294,7 +305,8 @@ var _ = Describe("Start Command", func() {
 								errs := make(chan error)
 
 								go func() {
-									errs <- v2action.StagingFailedError{Reason: "Something, but not nothing"}
+									warnings <- "warning 1"
+									warnings <- "warning 2"
 									close(messages)
 									close(logErrs)
 									close(warnings)
@@ -305,8 +317,101 @@ var _ = Describe("Start Command", func() {
 							}
 						})
 
-						It("stops logging and returns StagingFailedError", func() {
-							Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
+						It("displays the warnings to STDERR", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Err).To(Say("warning 1"))
+							Expect(testUI.Err).To(Say("warning 2"))
+						})
+					})
+
+					Context("while NOAA is no longer logging", func() {
+						BeforeEach(func() {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+								messages := make(chan *v2action.LogMessage)
+								logErrs := make(chan error)
+								warnings := make(chan string)
+								errs := make(chan error)
+
+								go func() {
+									warnings <- "warning 1"
+									warnings <- "warning 2"
+									logErrs <- v2action.NOAATimeoutError{}
+									close(messages)
+									close(logErrs)
+									warnings <- "warning 3"
+									warnings <- "warning 4"
+									close(warnings)
+									close(errs)
+								}()
+
+								return messages, logErrs, warnings, errs
+							}
+						})
+
+						It("displays the warnings to STDERR", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Err).To(Say("warning 1"))
+							Expect(testUI.Err).To(Say("warning 2"))
+							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
+							Expect(testUI.Err).To(Say("warning 3"))
+							Expect(testUI.Err).To(Say("warning 4"))
+						})
+					})
+				})
+
+				Context("when passed an API err", func() {
+					Context("while NOAA is still logging", func() {
+						Describe("an unexpected error", func() {
+							var expectedErr error
+
+							BeforeEach(func() {
+								expectedErr = errors.New("err log message")
+								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+									messages := make(chan *v2action.LogMessage)
+									logErrs := make(chan error)
+									warnings := make(chan string)
+									errs := make(chan error)
+
+									go func() {
+										errs <- expectedErr
+										close(messages)
+										close(logErrs)
+										close(warnings)
+										close(errs)
+									}()
+
+									return messages, logErrs, warnings, errs
+								}
+							})
+
+							It("stops logging and returns the error", func() {
+								Expect(executeErr).To(MatchError(expectedErr))
+							})
+						})
+
+						Describe("staging error", func() {
+							BeforeEach(func() {
+								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan string, <-chan error) {
+									messages := make(chan *v2action.LogMessage)
+									logErrs := make(chan error)
+									warnings := make(chan string)
+									errs := make(chan error)
+
+									go func() {
+										errs <- v2action.StagingFailedError{Reason: "Something, but not nothing"}
+										close(messages)
+										close(logErrs)
+										close(warnings)
+										close(errs)
+									}()
+
+									return messages, logErrs, warnings, errs
+								}
+							})
+
+							It("stops logging and returns StagingFailedError", func() {
+								Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
+							})
 						})
 					})
 				})

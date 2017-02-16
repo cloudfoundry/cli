@@ -93,37 +93,9 @@ func (cmd StartCommand) Execute(args []string) error {
 
 	messages, logErrs, apiWarnings, errs := cmd.Actor.StartApplication(app, cmd.NOAAClient, cmd.Config)
 	cmd.UI.DisplayNewline()
-
-dance:
-	for {
-		select {
-		case message, ok := <-messages:
-			if !ok {
-				break dance
-			}
-			cmd.UI.DisplayLogMessage(message, false)
-		case warning, ok := <-apiWarnings:
-			if !ok {
-				break dance
-			}
-			cmd.UI.DisplayWarning(warning)
-		case logErr, ok := <-logErrs:
-			if !ok {
-				break dance
-			}
-			return shared.HandleError(logErr)
-		case apiErr, ok := <-errs:
-			if !ok {
-				break dance
-			}
-			if stgErr, ok := apiErr.(v2action.StagingFailedError); ok {
-				return shared.StagingFailedError{
-					BinaryName: cmd.Config.BinaryName(),
-					Message:    stgErr.Error(),
-				}
-			}
-			return shared.HandleError(apiErr)
-		}
+	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, apiWarnings, errs)
+	if err != nil {
+		return err
 	}
 
 	cmd.UI.DisplayNewline()

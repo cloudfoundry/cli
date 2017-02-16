@@ -172,7 +172,7 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 
 // StartApplication starts a given application.
 func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan string, <-chan error) {
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
+	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
 	allWarnings := make(chan string)
 	errs := make(chan error)

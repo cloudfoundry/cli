@@ -10,15 +10,6 @@ import (
 )
 
 type FakeConfig struct {
-	APIVersionStub        func() string
-	aPIVersionMutex       sync.RWMutex
-	aPIVersionArgsForCall []struct{}
-	aPIVersionReturns     struct {
-		result1 string
-	}
-	aPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
@@ -26,6 +17,15 @@ type FakeConfig struct {
 		result1 string
 	}
 	accessTokenReturnsOnCall map[int]struct {
+		result1 string
+	}
+	APIVersionStub        func() string
+	aPIVersionMutex       sync.RWMutex
+	aPIVersionArgsForCall []struct{}
+	aPIVersionReturns     struct {
+		result1 string
+	}
+	aPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
 	BinaryNameStub        func() string
@@ -198,6 +198,15 @@ type FakeConfig struct {
 		refreshToken   string
 		sshOAuthClient string
 	}
+	SkipSSLValidationStub        func() bool
+	skipSSLValidationMutex       sync.RWMutex
+	skipSSLValidationArgsForCall []struct{}
+	skipSSLValidationReturns     struct {
+		result1 bool
+	}
+	skipSSLValidationReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
 	stagingTimeoutArgsForCall []struct{}
@@ -215,15 +224,6 @@ type FakeConfig struct {
 	}
 	startupTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
-	}
-	SkipSSLValidationStub        func() bool
-	skipSSLValidationMutex       sync.RWMutex
-	skipSSLValidationArgsForCall []struct{}
-	skipSSLValidationReturns     struct {
-		result1 bool
-	}
-	skipSSLValidationReturnsOnCall map[int]struct {
-		result1 bool
 	}
 	TargetStub        func() string
 	targetMutex       sync.RWMutex
@@ -270,12 +270,12 @@ type FakeConfig struct {
 	uAAOAuthClientSecretReturnsOnCall map[int]struct {
 		result1 string
 	}
-	UnsetSpaceInformationStub               func()
-	unsetSpaceInformationMutex              sync.RWMutex
-	unsetSpaceInformationArgsForCall        []struct{}
 	UnsetOrganizationInformationStub        func()
 	unsetOrganizationInformationMutex       sync.RWMutex
 	unsetOrganizationInformationArgsForCall []struct{}
+	UnsetSpaceInformationStub               func()
+	unsetSpaceInformationMutex              sync.RWMutex
+	unsetSpaceInformationArgsForCall        []struct{}
 	VerboseStub                             func() (bool, []string)
 	verboseMutex                            sync.RWMutex
 	verboseArgsForCall                      []struct{}
@@ -289,46 +289,6 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeConfig) APIVersion() string {
-	fake.aPIVersionMutex.Lock()
-	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
-	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("APIVersion", []interface{}{})
-	fake.aPIVersionMutex.Unlock()
-	if fake.APIVersionStub != nil {
-		return fake.APIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.aPIVersionReturns.result1
-}
-
-func (fake *FakeConfig) APIVersionCallCount() int {
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
-	return len(fake.aPIVersionArgsForCall)
-}
-
-func (fake *FakeConfig) APIVersionReturns(result1 string) {
-	fake.APIVersionStub = nil
-	fake.aPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) APIVersionReturnsOnCall(i int, result1 string) {
-	fake.APIVersionStub = nil
-	if fake.aPIVersionReturnsOnCall == nil {
-		fake.aPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.aPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
 }
 
 func (fake *FakeConfig) AccessToken() string {
@@ -367,6 +327,46 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 		})
 	}
 	fake.accessTokenReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) APIVersion() string {
+	fake.aPIVersionMutex.Lock()
+	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
+	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("APIVersion", []interface{}{})
+	fake.aPIVersionMutex.Unlock()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.aPIVersionReturns.result1
+}
+
+func (fake *FakeConfig) APIVersionCallCount() int {
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
+	return len(fake.aPIVersionArgsForCall)
+}
+
+func (fake *FakeConfig) APIVersionReturns(result1 string) {
+	fake.APIVersionStub = nil
+	fake.aPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) APIVersionReturnsOnCall(i int, result1 string) {
+	fake.APIVersionStub = nil
+	if fake.aPIVersionReturnsOnCall == nil {
+		fake.aPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.aPIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -1090,6 +1090,46 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 	return fake.setTokenInformationArgsForCall[i].accessToken, fake.setTokenInformationArgsForCall[i].refreshToken, fake.setTokenInformationArgsForCall[i].sshOAuthClient
 }
 
+func (fake *FakeConfig) SkipSSLValidation() bool {
+	fake.skipSSLValidationMutex.Lock()
+	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
+	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
+	fake.recordInvocation("SkipSSLValidation", []interface{}{})
+	fake.skipSSLValidationMutex.Unlock()
+	if fake.SkipSSLValidationStub != nil {
+		return fake.SkipSSLValidationStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.skipSSLValidationReturns.result1
+}
+
+func (fake *FakeConfig) SkipSSLValidationCallCount() int {
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
+	return len(fake.skipSSLValidationArgsForCall)
+}
+
+func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
+	fake.SkipSSLValidationStub = nil
+	fake.skipSSLValidationReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
+	fake.SkipSSLValidationStub = nil
+	if fake.skipSSLValidationReturnsOnCall == nil {
+		fake.skipSSLValidationReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.skipSSLValidationReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) StagingTimeout() time.Duration {
 	fake.stagingTimeoutMutex.Lock()
 	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
@@ -1167,46 +1207,6 @@ func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration
 	}
 	fake.startupTimeoutReturnsOnCall[i] = struct {
 		result1 time.Duration
-	}{result1}
-}
-
-func (fake *FakeConfig) SkipSSLValidation() bool {
-	fake.skipSSLValidationMutex.Lock()
-	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
-	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
-	fake.recordInvocation("SkipSSLValidation", []interface{}{})
-	fake.skipSSLValidationMutex.Unlock()
-	if fake.SkipSSLValidationStub != nil {
-		return fake.SkipSSLValidationStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.skipSSLValidationReturns.result1
-}
-
-func (fake *FakeConfig) SkipSSLValidationCallCount() int {
-	fake.skipSSLValidationMutex.RLock()
-	defer fake.skipSSLValidationMutex.RUnlock()
-	return len(fake.skipSSLValidationArgsForCall)
-}
-
-func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
-	fake.SkipSSLValidationStub = nil
-	fake.skipSSLValidationReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
-	fake.SkipSSLValidationStub = nil
-	if fake.skipSSLValidationReturnsOnCall == nil {
-		fake.skipSSLValidationReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.skipSSLValidationReturnsOnCall[i] = struct {
-		result1 bool
 	}{result1}
 }
 
@@ -1410,22 +1410,6 @@ func (fake *FakeConfig) UAAOAuthClientSecretReturnsOnCall(i int, result1 string)
 	}{result1}
 }
 
-func (fake *FakeConfig) UnsetSpaceInformation() {
-	fake.unsetSpaceInformationMutex.Lock()
-	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct{}{})
-	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
-	fake.unsetSpaceInformationMutex.Unlock()
-	if fake.UnsetSpaceInformationStub != nil {
-		fake.UnsetSpaceInformationStub()
-	}
-}
-
-func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
-	fake.unsetSpaceInformationMutex.RLock()
-	defer fake.unsetSpaceInformationMutex.RUnlock()
-	return len(fake.unsetSpaceInformationArgsForCall)
-}
-
 func (fake *FakeConfig) UnsetOrganizationInformation() {
 	fake.unsetOrganizationInformationMutex.Lock()
 	fake.unsetOrganizationInformationArgsForCall = append(fake.unsetOrganizationInformationArgsForCall, struct{}{})
@@ -1440,6 +1424,22 @@ func (fake *FakeConfig) UnsetOrganizationInformationCallCount() int {
 	fake.unsetOrganizationInformationMutex.RLock()
 	defer fake.unsetOrganizationInformationMutex.RUnlock()
 	return len(fake.unsetOrganizationInformationArgsForCall)
+}
+
+func (fake *FakeConfig) UnsetSpaceInformation() {
+	fake.unsetSpaceInformationMutex.Lock()
+	fake.unsetSpaceInformationArgsForCall = append(fake.unsetSpaceInformationArgsForCall, struct{}{})
+	fake.recordInvocation("UnsetSpaceInformation", []interface{}{})
+	fake.unsetSpaceInformationMutex.Unlock()
+	if fake.UnsetSpaceInformationStub != nil {
+		fake.UnsetSpaceInformationStub()
+	}
+}
+
+func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
+	return len(fake.unsetSpaceInformationArgsForCall)
 }
 
 func (fake *FakeConfig) Verbose() (bool, []string) {
@@ -1488,10 +1488,10 @@ func (fake *FakeConfig) VerboseReturnsOnCall(i int, result1 bool, result2 []stri
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()
@@ -1532,12 +1532,12 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
-	fake.skipSSLValidationMutex.RLock()
-	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.targetMutex.RLock()
 	defer fake.targetMutex.RUnlock()
 	fake.targetedOrganizationMutex.RLock()
@@ -1548,10 +1548,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.uAAOAuthClientMutex.RUnlock()
 	fake.uAAOAuthClientSecretMutex.RLock()
 	defer fake.uAAOAuthClientSecretMutex.RUnlock()
-	fake.unsetSpaceInformationMutex.RLock()
-	defer fake.unsetSpaceInformationMutex.RUnlock()
 	fake.unsetOrganizationInformationMutex.RLock()
 	defer fake.unsetOrganizationInformationMutex.RUnlock()
+	fake.unsetSpaceInformationMutex.RLock()
+	defer fake.unsetSpaceInformationMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	return fake.invocations
