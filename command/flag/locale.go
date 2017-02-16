@@ -15,14 +15,16 @@ type Locale struct {
 }
 
 func (l *Locale) Complete(prefix string) []flags.Completion {
-	return completions(l.listLocales(), prefix)
+	sanitized := strings.Replace(prefix, "_", "-", -1)
+	return completions(l.listLocales(), sanitized)
 }
 
 func (l *Locale) UnmarshalFlag(val string) error {
-	lowered := strings.ToLower(val)
+	sanitized := strings.ToLower(val)
+	sanitized = strings.Replace(sanitized, "_", "-", -1)
 
 	for _, locale := range l.listLocales() {
-		if lowered == strings.ToLower(locale) {
+		if sanitized == strings.ToLower(locale) {
 			l.Locale = locale
 			return nil
 		}
