@@ -327,7 +327,7 @@ var _ = Describe("Application Actions", func() {
 			app = Application{
 				GUID:      "some-app-guid",
 				Name:      "some-app",
-				Instances: 0,
+				Instances: 2,
 			}
 
 			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
@@ -343,7 +343,7 @@ var _ = Describe("Application Actions", func() {
 			}
 
 			fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-				Instances: 0,
+				Instances: 2,
 				Name:      "some-app",
 			}, ccv2.Warnings{"update-warning"}, nil)
 
@@ -353,7 +353,7 @@ var _ = Describe("Application Actions", func() {
 					appCount += 1
 					return ccv2.Application{
 						GUID:         "some-app-guid",
-						Instances:    0,
+						Instances:    2,
 						Name:         "some-app",
 						PackageState: ccv2.ApplicationPackagePending,
 					}, ccv2.Warnings{"app-warnings-1"}, nil
@@ -393,7 +393,7 @@ var _ = Describe("Application Actions", func() {
 			Eventually(errs).Should(BeClosed())
 		})
 
-		It("starts and polls the app instance", func() {
+		It("starts and polls for an app instance", func() {
 			messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
 
 			Eventually(<-warnings).Should(Equal("update-warning"))
@@ -413,6 +413,35 @@ var _ = Describe("Application Actions", func() {
 
 			Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 			Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+		})
+
+		Context("when the app has zero instances", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+					Instances: 0,
+					Name:      "some-app",
+				}, ccv2.Warnings{"update-warning"}, nil)
+			})
+
+			It("starts and only polls for staging to finish", func() {
+				messages, logErrs, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+				Eventually(<-warnings).Should(Equal("update-warning"))
+				Eventually(<-warnings).Should(Equal("app-warnings-1"))
+				Eventually(<-warnings).Should(Equal("app-warnings-2"))
+
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+				app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+				Expect(app).To(Equal(ccv2.Application{
+					GUID:  "some-app-guid",
+					State: ccv2.ApplicationStarted,
+				}))
+
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+			})
 		})
 
 		Context("when updating the application fails", func() {

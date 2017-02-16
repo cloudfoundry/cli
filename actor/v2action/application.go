@@ -181,7 +181,7 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 		defer close(errs)
 		defer client.Close()
 		// start app
-		_, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
 			State: ccv2.ApplicationStarted,
 		})
@@ -197,6 +197,10 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 		err = actor.pollStaging(app, config, allWarnings)
 		if err != nil {
 			errs <- err
+			return
+		}
+
+		if updatedApp.Instances == 0 {
 			return
 		}
 
