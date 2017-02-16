@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, apiWarnings <-chan string, apiErrs <-chan error) error {
+func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appStarting <-chan bool, apiWarnings <-chan string, apiErrs <-chan error) error {
 	for {
 		select {
 		case message, ok := <-messages:
@@ -14,6 +14,11 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			}
 
 			ui.DisplayLogMessage(message, false)
+		case _, ok := <-appStarting:
+			if !ok {
+				return nil
+			}
+			ui.DisplayText("Waiting for app to start...")
 		case warning, ok := <-apiWarnings:
 			if !ok {
 				return nil
@@ -42,7 +47,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 					Message:    stgErr.Error(),
 				}
 			}
-
+			// TODO: Handle start failed errors
 			return HandleError(apiErr)
 		}
 	}
