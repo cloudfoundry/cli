@@ -223,16 +223,16 @@ type RenameBuildpackArgs struct {
 }
 
 type SetOrgRoleArgs struct {
-	Username     string `positional-arg-name:"USERNAME" required:"true" description:"The user"`
-	Organization string `positional-arg-name:"ORG" required:"true" description:"The organization"`
-	Role         string `positional-arg-name:"ROLE" required:"true" description:"The organization role"`
+	Username     string  `positional-arg-name:"USERNAME" required:"true" description:"The user"`
+	Organization string  `positional-arg-name:"ORG" required:"true" description:"The organization"`
+	Role         OrgRole `positional-arg-name:"ROLE" required:"true" description:"The organization role"`
 }
 
 type SetSpaceRoleArgs struct {
-	Username     string `positional-arg-name:"USERNAME" required:"true" description:"The user"`
-	Organization string `positional-arg-name:"ORG" required:"true" description:"The organization"`
-	Space        string `positional-arg-name:"ORG" required:"true" description:"The space"`
-	Role         string `positional-arg-name:"ROLE" required:"true" description:"The space role"`
+	Username     string    `positional-arg-name:"USERNAME" required:"true" description:"The user"`
+	Organization string    `positional-arg-name:"ORG" required:"true" description:"The organization"`
+	Space        string    `positional-arg-name:"ORG" required:"true" description:"The space"`
+	Role         SpaceRole `positional-arg-name:"ROLE" required:"true" description:"The space role"`
 }
 
 type ServiceAuthTokenArgs struct {

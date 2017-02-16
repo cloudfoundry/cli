@@ -10,6 +10,10 @@ type HealthCheckType struct {
 	Type string
 }
 
+func (m *HealthCheckType) Complete(prefix string) []flags.Completion {
+	return completions([]string{"http", "port", "process"}, prefix)
+}
+
 func (m *HealthCheckType) UnmarshalFlag(val string) error {
 	valLower := strings.ToLower(val)
 	switch valLower {
