@@ -23,6 +23,12 @@ var _ = Describe("Locale", func() {
 			Expect(locale.Locale).To(Equal("en-US"))
 		})
 
+		It("accepts en_us", func() {
+			err := locale.UnmarshalFlag("en_us")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(locale.Locale).To(Equal("en-US"))
+		})
+
 		It("accepts ja-jp", func() {
 			err := locale.UnmarshalFlag("ja-jp")
 			Expect(err).ToNot(HaveOccurred())
@@ -48,6 +54,8 @@ var _ = Describe("Locale", func() {
 
 			Entry("completes to 'en-US' and 'es-ES' when passed 'e'", "e",
 				[]flags.Completion{{Item: "es-ES"}, {Item: "en-US"}}),
+			Entry("completes to 'en-US' when passed 'en_'", "en_",
+				[]flags.Completion{{Item: "en-US"}}),
 			Entry("returns CLEAR, de-DE, en-US, es-ES, fr-FR, it-IT, ja-JP, ko-KR, pt-BR, zh-Hans, zh-Hant when passed nothing", "",
 				[]flags.Completion{{Item: "CLEAR"}, {Item: "de-DE"}, {Item: "en-US"}, {Item: "es-ES"}, {Item: "fr-FR"}, {Item: "it-IT"}, {Item: "ja-JP"}, {Item: "ko-KR"}, {Item: "pt-BR"}, {Item: "zh-Hans"}, {Item: "zh-Hant"}}),
 			Entry("completes to nothing when passed 'wut'", "wut",
