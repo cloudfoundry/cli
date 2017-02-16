@@ -1100,6 +1100,10 @@
     "translation": "CLI plugin management:"
   },
   {
+    "id": "COLOR must be \"true\" or \"false\"",
+    "translation": ""
+  },
+  {
     "id": "CPU",
     "translation": ""
   },
@@ -1386,6 +1390,14 @@
   {
     "id": "RESERVED_ROUTE_PORTS",
     "translation": "RESERVED_ROUTE_PORTS"
+  },
+  {
+    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "translation": ""
+  },
+  {
+    "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
+    "translation": ""
   },
   {
     "id": "ROUTE_PATH",

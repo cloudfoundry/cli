@@ -41,4 +41,23 @@ var _ = Describe("HealthCheckType", func() {
 			})
 		})
 	})
+
+	Describe("Complete", func() {
+		DescribeTable("returns list of completions",
+			func(prefix string, matches []flags.Completion) {
+				completions := healthCheck.Complete(prefix)
+				Expect(completions).To(Equal(matches))
+			},
+			Entry("returns 'port' and 'process' when passed 'p'", "p",
+				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
+			Entry("returns 'port' and 'process' when passed 'P'", "P",
+				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
+			Entry("completes to 'http' when passed 'h'", "h",
+				[]flags.Completion{{Item: "http"}}),
+			Entry("completes to 'http', 'port', and 'process' when passed nothing", "",
+				[]flags.Completion{{Item: "http"}, {Item: "port"}, {Item: "process"}}),
+			Entry("completes to nothing when passed 'wut'", "wut",
+				[]flags.Completion{}),
+		)
+	})
 })

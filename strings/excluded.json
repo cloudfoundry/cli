@@ -554,6 +554,13 @@
     "cf api",
     "process",
     "http",
+    "OrgDeveloper",
+    "spaceauditor",
+    "orgdeveloper",
+    "orgauditor",
+    "orgmanager",
+    "spacemanager",
+    "spacedeveloper",
 
     "\rDone uploading",
     ". Process to uninstall ...",

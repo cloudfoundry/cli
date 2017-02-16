@@ -1620,6 +1620,10 @@
     "translation": ""
   },
   {
+    "id": "COLOR must be \"true\" or \"false\"",
+    "translation": ""
+  },
+  {
     "id": "COMMAND",
     "translation": ""
   },
@@ -4334,6 +4338,14 @@
   {
     "id": "RESPONSE:",
     "translation": "回應: "
+  },
+  {
+    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "translation": ""
+  },
+  {
+    "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
+    "translation": ""
   },
   {
     "id": "ROLES:\n",

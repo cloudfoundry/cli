@@ -704,6 +704,10 @@
     "translation": "CLI plugin management:"
   },
   {
+    "id": "COLOR must be \"true\" or \"false\"",
+    "translation": ""
+  },
+  {
     "id": "CPU",
     "translation": ""
   },
@@ -990,6 +994,14 @@
   {
     "id": "QUOTA",
     "translation": "QUOTA"
+  },
+  {
+    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "translation": ""
+  },
+  {
+    "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
+    "translation": ""
   },
   {
     "id": "RUNNING",
