@@ -5100,7 +5100,15 @@
     "translation": "앱 시작 제한시간 초과\n\n팁: 애플리케이션이 올바른 포트에서 청취 중이어야 합니다. 포트를 하드 코딩하는 대신 $PORT 환경 변수를 사용하십시오."
   },
   {
+    "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
+    "translation": ""
+  },
+  {
     "id": "Start command:",
+    "translation": ""
+  },
+  {
+    "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
   {
@@ -5996,6 +6004,10 @@
     "translation": "경고: 이 조작은 Cloud Foundry의 내부 조작입니다. 서비스 브로커에 접속하지 않으며 서비스 인스턴스의 리소스는 변경되지 않습니다. 이 조작의 기본 유스 케이스는 v1 플랜에서 v2 플랜으로 서비스 인스턴스를 다시 맵핑하여 v1 서비스 브로커 API를 구현하는 서비스 브로커를 v2 API를 구현하는 브로커로 바꾸는 것입니다. v1 플랜을 개인용으로 작성하거나 추가 인스턴스가 작성되지 않도록 v1 브로커를 종료하는 것이 좋습니다. 서비스 인스턴스가 마이그레이션되면 v1 서비스와 플랜을 Cloud Foundry에서 제거할 수 있습니다."
   },
   {
+    "id": "Waiting for app to start...",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },
@@ -6656,6 +6668,10 @@
     "translation": "{{.AppInstanceLimit}} 앱 인스턴스 한계"
   },
   {
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "translation": ""
+  },
+  {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
   },
@@ -6728,11 +6744,11 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
-    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {

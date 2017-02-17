@@ -5100,7 +5100,15 @@
     "translation": "啟動應用程式逾時\n\n提示: 必須在正確的埠接聽應用程式。使用 $PORT 環境變數，而非將埠寫在程式中。"
   },
   {
+    "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
+    "translation": ""
+  },
+  {
     "id": "Start command:",
+    "translation": ""
+  },
+  {
+    "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
   {
@@ -5996,6 +6004,10 @@
     "translation": "警告: 這是 Cloud Foundry 的內部作業；不會聯絡服務分配管理系統，而且不會變更服務實例的資源。此作業的主要用途是透過將服務實例從第 1 版方案重新對映至第 2 版方案，以將實作第 1 版「服務分配管理系統 API」的服務分配管理系統，取代為實作第 2 版 API 的分配管理系統。建議您將第 1 版方案設為專用，或關閉第 1 版分配管理系統，以防止建立其他實例。移轉服務實例之後，即可從 Cloud Foundry 中移除第 1 版服務和方案。"
   },
   {
+    "id": "Waiting for app to start...",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },
@@ -6656,6 +6668,10 @@
     "translation": "{{.AppInstanceLimit}} 個應用程式實例限制"
   },
   {
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "translation": ""
+  },
+  {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
   },
@@ -6728,11 +6744,11 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
-    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {

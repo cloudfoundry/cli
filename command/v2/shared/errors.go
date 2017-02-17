@@ -102,12 +102,60 @@ type StagingFailedError struct {
 }
 
 func (e StagingFailedError) Error() string {
-	return `{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.`
+	return "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
 }
 
 func (e StagingFailedError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Message":          e.Message,
 		"BuildpackCommand": fmt.Sprintf("%s buildpacks", e.BinaryName),
+	})
+}
+
+type StagingTimeoutError struct {
+	AppName string
+	Timeout time.Duration
+}
+
+func (e StagingTimeoutError) Error() string {
+	return "{{.AppName}} failed to stage within {{.Timeout}} minutes"
+}
+
+func (e StagingTimeoutError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"AppName": e.AppName,
+		"Timeout": e.Timeout.Minutes(),
+	})
+}
+
+type UnsuccessfulStartError struct {
+	AppName    string
+	BinaryName string
+}
+
+func (e UnsuccessfulStartError) Error() string {
+	return "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
+}
+
+func (e UnsuccessfulStartError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"AppName":    e.AppName,
+		"BinaryName": e.BinaryName,
+	})
+}
+
+type StartupTimeoutError struct {
+	AppName    string
+	BinaryName string
+}
+
+func (e StartupTimeoutError) Error() string {
+	return "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
+}
+
+func (e StartupTimeoutError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"AppName":    e.AppName,
+		"BinaryName": e.BinaryName,
 	})
 }

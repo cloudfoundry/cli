@@ -404,62 +404,86 @@ var _ = Describe("Start Command", func() {
 				})
 
 				Context("when passed an API err", func() {
-					Context("while NOAA is still logging", func() {
-						Describe("an unexpected error", func() {
-							var expectedErr error
+					var apiErr error
 
-							BeforeEach(func() {
-								expectedErr = errors.New("err log message")
-								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
-									messages := make(chan *v2action.LogMessage)
-									logErrs := make(chan error)
-									appStart := make(chan bool)
-									warnings := make(chan string)
-									errs := make(chan error)
+					BeforeEach(func() {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
+							appStart := make(chan bool)
+							warnings := make(chan string)
+							errs := make(chan error)
 
-									go func() {
-										errs <- expectedErr
-										close(messages)
-										close(logErrs)
-										close(appStart)
-										close(warnings)
-										close(errs)
-									}()
+							go func() {
+								errs <- apiErr
+								close(messages)
+								close(logErrs)
+								close(appStart)
+								close(warnings)
+								close(errs)
+							}()
 
-									return messages, logErrs, appStart, warnings, errs
-								}
-							})
+							return messages, logErrs, appStart, warnings, errs
+						}
+					})
 
-							It("stops logging and returns the error", func() {
-								Expect(executeErr).To(MatchError(expectedErr))
-							})
+					Context("an unexpected error", func() {
+						BeforeEach(func() {
+							apiErr = errors.New("err log message")
 						})
 
-						Describe("staging error", func() {
-							BeforeEach(func() {
-								fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
-									messages := make(chan *v2action.LogMessage)
-									logErrs := make(chan error)
-									appStart := make(chan bool)
-									warnings := make(chan string)
-									errs := make(chan error)
+						It("stops logging and returns the error", func() {
+							Expect(executeErr).To(MatchError(apiErr))
+						})
+					})
 
-									go func() {
-										errs <- v2action.StagingFailedError{Reason: "Something, but not nothing"}
-										close(messages)
-										close(logErrs)
-										close(appStart)
-										close(warnings)
-										close(errs)
-									}()
+					Context("staging failed", func() {
+						BeforeEach(func() {
+							apiErr = v2action.StagingFailedError{Reason: "Something, but not nothing"}
+						})
 
-									return messages, logErrs, appStart, warnings, errs
-								}
-							})
+						It("stops logging and returns StagingFailedError", func() {
+							Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
+						})
+					})
 
-							It("stops logging and returns StagingFailedError", func() {
-								Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
-							})
+					Context("staging timed out", func() {
+						BeforeEach(func() {
+							apiErr = v2action.StagingTimeoutError{Name: "some-app", Timeout: time.Nanosecond}
+						})
+
+						It("stops logging and returns StagingTimeoutError", func() {
+							Expect(executeErr).To(MatchError(shared.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
+						})
+					})
+
+					Context("when the app instance crashes", func() {
+						BeforeEach(func() {
+							apiErr = v2action.ApplicationInstanceCrashedError{Name: "some-app"}
+						})
+
+						It("stops logging and returns UnsuccessfulStartError", func() {
+							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+						})
+					})
+
+					Context("when the app instance flaps", func() {
+						BeforeEach(func() {
+							apiErr = v2action.ApplicationInstanceFlappingError{Name: "some-app"}
+						})
+
+						It("stops logging and returns UnsuccessfulStartError", func() {
+							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+						})
+					})
+
+					Context("starting timeout", func() {
+						BeforeEach(func() {
+							apiErr = v2action.StartupTimeoutError{Name: "some-app"}
+						})
+
+						It("stops logging and returns StartupTimeoutError", func() {
+							Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 				})

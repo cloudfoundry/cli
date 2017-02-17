@@ -5100,7 +5100,15 @@
     "translation": "启动应用程序超时\n\n提示: 应用程序必须在侦听正确的端口。不要对端口硬编码，而是使用 $PORT 环境变量。"
   },
   {
+    "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
+    "translation": ""
+  },
+  {
     "id": "Start command:",
+    "translation": ""
+  },
+  {
+    "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
   {
@@ -5996,6 +6004,10 @@
     "translation": "警告: 这是 Cloud Foundry 的内部操作；不会联系服务代理程序，并且不会更改服务实例的资源。此操作的主要用例是通过将服务实例从 V1 套餐重新映射到 V2 套餐，将实现 V1 服务代理程序 API 的服务代理程序替换为实现 V2 API 的代理程序。我们建议将 V1 套餐设置为专用套餐或者关闭 V1 代理程序，以阻止创建更多实例。一旦迁移了服务实例，就可以从 Cloud Foundry 中除去 V1 服务和套餐。"
   },
   {
+    "id": "Waiting for app to start...",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },
@@ -6656,6 +6668,10 @@
     "translation": "{{.AppInstanceLimit}} 应用程序实例限制"
   },
   {
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "translation": ""
+  },
+  {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
   },
@@ -6728,11 +6744,11 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
-    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {

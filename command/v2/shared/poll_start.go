@@ -41,13 +41,19 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 				return nil
 			}
 
-			if stgErr, ok := apiErr.(v2action.StagingFailedError); ok {
-				return StagingFailedError{
-					BinaryName: config.BinaryName(),
-					Message:    stgErr.Error(),
-				}
+			switch err := apiErr.(type) {
+			case v2action.StagingFailedError:
+				return StagingFailedError{BinaryName: config.BinaryName(), Message: err.Error()}
+			case v2action.StagingTimeoutError:
+				return StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
+			case v2action.ApplicationInstanceCrashedError:
+				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+			case v2action.ApplicationInstanceFlappingError:
+				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+			case v2action.StartupTimeoutError:
+				return StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
 			}
-			// TODO: Handle start failed errors
+
 			return HandleError(apiErr)
 		}
 	}
