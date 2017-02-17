@@ -99,7 +99,8 @@ func (e StagingFailedError) Error() string {
 // StagingTimeoutError is returned when staging timeout is reached waiting for
 // an application to stage.
 type StagingTimeoutError struct {
-	Name string
+	Name    string
+	Timeout time.Duration
 }
 
 func (e StagingTimeoutError) Error() string {
@@ -236,7 +237,7 @@ func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<
 		}
 		time.Sleep(config.PollingInterval())
 	}
-	return StagingTimeoutError{Name: app.Name}
+	return StagingTimeoutError{Name: app.Name, Timeout: config.StagingTimeout()}
 }
 
 func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<- string) error {

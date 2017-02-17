@@ -41,10 +41,13 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JobTimeoutError", JobTimeoutError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 		Entry("StagingFailedError", StagingFailedError{}),
+		Entry("StagingTimeoutError", StagingTimeoutError{}),
+		Entry("StartupTimeoutError", StartupTimeoutError{}),
 
 		// Command errors.
 		Entry("NoOrgTargetedError", NoOrganizationTargetedError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
+		Entry("UnsuccessfulStartError", UnsuccessfulStartError{}),
 	)
 })

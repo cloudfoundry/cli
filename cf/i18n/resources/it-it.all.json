@@ -5100,7 +5100,15 @@
     "translation": "Timeout avvio applicazione\n\nSUGGERIMENTO: l'applicazione deve essere in ascolto sulla porta corretta. Anziché impostare la porta come hardcoded, utilizza la variabile di ambiente $PORT."
   },
   {
+    "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
+    "translation": ""
+  },
+  {
     "id": "Start command:",
+    "translation": ""
+  },
+  {
+    "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
   {
@@ -5996,6 +6004,10 @@
     "translation": "AVVERTENZA: questa è un'operazione interna di Cloud Foundry; i broker dei servizi non verranno contattati e le risorse delle istanze del servizio non verranno modificate. Il caso di utilizzo primario per questa operazione è quello di sostituire un broker dei servizi che implementa l'API Broker dei servizi v1 con un broker che implementa l'API v2 mediante la riassociazione delle istanze del servizio dai piani della v1 ai piani della v2.  Si consiglia di rendere privato il piano v1 o di arrestare il broker v1 per impedire la creazione di istanze aggiuntive. Una volta che le istanze del servizio sono state migrate, i servizi e i piani della v1 possono essere rimossi da Cloud Foundry."
   },
   {
+    "id": "Waiting for app to start...",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },
@@ -6656,6 +6668,10 @@
     "translation": "Limite istanze applicazione {{.AppInstanceLimit}}"
   },
   {
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "translation": ""
+  },
+  {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
   },
@@ -6728,11 +6744,11 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
-    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {

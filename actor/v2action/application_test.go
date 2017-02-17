@@ -523,17 +523,17 @@ var _ = Describe("Application Actions", func() {
 
 			Context("when the application takes too long to stage", func() {
 				BeforeEach(func() {
-					fakeConfig.StagingTimeoutReturns(0)
+					fakeConfig.StagingTimeoutReturns(time.Nanosecond)
 				})
 
 				It("sends a timeout error and stops polling", func() {
 					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
 
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
-					Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app"})))
+					Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: time.Nanosecond})))
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
 				})

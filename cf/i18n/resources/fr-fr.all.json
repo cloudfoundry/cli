@@ -5100,7 +5100,15 @@
     "translation": "Dépassement du délai d'attente du démarrage de l'application\n\nASTUCE : l'application doit être à l'écoute sur le port approprié. Au lieu de coder le port en dur, utilisez la variable d'environnement $PORT."
   },
   {
+    "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
+    "translation": ""
+  },
+  {
     "id": "Start command:",
+    "translation": ""
+  },
+  {
+    "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
   {
@@ -5996,6 +6004,10 @@
     "translation": "AVERTISSEMENT : cette opération est interne à Cloud Foundry ; les courtiers de services ne sont pas contactés et les ressources des instances de service ne sont pas altérées. Cette opération est principalement utilisée pour remplacer un courtier de services implémentant l'API de courtier de services de version 1 par un courtier implémentant l'API de version 2 en remappant les instances de service des plans de version 1 aux plans de version 2.  Il est recommandé de rendre le plan de version 1 privé ou d'arrêter le courtier de version 1 pour éviter la création d'instances supplémentaires. Une fois les instances de service migrées, vous pouvez supprimer les services et les plans de version 1 de Cloud Foundry."
   },
   {
+    "id": "Waiting for app to start...",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },
@@ -6656,6 +6668,10 @@
     "translation": "{{.AppInstanceLimit}} comme nombre maximal d'instances d'application"
   },
   {
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "translation": ""
+  },
+  {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
   },
@@ -6728,11 +6744,11 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {
-    "id": "{{.Message}}\\n\\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {
