@@ -7,6 +7,8 @@ import (
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
+const StagingLog = "STG"
+
 type NOAATimeoutError struct{}
 
 func (e NOAATimeoutError) Error() string {
@@ -30,6 +32,10 @@ func (log LogMessage) Type() string {
 		return "OUT"
 	}
 	return "ERR"
+}
+
+func (log LogMessage) Staging() bool {
+	return log.sourceType == StagingLog
 }
 
 func (log LogMessage) Timestamp() time.Time {
