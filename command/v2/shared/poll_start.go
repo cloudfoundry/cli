@@ -13,11 +13,15 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 				break
 			}
 
-			ui.DisplayLogMessage(message, false)
+			if message.Staging() {
+				ui.DisplayLogMessage(message, false)
+			}
 		case _, ok := <-appStarting:
 			if !ok {
 				return nil
 			}
+
+			ui.DisplayNewline()
 			ui.DisplayText("Waiting for app to start...")
 		case warning, ok := <-apiWarnings:
 			if !ok {

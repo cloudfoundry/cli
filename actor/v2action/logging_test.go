@@ -25,6 +25,24 @@ var _ = Describe("Logging Actions", func() {
 		actor = NewActor(nil, nil)
 	})
 
+	Describe("LogMessage", func() {
+		Describe("Stagging", func() {
+			Context("when the log is a staging log", func() {
+				It("returns true", func() {
+					message := NewLogMessage("", 0, time.Now(), "STG", "")
+					Expect(message.Staging()).To(BeTrue())
+				})
+			})
+
+			Context("when the log is any other kind of log", func() {
+				It("returns true", func() {
+					message := NewLogMessage("", 0, time.Now(), "APP", "")
+					Expect(message.Staging()).To(BeFalse())
+				})
+			})
+		})
+	})
+
 	Describe("GetStreamingLogs", func() {
 		var (
 			expectedAppGUID string

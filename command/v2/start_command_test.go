@@ -184,8 +184,8 @@ var _ = Describe("Start Command", func() {
 							errs := make(chan error)
 
 							go func() {
-								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "APP", "1")
-								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
 								appStart <- true
 								close(messages)
 								close(logErrs)
@@ -216,8 +216,9 @@ var _ = Describe("Start Command", func() {
 							errs := make(chan error)
 
 							go func() {
-								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "APP", "1")
-								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "Something else", "1")
 								close(messages)
 								close(logErrs)
 								close(appStart)
@@ -233,6 +234,7 @@ var _ = Describe("Start Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(testUI.Out).To(Say("log message 1"))
 						Expect(testUI.Out).To(Say("log message 2"))
+						Expect(testUI.Out).ToNot(Say("log message 3"))
 					})
 				})
 
@@ -247,9 +249,9 @@ var _ = Describe("Start Command", func() {
 								errs := make(chan error)
 
 								go func() {
-									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "APP", "1")
-									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "APP", "1")
-									messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "APP", "1")
+									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+									messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "STG", "1")
 									logErrs <- v2action.NOAATimeoutError{}
 									close(messages)
 									close(logErrs)
