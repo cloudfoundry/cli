@@ -31,7 +31,10 @@ var _ = Describe("FilenameWithAt", func() {
 		})
 
 		Context("when the match starts with @", func() {
-			var tempDir string
+			var (
+				tempDir string
+				prevDir string
+			)
 
 			BeforeEach(func() {
 				var err error
@@ -39,6 +42,8 @@ var _ = Describe("FilenameWithAt", func() {
 				tempDir, err = ioutil.TempDir("", "")
 				Expect(err).ToNot(HaveOccurred())
 
+				prevDir, err = os.Getwd()
+				Expect(err).ToNot(HaveOccurred())
 				err = os.Chdir(tempDir)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -49,7 +54,9 @@ var _ = Describe("FilenameWithAt", func() {
 			})
 
 			AfterEach(func() {
-				err := os.RemoveAll(tempDir)
+				err := os.Chdir(prevDir)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.RemoveAll(tempDir)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
