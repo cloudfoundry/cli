@@ -6,26 +6,26 @@ import (
 	flags "github.com/jessevdk/go-flags"
 )
 
-type OrgRole struct {
+type SpaceRole struct {
 	Role string
 }
 
-func (s *OrgRole) Complete(prefix string) []flags.Completion {
-	return completions([]string{"OrgManager", "OrgDeveloper", "OrgAuditor"}, prefix)
+func (s *SpaceRole) Complete(prefix string) []flags.Completion {
+	return completions([]string{"SpaceManager", "SpaceDeveloper", "SpaceAuditor"}, prefix)
 }
 
-func (s *OrgRole) UnmarshalFlag(val string) error {
+func (s *SpaceRole) UnmarshalFlag(val string) error {
 	switch strings.ToLower(val) {
-	case "orgauditor":
-		s.Role = "OrgAuditor"
-	case "orgdeveloper":
-		s.Role = "OrgDeveloper"
-	case "orgmanager":
-		s.Role = "OrgManager"
+	case "spaceauditor":
+		s.Role = "SpaceAuditor"
+	case "spacedeveloper":
+		s.Role = "SpaceDeveloper"
+	case "spacemanager":
+		s.Role = "SpaceManager"
 	default:
 		return &flags.Error{
 			Type:    flags.ErrRequired,
-			Message: `ROLE must be "OrgManager", "OrgDeveloper" and "OrgAuditor"`,
+			Message: `ROLE must be "SpaceManager", "SpaceDeveloper" and "SpaceAuditor"`,
 		}
 	}
 

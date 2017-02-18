@@ -1468,8 +1468,8 @@
     "translation": "RESERVED_ROUTE_PORTS"
   },
   {
-    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
-    "translation": ""
+    "id": "ROLE must be \"OrgManager\", \"BillingManager\" and \"OrgAuditor\"",
+    "translation": "ROLE must be \"OrgManager\", \"BillingManager\" and \"OrgAuditor\""
   },
   {
     "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
@@ -1974,6 +1974,10 @@
   {
     "id": "apps",
     "translation": "apps"
+  },
+  {
+    "id": "billingmanager",
+    "translation": ""
   },
   {
     "id": "broker: {{.Name}}",

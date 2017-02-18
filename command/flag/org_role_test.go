@@ -23,10 +23,10 @@ var _ = Describe("OrgRole", func() {
 			Expect(orgRole).To(Equal(OrgRole{Role: "OrgManager"}))
 		})
 
-		It("accepts OrgDeveloper", func() {
-			err := orgRole.UnmarshalFlag("Orgdeveloper")
+		It("accepts BillingManager", func() {
+			err := orgRole.UnmarshalFlag("Billingmanager")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(orgRole).To(Equal(OrgRole{Role: "OrgDeveloper"}))
+			Expect(orgRole).To(Equal(OrgRole{Role: "BillingManager"}))
 		})
 
 		It("accepts OrgAuditor", func() {
@@ -39,7 +39,7 @@ var _ = Describe("OrgRole", func() {
 			err := orgRole.UnmarshalFlag("I AM A BANANANANANANANANA")
 			Expect(err).To(MatchError(&flags.Error{
 				Type:    flags.ErrRequired,
-				Message: `ROLE must be "OrgManager", "OrgDeveloper" and "OrgAuditor"`,
+				Message: `ROLE must be "OrgManager", "BillingManager" and "OrgAuditor"`,
 			}))
 			Expect(orgRole.Role).To(BeEmpty())
 		})
@@ -52,19 +52,29 @@ var _ = Describe("OrgRole", func() {
 				Expect(completions).To(Equal(matches))
 			},
 
-			Entry("returns 'OrgManager', 'OrgDeveloper' and 'OrgAuditor' when passed 'O'", "O",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgDeveloper"}, {Item: "OrgAuditor"}}),
-			Entry("returns 'OrgManager', 'OrgDeveloper' and 'OrgAuditor' when passed 'o'", "o",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgDeveloper"}, {Item: "OrgAuditor"}}),
-			Entry("completes to 'OrgAuditor' when passed 'Orga'", "Orga",
+			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'O'",
+				"O",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
+			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'o'",
+				"o",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
+			Entry("returns 'BillingManager' when passed 'B'",
+				"B",
+				[]flags.Completion{{Item: "BillingManager"}}),
+			Entry("returns 'BillingManager' when passed 'b'",
+				"b",
+				[]flags.Completion{{Item: "BillingManager"}}),
+			Entry("completes to 'OrgAuditor' when passed 'Orga'",
+				"Orga",
 				[]flags.Completion{{Item: "OrgAuditor"}}),
-			Entry("completes to 'OrgDeveloper' when passed 'Orgd'", "Orgd",
-				[]flags.Completion{{Item: "OrgDeveloper"}}),
-			Entry("completes to 'OrgManager' when passed 'Orgm'", "Orgm",
+			Entry("completes to 'OrgManager' when passed 'Orgm'",
+				"Orgm",
 				[]flags.Completion{{Item: "OrgManager"}}),
-			Entry("returns 'OrgManager', 'OrgDeveloper' and 'OrgAuditor' when passed nothing", "",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgDeveloper"}, {Item: "OrgAuditor"}}),
-			Entry("completes to nothing when passed 'wut'", "wut",
+			Entry("returns 'OrgManager', 'BillingManager' and 'OrgAuditor' when passed nothing",
+				"",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "BillingManager"}, {Item: "OrgAuditor"}}),
+			Entry("completes to nothing when passed 'wut'",
+				"wut",
 				[]flags.Completion{}),
 		)
 	})
