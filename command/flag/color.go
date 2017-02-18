@@ -10,7 +10,7 @@ type Color struct {
 	Color bool
 }
 
-func (c *Color) Complete(prefix string) []flags.Completion {
+func (c Color) Complete(prefix string) []flags.Completion {
 	return completions([]string{"true", "false"}, prefix)
 }
 

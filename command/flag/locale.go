@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/i18n"
-
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -14,15 +13,12 @@ type Locale struct {
 	Locale string
 }
 
-func (l *Locale) Complete(prefix string) []flags.Completion {
-	sanitized := strings.Replace(prefix, "_", "-", -1)
-	return completions(l.listLocales(), sanitized)
+func (l Locale) Complete(prefix string) []flags.Completion {
+	return completions(l.listLocales(), l.sanitize(prefix))
 }
 
 func (l *Locale) UnmarshalFlag(val string) error {
-	sanitized := strings.ToLower(val)
-	sanitized = strings.Replace(sanitized, "_", "-", -1)
-
+	sanitized := strings.ToLower(l.sanitize(val))
 	for _, locale := range l.listLocales() {
 		if sanitized == strings.ToLower(locale) {
 			l.Locale = locale
@@ -36,7 +32,11 @@ func (l *Locale) UnmarshalFlag(val string) error {
 	}
 }
 
-func (l *Locale) listLocales() []string {
+func (l Locale) sanitize(val string) string {
+	return strings.Replace(val, "_", "-", -1)
+}
+
+func (l Locale) listLocales() []string {
 	locals := append(i18n.SupportedLocales(), "CLEAR")
 	sort.Strings(locals)
 	return locals
