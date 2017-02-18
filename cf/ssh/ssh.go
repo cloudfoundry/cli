@@ -3,6 +3,7 @@ package sshCmd
 import (
 	"crypto/md5"
 	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +28,7 @@ import (
 const (
 	md5FingerprintLength  = 47 // inclusive of space between bytes
 	sha1FingerprintLength = 59 // inclusive of space between bytes
+	sha2FingerprintLength = 95 // inclusive of space between bytes
 )
 
 //go:generate counterfeiter . SecureShell
@@ -341,6 +343,11 @@ func sha1Fingerprint(key ssh.PublicKey) string {
 	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
 }
 
+func sha2Fingerprint(key ssh.PublicKey) string {
+	sum := sha256.Sum256(key.Marshal())
+	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
+}
+
 type hostKeyCallback func(hostname string, remote net.Addr, key ssh.PublicKey) error
 
 func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) hostKeyCallback {
@@ -350,6 +357,11 @@ func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) h
 
 	return func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 		switch len(expectedFingerprint) {
+		case sha2FingerprintLength:
+			fingerprint := sha2Fingerprint(key)
+			if fingerprint != expectedFingerprint {
+				return fmt.Errorf("Host key verification failed.\n\nThe fingerprint of the received key was %q.", fingerprint)
+			}
 		case sha1FingerprintLength:
 			fingerprint := sha1Fingerprint(key)
 			if fingerprint != expectedFingerprint {
