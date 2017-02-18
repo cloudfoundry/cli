@@ -4340,7 +4340,7 @@
     "translation": "回應: "
   },
   {
-    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "id": "ROLE must be \"OrgManager\", \"BillingManager\" and \"OrgAuditor\"",
     "translation": ""
   },
   {
@@ -6078,6 +6078,10 @@
   {
     "id": "auth request failed",
     "translation": "鑑別要求失敗"
+  },
+  {
+    "id": "billingmanager",
+    "translation": ""
   },
   {
     "id": "bound apps",

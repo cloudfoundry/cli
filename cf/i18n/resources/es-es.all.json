@@ -4340,7 +4340,7 @@
     "translation": "RESPUESTA:"
   },
   {
-    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "id": "ROLE must be \"OrgManager\", \"BillingManager\" and \"OrgAuditor\"",
     "translation": ""
   },
   {
@@ -6078,6 +6078,10 @@
   {
     "id": "auth request failed",
     "translation": "la solicitud de automatización ha fallado"
+  },
+  {
+    "id": "billingmanager",
+    "translation": ""
   },
   {
     "id": "bound apps",

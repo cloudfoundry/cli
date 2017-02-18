@@ -4340,7 +4340,7 @@
     "translation": "ANTWORT:"
   },
   {
-    "id": "ROLE must be \"OrgManager\", \"OrgDeveloper\" and \"OrgAuditor\"",
+    "id": "ROLE must be \"OrgManager\", \"BillingManager\" and \"OrgAuditor\"",
     "translation": ""
   },
   {
@@ -6078,6 +6078,10 @@
   {
     "id": "auth request failed",
     "translation": "Authorisierungsanforderung fehlgeschlagen"
+  },
+  {
+    "id": "billingmanager",
+    "translation": ""
   },
   {
     "id": "bound apps",
