@@ -16,7 +16,9 @@ BUILD_DATE=$(date -u +"%Y-%m-%d")
 
 go build \
   -o $ROOT_DIR/out/cf \
-  -ldflags "-X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} \
+  -ldflags "-w \
+            -s \
+            -X code.cloudfoundry.org/cli/version.binaryVersion=${BUILD_VERSION} \
             -X code.cloudfoundry.org/cli/version.binarySHA=${BUILD_SHA} \
             -X code.cloudfoundry.org/cli/version.binaryBuildDate=${BUILD_DATE}" \
   .
