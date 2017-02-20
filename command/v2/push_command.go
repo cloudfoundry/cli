@@ -3,8 +3,6 @@ package v2
 import (
 	"os"
 
-	flags "github.com/jessevdk/go-flags"
-
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -16,7 +14,7 @@ type PushCommand struct {
 	StartupCommand       string               `short:"c" description:"Startup command, set to null to reset to default start command"`
 	Domain               string               `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage          string               `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
-	PathToManifest       flags.Filename       `short:"f" description:"Path to manifest"` //TODO: Custom Path flag that does validation
+	PathToManifest       flag.Filename        `short:"f" description:"Path to manifest"`
 	HealthCheckType      flag.HealthCheckType `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	Hostname             string               `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
 	NumInstances         int                  `short:"i" description:"Number of instances"`
@@ -26,7 +24,7 @@ type PushCommand struct {
 	NoManifest           bool                 `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute              bool                 `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
 	NoStart              bool                 `long:"no-start" description:"Do not start an app after pushing"`
-	DirectoryPath        flags.Filename       `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"` //TODO: Custom Directory flag that does validation
+	DirectoryPath        flag.Filename        `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	RandomRoute          bool                 `long:"random-route" description:"Create a random route for this app"`
 	RoutePath            string               `long:"route-path" description:"Path for the route"`
 	Stack                string               `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
