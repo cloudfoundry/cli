@@ -13,8 +13,12 @@ import (
 		* SendMetadata - used to fetch the plugin metadata
 **/
 func Start(cmd Plugin) {
-	cliConnection := NewCliConnection(os.Args[1])
+	if len(os.Args) < 2 {
+		fmt.Printf("This cf CLI plugin is not intended to be run on its own\n\n")
+		os.Exit(1)
+	}
 
+	cliConnection := NewCliConnection(os.Args[1])
 	cliConnection.pingCLI()
 	if isMetadataRequest(os.Args) {
 		cliConnection.sendPluginMetadataToCliServer(cmd.GetMetadata())
