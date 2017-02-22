@@ -1,7 +1,9 @@
 package flag_test
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/command/flag"
 	flags "github.com/jessevdk/go-flags"
@@ -10,21 +12,28 @@ import (
 )
 
 var _ = Describe("EnvironmentVariable", func() {
-	var envVar EnvironmentVariable
+	var (
+		envVar  EnvironmentVariable
+		envList []string
+	)
 
 	BeforeEach(func() {
 		envVar = EnvironmentVariable("")
-		os.Clearenv()
+		envList = []string{"ENVIRONMENTVARIABLE_TEST_ABC", "ENVIRONMENTVARIABLE_TEST_FOO_BAR", "ENVIRONMENTVARIABLE_TEST_ACKBAR"}
 
 		var err error
-		for _, v := range []string{"ABC", "FOO_BAR", "ACKBAR"} {
+		for _, v := range envList {
 			err = os.Setenv(v, "")
 			Expect(err).NotTo(HaveOccurred())
 		}
 	})
 
 	AfterEach(func() {
-		os.Clearenv()
+		var err error
+		for _, v := range envList {
+			err = os.Unsetenv(v)
+			Expect(err).ToNot(HaveOccurred())
+		}
 	})
 
 	Describe("Complete", func() {
@@ -43,24 +52,28 @@ var _ = Describe("EnvironmentVariable", func() {
 		Context("when the prefix starts with $", func() {
 			Context("when only $ is specified", func() {
 				It("returns all environment variables", func() {
+					keyValPairs := os.Environ()
+					envVars := make([]string, len(keyValPairs))
+					for i, keyValPair := range keyValPairs {
+						envVars[i] = fmt.Sprintf("$%s", strings.Split(keyValPair, "=")[0])
+					}
+
 					matches := envVar.Complete("$")
-					Expect(matches).To(HaveLen(3))
-					Expect(matches).To(ConsistOf(
-						flags.Completion{Item: "$ABC"},
-						flags.Completion{Item: "$FOO_BAR"},
-						flags.Completion{Item: "$ACKBAR"},
-					))
+					Expect(matches).To(HaveLen(len(keyValPairs)))
+					for _, v := range envVars {
+						Expect(matches).To(ContainElement(flags.Completion{Item: v}))
+					}
 				})
 			})
 
 			Context("when additional characters are specified", func() {
 				Context("when there are matching environment variables", func() {
 					It("returns the matching environment variables", func() {
-						matches := envVar.Complete("$A")
+						matches := envVar.Complete("$ENVIRONMENTVARIABLE_TEST_A")
 						Expect(matches).To(HaveLen(2))
 						Expect(matches).To(ConsistOf(
-							flags.Completion{Item: "$ABC"},
-							flags.Completion{Item: "$ACKBAR"},
+							flags.Completion{Item: "$ENVIRONMENTVARIABLE_TEST_ABC"},
+							flags.Completion{Item: "$ENVIRONMENTVARIABLE_TEST_ACKBAR"},
 						))
 					})
 				})
