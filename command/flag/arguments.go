@@ -143,9 +143,9 @@ type FilesArgs struct {
 }
 
 type SetEnvironmentArgs struct {
-	AppName                  string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
-	EnvironmentVariableName  string `positional-arg-name:"ENV_VAR_NAME" required:"true" description:"The environment variable name"`
-	EnvironmentVariableValue string `positional-arg-name:"ENV_VAR_VALUE" required:"true" description:"The environment variable value"`
+	AppName                  string              `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	EnvironmentVariableName  string              `positional-arg-name:"ENV_VAR_NAME" required:"true" description:"The environment variable name"`
+	EnvironmentVariableValue EnvironmentVariable `positional-arg-name:"ENV_VAR_VALUE" required:"true" description:"The environment variable value"`
 }
 
 type UnsetEnvironmentArgs struct {

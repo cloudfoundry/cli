@@ -55,7 +55,9 @@ var _ = Describe("path flag types", func() {
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns all files and directories", func() {
-					Expect(path.Complete("")).To(ConsistOf(
+					matches := path.Complete("")
+					Expect(matches).To(HaveLen(5))
+					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
 						flags.Completion{Item: "add/"},
@@ -68,7 +70,9 @@ var _ = Describe("path flag types", func() {
 			Context("when the prefix is not empty", func() {
 				Context("when there are matching paths", func() {
 					It("returns the matching paths", func() {
-						Expect(path.Complete("a")).To(ConsistOf(
+						matches := path.Complete("a")
+						Expect(matches).To(HaveLen(4))
+						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "abc"},
 							flags.Completion{Item: "abd"},
 							flags.Completion{Item: "add/"},
@@ -140,7 +144,9 @@ var _ = Describe("path flag types", func() {
 			Context("when the prefix starts with @", func() {
 				Context("when there are no characters after the @", func() {
 					It("returns all files and directories", func() {
-						Expect(pathWithAt.Complete("@")).To(ConsistOf(
+						matches := pathWithAt.Complete("@")
+						Expect(matches).To(HaveLen(5))
+						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
 							flags.Completion{Item: "@add/"},
@@ -153,7 +159,9 @@ var _ = Describe("path flag types", func() {
 				Context("when there are characters after the @", func() {
 					Context("when there are matching paths", func() {
 						It("returns the matching paths", func() {
-							Expect(pathWithAt.Complete("@a")).To(ConsistOf(
+							matches := pathWithAt.Complete("@a")
+							Expect(matches).To(HaveLen(4))
+							Expect(matches).To(ConsistOf(
 								flags.Completion{Item: "@abc"},
 								flags.Completion{Item: "@abd"},
 								flags.Completion{Item: "@add/"},
@@ -182,7 +190,9 @@ var _ = Describe("path flag types", func() {
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns bool choices and all files and directories", func() {
-					Expect(pathWithBool.Complete("")).To(ConsistOf(
+					matches := pathWithBool.Complete("")
+					Expect(matches).To(HaveLen(7))
+					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "true"},
 						flags.Completion{Item: "false"},
 						flags.Completion{Item: "abc"},
@@ -197,7 +207,9 @@ var _ = Describe("path flag types", func() {
 			Context("when the prefix is not empty", func() {
 				Context("when there are matching bool/paths", func() {
 					It("returns the matching bool/paths", func() {
-						Expect(pathWithBool.Complete("t")).To(ConsistOf(
+						matches := pathWithBool.Complete("t")
+						Expect(matches).To(HaveLen(2))
+						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "true"},
 							flags.Completion{Item: "tfg"},
 						))
