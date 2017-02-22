@@ -31,6 +31,11 @@ var _ = Describe("path flag types", func() {
 			err = ioutil.WriteFile(filename, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 		}
+
+		for _, dir := range []string{"add", "aee"} {
+			err := os.Mkdir(dir, os.ModeDir)
+			Expect(err).ToNot(HaveOccurred())
+		}
 	})
 
 	AfterEach(func() {
@@ -49,10 +54,12 @@ var _ = Describe("path flag types", func() {
 
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
-				It("returns all files", func() {
+				It("returns all files and directories", func() {
 					Expect(path.Complete("")).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
+						flags.Completion{Item: "add/"},
+						flags.Completion{Item: "aee/"},
 						flags.Completion{Item: "efg"},
 					))
 				})
@@ -64,6 +71,8 @@ var _ = Describe("path flag types", func() {
 						Expect(path.Complete("a")).To(ConsistOf(
 							flags.Completion{Item: "abc"},
 							flags.Completion{Item: "abd"},
+							flags.Completion{Item: "add/"},
+							flags.Completion{Item: "aee/"},
 						))
 					})
 				})
@@ -84,34 +93,8 @@ var _ = Describe("path flag types", func() {
 			pathWithExistenceCheck = PathWithExistenceCheck("")
 		})
 
-		Describe("Complete", func() {
-			Context("when the prefix is empty", func() {
-				It("returns all files", func() {
-					Expect(pathWithExistenceCheck.Complete("")).To(ConsistOf(
-						flags.Completion{Item: "abc"},
-						flags.Completion{Item: "abd"},
-						flags.Completion{Item: "efg"},
-					))
-				})
-			})
-
-			Context("when the prefix is not empty", func() {
-				Context("when there are matching paths", func() {
-					It("returns the matching paths", func() {
-						Expect(pathWithExistenceCheck.Complete("a")).To(ConsistOf(
-							flags.Completion{Item: "abc"},
-							flags.Completion{Item: "abd"},
-						))
-					})
-				})
-
-				Context("when there are no matching paths", func() {
-					It("returns no matches", func() {
-						Expect(pathWithExistenceCheck.Complete("z")).To(BeEmpty())
-					})
-				})
-			})
-		})
+		// The Complete method is not tested because it shares the same code as
+		// Path.Complete().
 
 		Describe("UnmarshalFlag", func() {
 			Context("when the path does not exist", func() {
@@ -156,10 +139,12 @@ var _ = Describe("path flag types", func() {
 
 			Context("when the prefix starts with @", func() {
 				Context("when there are no characters after the @", func() {
-					It("returns all paths", func() {
+					It("returns all files and directories", func() {
 						Expect(pathWithAt.Complete("@")).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
+							flags.Completion{Item: "@add/"},
+							flags.Completion{Item: "@aee/"},
 							flags.Completion{Item: "@efg"},
 						))
 					})
@@ -171,6 +156,8 @@ var _ = Describe("path flag types", func() {
 							Expect(pathWithAt.Complete("@a")).To(ConsistOf(
 								flags.Completion{Item: "@abc"},
 								flags.Completion{Item: "@abd"},
+								flags.Completion{Item: "@add/"},
+								flags.Completion{Item: "@aee/"},
 							))
 						})
 					})

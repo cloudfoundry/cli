@@ -56,9 +56,19 @@ func findMatches(pattern string, formatMatch func(string) string) []flags.Comple
 		return nil
 	}
 
-	matches := make([]flags.Completion, len(paths))
-	for i, path := range paths {
-		matches[i].Item = formatMatch(path)
+	matches := []flags.Completion{}
+	for _, path := range paths {
+		info, err := os.Stat(path)
+		if err != nil {
+			continue
+		}
+
+		formattedMatch := formatMatch(path)
+		if info.IsDir() {
+			matches = append(matches, flags.Completion{Item: fmt.Sprintf("%s/", formattedMatch)})
+		} else {
+			matches = append(matches, flags.Completion{Item: formattedMatch})
+		}
 	}
 
 	return matches
