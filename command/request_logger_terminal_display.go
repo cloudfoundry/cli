@@ -17,6 +17,11 @@ func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
 	}
 }
 
+func (display RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
+	display.ui.DisplayText(dump)
+	return nil
+}
+
 func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
 	display.ui.DisplayText(RedactedValue)
 	return nil

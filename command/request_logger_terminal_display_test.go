@@ -25,6 +25,14 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		display = NewRequestLoggerTerminalDisplay(testUI)
 	})
 
+	Describe("DisplayDump", func() {
+		It("displays the passed in string", func() {
+			err := display.DisplayDump("some-dump-of-string")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("some-dump-of-string"))
+		})
+	})
+
 	Describe("DisplayBody", func() {
 		It("displays the redacted value", func() {
 			err := display.DisplayBody([]byte("some-string body"))

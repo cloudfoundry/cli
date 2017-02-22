@@ -42,6 +42,24 @@ var _ = Describe("Request Logger File Writer", func() {
 		os.RemoveAll(tmpdir)
 	})
 
+	Describe("DisplayDump", func() {
+		It("writes the dump to file`", func() {
+			err := display.DisplayDump("this is a dump of stuff")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("this is a dump of stuff\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("this is a dump of stuff\n"))
+		})
+	})
+
 	Describe("DisplayBody", func() {
 		It("writes the redacted value", func() {
 			err := display.DisplayBody([]byte("this is a body"))
