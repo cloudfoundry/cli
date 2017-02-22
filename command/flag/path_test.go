@@ -40,17 +40,17 @@ var _ = Describe("path flag types", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Describe("Filename", func() {
-		var filename Filename
+	Describe("Path", func() {
+		var path Path
 
 		BeforeEach(func() {
-			filename = Filename("")
+			path = Path("")
 		})
 
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns all files", func() {
-					Expect(filename.Complete("")).To(ConsistOf(
+					Expect(path.Complete("")).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
 						flags.Completion{Item: "efg"},
@@ -61,7 +61,7 @@ var _ = Describe("path flag types", func() {
 			Context("when the prefix is not empty", func() {
 				Context("when there are matching paths", func() {
 					It("returns the matching paths", func() {
-						Expect(filename.Complete("a")).To(ConsistOf(
+						Expect(path.Complete("a")).To(ConsistOf(
 							flags.Completion{Item: "abc"},
 							flags.Completion{Item: "abd"},
 						))
@@ -70,7 +70,44 @@ var _ = Describe("path flag types", func() {
 
 				Context("when there are no matching paths", func() {
 					It("returns no matches", func() {
-						Expect(filename.Complete("z")).To(BeEmpty())
+						Expect(path.Complete("z")).To(BeEmpty())
+					})
+				})
+			})
+		})
+	})
+
+	Describe("PathWithExistenceCheck", func() {
+		var pathWithExistenceCheck PathWithExistenceCheck
+
+		BeforeEach(func() {
+			pathWithExistenceCheck = PathWithExistenceCheck("")
+		})
+
+		Describe("Complete", func() {
+			Context("when the prefix is empty", func() {
+				It("returns all files", func() {
+					Expect(pathWithExistenceCheck.Complete("")).To(ConsistOf(
+						flags.Completion{Item: "abc"},
+						flags.Completion{Item: "abd"},
+						flags.Completion{Item: "efg"},
+					))
+				})
+			})
+
+			Context("when the prefix is not empty", func() {
+				Context("when there are matching paths", func() {
+					It("returns the matching paths", func() {
+						Expect(pathWithExistenceCheck.Complete("a")).To(ConsistOf(
+							flags.Completion{Item: "abc"},
+							flags.Completion{Item: "abd"},
+						))
+					})
+				})
+
+				Context("when there are no matching paths", func() {
+					It("returns no matches", func() {
+						Expect(pathWithExistenceCheck.Complete("z")).To(BeEmpty())
 					})
 				})
 			})
@@ -79,7 +116,7 @@ var _ = Describe("path flag types", func() {
 		Describe("UnmarshalFlag", func() {
 			Context("when the path does not exist", func() {
 				It("returns a path does not exist error", func() {
-					err := filename.UnmarshalFlag("./some-dir/some-file")
+					err := pathWithExistenceCheck.UnmarshalFlag("./some-dir/some-file")
 					Expect(err).To(MatchError(&flags.Error{
 						Type:    flags.ErrRequired,
 						Message: "The specified path './some-dir/some-file' does not exist.",
@@ -89,38 +126,38 @@ var _ = Describe("path flag types", func() {
 
 			Context("when the path exists", func() {
 				It("sets the path", func() {
-					err := filename.UnmarshalFlag("abc")
+					err := pathWithExistenceCheck.UnmarshalFlag("abc")
 					Expect(err).ToNot(HaveOccurred())
-					Expect(filename).To(BeEquivalentTo("abc"))
+					Expect(pathWithExistenceCheck).To(BeEquivalentTo("abc"))
 				})
 			})
 		})
 	})
 
-	Describe("FilenameWithAt", func() {
-		var filenameWithAt FilenameWithAt
+	Describe("PathWithAt", func() {
+		var pathWithAt PathWithAt
 
 		BeforeEach(func() {
-			filenameWithAt = FilenameWithAt("")
+			pathWithAt = PathWithAt("")
 		})
 
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns no completions", func() {
-					Expect(filenameWithAt.Complete("")).To(BeEmpty())
+					Expect(pathWithAt.Complete("")).To(BeEmpty())
 				})
 			})
 
 			Context("when the prefix doesn't start with @", func() {
 				It("returns no completions", func() {
-					Expect(filenameWithAt.Complete("a@b")).To(BeEmpty())
+					Expect(pathWithAt.Complete("a@b")).To(BeEmpty())
 				})
 			})
 
 			Context("when the prefix starts with @", func() {
 				Context("when there are no characters after the @", func() {
 					It("returns all paths", func() {
-						Expect(filenameWithAt.Complete("@")).To(ConsistOf(
+						Expect(pathWithAt.Complete("@")).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
 							flags.Completion{Item: "@efg"},
@@ -131,7 +168,7 @@ var _ = Describe("path flag types", func() {
 				Context("when there are characters after the @", func() {
 					Context("when there are matching paths", func() {
 						It("returns the matching paths", func() {
-							Expect(filenameWithAt.Complete("@a")).To(ConsistOf(
+							Expect(pathWithAt.Complete("@a")).To(ConsistOf(
 								flags.Completion{Item: "@abc"},
 								flags.Completion{Item: "@abd"},
 							))
@@ -140,7 +177,7 @@ var _ = Describe("path flag types", func() {
 
 					Context("when there are no matching paths", func() {
 						It("returns no matches", func() {
-							Expect(filenameWithAt.Complete("@z")).To(BeEmpty())
+							Expect(pathWithAt.Complete("@z")).To(BeEmpty())
 						})
 					})
 				})
