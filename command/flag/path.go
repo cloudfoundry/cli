@@ -39,15 +39,15 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 type PathWithAt string
 
 func (_ PathWithAt) Complete(prefix string) []flags.Completion {
-	if len(prefix) > 0 && prefix[0] == '@' {
-		return findMatches(
-			fmt.Sprintf("%s*", prefix[1:]),
-			func(path string) string {
-				return fmt.Sprintf("@%s", path)
-			})
+	if prefix == "" || prefix[0] != '@' {
+		return nil
 	}
 
-	return nil
+	return findMatches(
+		fmt.Sprintf("%s*", prefix[1:]),
+		func(path string) string {
+			return fmt.Sprintf("@%s", path)
+		})
 }
 
 type PathWithBool string
