@@ -1,7 +1,5 @@
 package flag
 
-import flags "github.com/jessevdk/go-flags"
-
 type AppName struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 }
@@ -212,9 +210,9 @@ type SetHealthCheckArgs struct {
 }
 
 type CreateBuildpackArgs struct {
-	Buildpack string         `positional-arg-name:"BUILDPACK" required:"true" description:"The buildpack"`
-	Path      flags.Filename `positional-arg-name:"PATH" required:"true" description:"The path to the buildpack file"`
-	Position  string         `positional-arg-name:"POSITION" required:"true" description:"The position that sets priority"`
+	Buildpack string   `positional-arg-name:"BUILDPACK" required:"true" description:"The buildpack"`
+	Path      Filename `positional-arg-name:"PATH" required:"true" description:"The path to the buildpack file"`
+	Position  string   `positional-arg-name:"POSITION" required:"true" description:"The position that sets priority"`
 }
 
 type RenameBuildpackArgs struct {
@@ -267,8 +265,8 @@ type MigrateServiceInstancesArgs struct {
 }
 
 type SecurityGroupArgs struct {
-	SecurityGroup   string         `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
-	PathToJsonRules flags.Filename `positional-arg-name:"PATH_TO_JSON_RULES_FILE" required:"true" description:"Path to file of JSON describing security group rules"`
+	SecurityGroup   string   `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group"`
+	PathToJsonRules Filename `positional-arg-name:"PATH_TO_JSON_RULES_FILE" required:"true" description:"Path to file of JSON describing security group rules"`
 }
 
 type AddPluginRepoArgs struct {
