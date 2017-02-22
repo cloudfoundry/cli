@@ -27,7 +27,7 @@ var _ = Describe("path flag types", func() {
 		err = os.Chdir(tempDir)
 		Expect(err).ToNot(HaveOccurred())
 
-		for _, filename := range []string{"abc", "abd", "efg"} {
+		for _, filename := range []string{"abc", "abd", "tfg"} {
 			err = ioutil.WriteFile(filename, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 		}
@@ -60,7 +60,7 @@ var _ = Describe("path flag types", func() {
 						flags.Completion{Item: "abd"},
 						flags.Completion{Item: "add/"},
 						flags.Completion{Item: "aee/"},
-						flags.Completion{Item: "efg"},
+						flags.Completion{Item: "tfg"},
 					))
 				})
 			})
@@ -145,7 +145,7 @@ var _ = Describe("path flag types", func() {
 							flags.Completion{Item: "@abd"},
 							flags.Completion{Item: "@add/"},
 							flags.Completion{Item: "@aee/"},
-							flags.Completion{Item: "@efg"},
+							flags.Completion{Item: "@tfg"},
 						))
 					})
 				})
@@ -166,6 +166,47 @@ var _ = Describe("path flag types", func() {
 						It("returns no matches", func() {
 							Expect(pathWithAt.Complete("@z")).To(BeEmpty())
 						})
+					})
+				})
+			})
+		})
+	})
+
+	Describe("PathWithBool", func() {
+		var pathWithBool PathWithBool
+
+		BeforeEach(func() {
+			pathWithBool = PathWithBool("")
+		})
+
+		Describe("Complete", func() {
+			Context("when the prefix is empty", func() {
+				It("returns bool choices and all files and directories", func() {
+					Expect(pathWithBool.Complete("")).To(ConsistOf(
+						flags.Completion{Item: "true"},
+						flags.Completion{Item: "false"},
+						flags.Completion{Item: "abc"},
+						flags.Completion{Item: "abd"},
+						flags.Completion{Item: "add/"},
+						flags.Completion{Item: "aee/"},
+						flags.Completion{Item: "tfg"},
+					))
+				})
+			})
+
+			Context("when the prefix is not empty", func() {
+				Context("when there are matching bool/paths", func() {
+					It("returns the matching bool/paths", func() {
+						Expect(pathWithBool.Complete("t")).To(ConsistOf(
+							flags.Completion{Item: "true"},
+							flags.Completion{Item: "tfg"},
+						))
+					})
+				})
+
+				Context("when there are no matching bool/paths", func() {
+					It("returns no matches", func() {
+						Expect(pathWithBool.Complete("z")).To(BeEmpty())
 					})
 				})
 			})
