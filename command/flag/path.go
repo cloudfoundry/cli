@@ -50,6 +50,15 @@ func (_ PathWithAt) Complete(prefix string) []flags.Completion {
 	return nil
 }
 
+type PathWithBool string
+
+func (_ PathWithBool) Complete(prefix string) []flags.Completion {
+	return append(
+		completions([]string{"true", "false"}, prefix),
+		completeWithNoFormatting(prefix)...,
+	)
+}
+
 func findMatches(pattern string, formatMatch func(string) string) []flags.Completion {
 	paths, _ := filepath.Glob(pattern)
 	if paths == nil {
