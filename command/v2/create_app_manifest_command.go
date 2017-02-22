@@ -3,18 +3,16 @@ package v2
 import (
 	"os"
 
-	flags "github.com/jessevdk/go-flags"
-
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type CreateAppManifestCommand struct {
-	RequiredArgs    flag.AppName   `positional-args:"yes"`
-	FilePath        flags.Filename `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
-	usage           interface{}    `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml]"`
-	relatedCommands interface{}    `related_commands:"apps, push"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	FilePath        flag.Path    `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
+	usage           interface{}  `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml]"`
+	relatedCommands interface{}  `related_commands:"apps, push"`
 }
 
 func (_ CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
