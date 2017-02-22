@@ -95,7 +95,9 @@ func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Co
 					break
 				}
 
-				errs <- err
+				if err != nil {
+					errs <- err
+				}
 			}
 		}
 	}()

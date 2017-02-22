@@ -6,6 +6,7 @@ import (
 )
 
 func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appStarting <-chan bool, apiWarnings <-chan string, apiErrs <-chan error) error {
+	var breakAppStart, breakWarnings, breakAPIErrs bool
 	for {
 		select {
 		case message, ok := <-messages:
@@ -18,14 +19,14 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			}
 		case _, ok := <-appStarting:
 			if !ok {
-				return nil
+				breakAppStart = true
 			}
 
 			ui.DisplayNewline()
 			ui.DisplayText("Waiting for app to start...")
 		case warning, ok := <-apiWarnings:
 			if !ok {
-				return nil
+				breakWarnings = true
 			}
 
 			ui.DisplayWarning(warning)
@@ -38,11 +39,11 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			case v2action.NOAATimeoutError:
 				ui.DisplayWarning("timeout connecting to log server, no log will be shown")
 			default:
-				return HandleError(logErr)
+				ui.DisplayWarning(logErr.Error())
 			}
 		case apiErr, ok := <-apiErrs:
 			if !ok {
-				return nil
+				breakAPIErrs = true
 			}
 
 			switch err := apiErr.(type) {
@@ -59,6 +60,10 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			}
 
 			return HandleError(apiErr)
+		}
+
+		if breakAppStart && breakWarnings && breakAPIErrs {
+			return nil
 		}
 	}
 }

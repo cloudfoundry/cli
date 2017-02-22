@@ -331,8 +331,9 @@ var _ = Describe("Start Command", func() {
 							}
 						})
 
-						It("stops logging and returns the error", func() {
-							Expect(executeErr).To(MatchError(expectedErr))
+						It("displays the error and continues to poll", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(testUI.Err).To(Say(expectedErr.Error()))
 						})
 					})
 				})

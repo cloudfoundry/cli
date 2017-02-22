@@ -1204,6 +1204,10 @@
     "translation": "Error removing plugin binary: "
   },
   {
+    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
+  },
+  {
     "id": "Error running task: {{.CloudControllerMessage}}",
     "translation": ""
   },
@@ -2001,10 +2005,6 @@
   },
   {
     "id": "{{.MemorySize}} x {{.NumInstances}} instances",
-    "translation": ""
-  },
-  {
-    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {

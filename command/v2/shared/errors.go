@@ -102,7 +102,7 @@ type StagingFailedError struct {
 }
 
 func (e StagingFailedError) Error() string {
-	return "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
+	return "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
 }
 
 func (e StagingFailedError) Translate(translate func(string, ...interface{}) string) string {
