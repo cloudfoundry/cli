@@ -22,6 +22,16 @@ func NewRequestLoggerFileWriter(ui UI, filePaths []string) *RequestLoggerFileWri
 	}
 }
 
+func (display RequestLoggerFileWriter) DisplayDump(dump string) error {
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(dump)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (display *RequestLoggerFileWriter) DisplayBody(_ []byte) error {
 	for _, logFile := range display.logFiles {
 		_, err := logFile.WriteString(RedactedValue)
