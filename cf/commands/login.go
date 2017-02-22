@@ -41,6 +41,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Org")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
 	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
+	fs["sso-passcode"] = &flags.StringFlag{Name: "sso-passcode", Usage: T("One-time password")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
 	return commandregistry.CommandMetadata{
@@ -56,7 +57,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 			T("CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"),
 			T("CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"),
 			T("CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"),
-			T("CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)"),
+			T("CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)"),
 		},
 		Flags: fs,
 	}
@@ -152,6 +153,8 @@ func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 }
 
 func (cmd Login) authenticateSSO(c flags.FlagContext) error {
+	passcodeFlagValue := c.String("sso-passcode")
+
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
 		return err
@@ -161,7 +164,12 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 	passcode := prompts["passcode"]
 
 	for i := 0; i < maxLoginTries; i++ {
-		credentials["passcode"] = cmd.ui.AskForPassword(passcode.DisplayName)
+		if passcodeFlagValue != "" {
+			credentials["passcode"] = passcodeFlagValue
+			passcodeFlagValue = ""
+		} else {
+			credentials["passcode"] = cmd.ui.AskForPassword(passcode.DisplayName)
+		}
 
 		cmd.ui.Say(T("Authenticating..."))
 		err = cmd.authenticator.Authenticate(credentials)
