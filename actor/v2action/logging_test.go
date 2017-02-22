@@ -131,6 +131,22 @@ var _ = Describe("Logging Actions", func() {
 		Context("when receiving errors", func() {
 			var err1, err2 error
 
+			Describe("nil error", func() {
+				BeforeEach(func() {
+					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
+						go func() {
+							errStream <- nil
+						}()
+
+						return eventStream, errStream
+					}
+				})
+
+				It("does not pass the nil along", func() {
+					Consistently(errs).ShouldNot(Receive())
+				})
+			})
+
 			Describe("unexpected error", func() {
 				BeforeEach(func() {
 					err1 = errors.New("ZOMG")

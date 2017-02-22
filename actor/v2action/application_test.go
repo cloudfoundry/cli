@@ -419,7 +419,7 @@ var _ = Describe("Application Actions", func() {
 
 			Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 			Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
-			Expect(fakeNOAAClient.CloseCallCount()).To(Equal(2))
+			Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 		})
 
 		Context("when the app has zero instances", func() {

@@ -2664,6 +2664,10 @@
     "translation": "Erro ao reiniciar o aplicativo: {{.Error}}"
   },
   {
+    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
+  },
+  {
     "id": "Error retrieving stack: ",
     "translation": "Erro ao recuperar pilha: "
   },
@@ -6741,10 +6745,6 @@
   },
   {
     "id": "{{.MemorySize}} x {{.NumInstances}} instances",
-    "translation": ""
-  },
-  {
-    "id": "{{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": ""
   },
   {

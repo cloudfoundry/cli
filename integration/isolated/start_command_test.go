@@ -32,7 +32,7 @@ var _ = Describe("start command", func() {
 				Eventually(session).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
 				Eventually(session).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("apps, logs, scale, ssh, stop, restart, run-task"))
+				Eventually(session).Should(Say("apps, logs, restart, run-task, scale, ssh, stop"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -176,6 +176,7 @@ applications:
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CF("start", appName)
 						Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Waiting for app to start..."))
 						Eventually(session).Should(Say("Name:              %s", appName))
 						Eventually(session).Should(Say("Requested state:   started"))
 						Eventually(session).Should(Say("Instances:         2/2"))
@@ -194,6 +195,7 @@ applications:
 				})
 
 				Context("when the app has *not* been staged", func() {
+					//TODO: Add Staging Timeout
 					Context("when the app does *not* stage properly", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
@@ -208,20 +210,21 @@ applications:
 							session := helpers.CF("start", appName)
 							Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							Eventually(session).Should(Say("Staging..."))
-							Eventually(session).Should(Say("Error restarting application: NoAppDetectedError"))
-							Eventually(session).Should(Say(`TIP: Buildpacks are detected when the "cf push" is executed from within the directory that contains the app source code.`))
+							Eventually(session.Err).Should(Say("Error restarting application: NoAppDetectedError"))
+							Eventually(session.Err).Should(Say(`TIP: Buildpacks are detected when the "cf push" is executed from within the directory that contains the app source code.`))
 							Eventually(session).Should(Exit(1))
 						})
 					})
 
 					Context("when the app stages properly", func() {
+						// TODO App timeout error
+						// TODO App crashed error
+
 						Context("when the app does *not* start properly", func() {
 							BeforeEach(func() {
 								appName = helpers.PrefixedRandomName("app")
-								domainName = defaultSharedDomain()
 								helpers.WithHelloWorldApp(func(appDir string) {
-									Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
+									Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start", "-b", "staticfile_buildpack", "-c", "giberrish")).Should(Exit(0))
 								})
 							})
 
@@ -230,9 +233,7 @@ applications:
 								session := helpers.CF("start", appName)
 								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-								Eventually(session).Should(Say("Staging..."))
-								Eventually(session).Should(Say("Error restarting application: Start unsuccessful"))
-								Eventually(session).Should(Say(`TIP: Buildpacks are detected when the "cf push" is executed from within the directory that contains the app source code.`))
+								Eventually(session.Err).Should(Say("Error restarting application: Start unsuccessful"))
 								Eventually(session).Should(Exit(1))
 							})
 						})
@@ -267,8 +268,8 @@ applications:
 								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
 								// Display Staging Logs
-								Eventually(session).Should(Say("Staging..."))
 								Eventually(session).Should(Say("Uploading droplet..."))
+								Eventually(session).Should(Say("Waiting for app to start..."))
 
 								Eventually(session).Should(Say("Name:              %s", appName))
 								Eventually(session).Should(Say("Requested state:   started"))
