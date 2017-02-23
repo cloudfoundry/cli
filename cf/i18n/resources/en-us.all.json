@@ -1020,8 +1020,8 @@
     "translation": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)"
   },
   {
-    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)",
-    "translation": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)"
+    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)",
+    "translation": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)"
   },
   {
     "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
@@ -3376,6 +3376,10 @@
     "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -3992,6 +3996,10 @@
     "translation": "ORGS:"
   },
   {
+    "id": "One-time passcode",
+    "translation": ""
+  },
+  {
     "id": "One-time password",
     "translation": "One-time password"
   },
@@ -4278,6 +4286,10 @@
   {
     "id": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}",
     "translation": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}"
+  },
+  {
+    "id": "Prompt for a one-time passcode to login",
+    "translation": ""
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
@@ -6510,6 +6522,10 @@
   {
     "id": "ssh support is not enabled for ",
     "translation": "ssh support is not enabled for "
+  },
+  {
+    "id": "sso-passcode",
+    "translation": ""
   },
   {
     "id": "stack:",

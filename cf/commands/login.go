@@ -40,8 +40,8 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Password")}
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Org")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
-	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
-	fs["sso-passcode"] = &flags.StringFlag{Name: "sso-passcode", Usage: T("One-time password")}
+	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Prompt for a one-time passcode to login")}
+	fs["sso-passcode"] = &flags.StringFlag{Name: "sso-passcode", Usage: T("One-time passcode")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
 	return commandregistry.CommandMetadata{
@@ -57,7 +57,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 			T("CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"),
 			T("CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"),
 			T("CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"),
-			T("CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)"),
+			T("CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)"),
 		},
 		Flags: fs,
 	}
@@ -108,12 +108,15 @@ func (cmd *Login) Execute(c flags.FlagContext) error {
 	//   EITHER   username and password
 	//   OR       a one-time passcode
 
-	if c.Bool("sso") {
+	switch {
+	case c.Bool("sso") && c.IsSet("sso-passcode"):
+		return errors.New(T("Incorrect usage: --sso-passcode flag cannot be used with --sso"))
+	case c.Bool("sso") || c.IsSet("sso-passcode"):
 		err = cmd.authenticateSSO(c)
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		err = cmd.authenticate(c)
 		if err != nil {
 			return err
@@ -153,8 +156,6 @@ func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 }
 
 func (cmd Login) authenticateSSO(c flags.FlagContext) error {
-	passcodeFlagValue := c.String("sso-passcode")
-
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
 		return err
@@ -164,9 +165,8 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 	passcode := prompts["passcode"]
 
 	for i := 0; i < maxLoginTries; i++ {
-		if passcodeFlagValue != "" {
-			credentials["passcode"] = passcodeFlagValue
-			passcodeFlagValue = ""
+		if c.IsSet("sso-passcode") && i == 0 {
+			credentials["passcode"] = c.String("sso-passcode")
 		} else {
 			credentials["passcode"] = cmd.ui.AskForPassword(passcode.DisplayName)
 		}

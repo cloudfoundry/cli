@@ -1020,7 +1020,7 @@
     "translation": "CF_NAME login（省略用户名和密码以通过交互方式登录 - CF_NAME 将提示输入用户名和密码）"
   },
   {
-    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)",
+    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)",
     "translation": "CF_NAME login --sso [--sso-passcode PASSCODE]（CF_NAME 将提供 URL 用于获取一次性登录密码）"
   },
   {
@@ -3376,6 +3376,10 @@
     "translation": "JSON 格式不正确: 文件: {{.JSONFile}}\n\t\t\n有效的 JSON 文件示例: \n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -3992,6 +3996,10 @@
     "translation": "组织:"
   },
   {
+    "id": "One-time passcode",
+    "translation": ""
+  },
+  {
     "id": "One-time password",
     "translation": ""
   },
@@ -4278,6 +4286,10 @@
   {
     "id": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}",
     "translation": "进程被以下信号终止: {{.Signal}}。已退出，并带有 {{.ExitCode}}"
+  },
+  {
+    "id": "Prompt for a one-time passcode to login",
+    "translation": ""
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
@@ -6510,6 +6522,10 @@
   {
     "id": "ssh support is not enabled for ",
     "translation": "针对以下项的 SSH 支持未启用"
+  },
+  {
+    "id": "sso-passcode",
+    "translation": ""
   },
   {
     "id": "stack:",

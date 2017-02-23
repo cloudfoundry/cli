@@ -1020,7 +1020,7 @@
     "translation": "CF_NAME login(대화식으로 로그인하려면 사용자 이름 및 비밀번호 생략 -- CF_NAME이 두 항목에 대한 프롬프트 표시)"
   },
   {
-    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)",
+    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)",
     "translation": "CF_NAME login --sso [--sso-passcode PASSCODE](CF_NAME이 로그인하기 위해 일회성 비밀번호를 얻을 URL을 제공함)"
   },
   {
@@ -3376,6 +3376,10 @@
     "translation": "올바르지 않은 JSON 형식: 파일: {{.JSONFile}}\n\t\t\n올바른 JSON 파일 예:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -3992,6 +3996,10 @@
     "translation": "조직:"
   },
   {
+    "id": "One-time passcode",
+    "translation": ""
+  },
+  {
     "id": "One-time password",
     "translation": ""
   },
@@ -4278,6 +4286,10 @@
   {
     "id": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}",
     "translation": "{{.Signal}} 신호로 프로세스가 종료되었습니다. 종료되고 다음이 발생합니다. {{.ExitCode}}"
+  },
+  {
+    "id": "Prompt for a one-time passcode to login",
+    "translation": ""
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
@@ -6510,6 +6522,10 @@
   {
     "id": "ssh support is not enabled for ",
     "translation": "SSH 지원이 사용으로 설정되지 않은 대상"
+  },
+  {
+    "id": "sso-passcode",
+    "translation": ""
   },
   {
     "id": "stack:",

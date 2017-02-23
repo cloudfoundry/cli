@@ -442,9 +442,11 @@ var _ = Describe("Login Command", func() {
 						"passcode": "the-one-time-code",
 					}))
 				})
+			})
 
+			Context("when the user provides the --sso-passcode flag", func() {
 				It("does not prompt the user for the passcode type prompts", func() {
-					Flags = []string{"--sso", "--sso-passcode", "the-one-time-code", "-a", "api.example.com"}
+					Flags = []string{"--sso-passcode", "the-one-time-code", "-a", "api.example.com"}
 
 					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
 
@@ -454,6 +456,18 @@ var _ = Describe("Login Command", func() {
 					Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 						"passcode": "the-one-time-code",
 					}))
+				})
+			})
+
+			Context("when the user does provides both the --sso and --sso-passcode flags", func() {
+				It("errors with usage error and does not try to authenticate", func() {
+					Flags = []string{"--sso", "-sso-passcode", "the-one-time-code", "-a", "api.example.com"}
+					ui.Inputs = []string{"the-one-time-code"}
+
+					execution := testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
+					Expect(execution).To(BeFalse())
+
+					Expect(authRepo.AuthenticateCallCount()).To(Equal(0))
 				})
 			})
 
