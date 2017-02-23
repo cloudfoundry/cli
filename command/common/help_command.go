@@ -315,7 +315,8 @@ func (cmd HelpCommand) globalOptionsTableData() [][]string {
 func (cmd HelpCommand) findPlugin() (sharedaction.CommandInfo, bool) {
 	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
-			if command.Name == cmd.OptionalArgs.CommandName {
+			if command.Name == cmd.OptionalArgs.CommandName ||
+				command.Alias == cmd.OptionalArgs.CommandName {
 				return internal.ConvertPluginToCommandInfo(command), true
 			}
 		}
