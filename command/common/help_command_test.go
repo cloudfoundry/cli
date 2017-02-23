@@ -325,6 +325,48 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("--second-third\\s+baz"))
 			})
 		})
+
+		Describe("plug-in alias", func() {
+			BeforeEach(func() {
+				cmd.OptionalArgs = flag.CommandName{
+					CommandName: "ed",
+				}
+
+				fakeConfig.PluginsReturns(map[string]configv3.Plugin{
+					"Diego-Enabler": configv3.Plugin{
+						Commands: []configv3.PluginCommand{
+							{
+								Name:     "enable-diego",
+								Alias:    "ed",
+								HelpText: "enable Diego support for an app",
+								UsageDetails: configv3.PluginUsageDetails{
+									Usage: "faceman diego-enabler this and that and a little stuff",
+									Options: map[string]string{
+										"--first":        "foobar",
+										"--second-third": "baz",
+									},
+								},
+							},
+						},
+					},
+				})
+
+				fakeActor.CommandInfoByNameReturns(sharedaction.CommandInfo{},
+					sharedaction.ErrorInvalidCommand{CommandName: "enable-diego"})
+			})
+
+			It("displays the plugin's help", func() {
+				err := cmd.Execute(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("enable-diego - enable Diego support for an app"))
+				Expect(testUI.Out).To(Say("faceman diego-enabler this and that and a little stuff"))
+				Expect(testUI.Out).To(Say("ALIAS:"))
+				Expect(testUI.Out).To(Say("ed"))
+				Expect(testUI.Out).To(Say("--first\\s+foobar"))
+				Expect(testUI.Out).To(Say("--second-third\\s+baz"))
+			})
+		})
 	})
 
 	Describe("help for common commands", func() {
