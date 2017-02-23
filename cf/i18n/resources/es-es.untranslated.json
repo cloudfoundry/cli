@@ -1284,6 +1284,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -1364,6 +1368,10 @@
     "translation": "Not supported on windows"
   },
   {
+    "id": "One-time passcode",
+    "translation": ""
+  },
+  {
     "id": "Option '--app-ports'",
     "translation": "Option '--app-ports'"
   },
@@ -1441,6 +1449,10 @@
   },
   {
     "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to unbind",
+    "translation": ""
+  },
+  {
+    "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
   {
@@ -2018,6 +2030,10 @@
   {
     "id": "service_guid IN ",
     "translation": "service_guid IN "
+  },
+  {
+    "id": "sso-passcode",
+    "translation": ""
   },
   {
     "id": "start time",

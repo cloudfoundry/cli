@@ -1020,7 +1020,7 @@
     "translation": "CF_NAME login (Benutzernamen und Kennwort für interaktive Anmeldung weglassen -- CF_NAME fordert zur Eingabe beider Angaben auf)"
   },
   {
-    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)",
+    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)",
     "translation": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME stellt eine URL zur Verfügung, um ein Einmalkennwort für die Anmeldung abzurufen)"
   },
   {
@@ -3376,6 +3376,10 @@
     "translation": "Falsches JSON-Format: Datei: {{.JSONFile}}\n\t\t\nBeispiel für gültige JSON-Datei:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -3992,6 +3996,10 @@
     "translation": "ORGANISATIONEN:"
   },
   {
+    "id": "One-time passcode",
+    "translation": ""
+  },
+  {
     "id": "One-time password",
     "translation": "Einmalkennwort"
   },
@@ -4278,6 +4286,10 @@
   {
     "id": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}",
     "translation": "Der Prozesse wurde durch das folgende Signal beendet: {{.Signal}} Beendet mit {{.ExitCode}}"
+  },
+  {
+    "id": "Prompt for a one-time passcode to login",
+    "translation": ""
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
@@ -6510,6 +6522,10 @@
   {
     "id": "ssh support is not enabled for ",
     "translation": "SSH-Unterstützung ist nicht aktiviert für "
+  },
+  {
+    "id": "sso-passcode",
+    "translation": ""
   },
   {
     "id": "stack:",
