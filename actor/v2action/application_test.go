@@ -165,7 +165,7 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
-		Context("when the application does not exists", func() {
+		Context("when the application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationReturns(ccv2.Application{}, nil, cloudcontroller.ResourceNotFoundError{})
 			})

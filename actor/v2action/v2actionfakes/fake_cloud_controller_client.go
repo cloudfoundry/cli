@@ -108,6 +108,27 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetOrganizationPrivateDomainsStub        func(orgGUID string, queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
+	getOrganizationPrivateDomainsMutex       sync.RWMutex
+	getOrganizationPrivateDomainsArgsForCall []struct {
+		orgGUID string
+		queries []ccv2.Query
+	}
+	getOrganizationPrivateDomainsReturns struct {
+		result1 []ccv2.Domain
+		result2 ccv2.Warnings
+		result3 error
+	}
+	GetOrganizationQuotaStub        func(guid string) (ccv2.OrganizationQuota, ccv2.Warnings, error)
+	getOrganizationQuotaMutex       sync.RWMutex
+	getOrganizationQuotaArgsForCall []struct {
+		guid string
+	}
+	getOrganizationQuotaReturns struct {
+		result1 ccv2.OrganizationQuota
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetPrivateDomainStub        func(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	getPrivateDomainMutex       sync.RWMutex
 	getPrivateDomainArgsForCall []struct {
@@ -156,6 +177,14 @@ type FakeCloudControllerClient struct {
 	}
 	getSharedDomainReturns struct {
 		result1 ccv2.Domain
+		result2 ccv2.Warnings
+		result3 error
+	}
+	GetSharedDomainsStub        func() ([]ccv2.Domain, ccv2.Warnings, error)
+	getSharedDomainsMutex       sync.RWMutex
+	getSharedDomainsArgsForCall []struct{}
+	getSharedDomainsReturns     struct {
+		result1 []ccv2.Domain
 		result2 ccv2.Warnings
 		result3 error
 	}
@@ -650,6 +679,82 @@ func (fake *FakeCloudControllerClient) GetOrganizationsReturns(result1 []ccv2.Or
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomains(orgGUID string, queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
+	var queriesCopy []ccv2.Query
+	if queries != nil {
+		queriesCopy = make([]ccv2.Query, len(queries))
+		copy(queriesCopy, queries)
+	}
+	fake.getOrganizationPrivateDomainsMutex.Lock()
+	fake.getOrganizationPrivateDomainsArgsForCall = append(fake.getOrganizationPrivateDomainsArgsForCall, struct {
+		orgGUID string
+		queries []ccv2.Query
+	}{orgGUID, queriesCopy})
+	fake.recordInvocation("GetOrganizationPrivateDomains", []interface{}{orgGUID, queriesCopy})
+	fake.getOrganizationPrivateDomainsMutex.Unlock()
+	if fake.GetOrganizationPrivateDomainsStub != nil {
+		return fake.GetOrganizationPrivateDomainsStub(orgGUID, queries)
+	} else {
+		return fake.getOrganizationPrivateDomainsReturns.result1, fake.getOrganizationPrivateDomainsReturns.result2, fake.getOrganizationPrivateDomainsReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomainsCallCount() int {
+	fake.getOrganizationPrivateDomainsMutex.RLock()
+	defer fake.getOrganizationPrivateDomainsMutex.RUnlock()
+	return len(fake.getOrganizationPrivateDomainsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomainsArgsForCall(i int) (string, []ccv2.Query) {
+	fake.getOrganizationPrivateDomainsMutex.RLock()
+	defer fake.getOrganizationPrivateDomainsMutex.RUnlock()
+	return fake.getOrganizationPrivateDomainsArgsForCall[i].orgGUID, fake.getOrganizationPrivateDomainsArgsForCall[i].queries
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomainsReturns(result1 []ccv2.Domain, result2 ccv2.Warnings, result3 error) {
+	fake.GetOrganizationPrivateDomainsStub = nil
+	fake.getOrganizationPrivateDomainsReturns = struct {
+		result1 []ccv2.Domain
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuota(guid string) (ccv2.OrganizationQuota, ccv2.Warnings, error) {
+	fake.getOrganizationQuotaMutex.Lock()
+	fake.getOrganizationQuotaArgsForCall = append(fake.getOrganizationQuotaArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("GetOrganizationQuota", []interface{}{guid})
+	fake.getOrganizationQuotaMutex.Unlock()
+	if fake.GetOrganizationQuotaStub != nil {
+		return fake.GetOrganizationQuotaStub(guid)
+	} else {
+		return fake.getOrganizationQuotaReturns.result1, fake.getOrganizationQuotaReturns.result2, fake.getOrganizationQuotaReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaCallCount() int {
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
+	return len(fake.getOrganizationQuotaArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaArgsForCall(i int) string {
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
+	return fake.getOrganizationQuotaArgsForCall[i].guid
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturns(result1 ccv2.OrganizationQuota, result2 ccv2.Warnings, result3 error) {
+	fake.GetOrganizationQuotaStub = nil
+	fake.getOrganizationQuotaReturns = struct {
+		result1 ccv2.OrganizationQuota
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetPrivateDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error) {
 	fake.getPrivateDomainMutex.Lock()
 	fake.getPrivateDomainArgsForCall = append(fake.getPrivateDomainArgsForCall, struct {
@@ -836,6 +941,33 @@ func (fake *FakeCloudControllerClient) GetSharedDomainReturns(result1 ccv2.Domai
 	fake.GetSharedDomainStub = nil
 	fake.getSharedDomainReturns = struct {
 		result1 ccv2.Domain
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSharedDomains() ([]ccv2.Domain, ccv2.Warnings, error) {
+	fake.getSharedDomainsMutex.Lock()
+	fake.getSharedDomainsArgsForCall = append(fake.getSharedDomainsArgsForCall, struct{}{})
+	fake.recordInvocation("GetSharedDomains", []interface{}{})
+	fake.getSharedDomainsMutex.Unlock()
+	if fake.GetSharedDomainsStub != nil {
+		return fake.GetSharedDomainsStub()
+	} else {
+		return fake.getSharedDomainsReturns.result1, fake.getSharedDomainsReturns.result2, fake.getSharedDomainsReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetSharedDomainsCallCount() int {
+	fake.getSharedDomainsMutex.RLock()
+	defer fake.getSharedDomainsMutex.RUnlock()
+	return len(fake.getSharedDomainsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSharedDomainsReturns(result1 []ccv2.Domain, result2 ccv2.Warnings, result3 error) {
+	fake.GetSharedDomainsStub = nil
+	fake.getSharedDomainsReturns = struct {
+		result1 []ccv2.Domain
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1335,6 +1467,10 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getJobMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
+	fake.getOrganizationPrivateDomainsMutex.RLock()
+	defer fake.getOrganizationPrivateDomainsMutex.RUnlock()
+	fake.getOrganizationQuotaMutex.RLock()
+	defer fake.getOrganizationQuotaMutex.RUnlock()
 	fake.getPrivateDomainMutex.RLock()
 	defer fake.getPrivateDomainMutex.RUnlock()
 	fake.getRouteApplicationsMutex.RLock()
@@ -1345,6 +1481,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceInstancesMutex.RUnlock()
 	fake.getSharedDomainMutex.RLock()
 	defer fake.getSharedDomainMutex.RUnlock()
+	fake.getSharedDomainsMutex.RLock()
+	defer fake.getSharedDomainsMutex.RUnlock()
 	fake.getSpaceRoutesMutex.RLock()
 	defer fake.getSpaceRoutesMutex.RUnlock()
 	fake.getSpaceServiceInstancesMutex.RLock()
