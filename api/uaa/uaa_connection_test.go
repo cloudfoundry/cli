@@ -112,7 +112,7 @@ var _ = Describe("UAA Connection", func() {
 
 					requestErr, ok := err.(RequestError)
 					Expect(ok).To(BeTrue())
-					Expect(requestErr.Error()).To(MatchRegexp(".*http://i.hope.this.doesnt.exist.com/v2/foo.*[nN]o such host"))
+					Expect(requestErr.Error()).To(MatchRegexp(".*http://i.hope.this.doesnt.exist.com/v2/foo.*"))
 				})
 			})
 
