@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("create-buildpack command", func() {
+var _ = Describe("create-buildpack command", func() {
 	Context("when the wrong data type is provided as the position argument", func() {
 		var filename string
 
