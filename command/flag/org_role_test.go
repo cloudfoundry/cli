@@ -2,7 +2,6 @@ package flag_test
 
 import (
 	. "code.cloudfoundry.org/cli/command/flag"
-
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -11,6 +10,31 @@ import (
 
 var _ = Describe("OrgRole", func() {
 	var orgRole OrgRole
+
+	Describe("Complete", func() {
+		DescribeTable("returns list of completions",
+			func(prefix string, matches []flags.Completion) {
+				completions := orgRole.Complete(prefix)
+				Expect(completions).To(Equal(matches))
+			},
+			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'O'", "O",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
+			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'o'", "o",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
+			Entry("returns 'BillingManager' when passed 'B'", "B",
+				[]flags.Completion{{Item: "BillingManager"}}),
+			Entry("returns 'BillingManager' when passed 'b'", "b",
+				[]flags.Completion{{Item: "BillingManager"}}),
+			Entry("completes to 'OrgAuditor' when passed 'orgA'", "orgA",
+				[]flags.Completion{{Item: "OrgAuditor"}}),
+			Entry("completes to 'OrgManager' when passed 'orgm'", "orgm",
+				[]flags.Completion{{Item: "OrgManager"}}),
+			Entry("returns 'OrgManager', 'BillingManager' and 'OrgAuditor' when passed nothing", "",
+				[]flags.Completion{{Item: "OrgManager"}, {Item: "BillingManager"}, {Item: "OrgAuditor"}}),
+			Entry("completes to nothing when passed 'wut'", "wut",
+				[]flags.Completion{}),
+		)
+	})
 
 	Describe("UnmarshalFlag", func() {
 		BeforeEach(func() {
@@ -43,39 +67,5 @@ var _ = Describe("OrgRole", func() {
 			}))
 			Expect(orgRole.Role).To(BeEmpty())
 		})
-	})
-
-	Describe("Complete", func() {
-		DescribeTable("returns list of completions",
-			func(prefix string, matches []flags.Completion) {
-				completions := orgRole.Complete(prefix)
-				Expect(completions).To(Equal(matches))
-			},
-
-			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'O'",
-				"O",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
-			Entry("returns 'OrgManager' and 'OrgAuditor' when passed 'o'",
-				"o",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "OrgAuditor"}}),
-			Entry("returns 'BillingManager' when passed 'B'",
-				"B",
-				[]flags.Completion{{Item: "BillingManager"}}),
-			Entry("returns 'BillingManager' when passed 'b'",
-				"b",
-				[]flags.Completion{{Item: "BillingManager"}}),
-			Entry("completes to 'OrgAuditor' when passed 'Orga'",
-				"Orga",
-				[]flags.Completion{{Item: "OrgAuditor"}}),
-			Entry("completes to 'OrgManager' when passed 'Orgm'",
-				"Orgm",
-				[]flags.Completion{{Item: "OrgManager"}}),
-			Entry("returns 'OrgManager', 'BillingManager' and 'OrgAuditor' when passed nothing",
-				"",
-				[]flags.Completion{{Item: "OrgManager"}, {Item: "BillingManager"}, {Item: "OrgAuditor"}}),
-			Entry("completes to nothing when passed 'wut'",
-				"wut",
-				[]flags.Completion{}),
-		)
 	})
 })

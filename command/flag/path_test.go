@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("path flag types", func() {
+var _ = Describe("path types", func() {
 	var (
 		currentDir string
 		tempDir    string
@@ -27,7 +27,7 @@ var _ = Describe("path flag types", func() {
 		err = os.Chdir(tempDir)
 		Expect(err).ToNot(HaveOccurred())
 
-		for _, filename := range []string{"abc", "abd", "tfg"} {
+		for _, filename := range []string{"abc", "abd", "tfg", "ABCD"} {
 			err = ioutil.WriteFile(filename, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 		}
@@ -48,21 +48,18 @@ var _ = Describe("path flag types", func() {
 	Describe("Path", func() {
 		var path Path
 
-		BeforeEach(func() {
-			path = Path("")
-		})
-
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns all files and directories", func() {
 					matches := path.Complete("")
-					Expect(matches).To(HaveLen(5))
+					Expect(matches).To(HaveLen(6))
 					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
 						flags.Completion{Item: "add/"},
 						flags.Completion{Item: "aee/"},
 						flags.Completion{Item: "tfg"},
+						flags.Completion{Item: "ABCD"},
 					))
 				})
 			})
@@ -77,6 +74,14 @@ var _ = Describe("path flag types", func() {
 							flags.Completion{Item: "abd"},
 							flags.Completion{Item: "add/"},
 							flags.Completion{Item: "aee/"},
+						))
+					})
+
+					It("is case sensitive", func() {
+						matches := path.Complete("A")
+						Expect(matches).To(HaveLen(1))
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "ABCD"},
 						))
 					})
 				})
@@ -124,19 +129,15 @@ var _ = Describe("path flag types", func() {
 	Describe("PathWithAt", func() {
 		var pathWithAt PathWithAt
 
-		BeforeEach(func() {
-			pathWithAt = PathWithAt("")
-		})
-
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
-				It("returns no completions", func() {
+				It("returns no matches", func() {
 					Expect(pathWithAt.Complete("")).To(BeEmpty())
 				})
 			})
 
 			Context("when the prefix doesn't start with @", func() {
-				It("returns no completions", func() {
+				It("returns no matches", func() {
 					Expect(pathWithAt.Complete("a@b")).To(BeEmpty())
 				})
 			})
@@ -145,13 +146,14 @@ var _ = Describe("path flag types", func() {
 				Context("when there are no characters after the @", func() {
 					It("returns all files and directories", func() {
 						matches := pathWithAt.Complete("@")
-						Expect(matches).To(HaveLen(5))
+						Expect(matches).To(HaveLen(6))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
 							flags.Completion{Item: "@add/"},
 							flags.Completion{Item: "@aee/"},
 							flags.Completion{Item: "@tfg"},
+							flags.Completion{Item: "@ABCD"},
 						))
 					})
 				})
@@ -166,6 +168,14 @@ var _ = Describe("path flag types", func() {
 								flags.Completion{Item: "@abd"},
 								flags.Completion{Item: "@add/"},
 								flags.Completion{Item: "@aee/"},
+							))
+						})
+
+						It("is case sensitive", func() {
+							matches := pathWithAt.Complete("@A")
+							Expect(matches).To(HaveLen(1))
+							Expect(matches).To(ConsistOf(
+								flags.Completion{Item: "@ABCD"},
 							))
 						})
 					})
@@ -183,15 +193,11 @@ var _ = Describe("path flag types", func() {
 	Describe("PathWithBool", func() {
 		var pathWithBool PathWithBool
 
-		BeforeEach(func() {
-			pathWithBool = PathWithBool("")
-		})
-
 		Describe("Complete", func() {
 			Context("when the prefix is empty", func() {
 				It("returns bool choices and all files and directories", func() {
 					matches := pathWithBool.Complete("")
-					Expect(matches).To(HaveLen(7))
+					Expect(matches).To(HaveLen(8))
 					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "true"},
 						flags.Completion{Item: "false"},
@@ -200,6 +206,7 @@ var _ = Describe("path flag types", func() {
 						flags.Completion{Item: "add/"},
 						flags.Completion{Item: "aee/"},
 						flags.Completion{Item: "tfg"},
+						flags.Completion{Item: "ABCD"},
 					))
 				})
 			})
@@ -212,6 +219,22 @@ var _ = Describe("path flag types", func() {
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "true"},
 							flags.Completion{Item: "tfg"},
+						))
+					})
+
+					It("paths are case sensitive", func() {
+						matches := pathWithBool.Complete("A")
+						Expect(matches).To(HaveLen(1))
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "ABCD"},
+						))
+					})
+
+					It("bools are not case sensitive", func() {
+						matches := pathWithBool.Complete("Tr")
+						Expect(matches).To(HaveLen(1))
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "true"},
 						))
 					})
 				})
