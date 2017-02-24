@@ -10,15 +10,15 @@ type HealthCheckType struct {
 	Type string
 }
 
-func (m HealthCheckType) Complete(prefix string) []flags.Completion {
-	return completions([]string{"http", "port", "process"}, prefix)
+func (_ HealthCheckType) Complete(prefix string) []flags.Completion {
+	return completions([]string{"http", "port", "process"}, prefix, false)
 }
 
-func (m *HealthCheckType) UnmarshalFlag(val string) error {
+func (h *HealthCheckType) UnmarshalFlag(val string) error {
 	valLower := strings.ToLower(val)
 	switch valLower {
 	case "port", "process", "http", "none":
-		m.Type = valLower
+		h.Type = valLower
 	default:
 		return &flags.Error{
 			Type:    flags.ErrRequired,

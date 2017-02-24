@@ -14,7 +14,7 @@ type Locale struct {
 }
 
 func (l Locale) Complete(prefix string) []flags.Completion {
-	return completions(l.listLocales(), l.sanitize(prefix))
+	return completions(l.listLocales(), l.sanitize(prefix), false)
 }
 
 func (l *Locale) UnmarshalFlag(val string) error {
@@ -32,11 +32,11 @@ func (l *Locale) UnmarshalFlag(val string) error {
 	}
 }
 
-func (l Locale) sanitize(val string) string {
+func (_ Locale) sanitize(val string) string {
 	return strings.Replace(val, "_", "-", -1)
 }
 
-func (l Locale) listLocales() []string {
+func (_ Locale) listLocales() []string {
 	locals := append(i18n.SupportedLocales(), "CLEAR")
 	sort.Strings(locals)
 	return locals

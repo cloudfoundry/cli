@@ -21,5 +21,5 @@ func (_ EnvironmentVariable) Complete(prefix string) []flags.Completion {
 		envVars[i] = fmt.Sprintf("$%s", strings.Split(keyValPair, "=")[0])
 	}
 
-	return completions(envVars, prefix)
+	return completions(envVars, prefix, true)
 }

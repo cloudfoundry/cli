@@ -54,7 +54,7 @@ type PathWithBool string
 
 func (_ PathWithBool) Complete(prefix string) []flags.Completion {
 	return append(
-		completions([]string{"true", "false"}, prefix),
+		completions([]string{"true", "false"}, prefix, false),
 		completeWithNoFormatting(prefix)...,
 	)
 }
