@@ -49,7 +49,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 		ShortName:   "l",
 		Description: T("Log user in"),
 		Usage: []string{
-			T("CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"),
+			T("CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE]\n\n"),
 			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history")),
 		},
 		Examples: []string{
@@ -57,7 +57,7 @@ func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 			T("CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"),
 			T("CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"),
 			T("CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)"),
-			T("CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)"),
+			T("CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)"),
 		},
 		Flags: fs,
 	}
