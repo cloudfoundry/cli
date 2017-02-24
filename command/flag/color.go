@@ -10,8 +10,8 @@ type Color struct {
 	Color bool
 }
 
-func (c Color) Complete(prefix string) []flags.Completion {
-	return completions([]string{"true", "false"}, prefix)
+func (_ Color) Complete(prefix string) []flags.Completion {
+	return completions([]string{"true", "false"}, prefix, false)
 }
 
 func (c *Color) UnmarshalFlag(val string) error {

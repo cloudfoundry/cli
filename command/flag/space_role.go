@@ -10,8 +10,8 @@ type SpaceRole struct {
 	Role string
 }
 
-func (s SpaceRole) Complete(prefix string) []flags.Completion {
-	return completions([]string{"SpaceManager", "SpaceDeveloper", "SpaceAuditor"}, prefix)
+func (_ SpaceRole) Complete(prefix string) []flags.Completion {
+	return completions([]string{"SpaceManager", "SpaceDeveloper", "SpaceAuditor"}, prefix, false)
 }
 
 func (s *SpaceRole) UnmarshalFlag(val string) error {
