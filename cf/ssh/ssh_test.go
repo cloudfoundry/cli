@@ -228,33 +228,39 @@ var _ = Describe("SSH", func() {
 				listener.Close()
 			})
 
+			Context("when the md5 fingerprint matches", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "41:ce:56:e6:9c:42:a9:c6:9e:68:ac:e3:4d:f6:38:79"
+				})
+
+				It("does not return an error", func() {
+					Expect(callback("", addr, TestHostKey.PublicKey())).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when the hex sha1 fingerprint matches", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "a8:e2:67:cb:ea:2a:6e:23:a1:72:ce:8f:07:92:15:ee:1f:82:f8:ca"
+				})
+
+				It("does not return an error", func() {
+					Expect(callback("", addr, TestHostKey.PublicKey())).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when the base64 sha256 fingerprint matches", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "sp/jrLuj66r+yrLDUKZdJU5tdzt4mq/UaSiNBjpgr+8"
+				})
+
+				It("does not return an error", func() {
+					Expect(callback("", addr, TestHostKey.PublicKey())).ToNot(HaveOccurred())
+				})
+			})
+
 			Context("when the base64 SHA256 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "0000000000000000000000000000000000000000000"
-				})
-
-				It("returns an error'", func() {
-					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
-					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
-				})
-			})
-
-			Context("when the hex SHA256 fingerprint does not match", func() {
-				BeforeEach(func() {
-					sshEndpointFingerprint = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
-				})
-
-				It("returns an error'", func() {
-					err := callback("", addr, TestHostKey.PublicKey())
-					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
-					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
-				})
-			})
-
-			Context("when the base64 SHA1 fingerprint does not match", func() {
-				BeforeEach(func() {
-					sshEndpointFingerprint = "000000000000000000000000000"
 				})
 
 				It("returns an error'", func() {
