@@ -228,7 +228,43 @@ var _ = Describe("SSH", func() {
 				listener.Close()
 			})
 
-			Context("when the SHA1 fingerprint does not match", func() {
+			Context("when the base64 SHA256 fingerprint does not match", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "0000000000000000000000000000000000000000000"
+				})
+
+				It("returns an error'", func() {
+					err := callback("", addr, TestHostKey.PublicKey())
+					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
+				})
+			})
+
+			Context("when the hex SHA256 fingerprint does not match", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
+				})
+
+				It("returns an error'", func() {
+					err := callback("", addr, TestHostKey.PublicKey())
+					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
+				})
+			})
+
+			Context("when the base64 SHA1 fingerprint does not match", func() {
+				BeforeEach(func() {
+					sshEndpointFingerprint = "000000000000000000000000000"
+				})
+
+				It("returns an error'", func() {
+					err := callback("", addr, TestHostKey.PublicKey())
+					Expect(err).To(MatchError(MatchRegexp("Host key verification failed\\.")))
+					Expect(err).To(MatchError(MatchRegexp("The fingerprint of the received key was \".*\"")))
+				})
+			})
+
+			Context("when the hex SHA1 fingerprint does not match", func() {
 				BeforeEach(func() {
 					sshEndpointFingerprint = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"
 				})
