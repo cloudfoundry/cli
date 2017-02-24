@@ -18,8 +18,12 @@ var _ = Describe("EnvironmentVariable", func() {
 	)
 
 	BeforeEach(func() {
-		envVar = EnvironmentVariable("")
-		envList = []string{"ENVIRONMENTVARIABLE_TEST_ABC", "ENVIRONMENTVARIABLE_TEST_FOO_BAR", "ENVIRONMENTVARIABLE_TEST_ACKBAR"}
+		envList = []string{
+			"ENVIRONMENTVARIABLE_TEST_ABC",
+			"ENVIRONMENTVARIABLE_TEST_FOO_BAR",
+			"ENVIRONMENTVARIABLE_TEST_ACKBAR",
+			"ENVIRONMENTVARIABLE_TEST_abc",
+		}
 
 		var err error
 		for _, v := range envList {
@@ -74,6 +78,14 @@ var _ = Describe("EnvironmentVariable", func() {
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "$ENVIRONMENTVARIABLE_TEST_ABC"},
 							flags.Completion{Item: "$ENVIRONMENTVARIABLE_TEST_ACKBAR"},
+						))
+					})
+
+					It("is case sensitive", func() {
+						matches := envVar.Complete("$ENVIRONMENTVARIABLE_TEST_a")
+						Expect(matches).To(HaveLen(1))
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "$ENVIRONMENTVARIABLE_TEST_abc"},
 						))
 					})
 				})

@@ -2,7 +2,6 @@ package flag_test
 
 import (
 	. "code.cloudfoundry.org/cli/command/flag"
-
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -12,11 +11,32 @@ import (
 var _ = Describe("HealthCheckType", func() {
 	var healthCheck HealthCheckType
 
-	BeforeEach(func() {
-		healthCheck = HealthCheckType{}
+	Describe("Complete", func() {
+		DescribeTable("returns list of completions",
+			func(prefix string, matches []flags.Completion) {
+				completions := healthCheck.Complete(prefix)
+				Expect(completions).To(Equal(matches))
+			},
+			Entry("returns 'port' and 'process' when passed 'p'", "p",
+				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
+			Entry("returns 'port' and 'process' when passed 'P'", "P",
+				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
+			Entry("returns 'port' when passed 'poR'", "poR",
+				[]flags.Completion{{Item: "port"}}),
+			Entry("completes to 'http' when passed 'h'", "h",
+				[]flags.Completion{{Item: "http"}}),
+			Entry("completes to 'http', 'port', and 'process' when passed nothing", "",
+				[]flags.Completion{{Item: "http"}, {Item: "port"}, {Item: "process"}}),
+			Entry("completes to nothing when passed 'wut'", "wut",
+				[]flags.Completion{}),
+		)
 	})
 
 	Describe("UnmarshalFlag", func() {
+		BeforeEach(func() {
+			healthCheck = HealthCheckType{}
+		})
+
 		DescribeTable("downcases and sets type",
 			func(settingType string, expectedType string) {
 				err := healthCheck.UnmarshalFlag(settingType)
@@ -40,24 +60,5 @@ var _ = Describe("HealthCheckType", func() {
 				Expect(healthCheck.Type).To(BeEmpty())
 			})
 		})
-	})
-
-	Describe("Complete", func() {
-		DescribeTable("returns list of completions",
-			func(prefix string, matches []flags.Completion) {
-				completions := healthCheck.Complete(prefix)
-				Expect(completions).To(Equal(matches))
-			},
-			Entry("returns 'port' and 'process' when passed 'p'", "p",
-				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
-			Entry("returns 'port' and 'process' when passed 'P'", "P",
-				[]flags.Completion{{Item: "port"}, {Item: "process"}}),
-			Entry("completes to 'http' when passed 'h'", "h",
-				[]flags.Completion{{Item: "http"}}),
-			Entry("completes to 'http', 'port', and 'process' when passed nothing", "",
-				[]flags.Completion{{Item: "http"}, {Item: "port"}, {Item: "process"}}),
-			Entry("completes to nothing when passed 'wut'", "wut",
-				[]flags.Completion{}),
-		)
 	})
 })

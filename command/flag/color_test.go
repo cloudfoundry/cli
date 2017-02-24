@@ -2,7 +2,6 @@ package flag_test
 
 import (
 	. "code.cloudfoundry.org/cli/command/flag"
-
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -11,6 +10,28 @@ import (
 
 var _ = Describe("Color", func() {
 	var color Color
+
+	Describe("Complete", func() {
+		DescribeTable("returns list of completions",
+			func(prefix string, matches []flags.Completion) {
+				completions := color.Complete(prefix)
+				Expect(completions).To(Equal(matches))
+			},
+
+			Entry("completes to 'true' when passed 't'", "t",
+				[]flags.Completion{{Item: "true"}}),
+			Entry("completes to 'false' when passed 'f'", "f",
+				[]flags.Completion{{Item: "false"}}),
+			Entry("completes to 'true' when passed 'tR'", "tR",
+				[]flags.Completion{{Item: "true"}}),
+			Entry("completes to 'false' when passed 'Fa'", "Fa",
+				[]flags.Completion{{Item: "false"}}),
+			Entry("returns 'true' and 'false' when passed nothing", "",
+				[]flags.Completion{{Item: "true"}, {Item: "false"}}),
+			Entry("completes to nothing when passed 'wut'", "wut",
+				[]flags.Completion{}),
+		)
+	})
 
 	Describe("UnmarshalFlag", func() {
 		BeforeEach(func() {
@@ -36,23 +57,5 @@ var _ = Describe("Color", func() {
 				Message: `COLOR must be "true" or "false"`,
 			}))
 		})
-	})
-
-	Describe("Complete", func() {
-		DescribeTable("returns list of completions",
-			func(prefix string, matches []flags.Completion) {
-				completions := color.Complete(prefix)
-				Expect(completions).To(Equal(matches))
-			},
-
-			Entry("completes to 'true' when passed 't'", "t",
-				[]flags.Completion{{Item: "true"}}),
-			Entry("completes to 'false' when passed 'F'", "F",
-				[]flags.Completion{{Item: "false"}}),
-			Entry("returns 'true' and 'false' when passed nothing", "",
-				[]flags.Completion{{Item: "true"}, {Item: "false"}}),
-			Entry("completes to nothing when passed 'wut'", "wut",
-				[]flags.Completion{}),
-		)
 	})
 })

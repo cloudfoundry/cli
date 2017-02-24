@@ -2,7 +2,6 @@ package flag_test
 
 import (
 	. "code.cloudfoundry.org/cli/command/flag"
-
 	flags "github.com/jessevdk/go-flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,11 +10,11 @@ import (
 var _ = Describe("Megabytes", func() {
 	var megabytes Megabytes
 
-	BeforeEach(func() {
-		megabytes = Megabytes{}
-	})
-
 	Describe("UnmarshalFlag", func() {
+		BeforeEach(func() {
+			megabytes = Megabytes{}
+		})
+
 		Context("when the suffix is M", func() {
 			It("interprets the number as megabytes", func() {
 				err := megabytes.UnmarshalFlag("17M")
