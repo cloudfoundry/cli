@@ -1020,7 +1020,7 @@
     "translation": "CF_NAME login(대화식으로 로그인하려면 사용자 이름 및 비밀번호 생략 -- CF_NAME이 두 항목에 대한 프롬프트 표시)"
   },
   {
-    "id": "CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time passcode to login)",
+    "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)",
     "translation": "CF_NAME login --sso [--sso-passcode PASSCODE](CF_NAME이 로그인하기 위해 일회성 비밀번호를 얻을 URL을 제공함)"
   },
   {
@@ -1036,11 +1036,11 @@
     "translation": "CF_NAME login -u name@example.com -p pa55woRD(사용자 이름과 비밀번호를 인수로 지정)"
   },
   {
-    "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
+    "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE]\n\n",
     "translation": ""
   },
   {
-    "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\\n\\nWARNING:\\n   Providing your password as a command line option is highly discouraged\\n   Your password may be visible to others and may be recorded in your shell history\\n\\nEXAMPLES:\\n   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\\n   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\\n   CF_NAME login -u name@example.com -p \\\"my password\\\" (use quotes for passwords with a space)\\n   CF_NAME login -u name@example.com -p \\\"\\\\\\\"password\\\\\\\"\\\" (escape quotes if used in password)\\n   CF_NAME login --sso [--sso-passcode PASSCODE] (CF_NAME will provide a url to obtain a one-time password to login)",
+    "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--sso | --sso-passcode PASSCODE]\\n\\nWARNING:\\n   Providing your password as a command line option is highly discouraged\\n   Your password may be visible to others and may be recorded in your shell history\\n\\nEXAMPLES:\\n   CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)\\n   CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)\\n   CF_NAME login -u name@example.com -p \\\"my password\\\" (use quotes for passwords with a space)\\n   CF_NAME login -u name@example.com -p \\\"\\\\\\\"password\\\\\\\"\\\" (escape quotes if used in password)\\n   CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time passcode to login)",
     "translation": ""
   },
   {
@@ -4000,10 +4000,6 @@
     "translation": ""
   },
   {
-    "id": "One-time password",
-    "translation": ""
-  },
-  {
     "id": "Option '--app-ports'",
     "translation": ""
   },
@@ -5902,10 +5898,6 @@
   {
     "id": "Use '{{.Name}}' to view or set your target org and space",
     "translation": "대상 조직과 영역을 보거나 설정하려면 '{{.Name}}'을(를) 사용하십시오."
-  },
-  {
-    "id": "Use a one-time password to login",
-    "translation": "일회성 비밀번호를 사용하여 로그인"
   },
   {
     "id": "User provided tags",
