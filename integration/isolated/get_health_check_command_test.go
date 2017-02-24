@@ -168,7 +168,6 @@ var _ = Describe("get-health-check command", func() {
 
 			Context("when the health check type is http with a custom endpoint", func() {
 				BeforeEach(func() {
-					Skip("until #137592777, #137502797 so set-health-check can set http with endpoint")
 					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
 				})
 
@@ -177,7 +176,7 @@ var _ = Describe("get-health-check command", func() {
 
 					Eventually(session.Out).Should(Say("Getting health check type for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, username))
 					Eventually(session.Out).Should(Say("\n\n"))
-					Eventually(session.Out).Should(Say("Health check type:          process"))
+					Eventually(session.Out).Should(Say("Health check type:          http"))
 					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):   /some-endpoint"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -233,7 +232,6 @@ var _ = Describe("get-health-check command", func() {
 
 			Context("when the health check type changes from http to another type", func() {
 				BeforeEach(func() {
-					Skip("until #137592777, #137502797 so set-health-check can set http with endpoint")
 					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
 					Eventually(helpers.CF("set-health-check", appName, "process")).Should(Exit(0))
 				})
