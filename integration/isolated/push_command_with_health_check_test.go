@@ -308,17 +308,17 @@ applications:
 applications:
 - name: %s
   memory: 128M
-  health-check-type: port
+  health-check-type: http
 `, appName))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
 							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 							Expect(err).ToNot(HaveOccurred())
 
-							Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+							Eventually(helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "-u", "port")).Should(Exit(0))
 						})
 
 						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+http"))
+						Eventually(session.Out).Should(Say("Health check type:\\s+port"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -331,8 +331,7 @@ applications:
 applications:
 - name: %s
   memory: 128M
-  health-check-type: http
-  health-check-http-endpoint: /some-endpoint
+  health-check-type: port
 `, appName))
 							manifestPath := filepath.Join(appDir, "manifest.yml")
 							err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
@@ -343,7 +342,7 @@ applications:
 
 						session := helpers.CF("get-health-check", appName)
 						Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-						Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/some-endpoint\n"))
+						Eventually(session.Out).Should(Say("(?m)Endpoint \\(for http type\\):\\s+/$"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
