@@ -1,10 +1,10 @@
 package sshCmd
 
 import (
-        "encoding/base64"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -27,10 +27,8 @@ import (
 )
 
 const (
-	md5FingerprintLength  = 47 // inclusive of space between bytes
-	hexSha1FingerprintLength = 59 // inclusive of space between bytes
-	hexSha256FingerprintLength = 95 // inclusive of space between bytes
-	base64Sha1FingerprintLength = 27
+	md5FingerprintLength          = 47 // inclusive of space between bytes
+	hexSha1FingerprintLength      = 59 // inclusive of space between bytes
 	base64Sha256FingerprintLength = 43
 )
 
@@ -346,16 +344,6 @@ func hexSha1Fingerprint(key ssh.PublicKey) string {
 	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
 }
 
-func hexSha256Fingerprint(key ssh.PublicKey) string {
-	sum := sha256.Sum256(key.Marshal())
-	return strings.Replace(fmt.Sprintf("% x", sum), " ", ":", -1)
-}
-
-func base64Sha1Fingerprint(key ssh.PublicKey) string {
-	sum := sha1.Sum(key.Marshal())
-	return base64.RawStdEncoding.EncodeToString(sum[:])
-}
-
 func base64Sha256Fingerprint(key ssh.PublicKey) string {
 	sum := sha256.Sum256(key.Marshal())
 	return base64.RawStdEncoding.EncodeToString(sum[:])
@@ -372,14 +360,10 @@ func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) h
 		var fingerprint string
 
 		switch len(expectedFingerprint) {
-		case hexSha256FingerprintLength:
-			fingerprint = hexSha256Fingerprint(key)
 		case base64Sha256FingerprintLength:
 			fingerprint = base64Sha256Fingerprint(key)
 		case hexSha1FingerprintLength:
 			fingerprint = hexSha1Fingerprint(key)
-		case base64Sha1FingerprintLength:
-			fingerprint = base64Sha1Fingerprint(key)
 		case md5FingerprintLength:
 			fingerprint = md5Fingerprint(key)
 		case 0:
