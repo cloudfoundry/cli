@@ -235,4 +235,72 @@ var _ = Describe("Domain Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetOrganizationDomains", func() {
+		Context("when the organization has both shared and private domains", func() {
+
+			BeforeEach(func() {
+				sharedDomain := ccv2.Domain{
+					Name: "some-shared-domain",
+				}
+				privateDomain := ccv2.Domain{
+					Name: "some-private-domain",
+				}
+				otherPrivateDomain := ccv2.Domain{
+					Name: "some-other-private-domain",
+				}
+
+				fakeCloudControllerClient.GetSharedDomainsReturns([]ccv2.Domain{sharedDomain}, ccv2.Warnings{"shared domains warning"}, nil)
+				fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns([]ccv2.Domain{privateDomain, otherPrivateDomain}, ccv2.Warnings{"private domains warning"}, nil)
+			})
+
+			It("returns a concatenated slice with shared and private domains", func() {
+				domains, warnings, err := actor.GetOrganizationDomains("some-org-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(domains).To(Equal([]Domain{
+					{Name: "some-shared-domain"},
+					{Name: "some-private-domain"},
+					{Name: "some-other-private-domain"},
+				}))
+				Expect(warnings).To(ConsistOf("shared domains warning", "private domains warning"))
+
+				Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+
+				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+				orgGUID, query := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+				Expect(orgGUID).To(Equal("some-org-guid"))
+				Expect(query).To(BeEmpty())
+			})
+		})
+		Context("when get shared domains returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("shared domains error")
+				fakeCloudControllerClient.GetSharedDomainsReturns([]ccv2.Domain{}, ccv2.Warnings{"shared domains warning"}, expectedErr)
+			})
+
+			It("returns that error", func() {
+				domains, warnings, err := actor.GetOrganizationDomains("some-org-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domains).To(Equal([]Domain{}))
+				Expect(warnings).To(ConsistOf("shared domains warning"))
+			})
+		})
+		Context("when get organization private domains returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("private domains error")
+				fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns([]ccv2.Domain{}, ccv2.Warnings{"private domains warning"}, expectedErr)
+			})
+
+			It("returns that error", func() {
+				domains, warnings, err := actor.GetOrganizationDomains("some-org-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domains).To(Equal([]Domain{}))
+				Expect(warnings).To(ConsistOf("private domains warning"))
+			})
+		})
+	})
 })

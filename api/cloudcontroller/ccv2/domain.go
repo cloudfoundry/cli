@@ -77,3 +77,55 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 
 	return domain, response.Warnings, nil
 }
+
+// GetSharedDomains returns the global shared domains.
+func (client *Client) GetSharedDomains() ([]Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.SharedDomainsRequest,
+	})
+	if err != nil {
+		return []Domain{}, nil, err
+	}
+
+	fullDomainsList := []Domain{}
+	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
+		if domain, ok := item.(Domain); ok {
+			fullDomainsList = append(fullDomainsList, domain)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Domain{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullDomainsList, warnings, err
+}
+
+// GetOrganizationPrivateDomains returns the private domains associated with an organization.
+func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries []Query) ([]Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PrivateDomainsFromOrganizationRequest,
+		Query:       FormatQueryParameters(queries),
+		URIParams:   map[string]string{"organization_guid": orgGUID},
+	})
+	if err != nil {
+		return []Domain{}, nil, err
+	}
+
+	fullDomainsList := []Domain{}
+	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
+		if domain, ok := item.(Domain); ok {
+			fullDomainsList = append(fullDomainsList, domain)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Domain{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullDomainsList, warnings, err
+}
