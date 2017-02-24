@@ -187,7 +187,11 @@ func (cmd HelpCommand) displayCommonCommands() {
 		for j := 0; j < 3; j++ {
 			index := i + j*size
 			if index < len(pluginCommands) {
-				table[i][j] = pluginCommands[index].Name
+				pluginName := pluginCommands[index].Name
+				if pluginCommands[index].Alias != "" {
+					pluginName = pluginName + "," + pluginCommands[index].Alias
+				}
+				table[i][j] = pluginName
 			}
 		}
 	}
