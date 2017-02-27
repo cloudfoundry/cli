@@ -36,6 +36,7 @@ var _ = Describe("org Command", func() {
 		}
 
 		cmd.RequiredArgs.Organization = "some-org"
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
