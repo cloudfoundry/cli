@@ -474,6 +474,8 @@ var _ = Describe("App", func() {
 					Expect(getAppModel.Routes[0].Guid).To(Equal("fake-route-guid"))
 					Expect(getAppModel.Routes[0].Domain.Name).To(Equal("fake-route-domain-name"))
 					Expect(getAppModel.Routes[0].Domain.Guid).To(Equal("fake-route-domain-guid"))
+					Expect(getAppModel.Routes[0].Path).To(Equal("some-path"))
+					Expect(getAppModel.Routes[0].Port).To(Equal(3333))
 					Expect(getAppModel.Services[0].Guid).To(Equal("fake-service-guid"))
 					Expect(getAppModel.Services[0].Name).To(Equal("fake-service-name"))
 
@@ -674,7 +676,9 @@ var getSummaryJSON string = `{
 		"domain": {
 			"guid": "fake-route-domain-guid",
 			"name": "fake-route-domain-name"
-		}
+		},
+		"path": "some-path",
+    "port": 3333
 	}
 	],
 	"running_instances": 1,
