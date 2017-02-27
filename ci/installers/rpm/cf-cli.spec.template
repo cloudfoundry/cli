@@ -10,21 +10,16 @@ Source: %{expand:%%(pwd)}
 %description
 Cloud Foundry CLI is the official command line client for Cloud Foundry.
 
-%prep
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/bin
-mkdir -p $RPM_BUILD_ROOT/usr/share/doc/cf-cli
-cd $RPM_BUILD_ROOT
-cp %{SOURCEURL0}/cf ./usr/bin/cf
-cp %{SOURCEURL0}/LICENSE ./usr/share/doc/cf-cli/LICENSE
-cp %{SOURCEURL0}/NOTICE ./usr/share/doc/cf-cli/NOTICE
+%install
+%{__rm} -rf %{buildroot}
+%{__install} -Dp -m0755 %{SOURCEURL0}/cf %{buildroot}%{_bindir}/cf
+%{__install} -Dp -m0644 %{SOURCEURL0}/LICENSE %{buildroot}%{_defaultdocdir}/cf-cli/LICENSE
+%{__install} -Dp -m0644 %{SOURCEURL0}/NOTICE %{buildroot}%{_defaultdocdir}/cf-cli/NOTICE
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
 %files
-%defattr(644,root,root)
-%license /usr/share/doc/cf-cli/LICENSE
-/usr/share/doc/cf-cli/NOTICE
-%defattr(755,root,root)
-/usr/bin/cf
+%{_bindir}/cf
+%license %{_defaultdocdir}/cf-cli/LICENSE
+%license %{_defaultdocdir}/cf-cli/NOTICE
