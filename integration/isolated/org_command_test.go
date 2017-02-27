@@ -17,6 +17,8 @@ var _ = Describe("org command", func() {
 	)
 
 	BeforeEach(func() {
+		helpers.RunIfExperimental("org command refactor is still experimental")
+
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.PrefixedRandomName("SPACE")
 	})

@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("app command", func() {
 	BeforeEach(func() {
-		helpers.RunIfExperimental("target command refactor is still experimental")
+		helpers.RunIfExperimental("app command refactor is still experimental")
 	})
 
 	Describe("help", func() {
