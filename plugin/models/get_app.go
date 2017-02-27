@@ -48,6 +48,8 @@ type GetApp_RouteSummary struct {
 	Guid   string
 	Host   string
 	Domain GetApp_DomainFields
+	Path   string
+	Port   int
 }
 
 type GetApp_DomainFields struct {

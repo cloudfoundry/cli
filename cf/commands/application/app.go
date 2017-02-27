@@ -268,6 +268,8 @@ func (cmd *ShowApp) populatePluginModel(
 				Name: getSummaryApp.Routes[i].Domain.Name,
 				Guid: getSummaryApp.Routes[i].Domain.GUID,
 			},
+			Path: getSummaryApp.Routes[i].Path,
+			Port: getSummaryApp.Routes[i].Port,
 		}
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
 	}
