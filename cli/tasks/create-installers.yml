@@ -95,6 +95,7 @@ run:
         cp $root/extracted-binaries/cf-cli_linux_i686 cf
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+        cp ../completion/cf cf.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
@@ -108,6 +109,7 @@ run:
         cp $root/extracted-binaries/cf-cli_linux_x86-64 cf
         cp ../../license/NOTICE .
         cp ../../license/LICENSE-WITH-3RD-PARTY-LICENSES LICENSE
+        cp ../completion/cf cf.bash
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
         rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
