@@ -175,13 +175,14 @@ applications:
 					Eventually(session).Should(Say("Instances:         2/2"))
 					Eventually(session).Should(Say("Usage:             128M x 2 instances"))
 					Eventually(session).Should(Say("Routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
-					Eventually(session).Should(Say("Last uploaded:"))
+
+					Eventually(session).Should(Say("Last uploaded:     \\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
 					Eventually(session).Should(Say("Stack:             cflinuxfs2"))
 					Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
 
 					Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
-					Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
-					Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
+					Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
+					Eventually(session).Should(Say("#1\\s+running\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
 					Eventually(session).Should(Exit(0))
 				})
 			})

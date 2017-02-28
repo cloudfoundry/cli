@@ -3,6 +3,7 @@ package shared
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -63,7 +64,7 @@ func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance
 			[]string{
 				fmt.Sprintf("#%d", instance.ID),
 				ui.TranslateText(strings.ToLower(string(instance.State))),
-				ui.UserFriendlyDate(instance.TimeSinceCreation()),
+				zuluDate(instance.TimeSinceCreation()),
 				fmt.Sprintf("%.1f%%", instance.CPU*100),
 				fmt.Sprintf("%s of %s", bytefmt.ByteSize(uint64(instance.Memory)), bytefmt.ByteSize(uint64(instance.MemoryQuota))),
 				fmt.Sprintf("%s of %s", bytefmt.ByteSize(uint64(instance.Disk)), bytefmt.ByteSize(uint64(instance.DiskQuota))),
@@ -72,4 +73,10 @@ func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance
 	}
 
 	ui.DisplayTable("", table, 3)
+}
+
+// zuluDate converts the time to UTC and then formats it to ISO8601.
+func zuluDate(input time.Time) string {
+	// "2006-01-02T15:04:05Z07:00"
+	return input.UTC().Format(time.RFC3339)
 }
