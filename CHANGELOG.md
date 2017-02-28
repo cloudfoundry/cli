@@ -1,3 +1,82 @@
+## 6.25.0
+* Bump version to 6.25.0
+* add bash completion to red hat rpm
+* modify rpmbuild step to follow best practices
+* Revert "disabled bash completion for environment variables on windows"
+* pipeline uses concourse temp tracker fix to deliver stories
+* GetApp_RouteSummary from plugin repo contains context path and port
+* add experimental flag to org command
+* disabled bash completion for environment variables on windows
+* removed unsupported sha hashes and filled in tests
+* Merge branch 'pivotal-danjahner-master'
+* Merge branch 'master' of https://github.com/pivotal-danjahner/cli into pivotal-danjahner-master
+* Don't run environment_variable_test on windows
+* Make assertion on UAA client unit test more generic
+* Org Refactor
+* fixed login command --sso-passcode UX
+* cf help displays plugin command aliases
+* fix push -u health check type override integration tests
+* use $ instead of \n for matching end of line
+* Remove skips now that set-health-check is done
+* backfill tests around completion case sensitivity
+* completions for environment variables should be case sensitive
+* removed focus from integration tests
+* `cf help <alias>` works for commands contributed by plugins
+* lazy login integration tests and --sso-passcode fixup
+* use script to add missing properties
+* add sso-passcode to general help, add translation for some languages
+* add feature to specify sso token via commandline
+* Add base64 encoded hash handling for SHA1 and SHA256
+* create-buildpack integration test cleans after itself
+* Merge branch 'dcarley-plugin_no_arguments'
+* Merge branch 'plugin_no_arguments' of https://github.com/dcarley/cf-cli into dcarley-plugin_no_arguments
+* remove side effects from EnvironmentVariable tests
+* disable tracker story delivery due to 400 response bug
+* added completion of environment variables to the set-env command
+* plugin: Friendly error when run without arguments
+* added bool/path hybrid completion for config --trace
+* added '/' to directory names for tab completion
+* removed dependency on go-flags Filename
+* added error message > arcane message for following commands
+* fixed more bash
+* weak bash scripting
+* pipeline checks out the diego repo corresponding to the diego-release version
+* updated bin/build with -ldflags "-w -s"
+* go build with -ldflags "-w -s" to reduce binary file size
+* checks if path exists when parsing push's -f and -p flag values
+* refactors in command/flag
+* Add support for SHA256 SSH fingerprints
+* OrgDeveloper is not a valid role
+* change back to previous working directory before cleanup
+* tab complete cf curl -d @
+* locale flag accepts underscores
+* cli supports bash completion on static multiple choice args & options
+* tab completion for file/json args
+* cli supports tab completion on file/directory args
+* sourced out bash completion in brew-formula to file in repo
+* added support for tab completion on file/directory options
+* cf cli tab completion automatically sourced if bash-completion installed
+* added bash tab completion for built-in commands (Mac OS)
+* added bash tab completion for built-in commands (Ubuntu)
+* added bash tab completion for built-in commands (Mac OS/Homebrew)
+* add quota definition GUID field to org
+* changed name of arguments displayed in run-task command help
+* cf help page displays run-task under common commands
+* run-task command now accepts option to configure task disk limit
+* add translations
+* do not focus
+* only color error log lines, not the headers
+* display tip for staging errors
+* display app start command in app info after start
+* do not display log headers during staging/startup
+* refactor app start
+* app update sends state, new GetApplication call
+* run task command now accepts option to adjust memory on task
+* improve error when refresh token is invalid
+* added italics
+* update plugins docs
+* Bump version to 6.24.0
+
 ## 6.24.0
 * Bump version to 6.24.0
 * Revert "Bump version to 6.24.0"
