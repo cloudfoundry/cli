@@ -99,6 +99,8 @@ $ curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=gith
 $ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
 # ...move it to /usr/local/bin or a location you know is in your $PATH
 $ mv cf /usr/local/bin
+# ...copy tab completion file on Ubuntu (takes affect after re-opening your shell)
+$ sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercontent.com/cloudfoundry/cli/master/ci/installers/completion/cf
 # ...and to confirm your cf CLI version
 $ cf --version
 cf version x.y.z+...
