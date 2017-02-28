@@ -1,5 +1,8 @@
 If you have any questions about developing a CLI plugin, ask away on the [cf-dev mailing list](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) (many plugin developers there!) or the #cli channel in our Slack community.
 
+# Changes in v6.25.0
+- `GetApp` now returns `Path` and `Port` information.
+
 # Changes in v6.24.0
 - API `LoggregatorEndpoint()` is deprecated and now always returns the empty string. Use `DopplerEndpoint()` instead to obtain logs.
 
