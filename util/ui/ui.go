@@ -117,7 +117,7 @@ func (ui *UI) TranslateText(template string, templateValues ...map[string]interf
 
 // UserFriendlyDate converts the time to UTC and then formats it to ISO8601.
 func (ui *UI) UserFriendlyDate(input time.Time) string {
-	return input.UTC().Format(time.RFC3339)
+	return input.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
 }
 
 // DisplayOK outputs a bold green translated "OK" to UI.Out.
