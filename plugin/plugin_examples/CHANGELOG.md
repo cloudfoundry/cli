@@ -1,5 +1,8 @@
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/DOC.md)
 
+# Changes in v6.25.0
+- `GetApp` now returns `Path` and `Port` information.
+
 # Changes in v6.24.0
 - API `LoggregatorEndpoint()` is deprecated and now always returns the empty string. Use `DopplerEndpoint()` instead to obtain logs.
 
