@@ -23,6 +23,7 @@ import (
 const (
 	DefaultMinRetryDelay = 500 * time.Millisecond
 	DefaultMaxRetryDelay = time.Minute
+	DefaultMaxRetryCount = 1000
 )
 
 // SetMinRetryDelay sets the duration that automatically reconnecting methods
@@ -44,6 +45,14 @@ func (c *Consumer) SetMinRetryDelay(d time.Duration) {
 // Defaults to DefaultMaxRetryDelay.
 func (c *Consumer) SetMaxRetryDelay(d time.Duration) {
 	atomic.StoreInt64(&c.maxRetryDelay, int64(d))
+}
+
+// SetMaxRetryCount sets the maximum number of reconnnection attemps that
+// methods on c (e.g. Firehose, Stream, TailingLogs) will make before failing.
+//
+// Defaults to DefaultMaxRetryCount.
+func (c *Consumer) SetMaxRetryCount(count int) {
+	atomic.StoreInt64(&c.maxRetryCount, int64(count))
 }
 
 // TailingLogs listens indefinitely for log messages only; other event types
@@ -269,10 +278,12 @@ func (c *Consumer) retryAction(action func() (err error, done bool), errors chan
 
 	context := retryContext{
 		sleep: atomic.LoadInt64(&c.minRetryDelay),
+		count: 0,
 	}
 
 	c.SetOnConnectCallback(func() {
 		atomic.StoreInt64(&context.sleep, atomic.LoadInt64(&c.minRetryDelay))
+		atomic.StoreInt64(&context.count, 0)
 		if oldConnectCallback != nil {
 			oldConnectCallback()
 		}
@@ -289,6 +300,15 @@ func (c *Consumer) retryAction(action func() (err error, done bool), errors chan
 			errors <- err
 			return
 		}
+
+		retryCount := atomic.LoadInt64(&context.count)
+		maxRetryCount := atomic.LoadInt64(&c.maxRetryCount)
+		if retryCount >= maxRetryCount {
+			c.debugPrinter.Print("WEBSOCKET ERROR", fmt.Sprintf("Maximum number of retries %d reached", maxRetryCount))
+			errors <- ErrMaxRetriesReached
+			return
+		}
+		atomic.StoreInt64(&context.count, retryCount+1)
 
 		if err != nil {
 			c.debugPrinter.Print("WEBSOCKET ERROR", fmt.Sprintf("%s. Retrying...", err.Error()))
@@ -518,7 +538,7 @@ func (c *connection) closed() bool {
 // use it primarily to guarantee 64-bit byte alignment on 32-bit systems.
 // https://golang.org/src/sync/atomic/doc.go?#L50
 type retryContext struct {
-	// sleep must be the first word within this struct to ensure 64-bit byte
-	// alignment.
-	sleep int64
+	// sleep and count must be the first words within this struct to ensure
+	// 64-bit byte alignment.
+	sleep, count int64
 }

@@ -131,7 +131,7 @@
 			"importpath": "github.com/cloudfoundry/noaa",
 			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
-			"revision": "5a1ef880e4cc4f6081ab42bdd9ce79ecd13636d5",
+			"revision": "a658db22c62ed0fa527c789997572a346b3faa6b",
 			"branch": "master",
 			"notests": true
 		},
