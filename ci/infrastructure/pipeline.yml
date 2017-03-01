@@ -134,10 +134,10 @@ resources:
   source:
     repository: cloudfoundry/garden-runc-release
 
-- name: netman-release
+- name: cf-networking
   type: bosh-io-release
   source:
-    repository: cloudfoundry-incubator/netman-release
+    repository: cloudfoundry-incubator/cf-networking-release
 
 groups:
 - name: bosh-lites
@@ -257,7 +257,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -370,7 +370,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -483,7 +483,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -595,7 +595,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - do:
     - task: deploy-diego
@@ -713,7 +713,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -825,7 +825,7 @@ jobs:
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
-    - get: netman-release
+    - get: cf-networking
     - get: cli
   - do:
     - task: deploy-diego
