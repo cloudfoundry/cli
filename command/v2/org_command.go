@@ -2,11 +2,10 @@ package v2
 
 import (
 	"os"
-	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -17,9 +16,7 @@ import (
 
 type OrgActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
-	GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
-	GetOrganizationQuota(quotaGUID string) (v2action.OrganizationQuota, v2action.Warnings, error)
-	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
+	GetOrganizationSummaryByName(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error)
 }
 
 type OrgCommand struct {
@@ -28,14 +25,16 @@ type OrgCommand struct {
 	usage           interface{}       `usage:"CF_NAME org ORG [--guid]"`
 	relatedCommands interface{}       `related_commands:"org-users, orgs"`
 
-	UI     command.UI
-	Config command.Config
-	Actor  OrgActor
+	UI          command.UI
+	Config      command.Config
+	SharedActor command.SharedActor
+	Actor       OrgActor
 }
 
 func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
+	cmd.SharedActor = sharedaction.NewActor()
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
@@ -53,6 +52,11 @@ func (cmd OrgCommand) Execute(args []string) error {
 	}
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
+
+	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	if err != nil {
+		return shared.HandleError(err)
+	}
 
 	if cmd.GUID {
 		return cmd.displayOrgGUID()
@@ -87,52 +91,17 @@ func (cmd OrgCommand) displayOrgSummary() error {
 		})
 	cmd.UI.DisplayNewline()
 
-	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	domains, warnings, err := cmd.Actor.GetOrganizationDomains(org.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	var domainNames []string
-	for _, domain := range domains {
-		domainNames = append(domainNames, domain.Name)
-	}
-	sort.Strings(domainNames)
-
-	quota, warnings, err := cmd.Actor.GetOrganizationQuota(org.QuotaDefinitionGUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(org.GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	var spaceNames []string
-	for _, space := range spaces {
-		spaceNames = append(spaceNames, space.Name)
-	}
-	sort.Strings(spaceNames)
-
+	orgSummary, warnings, err := cmd.Actor.GetOrganizationSummaryByName(cmd.RequiredArgs.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
 	table := [][]string{
-		{cmd.UI.TranslateText("name:"), org.Name},
-		{cmd.UI.TranslateText("domains:"), strings.Join(domainNames, ", ")},
-		{cmd.UI.TranslateText("quota:"), quota.Name},
-		{cmd.UI.TranslateText("spaces:"), strings.Join(spaceNames, ", ")},
+		{cmd.UI.TranslateText("name:"), orgSummary.Name},
+		{cmd.UI.TranslateText("domains:"), strings.Join(orgSummary.DomainNames, ", ")},
+		{cmd.UI.TranslateText("quota:"), orgSummary.QuotaName},
+		{cmd.UI.TranslateText("spaces:"), strings.Join(orgSummary.SpaceNames, ", ")},
 	}
 	cmd.UI.DisplayTable("", table, 3)
 
