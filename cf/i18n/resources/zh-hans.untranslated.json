@@ -216,6 +216,10 @@
     "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
+    "id": "CF_NAME create-isolation-segment SEGMENT_NAME\\n\\nNOTES:\\n   The isolation segment name must match the placement tag applied to the Diego cell.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -1132,6 +1136,14 @@
     "translation": "Create an HTTP route:\\n      CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\\n\\n   Create a TCP route:\\n      CF_NAME create-route SPACE DOMAIN (--port PORT | --random-port)\\n\\nEXAMPLES:\\n   CF_NAME create-route my-space example.com                             # example.com\\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\\n   CF_NAME create-route my-space example.com --port 5000                 # example.com:5000"
   },
   {
+    "id": "Create an isolation segment",
+    "translation": ""
+  },
+  {
+    "id": "Creating isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -1654,6 +1666,10 @@
   {
     "id": "The index of the application instance",
     "translation": "The index of the application instance"
+  },
+  {
+    "id": "The isolation segment name",
+    "translation": ""
   },
   {
     "id": "The local path to the plugin, if the plugin exists locally",

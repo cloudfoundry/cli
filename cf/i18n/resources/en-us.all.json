@@ -688,6 +688,10 @@
     "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
+    "id": "CF_NAME create-isolation-segment SEGMENT_NAME\\n\\nNOTES:\\n   The isolation segment name must match the placement tag applied to the Diego cell.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -1896,6 +1900,10 @@
     "translation": "Create an app manifest for an app that has been pushed successfully"
   },
   {
+    "id": "Create an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Create an org",
     "translation": "Create an org"
   },
@@ -1926,6 +1934,10 @@
   {
     "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
     "translation": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}..."
+  },
+  {
+    "id": "Creating isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating org {{.OrgName}} as {{.Username}}...",
@@ -5302,6 +5314,10 @@
   {
     "id": "The index of the application instance",
     "translation": "The index of the application instance"
+  },
+  {
+    "id": "The isolation segment name",
+    "translation": ""
   },
   {
     "id": "The local path to the plugin, if the plugin exists locally",

@@ -688,6 +688,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME create-isolation-segment SEGMENT_NAME\\n\\nNOTES:\\n   The isolation segment name must match the placement tag applied to the Diego cell.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME create-org ORG",
     "translation": ""
   },
@@ -1896,6 +1900,10 @@
     "translation": "为已成功推送的应用程序创建应用程序清单"
   },
   {
+    "id": "Create an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Create an org",
     "translation": "创建组织"
   },
@@ -1926,6 +1934,10 @@
   {
     "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份为组织 {{.OrgName}} 创建域 {{.DomainName}}..."
+  },
+  {
+    "id": "Creating isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating org {{.OrgName}} as {{.Username}}...",
@@ -5301,6 +5313,10 @@
   },
   {
     "id": "The index of the application instance",
+    "translation": ""
+  },
+  {
+    "id": "The isolation segment name",
     "translation": ""
   },
   {
