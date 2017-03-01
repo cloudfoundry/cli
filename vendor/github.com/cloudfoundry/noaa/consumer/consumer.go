@@ -20,12 +20,13 @@ var (
 	// KeepAlive sets the interval between keep-alive messages sent by the client to loggregator.
 	KeepAlive = 25 * time.Second
 
-	boundaryRegexp    = regexp.MustCompile("boundary=(.*)")
-	ErrNotOK          = errors.New("unknown issue when making HTTP request to Loggregator")
-	ErrNotFound       = ErrNotOK // NotFound isn't an accurate description of how this is used; please use ErrNotOK instead
-	ErrBadResponse    = errors.New("bad server response")
-	ErrBadRequest     = errors.New("bad client request")
-	ErrLostConnection = errors.New("remote server terminated connection unexpectedly")
+	boundaryRegexp       = regexp.MustCompile("boundary=(.*)")
+	ErrNotOK             = errors.New("unknown issue when making HTTP request to Loggregator")
+	ErrNotFound          = ErrNotOK // NotFound isn't an accurate description of how this is used; please use ErrNotOK instead
+	ErrBadResponse       = errors.New("bad server response")
+	ErrBadRequest        = errors.New("bad client request")
+	ErrLostConnection    = errors.New("remote server terminated connection unexpectedly")
+	ErrMaxRetriesReached = errors.New("maximum number of connection retries reached")
 )
 
 //go:generate hel --type DebugPrinter --output mock_debug_printer_test.go
@@ -44,10 +45,10 @@ func (nullDebugPrinter) Print(title, body string) {
 // Consumer represents the actions that can be performed against trafficcontroller.
 // See sync.go and async.go for trafficcontroller access methods.
 type Consumer struct {
-	// minRetryDelay and maxRetryDelay must be the first words in this struct
-	// in order to be used atomically by 32-bit systems.
+	// minRetryDelay, maxRetryDelay, and maxRetryCount must be the first words in
+	// this struct in order to be used atomically by 32-bit systems.
 	// https://golang.org/src/sync/atomic/doc.go?#L50
-	minRetryDelay, maxRetryDelay int64
+	minRetryDelay, maxRetryDelay, maxRetryCount int64
 
 	trafficControllerUrl string
 	idleTimeout          time.Duration
@@ -79,6 +80,7 @@ func New(trafficControllerUrl string, tlsConfig *tls.Config, proxy func(*http.Re
 		},
 		minRetryDelay: int64(DefaultMinRetryDelay),
 		maxRetryDelay: int64(DefaultMaxRetryDelay),
+		maxRetryCount: int64(DefaultMaxRetryCount),
 	}
 	consumer.dialer = websocket.Dialer{HandshakeTimeout: internal.Timeout, NetDial: consumer.proxyDial, TLSClientConfig: tlsConfig}
 	return consumer
