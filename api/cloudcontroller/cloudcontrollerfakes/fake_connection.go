@@ -18,12 +18,16 @@ type FakeConnection struct {
 	makeReturns struct {
 		result1 error
 	}
+	makeReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeConnection) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	fake.makeMutex.Lock()
+	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
 		request        *http.Request
 		passedResponse *cloudcontroller.Response
@@ -32,9 +36,11 @@ func (fake *FakeConnection) Make(request *http.Request, passedResponse *cloudcon
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
 		return fake.MakeStub(request, passedResponse)
-	} else {
-		return fake.makeReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.makeReturns.result1
 }
 
 func (fake *FakeConnection) MakeCallCount() int {
@@ -52,6 +58,18 @@ func (fake *FakeConnection) MakeArgsForCall(i int) (*http.Request, *cloudcontrol
 func (fake *FakeConnection) MakeReturns(result1 error) {
 	fake.MakeStub = nil
 	fake.makeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeConnection) MakeReturnsOnCall(i int, result1 error) {
+	fake.MakeStub = nil
+	if fake.makeReturnsOnCall == nil {
+		fake.makeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.makeReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

@@ -15,6 +15,9 @@ type FakeConfig struct {
 	pollingIntervalReturns     struct {
 		result1 time.Duration
 	}
+	pollingIntervalReturnsOnCall map[int]struct {
+		result1 time.Duration
+	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
 	setTargetInformationArgsForCall []struct {
@@ -40,10 +43,16 @@ type FakeConfig struct {
 	skipSSLValidationReturns     struct {
 		result1 bool
 	}
+	skipSSLValidationReturnsOnCall map[int]struct {
+		result1 bool
+	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
 	stagingTimeoutArgsForCall []struct{}
 	stagingTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	stagingTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
 	StartupTimeoutStub        func() time.Duration
@@ -52,10 +61,16 @@ type FakeConfig struct {
 	startupTimeoutReturns     struct {
 		result1 time.Duration
 	}
+	startupTimeoutReturnsOnCall map[int]struct {
+		result1 time.Duration
+	}
 	TargetStub        func() string
 	targetMutex       sync.RWMutex
 	targetArgsForCall []struct{}
 	targetReturns     struct {
+		result1 string
+	}
+	targetReturnsOnCall map[int]struct {
 		result1 string
 	}
 	UnsetOrganizationInformationStub        func()
@@ -70,14 +85,17 @@ type FakeConfig struct {
 
 func (fake *FakeConfig) PollingInterval() time.Duration {
 	fake.pollingIntervalMutex.Lock()
+	ret, specificReturn := fake.pollingIntervalReturnsOnCall[len(fake.pollingIntervalArgsForCall)]
 	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct{}{})
 	fake.recordInvocation("PollingInterval", []interface{}{})
 	fake.pollingIntervalMutex.Unlock()
 	if fake.PollingIntervalStub != nil {
 		return fake.PollingIntervalStub()
-	} else {
-		return fake.pollingIntervalReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.pollingIntervalReturns.result1
 }
 
 func (fake *FakeConfig) PollingIntervalCallCount() int {
@@ -89,6 +107,18 @@ func (fake *FakeConfig) PollingIntervalCallCount() int {
 func (fake *FakeConfig) PollingIntervalReturns(result1 time.Duration) {
 	fake.PollingIntervalStub = nil
 	fake.pollingIntervalReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) PollingIntervalReturnsOnCall(i int, result1 time.Duration) {
+	fake.PollingIntervalStub = nil
+	if fake.pollingIntervalReturnsOnCall == nil {
+		fake.pollingIntervalReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.pollingIntervalReturnsOnCall[i] = struct {
 		result1 time.Duration
 	}{result1}
 }
@@ -152,14 +182,17 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 
 func (fake *FakeConfig) SkipSSLValidation() bool {
 	fake.skipSSLValidationMutex.Lock()
+	ret, specificReturn := fake.skipSSLValidationReturnsOnCall[len(fake.skipSSLValidationArgsForCall)]
 	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
 	fake.recordInvocation("SkipSSLValidation", []interface{}{})
 	fake.skipSSLValidationMutex.Unlock()
 	if fake.SkipSSLValidationStub != nil {
 		return fake.SkipSSLValidationStub()
-	} else {
-		return fake.skipSSLValidationReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.skipSSLValidationReturns.result1
 }
 
 func (fake *FakeConfig) SkipSSLValidationCallCount() int {
@@ -175,16 +208,31 @@ func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
+	fake.SkipSSLValidationStub = nil
+	if fake.skipSSLValidationReturnsOnCall == nil {
+		fake.skipSSLValidationReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.skipSSLValidationReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) StagingTimeout() time.Duration {
 	fake.stagingTimeoutMutex.Lock()
+	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
 	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct{}{})
 	fake.recordInvocation("StagingTimeout", []interface{}{})
 	fake.stagingTimeoutMutex.Unlock()
 	if fake.StagingTimeoutStub != nil {
 		return fake.StagingTimeoutStub()
-	} else {
-		return fake.stagingTimeoutReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.stagingTimeoutReturns.result1
 }
 
 func (fake *FakeConfig) StagingTimeoutCallCount() int {
@@ -200,16 +248,31 @@ func (fake *FakeConfig) StagingTimeoutReturns(result1 time.Duration) {
 	}{result1}
 }
 
+func (fake *FakeConfig) StagingTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.StagingTimeoutStub = nil
+	if fake.stagingTimeoutReturnsOnCall == nil {
+		fake.stagingTimeoutReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.stagingTimeoutReturnsOnCall[i] = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) StartupTimeout() time.Duration {
 	fake.startupTimeoutMutex.Lock()
+	ret, specificReturn := fake.startupTimeoutReturnsOnCall[len(fake.startupTimeoutArgsForCall)]
 	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct{}{})
 	fake.recordInvocation("StartupTimeout", []interface{}{})
 	fake.startupTimeoutMutex.Unlock()
 	if fake.StartupTimeoutStub != nil {
 		return fake.StartupTimeoutStub()
-	} else {
-		return fake.startupTimeoutReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.startupTimeoutReturns.result1
 }
 
 func (fake *FakeConfig) StartupTimeoutCallCount() int {
@@ -225,16 +288,31 @@ func (fake *FakeConfig) StartupTimeoutReturns(result1 time.Duration) {
 	}{result1}
 }
 
+func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.StartupTimeoutStub = nil
+	if fake.startupTimeoutReturnsOnCall == nil {
+		fake.startupTimeoutReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.startupTimeoutReturnsOnCall[i] = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) Target() string {
 	fake.targetMutex.Lock()
+	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
 	fake.targetArgsForCall = append(fake.targetArgsForCall, struct{}{})
 	fake.recordInvocation("Target", []interface{}{})
 	fake.targetMutex.Unlock()
 	if fake.TargetStub != nil {
 		return fake.TargetStub()
-	} else {
-		return fake.targetReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.targetReturns.result1
 }
 
 func (fake *FakeConfig) TargetCallCount() int {
@@ -246,6 +324,18 @@ func (fake *FakeConfig) TargetCallCount() int {
 func (fake *FakeConfig) TargetReturns(result1 string) {
 	fake.TargetStub = nil
 	fake.targetReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
+	fake.TargetStub = nil
+	if fake.targetReturnsOnCall == nil {
+		fake.targetReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.targetReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }

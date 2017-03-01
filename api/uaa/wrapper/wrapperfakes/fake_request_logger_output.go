@@ -17,12 +17,18 @@ type FakeRequestLoggerOutput struct {
 	displayBodyReturns struct {
 		result1 error
 	}
+	displayBodyReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DisplayJSONBodyStub        func(body []byte) error
 	displayJSONBodyMutex       sync.RWMutex
 	displayJSONBodyArgsForCall []struct {
 		body []byte
 	}
 	displayJSONBodyReturns struct {
+		result1 error
+	}
+	displayJSONBodyReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DisplayHeaderStub        func(name string, value string) error
@@ -34,12 +40,18 @@ type FakeRequestLoggerOutput struct {
 	displayHeaderReturns struct {
 		result1 error
 	}
+	displayHeaderReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DisplayHostStub        func(name string) error
 	displayHostMutex       sync.RWMutex
 	displayHostArgsForCall []struct {
 		name string
 	}
 	displayHostReturns struct {
+		result1 error
+	}
+	displayHostReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string) error
@@ -52,6 +64,9 @@ type FakeRequestLoggerOutput struct {
 	displayRequestHeaderReturns struct {
 		result1 error
 	}
+	displayRequestHeaderReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DisplayResponseHeaderStub        func(httpProtocol string, status string) error
 	displayResponseHeaderMutex       sync.RWMutex
 	displayResponseHeaderArgsForCall []struct {
@@ -61,6 +76,9 @@ type FakeRequestLoggerOutput struct {
 	displayResponseHeaderReturns struct {
 		result1 error
 	}
+	displayResponseHeaderReturnsOnCall map[int]struct {
+		result1 error
+	}
 	DisplayTypeStub        func(name string, requestDate time.Time) error
 	displayTypeMutex       sync.RWMutex
 	displayTypeArgsForCall []struct {
@@ -68,6 +86,9 @@ type FakeRequestLoggerOutput struct {
 		requestDate time.Time
 	}
 	displayTypeReturns struct {
+		result1 error
+	}
+	displayTypeReturnsOnCall map[int]struct {
 		result1 error
 	}
 	HandleInternalErrorStub        func(err error)
@@ -81,10 +102,16 @@ type FakeRequestLoggerOutput struct {
 	startReturns     struct {
 		result1 error
 	}
+	startReturnsOnCall map[int]struct {
+		result1 error
+	}
 	StopStub        func() error
 	stopMutex       sync.RWMutex
 	stopArgsForCall []struct{}
 	stopReturns     struct {
+		result1 error
+	}
+	stopReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -98,6 +125,7 @@ func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) error {
 		copy(bodyCopy, body)
 	}
 	fake.displayBodyMutex.Lock()
+	ret, specificReturn := fake.displayBodyReturnsOnCall[len(fake.displayBodyArgsForCall)]
 	fake.displayBodyArgsForCall = append(fake.displayBodyArgsForCall, struct {
 		body []byte
 	}{bodyCopy})
@@ -105,9 +133,11 @@ func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) error {
 	fake.displayBodyMutex.Unlock()
 	if fake.DisplayBodyStub != nil {
 		return fake.DisplayBodyStub(body)
-	} else {
-		return fake.displayBodyReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayBodyReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayBodyCallCount() int {
@@ -129,6 +159,18 @@ func (fake *FakeRequestLoggerOutput) DisplayBodyReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayBodyReturnsOnCall(i int, result1 error) {
+	fake.DisplayBodyStub = nil
+	if fake.displayBodyReturnsOnCall == nil {
+		fake.displayBodyReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayBodyReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
 	var bodyCopy []byte
 	if body != nil {
@@ -136,6 +178,7 @@ func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
 		copy(bodyCopy, body)
 	}
 	fake.displayJSONBodyMutex.Lock()
+	ret, specificReturn := fake.displayJSONBodyReturnsOnCall[len(fake.displayJSONBodyArgsForCall)]
 	fake.displayJSONBodyArgsForCall = append(fake.displayJSONBodyArgsForCall, struct {
 		body []byte
 	}{bodyCopy})
@@ -143,9 +186,11 @@ func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
 	fake.displayJSONBodyMutex.Unlock()
 	if fake.DisplayJSONBodyStub != nil {
 		return fake.DisplayJSONBodyStub(body)
-	} else {
-		return fake.displayJSONBodyReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayJSONBodyReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayJSONBodyCallCount() int {
@@ -167,8 +212,21 @@ func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturnsOnCall(i int, result1 error) {
+	fake.DisplayJSONBodyStub = nil
+	if fake.displayJSONBodyReturnsOnCall == nil {
+		fake.displayJSONBodyReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayJSONBodyReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) error {
 	fake.displayHeaderMutex.Lock()
+	ret, specificReturn := fake.displayHeaderReturnsOnCall[len(fake.displayHeaderArgsForCall)]
 	fake.displayHeaderArgsForCall = append(fake.displayHeaderArgsForCall, struct {
 		name  string
 		value string
@@ -177,9 +235,11 @@ func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) er
 	fake.displayHeaderMutex.Unlock()
 	if fake.DisplayHeaderStub != nil {
 		return fake.DisplayHeaderStub(name, value)
-	} else {
-		return fake.displayHeaderReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayHeaderReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayHeaderCallCount() int {
@@ -201,8 +261,21 @@ func (fake *FakeRequestLoggerOutput) DisplayHeaderReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayHeaderReturnsOnCall(i int, result1 error) {
+	fake.DisplayHeaderStub = nil
+	if fake.displayHeaderReturnsOnCall == nil {
+		fake.displayHeaderReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayHeaderReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayHost(name string) error {
 	fake.displayHostMutex.Lock()
+	ret, specificReturn := fake.displayHostReturnsOnCall[len(fake.displayHostArgsForCall)]
 	fake.displayHostArgsForCall = append(fake.displayHostArgsForCall, struct {
 		name string
 	}{name})
@@ -210,9 +283,11 @@ func (fake *FakeRequestLoggerOutput) DisplayHost(name string) error {
 	fake.displayHostMutex.Unlock()
 	if fake.DisplayHostStub != nil {
 		return fake.DisplayHostStub(name)
-	} else {
-		return fake.displayHostReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayHostReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayHostCallCount() int {
@@ -234,8 +309,21 @@ func (fake *FakeRequestLoggerOutput) DisplayHostReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayHostReturnsOnCall(i int, result1 error) {
+	fake.DisplayHostStub = nil
+	if fake.displayHostReturnsOnCall == nil {
+		fake.displayHostReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayHostReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
 	fake.displayRequestHeaderMutex.Lock()
+	ret, specificReturn := fake.displayRequestHeaderReturnsOnCall[len(fake.displayRequestHeaderArgsForCall)]
 	fake.displayRequestHeaderArgsForCall = append(fake.displayRequestHeaderArgsForCall, struct {
 		method       string
 		uri          string
@@ -245,9 +333,11 @@ func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri str
 	fake.displayRequestHeaderMutex.Unlock()
 	if fake.DisplayRequestHeaderStub != nil {
 		return fake.DisplayRequestHeaderStub(method, uri, httpProtocol)
-	} else {
-		return fake.displayRequestHeaderReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayRequestHeaderReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderCallCount() int {
@@ -269,8 +359,21 @@ func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderReturns(result1 error) 
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderReturnsOnCall(i int, result1 error) {
+	fake.DisplayRequestHeaderStub = nil
+	if fake.displayRequestHeaderReturnsOnCall == nil {
+		fake.displayRequestHeaderReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayRequestHeaderReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, status string) error {
 	fake.displayResponseHeaderMutex.Lock()
+	ret, specificReturn := fake.displayResponseHeaderReturnsOnCall[len(fake.displayResponseHeaderArgsForCall)]
 	fake.displayResponseHeaderArgsForCall = append(fake.displayResponseHeaderArgsForCall, struct {
 		httpProtocol string
 		status       string
@@ -279,9 +382,11 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, 
 	fake.displayResponseHeaderMutex.Unlock()
 	if fake.DisplayResponseHeaderStub != nil {
 		return fake.DisplayResponseHeaderStub(httpProtocol, status)
-	} else {
-		return fake.displayResponseHeaderReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayResponseHeaderReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderCallCount() int {
@@ -303,8 +408,21 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderReturns(result1 error)
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderReturnsOnCall(i int, result1 error) {
+	fake.DisplayResponseHeaderStub = nil
+	if fake.displayResponseHeaderReturnsOnCall == nil {
+		fake.displayResponseHeaderReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayResponseHeaderReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.Time) error {
 	fake.displayTypeMutex.Lock()
+	ret, specificReturn := fake.displayTypeReturnsOnCall[len(fake.displayTypeArgsForCall)]
 	fake.displayTypeArgsForCall = append(fake.displayTypeArgsForCall, struct {
 		name        string
 		requestDate time.Time
@@ -313,9 +431,11 @@ func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.T
 	fake.displayTypeMutex.Unlock()
 	if fake.DisplayTypeStub != nil {
 		return fake.DisplayTypeStub(name, requestDate)
-	} else {
-		return fake.displayTypeReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayTypeReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayTypeCallCount() int {
@@ -333,6 +453,18 @@ func (fake *FakeRequestLoggerOutput) DisplayTypeArgsForCall(i int) (string, time
 func (fake *FakeRequestLoggerOutput) DisplayTypeReturns(result1 error) {
 	fake.DisplayTypeStub = nil
 	fake.displayTypeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayTypeReturnsOnCall(i int, result1 error) {
+	fake.DisplayTypeStub = nil
+	if fake.displayTypeReturnsOnCall == nil {
+		fake.displayTypeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayTypeReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -363,14 +495,17 @@ func (fake *FakeRequestLoggerOutput) HandleInternalErrorArgsForCall(i int) error
 
 func (fake *FakeRequestLoggerOutput) Start() error {
 	fake.startMutex.Lock()
+	ret, specificReturn := fake.startReturnsOnCall[len(fake.startArgsForCall)]
 	fake.startArgsForCall = append(fake.startArgsForCall, struct{}{})
 	fake.recordInvocation("Start", []interface{}{})
 	fake.startMutex.Unlock()
 	if fake.StartStub != nil {
 		return fake.StartStub()
-	} else {
-		return fake.startReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.startReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) StartCallCount() int {
@@ -386,16 +521,31 @@ func (fake *FakeRequestLoggerOutput) StartReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRequestLoggerOutput) StartReturnsOnCall(i int, result1 error) {
+	fake.StartStub = nil
+	if fake.startReturnsOnCall == nil {
+		fake.startReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.startReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) Stop() error {
 	fake.stopMutex.Lock()
+	ret, specificReturn := fake.stopReturnsOnCall[len(fake.stopArgsForCall)]
 	fake.stopArgsForCall = append(fake.stopArgsForCall, struct{}{})
 	fake.recordInvocation("Stop", []interface{}{})
 	fake.stopMutex.Unlock()
 	if fake.StopStub != nil {
 		return fake.StopStub()
-	} else {
-		return fake.stopReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.stopReturns.result1
 }
 
 func (fake *FakeRequestLoggerOutput) StopCallCount() int {
@@ -407,6 +557,18 @@ func (fake *FakeRequestLoggerOutput) StopCallCount() int {
 func (fake *FakeRequestLoggerOutput) StopReturns(result1 error) {
 	fake.StopStub = nil
 	fake.stopReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) StopReturnsOnCall(i int, result1 error) {
+	fake.StopStub = nil
+	if fake.stopReturnsOnCall == nil {
+		fake.stopReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.stopReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

@@ -20,12 +20,17 @@ type FakeUAAClient struct {
 		result1 uaa.User
 		result2 error
 	}
+	newUserReturnsOnCall map[int]struct {
+		result1 uaa.User
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUAAClient) NewUser(username string, password string, origin string) (uaa.User, error) {
 	fake.newUserMutex.Lock()
+	ret, specificReturn := fake.newUserReturnsOnCall[len(fake.newUserArgsForCall)]
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
 		username string
 		password string
@@ -35,9 +40,11 @@ func (fake *FakeUAAClient) NewUser(username string, password string, origin stri
 	fake.newUserMutex.Unlock()
 	if fake.NewUserStub != nil {
 		return fake.NewUserStub(username, password, origin)
-	} else {
-		return fake.newUserReturns.result1, fake.newUserReturns.result2
 	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.newUserReturns.result1, fake.newUserReturns.result2
 }
 
 func (fake *FakeUAAClient) NewUserCallCount() int {
@@ -55,6 +62,20 @@ func (fake *FakeUAAClient) NewUserArgsForCall(i int) (string, string, string) {
 func (fake *FakeUAAClient) NewUserReturns(result1 uaa.User, result2 error) {
 	fake.NewUserStub = nil
 	fake.newUserReturns = struct {
+		result1 uaa.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) NewUserReturnsOnCall(i int, result1 uaa.User, result2 error) {
+	fake.NewUserStub = nil
+	if fake.newUserReturnsOnCall == nil {
+		fake.newUserReturnsOnCall = make(map[int]struct {
+			result1 uaa.User
+			result2 error
+		})
+	}
+	fake.newUserReturnsOnCall[i] = struct {
 		result1 uaa.User
 		result2 error
 	}{result1, result2}

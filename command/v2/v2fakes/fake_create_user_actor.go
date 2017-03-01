@@ -21,12 +21,18 @@ type FakeCreateUserActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	newUserReturnsOnCall map[int]struct {
+		result1 v2action.User
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeCreateUserActor) NewUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error) {
 	fake.newUserMutex.Lock()
+	ret, specificReturn := fake.newUserReturnsOnCall[len(fake.newUserArgsForCall)]
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
 		username string
 		password string
@@ -36,9 +42,11 @@ func (fake *FakeCreateUserActor) NewUser(username string, password string, origi
 	fake.newUserMutex.Unlock()
 	if fake.NewUserStub != nil {
 		return fake.NewUserStub(username, password, origin)
-	} else {
-		return fake.newUserReturns.result1, fake.newUserReturns.result2, fake.newUserReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.newUserReturns.result1, fake.newUserReturns.result2, fake.newUserReturns.result3
 }
 
 func (fake *FakeCreateUserActor) NewUserCallCount() int {
@@ -56,6 +64,22 @@ func (fake *FakeCreateUserActor) NewUserArgsForCall(i int) (string, string, stri
 func (fake *FakeCreateUserActor) NewUserReturns(result1 v2action.User, result2 v2action.Warnings, result3 error) {
 	fake.NewUserStub = nil
 	fake.newUserReturns = struct {
+		result1 v2action.User
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCreateUserActor) NewUserReturnsOnCall(i int, result1 v2action.User, result2 v2action.Warnings, result3 error) {
+	fake.NewUserStub = nil
+	if fake.newUserReturnsOnCall == nil {
+		fake.newUserReturnsOnCall = make(map[int]struct {
+			result1 v2action.User
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.newUserReturnsOnCall[i] = struct {
 		result1 v2action.User
 		result2 v2action.Warnings
 		result3 error

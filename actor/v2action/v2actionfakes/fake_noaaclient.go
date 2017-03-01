@@ -15,6 +15,9 @@ type FakeNOAAClient struct {
 	closeReturns     struct {
 		result1 error
 	}
+	closeReturnsOnCall map[int]struct {
+		result1 error
+	}
 	TailingLogsStub        func(appGuid, authToken string) (<-chan *events.LogMessage, <-chan error)
 	tailingLogsMutex       sync.RWMutex
 	tailingLogsArgsForCall []struct {
@@ -25,20 +28,27 @@ type FakeNOAAClient struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}
+	tailingLogsReturnsOnCall map[int]struct {
+		result1 <-chan *events.LogMessage
+		result2 <-chan error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeNOAAClient) Close() error {
 	fake.closeMutex.Lock()
+	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
-	} else {
-		return fake.closeReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.closeReturns.result1
 }
 
 func (fake *FakeNOAAClient) CloseCallCount() int {
@@ -54,8 +64,21 @@ func (fake *FakeNOAAClient) CloseReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeNOAAClient) CloseReturnsOnCall(i int, result1 error) {
+	fake.CloseStub = nil
+	if fake.closeReturnsOnCall == nil {
+		fake.closeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.closeReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeNOAAClient) TailingLogs(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 	fake.tailingLogsMutex.Lock()
+	ret, specificReturn := fake.tailingLogsReturnsOnCall[len(fake.tailingLogsArgsForCall)]
 	fake.tailingLogsArgsForCall = append(fake.tailingLogsArgsForCall, struct {
 		appGuid   string
 		authToken string
@@ -64,9 +87,11 @@ func (fake *FakeNOAAClient) TailingLogs(appGuid string, authToken string) (<-cha
 	fake.tailingLogsMutex.Unlock()
 	if fake.TailingLogsStub != nil {
 		return fake.TailingLogsStub(appGuid, authToken)
-	} else {
-		return fake.tailingLogsReturns.result1, fake.tailingLogsReturns.result2
 	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.tailingLogsReturns.result1, fake.tailingLogsReturns.result2
 }
 
 func (fake *FakeNOAAClient) TailingLogsCallCount() int {
@@ -84,6 +109,20 @@ func (fake *FakeNOAAClient) TailingLogsArgsForCall(i int) (string, string) {
 func (fake *FakeNOAAClient) TailingLogsReturns(result1 <-chan *events.LogMessage, result2 <-chan error) {
 	fake.TailingLogsStub = nil
 	fake.tailingLogsReturns = struct {
+		result1 <-chan *events.LogMessage
+		result2 <-chan error
+	}{result1, result2}
+}
+
+func (fake *FakeNOAAClient) TailingLogsReturnsOnCall(i int, result1 <-chan *events.LogMessage, result2 <-chan error) {
+	fake.TailingLogsStub = nil
+	if fake.tailingLogsReturnsOnCall == nil {
+		fake.tailingLogsReturnsOnCall = make(map[int]struct {
+			result1 <-chan *events.LogMessage
+			result2 <-chan error
+		})
+	}
+	fake.tailingLogsReturnsOnCall[i] = struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}{result1, result2}
