@@ -19,33 +19,13 @@ type FakeOrgActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetOrganizationDomainsStub        func(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
-	getOrganizationDomainsMutex       sync.RWMutex
-	getOrganizationDomainsArgsForCall []struct {
-		orgGUID string
+	GetOrganizationSummaryByNameStub        func(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error)
+	getOrganizationSummaryByNameMutex       sync.RWMutex
+	getOrganizationSummaryByNameArgsForCall []struct {
+		orgName string
 	}
-	getOrganizationDomainsReturns struct {
-		result1 []v2action.Domain
-		result2 v2action.Warnings
-		result3 error
-	}
-	GetOrganizationQuotaStub        func(quotaGUID string) (v2action.OrganizationQuota, v2action.Warnings, error)
-	getOrganizationQuotaMutex       sync.RWMutex
-	getOrganizationQuotaArgsForCall []struct {
-		quotaGUID string
-	}
-	getOrganizationQuotaReturns struct {
-		result1 v2action.OrganizationQuota
-		result2 v2action.Warnings
-		result3 error
-	}
-	GetOrganizationSpacesStub        func(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
-	getOrganizationSpacesMutex       sync.RWMutex
-	getOrganizationSpacesArgsForCall []struct {
-		orgGUID string
-	}
-	getOrganizationSpacesReturns struct {
-		result1 []v2action.Space
+	getOrganizationSummaryByNameReturns struct {
+		result1 v2action.OrganizationSummary
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -88,106 +68,36 @@ func (fake *FakeOrgActor) GetOrganizationByNameReturns(result1 v2action.Organiza
 	}{result1, result2, result3}
 }
 
-func (fake *FakeOrgActor) GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error) {
-	fake.getOrganizationDomainsMutex.Lock()
-	fake.getOrganizationDomainsArgsForCall = append(fake.getOrganizationDomainsArgsForCall, struct {
-		orgGUID string
-	}{orgGUID})
-	fake.recordInvocation("GetOrganizationDomains", []interface{}{orgGUID})
-	fake.getOrganizationDomainsMutex.Unlock()
-	if fake.GetOrganizationDomainsStub != nil {
-		return fake.GetOrganizationDomainsStub(orgGUID)
+func (fake *FakeOrgActor) GetOrganizationSummaryByName(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error) {
+	fake.getOrganizationSummaryByNameMutex.Lock()
+	fake.getOrganizationSummaryByNameArgsForCall = append(fake.getOrganizationSummaryByNameArgsForCall, struct {
+		orgName string
+	}{orgName})
+	fake.recordInvocation("GetOrganizationSummaryByName", []interface{}{orgName})
+	fake.getOrganizationSummaryByNameMutex.Unlock()
+	if fake.GetOrganizationSummaryByNameStub != nil {
+		return fake.GetOrganizationSummaryByNameStub(orgName)
 	} else {
-		return fake.getOrganizationDomainsReturns.result1, fake.getOrganizationDomainsReturns.result2, fake.getOrganizationDomainsReturns.result3
+		return fake.getOrganizationSummaryByNameReturns.result1, fake.getOrganizationSummaryByNameReturns.result2, fake.getOrganizationSummaryByNameReturns.result3
 	}
 }
 
-func (fake *FakeOrgActor) GetOrganizationDomainsCallCount() int {
-	fake.getOrganizationDomainsMutex.RLock()
-	defer fake.getOrganizationDomainsMutex.RUnlock()
-	return len(fake.getOrganizationDomainsArgsForCall)
+func (fake *FakeOrgActor) GetOrganizationSummaryByNameCallCount() int {
+	fake.getOrganizationSummaryByNameMutex.RLock()
+	defer fake.getOrganizationSummaryByNameMutex.RUnlock()
+	return len(fake.getOrganizationSummaryByNameArgsForCall)
 }
 
-func (fake *FakeOrgActor) GetOrganizationDomainsArgsForCall(i int) string {
-	fake.getOrganizationDomainsMutex.RLock()
-	defer fake.getOrganizationDomainsMutex.RUnlock()
-	return fake.getOrganizationDomainsArgsForCall[i].orgGUID
+func (fake *FakeOrgActor) GetOrganizationSummaryByNameArgsForCall(i int) string {
+	fake.getOrganizationSummaryByNameMutex.RLock()
+	defer fake.getOrganizationSummaryByNameMutex.RUnlock()
+	return fake.getOrganizationSummaryByNameArgsForCall[i].orgName
 }
 
-func (fake *FakeOrgActor) GetOrganizationDomainsReturns(result1 []v2action.Domain, result2 v2action.Warnings, result3 error) {
-	fake.GetOrganizationDomainsStub = nil
-	fake.getOrganizationDomainsReturns = struct {
-		result1 []v2action.Domain
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeOrgActor) GetOrganizationQuota(quotaGUID string) (v2action.OrganizationQuota, v2action.Warnings, error) {
-	fake.getOrganizationQuotaMutex.Lock()
-	fake.getOrganizationQuotaArgsForCall = append(fake.getOrganizationQuotaArgsForCall, struct {
-		quotaGUID string
-	}{quotaGUID})
-	fake.recordInvocation("GetOrganizationQuota", []interface{}{quotaGUID})
-	fake.getOrganizationQuotaMutex.Unlock()
-	if fake.GetOrganizationQuotaStub != nil {
-		return fake.GetOrganizationQuotaStub(quotaGUID)
-	} else {
-		return fake.getOrganizationQuotaReturns.result1, fake.getOrganizationQuotaReturns.result2, fake.getOrganizationQuotaReturns.result3
-	}
-}
-
-func (fake *FakeOrgActor) GetOrganizationQuotaCallCount() int {
-	fake.getOrganizationQuotaMutex.RLock()
-	defer fake.getOrganizationQuotaMutex.RUnlock()
-	return len(fake.getOrganizationQuotaArgsForCall)
-}
-
-func (fake *FakeOrgActor) GetOrganizationQuotaArgsForCall(i int) string {
-	fake.getOrganizationQuotaMutex.RLock()
-	defer fake.getOrganizationQuotaMutex.RUnlock()
-	return fake.getOrganizationQuotaArgsForCall[i].quotaGUID
-}
-
-func (fake *FakeOrgActor) GetOrganizationQuotaReturns(result1 v2action.OrganizationQuota, result2 v2action.Warnings, result3 error) {
-	fake.GetOrganizationQuotaStub = nil
-	fake.getOrganizationQuotaReturns = struct {
-		result1 v2action.OrganizationQuota
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeOrgActor) GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error) {
-	fake.getOrganizationSpacesMutex.Lock()
-	fake.getOrganizationSpacesArgsForCall = append(fake.getOrganizationSpacesArgsForCall, struct {
-		orgGUID string
-	}{orgGUID})
-	fake.recordInvocation("GetOrganizationSpaces", []interface{}{orgGUID})
-	fake.getOrganizationSpacesMutex.Unlock()
-	if fake.GetOrganizationSpacesStub != nil {
-		return fake.GetOrganizationSpacesStub(orgGUID)
-	} else {
-		return fake.getOrganizationSpacesReturns.result1, fake.getOrganizationSpacesReturns.result2, fake.getOrganizationSpacesReturns.result3
-	}
-}
-
-func (fake *FakeOrgActor) GetOrganizationSpacesCallCount() int {
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
-	return len(fake.getOrganizationSpacesArgsForCall)
-}
-
-func (fake *FakeOrgActor) GetOrganizationSpacesArgsForCall(i int) string {
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
-	return fake.getOrganizationSpacesArgsForCall[i].orgGUID
-}
-
-func (fake *FakeOrgActor) GetOrganizationSpacesReturns(result1 []v2action.Space, result2 v2action.Warnings, result3 error) {
-	fake.GetOrganizationSpacesStub = nil
-	fake.getOrganizationSpacesReturns = struct {
-		result1 []v2action.Space
+func (fake *FakeOrgActor) GetOrganizationSummaryByNameReturns(result1 v2action.OrganizationSummary, result2 v2action.Warnings, result3 error) {
+	fake.GetOrganizationSummaryByNameStub = nil
+	fake.getOrganizationSummaryByNameReturns = struct {
+		result1 v2action.OrganizationSummary
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -198,12 +108,8 @@ func (fake *FakeOrgActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
-	fake.getOrganizationDomainsMutex.RLock()
-	defer fake.getOrganizationDomainsMutex.RUnlock()
-	fake.getOrganizationQuotaMutex.RLock()
-	defer fake.getOrganizationQuotaMutex.RUnlock()
-	fake.getOrganizationSpacesMutex.RLock()
-	defer fake.getOrganizationSpacesMutex.RUnlock()
+	fake.getOrganizationSummaryByNameMutex.RLock()
+	defer fake.getOrganizationSummaryByNameMutex.RUnlock()
 	return fake.invocations
 }
 

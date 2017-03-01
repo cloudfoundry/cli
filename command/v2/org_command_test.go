@@ -3,7 +3,9 @@ package v2_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -17,30 +19,54 @@ import (
 
 var _ = Describe("org Command", func() {
 	var (
-		cmd        v2.OrgCommand
-		testUI     *ui.UI
-		fakeConfig *commandfakes.FakeConfig
-		fakeActor  *v2fakes.FakeOrgActor
-		executeErr error
+		cmd             v2.OrgCommand
+		testUI          *ui.UI
+		fakeConfig      *commandfakes.FakeConfig
+		fakeSharedActor *commandfakes.FakeSharedActor
+		fakeActor       *v2fakes.FakeOrgActor
+		binaryName      string
+		executeErr      error
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
+		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeOrgActor)
 
 		cmd = v2.OrgCommand{
-			UI:     testUI,
-			Config: fakeConfig,
-			Actor:  fakeActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			SharedActor: fakeSharedActor,
+			Actor:       fakeActor,
 		}
 
+		binaryName = "faceman"
+		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Organization = "some-org"
 		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when checking the target fails", func() {
+		BeforeEach(func() {
+			fakeSharedActor.CheckTargetReturns(
+				sharedaction.NotLoggedInError{BinaryName: binaryName})
+		})
+
+		It("returns an error", func() {
+			Expect(executeErr).To(MatchError(
+				command.NotLoggedInError{BinaryName: binaryName}))
+
+			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
+			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
+			Expect(config).To(Equal(fakeConfig))
+			Expect(targetedOrganizationRequired).To(Equal(false))
+			Expect(targetedSpaceRequired).To(Equal(false))
+		})
 	})
 
 	Context("when the --guid flag is provided", func() {
@@ -116,39 +142,22 @@ var _ = Describe("org Command", func() {
 					},
 					nil)
 
-				fakeActor.GetOrganizationByNameReturns(
-					v2action.Organization{
-						Name:                "some-org",
-						GUID:                "some-org-guid",
-						QuotaDefinitionGUID: "some-quota-guid",
+				fakeActor.GetOrganizationSummaryByNameReturns(
+					v2action.OrganizationSummary{
+						Name: "some-org",
+						DomainNames: []string{
+							"a-shared.com",
+							"b-private.com",
+							"c-shared.com",
+							"d-private.com",
+						},
+						QuotaName: "some-quota",
+						SpaceNames: []string{
+							"space1",
+							"space2",
+						},
 					},
 					v2action.Warnings{"warning-1", "warning-2"},
-					nil)
-
-				fakeActor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{
-						{Name: "a-shared.com"},
-						{Name: "b-private.com"},
-						{Name: "c-shared.com"},
-						{Name: "d-private.com"},
-					},
-					v2action.Warnings{"warning-3", "warning-4"},
-					nil)
-
-				fakeActor.GetOrganizationQuotaReturns(
-					v2action.OrganizationQuota{
-						GUID: "some-quota-guid",
-						Name: "some-quota",
-					},
-					v2action.Warnings{"warning-5", "warning-6"},
-					nil)
-
-				fakeActor.GetOrganizationSpacesReturns(
-					[]v2action.Space{
-						{Name: "space2"},
-						{Name: "space1"},
-					},
-					v2action.Warnings{"warning-7", "warning-8"},
 					nil)
 			})
 
@@ -158,12 +167,6 @@ var _ = Describe("org Command", func() {
 				Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
-				Expect(testUI.Err).To(Say("warning-3"))
-				Expect(testUI.Err).To(Say("warning-4"))
-				Expect(testUI.Err).To(Say("warning-5"))
-				Expect(testUI.Err).To(Say("warning-6"))
-				Expect(testUI.Err).To(Say("warning-7"))
-				Expect(testUI.Err).To(Say("warning-8"))
 
 				Eventually(testUI.Out).Should(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
 
@@ -175,21 +178,9 @@ var _ = Describe("org Command", func() {
 
 				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
-				Expect(fakeActor.GetOrganizationByNameCallCount()).To(Equal(1))
-				orgName := fakeActor.GetOrganizationByNameArgsForCall(0)
+				Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
+				orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
 				Expect(orgName).To(Equal("some-org"))
-
-				Expect(fakeActor.GetOrganizationDomainsCallCount()).To(Equal(1))
-				orgGUID := fakeActor.GetOrganizationDomainsArgsForCall(0)
-				Expect(orgGUID).To(Equal("some-org-guid"))
-
-				Expect(fakeActor.GetOrganizationQuotaCallCount()).To(Equal(1))
-				quotaGUID := fakeActor.GetOrganizationQuotaArgsForCall(0)
-				Expect(quotaGUID).To(Equal("some-quota-guid"))
-
-				Expect(fakeActor.GetOrganizationSpacesCallCount()).To(Equal(1))
-				orgGUID = fakeActor.GetOrganizationSpacesArgsForCall(0)
-				Expect(orgGUID).To(Equal("some-org-guid"))
 			})
 		})
 
@@ -208,11 +199,11 @@ var _ = Describe("org Command", func() {
 			})
 		})
 
-		Context("when getting the org returns an error", func() {
+		Context("when getting the org summary returns an error", func() {
 			Context("when the error is translatable", func() {
 				BeforeEach(func() {
-					fakeActor.GetOrganizationByNameReturns(
-						v2action.Organization{},
+					fakeActor.GetOrganizationSummaryByNameReturns(
+						v2action.OrganizationSummary{},
 						v2action.Warnings{"warning-1", "warning-2"},
 						v2action.OrganizationNotFoundError{Name: "some-org"})
 				})
@@ -230,8 +221,8 @@ var _ = Describe("org Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("get org error")
-					fakeActor.GetOrganizationByNameReturns(
-						v2action.Organization{},
+					fakeActor.GetOrganizationSummaryByNameReturns(
+						v2action.OrganizationSummary{},
 						v2action.Warnings{"warning-1", "warning-2"},
 						expectedErr)
 				})
@@ -242,81 +233,6 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 				})
-			})
-		})
-
-		Context("when getting the org domain names returns an error", func() {
-			Context("when the error is translatable", func() {
-				BeforeEach(func() {
-					fakeActor.GetOrganizationDomainsReturns(
-						[]v2action.Domain{},
-						v2action.Warnings{"warning-1", "warning-2"},
-						v2action.OrganizationNotFoundError{Name: "some-org"})
-				})
-
-				It("returns a translatable error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-				})
-			})
-
-			Context("when the error is not translatable", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("get org domains error")
-					fakeActor.GetOrganizationDomainsReturns(
-						[]v2action.Domain{},
-						v2action.Warnings{"warning-1", "warning-2"},
-						expectedErr)
-				})
-
-				It("returns the error and all warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-				})
-			})
-		})
-
-		Context("when getting the org quota returns an error", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("get org quota error")
-				fakeActor.GetOrganizationQuotaReturns(
-					v2action.OrganizationQuota{},
-					v2action.Warnings{"warning-1", "warning-2"},
-					expectedErr)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
-			})
-		})
-
-		Context("when getting the org spaces returns an error", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("get org spaces error")
-				fakeActor.GetOrganizationSpacesReturns(
-					[]v2action.Space{},
-					v2action.Warnings{"warning-1", "warning-2"},
-					expectedErr)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
 			})
 		})
 	})

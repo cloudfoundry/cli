@@ -62,7 +62,7 @@ var _ = Describe("org command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("org", orgName)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Authentication error"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
