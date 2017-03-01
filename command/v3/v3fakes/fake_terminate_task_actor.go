@@ -20,6 +20,11 @@ type FakeTerminateTaskActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}
 	GetTaskBySequenceIDAndApplicationStub        func(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error)
 	getTaskBySequenceIDAndApplicationMutex       sync.RWMutex
 	getTaskBySequenceIDAndApplicationArgsForCall []struct {
@@ -27,6 +32,11 @@ type FakeTerminateTaskActor struct {
 		appGUID    string
 	}
 	getTaskBySequenceIDAndApplicationReturns struct {
+		result1 v3action.Task
+		result2 v3action.Warnings
+		result3 error
+	}
+	getTaskBySequenceIDAndApplicationReturnsOnCall map[int]struct {
 		result1 v3action.Task
 		result2 v3action.Warnings
 		result3 error
@@ -41,10 +51,18 @@ type FakeTerminateTaskActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	terminateTaskReturnsOnCall map[int]struct {
+		result1 v3action.Task
+		result2 v3action.Warnings
+		result3 error
+	}
 	CloudControllerAPIVersionStub        func() string
 	cloudControllerAPIVersionMutex       sync.RWMutex
 	cloudControllerAPIVersionArgsForCall []struct{}
 	cloudControllerAPIVersionReturns     struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
 	invocations      map[string][][]interface{}
@@ -53,6 +71,7 @@ type FakeTerminateTaskActor struct {
 
 func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
@@ -61,9 +80,11 @@ func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpace(appName string,
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
 		return fake.GetApplicationByNameAndSpaceStub(appName, spaceGUID)
-	} else {
-		return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 }
 
 func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -87,8 +108,25 @@ func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceReturns(result1 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v3action.Application, result2 v3action.Warnings, result3 error) {
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v3action.Application
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v3action.Application
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
+	ret, specificReturn := fake.getTaskBySequenceIDAndApplicationReturnsOnCall[len(fake.getTaskBySequenceIDAndApplicationArgsForCall)]
 	fake.getTaskBySequenceIDAndApplicationArgsForCall = append(fake.getTaskBySequenceIDAndApplicationArgsForCall, struct {
 		sequenceID int
 		appGUID    string
@@ -97,9 +135,11 @@ func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplication(sequenceID
 	fake.getTaskBySequenceIDAndApplicationMutex.Unlock()
 	if fake.GetTaskBySequenceIDAndApplicationStub != nil {
 		return fake.GetTaskBySequenceIDAndApplicationStub(sequenceID, appGUID)
-	} else {
-		return fake.getTaskBySequenceIDAndApplicationReturns.result1, fake.getTaskBySequenceIDAndApplicationReturns.result2, fake.getTaskBySequenceIDAndApplicationReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getTaskBySequenceIDAndApplicationReturns.result1, fake.getTaskBySequenceIDAndApplicationReturns.result2, fake.getTaskBySequenceIDAndApplicationReturns.result3
 }
 
 func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationCallCount() int {
@@ -123,8 +163,25 @@ func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationReturns(res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationReturnsOnCall(i int, result1 v3action.Task, result2 v3action.Warnings, result3 error) {
+	fake.GetTaskBySequenceIDAndApplicationStub = nil
+	if fake.getTaskBySequenceIDAndApplicationReturnsOnCall == nil {
+		fake.getTaskBySequenceIDAndApplicationReturnsOnCall = make(map[int]struct {
+			result1 v3action.Task
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.getTaskBySequenceIDAndApplicationReturnsOnCall[i] = struct {
+		result1 v3action.Task
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeTerminateTaskActor) TerminateTask(taskGUID string) (v3action.Task, v3action.Warnings, error) {
 	fake.terminateTaskMutex.Lock()
+	ret, specificReturn := fake.terminateTaskReturnsOnCall[len(fake.terminateTaskArgsForCall)]
 	fake.terminateTaskArgsForCall = append(fake.terminateTaskArgsForCall, struct {
 		taskGUID string
 	}{taskGUID})
@@ -132,9 +189,11 @@ func (fake *FakeTerminateTaskActor) TerminateTask(taskGUID string) (v3action.Tas
 	fake.terminateTaskMutex.Unlock()
 	if fake.TerminateTaskStub != nil {
 		return fake.TerminateTaskStub(taskGUID)
-	} else {
-		return fake.terminateTaskReturns.result1, fake.terminateTaskReturns.result2, fake.terminateTaskReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.terminateTaskReturns.result1, fake.terminateTaskReturns.result2, fake.terminateTaskReturns.result3
 }
 
 func (fake *FakeTerminateTaskActor) TerminateTaskCallCount() int {
@@ -158,16 +217,35 @@ func (fake *FakeTerminateTaskActor) TerminateTaskReturns(result1 v3action.Task, 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeTerminateTaskActor) TerminateTaskReturnsOnCall(i int, result1 v3action.Task, result2 v3action.Warnings, result3 error) {
+	fake.TerminateTaskStub = nil
+	if fake.terminateTaskReturnsOnCall == nil {
+		fake.terminateTaskReturnsOnCall = make(map[int]struct {
+			result1 v3action.Task
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.terminateTaskReturnsOnCall[i] = struct {
+		result1 v3action.Task
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeTerminateTaskActor) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
 		return fake.CloudControllerAPIVersionStub()
-	} else {
-		return fake.cloudControllerAPIVersionReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerAPIVersionReturns.result1
 }
 
 func (fake *FakeTerminateTaskActor) CloudControllerAPIVersionCallCount() int {
@@ -179,6 +257,18 @@ func (fake *FakeTerminateTaskActor) CloudControllerAPIVersionCallCount() int {
 func (fake *FakeTerminateTaskActor) CloudControllerAPIVersionReturns(result1 string) {
 	fake.CloudControllerAPIVersionStub = nil
 	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeTerminateTaskActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }

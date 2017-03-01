@@ -19,6 +19,9 @@ type FakeConnectionWrapper struct {
 	makeReturns struct {
 		result1 error
 	}
+	makeReturnsOnCall map[int]struct {
+		result1 error
+	}
 	WrapStub        func(innerconnection cloudcontroller.Connection) cloudcontroller.Connection
 	wrapMutex       sync.RWMutex
 	wrapArgsForCall []struct {
@@ -27,12 +30,16 @@ type FakeConnectionWrapper struct {
 	wrapReturns struct {
 		result1 cloudcontroller.Connection
 	}
+	wrapReturnsOnCall map[int]struct {
+		result1 cloudcontroller.Connection
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	fake.makeMutex.Lock()
+	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
 		request        *http.Request
 		passedResponse *cloudcontroller.Response
@@ -41,9 +48,11 @@ func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *c
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
 		return fake.MakeStub(request, passedResponse)
-	} else {
-		return fake.makeReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.makeReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) MakeCallCount() int {
@@ -65,8 +74,21 @@ func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeConnectionWrapper) MakeReturnsOnCall(i int, result1 error) {
+	fake.MakeStub = nil
+	if fake.makeReturnsOnCall == nil {
+		fake.makeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.makeReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeConnectionWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	fake.wrapMutex.Lock()
+	ret, specificReturn := fake.wrapReturnsOnCall[len(fake.wrapArgsForCall)]
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
 		innerconnection cloudcontroller.Connection
 	}{innerconnection})
@@ -74,9 +96,11 @@ func (fake *FakeConnectionWrapper) Wrap(innerconnection cloudcontroller.Connecti
 	fake.wrapMutex.Unlock()
 	if fake.WrapStub != nil {
 		return fake.WrapStub(innerconnection)
-	} else {
-		return fake.wrapReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.wrapReturns.result1
 }
 
 func (fake *FakeConnectionWrapper) WrapCallCount() int {
@@ -94,6 +118,18 @@ func (fake *FakeConnectionWrapper) WrapArgsForCall(i int) cloudcontroller.Connec
 func (fake *FakeConnectionWrapper) WrapReturns(result1 cloudcontroller.Connection) {
 	fake.WrapStub = nil
 	fake.wrapReturns = struct {
+		result1 cloudcontroller.Connection
+	}{result1}
+}
+
+func (fake *FakeConnectionWrapper) WrapReturnsOnCall(i int, result1 cloudcontroller.Connection) {
+	fake.WrapStub = nil
+	if fake.wrapReturnsOnCall == nil {
+		fake.wrapReturnsOnCall = make(map[int]struct {
+			result1 cloudcontroller.Connection
+		})
+	}
+	fake.wrapReturnsOnCall[i] = struct {
 		result1 cloudcontroller.Connection
 	}{result1}
 }

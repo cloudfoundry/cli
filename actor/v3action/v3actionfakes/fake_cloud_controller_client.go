@@ -16,6 +16,9 @@ type FakeCloudControllerClient struct {
 	cloudControllerAPIVersionReturns     struct {
 		result1 string
 	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
 	GetApplicationTasksStub        func(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error)
 	getApplicationTasksMutex       sync.RWMutex
 	getApplicationTasksArgsForCall []struct {
@@ -27,12 +30,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	getApplicationTasksReturnsOnCall map[int]struct {
+		result1 []ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetApplicationsStub        func(query url.Values) ([]ccv3.Application, ccv3.Warnings, error)
 	getApplicationsMutex       sync.RWMutex
 	getApplicationsArgsForCall []struct {
 		query url.Values
 	}
 	getApplicationsReturns struct {
+		result1 []ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationsReturnsOnCall map[int]struct {
 		result1 []ccv3.Application
 		result2 ccv3.Warnings
 		result3 error
@@ -51,6 +64,11 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	newTaskReturnsOnCall map[int]struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	updateTaskMutex       sync.RWMutex
 	updateTaskArgsForCall []struct {
@@ -61,20 +79,28 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	updateTaskReturnsOnCall map[int]struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeCloudControllerClient) CloudControllerAPIVersion() string {
 	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
 	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
 	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
 	fake.cloudControllerAPIVersionMutex.Unlock()
 	if fake.CloudControllerAPIVersionStub != nil {
 		return fake.CloudControllerAPIVersionStub()
-	} else {
-		return fake.cloudControllerAPIVersionReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerAPIVersionReturns.result1
 }
 
 func (fake *FakeCloudControllerClient) CloudControllerAPIVersionCallCount() int {
@@ -90,8 +116,21 @@ func (fake *FakeCloudControllerClient) CloudControllerAPIVersionReturns(result1 
 	}{result1}
 }
 
+func (fake *FakeCloudControllerClient) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeCloudControllerClient) GetApplicationTasks(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error) {
 	fake.getApplicationTasksMutex.Lock()
+	ret, specificReturn := fake.getApplicationTasksReturnsOnCall[len(fake.getApplicationTasksArgsForCall)]
 	fake.getApplicationTasksArgsForCall = append(fake.getApplicationTasksArgsForCall, struct {
 		appGUID string
 		query   url.Values
@@ -100,9 +139,11 @@ func (fake *FakeCloudControllerClient) GetApplicationTasks(appGUID string, query
 	fake.getApplicationTasksMutex.Unlock()
 	if fake.GetApplicationTasksStub != nil {
 		return fake.GetApplicationTasksStub(appGUID, query)
-	} else {
-		return fake.getApplicationTasksReturns.result1, fake.getApplicationTasksReturns.result2, fake.getApplicationTasksReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationTasksReturns.result1, fake.getApplicationTasksReturns.result2, fake.getApplicationTasksReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) GetApplicationTasksCallCount() int {
@@ -126,8 +167,25 @@ func (fake *FakeCloudControllerClient) GetApplicationTasksReturns(result1 []ccv3
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetApplicationTasksReturnsOnCall(i int, result1 []ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.GetApplicationTasksStub = nil
+	if fake.getApplicationTasksReturnsOnCall == nil {
+		fake.getApplicationTasksReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Task
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationTasksReturnsOnCall[i] = struct {
+		result1 []ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetApplications(query url.Values) ([]ccv3.Application, ccv3.Warnings, error) {
 	fake.getApplicationsMutex.Lock()
+	ret, specificReturn := fake.getApplicationsReturnsOnCall[len(fake.getApplicationsArgsForCall)]
 	fake.getApplicationsArgsForCall = append(fake.getApplicationsArgsForCall, struct {
 		query url.Values
 	}{query})
@@ -135,9 +193,11 @@ func (fake *FakeCloudControllerClient) GetApplications(query url.Values) ([]ccv3
 	fake.getApplicationsMutex.Unlock()
 	if fake.GetApplicationsStub != nil {
 		return fake.GetApplicationsStub(query)
-	} else {
-		return fake.getApplicationsReturns.result1, fake.getApplicationsReturns.result2, fake.getApplicationsReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationsReturns.result1, fake.getApplicationsReturns.result2, fake.getApplicationsReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) GetApplicationsCallCount() int {
@@ -161,8 +221,25 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturns(result1 []ccv3.App
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetApplicationsReturnsOnCall(i int, result1 []ccv3.Application, result2 ccv3.Warnings, result3 error) {
+	fake.GetApplicationsStub = nil
+	if fake.getApplicationsReturnsOnCall == nil {
+		fake.getApplicationsReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Application
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationsReturnsOnCall[i] = struct {
+		result1 []ccv3.Application
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) NewTask(appGUID string, command string, name string, memory uint64, disk uint64) (ccv3.Task, ccv3.Warnings, error) {
 	fake.newTaskMutex.Lock()
+	ret, specificReturn := fake.newTaskReturnsOnCall[len(fake.newTaskArgsForCall)]
 	fake.newTaskArgsForCall = append(fake.newTaskArgsForCall, struct {
 		appGUID string
 		command string
@@ -174,9 +251,11 @@ func (fake *FakeCloudControllerClient) NewTask(appGUID string, command string, n
 	fake.newTaskMutex.Unlock()
 	if fake.NewTaskStub != nil {
 		return fake.NewTaskStub(appGUID, command, name, memory, disk)
-	} else {
-		return fake.newTaskReturns.result1, fake.newTaskReturns.result2, fake.newTaskReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.newTaskReturns.result1, fake.newTaskReturns.result2, fake.newTaskReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) NewTaskCallCount() int {
@@ -200,8 +279,25 @@ func (fake *FakeCloudControllerClient) NewTaskReturns(result1 ccv3.Task, result2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) NewTaskReturnsOnCall(i int, result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.NewTaskStub = nil
+	if fake.newTaskReturnsOnCall == nil {
+		fake.newTaskReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Task
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.newTaskReturnsOnCall[i] = struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
 	fake.updateTaskMutex.Lock()
+	ret, specificReturn := fake.updateTaskReturnsOnCall[len(fake.updateTaskArgsForCall)]
 	fake.updateTaskArgsForCall = append(fake.updateTaskArgsForCall, struct {
 		taskGUID string
 	}{taskGUID})
@@ -209,9 +305,11 @@ func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, c
 	fake.updateTaskMutex.Unlock()
 	if fake.UpdateTaskStub != nil {
 		return fake.UpdateTaskStub(taskGUID)
-	} else {
-		return fake.updateTaskReturns.result1, fake.updateTaskReturns.result2, fake.updateTaskReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateTaskReturns.result1, fake.updateTaskReturns.result2, fake.updateTaskReturns.result3
 }
 
 func (fake *FakeCloudControllerClient) UpdateTaskCallCount() int {
@@ -229,6 +327,22 @@ func (fake *FakeCloudControllerClient) UpdateTaskArgsForCall(i int) string {
 func (fake *FakeCloudControllerClient) UpdateTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
 	fake.UpdateTaskStub = nil
 	fake.updateTaskReturns = struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateTaskReturnsOnCall(i int, result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateTaskStub = nil
+	if fake.updateTaskReturnsOnCall == nil {
+		fake.updateTaskReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Task
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateTaskReturnsOnCall[i] = struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error

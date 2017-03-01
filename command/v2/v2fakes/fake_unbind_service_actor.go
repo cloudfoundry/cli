@@ -20,12 +20,17 @@ type FakeUnbindServiceActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	unbindServiceBySpaceReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error) {
 	fake.unbindServiceBySpaceMutex.Lock()
+	ret, specificReturn := fake.unbindServiceBySpaceReturnsOnCall[len(fake.unbindServiceBySpaceArgsForCall)]
 	fake.unbindServiceBySpaceArgsForCall = append(fake.unbindServiceBySpaceArgsForCall, struct {
 		appName             string
 		serviceInstanceName string
@@ -35,9 +40,11 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, service
 	fake.unbindServiceBySpaceMutex.Unlock()
 	if fake.UnbindServiceBySpaceStub != nil {
 		return fake.UnbindServiceBySpaceStub(appName, serviceInstanceName, spaceGUID)
-	} else {
-		return fake.unbindServiceBySpaceReturns.result1, fake.unbindServiceBySpaceReturns.result2
 	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.unbindServiceBySpaceReturns.result1, fake.unbindServiceBySpaceReturns.result2
 }
 
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceCallCount() int {
@@ -55,6 +62,20 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceArgsForCall(i int) (stri
 func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action.Warnings, result2 error) {
 	fake.UnbindServiceBySpaceStub = nil
 	fake.unbindServiceBySpaceReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.UnbindServiceBySpaceStub = nil
+	if fake.unbindServiceBySpaceReturnsOnCall == nil {
+		fake.unbindServiceBySpaceReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.unbindServiceBySpaceReturnsOnCall[i] = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}

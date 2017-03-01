@@ -19,12 +19,16 @@ type FakeSharedActor struct {
 	checkTargetReturns struct {
 		result1 error
 	}
+	checkTargetReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSharedActor) CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
 	fake.checkTargetMutex.Lock()
+	ret, specificReturn := fake.checkTargetReturnsOnCall[len(fake.checkTargetArgsForCall)]
 	fake.checkTargetArgsForCall = append(fake.checkTargetArgsForCall, struct {
 		config                       sharedaction.Config
 		targetedOrganizationRequired bool
@@ -34,9 +38,11 @@ func (fake *FakeSharedActor) CheckTarget(config sharedaction.Config, targetedOrg
 	fake.checkTargetMutex.Unlock()
 	if fake.CheckTargetStub != nil {
 		return fake.CheckTargetStub(config, targetedOrganizationRequired, targetedSpaceRequired)
-	} else {
-		return fake.checkTargetReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.checkTargetReturns.result1
 }
 
 func (fake *FakeSharedActor) CheckTargetCallCount() int {
@@ -54,6 +60,18 @@ func (fake *FakeSharedActor) CheckTargetArgsForCall(i int) (sharedaction.Config,
 func (fake *FakeSharedActor) CheckTargetReturns(result1 error) {
 	fake.CheckTargetStub = nil
 	fake.checkTargetReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSharedActor) CheckTargetReturnsOnCall(i int, result1 error) {
+	fake.CheckTargetStub = nil
+	if fake.checkTargetReturnsOnCall == nil {
+		fake.checkTargetReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.checkTargetReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }

@@ -14,6 +14,9 @@ type FakeTokenCache struct {
 	refreshTokenReturns     struct {
 		result1 string
 	}
+	refreshTokenReturnsOnCall map[int]struct {
+		result1 string
+	}
 	SetAccessTokenStub        func(token string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
@@ -30,14 +33,17 @@ type FakeTokenCache struct {
 
 func (fake *FakeTokenCache) RefreshToken() string {
 	fake.refreshTokenMutex.Lock()
+	ret, specificReturn := fake.refreshTokenReturnsOnCall[len(fake.refreshTokenArgsForCall)]
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
 	fake.recordInvocation("RefreshToken", []interface{}{})
 	fake.refreshTokenMutex.Unlock()
 	if fake.RefreshTokenStub != nil {
 		return fake.RefreshTokenStub()
-	} else {
-		return fake.refreshTokenReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.refreshTokenReturns.result1
 }
 
 func (fake *FakeTokenCache) RefreshTokenCallCount() int {
@@ -49,6 +55,18 @@ func (fake *FakeTokenCache) RefreshTokenCallCount() int {
 func (fake *FakeTokenCache) RefreshTokenReturns(result1 string) {
 	fake.RefreshTokenStub = nil
 	fake.refreshTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeTokenCache) RefreshTokenReturnsOnCall(i int, result1 string) {
+	fake.RefreshTokenStub = nil
+	if fake.refreshTokenReturnsOnCall == nil {
+		fake.refreshTokenReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.refreshTokenReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }

@@ -20,6 +20,11 @@ type FakeAppActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
 	GetApplicationSummaryByNameAndSpaceStub        func(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
 	getApplicationSummaryByNameAndSpaceMutex       sync.RWMutex
 	getApplicationSummaryByNameAndSpaceArgsForCall []struct {
@@ -31,12 +36,18 @@ type FakeAppActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	getApplicationSummaryByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v2action.ApplicationSummary
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeAppActor) GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
 		name      string
 		spaceGUID string
@@ -45,9 +56,11 @@ func (fake *FakeAppActor) GetApplicationByNameAndSpace(name string, spaceGUID st
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
 		return fake.GetApplicationByNameAndSpaceStub(name, spaceGUID)
-	} else {
-		return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 }
 
 func (fake *FakeAppActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -71,8 +84,25 @@ func (fake *FakeAppActor) GetApplicationByNameAndSpaceReturns(result1 v2action.A
 	}{result1, result2, result3}
 }
 
+func (fake *FakeAppActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v2action.Application
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error) {
 	fake.getApplicationSummaryByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[len(fake.getApplicationSummaryByNameAndSpaceArgsForCall)]
 	fake.getApplicationSummaryByNameAndSpaceArgsForCall = append(fake.getApplicationSummaryByNameAndSpaceArgsForCall, struct {
 		name      string
 		spaceGUID string
@@ -81,9 +111,11 @@ func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpace(name string, space
 	fake.getApplicationSummaryByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationSummaryByNameAndSpaceStub != nil {
 		return fake.GetApplicationSummaryByNameAndSpaceStub(name, spaceGUID)
-	} else {
-		return fake.getApplicationSummaryByNameAndSpaceReturns.result1, fake.getApplicationSummaryByNameAndSpaceReturns.result2, fake.getApplicationSummaryByNameAndSpaceReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationSummaryByNameAndSpaceReturns.result1, fake.getApplicationSummaryByNameAndSpaceReturns.result2, fake.getApplicationSummaryByNameAndSpaceReturns.result3
 }
 
 func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpaceCallCount() int {
@@ -101,6 +133,22 @@ func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpaceArgsForCall(i int) 
 func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpaceReturns(result1 v2action.ApplicationSummary, result2 v2action.Warnings, result3 error) {
 	fake.GetApplicationSummaryByNameAndSpaceStub = nil
 	fake.getApplicationSummaryByNameAndSpaceReturns = struct {
+		result1 v2action.ApplicationSummary
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeAppActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i int, result1 v2action.ApplicationSummary, result2 v2action.Warnings, result3 error) {
+	fake.GetApplicationSummaryByNameAndSpaceStub = nil
+	if fake.getApplicationSummaryByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationSummaryByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v2action.ApplicationSummary
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationSummaryByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v2action.ApplicationSummary
 		result2 v2action.Warnings
 		result3 error

@@ -20,12 +20,18 @@ type FakeGetHealthCheckActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	getApplicationByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationByNameAndSpaceReturnsOnCall[len(fake.getApplicationByNameAndSpaceArgsForCall)]
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
 		name      string
 		spaceGUID string
@@ -34,9 +40,11 @@ func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpace(name string, s
 	fake.getApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationByNameAndSpaceStub != nil {
 		return fake.GetApplicationByNameAndSpaceStub(name, spaceGUID)
-	} else {
-		return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationByNameAndSpaceReturns.result1, fake.getApplicationByNameAndSpaceReturns.result2, fake.getApplicationByNameAndSpaceReturns.result3
 }
 
 func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpaceCallCount() int {
@@ -54,6 +62,22 @@ func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpaceArgsForCall(i i
 func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpaceReturns(result1 v2action.Application, result2 v2action.Warnings, result3 error) {
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeGetHealthCheckActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.GetApplicationByNameAndSpaceStub = nil
+	if fake.getApplicationByNameAndSpaceReturnsOnCall == nil {
+		fake.getApplicationByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v2action.Application
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationByNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v2action.Application
 		result2 v2action.Warnings
 		result3 error
