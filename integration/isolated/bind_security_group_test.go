@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("create-user command", func() {
+var _ = Describe("bind-security-group command", func() {
 	var (
 		orgName    string
 		spaceName1 string
@@ -16,7 +16,7 @@ var _ = FDescribe("create-user command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("app command refactor is still experimental")
+		helpers.RunIfExperimental("bind-security-group command refactor is still experimental")
 		orgName = helpers.NewOrgName()
 		spaceName1 = helpers.PrefixedRandomName("SPACE")
 		spaceName2 = helpers.PrefixedRandomName("SPACE")
@@ -120,31 +120,61 @@ var _ = FDescribe("create-user command", func() {
 
 		Context("when the org exists", func() {
 			BeforeEach(func() {
-				helpers.CreateOrgAndSpace(orgName, spaceName1)
-				helpers.CreateSpace(spaceName2)
+				helpers.CreateOrg(orgName)
+				helpers.TargetOrg(orgName)
 			})
 
 			Context("when binding to all spaces in an org", func() {
-				It("binds the security group to each space", func() {
-					session := helpers.CF("bind-security-group", "some-security-group", orgName)
-					Eventually(session).Should(Exit(0))
-					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
-					Expect(session.Out).To(Say("OK"))
-					Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
-					Expect(session.Out).To(Say("OK"))
-					Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+				Context("when there are spaces in this org", func() {
+					BeforeEach(func() {
+						helpers.CreateSpace(spaceName1)
+						helpers.CreateSpace(spaceName2)
+					})
+					It("binds the security group to each space", func() {
+						session := helpers.CF("bind-security-group", "some-security-group", orgName)
+						Eventually(session).Should(Exit(0))
+						userName, _ := helpers.GetCredentials()
+						Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
+						Expect(session.Out).To(Say("OK"))
+						Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
+						Expect(session.Out).To(Say("OK"))
+						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+					})
+				})
+
+				Context("when there are no spaces in this org", func() {
+					It("does not bind the security group to any space", func() {
+						session := helpers.CF("bind-security-group", "some-security-group", orgName)
+						Eventually(session).Should(Exit(0))
+						Consistently(session.Out).ShouldNot(Say("Assigning security group"))
+						Consistently(session.Out).ShouldNot(Say("OK"))
+						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+					})
 				})
 			})
 
 			Context("when binding to a particular space", func() {
-				It("binds the security group to the space", func() {
-					session := helpers.CF("bind-security-group", "some-security-group", orgName, spaceName1)
-					Eventually(session).Should(Exit(0))
-					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say("Assigning security group some-security-group to space %s in org %s as %s...", spaceName1, orgName, userName))
-					Expect(session.Out).To(Say("OK"))
-					Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+				Context("when the space exists", func() {
+					BeforeEach(func() {
+						helpers.CreateSpace(spaceName1)
+					})
+					It("binds the security group to the space", func() {
+						session := helpers.CF("bind-security-group", "some-security-group", orgName, spaceName1)
+						Eventually(session).Should(Exit(0))
+						userName, _ := helpers.GetCredentials()
+						Expect(session.Out).To(Say("Assigning security group some-security-group to space %s in org %s as %s...", spaceName1, orgName, userName))
+						Expect(session.Out).To(Say("OK"))
+						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+					})
+				})
+				Context("when the space doesn't exist", func() {
+					It("fails with a space not found message", func() {
+						session := helpers.CF("bind-security-group", "some-security-group", orgName, "space-doesnt-exist")
+						Eventually(session).Should(Exit(1))
+						Expect(session.Err).To(Say("space space-doesnt-exist not found."))
+						Expect(session.Out).To(Say("FAILED"))
+
+					})
 				})
 			})
 		})
