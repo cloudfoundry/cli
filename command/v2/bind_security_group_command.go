@@ -14,10 +14,10 @@ import (
 //go:generate counterfeiter . BindSecurityGroupActor
 
 type BindSecurityGroupActor interface {
+	GetSecurityGroupByName(securityGroupName string) (v2action.SecurityGroup, v2action.Warnings, error)
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
-	GetSecurityGroupByName(securityGroupName string) (v2action.SecurityGroup, v2action.Warnings, error)
 	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string) (v2action.Warnings, error)
 }
 
@@ -60,7 +60,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	_, err = cmd.Config.CurrentUser()
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
 	}
@@ -77,21 +77,40 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
+	spacesToBind := []v2action.Space{}
 	if cmd.RequiredArgs.SpaceName != "" {
 		space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.RequiredArgs.SpaceName)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
 		}
-
-		warnings, _ = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID)
+		spacesToBind = append(spacesToBind, space)
+	} else {
+		spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return shared.HandleError(err)
+		}
+		spacesToBind = append(spacesToBind, spaces...)
 	}
 
-	// security group,
-	// get security group
-	// get org
-	// get space OR get spaces in org
-	// for each space, bind security group
+	for _, space := range spacesToBind {
+		cmd.UI.DisplayText("Assigning security group {{.SecurityGroupName}} to space {{.SpaceName}} in org {{.OrgName}} as {{.UserName}}...", map[string]interface{}{
+			"SecurityGroupName": securityGroup.Name,
+			"SpaceName":         space.Name,
+			"OrgName":           org.Name,
+			"UserName":          user.Name,
+		})
+
+		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return shared.HandleError(err)
+		}
+
+		cmd.UI.DisplayOK()
+	}
+
+	cmd.UI.DisplayText("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return nil
 }

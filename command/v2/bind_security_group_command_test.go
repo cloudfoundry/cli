@@ -41,28 +41,27 @@ var _ = Describe("bind-security-group Command", func() {
 			Actor:       fakeActor,
 		}
 
-		cmd.RequiredArgs.SecurityGroupName = "some-security-group"
-		cmd.RequiredArgs.OrganizationName = "some-org"
-
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+
 		// TODO: remove when experimental flag is removed
 		fakeConfig.ExperimentalReturns(true)
 
-		// Stubs for the happy path
+		// Stubs for the happy path.
+		cmd.RequiredArgs.SecurityGroupName = "some-security-group"
+		cmd.RequiredArgs.OrganizationName = "some-org"
+
 		fakeConfig.CurrentUserReturns(
 			configv3.User{Name: "some-user"},
 			nil)
 		fakeActor.GetSecurityGroupByNameReturns(
 			v2action.SecurityGroup{Name: "some-security-group", GUID: "some-security-group-guid"},
 			v2action.Warnings{"get security group warning"},
-			nil,
-		)
+			nil)
 		fakeActor.GetOrganizationByNameReturns(
 			v2action.Organization{Name: "some-org", GUID: "some-org-guid"},
 			v2action.Warnings{"get org warning"},
-			nil,
-		)
+			nil)
 	})
 
 	JustBeforeEach(func() {
@@ -109,12 +108,28 @@ var _ = Describe("bind-security-group Command", func() {
 			fakeActor.GetSecurityGroupByNameReturns(
 				v2action.SecurityGroup{},
 				v2action.Warnings{"get security group warning"},
-				v2action.SecurityGroupNotFoundError{Name: "some-security-group"},
-			)
+				v2action.SecurityGroupNotFoundError{Name: "some-security-group"})
 		})
 
 		It("returns a SecurityGroupNotFoundError and displays all warnings", func() {
 			Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
+			Expect(testUI.Err).To(Say("get security group warning"))
+		})
+	})
+
+	Context("when an error is encountered getting the provided security group", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = errors.New("get security group error")
+			fakeActor.GetSecurityGroupByNameReturns(
+				v2action.SecurityGroup{},
+				v2action.Warnings{"get security group warning"},
+				expectedErr)
+		})
+
+		It("returns the error and displays all warnings", func() {
+			Expect(executeErr).To(MatchError(expectedErr))
 			Expect(testUI.Err).To(Say("get security group warning"))
 		})
 	})
@@ -124,13 +139,31 @@ var _ = Describe("bind-security-group Command", func() {
 			fakeActor.GetOrganizationByNameReturns(
 				v2action.Organization{},
 				v2action.Warnings{"get organization warning"},
-				v2action.OrganizationNotFoundError{Name: "some-org"},
-			)
+				v2action.OrganizationNotFoundError{Name: "some-org"})
 		})
 
 		It("returns an OrganizationNotFoundError and displays all warnings", func() {
 			Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+			Expect(testUI.Err).To(Say("get security group warning"))
 			Expect(testUI.Err).To(Say("get organization warning"))
+		})
+	})
+
+	Context("when an error is encountered getting the provided org", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = errors.New("get org error")
+			fakeActor.GetOrganizationByNameReturns(
+				v2action.Organization{},
+				v2action.Warnings{"get org warning"},
+				expectedErr)
+		})
+
+		It("returns the error and displays all warnings", func() {
+			Expect(executeErr).To(MatchError(expectedErr))
+			Expect(testUI.Err).To(Say("get security group warning"))
+			Expect(testUI.Err).To(Say("get org warning"))
 		})
 	})
 
@@ -144,35 +177,205 @@ var _ = Describe("bind-security-group Command", func() {
 				fakeActor.GetSpaceByOrganizationAndNameReturns(
 					v2action.Space{},
 					v2action.Warnings{"get space warning"},
-					v2action.SpaceNotFoundError{Name: "some-space"},
-				)
+					v2action.SpaceNotFoundError{Name: "some-space"})
 			})
 
 			It("returns a SpaceNotFoundError", func() {
 				Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+				Expect(testUI.Err).To(Say("get security group warning"))
+				Expect(testUI.Err).To(Say("get org warning"))
 				Expect(testUI.Err).To(Say("get space warning"))
 			})
 		})
 
-		Context("when the space does exist", func() {
+		Context("when the space exists", func() {
 			BeforeEach(func() {
 				fakeActor.GetSpaceByOrganizationAndNameReturns(
-					v2action.Space{GUID: "some-space-guid"},
+					v2action.Space{
+						GUID: "some-space-guid",
+						Name: "some-space",
+					},
 					v2action.Warnings{"get space by org warning"},
-					nil,
-				)
+					nil)
 			})
 
-			It("binds the security group to the space and displays all warnings", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
-				Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
-				securityGroupGUID, spaceGUID := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
-				Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
+			Context("when no errors are encountered binding the security group to the space", func() {
+				BeforeEach(func() {
+					fakeActor.BindSecurityGroupToSpaceReturns(
+						v2action.Warnings{"bind security group to space warning"},
+						nil)
+				})
 
+				It("binds the security group to the space and displays all warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+
+					Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space in org some-org as some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+
+					Expect(testUI.Err).To(Say("get security group warning"))
+					Expect(testUI.Err).To(Say("get org warning"))
+					Expect(testUI.Err).To(Say("get space by org warning"))
+					Expect(testUI.Err).To(Say("bind security group to space warning"))
+				})
+			})
+
+			Context("when an error is encountered binding the security group to the space", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("bind error")
+					fakeActor.BindSecurityGroupToSpaceReturns(
+						v2action.Warnings{"bind security group to space warning"},
+						expectedErr)
+				})
+
+				It("returns the error and displays all warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+
+					Consistently(testUI.Out).ShouldNot(Say("OK"))
+
+					Expect(testUI.Err).To(Say("get security group warning"))
+					Expect(testUI.Err).To(Say("get org warning"))
+					Expect(testUI.Err).To(Say("get space by org warning"))
+					Expect(testUI.Err).To(Say("bind security group to space warning"))
+				})
+			})
+		})
+
+		Context("when an error is encountered getting the space", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("get org error")
+				fakeActor.GetSpaceByOrganizationAndNameReturns(
+					v2action.Space{},
+					v2action.Warnings{"get space by org warning"},
+					expectedErr)
+			})
+
+			It("returns the error and displays all warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
 				Expect(testUI.Err).To(Say("get security group warning"))
 				Expect(testUI.Err).To(Say("get org warning"))
 				Expect(testUI.Err).To(Say("get space by org warning"))
+			})
+		})
+	})
+
+	Context("when a space is not provided", func() {
+		Context("when there are no spaces in the org", func() {
+			BeforeEach(func() {
+				fakeActor.GetOrganizationSpacesReturns(
+					[]v2action.Space{},
+					v2action.Warnings{"get org spaces warning"},
+					nil)
+			})
+
+			It("does not perform any bindings and displays all warnings", func() {
+				Expect(executeErr).NotTo(HaveOccurred())
+
+				Consistently(testUI.Out).ShouldNot(Say("Assigning security group"))
+				Consistently(testUI.Out).ShouldNot(Say("OK"))
+
+				Expect(testUI.Err).To(Say("get security group warning"))
+				Expect(testUI.Err).To(Say("get org warning"))
+				Expect(testUI.Err).To(Say("get org spaces warning"))
+			})
+		})
+
+		Context("when there are spaces in the org", func() {
+			BeforeEach(func() {
+				fakeActor.GetOrganizationSpacesReturns(
+					[]v2action.Space{
+						{
+							GUID: "some-space-guid-1",
+							Name: "some-space-1",
+						},
+						{
+							GUID: "some-space-guid-2",
+							Name: "some-space-2",
+						},
+					},
+					v2action.Warnings{"get org spaces warning"},
+					nil)
+			})
+
+			Context("when no errors are encountered binding the security group to the spaces", func() {
+				BeforeEach(func() {
+					fakeActor.BindSecurityGroupToSpaceReturns(
+						v2action.Warnings{"bind security group to space warning"},
+						nil)
+				})
+
+				It("binds the security group to each space and displays all warnings", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-1 in org some-org as some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Assigning security group some-security-group to space some-space-2 in org some-org as some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+
+					Expect(testUI.Err).To(Say("get security group warning"))
+					Expect(testUI.Err).To(Say("get org warning"))
+					Expect(testUI.Err).To(Say("get org spaces warning"))
+					Expect(testUI.Err).To(Say("bind security group to space warning"))
+					Expect(testUI.Err).To(Say("bind security group to space warning"))
+
+					Expect(fakeActor.BindSecurityGroupToSpaceCallCount()).To(Equal(2))
+					securityGroupGUID, spaceGUID := fakeActor.BindSecurityGroupToSpaceArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid-1"))
+					securityGroupGUID, spaceGUID = fakeActor.BindSecurityGroupToSpaceArgsForCall(1)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid-2"))
+				})
+			})
+
+			Context("when an error is encountered binding the security group to a space", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("bind security group to space error")
+					fakeActor.BindSecurityGroupToSpaceReturns(
+						v2action.Warnings{"bind security group to space warning"},
+						expectedErr)
+				})
+
+				It("returns the error and displays all warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+
+					Consistently(testUI.Out).ShouldNot(Say("OK"))
+
+					Expect(testUI.Err).To(Say("get security group warning"))
+					Expect(testUI.Err).To(Say("get org warning"))
+					Expect(testUI.Err).To(Say("get org spaces warning"))
+					Expect(testUI.Err).To(Say("bind security group to space warning"))
+				})
+			})
+		})
+
+		Context("when an error is encountered getting spaces in the org", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("get org spaces error")
+				fakeActor.GetOrganizationSpacesReturns(
+					nil,
+					v2action.Warnings{"get org spaces warning"},
+					expectedErr)
+			})
+
+			It("returns the error and displays all warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(testUI.Err).To(Say("get security group warning"))
+				Expect(testUI.Err).To(Say("get org warning"))
+				Expect(testUI.Err).To(Say("get org spaces warning"))
 			})
 		})
 	})
