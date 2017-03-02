@@ -44,6 +44,10 @@ var _ = Describe("HandleError", func() {
 			v2action.ApplicationNotFoundError{Name: "some-app"},
 			command.ApplicationNotFoundError{Name: "some-app"}),
 
+		Entry("v2action.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
+			v2action.SecurityGroupNotFoundError{Name: "some-security-group"},
+			SecurityGroupNotFoundError{Name: "some-security-group"}),
+
 		Entry("v2action.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError",
 			v2action.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			command.ServiceInstanceNotFoundError{Name: "some-service-instance"}),
