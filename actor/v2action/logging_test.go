@@ -141,8 +141,8 @@ var _ = Describe("Logging Actions", func() {
 					waiting = make(chan bool)
 					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
 						go func() {
-							close(waiting)
 							errStream <- nil
+							close(waiting)
 						}()
 
 						return eventStream, errStream
