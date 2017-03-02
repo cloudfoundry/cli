@@ -206,24 +206,6 @@ var _ = Describe("Logging Actions", func() {
 						Consistently(errs).ShouldNot(Receive())
 					})
 				})
-
-				Context("when NOAA is unable to recover", func() {
-					BeforeEach(func() {
-						Skip("waiting on NOAA #140000891")
-						fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
-							go func() {
-								errStream <- noaaErrors.NewRetryError(errors.New("error 1"))
-								errStream <- noaaErrors.NewRetryError(errors.New("error 2"))
-							}()
-
-							return eventStream, errStream
-						}
-					})
-
-					It("returns a NOAATimeoutError", func() {
-						Eventually(errs).Should(Receive(MatchError(NOAATimeoutError{})))
-					})
-				})
 			})
 		})
 	})
