@@ -129,12 +129,19 @@ var _ = Describe("Logging Actions", func() {
 		})
 
 		Context("when receiving errors", func() {
-			var err1, err2 error
+			var (
+				err1 error
+				err2 error
+
+				waiting chan bool
+			)
 
 			Describe("nil error", func() {
 				BeforeEach(func() {
+					waiting = make(chan bool)
 					fakeNOAAClient.TailingLogsStub = func(_ string, _ string) (<-chan *events.LogMessage, <-chan error) {
 						go func() {
+							close(waiting)
 							errStream <- nil
 						}()
 
@@ -143,6 +150,7 @@ var _ = Describe("Logging Actions", func() {
 				})
 
 				It("does not pass the nil along", func() {
+					Eventually(waiting).Should(BeClosed())
 					Consistently(errs).ShouldNot(Receive())
 				})
 			})
