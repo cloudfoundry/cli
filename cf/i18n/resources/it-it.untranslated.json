@@ -1040,6 +1040,10 @@
     "translation": ""
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
     "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
   },

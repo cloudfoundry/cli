@@ -110,7 +110,7 @@ var _ = Describe("UI", func() {
 		})
 
 		It("displays the passed in string", func() {
-			ui.DisplayBoolPrompt("some-prompt", false)
+			ui.DisplayBoolPrompt(false, "some-prompt", nil)
 			Expect(ui.Out).To(Say("some-prompt\x1b\\[36;1m>>\x1b\\[0m"))
 		})
 
@@ -120,7 +120,7 @@ var _ = Describe("UI", func() {
 			})
 
 			It("returns true", func() {
-				response, err := ui.DisplayBoolPrompt("some-prompt", false)
+				response, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(response).To(BeTrue())
 			})
@@ -132,7 +132,7 @@ var _ = Describe("UI", func() {
 			})
 
 			It("returns false", func() {
-				response, err := ui.DisplayBoolPrompt("some-prompt", true)
+				response, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(response).To(BeFalse())
 			})
@@ -145,7 +145,7 @@ var _ = Describe("UI", func() {
 
 			Context("when the default is true", func() {
 				It("returns true", func() {
-					response, err := ui.DisplayBoolPrompt("some-prompt", true)
+					response, err := ui.DisplayBoolPrompt(true, "some-prompt", nil)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(response).To(BeTrue())
 				})
@@ -153,7 +153,7 @@ var _ = Describe("UI", func() {
 
 			Context("when the default is false", func() {
 				It("returns false", func() {
-					response, err := ui.DisplayBoolPrompt("some-prompt", false)
+					response, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(response).To(BeFalse())
 				})
@@ -163,7 +163,7 @@ var _ = Describe("UI", func() {
 		Context("when the interact library returns an error", func() {
 			It("returns the error", func() {
 				inBuffer.Write([]byte("invalid\n"))
-				_, err := ui.DisplayBoolPrompt("some-prompt", false)
+				_, err := ui.DisplayBoolPrompt(false, "some-prompt", nil)
 				Expect(err).To(HaveOccurred())
 			})
 		})

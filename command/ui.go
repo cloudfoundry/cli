@@ -10,7 +10,7 @@ import (
 
 // UI is the interface to STDOUT
 type UI interface {
-	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
+	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayError(err error)
 	DisplayHeader(text string)
 	DisplayLogMessage(message ui.LogMessage, displayHeader bool)

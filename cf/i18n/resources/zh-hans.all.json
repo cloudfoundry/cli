@@ -4408,6 +4408,10 @@
     "translation": "真的要删除孤立的路径吗？{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "真的要删除{{.ModelType}} {{.ModelName}} 以及与其关联的一切内容吗？"
   },

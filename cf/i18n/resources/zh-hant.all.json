@@ -4408,6 +4408,10 @@
     "translation": "真的要刪除遺留的路徑嗎？{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "真的要刪除{{.ModelType}} {{.ModelName}} 以及與其相關聯的所有項目嗎？"
   },

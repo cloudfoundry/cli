@@ -4408,6 +4408,10 @@
     "translation": "Realmente excluir as rotas órfãs?{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "Realmente excluir o {{.ModelType}} {{.ModelName}} e tudo que estiver associado a ele?"
   },

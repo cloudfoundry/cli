@@ -4408,6 +4408,10 @@
     "translation": "Voulez-vous vraiment supprimer les routes orphelines ? {{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "Voulez-vous vraiment supprimer le {{.ModelType}} {{.ModelName}} et tous les éléments associés ?"
   },
