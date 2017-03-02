@@ -4408,6 +4408,10 @@
     "translation": "Si è sicuri di voler eliminare le rotte orfane?{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "Si è sicuri di voler eliminare {{.ModelType}} {{.ModelName}} e tutti gli elementi associati?"
   },

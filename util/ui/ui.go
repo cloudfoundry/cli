@@ -133,9 +133,9 @@ func (ui *UI) DisplayNewline() {
 // DisplayBoolPrompt outputs the prompt and waits for user input. It only
 // allows for a boolean response. A default boolean response can be set with
 // defaultResponse.
-func (ui *UI) DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error) {
+func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error) {
 	response := defaultResponse
-	interactivePrompt := interact.NewInteraction(fmt.Sprintf("%s%s", prompt, ui.addFlavor(">>", cyan, true)))
+	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...) + ui.addFlavor(">>", cyan, true))
 	interactivePrompt.Input = ui.In
 	interactivePrompt.Output = ui.Out
 	err := interactivePrompt.Resolve(&response)

@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -54,7 +52,9 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		deleteOrg, promptErr := cmd.UI.DisplayBoolPrompt(fmt.Sprintf("Really delete the org %s and everything associated with it?", cmd.RequiredArgs.Organization), false)
+		promptMessage := "Really delete the org {{.OrgName}} and everything associated with it?"
+		deleteOrg, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{"OrgName": cmd.RequiredArgs.Organization})
+
 		if promptErr != nil {
 			return promptErr
 		}

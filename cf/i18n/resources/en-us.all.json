@@ -4408,6 +4408,10 @@
     "translation": "Really delete orphaned routes?{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?"
   },

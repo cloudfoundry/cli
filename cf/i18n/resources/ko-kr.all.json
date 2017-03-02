@@ -4408,6 +4408,10 @@
     "translation": "고아인 라우트를 삭제하시겠습니까?{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "{{.ModelType}} {{.ModelName}}과(와) 이와 연관된 모든 항목을 삭제하시겠습니까?"
   },

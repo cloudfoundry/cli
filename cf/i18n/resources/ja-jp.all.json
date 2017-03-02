@@ -4408,6 +4408,10 @@
     "translation": "孤立した経路を削除しますか?{{.Prompt}}"
   },
   {
+    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "{{.ModelType}} {{.ModelName}} とそれに関連付けられているすべてのものを削除しますか?"
   },
