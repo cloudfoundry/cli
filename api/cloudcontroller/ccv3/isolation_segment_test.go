@@ -1,7 +1,9 @@
 package ccv3_test
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -82,6 +84,181 @@ var _ = Describe("Isolation Segments", func() {
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
 								Title:  "CF-UnprocessableEntity",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetIsolationSegments", func() {
+		Context("when the isolation segments exist", func() {
+			BeforeEach(func() {
+				response1 := fmt.Sprintf(`{
+					"pagination": {
+						"next": {
+							"href": "%s/v3/isolation_segments?organization_guids=some-org-guid&names=iso1,iso2,iso3&page=2&per_page=2"
+						}
+					},
+					"resources": [
+						{
+							"name": "iso-name-1",
+							"guid": "iso-guid-1"
+						},
+						{
+							"name": "iso-name-2",
+							"guid": "iso-guid-2"
+						}
+					]
+				}`, server.URL())
+				response2 := `{
+					"pagination": {
+						"next": null
+					},
+					"resources": [
+						{
+							"name": "iso-name-3",
+							"guid": "iso-guid-3"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments", "organization_guids=some-org-guid&names=iso1,iso2,iso3"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments", "organization_guids=some-org-guid&names=iso1,iso2,iso3&page=2&per_page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the queried applications and all warnings", func() {
+				segments, warnings, err := client.GetIsolationSegments(url.Values{
+					"organization_guids": []string{"some-org-guid"},
+					"names":              []string{"iso1,iso2,iso3"},
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(segments).To(ConsistOf(
+					IsolationSegment{Name: "iso-name-1", GUID: "iso-guid-1"},
+					IsolationSegment{Name: "iso-name-2", GUID: "iso-guid-2"},
+					IsolationSegment{Name: "iso-name-3", GUID: "iso-guid-3"},
+				))
+				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.GetIsolationSegments(url.Values{})
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						[]CCError{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("DeleteIsolationSegment", func() {
+		Context("when the delete is successful", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/some-iso-guid"),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the queried applications and all warnings", func() {
+				warnings, err := client.DeleteIsolationSegment("some-iso-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/some-iso-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				warnings, err := client.DeleteIsolationSegment("some-iso-guid")
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						[]CCError{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
 							},
 						},
 					},

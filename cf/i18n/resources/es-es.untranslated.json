@@ -388,6 +388,10 @@
     "translation": "CF_NAME delete-domain DOMAIN [-f]"
   },
   {
+    "id": "CF_NAME delete-isolation-segment SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME delete-org ORG [-f]",
     "translation": "CF_NAME delete-org ORG [-f]"
   },
@@ -1192,7 +1196,15 @@
     "translation": "Delete an HTTP route:\\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\\n\\n   Delete a TCP route:\\n      CF_NAME delete-route DOMAIN --port PORT [-f]\\n\\nEXAMPLES:\\n   CF_NAME delete-route example.com                              # example.com\\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME delete-route example.com --port 5000                  # example.com:5000"
   },
   {
+    "id": "Delete an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Delete space within specified org",
+    "translation": ""
+  },
+  {
+    "id": "Deleting isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -1296,6 +1308,10 @@
     "translation": "INSTANCE_MEMORY"
   },
   {
+    "id": "ISOLATION SEGMENTS:",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
@@ -1326,6 +1342,10 @@
   {
     "id": "Invalid flag: ",
     "translation": "Invalid flag: "
+  },
+  {
+    "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
+    "translation": ""
   },
   {
     "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
@@ -1497,6 +1517,10 @@
   },
   {
     "id": "Really delete orphaned routes?",
+    "translation": ""
+  },
+  {
+    "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",
     "translation": ""
   },
   {
@@ -2018,6 +2042,10 @@
   {
     "id": "cpu",
     "translation": "cpu"
+  },
+  {
+    "id": "delete-isolation-segment",
+    "translation": ""
   },
   {
     "id": "does exist",

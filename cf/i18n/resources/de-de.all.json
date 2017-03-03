@@ -852,6 +852,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME delete-isolation-segment SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME delete-org ORG [-f]",
     "translation": ""
   },
@@ -2132,6 +2136,10 @@
     "translation": "Eine App löschen"
   },
   {
+    "id": "Delete an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Delete an org",
     "translation": "Eine Organisation löschen"
   },
@@ -2158,6 +2166,10 @@
   {
     "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
     "translation": "Löschen von Domäne {{.DomainName}} als {{.Username}}..."
+  },
+  {
+    "id": "Deleting isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -3164,6 +3176,10 @@
     "translation": "INSTANZSPEICHER"
   },
   {
+    "id": "ISOLATION SEGMENTS:",
+    "translation": ""
+  },
+  {
     "id": "Ignore manifest file",
     "translation": "Manifestdatei ignorieren"
   },
@@ -3542,6 +3558,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "Benutzer einladen und verwalten, Pläne auswählen und ändern und Ausgabenlimits festlegen\n"
+  },
+  {
+    "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
+    "translation": ""
   },
   {
     "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
@@ -4406,6 +4426,10 @@
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
     "translation": "Sollen verwaiste Routen wirklich gelöscht werden?{{.Prompt}}"
+  },
+  {
+    "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",
+    "translation": ""
   },
   {
     "id": "Really delete the org {{.OrgName}} and everything associated with it?",
@@ -6170,6 +6194,10 @@
   {
     "id": "crashing",
     "translation": "Absturz"
+  },
+  {
+    "id": "delete-isolation-segment",
+    "translation": ""
   },
   {
     "id": "description",
