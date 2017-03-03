@@ -1,6 +1,9 @@
 package v2action
 
-import "fmt"
+import (
+	"fmt"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 // SecurityGroup represents a CF SecurityGroup.
 type SecurityGroup struct {
@@ -23,10 +26,30 @@ func (e SecurityGroupNotFoundError) Error() string {
 }
 
 func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGroup, Warnings, error) {
-	return SecurityGroup{}, Warnings{}, nil
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups([]ccv2.Query{
+		{
+			Filter:   ccv2.NameFilter,
+			Operator: ccv2.EqualOperator,
+			Value:    securityGroupName,
+		},
+	})
+
+	if err != nil {
+		return SecurityGroup{}, Warnings(warnings), err
+	}
+
+	if len(securityGroups) == 0 {
+		return SecurityGroup{}, Warnings(warnings), SecurityGroupNotFoundError{securityGroupName}
+	}
+
+	securityGroup := SecurityGroup{
+		Name: securityGroups[0].Name,
+		GUID: securityGroups[0].GUID,
+	}
+	return securityGroup, Warnings(warnings), nil
 }
 
 func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
-	return Warnings{}, nil
-
+	warnings, err := actor.CloudControllerClient.AssociateSpaceWithSecurityGroup(securityGroupGUID, spaceGUID)
+	return Warnings(warnings), err
 }

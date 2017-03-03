@@ -6,6 +6,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 // CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
+	AssociateSpaceWithSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
@@ -20,6 +21,7 @@ type CloudControllerClient interface {
 	GetOrganizationQuota(guid string) (ccv2.OrganizationQuota, ccv2.Warnings, error)
 	GetPrivateDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	GetRouteApplications(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetSecurityGroups(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetServiceBindings(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	GetServiceInstances(queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSharedDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
