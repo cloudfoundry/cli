@@ -44,6 +44,7 @@ type commandList struct {
 	Curl                               v2.CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
 	DeleteBuildpack                    v2.DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
 	DeleteDomain                       v2.DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
+	DeleteIsolationSegment             v3.DeleteIsolationSegmentCommand             `command:"delete-isolation-segment" description:"Delete an isolation segment"`
 	DeleteOrg                          v2.DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
 	DeleteOrphanedRoutes               v2.DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes (i.e. those that are not mapped to an app)"`
 	DeleteQuota                        v2.DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`

@@ -852,6 +852,10 @@
     "translation": "CF_NAME delete-domain DOMAINE [-f]"
   },
   {
+    "id": "CF_NAME delete-isolation-segment SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME delete-org ORG [-f]",
     "translation": ""
   },
@@ -2132,6 +2136,10 @@
     "translation": "Supprimer une application"
   },
   {
+    "id": "Delete an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Delete an org",
     "translation": "Supprimer une organisation"
   },
@@ -2158,6 +2166,10 @@
   {
     "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
     "translation": "Suppression du domaine {{.DomainName}} en tant que {{.Username}}..."
+  },
+  {
+    "id": "Deleting isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -3164,6 +3176,10 @@
     "translation": "MEMOIRE_INSTANCE"
   },
   {
+    "id": "ISOLATION SEGMENTS:",
+    "translation": ""
+  },
+  {
     "id": "Ignore manifest file",
     "translation": "Ignorer le fichier manifeste"
   },
@@ -3542,6 +3558,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "Inviter et gérer des utilisateurs, sélectionner et changer les plans, et définir des limites relatives aux dépenses\n"
+  },
+  {
+    "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
+    "translation": ""
   },
   {
     "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
@@ -4406,6 +4426,10 @@
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
     "translation": "Voulez-vous vraiment supprimer les routes orphelines ? {{.Prompt}}"
+  },
+  {
+    "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",
+    "translation": ""
   },
   {
     "id": "Really delete the org {{.OrgName}} and everything associated with it?",
@@ -6170,6 +6194,10 @@
   {
     "id": "crashing",
     "translation": "tombe en panne"
+  },
+  {
+    "id": "delete-isolation-segment",
+    "translation": ""
   },
   {
     "id": "description",

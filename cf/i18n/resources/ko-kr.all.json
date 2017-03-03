@@ -852,6 +852,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME delete-isolation-segment SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME delete-org ORG [-f]",
     "translation": ""
   },
@@ -2132,6 +2136,10 @@
     "translation": "앱 삭제"
   },
   {
+    "id": "Delete an isolation segment",
+    "translation": ""
+  },
+  {
     "id": "Delete an org",
     "translation": "조직 삭제"
   },
@@ -2158,6 +2166,10 @@
   {
     "id": "Deleting domain {{.DomainName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.DomainName}} 도메인 삭제 중..."
+  },
+  {
+    "id": "Deleting isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -3164,6 +3176,10 @@
     "translation": ""
   },
   {
+    "id": "ISOLATION SEGMENTS:",
+    "translation": ""
+  },
+  {
     "id": "Ignore manifest file",
     "translation": "Manifest 파일 무시"
   },
@@ -3542,6 +3558,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "사용자 초대 및 관리, 플랜 선택 및 변경, 지출 한계 설정\n"
+  },
+  {
+    "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
+    "translation": ""
   },
   {
     "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
@@ -4406,6 +4426,10 @@
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
     "translation": "고아인 라우트를 삭제하시겠습니까?{{.Prompt}}"
+  },
+  {
+    "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",
+    "translation": ""
   },
   {
     "id": "Really delete the org {{.OrgName}} and everything associated with it?",
@@ -6170,6 +6194,10 @@
   {
     "id": "crashing",
     "translation": "충돌 중"
+  },
+  {
+    "id": "delete-isolation-segment",
+    "translation": ""
   },
   {
     "id": "description",

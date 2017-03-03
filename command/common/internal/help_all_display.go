@@ -115,6 +115,12 @@ var HelpCategoryList = []HelpCategory{
 		},
 	},
 	{
+		CategoryName: "ISOLATION SEGMENTS:",
+		CommandList: [][]string{
+			{"delete-isolation-segment"},
+		},
+	},
+	{
 		CategoryName: "FEATURE FLAGS:",
 		CommandList: [][]string{
 			{"feature-flags", "feature-flag", "enable-feature-flag", "disable-feature-flag"},
