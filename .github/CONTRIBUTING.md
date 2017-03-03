@@ -69,6 +69,7 @@ ginkgo -r
 # Architecture Overview
 
 The CLI is divided into a few major components, including but not limited to:
+
 1. command
 1. actor
 1. API
