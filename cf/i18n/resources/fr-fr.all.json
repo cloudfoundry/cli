@@ -3560,6 +3560,10 @@
     "translation": "Inviter et gérer des utilisateurs, sélectionner et changer les plans, et définir des limites relatives aux dépenses\n"
   },
   {
+    "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
     "translation": ""
   },
@@ -6194,6 +6198,10 @@
   {
     "id": "crashing",
     "translation": "tombe en panne"
+  },
+  {
+    "id": "create-isolation-segment",
+    "translation": ""
   },
   {
     "id": "delete-isolation-segment",

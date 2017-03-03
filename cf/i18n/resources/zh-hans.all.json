@@ -3560,6 +3560,10 @@
     "translation": "邀请和管理用户，选择和更改套餐，以及设置支出限制\n"
   },
   {
+    "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
     "translation": ""
   },
@@ -6194,6 +6198,10 @@
   {
     "id": "crashing",
     "translation": "崩溃"
+  },
+  {
+    "id": "create-isolation-segment",
+    "translation": ""
   },
   {
     "id": "delete-isolation-segment",

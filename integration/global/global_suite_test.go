@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	CFEventuallyTimeout  = 30 * time.Second
-	isolationSegmentName = "iso_seg_1"
+	CFEventuallyTimeout = 30 * time.Second
 )
 
 var (

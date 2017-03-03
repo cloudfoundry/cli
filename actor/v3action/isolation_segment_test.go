@@ -34,7 +34,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 
 			It("returns all warnings", func() {
-				warnings, err := actor.CreateIsolationSegment("some-isolation-segment-guid")
+				warnings, err := actor.CreateIsolationSegmentByName("some-isolation-segment-guid")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -59,7 +59,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 				})
 
 				It("returns the same error and all warnings", func() {
-					warnings, err := actor.CreateIsolationSegment("isolation-segment")
+					warnings, err := actor.CreateIsolationSegmentByName("isolation-segment")
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
@@ -74,9 +74,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 					)
 				})
 
-				It("returns the same error and all warnings", func() {
-					warnings, err := actor.CreateIsolationSegment("isolation-segment")
-					Expect(err).NotTo(HaveOccurred())
+				It("returns an IsolationSegmentAlreadyExistsError and all warnings", func() {
+					warnings, err := actor.CreateIsolationSegmentByName("isolation-segment")
+					Expect(err).To(MatchError(IsolationSegmentAlreadyExistsError{Name: "isolation-segment"}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})

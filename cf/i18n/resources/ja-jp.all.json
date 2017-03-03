@@ -3560,6 +3560,10 @@
     "translation": "ユーザーの招待と管理、プランの選択と変更、および支払上限の設定を行います\n"
   },
   {
+    "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
     "translation": ""
   },
@@ -6194,6 +6198,10 @@
   {
     "id": "crashing",
     "translation": "異常終了中"
+  },
+  {
+    "id": "create-isolation-segment",
+    "translation": ""
   },
   {
     "id": "delete-isolation-segment",

@@ -888,6 +888,10 @@
     "translation": "Invalid flag: "
   },
   {
+    "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
     "translation": ""
   },
@@ -1566,6 +1570,10 @@
   {
     "id": "cpu",
     "translation": "cpu"
+  },
+  {
+    "id": "create-isolation-segment",
+    "translation": ""
   },
   {
     "id": "delete-isolation-segment",
