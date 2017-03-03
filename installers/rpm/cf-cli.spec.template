@@ -18,7 +18,7 @@ Cloud Foundry CLI is the official command line client for Cloud Foundry.
 %{__install} -Dp -m0644 %{SOURCEURL0}/cf.bash %{buildroot}%{_sysconfdir}/bash_completion.d/cf.bash
 
 %clean
-rm -rf "$RPM_BUILD_ROOT"
+%{__rm} -rf %{buildroot}
 
 %files
 %{_bindir}/cf
