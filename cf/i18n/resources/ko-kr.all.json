@@ -3560,6 +3560,10 @@
     "translation": "사용자 초대 및 관리, 플랜 선택 및 변경, 지출 한계 설정\n"
   },
   {
+    "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "Isolation segment {{.IsolationSegmentName}} does not exist.",
     "translation": ""
   },
@@ -6194,6 +6198,10 @@
   {
     "id": "crashing",
     "translation": "충돌 중"
+  },
+  {
+    "id": "create-isolation-segment",
+    "translation": ""
   },
   {
     "id": "delete-isolation-segment",

@@ -11,7 +11,7 @@ import (
 //go:generate counterfeiter . CreateIsolationSegmentActor
 
 type CreateIsolationSegmentActor interface {
-	CreateIsolationSegment(name string) (v3action.Warnings, error)
+	CreateIsolationSegmentByName(name string) (v3action.Warnings, error)
 }
 
 type CreateIsolationSegmentCommand struct {
@@ -61,9 +61,13 @@ func (cmd CreateIsolationSegmentCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.CreateIsolationSegment(cmd.RequiredArgs.IsolationSegmentName)
+	warnings, err := cmd.Actor.CreateIsolationSegmentByName(cmd.RequiredArgs.IsolationSegmentName)
 	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
+	if _, ok := err.(v3action.IsolationSegmentAlreadyExistsError); ok {
+		cmd.UI.DisplayWarning("Isolation segment {{.IsolationSegmentName}} already exists.", map[string]interface{}{
+			"IsolationSegmentName": cmd.RequiredArgs.IsolationSegmentName,
+		})
+	} else if err != nil {
 		return err
 	}
 

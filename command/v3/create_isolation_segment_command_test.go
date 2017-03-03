@@ -18,13 +18,14 @@ import (
 
 var _ = Describe("create-isolation-segment Command", func() {
 	var (
-		cmd             v3.CreateIsolationSegmentCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeCreateIsolationSegmentActor
-		binaryName      string
-		executeErr      error
+		cmd              v3.CreateIsolationSegmentCommand
+		testUI           *ui.UI
+		fakeConfig       *commandfakes.FakeConfig
+		fakeSharedActor  *commandfakes.FakeSharedActor
+		fakeActor        *v3fakes.FakeCreateIsolationSegmentActor
+		binaryName       string
+		executeErr       error
+		isolationSegment string
 	)
 
 	BeforeEach(func() {
@@ -42,6 +43,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		isolationSegment = "segment1"
 		// fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 	})
 
@@ -78,12 +80,15 @@ var _ = Describe("create-isolation-segment Command", func() {
 	})
 
 	Context("when the user is logged in", func() {
-		Context("when the tag placement_tags exists", func() {
-			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
-				fakeActor.CreateIsolationSegmentReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+		BeforeEach(func() {
+			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
-				cmd.RequiredArgs.IsolationSegmentName = "segment1"
+			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
+		})
+
+		Context("when the create is successful", func() {
+			BeforeEach(func() {
+				fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("displays the header and ok", func() {
@@ -95,31 +100,46 @@ var _ = Describe("create-isolation-segment Command", func() {
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
-				Expect(fakeActor.CreateIsolationSegmentCallCount()).To(Equal(1))
-				Expect(fakeActor.CreateIsolationSegmentArgsForCall(0)).To(Equal("segment1"))
+				Expect(fakeActor.CreateIsolationSegmentByNameCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateIsolationSegmentByNameArgsForCall(0)).To(Equal(isolationSegment))
 			})
 		})
 
-		Context("when the tag placement_tags not exist", func() {
-			var expectedErr error
+		Context("when the create is unsuccessful", func() {
+			Context("due to an unexpected error", func() {
+				var expectedErr error
 
-			BeforeEach(func() {
-				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
-				expectedErr = errors.New("I am an error")
-				fakeActor.CreateIsolationSegmentReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+				BeforeEach(func() {
+					expectedErr = errors.New("I am an error")
+					fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+				})
 
-				cmd.RequiredArgs.IsolationSegmentName = "segment1"
+				It("displays the header and error", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+
+					Expect(testUI.Out).To(Say("Creating isolation segment segment1 as banana..."))
+
+					Expect(testUI.Err).To(Say("I am a warning"))
+					Expect(testUI.Err).To(Say("I am also a warning"))
+				})
 			})
 
-			It("displays the header and error", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
+			Context("due to an IsolationSegmentAlreadyExistsError", func() {
+				BeforeEach(func() {
+					fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.IsolationSegmentAlreadyExistsError{})
+				})
 
-				Expect(testUI.Out).To(Say("Creating isolation segment segment1 as banana..."))
+				It("displays the header and ok", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Err).To(Say("I am a warning"))
-				Expect(testUI.Err).To(Say("I am also a warning"))
+					Expect(testUI.Out).To(Say("Creating isolation segment segment1 as banana..."))
+					Expect(testUI.Out).To(Say("OK"))
+
+					Expect(testUI.Err).To(Say("I am a warning"))
+					Expect(testUI.Err).To(Say("I am also a warning"))
+					Expect(testUI.Err).To(Say("Isolation segment %s already exists.", isolationSegment))
+				})
 			})
 		})
 	})
-
 })

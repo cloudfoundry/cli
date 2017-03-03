@@ -21,15 +21,26 @@ func (e IsolationSegmentNotFoundError) Error() string {
 	return fmt.Sprintf("Isolation Segment '%s' not found.", e.Name)
 }
 
-// CreateIsolationSegment returns a new Isolation Segment
-func (actor Actor) CreateIsolationSegment(name string) (Warnings, error) {
+// IsolationSegmentAlreadyExistsError gets returned when an isolation segment
+// already exists.
+type IsolationSegmentAlreadyExistsError struct {
+	Name string
+}
+
+func (e IsolationSegmentAlreadyExistsError) Error() string {
+	return fmt.Sprintf("Isolation Segment '%s' already exists.", e.Name)
+}
+
+// CreateIsolationSegmentByName creates a given isolation segment.
+func (actor Actor) CreateIsolationSegmentByName(name string) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(name)
 	if _, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
-		return Warnings(warnings), nil
+		return Warnings(warnings), IsolationSegmentAlreadyExistsError{Name: name}
 	}
 	return Warnings(warnings), err
 }
 
+// DeleteIsolationSegmentByName deletes the given isolation segment.
 func (actor Actor) DeleteIsolationSegmentByName(name string) (Warnings, error) {
 	isolationSegment, warnings, err := actor.GetIsolationSegmentByName(name)
 	allWarnings := append(Warnings{}, warnings...)
@@ -41,6 +52,7 @@ func (actor Actor) DeleteIsolationSegmentByName(name string) (Warnings, error) {
 	return append(allWarnings, apiWarnings...), err
 }
 
+// GetIsolationSegmentByName returns the requested isolation segment.
 func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, Warnings, error) {
 	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{ccv3.NameFilter: []string{name}})
 	if err != nil {

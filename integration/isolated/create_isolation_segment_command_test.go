@@ -1,4 +1,4 @@
-package global
+package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -9,8 +9,10 @@ import (
 )
 
 var _ = Describe("create-isolation-segment command", func() {
+	var isolationSegmentName string
+
 	BeforeEach(func() {
-		Skip("Unskip after #138303921")
+		isolationSegmentName = helpers.IsolationSegmentName()
 	})
 
 	Describe("help", func() {
@@ -63,6 +65,11 @@ var _ = Describe("create-isolation-segment command", func() {
 			helpers.LoginCF()
 		})
 
+		// TODO: Delete this and add it to cleanup script after #138303919
+		AfterEach(func() {
+			Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName)).Should(Exit(0))
+		})
+
 		Context("when the isolation segment does not exist", func() {
 			It("creates the isolation segment", func() {
 				session := helpers.CF("create-isolation-segment", isolationSegmentName)
@@ -80,6 +87,7 @@ var _ = Describe("create-isolation-segment command", func() {
 
 			It("returns an ok", func() {
 				session := helpers.CF("create-isolation-segment", isolationSegmentName)
+				Eventually(session.Err).Should(Say("Isolation segment %s already exists", isolationSegmentName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
