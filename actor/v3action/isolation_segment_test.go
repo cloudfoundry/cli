@@ -146,6 +146,97 @@ var _ = Describe("Isolation Segment Actions", func() {
 		})
 	})
 
+	Describe("EntitleIsolationSegmentToOrganizationByName", func() {
+		Context("when the isolation segment exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetIsolationSegmentsReturns([]ccv3.IsolationSegment{
+					{
+						Name: "some-iso-seg",
+						GUID: "some-iso-guid",
+					},
+				}, ccv3.Warnings{"get-iso-warning"}, nil)
+			})
+
+			Context("when the organization exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+						{
+							Name: "some-org",
+							GUID: "some-org-guid",
+						},
+					}, ccv3.Warnings{"get-org-warning"}, nil)
+				})
+
+				Context("when the relationship succeeds", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.EntitleIsolationSegmentToOrganizationsReturns(
+							ccv3.RelationshipList{GUIDs: []string{"some-relationship-guid"}},
+							ccv3.Warnings{"entitle-iso-to-org-warning"},
+							nil)
+					})
+
+					It("returns all warnings", func() {
+						warnings, err := actor.EntitleIsolationSegmentToOrganizationByName("some-iso-seg", "some-org")
+						Expect(warnings).To(ConsistOf("get-iso-warning", "get-org-warning", "entitle-iso-to-org-warning"))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.EntitleIsolationSegmentToOrganizationsCallCount()).To(Equal(1))
+					})
+				})
+
+				Context("when the relationship fails", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("toxic-relationship")
+						fakeCloudControllerClient.EntitleIsolationSegmentToOrganizationsReturns(
+							ccv3.RelationshipList{},
+							ccv3.Warnings{"entitle-iso-to-org-warning"},
+							expectedErr)
+					})
+
+					It("returns the error", func() {
+						warnings, err := actor.EntitleIsolationSegmentToOrganizationByName("some-iso-seg", "some-org")
+						Expect(warnings).To(ConsistOf("get-iso-warning", "get-org-warning", "entitle-iso-to-org-warning"))
+						Expect(err).To(MatchError(expectedErr))
+					})
+
+				})
+			})
+
+			Context("when retrieving the orgs errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = OrganizationNotFoundError{Name: "some-org"}
+					fakeCloudControllerClient.GetOrganizationsReturns(nil, ccv3.Warnings{"get-org-warning"}, expectedErr)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.EntitleIsolationSegmentToOrganizationByName("some-iso-seg", "some-org")
+					Expect(warnings).To(ConsistOf("get-org-warning", "get-iso-warning"))
+					Expect(err).To(MatchError(expectedErr))
+				})
+			})
+		})
+
+		Context("when retrieving the isolation segment errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = IsolationSegmentNotFoundError{Name: "some-iso-seg"}
+				fakeCloudControllerClient.GetIsolationSegmentsReturns(nil, ccv3.Warnings{"get-iso-warning"}, expectedErr)
+			})
+
+			It("returns the error", func() {
+				warnings, err := actor.EntitleIsolationSegmentToOrganizationByName("some-iso-seg", "some-org")
+				Expect(warnings).To(ConsistOf("get-iso-warning"))
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+	})
+
 	Describe("GetIsolationSegmentByName", func() {
 		Context("when the isolation segment exists", func() {
 			BeforeEach(func() {

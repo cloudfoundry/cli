@@ -67,6 +67,9 @@ func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment
 	return fullIsolationSegmentsList, warnings, err
 }
 
+// DeleteIsolationSegment removes an isolation segment from the cloud
+// controller. Note: This will only remove it from the cloud controller
+// database. It will not remove it from diego.
 func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteIsolationSegmentRequest,

@@ -11,30 +11,30 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Application", func() {
+var _ = Describe("Organizations", func() {
 	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetApplications", func() {
-		Context("when applications exist", func() {
+	Describe("GetOrganizationss", func() {
+		Context("when organizations exist", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 	"pagination": {
 		"next": {
-			"href": "%s/v3/apps?space_guids=some-space-guid&names=some-app-name&page=2&per_page=2"
+			"href": "%s/v3/organizations?names=some-org-name&page=2&per_page=2"
 		}
 	},
   "resources": [
     {
-      "name": "app-name-1",
-      "guid": "app-guid-1"
+      "name": "org-name-1",
+      "guid": "org-guid-1"
     },
     {
-      "name": "app-name-2",
-      "guid": "app-guid-2"
+      "name": "org-name-2",
+      "guid": "org-guid-2"
     }
   ]
 }`, server.URL())
@@ -44,36 +44,35 @@ var _ = Describe("Application", func() {
 	},
 	"resources": [
 	  {
-      "name": "app-name-3",
-		  "guid": "app-guid-3"
+      "name": "org-name-3",
+		  "guid": "org-guid-3"
 		}
 	]
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps", "space_guids=some-space-guid&names=some-app-name"),
+						VerifyRequest(http.MethodGet, "/v3/organizations", "names=some-org-name"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps", "space_guids=some-space-guid&names=some-app-name&page=2&per_page=2"),
+						VerifyRequest(http.MethodGet, "/v3/organizations", "names=some-org-name&page=2&per_page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
-			It("returns the queried applications and all warnings", func() {
-				apps, warnings, err := client.GetApplications(url.Values{
-					SpaceGUIDFilter: []string{"some-space-guid"},
-					NameFilter:      []string{"some-app-name"},
+			It("returns the queried organizations and all warnings", func() {
+				organizations, warnings, err := client.GetOrganizations(url.Values{
+					NameFilter: []string{"some-org-name"},
 				})
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(apps).To(ConsistOf(
-					Application{Name: "app-name-1", GUID: "app-guid-1"},
-					Application{Name: "app-name-2", GUID: "app-guid-2"},
-					Application{Name: "app-name-3", GUID: "app-guid-3"},
+				Expect(organizations).To(ConsistOf(
+					Organization{Name: "org-name-1", GUID: "org-guid-1"},
+					Organization{Name: "org-name-2", GUID: "org-guid-2"},
+					Organization{Name: "org-name-3", GUID: "org-guid-3"},
 				))
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 			})
@@ -90,21 +89,21 @@ var _ = Describe("Application", func() {
     },
     {
       "code": 10010,
-      "detail": "App not found",
+      "detail": "Org not found",
       "title": "CF-ResourceNotFound"
     }
   ]
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps"),
+						VerifyRequest(http.MethodGet, "/v3/organizations"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetApplications(nil)
+				_, warnings, err := client.GetOrganizations(nil)
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
@@ -116,7 +115,7 @@ var _ = Describe("Application", func() {
 							},
 							{
 								Code:   10010,
-								Detail: "App not found",
+								Detail: "Org not found",
 								Title:  "CF-ResourceNotFound",
 							},
 						},
