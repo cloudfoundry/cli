@@ -4,12 +4,14 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 // requestOptions contains all the options to create an HTTP request.
 type requestOptions struct {
 	// URIParams are the list URI route parameters
-	URIParams map[string]string
+	URIParams internal.Params
 
 	// Query is a list of HTTP query parameters. Query will overwrite any
 	// existing query string in the URI. If you want to preserve the query
@@ -42,7 +44,7 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*http.Reques
 	} else {
 		request, err = client.router.CreateRequest(
 			passedRequest.RequestName,
-			passedRequest.URIParams,
+			map[string]string(passedRequest.URIParams),
 			passedRequest.Body,
 		)
 	}

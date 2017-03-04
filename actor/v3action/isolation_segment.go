@@ -52,6 +52,26 @@ func (actor Actor) DeleteIsolationSegmentByName(name string) (Warnings, error) {
 	return append(allWarnings, apiWarnings...), err
 }
 
+// EntitleIsolationSegmentToOrganizationByName entitles the given organization
+// to use the specified isolation segment
+func (actor Actor) EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (Warnings, error) {
+	isolationSegment, warnings, err := actor.GetIsolationSegmentByName(isolationSegmentName)
+	allWarnings := append(Warnings{}, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	organization, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	_, apiWarnings, err := actor.CloudControllerClient.EntitleIsolationSegmentToOrganizations(isolationSegment.GUID, organization.GUID)
+
+	return append(allWarnings, apiWarnings...), err
+}
+
 // GetIsolationSegmentByName returns the requested isolation segment.
 func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, Warnings, error) {
 	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{ccv3.NameFilter: []string{name}})

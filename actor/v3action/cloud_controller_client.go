@@ -13,9 +13,11 @@ type CloudControllerClient interface {
 	CloudControllerAPIVersion() string
 	CreateIsolationSegment(name string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
+	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUID string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplications(query url.Values) ([]ccv3.Application, ccv3.Warnings, error)
 	GetApplicationTasks(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error)
 	GetIsolationSegments(query url.Values) ([]ccv3.IsolationSegment, ccv3.Warnings, error)
+	GetOrganizations(query url.Values) ([]ccv3.Organization, ccv3.Warnings, error)
 	NewTask(appGUID string, command string, name string, memory uint64, disk uint64) (ccv3.Task, ccv3.Warnings, error)
 	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 }
