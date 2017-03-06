@@ -79,14 +79,16 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 
 	spacesToBind := []v2action.Space{}
 	if cmd.RequiredArgs.SpaceName != "" {
-		space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.RequiredArgs.SpaceName)
+		var space v2action.Space
+		space, warnings, err = cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.RequiredArgs.SpaceName)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
 		}
 		spacesToBind = append(spacesToBind, space)
 	} else {
-		spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(org.GUID)
+		var spaces []v2action.Space
+		spaces, warnings, err = cmd.Actor.GetOrganizationSpaces(org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
@@ -95,11 +97,11 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	}
 
 	for _, space := range spacesToBind {
-		cmd.UI.DisplayText("Assigning security group {{.SecurityGroupName}} to space {{.SpaceName}} in org {{.OrgName}} as {{.UserName}}...", map[string]interface{}{
-			"SecurityGroupName": securityGroup.Name,
-			"SpaceName":         space.Name,
-			"OrgName":           org.Name,
-			"UserName":          user.Name,
+		cmd.UI.DisplayText("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...", map[string]interface{}{
+			"security_group": securityGroup.Name,
+			"space":          space.Name,
+			"organization":   org.Name,
+			"username":       user.Name,
 		})
 
 		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID)

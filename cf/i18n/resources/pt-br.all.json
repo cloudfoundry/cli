@@ -4836,6 +4836,10 @@
     "translation": "Grupos de Segurança:"
   },
   {
+    "id": "Security group '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "Security group {{.security_group}} does not exist",
     "translation": "O grupo de segurança {{.security_group}} não existe"
   },
