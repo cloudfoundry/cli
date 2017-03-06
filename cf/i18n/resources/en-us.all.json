@@ -956,6 +956,10 @@
     "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
   },
   {
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]"
   },
@@ -2420,6 +2424,10 @@
     "translation": "Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}..."
   },
   {
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "translation": ""
+  },
+  {
     "id": "Enabling ssh support for '{{.AppName}}'...",
     "translation": "Enabling ssh support for '{{.AppName}}'..."
   },
@@ -2434,6 +2442,10 @@
   {
     "id": "Endpoint deprecated",
     "translation": "Endpoint deprecated"
+  },
+  {
+    "id": "Entitle an organization to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Env variable {{.VarName}} was not set.",
@@ -3558,6 +3570,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "Invite and manage users, select and change plans, and set spending limits\n"
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5446,6 +5462,10 @@
   {
     "id": "The organization group name",
     "translation": "The organization group name"
+  },
+  {
+    "id": "The organization name",
+    "translation": ""
   },
   {
     "id": "The organization quota",

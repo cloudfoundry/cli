@@ -956,6 +956,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": ""
   },
@@ -2420,6 +2424,10 @@
     "translation": "Habilitando el acceso al plan {{.PlanName}} del servicio {{.ServiceName}} para la organización {{.OrgName}} as {{.Username}}..."
   },
   {
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "translation": ""
+  },
+  {
     "id": "Enabling ssh support for '{{.AppName}}'...",
     "translation": "Habilitando el soporte de ssh para '{{.AppName}}'..."
   },
@@ -2433,6 +2441,10 @@
   },
   {
     "id": "Endpoint deprecated",
+    "translation": ""
+  },
+  {
+    "id": "Entitle an organization to an isolation segment",
     "translation": ""
   },
   {
@@ -3558,6 +3570,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "Invitar y gestionar usuarios, seleccionar y cambiar planes, y establecer los límites de gasto\n"
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5445,6 +5461,10 @@
   },
   {
     "id": "The organization group name",
+    "translation": ""
+  },
+  {
+    "id": "The organization name",
     "translation": ""
   },
   {

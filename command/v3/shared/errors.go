@@ -27,3 +27,31 @@ func (e ClientTargetError) Translate(translate func(string, ...interface{}) stri
 		"Message": e.Message,
 	})
 }
+
+type IsolationSegmentNotFoundError struct {
+	Name string
+}
+
+func (e IsolationSegmentNotFoundError) Error() string {
+	return "Isolation segment '{{.Name}}' not found."
+}
+
+func (e IsolationSegmentNotFoundError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Name": e.Name,
+	})
+}
+
+type OrganizationNotFoundError struct {
+	Name string
+}
+
+func (e OrganizationNotFoundError) Error() string {
+	return "Organization '{{.Name}}' not found."
+}
+
+func (e OrganizationNotFoundError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Name": e.Name,
+	})
+}

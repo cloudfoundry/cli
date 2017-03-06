@@ -956,6 +956,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": ""
   },
@@ -2420,6 +2424,10 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직에서 사용할 {{.ServiceName}} 서비스의 {{.PlanName}} 플랜에 대한 액세스 사용 설정 중..."
   },
   {
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "translation": ""
+  },
+  {
     "id": "Enabling ssh support for '{{.AppName}}'...",
     "translation": "'{{.AppName}}'에 대한 SSH 지원 사용 설정 중..."
   },
@@ -2433,6 +2441,10 @@
   },
   {
     "id": "Endpoint deprecated",
+    "translation": ""
+  },
+  {
+    "id": "Entitle an organization to an isolation segment",
     "translation": ""
   },
   {
@@ -3558,6 +3570,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "사용자 초대 및 관리, 플랜 선택 및 변경, 지출 한계 설정\n"
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5445,6 +5461,10 @@
   },
   {
     "id": "The organization group name",
+    "translation": ""
+  },
+  {
+    "id": "The organization name",
     "translation": ""
   },
   {

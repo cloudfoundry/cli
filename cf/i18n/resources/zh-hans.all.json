@@ -956,6 +956,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": ""
   },
@@ -2420,6 +2424,10 @@
     "translation": "正在以 {{.Username}} 身份启用对组织 {{.OrgName}} 的服务 {{.ServiceName}} 的套餐 {{.PlanName}} 的访问..."
   },
   {
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "translation": ""
+  },
+  {
     "id": "Enabling ssh support for '{{.AppName}}'...",
     "translation": "正在启用对 '{{.AppName}}' 的 SSH 支持..."
   },
@@ -2433,6 +2441,10 @@
   },
   {
     "id": "Endpoint deprecated",
+    "translation": ""
+  },
+  {
+    "id": "Entitle an organization to an isolation segment",
     "translation": ""
   },
   {
@@ -3558,6 +3570,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "邀请和管理用户，选择和更改套餐，以及设置支出限制\n"
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5445,6 +5461,10 @@
   },
   {
     "id": "The organization group name",
+    "translation": ""
+  },
+  {
+    "id": "The organization name",
     "translation": ""
   },
   {

@@ -65,6 +65,7 @@ type commandList struct {
 	DisallowSpaceSSH                   v2.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v2.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
 	EnableFeatureFlag                  v2.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Enable the use of a feature so that users have access to and can use the feature"`
+	EnableOrgIsolation                 v3.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
 	EnableServiceAccess                v2.EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
 	EnableSSH                          v2.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	Env                                v2.EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`

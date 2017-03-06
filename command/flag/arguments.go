@@ -292,3 +292,8 @@ type TerminateTaskArgs struct {
 type IsolationSegmentName struct {
 	IsolationSegmentName string `positional-arg-name:"SEGMENT_NAME" required:"true" description:"The isolation segment name"`
 }
+
+type OrgIsolationArgs struct {
+	IsolationSegmentName string `positional-arg-name:"SEGMENT_NAME" required:"true" description:"The isolation segment name"`
+	OrganizationName     string `positional-arg-name:"ORG_NAME" required:"true" description:"The organization name"`
+}

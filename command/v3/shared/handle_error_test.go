@@ -67,6 +67,10 @@ var _ = Describe("HandleError", func() {
 			sharedaction.NoTargetedSpaceError{BinaryName: "faceman"},
 			command.NoTargetedSpaceError{BinaryName: "faceman"}),
 
+		Entry("v3action.OrganizationNotFoundError -> OrgNotFoundError",
+			v3action.OrganizationNotFoundError{Name: "some-org"},
+			OrganizationNotFoundError{Name: "some-org"}),
+
 		Entry("default case -> original error",
 			err,
 			err),
