@@ -492,6 +492,10 @@
     "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
   },
   {
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]"
   },
@@ -1232,8 +1236,16 @@
     "translation": "Empty file or folder"
   },
   {
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "translation": ""
+  },
+  {
     "id": "Endpoint deprecated",
     "translation": "Endpoint deprecated"
+  },
+  {
+    "id": "Entitle an organization to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Error creating user {{.User}}.",
@@ -1342,6 +1354,10 @@
   {
     "id": "Invalid flag: ",
     "translation": "Invalid flag: "
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -1814,6 +1830,10 @@
   {
     "id": "The organization group name",
     "translation": "The organization group name"
+  },
+  {
+    "id": "The organization name",
+    "translation": ""
   },
   {
     "id": "The organization quota",

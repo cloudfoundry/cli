@@ -34,6 +34,10 @@ func HandleError(err error) error {
 		return command.ApplicationNotFoundError{Name: e.Name}
 	case v3action.TaskWorkersUnavailableError:
 		return RunTaskError{Message: "Task workers are unavailable."}
+	case v3action.OrganizationNotFoundError:
+		return OrganizationNotFoundError{Name: e.Name}
+	case v3action.IsolationSegmentNotFoundError:
+		return IsolationSegmentNotFoundError{Name: e.Name}
 	}
 
 	return err

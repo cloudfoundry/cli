@@ -67,8 +67,7 @@ func (actor Actor) EntitleIsolationSegmentToOrganizationByName(isolationSegmentN
 		return allWarnings, err
 	}
 
-	_, apiWarnings, err := actor.CloudControllerClient.EntitleIsolationSegmentToOrganizations(isolationSegment.GUID, organization.GUID)
-
+	_, apiWarnings, err := actor.CloudControllerClient.EntitleIsolationSegmentToOrganizations(isolationSegment.GUID, []string{organization.GUID})
 	return append(allWarnings, apiWarnings...), err
 }
 

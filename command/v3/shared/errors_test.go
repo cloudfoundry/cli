@@ -39,5 +39,7 @@ var _ = Describe("Translatable Errors", func() {
 		// Actor errors.
 		Entry("RunTaskError", RunTaskError{}),
 		Entry("ClientTargetError", ClientTargetError{}),
+		Entry("IsolationSegmentNotFoundError", IsolationSegmentNotFoundError{}),
+		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
 	)
 })
