@@ -1572,6 +1572,10 @@
     "translation": ""
   },
   {
+    "id": "Security group '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
     "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
     "translation": ""
   },

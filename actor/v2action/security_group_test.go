@@ -1,15 +1,17 @@
 package v2action_test
 
-import ("errors"
+import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
+
 var _ = Describe("Security group Actions", func() {
 	var (
-		actor Actor
+		actor                     Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 	)
 
@@ -21,8 +23,8 @@ var _ = Describe("Security group Actions", func() {
 	Describe("GetSecurityGroupByName", func() {
 		var (
 			security_group SecurityGroup
-			warnings Warnings
-			err error
+			warnings       Warnings
+			err            error
 		)
 		JustBeforeEach(func() {
 			security_group, warnings, err = actor.GetSecurityGroupByName("some-security-group")
@@ -50,9 +52,9 @@ var _ = Describe("Security group Actions", func() {
 				query := fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)
 				Expect(query).To(Equal(
 					[]ccv2.Query{{
-						Filter: ccv2.NameFilter,
+						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value: "some-security-group",
+						Value:    "some-security-group",
 					}}))
 			})
 		})
@@ -91,7 +93,7 @@ var _ = Describe("Security group Actions", func() {
 
 	Describe("BindSecurityGroupToSpace", func() {
 		var (
-			err error
+			err      error
 			warnings []string
 		)
 

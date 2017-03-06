@@ -3,21 +3,22 @@ package ccv2
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
 type SecurityGroup struct {
-	GUID                string
-	Name                string
+	GUID string
+	Name string
 }
+
 // UnmarshalJSON helps unmarshal a Cloud Controller Security Group response
-func(securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
+func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 	var ccSecurityGroup struct {
 		Metadata internal.Metadata `json:"metadata"`
-		Entity struct {
-			GUID	string `json:"guid"`
-			Name	string `json:"name"`
+		Entity   struct {
+			GUID string `json:"guid"`
+			Name string `json:"name"`
 		}
 	}
 
@@ -33,9 +34,9 @@ func(securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 func (client *Client) AssociateSpaceWithSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.AssociateSpaceWithSecurityGroupRequest,
-		URIParams:   Params{
+		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
-			"space_guid": spaceGUID,
+			"space_guid":          spaceGUID,
 		},
 	})
 

@@ -1,8 +1,8 @@
 package v2action
 
 import (
-	"fmt"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"fmt"
 )
 
 // SecurityGroup represents a CF SecurityGroup.
