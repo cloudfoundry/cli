@@ -40,6 +40,7 @@ func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warning
 		RequestName: internal.OrganizationsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
+
 	if err != nil {
 		return nil, nil, err
 	}

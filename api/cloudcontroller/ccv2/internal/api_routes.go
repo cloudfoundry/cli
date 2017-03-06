@@ -12,6 +12,7 @@ const (
 	AppRequest                            = "App"
 	AppsFromRouteRequest                  = "AppsFromRoute"
 	AppsRequest                           = "Apps"
+	AssociateSpaceWithSecurityGroupRequest = "AssociateSpaceWithSecurityGroupRequest"
 	DeleteOrganizationRequest             = "DeleteOrganization"
 	DeleteRouteRequest                    = "DeleteRoute"
 	DeleteServiceBindingRequest           = "DeleteServiceBinding"
@@ -24,6 +25,7 @@ const (
 	RouteMappingsFromRouteRequest         = "RouteMappingsFromRoute"
 	RoutesFromApplicationRequest          = "RoutesFromApplication"
 	RoutesFromSpaceRequest                = "RoutesFromSpace"
+	SecurityGroupsRequest                 = "SecurityGroups"
 	ServiceBindingsRequest                = "ServiceBindings"
 	ServiceInstancesRequest               = "ServiceInstances"
 	SharedDomainRequest                   = "SharedDomain"
@@ -54,6 +56,8 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
 	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: AppsFromRouteRequest},
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: RouteMappingsFromRouteRequest},
+	{Path: "/v2/security_groups", Method: http.MethodGet, Name: SecurityGroupsRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: AssociateSpaceWithSecurityGroupRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: ServiceBindingsRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: ServiceInstancesRequest},

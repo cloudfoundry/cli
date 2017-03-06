@@ -92,7 +92,7 @@ var _ = Describe("bind-security-group command", func() {
 		It("fails with a security group not found message", func() {
 			session := helpers.CF("bind-security-group", "some-security-group-that-doesn't-exist", "some-org")
 			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("Security group some-security-group-that-doesn't-exist not found."))
+			Expect(session.Err).To(Say("Security group 'some-security-group-that-doesn't-exist' not found."))
 			Expect(session.Out).To(Say("FAILED"))
 		})
 	})
@@ -113,7 +113,7 @@ var _ = Describe("bind-security-group command", func() {
 			It("fails with a org not found message", func() {
 				session := helpers.CF("bind-security-group", "some-security-group", "some-org")
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Organization some-org not found."))
+				Expect(session.Err).To(Say("Organization 'some-org' not found."))
 				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
@@ -171,7 +171,7 @@ var _ = Describe("bind-security-group command", func() {
 					It("fails with a space not found message", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName, "space-doesnt-exist")
 						Eventually(session).Should(Exit(1))
-						Expect(session.Err).To(Say("space space-doesnt-exist not found."))
+						Expect(session.Err).To(Say("Space 'space-doesnt-exist' not found."))
 						Expect(session.Out).To(Say("FAILED"))
 
 					})
