@@ -24,8 +24,10 @@ rm -f plugin_examples/*.exe
 export LC_ALL="en_US.UTF-8"
 
 if [ ! $(which ginkgo) ];then
-  echo -e "\n Installing ginkgo..."
-  go get github.com/onsi/ginkgo/ginkgo
+  echo -e "\n Building ginkgo..."
+  pushd vendor/github.com/onsi/ginkgo/ginkgo
+  go install
+  popd
 fi
 
 echo -e "\n Formatting packages..."
