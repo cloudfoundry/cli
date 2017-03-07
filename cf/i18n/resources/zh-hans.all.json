@@ -956,7 +956,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME",
     "translation": ""
   },
   {
@@ -6286,6 +6286,10 @@
   {
     "id": "each route in 'routes' must have a 'route' property",
     "translation": "'routes' 中的每个路径都必须有一个 'route' 属性"
+  },
+  {
+    "id": "enable-org-isolation",
+    "translation": ""
   },
   {
     "id": "enabled",
