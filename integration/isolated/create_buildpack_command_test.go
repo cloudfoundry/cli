@@ -36,4 +36,26 @@ var _ = Describe("create-buildpack command", func() {
 			Expect(session.Out).To(Say("cf create-buildpack BUILDPACK PATH POSITION")) // help
 		})
 	})
+
+	Context("when a nonexistent file is provided", func() {
+		It("outputs an error message to the user and exits 1", func() {
+			session := CF("create-buildpack", "some-buildpack", "some-bogus-file", "1")
+			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'some-bogus-file' does not exist."))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when a URL is provided as the buildpack", func() {
+		BeforeEach(func() {
+			LoginCF()
+		})
+
+		It("outputs an error message to the user, provides help text, and exits 1", func() {
+			session := CF("create-buildpack", "some-buildpack", "https://example.com/bogus.tgz", "1")
+			Eventually(session.Out).Should(Say("Failed to create a local temporary zip file for the buildpack"))
+			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session.Out).Should(Say("Couldn't write zip file: zip: not a valid zip file"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
 })
