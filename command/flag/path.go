@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	flags "github.com/jessevdk/go-flags"
 )
@@ -33,6 +34,30 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 	}
 
 	*p = PathWithExistenceCheck(path)
+	return nil
+}
+
+type PathWithExistenceCheckOrURL string
+
+func (_ PathWithExistenceCheckOrURL) Complete(prefix string) []flags.Completion {
+	return completeWithNoFormatting(prefix)
+}
+
+func (p *PathWithExistenceCheckOrURL) UnmarshalFlag(path string) error {
+	if !strings.HasPrefix(path, "http://") && !strings.HasPrefix(path, "https://") {
+		_, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return &flags.Error{
+					Type:    flags.ErrRequired,
+					Message: fmt.Sprintf("The specified path '%s' does not exist.", path),
+				}
+			}
+			return err
+		}
+	}
+
+	*p = PathWithExistenceCheckOrURL(path)
 	return nil
 }
 

@@ -126,6 +126,51 @@ var _ = Describe("path types", func() {
 		})
 	})
 
+	Describe("PathWithExistenceCheckOrURL", func() {
+		var pathWithExistenceCheckOrURL PathWithExistenceCheckOrURL
+
+		BeforeEach(func() {
+			pathWithExistenceCheckOrURL = PathWithExistenceCheckOrURL("")
+		})
+
+		// The Complete method is not tested because it shares the same code as
+		// Path.Complete().
+
+		Describe("UnmarshalFlag", func() {
+			Context("when the path is a URL", func() {
+				It("sets the path if it starts with 'http://'", func() {
+					err := pathWithExistenceCheckOrURL.UnmarshalFlag("http://example.com/payload.tgz")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(pathWithExistenceCheckOrURL).To(BeEquivalentTo("http://example.com/payload.tgz"))
+				})
+
+				It("sets the path if it starts with 'https://'", func() {
+					err := pathWithExistenceCheckOrURL.UnmarshalFlag("https://example.com/payload.tgz")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(pathWithExistenceCheckOrURL).To(BeEquivalentTo("https://example.com/payload.tgz"))
+				})
+			})
+
+			Context("when the path does not exist", func() {
+				It("returns a path does not exist error", func() {
+					err := pathWithExistenceCheckOrURL.UnmarshalFlag("./some-dir/some-file")
+					Expect(err).To(MatchError(&flags.Error{
+						Type:    flags.ErrRequired,
+						Message: "The specified path './some-dir/some-file' does not exist.",
+					}))
+				})
+			})
+
+			Context("when the path exists", func() {
+				It("sets the path", func() {
+					err := pathWithExistenceCheckOrURL.UnmarshalFlag("abc")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(pathWithExistenceCheckOrURL).To(BeEquivalentTo("abc"))
+				})
+			})
+		})
+	})
+
 	Describe("PathWithAt", func() {
 		var pathWithAt PathWithAt
 
