@@ -26,7 +26,7 @@ var _ = Describe("create-isolation-segment command", func() {
 				Eventually(session).Should(Say("NOTES:"))
 				Eventually(session).Should(Say("The isolation segment name must match the placement tag applied to the Diego cell."))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("add-isolation-segment-org, isolation-segments"))
+				Eventually(session).Should(Say("enable-org-isolation, isolation-segments"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

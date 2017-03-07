@@ -16,7 +16,7 @@ type EnableOrgIsolationActor interface {
 
 type EnableOrgIsolationCommand struct {
 	RequiredArgs    flag.OrgIsolationArgs `positional-args:"yes"`
-	usage           interface{}           `usage:"CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\n\n."`
+	usage           interface{}           `usage:"CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME"`
 	relatedCommands interface{}           `related_commands:"create-isolation-segment, isolation-segments"`
 
 	UI          command.UI

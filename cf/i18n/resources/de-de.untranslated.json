@@ -480,8 +480,8 @@
     "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
   },
   {
-    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
-    "translation": ""
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME"
   },
   {
     "id": "CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]",
@@ -2070,6 +2070,10 @@
   {
     "id": "does not exist",
     "translation": "does not exist"
+  },
+  {
+    "id": "enable-org-isolation",
+    "translation": ""
   },
   {
     "id": "integer",

@@ -956,7 +956,7 @@
     "translation": "CF_NAME enable-feature-flag NOM_FONCTION"
   },
   {
-    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME\\n\\n.",
+    "id": "CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME",
     "translation": ""
   },
   {
@@ -6286,6 +6286,10 @@
   {
     "id": "each route in 'routes' must have a 'route' property",
     "translation": "chaque route dans routes doit avoir une propriété route"
+  },
+  {
+    "id": "enable-org-isolation",
+    "translation": ""
   },
   {
     "id": "enabled",
