@@ -33,7 +33,7 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 
 func (client *Client) AssociateSpaceWithSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AssociateSpaceWithSecurityGroupRequest,
+		RequestName: internal.PutSecurityGroupSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,
@@ -52,7 +52,7 @@ func (client *Client) AssociateSpaceWithSecurityGroup(securityGroupGUID string, 
 
 func (client *Client) GetSecurityGroups(queries []Query) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.SecurityGroupsRequest,
+		RequestName: internal.GetSecurityGroupsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 

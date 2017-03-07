@@ -36,7 +36,7 @@ func (stack *Stack) UnmarshalJSON(data []byte) error {
 // GetStack returns the requested stack.
 func (client *Client) GetStack(guid string) (Stack, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.StackRequest,
+		RequestName: internal.GetStackRequest,
 		URIParams:   Params{"stack_guid": guid},
 	})
 	if err != nil {

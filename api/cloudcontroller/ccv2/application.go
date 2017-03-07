@@ -124,7 +124,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 // GetApplication returns back an Application.
 func (client *Client) GetApplication(guid string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AppRequest,
+		RequestName: internal.GetAppRequest,
 		URIParams:   Params{"app_guid": guid},
 	})
 	if err != nil {
@@ -144,7 +144,7 @@ func (client *Client) GetApplication(guid string) (Application, Warnings, error)
 // provided queries.
 func (client *Client) GetApplications(queries []Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AppsRequest,
+		RequestName: internal.GetAppsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 	if err != nil {
@@ -174,7 +174,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.UpdateAppRequest,
+		RequestName: internal.PutAppRequest,
 		URIParams:   Params{"app_guid": app.GUID},
 		Body:        bytes.NewBuffer(body),
 	})
@@ -195,7 +195,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 // GUID, filtered by provided queries.
 func (client *Client) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AppsFromRouteRequest,
+		RequestName: internal.GetRouteAppsRequest,
 		URIParams:   map[string]string{"route_guid": routeGUID},
 		Query:       FormatQueryParameters(queryParams),
 	})

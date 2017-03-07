@@ -25,7 +25,7 @@ func (client *Client) CreateIsolationSegment(name string) (IsolationSegment, War
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.NewIsolationSegmentRequest,
+		RequestName: internal.PostIsolationSegmentsRequest,
 		Body:        bytes.NewBuffer(body),
 	})
 	if err != nil {

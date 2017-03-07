@@ -30,7 +30,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 // provided queries.
 func (client *Client) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.ServiceBindingsRequest,
+		RequestName: internal.GetServiceBindingsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 	if err != nil {

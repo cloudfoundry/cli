@@ -60,7 +60,7 @@ func (serviceInstance ServiceInstance) Managed() bool {
 // off of the provided queries.
 func (client *Client) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.ServiceInstancesRequest,
+		RequestName: internal.GetServiceInstancesRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 	if err != nil {
@@ -94,7 +94,7 @@ func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProv
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.SpaceServiceInstancesRequest,
+		RequestName: internal.GetSpaceServiceInstancesRequest,
 		URIParams:   map[string]string{"guid": spaceGUID},
 		Query:       query,
 	})

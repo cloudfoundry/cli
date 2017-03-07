@@ -41,7 +41,7 @@ func (client *Client) NewUser(uaaUserID string) (User, Warnings, error) {
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.UsersRequest,
+		RequestName: internal.GetUsersRequest,
 		Body:        bytes.NewBuffer(bodyBytes),
 	})
 	if err != nil {

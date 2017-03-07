@@ -37,7 +37,7 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 // provided queries.
 func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.OrganizationsRequest,
+		RequestName: internal.GetOrganizationsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 

@@ -61,7 +61,7 @@ func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
 // some application instances.
 func (client *Client) GetApplicationInstancesByApplication(guid string) (map[int]ApplicationInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AppInstances,
+		RequestName: internal.GetAppInstancesRequest,
 		URIParams:   Params{"app_guid": guid},
 	})
 	if err != nil {

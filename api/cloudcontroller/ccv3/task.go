@@ -45,7 +45,7 @@ func (client *Client) NewTask(appGUID string, command string, name string, memor
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.NewAppTaskRequest,
+		RequestName: internal.PostAppTasksRequest,
 		URIParams: internal.Params{
 			"guid": appGUID,
 		},
