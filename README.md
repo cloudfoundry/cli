@@ -60,8 +60,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 **Mac OS X** (using [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap)):
 
 ```sh
-$ brew tap cloudfoundry/tap
-$ brew install cf-cli
+$ brew install cloudfoundry/tap/cf-cli
 ```
 
 **Debian** and **Ubuntu** based Linux distributions:
