@@ -89,7 +89,7 @@ func (job Job) Failed() bool {
 // GetJob returns a job for the provided GUID.
 func (client *Client) GetJob(jobGUID string) (Job, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.JobRequest,
+		RequestName: internal.GetJobRequest,
 		URIParams:   map[string]string{"job_guid": jobGUID},
 	})
 	if err != nil {

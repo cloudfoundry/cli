@@ -34,7 +34,7 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 // Domain GUID.
 func (client *Client) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.SharedDomainRequest,
+		RequestName: internal.GetSharedDomainRequest,
 		URIParams:   map[string]string{"shared_domain_guid": domainGUID},
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func (client *Client) GetSharedDomain(domainGUID string) (Domain, Warnings, erro
 // Domain GUID.
 func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PrivateDomainRequest,
+		RequestName: internal.GetPrivateDomainRequest,
 		URIParams:   map[string]string{"private_domain_guid": domainGUID},
 	})
 	if err != nil {
@@ -81,7 +81,7 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 // GetSharedDomains returns the global shared domains.
 func (client *Client) GetSharedDomains() ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.SharedDomainsRequest,
+		RequestName: internal.GetSharedDomainsRequest,
 	})
 	if err != nil {
 		return []Domain{}, nil, err
@@ -106,7 +106,7 @@ func (client *Client) GetSharedDomains() ([]Domain, Warnings, error) {
 // GetOrganizationPrivateDomains returns the private domains associated with an organization.
 func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries []Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PrivateDomainsFromOrganizationRequest,
+		RequestName: internal.GetOrganizationPrivateDomainsRequest,
 		Query:       FormatQueryParameters(queries),
 		URIParams:   map[string]string{"organization_guid": orgGUID},
 	})

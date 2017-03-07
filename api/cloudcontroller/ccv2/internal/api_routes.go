@@ -7,65 +7,66 @@ import (
 )
 
 const (
-	AppInstances                           = "AppInstances"
-	AppInstanceStats                       = "AppInstanceStats"
-	AppRequest                             = "App"
-	AppsFromRouteRequest                   = "AppsFromRoute"
-	AppsRequest                            = "Apps"
-	AssociateSpaceWithSecurityGroupRequest = "AssociateSpaceWithSecurityGroupRequest"
-	DeleteOrganizationRequest              = "DeleteOrganization"
-	DeleteRouteRequest                     = "DeleteRoute"
-	DeleteServiceBindingRequest            = "DeleteServiceBinding"
-	InfoRequest                            = "Info"
-	JobRequest                             = "Job"
-	OrganizationsRequest                   = "Organizations"
-	OrganizationQuotaRequest               = "OrganizationQuota"
-	PrivateDomainRequest                   = "PrivateDomain"
-	PrivateDomainsFromOrganizationRequest  = "PrivateDomainsFromOrganization"
-	RouteMappingsFromRouteRequest          = "RouteMappingsFromRoute"
-	RoutesFromApplicationRequest           = "RoutesFromApplication"
-	RoutesFromSpaceRequest                 = "RoutesFromSpace"
-	SecurityGroupsRequest                  = "SecurityGroups"
-	ServiceBindingsRequest                 = "ServiceBindings"
-	ServiceInstancesRequest                = "ServiceInstances"
-	SharedDomainRequest                    = "SharedDomain"
-	SharedDomainsRequest                   = "SharedDomains"
-	SpaceServiceInstancesRequest           = "SpaceServiceInstances"
-	SpacesRequest                          = "Spaces"
-	StackRequest                           = "Stack"
-	UpdateAppRequest                       = "UpdateApp"
-	UsersRequest                           = "Users"
+	GetAppInstancesRequest               = "GetAppInstances"
+	GetAppStatsRequest                   = "GetAppStats"
+	GetAppRequest                        = "GetApp"
+	GetRouteAppsRequest                  = "GetRouteApps"
+	GetAppsRequest                       = "GetApps"
+	PutSecurityGroupSpaceRequest         = "PutSecurityGroupSpace"
+	DeleteOrganizationRequest            = "DeleteOrganization"
+	DeleteRouteRequest                   = "DeleteRoute"
+	DeleteServiceBindingRequest          = "DeleteServiceBinding"
+	GetInfoRequest                       = "GetInfo"
+	GetJobRequest                        = "GetJob"
+	GetOrganizationsRequest              = "GetOrganizations"
+	GetQuotaDefinition                   = "GetQuotaDefinition"
+	GetPrivateDomainRequest              = "GetPrivateDomain"
+	GetOrganizationPrivateDomainsRequest = "GetOrganizationPrivateDomains"
+	GetRouteRouteMappingsRequest         = "GetRouteRouteMappings"
+	GetAppRoutesRequest                  = "GetAppRoutes"
+	GetSpaceRoutesRequest                = "GetSpaceRoutes"
+	GetSecurityGroupsRequest             = "GetSecurityGroups"
+	GetServiceBindingsRequest            = "GetServiceBindings"
+	GetServiceInstancesRequest           = "GetServiceInstances"
+	GetSharedDomainRequest               = "GetSharedDomain"
+	GetSharedDomainsRequest              = "GetSharedDomains"
+	GetSpaceServiceInstancesRequest      = "GetSpaceServiceInstances"
+	GetSpacesRequest                     = "GetSpaces"
+	GetStackRequest                      = "GetStack"
+	PutAppRequest                        = "PutApp"
+	GetUsersRequest                      = "GetUsers"
 )
 
 // APIRoutes is a list of routes used by the rata library to construct request
 // URLs.
+// Naming convention: Method + [ParentResourceInstance] + Resource
 var APIRoutes = rata.Routes{
-	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
-	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: AppRequest},
-	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: UpdateAppRequest},
-	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: AppInstances},
-	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: RoutesFromApplicationRequest},
-	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: AppInstanceStats},
-	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},
-	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: JobRequest},
-	{Path: "/v2/organizations", Method: http.MethodGet, Name: OrganizationsRequest},
+	{Path: "/v2/apps", Method: http.MethodGet, Name: GetAppsRequest},
+	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: GetAppRequest},
+	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: PutAppRequest},
+	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: GetAppInstancesRequest},
+	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
+	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
+	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
+	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
+	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
-	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: PrivateDomainsFromOrganizationRequest},
-	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: PrivateDomainRequest},
-	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: OrganizationQuotaRequest},
+	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
+	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
+	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetQuotaDefinition},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
-	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: AppsFromRouteRequest},
-	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: RouteMappingsFromRouteRequest},
-	{Path: "/v2/security_groups", Method: http.MethodGet, Name: SecurityGroupsRequest},
-	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: AssociateSpaceWithSecurityGroupRequest},
-	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: ServiceBindingsRequest},
+	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: GetRouteAppsRequest},
+	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
+	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupSpaceRequest},
+	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
-	{Path: "/v2/service_instances", Method: http.MethodGet, Name: ServiceInstancesRequest},
-	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: SharedDomainRequest},
-	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: SharedDomainsRequest},
-	{Path: "/v2/spaces", Method: http.MethodGet, Name: SpacesRequest},
-	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: SpaceServiceInstancesRequest},
-	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: RoutesFromSpaceRequest},
-	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: StackRequest},
-	{Path: "/v2/users", Method: http.MethodPost, Name: UsersRequest},
+	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
+	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},
+	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},
+	{Path: "/v2/spaces", Method: http.MethodGet, Name: GetSpacesRequest},
+	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: GetSpaceServiceInstancesRequest},
+	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: GetSpaceRoutesRequest},
+	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
+	{Path: "/v2/users", Method: http.MethodPost, Name: GetUsersRequest},
 }

@@ -71,7 +71,7 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 // application, it might skip some application instances.
 func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) (map[int]ApplicationInstanceStatus, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.AppInstanceStats,
+		RequestName: internal.GetAppStatsRequest,
 		URIParams:   Params{"app_guid": guid},
 	})
 	if err != nil {

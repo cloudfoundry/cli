@@ -54,7 +54,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.NewIsolationSegmentOrganizationRelationshipRequest,
+		RequestName: internal.PostIsolationSegmentRelationshipOrganizationsRequest,
 		URIParams:   internal.Params{"guid": isolationSegmentGUID},
 		Body:        bytes.NewBuffer(body),
 	})

@@ -36,7 +36,7 @@ func (space *Space) UnmarshalJSON(data []byte) error {
 // GetSpaces returns back a list of Spaces based off of the provided queries.
 func (client *Client) GetSpaces(queries []Query) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.SpacesRequest,
+		RequestName: internal.GetSpacesRequest,
 		Query:       FormatQueryParameters(queries),
 	})
 	if err != nil {

@@ -43,7 +43,7 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 // GUID, and filtered by the provided queries.
 func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.RoutesFromApplicationRequest,
+		RequestName: internal.GetAppRoutesRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 		Query:       FormatQueryParameters(queryParams),
 	})
@@ -71,7 +71,7 @@ func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) 
 // GUID, and filtered by the provided queries.
 func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.RoutesFromSpaceRequest,
+		RequestName: internal.GetSpaceRoutesRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
 		Query:       FormatQueryParameters(queryParams),
 	})

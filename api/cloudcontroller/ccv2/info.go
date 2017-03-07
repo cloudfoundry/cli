@@ -60,7 +60,7 @@ func (client *Client) TokenEndpoint() string {
 // Info returns back endpoint and API information from /v2/info.
 func (client *Client) Info() (APIInformation, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.InfoRequest,
+		RequestName: internal.GetInfoRequest,
 	})
 	if err != nil {
 		return APIInformation{}, nil, err
