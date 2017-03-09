@@ -1,16 +1,21 @@
 package isolated
 
 import (
-	"code.cloudfoundry.org/cli/integration/helpers"
 	"fmt"
+	"net/http"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"net/http"
 )
 
 var _ = Describe("Logs Command", func() {
+	BeforeEach(func() {
+		helpers.RunIfExperimental("logs command refactor is still experimental")
+	})
+
 	Describe("help", func() {
 		It("displays command usage to output", func() {
 			session := helpers.CF("logs", "--help")
