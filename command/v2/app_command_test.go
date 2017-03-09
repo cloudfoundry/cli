@@ -47,18 +47,10 @@ var _ = Describe("App Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-
-		// TODO: remove when experimental flag is removed
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	// TODO: remove when experimental flag is removed
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking target fails", func() {
