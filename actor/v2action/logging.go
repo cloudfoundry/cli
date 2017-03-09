@@ -3,6 +3,7 @@ package v2action
 import (
 	"time"
 
+	"github.com/cloudfoundry/noaa"
 	noaaErrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 )
@@ -103,4 +104,43 @@ func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Co
 	}()
 
 	return messages, errs
+}
+
+func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient, config Config) ([]LogMessage, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	noaaMessages, err := client.RecentLogs(app.GUID, "")
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	noaaMessages = noaa.SortRecent(noaaMessages)
+
+	var logMessages []LogMessage
+
+	for _, message := range noaaMessages {
+		logMessages = append(logMessages, LogMessage{
+			message:        string(message.GetMessage()),
+			messageType:    message.GetMessageType(),
+			timestamp:      time.Unix(0, message.GetTimestamp()),
+			sourceType:     message.GetSourceType(),
+			sourceInstance: message.GetSourceInstance(),
+		})
+	}
+
+	return logMessages, allWarnings, nil
+}
+
+func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, nil, allWarnings, err
+	}
+
+	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
+
+	return messages, logErrs, allWarnings, err
 }

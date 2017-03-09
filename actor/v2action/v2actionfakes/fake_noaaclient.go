@@ -18,6 +18,20 @@ type FakeNOAAClient struct {
 	closeReturnsOnCall map[int]struct {
 		result1 error
 	}
+	RecentLogsStub        func(appGuid string, authToken string) ([]*events.LogMessage, error)
+	recentLogsMutex       sync.RWMutex
+	recentLogsArgsForCall []struct {
+		appGuid   string
+		authToken string
+	}
+	recentLogsReturns struct {
+		result1 []*events.LogMessage
+		result2 error
+	}
+	recentLogsReturnsOnCall map[int]struct {
+		result1 []*events.LogMessage
+		result2 error
+	}
 	TailingLogsStub        func(appGuid, authToken string) (<-chan *events.LogMessage, <-chan error)
 	tailingLogsMutex       sync.RWMutex
 	tailingLogsArgsForCall []struct {
@@ -74,6 +88,58 @@ func (fake *FakeNOAAClient) CloseReturnsOnCall(i int, result1 error) {
 	fake.closeReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeNOAAClient) RecentLogs(appGuid string, authToken string) ([]*events.LogMessage, error) {
+	fake.recentLogsMutex.Lock()
+	ret, specificReturn := fake.recentLogsReturnsOnCall[len(fake.recentLogsArgsForCall)]
+	fake.recentLogsArgsForCall = append(fake.recentLogsArgsForCall, struct {
+		appGuid   string
+		authToken string
+	}{appGuid, authToken})
+	fake.recordInvocation("RecentLogs", []interface{}{appGuid, authToken})
+	fake.recentLogsMutex.Unlock()
+	if fake.RecentLogsStub != nil {
+		return fake.RecentLogsStub(appGuid, authToken)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.recentLogsReturns.result1, fake.recentLogsReturns.result2
+}
+
+func (fake *FakeNOAAClient) RecentLogsCallCount() int {
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
+	return len(fake.recentLogsArgsForCall)
+}
+
+func (fake *FakeNOAAClient) RecentLogsArgsForCall(i int) (string, string) {
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
+	return fake.recentLogsArgsForCall[i].appGuid, fake.recentLogsArgsForCall[i].authToken
+}
+
+func (fake *FakeNOAAClient) RecentLogsReturns(result1 []*events.LogMessage, result2 error) {
+	fake.RecentLogsStub = nil
+	fake.recentLogsReturns = struct {
+		result1 []*events.LogMessage
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeNOAAClient) RecentLogsReturnsOnCall(i int, result1 []*events.LogMessage, result2 error) {
+	fake.RecentLogsStub = nil
+	if fake.recentLogsReturnsOnCall == nil {
+		fake.recentLogsReturnsOnCall = make(map[int]struct {
+			result1 []*events.LogMessage
+			result2 error
+		})
+	}
+	fake.recentLogsReturnsOnCall[i] = struct {
+		result1 []*events.LogMessage
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeNOAAClient) TailingLogs(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
@@ -133,6 +199,8 @@ func (fake *FakeNOAAClient) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.closeMutex.RLock()
 	defer fake.closeMutex.RUnlock()
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
 	fake.tailingLogsMutex.RLock()
 	defer fake.tailingLogsMutex.RUnlock()
 	return fake.invocations

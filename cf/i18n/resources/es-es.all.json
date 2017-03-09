@@ -4692,6 +4692,10 @@
     "translation": "Recuperar las reglas para todos los grupos de seguridad asociados con este espacio"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "Recuperando el estado de todas las características señaladas como {{.Username}}..."
   },

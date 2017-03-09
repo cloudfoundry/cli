@@ -7,5 +7,6 @@ import "github.com/cloudfoundry/sonde-go/events"
 // NOAAClient is a client for getting logs.
 type NOAAClient interface {
 	Close() error
+	RecentLogs(appGuid string, authToken string) ([]*events.LogMessage, error)
 	TailingLogs(appGuid, authToken string) (<-chan *events.LogMessage, <-chan error)
 }

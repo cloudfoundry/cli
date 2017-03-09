@@ -100,11 +100,12 @@ func NewUI(c Config) (*UI, error) {
 // and colors are disabled
 func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	return &UI{
-		In:           in,
-		Out:          out,
-		Err:          err,
-		colorEnabled: configv3.ColorDisabled,
-		translate:    translationWrapper(i18n.IdentityTfunc()),
+		In:               in,
+		Out:              out,
+		Err:              err,
+		colorEnabled:     configv3.ColorDisabled,
+		translate:        translationWrapper(i18n.IdentityTfunc()),
+		TimezoneLocation: time.UTC,
 	}
 }
 

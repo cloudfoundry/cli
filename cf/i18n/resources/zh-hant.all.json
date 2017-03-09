@@ -4692,6 +4692,10 @@
     "translation": "擷取所有與空間相關聯的安全群組的規則"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分擷取所有已標示特性的狀態..."
   },

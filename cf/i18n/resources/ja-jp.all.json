@@ -4692,6 +4692,10 @@
     "translation": "このスペースに関連付けられているすべてのセキュリティー・グループのルールを取得します"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "{{.Username}} としてすべてのフラグ付きフィーチャーの状況を取得しています..."
   },
