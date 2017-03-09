@@ -1088,6 +1088,10 @@
     "translation": ""
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Route and domain management:",
     "translation": "Route and domain management:"
   },

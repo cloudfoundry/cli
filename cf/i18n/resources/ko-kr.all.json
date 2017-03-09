@@ -4692,6 +4692,10 @@
     "translation": "영역과 연관된 모든 보안 그룹의 규칙 검색"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "{{.Username}}(으)로 모든 플래그 지정된 기능의 상태 검색 중..."
   },

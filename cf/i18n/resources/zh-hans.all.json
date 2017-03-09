@@ -4692,6 +4692,10 @@
     "translation": "检索与空间关联的所有安全组的规则"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份检索所有已标记功能的状态..."
   },

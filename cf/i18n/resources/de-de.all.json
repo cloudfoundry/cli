@@ -4692,6 +4692,10 @@
     "translation": "Regeln für alle Sicherheitsgruppen abrufen, die dem Bereich zugeordnet sind"
   },
   {
+    "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
     "translation": "Abrufen des Status aller mit Flags markierten Features als {{.Username}}..."
   },
