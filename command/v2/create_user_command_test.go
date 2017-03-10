@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/v2"
+	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -18,7 +18,7 @@ import (
 
 var _ = Describe("create-user Command", func() {
 	var (
-		cmd             v2.CreateUserCommand
+		cmd             CreateUserCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -33,7 +33,7 @@ var _ = Describe("create-user Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeCreateUserActor)
 
-		cmd = v2.CreateUserCommand{
+		cmd = CreateUserCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,

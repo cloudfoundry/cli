@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/v2"
+	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -19,7 +19,7 @@ import (
 
 var _ = Describe("space Command", func() {
 	var (
-		cmd             v2.SpaceCommand
+		cmd             SpaceCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -34,7 +34,7 @@ var _ = Describe("space Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeSpaceActor)
 
-		cmd = v2.SpaceCommand{
+		cmd = SpaceCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
