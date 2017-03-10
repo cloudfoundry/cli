@@ -2,15 +2,23 @@ package internal
 
 import "net/http"
 
+// Naming convention:
+//
+// Method + non-parameter parts of the path
+//
+// If the request returns a single entity by GUID, use the singular (for example
+// /v2/organizations/:organization_guid is GetOrganization).
+//
+// The const name should always be the const value + Request.
 const (
 	DeleteIsolationSegmentRequest                        = "DeleteIsolationSegment"
-	GetAppsRequest                                       = "Apps"
-	GetAppTasksRequest                                   = "AppTasks"
+	GetAppsRequest                                       = "GetApps"
+	GetAppTasksRequest                                   = "GetAppTasks"
 	GetIsolationSegmentsRequest                          = "GetIsolationSegments"
-	GetOrgsRequest                                       = "Orgs"
+	GetOrgsRequest                                       = "GetOrgs"
 	PostAppTasksRequest                                  = "PostAppTasks"
-	PostIsolationSegmentsRequest                         = "PostIsolationSegment"
-	PostIsolationSegmentRelationshipOrganizationsRequest = "NewIsolationSegmentOrganizationRelationship"
+	PostIsolationSegmentsRequest                         = "PostIsolationSegments"
+	PostIsolationSegmentRelationshipOrganizationsRequest = "PostIsolationSegmentRelationshipOrganizations"
 )
 
 const (
