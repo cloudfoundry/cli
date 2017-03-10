@@ -114,4 +114,19 @@ var _ = Describe("Request Logger Terminal Display", func() {
 			Expect(testUI.Err).To(Say("foobar"))
 		})
 	})
+
+	Describe("Start and Stop", func() {
+		It("locks and then unlocks the mutex properly", func() {
+			c := make(chan bool)
+			err := display.Start()
+			Expect(err).ToNot(HaveOccurred())
+			go func() {
+				display.Start()
+				c <- true
+			}()
+			Consistently(c).ShouldNot(Receive())
+			display.Stop()
+			Eventually(c).Should(Receive())
+		})
+	})
 })

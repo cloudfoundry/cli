@@ -4,16 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 )
 
 type RequestLoggerTerminalDisplay struct {
-	ui UI
+	ui   UI
+	lock *sync.Mutex
 }
 
 func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
 	return &RequestLoggerTerminalDisplay{
-		ui: ui,
+		ui:   ui,
+		lock: &sync.Mutex{},
 	}
 }
 
@@ -86,9 +89,13 @@ func (display *RequestLoggerTerminalDisplay) HandleInternalError(err error) {
 	display.ui.DisplayWarning(err.Error())
 }
 
-func (display *RequestLoggerTerminalDisplay) Start() error { return nil }
+func (display *RequestLoggerTerminalDisplay) Start() error {
+	display.lock.Lock()
+	return nil
+}
 
 func (display *RequestLoggerTerminalDisplay) Stop() error {
+	display.lock.Unlock()
 	display.ui.DisplayNewline()
 	return nil
 }
