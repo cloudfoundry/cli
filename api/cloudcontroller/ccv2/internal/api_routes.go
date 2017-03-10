@@ -6,6 +6,14 @@ import (
 	"github.com/tedsuo/rata"
 )
 
+// Naming convention:
+//
+// Method + non-parameter parts of the path
+//
+// If the request returns a single entity by GUID, use the singular (for example
+// /v2/organizations/:organization_guid is GetOrganization).
+//
+// The const name should always be the const value + Request.
 const (
 	GetAppInstancesRequest               = "GetAppInstances"
 	GetAppStatsRequest                   = "GetAppStats"
@@ -39,7 +47,6 @@ const (
 
 // APIRoutes is a list of routes used by the rata library to construct request
 // URLs.
-// Naming convention: Method + [ParentResourceInstance] + Resource
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: GetAppsRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: GetAppRequest},
