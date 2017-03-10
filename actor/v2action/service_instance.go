@@ -41,3 +41,19 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 
 	return ServiceInstance(serviceInstances[0]), Warnings(warnings), nil
 }
+
+func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstance, Warnings, error) {
+	ccv2ServiceInstances, warnings, err := actor.CloudControllerClient.GetSpaceServiceInstances(
+		spaceGUID, true, nil)
+
+	if err != nil {
+		return []ServiceInstance{}, Warnings(warnings), err
+	}
+
+	serviceInstances := make([]ServiceInstance, len(ccv2ServiceInstances))
+	for i, ccv2ServiceInstance := range ccv2ServiceInstances {
+		serviceInstances[i] = ServiceInstance(ccv2ServiceInstance)
+	}
+
+	return serviceInstances, Warnings(warnings), nil
+}

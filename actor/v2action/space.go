@@ -12,11 +12,19 @@ type Space ccv2.Space
 // SpaceFoundError represents the scenario when the space searched for could
 // not be found.
 type SpaceNotFoundError struct {
+	GUID string
 	Name string
 }
 
 func (e SpaceNotFoundError) Error() string {
-	return fmt.Sprintf("Space '%s' not found.", e.Name)
+	switch {
+	case e.Name != "":
+		return fmt.Sprintf("Space '%s' not found.", e.Name)
+	case e.GUID != "":
+		return fmt.Sprintf("Space with GUID '%s' not found.", e.GUID)
+	default:
+		return fmt.Sprintf("Space '' not found.")
+	}
 }
 
 // MultipleSpacesFoundError represents the scenario when the cloud
@@ -29,6 +37,27 @@ type MultipleSpacesFoundError struct {
 
 func (e MultipleSpacesFoundError) Error() string {
 	return fmt.Sprintf("Multiple spaces found matching organization GUID '%s' and name '%s'", e.OrgGUID, e.Name)
+}
+
+// GetOrganizationSpaces returns a list of spaces in the specified org
+func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
+	query := []ccv2.Query{
+		{
+			Filter:   ccv2.OrganizationGUIDFilter,
+			Operator: ccv2.EqualOperator,
+			Value:    orgGUID,
+		}}
+	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(query)
+	if err != nil {
+		return []Space{}, Warnings(warnings), err
+	}
+
+	spaces := make([]Space, len(ccv2Spaces))
+	for i, ccv2Space := range ccv2Spaces {
+		spaces[i] = Space(ccv2Space)
+	}
+
+	return spaces, Warnings(warnings), nil
 }
 
 // GetSpaceByOrganizationAndName returns an Space based on the org and name.
@@ -59,35 +88,5 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 		return Space{}, Warnings(warnings), MultipleSpacesFoundError{OrgGUID: orgGUID, Name: spaceName}
 	}
 
-	return Space{
-		GUID:     ccv2Spaces[0].GUID,
-		Name:     ccv2Spaces[0].Name,
-		AllowSSH: ccv2Spaces[0].AllowSSH,
-	}, Warnings(warnings), nil
-}
-
-// GetOrganizationSpaces returns a list of spaces in the specified org
-func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
-	query := []ccv2.Query{
-		{
-			Filter:   ccv2.OrganizationGUIDFilter,
-			Operator: ccv2.EqualOperator,
-			Value:    orgGUID,
-		}}
-	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(query)
-	if err != nil {
-		return []Space{}, Warnings(warnings), err
-	}
-
-	var spaces []Space
-
-	for _, ccv2Space := range ccv2Spaces {
-		spaces = append(spaces, Space{
-			GUID:     ccv2Space.GUID,
-			Name:     ccv2Space.Name,
-			AllowSSH: ccv2Space.AllowSSH,
-		})
-	}
-
-	return spaces, Warnings(warnings), nil
+	return Space(ccv2Spaces[0]), Warnings(warnings), nil
 }

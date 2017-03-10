@@ -1104,6 +1104,10 @@
     "translation": ""
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -1572,6 +1576,10 @@
     "translation": ""
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "billingmanager",
     "translation": ""
   },
@@ -1608,6 +1616,10 @@
     "translation": ""
   },
   {
+    "id": "destination",
+    "translation": ""
+  },
+  {
     "id": "does exist",
     "translation": "does exist"
   },
@@ -1628,8 +1640,24 @@
     "translation": ""
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "name:",
     "translation": "name:"
+  },
+  {
+    "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "ports",
+    "translation": ""
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -1648,12 +1676,24 @@
     "translation": ""
   },
   {
+    "id": "security groups:",
+    "translation": ""
+  },
+  {
     "id": "service_broker_guid IN ",
     "translation": "service_broker_guid IN "
   },
   {
     "id": "service_guid IN ",
     "translation": "service_guid IN "
+  },
+  {
+    "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "sso-passcode",

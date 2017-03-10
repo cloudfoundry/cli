@@ -4692,6 +4692,10 @@
     "translation": "擷取所有與空間相關聯的安全群組的規則"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -6176,6 +6180,10 @@
     "translation": "應用程式"
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "auth request failed",
     "translation": "鑑別要求失敗"
   },
@@ -6238,6 +6246,10 @@
   {
     "id": "description",
     "translation": "說明"
+  },
+  {
+    "id": "destination",
+    "translation": ""
   },
   {
     "id": "details",
@@ -6384,6 +6396,10 @@
     "translation": "前次上傳: "
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "limited",
     "translation": "有限"
   },
@@ -6424,6 +6440,10 @@
     "translation": "組織"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "組織"
   },
@@ -6456,8 +6476,16 @@
     "translation": "埠"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "位置"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6520,6 +6548,10 @@
     "translation": "安全群組"
   },
   {
+    "id": "security groups:",
+    "translation": ""
+  },
+  {
     "id": "service",
     "translation": "服務"
   },
@@ -6560,6 +6592,10 @@
     "translation": "服務"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "共用"
   },
@@ -6570,6 +6606,10 @@
   {
     "id": "space",
     "translation": "空間"
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "space quotas:",

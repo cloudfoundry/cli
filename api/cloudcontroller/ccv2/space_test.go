@@ -21,51 +21,55 @@ var _ = Describe("Space", func() {
 			Context("when results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
-					"next_url": "/v2/spaces?q=some-query:some-value&page=2",
-					"resources": [
-						{
-							"metadata": {
-								"guid": "space-guid-1"
+						"next_url": "/v2/spaces?q=some-query:some-value&page=2",
+						"resources": [
+							{
+								"metadata": {
+									"guid": "space-guid-1"
+								},
+								"entity": {
+									"name": "space-1",
+									"allow_ssh": false,
+									"space_quota_definition_guid": "some-space-quota-guid-1"
+								}
 							},
-							"entity": {
-								"name": "space-1",
-								"allow_ssh": false
+							{
+								"metadata": {
+									"guid": "space-guid-2"
+								},
+								"entity": {
+									"name": "space-2",
+									"allow_ssh": true,
+									"space_quota_definition_guid": "some-space-quota-guid-2"
+								}
 							}
-						},
-						{
-							"metadata": {
-								"guid": "space-guid-2"
-							},
-							"entity": {
-								"name": "space-2",
-								"allow_ssh": true
-							}
-						}
-					]
-				}`
+						]
+					}`
 					response2 := `{
-					"next_url": null,
-					"resources": [
-						{
-							"metadata": {
-								"guid": "space-guid-3"
+						"next_url": null,
+						"resources": [
+							{
+								"metadata": {
+									"guid": "space-guid-3"
+								},
+								"entity": {
+									"name": "space-3",
+									"allow_ssh": false,
+									"space_quota_definition_guid": "some-space-quota-guid-3"
+								}
 							},
-							"entity": {
-								"name": "space-3",
-								"allow_ssh": false
+							{
+								"metadata": {
+									"guid": "space-guid-4"
+								},
+								"entity": {
+									"name": "space-4",
+									"allow_ssh": true,
+									"space_quota_definition_guid": "some-space-quota-guid-4"
+								}
 							}
-						},
-						{
-							"metadata": {
-								"guid": "space-guid-4"
-							},
-							"entity": {
-								"name": "space-4",
-								"allow_ssh": true
-							}
-						}
-					]
-				}`
+						]
+					}`
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodGet, "/v2/spaces", "q=some-query:some-value"),
@@ -88,24 +92,28 @@ var _ = Describe("Space", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(spaces).To(Equal([]Space{
 						{
-							GUID:     "space-guid-1",
-							Name:     "space-1",
-							AllowSSH: false,
+							GUID:                     "space-guid-1",
+							Name:                     "space-1",
+							AllowSSH:                 false,
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid-1",
 						},
 						{
-							GUID:     "space-guid-2",
-							Name:     "space-2",
-							AllowSSH: true,
+							GUID:                     "space-guid-2",
+							Name:                     "space-2",
+							AllowSSH:                 true,
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid-2",
 						},
 						{
-							GUID:     "space-guid-3",
-							Name:     "space-3",
-							AllowSSH: false,
+							GUID:                     "space-guid-3",
+							Name:                     "space-3",
+							AllowSSH:                 false,
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid-3",
 						},
 						{
-							GUID:     "space-guid-4",
-							Name:     "space-4",
-							AllowSSH: true,
+							GUID:                     "space-guid-4",
+							Name:                     "space-4",
+							AllowSSH:                 true,
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid-4",
 						},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))

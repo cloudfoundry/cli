@@ -1560,6 +1560,10 @@
     "translation": ""
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -2052,6 +2056,10 @@
     "translation": "app"
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "billingmanager",
     "translation": ""
   },
@@ -2084,6 +2092,10 @@
     "translation": ""
   },
   {
+    "id": "destination",
+    "translation": ""
+  },
+  {
     "id": "does exist",
     "translation": "does exist"
   },
@@ -2104,6 +2116,10 @@
     "translation": ""
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "name:",
     "translation": "name:"
   },
@@ -2112,8 +2128,20 @@
     "translation": "org"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "plan",
     "translation": "plan"
+  },
+  {
+    "id": "ports",
+    "translation": ""
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "repo-plugins",
@@ -2121,6 +2149,10 @@
   },
   {
     "id": "run-task",
+    "translation": ""
+  },
+  {
+    "id": "security groups:",
     "translation": ""
   },
   {
@@ -2134,6 +2166,14 @@
   {
     "id": "service_guid IN ",
     "translation": "service_guid IN "
+  },
+  {
+    "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "sso-passcode",

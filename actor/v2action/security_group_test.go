@@ -1,15 +1,17 @@
 package v2action_test
 
 import (
+	"errors"
+
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Security group Actions", func() {
+var _ = Describe("Security Group Actions", func() {
 	var (
 		actor                     Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
@@ -132,6 +134,143 @@ var _ = Describe("Security group Actions", func() {
 			It("returns the error and warnings", func() {
 				Expect(err).To(Equal(returnedError))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("GetSpaceRunningSecurityGroupsBySpace", func() {
+		Context("when the space exists and there are no errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					[]ccv2.SecurityGroup{
+						{
+							Name: "some-shared-security-group",
+						},
+						{
+							Name: "some-running-security-group",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+			It("returns the security groups and warnings", func() {
+				securityGroups, warnings, err := actor.GetSpaceRunningSecurityGroupsBySpace("space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf([]string{"warning-1", "warning-2"}))
+				Expect(securityGroups).To(Equal(
+					[]SecurityGroup{
+						{
+							Name: "some-shared-security-group",
+						},
+						{
+							Name: "some-running-security-group",
+						},
+					}))
+
+				Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)).To(Equal("space-guid"))
+			})
+		})
+
+		Context("when the space does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					nil,
+					nil,
+					cloudcontroller.ResourceNotFoundError{})
+			})
+
+			It("returns an SpaceNotFoundError", func() {
+				_, _, err := actor.GetSpaceRunningSecurityGroupsBySpace("space-guid")
+				Expect(err).To(MatchError(SpaceNotFoundError{GUID: "space-guid"}))
+			})
+		})
+
+		Context("when there is an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("banana")
+				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
+					nil,
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetSpaceRunningSecurityGroupsBySpace("space-guid")
+				Expect(warnings).To(ConsistOf([]string{"warning-1", "warning-2"}))
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+	})
+
+	Describe("GetSpaceStagingSecurityGroupsBySpace", func() {
+		Context("when the space exists and there are no errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					[]ccv2.SecurityGroup{
+						{
+							Name: "some-shared-security-group",
+						},
+						{
+							Name: "some-staging-security-group",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the security groups and warnings", func() {
+				securityGroups, warnings, err := actor.GetSpaceStagingSecurityGroupsBySpace("space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf([]string{"warning-1", "warning-2"}))
+				Expect(securityGroups).To(Equal(
+					[]SecurityGroup{
+						{
+							Name: "some-shared-security-group",
+						},
+						{
+							Name: "some-staging-security-group",
+						},
+					}))
+
+				Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)).To(Equal("space-guid"))
+			})
+		})
+
+		Context("when the space does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					nil,
+					nil,
+					cloudcontroller.ResourceNotFoundError{})
+			})
+
+			It("returns an SpaceNotFoundError", func() {
+				_, _, err := actor.GetSpaceStagingSecurityGroupsBySpace("space-guid")
+				Expect(err).To(MatchError(SpaceNotFoundError{GUID: "space-guid"}))
+			})
+		})
+
+		Context("when there is an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("banana")
+				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
+					nil,
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetSpaceStagingSecurityGroupsBySpace("space-guid")
+				Expect(warnings).To(ConsistOf([]string{"warning-1", "warning-2"}))
+				Expect(err).To(MatchError(expectedErr))
 			})
 		})
 	})

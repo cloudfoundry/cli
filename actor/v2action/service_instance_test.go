@@ -22,7 +22,69 @@ var _ = Describe("Service Instance Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
-	Describe("GetSpaceServiceInstanceByName", func() {
+	Describe("GetServiceInstancesBySpace", func() {
+		Context("when there are service instances", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+					[]ccv2.ServiceInstance{
+						{
+							GUID: "some-service-instance-guid-1",
+							Name: "some-service-instance-1",
+						},
+						{
+							GUID: "some-service-instance-guid-2",
+							Name: "some-service-instance-2",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the service instances and warnings", func() {
+				serviceInstances, warnings, err := actor.GetServiceInstancesBySpace("some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(serviceInstances).To(ConsistOf(
+					ServiceInstance{
+						GUID: "some-service-instance-guid-1",
+						Name: "some-service-instance-1",
+					},
+					ServiceInstance{
+						GUID: "some-service-instance-guid-2",
+						Name: "some-service-instance-2",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
+
+				spaceGUID, includeUserProvidedServices, queries := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(includeUserProvidedServices).To(BeTrue())
+				Expect(queries).To(BeNil())
+			})
+		})
+
+		Context("when the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+					[]ccv2.ServiceInstance{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedError)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetServiceInstancesBySpace("some-space-guid")
+				Expect(err).To(MatchError(expectedError))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("GetServiceInstanceByNameAndSpace", func() {
 		Context("when the service instance exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(

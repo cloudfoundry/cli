@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,6 +20,78 @@ var _ = Describe("Org Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil)
+	})
+
+	Describe("GetOrganization", func() {
+		var (
+			org      Organization
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			org, warnings, err = actor.GetOrganization("some-org-guid")
+		})
+
+		Context("when the org exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationReturns(
+					ccv2.Organization{
+						GUID:                "some-org-guid",
+						Name:                "some-org",
+						QuotaDefinitionGUID: "some-quota-definition-guid",
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil)
+			})
+
+			It("returns the org and all warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(org.GUID).To(Equal("some-org-guid"))
+				Expect(org.Name).To(Equal("some-org"))
+				Expect(org.QuotaDefinitionGUID).To(Equal("some-quota-definition-guid"))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
+				guid := fakeCloudControllerClient.GetOrganizationArgsForCall(0)
+				Expect(guid).To(Equal("some-org-guid"))
+			})
+		})
+
+		Context("when the org does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationReturns(
+					ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					cloudcontroller.ResourceNotFoundError{},
+				)
+			})
+
+			It("returns warnings and OrganizationNotFoundError", func() {
+				Expect(err).To(MatchError(OrganizationNotFoundError{GUID: "some-org-guid"}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when client returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get org error")
+				fakeCloudControllerClient.GetOrganizationReturns(
+					ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedErr,
+				)
+			})
+
+			It("returns warnings and the error", func() {
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
 	})
 
 	Describe("GetOrganizationByName", func() {
