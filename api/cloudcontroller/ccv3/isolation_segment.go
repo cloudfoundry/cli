@@ -41,7 +41,7 @@ func (client *Client) CreateIsolationSegment(name string) (IsolationSegment, War
 	return isolationSegment, response.Warnings, err
 }
 
-// GetIsolationSegments lists applications with optional filters.
+// GetIsolationSegments lists isolation segments with optional filters.
 func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentsRequest,

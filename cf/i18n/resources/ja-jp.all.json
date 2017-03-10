@@ -1024,6 +1024,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": ""
   },
@@ -2980,6 +2984,10 @@
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} 内のスペース {{.TargetSpace}} の情報を取得しています..."
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} としてサービス・インスタンス {{.ServiceInstanceName}} のキー {{.ServiceKeyName}} を取得しています..."
   },
@@ -3614,6 +3622,10 @@
   {
     "id": "List all buildpacks",
     "translation": "すべてのビルドパックをリストします"
+  },
+  {
+    "id": "List all isolation segments",
+    "translation": ""
   },
   {
     "id": "List all orgs",
@@ -6382,6 +6394,10 @@
   {
     "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
     "translation": "環境変数 CF_STARTUP_TIMEOUT の値が無効です\n{{.Err}}"
+  },
+  {
+    "id": "isolation-segments",
+    "translation": ""
   },
   {
     "id": "label",

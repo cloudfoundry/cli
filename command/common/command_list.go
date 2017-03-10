@@ -76,6 +76,7 @@ type commandList struct {
 	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      v2.InstallPluginCommand                      `command:"install-plugin" description:"Install CLI plugin"`
+	IsolationSegments                  v3.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
 	ListPluginRepos                    v2.ListPluginReposCommand                    `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v2.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v2.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`

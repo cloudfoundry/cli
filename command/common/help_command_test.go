@@ -555,6 +555,10 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   running-environment-variable-group\\s+Retrieve the contents of the running environment variable group"))
 				Expect(testUI.Out).To(Say("   set-running-environment-variable-group Pass parameters as JSON to create a running environment variable group"))
 
+				Expect(testUI.Out).To(Say("ISOLATION SEGMENTS:"))
+				Expect(testUI.Out).To(Say("   isolation-segments\\s+List all isolation segments"))
+				Expect(testUI.Out).To(Say("   create-isolation-segment\\s+Create an isolation segment"))
+
 				Expect(testUI.Out).To(Say("FEATURE FLAGS:"))
 				Expect(testUI.Out).To(Say("   feature-flags\\s+Retrieve list of feature flags with status of each flag-able feature"))
 				Expect(testUI.Out).To(Say("   disable-feature-flag\\s+Disable the use of a feature so that users have access to and can use the feature"))

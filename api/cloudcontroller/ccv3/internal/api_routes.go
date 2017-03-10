@@ -15,6 +15,7 @@ const (
 	GetAppsRequest                                       = "GetApps"
 	GetAppTasksRequest                                   = "GetAppTasks"
 	GetIsolationSegmentsRequest                          = "GetIsolationSegments"
+	GetIsolationSegmentOrganizationsRequest              = "GetIsolationSegmentRelationshipOrganizations"
 	GetOrgsRequest                                       = "GetOrgs"
 	PostAppTasksRequest                                  = "PostAppTasks"
 	PostIsolationSegmentsRequest                         = "PostIsolationSegments"
@@ -32,6 +33,7 @@ const (
 var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/tasks", Method: http.MethodGet, Name: GetAppTasksRequest, Resource: AppsResource},
 	{Path: "/:guid/tasks", Method: http.MethodPost, Name: PostAppTasksRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetAppsRequest, Resource: AppsResource},

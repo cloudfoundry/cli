@@ -1024,6 +1024,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": ""
   },
@@ -2980,6 +2984,10 @@
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.OrgName}} 中空间 {{.TargetSpace}} 的信息..."
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份获取服务实例 {{.ServiceInstanceName}} 的密钥 {{.ServiceKeyName}}..."
   },
@@ -3614,6 +3622,10 @@
   {
     "id": "List all buildpacks",
     "translation": "列出所有 buildpack"
+  },
+  {
+    "id": "List all isolation segments",
+    "translation": ""
   },
   {
     "id": "List all orgs",
@@ -6382,6 +6394,10 @@
   {
     "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
     "translation": "环境变量 CF_STARTUP_TIMEOUT 的值无效\n{{.Err}}"
+  },
+  {
+    "id": "isolation-segments",
+    "translation": ""
   },
   {
     "id": "label",

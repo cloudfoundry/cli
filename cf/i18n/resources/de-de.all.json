@@ -1024,6 +1024,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": ""
   },
@@ -2980,6 +2984,10 @@
     "translation": "Abrufen der Infos für Bereich {{.TargetSpace}} in Organisation {{.OrgName}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
     "translation": "Abrufen des Schlüssels {{.ServiceKeyName}} für Serviceinstanz {{.ServiceInstanceName}} als {{.CurrentUser}}..."
   },
@@ -3614,6 +3622,10 @@
   {
     "id": "List all buildpacks",
     "translation": "Alle Buildpacks auflisten"
+  },
+  {
+    "id": "List all isolation segments",
+    "translation": ""
   },
   {
     "id": "List all orgs",
@@ -6382,6 +6394,10 @@
   {
     "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
     "translation": "Ungültiger Wert für Umgebungsvariable CF_STARTUP_TIMEOUT\n{{.Err}}"
+  },
+  {
+    "id": "isolation-segments",
+    "translation": ""
   },
   {
     "id": "label",

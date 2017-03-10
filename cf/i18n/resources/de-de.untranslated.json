@@ -540,6 +540,10 @@
     "translation": "CF_NAME install-plugin ~/Downloads/plugin-foobar"
   },
   {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1252,6 +1256,10 @@
     "translation": "Features"
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting routes as {{.CurrentUser}} ...",
     "translation": ""
   },
@@ -1333,6 +1341,10 @@
   },
   {
     "id": "Last uploaded:",
+    "translation": ""
+  },
+  {
+    "id": "List all isolation segments",
     "translation": ""
   },
   {
@@ -2093,6 +2105,10 @@
   },
   {
     "id": "integer",
+    "translation": ""
+  },
+  {
+    "id": "isolation-segments",
     "translation": ""
   },
   {
