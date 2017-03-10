@@ -13,20 +13,12 @@ import (
 
 // Task represents a Cloud Controller V3 Task.
 type Task struct {
-	GUID       string `json:"guid"`
-	SequenceID int    `json:"sequence_id"`
-	Name       string `json:"name"`
-	Command    string `json:"command"`
-	State      string `json:"state"`
-	CreatedAt  string `json:"created_at"`
-	MemoryInMB uint64 `json:"memory_in_mb"`
-	DiskInMB   uint64 `json:"disk_in_mb"`
-}
-
-// NewTaskBody represents the body of the request to create a Task.
-type NewTaskBody struct {
-	Command    string `json:"command"`
+	GUID       string `json:"guid,omitempty"`
+	SequenceID int    `json:"sequence_id,omitempty"`
 	Name       string `json:"name,omitempty"`
+	Command    string `json:"command"`
+	State      string `json:"state,omitempty"`
+	CreatedAt  string `json:"created_at,omitempty"`
 	MemoryInMB uint64 `json:"memory_in_mb,omitempty"`
 	DiskInMB   uint64 `json:"disk_in_mb,omitempty"`
 }
@@ -34,7 +26,7 @@ type NewTaskBody struct {
 // NewTask runs a command in the Application environment associated with the
 // provided Application GUID.
 func (client *Client) NewTask(appGUID string, command string, name string, memory uint64, disk uint64) (Task, Warnings, error) {
-	bodyBytes, err := json.Marshal(NewTaskBody{
+	bodyBytes, err := json.Marshal(Task{
 		Command:    command,
 		Name:       name,
 		MemoryInMB: memory,
