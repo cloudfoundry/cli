@@ -45,8 +45,8 @@ var _ = Describe("enable-org-isolation Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		isolationSegment = "segment1"
 		org = "some-org"
+		isolationSegment = "segment1"
 		// fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 	})
 
@@ -86,8 +86,8 @@ var _ = Describe("enable-org-isolation Command", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 
-			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 			cmd.RequiredArgs.OrganizationName = org
+			cmd.RequiredArgs.IsolationSegmentName = isolationSegment
 		})
 
 		Context("when the enable is successful", func() {
@@ -105,9 +105,9 @@ var _ = Describe("enable-org-isolation Command", func() {
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
 				Expect(fakeActor.EntitleIsolationSegmentToOrganizationByNameCallCount()).To(Equal(1))
-				isolationSegmentName, orgName := fakeActor.EntitleIsolationSegmentToOrganizationByNameArgsForCall(0)
-				Expect(isolationSegmentName).To(Equal(isolationSegment))
+				orgName, isolationSegmentName := fakeActor.EntitleIsolationSegmentToOrganizationByNameArgsForCall(0)
 				Expect(orgName).To(Equal(org))
+				Expect(isolationSegmentName).To(Equal(isolationSegment))
 			})
 		})
 
