@@ -222,30 +222,20 @@ var _ = Describe("target command", func() {
 
 	Context("when only a space argument is provided", func() {
 		Context("when there is an existing targeted org", func() {
-			existingOrg := helpers.RandomName()
-			existingSpace := helpers.RandomName()
-
 			BeforeEach(func() {
 				helpers.LoginCF()
-				// We create and set a space to verify that the target command
-				// preserves existing targets in failure
-				helpers.CreateOrgAndSpace(existingOrg, existingSpace)
-				helpers.TargetOrgAndSpace(existingOrg, existingSpace)
+				Eventually(helpers.CF("target", "-o", ReadOnlyOrg)).Should(Exit(0))
 			})
 
 			Context("when the space exists", func() {
-				BeforeEach(func() {
-					helpers.CreateSpace(spaceName)
-				})
-
 				It("targets the space and exits 0", func() {
 					username, _ := helpers.GetCredentials()
-					session := helpers.CF("target", "-s", spaceName)
+					session := helpers.CF("target", "-s", ReadOnlySpace)
 					Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
 					Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
 					Eventually(session.Out).Should(Say("User:           %s", username))
-					Eventually(session.Out).Should(Say("Org:            %s", existingOrg))
-					Eventually(session.Out).Should(Say("Space:          %s", spaceName))
+					Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
+					Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -258,7 +248,7 @@ var _ = Describe("target command", func() {
 					Eventually(session).Should(Exit(1))
 
 					session = helpers.CF("target")
-					Eventually(session.Out).Should(Say("Org:            %s", existingOrg))
+					Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
 					Eventually(session.Out).Should(Say("No space targeted, use 'cf target -s SPACE'"))
 					Eventually(session).Should(Exit(0))
 				})
