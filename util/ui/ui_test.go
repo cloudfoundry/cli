@@ -87,6 +87,42 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("RequestLoggerTerminalDisplay", func() {
+		It("returns a RequestLoggerTerminalDisplay with the consistent display mutex", func() {
+			logger1 := ui.RequestLoggerTerminalDisplay()
+			logger2 := ui.RequestLoggerTerminalDisplay()
+
+			c := make(chan bool)
+			err := logger1.Start()
+			Expect(err).ToNot(HaveOccurred())
+			go func() {
+				logger2.Start()
+				c <- true
+			}()
+			Consistently(c).ShouldNot(Receive())
+			logger1.Stop()
+			Eventually(c).Should(Receive())
+		})
+	})
+
+	Describe("RequestLoggerFileWriter", func() {
+		It("returns a RequestLoggerFileWriter with the consistent filewriting mutex", func() {
+			logger1 := ui.RequestLoggerFileWriter(nil)
+			logger2 := ui.RequestLoggerFileWriter(nil)
+
+			c := make(chan bool)
+			err := logger1.Start()
+			Expect(err).ToNot(HaveOccurred())
+			go func() {
+				logger2.Start()
+				c <- true
+			}()
+			Consistently(c).ShouldNot(Receive())
+			logger1.Stop()
+			Eventually(c).Should(Receive())
+		})
+	})
+
 	Describe("DisplayOK", func() {
 		It("displays 'OK' in green and bold", func() {
 			ui.DisplayOK()

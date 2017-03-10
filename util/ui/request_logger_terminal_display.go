@@ -1,4 +1,4 @@
-package command
+package ui
 
 import (
 	"bytes"
@@ -9,14 +9,14 @@ import (
 )
 
 type RequestLoggerTerminalDisplay struct {
-	ui   UI
+	ui   *UI
 	lock *sync.Mutex
 }
 
-func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
+func newRequestLoggerTerminalDisplay(ui *UI, lock *sync.Mutex) *RequestLoggerTerminalDisplay {
 	return &RequestLoggerTerminalDisplay{
 		ui:   ui,
-		lock: &sync.Mutex{},
+		lock: lock,
 	}
 }
 

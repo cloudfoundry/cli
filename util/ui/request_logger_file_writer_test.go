@@ -1,4 +1,4 @@
-package command_test
+package ui_test
 
 import (
 	"errors"
@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	. "code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util/ui"
+	. "code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +17,7 @@ import (
 
 var _ = Describe("Request Logger File Writer", func() {
 	var (
-		testUI   *ui.UI
+		testUI   *UI
 		display  *RequestLoggerFileWriter
 		tmpdir   string
 		logFile1 string
@@ -26,14 +25,14 @@ var _ = Describe("Request Logger File Writer", func() {
 	)
 
 	BeforeEach(func() {
-		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		testUI = NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		var err error
 		tmpdir, err = ioutil.TempDir("", "request_logger")
 		Expect(err).ToNot(HaveOccurred())
 
 		logFile1 = filepath.Join(tmpdir, "tmpfile1")
 		logFile2 = filepath.Join(tmpdir, "tmpfile2")
-		display = NewRequestLoggerFileWriter(testUI, []string{logFile1, logFile2})
+		display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
 		err = display.Start()
 		Expect(err).ToNot(HaveOccurred())
 	})
@@ -221,6 +220,19 @@ var _ = Describe("Request Logger File Writer", func() {
 			err := errors.New("foobar")
 			display.HandleInternalError(err)
 			Expect(testUI.Err).To(Say("foobar"))
+		})
+	})
+
+	Describe("Start and Stop", func() {
+		It("locks and then unlocks the mutex properly", func() {
+			c := make(chan bool)
+			go func() {
+				display.Start()
+				c <- true
+			}()
+			Consistently(c).ShouldNot(Receive())
+			display.Stop()
+			Eventually(c).Should(Receive())
 		})
 	})
 })

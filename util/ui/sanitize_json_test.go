@@ -1,7 +1,7 @@
-package command_test
+package ui_test
 
 import (
-	. "code.cloudfoundry.org/cli/command"
+	. "code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -44,12 +44,12 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 
 	verbose, location := config.Verbose()
 	if verbose {
-		ccClient.WrapConnection(ccWrapper.NewRequestLogger(command.NewRequestLoggerTerminalDisplay(ui)))
-		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(command.NewRequestLoggerTerminalDisplay(ui)))
+		ccClient.WrapConnection(ccWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
+		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
 	}
 	if location != nil {
-		ccClient.WrapConnection(ccWrapper.NewRequestLogger(command.NewRequestLoggerFileWriter(ui, location)))
-		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(command.NewRequestLoggerFileWriter(ui, location)))
+		ccClient.WrapConnection(ccWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
+		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
 	ccClient.WrapConnection(ccWrapper.NewUAAAuthentication(uaaClient, config))
