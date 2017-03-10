@@ -8,6 +8,11 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
+type IsolationSegmentSummary struct {
+	Name         string
+	EntitledOrgs []string
+}
+
 // IsolationSegment represents a V3 actor IsolationSegment.
 type IsolationSegment ccv3.IsolationSegment
 
@@ -83,4 +88,35 @@ func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, War
 	}
 
 	return IsolationSegment(isolationSegments[0]), Warnings(warnings), nil
+}
+
+// GetIsolationSegmentSummaries returns all isolation segments and their entitled orgs
+func (actor Actor) GetIsolationSegmentSummaries() ([]IsolationSegmentSummary, Warnings, error) {
+	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(nil)
+	allWarnings := append(Warnings{}, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	var isolationSegmentSummaries []IsolationSegmentSummary
+
+	for _, isolationSegment := range isolationSegments {
+		isolationSegmentSummary := IsolationSegmentSummary{
+			Name:         isolationSegment.Name,
+			EntitledOrgs: []string{},
+		}
+
+		orgs, warnings, err := actor.CloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegment(isolationSegment.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+
+		for _, org := range orgs {
+			isolationSegmentSummary.EntitledOrgs = append(isolationSegmentSummary.EntitledOrgs, org.Name)
+		}
+
+		isolationSegmentSummaries = append(isolationSegmentSummaries, isolationSegmentSummary)
+	}
+	return isolationSegmentSummaries, allWarnings, nil
 }

@@ -290,4 +290,89 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetIsolationSegmentSummaries", func() {
+		Context("when getting isolation segments succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetIsolationSegmentsReturns([]ccv3.IsolationSegment{
+					{
+						Name: "iso-seg-1",
+						GUID: "iso-guid-1",
+					},
+					{
+						Name: "iso-seg-2",
+						GUID: "iso-guid-2",
+					},
+				}, ccv3.Warnings{"get-iso-warning"}, nil)
+			})
+
+			Context("when getting entitled organizations succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturnsOnCall(0, []ccv3.Organization{}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturnsOnCall(1, []ccv3.Organization{
+						{
+							Name: "iso-2-org-1",
+							GUID: "iso-2-org-guid-1",
+						},
+						{
+							Name: "iso-2-org-2",
+							GUID: "iso-2-org-guid-2",
+						},
+					}, ccv3.Warnings{"get-entitled-orgs-warning-2"}, nil)
+				})
+
+				It("returns all isolation segment summaries and all warnings", func() {
+					isoSummaries, warnings, err := actor.GetIsolationSegmentSummaries()
+					Expect(warnings).To(ConsistOf("get-iso-warning", "get-entitled-orgs-warning-1", "get-entitled-orgs-warning-2"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(isoSummaries).To(ConsistOf([]IsolationSegmentSummary{
+						{
+							Name:         "iso-seg-1",
+							EntitledOrgs: []string{},
+						},
+						{
+							Name:         "iso-seg-2",
+							EntitledOrgs: []string{"iso-2-org-1", "iso-2-org-2"},
+						},
+					}))
+
+					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(BeEmpty())
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentArgsForCall(0)).To(Equal("iso-guid-1"))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentArgsForCall(1)).To(Equal("iso-guid-2"))
+				})
+			})
+
+			Context("when getting entitled organizations fails", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some-error")
+					fakeCloudControllerClient.GetIsolationSegmentOrganizationsByIsolationSegmentReturns(nil, ccv3.Warnings{"get-entitled-orgs-warning"}, expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					_, warnings, err := actor.GetIsolationSegmentSummaries()
+					Expect(warnings).To(ConsistOf("get-iso-warning", "get-entitled-orgs-warning"))
+					Expect(err).To(MatchError(expectedErr))
+				})
+			})
+		})
+
+		Context("when getting isolation segments fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some-error")
+				fakeCloudControllerClient.GetIsolationSegmentsReturns(nil, ccv3.Warnings{"get-iso-warning"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetIsolationSegmentSummaries()
+				Expect(warnings).To(ConsistOf("get-iso-warning"))
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+	})
 })

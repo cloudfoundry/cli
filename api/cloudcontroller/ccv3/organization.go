@@ -38,3 +38,30 @@ func (client *Client) GetOrganizations(query url.Values) ([]Organization, Warnin
 
 	return fullOrgsList, warnings, err
 }
+
+// GetIsolationSegmentOrganizationsByIsolationSegment lists organizations
+// entitled to an isolation segment
+func (client *Client) GetIsolationSegmentOrganizationsByIsolationSegment(isolationSegmentGUID string) ([]Organization, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetIsolationSegmentOrganizationsRequest,
+		URIParams:   map[string]string{"guid": isolationSegmentGUID},
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullOrgsList []Organization
+	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
+		if app, ok := item.(Organization); ok {
+			fullOrgsList = append(fullOrgsList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Organization{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullOrgsList, warnings, err
+}
