@@ -1,22 +1,25 @@
-package command
+package ui
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 )
 
 type RequestLoggerFileWriter struct {
-	ui        UI
+	ui        *UI
+	lock      *sync.Mutex
 	filePaths []string
 	logFiles  []*os.File
 }
 
-func NewRequestLoggerFileWriter(ui UI, filePaths []string) *RequestLoggerFileWriter {
+func newRequestLoggerFileWriter(ui *UI, lock *sync.Mutex, filePaths []string) *RequestLoggerFileWriter {
 	return &RequestLoggerFileWriter{
 		ui:        ui,
+		lock:      lock,
 		filePaths: filePaths,
 		logFiles:  []*os.File{},
 	}
@@ -125,6 +128,7 @@ func (display *RequestLoggerFileWriter) HandleInternalError(err error) {
 }
 
 func (display *RequestLoggerFileWriter) Start() error {
+	display.lock.Lock()
 	for _, filePath := range display.filePaths {
 		logFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 		if err != nil {
@@ -145,5 +149,6 @@ func (display *RequestLoggerFileWriter) Stop() error {
 		}
 	}
 	display.logFiles = []*os.File{}
+	display.lock.Unlock()
 	return nil
 }

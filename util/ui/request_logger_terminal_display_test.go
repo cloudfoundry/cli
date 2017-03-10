@@ -1,11 +1,10 @@
-package command_test
+package ui_test
 
 import (
 	"errors"
 	"time"
 
-	. "code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/util/ui"
+	. "code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,14 +14,14 @@ import (
 var _ = Describe("Request Logger Terminal Display", func() {
 	var (
 		out     *Buffer
-		testUI  *ui.UI
+		testUI  *UI
 		display *RequestLoggerTerminalDisplay
 	)
 
 	BeforeEach(func() {
 		out = NewBuffer()
-		testUI = ui.NewTestUI(nil, out, NewBuffer())
-		display = NewRequestLoggerTerminalDisplay(testUI)
+		testUI = NewTestUI(nil, out, NewBuffer())
+		display = testUI.RequestLoggerTerminalDisplay()
 	})
 
 	Describe("DisplayDump", func() {

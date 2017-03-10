@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -73,6 +74,9 @@ type UI struct {
 	colorEnabled configv3.ColorSetting
 	translate    i18n.TranslateFunc
 
+	terminalLock *sync.Mutex
+	fileLock     *sync.Mutex
+
 	TimezoneLocation *time.Location
 }
 
@@ -92,6 +96,8 @@ func NewUI(c Config) (*UI, error) {
 		Err:              os.Stderr,
 		colorEnabled:     c.ColorEnabled(),
 		translate:        translateFunc,
+		terminalLock:     &sync.Mutex{},
+		fileLock:         &sync.Mutex{},
 		TimezoneLocation: location,
 	}, nil
 }
@@ -105,6 +111,8 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 		Err:              err,
 		colorEnabled:     configv3.ColorDisabled,
 		translate:        translationWrapper(i18n.IdentityTfunc()),
+		terminalLock:     &sync.Mutex{},
+		fileLock:         &sync.Mutex{},
 		TimezoneLocation: time.UTC,
 	}
 }
@@ -119,6 +127,19 @@ func (ui *UI) TranslateText(template string, templateValues ...map[string]interf
 // UserFriendlyDate converts the time to UTC and then formats it to ISO8601.
 func (ui *UI) UserFriendlyDate(input time.Time) string {
 	return input.Local().Format("Mon 02 Jan 15:04:05 MST 2006")
+}
+
+// RequestLoggerTerminalDisplay returns a RequestLoggerTerminalDisplay that
+// cannot overwrite another RequestLoggerTerminalDisplay or the current
+// display.
+func (ui *UI) RequestLoggerTerminalDisplay() *RequestLoggerTerminalDisplay {
+	return newRequestLoggerTerminalDisplay(ui, ui.terminalLock)
+}
+
+// RequestLoggerFileWriter returns a RequestLoggerFileWriter that cannot
+// overwrite another RequestLoggerFileWriter.
+func (ui *UI) RequestLoggerFileWriter(filePaths []string) *RequestLoggerFileWriter {
+	return newRequestLoggerFileWriter(ui, ui.fileLock, filePaths)
 }
 
 // DisplayOK outputs a bold green translated "OK" to UI.Out.

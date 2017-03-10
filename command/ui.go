@@ -22,6 +22,8 @@ type UI interface {
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
+	RequestLoggerFileWriter(filePaths []string) *ui.RequestLoggerFileWriter
+	RequestLoggerTerminalDisplay() *ui.RequestLoggerTerminalDisplay
 	TranslateText(template string, data ...map[string]interface{}) string
 	UserFriendlyDate(input time.Time) string
 }

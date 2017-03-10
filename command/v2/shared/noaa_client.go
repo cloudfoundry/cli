@@ -57,10 +57,10 @@ func NewNOAAClient(apiURL string, config command.Config, uaaClient *uaa.Client, 
 	client.SetDebugPrinter(&noaaDebugPrinter)
 
 	if verbose {
-		noaaDebugPrinter.addOutput(command.NewRequestLoggerTerminalDisplay(ui))
+		noaaDebugPrinter.addOutput(ui.RequestLoggerTerminalDisplay())
 	}
 	if location != nil {
-		noaaDebugPrinter.addOutput(command.NewRequestLoggerFileWriter(ui, location))
+		noaaDebugPrinter.addOutput(ui.RequestLoggerFileWriter(location))
 	}
 
 	return client
