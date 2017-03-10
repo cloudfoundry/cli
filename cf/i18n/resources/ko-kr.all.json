@@ -4692,6 +4692,10 @@
     "translation": "영역과 연관된 모든 보안 그룹의 규칙 검색"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -6176,6 +6180,10 @@
     "translation": "앱"
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "auth request failed",
     "translation": "인증 요청 실패"
   },
@@ -6238,6 +6246,10 @@
   {
     "id": "description",
     "translation": "설명"
+  },
+  {
+    "id": "destination",
+    "translation": ""
   },
   {
     "id": "details",
@@ -6384,6 +6396,10 @@
     "translation": "마지막으로 업로드함:"
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "limited",
     "translation": "제한됨"
   },
@@ -6424,6 +6440,10 @@
     "translation": "조직"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "조직"
   },
@@ -6456,8 +6476,16 @@
     "translation": "포트"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "위치"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6520,6 +6548,10 @@
     "translation": "보안 그룹"
   },
   {
+    "id": "security groups:",
+    "translation": ""
+  },
+  {
     "id": "service",
     "translation": "서비스"
   },
@@ -6560,6 +6592,10 @@
     "translation": "서비스"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "공유"
   },
@@ -6570,6 +6606,10 @@
   {
     "id": "space",
     "translation": "영역"
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "space quotas:",

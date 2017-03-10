@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -13,6 +14,7 @@ type Organization ccv2.Organization
 // OrganizationNotFoundError represents the scenario when the organization
 // searched for could not be found.
 type OrganizationNotFoundError struct {
+	GUID string
 	Name string
 }
 
@@ -31,6 +33,17 @@ type MultipleOrganizationsFoundError struct {
 func (e MultipleOrganizationsFoundError) Error() string {
 	guids := strings.Join(e.GUIDs, ", ")
 	return fmt.Sprintf("Organization name '%s' matches multiple GUIDs: %s", e.Name, guids)
+}
+
+// GetOrganization returns an Organization based on the provided guid.
+func (actor Actor) GetOrganization(guid string) (Organization, Warnings, error) {
+	org, warnings, err := actor.CloudControllerClient.GetOrganization(guid)
+
+	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+		return Organization{}, Warnings(warnings), OrganizationNotFoundError{GUID: guid}
+	}
+
+	return Organization(org), Warnings(warnings), err
 }
 
 // GetOrganizationByName returns an Organization based off of the name given.

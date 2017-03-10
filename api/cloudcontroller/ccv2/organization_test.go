@@ -16,6 +16,70 @@ var _ = Describe("Organization", func() {
 		client = NewTestClient()
 	})
 
+	Describe("GetOrganization", func() {
+		Context("when the organization exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-org-guid"
+					},
+					"entity": {
+						"name": "some-org",
+						"quota_definition_guid": "some-quota-guid"
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/organizations/some-org-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns the org and all warnings", func() {
+				orgs, warnings, err := client.GetOrganization("some-org-guid")
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(orgs).To(Equal(
+					Organization{
+						GUID:                "some-org-guid",
+						Name:                "some-org",
+						QuotaDefinitionGUID: "some-quota-guid",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/organizations/some-org-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns an error and all warnings", func() {
+				_, warnings, err := client.GetOrganization("some-org-guid")
+
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
 	Describe("GetOrganizations", func() {
 		Context("when no errors are encountered", func() {
 			Context("when results are paginated", func() {

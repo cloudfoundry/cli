@@ -4692,6 +4692,10 @@
     "translation": "Recuperar as regras de todos os grupos de segurança associados ao espaço"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -6176,6 +6180,10 @@
     "translation": ""
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "auth request failed",
     "translation": "falha na solicitação de autenticação"
   },
@@ -6237,6 +6245,10 @@
   },
   {
     "id": "description",
+    "translation": ""
+  },
+  {
+    "id": "destination",
     "translation": ""
   },
   {
@@ -6384,6 +6396,10 @@
     "translation": "última transferência por upload:"
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "limited",
     "translation": "limitado"
   },
@@ -6424,6 +6440,10 @@
     "translation": ""
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "organizações"
   },
@@ -6456,8 +6476,16 @@
     "translation": "ports"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "posição"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6520,6 +6548,10 @@
     "translation": "grupo de segurança"
   },
   {
+    "id": "security groups:",
+    "translation": ""
+  },
+  {
     "id": "service",
     "translation": "serviços"
   },
@@ -6560,6 +6592,10 @@
     "translation": "Extended Services"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "compartilhada"
   },
@@ -6570,6 +6606,10 @@
   {
     "id": "space",
     "translation": "espaço"
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "space quotas:",

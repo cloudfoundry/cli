@@ -177,7 +177,71 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("GetApplicationByNameSpace", func() {
+	Describe("GetApplicationsBySpace", func() {
+		Context("when the there are applications in the space", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{
+						{
+							GUID: "some-app-guid-1",
+							Name: "some-app-1",
+						},
+						{
+							GUID: "some-app-guid-2",
+							Name: "some-app-2",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the application and warnings", func() {
+				apps, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(apps).To(ConsistOf(
+					Application{
+						GUID: "some-app-guid-1",
+						Name: "some-app-1",
+					},
+					Application{
+						GUID: "some-app-guid-2",
+						Name: "some-app-2",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Query{
+					ccv2.Query{
+						Filter:   ccv2.SpaceGUIDFilter,
+						Operator: ccv2.EqualOperator,
+						Value:    "some-space-guid",
+					},
+				}))
+			})
+		})
+
+		Context("when the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("some cc error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedError)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
+	Describe("GetApplicationByNameAndSpace", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(

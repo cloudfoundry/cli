@@ -128,6 +128,28 @@ func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	return Application(app), Warnings(warnings), err
 }
 
+// GetApplicationsBySpace returns all applications in a space.
+func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
+	ccv2Apps, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
+		ccv2.Query{
+			Filter:   ccv2.SpaceGUIDFilter,
+			Operator: ccv2.EqualOperator,
+			Value:    spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return []Application{}, Warnings(warnings), err
+	}
+
+	apps := make([]Application, len(ccv2Apps))
+	for i, ccv2App := range ccv2Apps {
+		apps[i] = Application(ccv2App)
+	}
+
+	return apps, Warnings(warnings), nil
+}
+
 // GetApplicationByNameAndSpace returns an application with matching name in
 // the space.
 func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (Application, Warnings, error) {

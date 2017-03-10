@@ -9,9 +9,10 @@ import (
 
 // Space represents a Cloud Controller Space.
 type Space struct {
-	GUID     string
-	Name     string
-	AllowSSH bool
+	GUID                     string
+	Name                     string
+	AllowSSH                 bool
+	SpaceQuotaDefinitionGUID string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Space response.
@@ -19,8 +20,9 @@ func (space *Space) UnmarshalJSON(data []byte) error {
 	var ccSpace struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Name     string `json:"name"`
-			AllowSSH bool   `json:"allow_ssh"`
+			Name                     string `json:"name"`
+			AllowSSH                 bool   `json:"allow_ssh"`
+			SpaceQuotaDefinitionGUID string `json:"space_quota_definition_guid"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccSpace); err != nil {
@@ -30,6 +32,7 @@ func (space *Space) UnmarshalJSON(data []byte) error {
 	space.GUID = ccSpace.Metadata.GUID
 	space.Name = ccSpace.Entity.Name
 	space.AllowSSH = ccSpace.Entity.AllowSSH
+	space.SpaceQuotaDefinitionGUID = ccSpace.Entity.SpaceQuotaDefinitionGUID
 	return nil
 }
 

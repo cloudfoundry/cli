@@ -1,9 +1,10 @@
 package ccv2
 
 import (
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-	"encoding/json"
 )
 
 // OrganizationQuota is the definition of a quota for an organization.
@@ -33,7 +34,7 @@ func (application *OrganizationQuota) UnmarshalJSON(data []byte) error {
 // GetOrganizaitonQuota gets an organization quota (quota definition) from the API.
 func (client *Client) GetOrganizationQuota(guid string) (OrganizationQuota, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetQuotaDefinition,
+		RequestName: internal.GetOrganizationQuotaDefinitionRequest,
 		URIParams:   Params{"organization_quota_guid": guid},
 	})
 	if err != nil {

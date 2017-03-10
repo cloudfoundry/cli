@@ -4692,6 +4692,10 @@
     "translation": "このスペースに関連付けられているすべてのセキュリティー・グループのルールを取得します"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -6176,6 +6180,10 @@
     "translation": "アプリ"
   },
   {
+    "id": "apps:",
+    "translation": ""
+  },
+  {
     "id": "auth request failed",
     "translation": "認証要求が失敗しました"
   },
@@ -6238,6 +6246,10 @@
   {
     "id": "description",
     "translation": "説明"
+  },
+  {
+    "id": "destination",
+    "translation": ""
   },
   {
     "id": "details",
@@ -6384,6 +6396,10 @@
     "translation": "最終アップロード日時:"
   },
   {
+    "id": "lifecycle",
+    "translation": ""
+  },
+  {
     "id": "limited",
     "translation": "制限"
   },
@@ -6424,6 +6440,10 @@
     "translation": "組織"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "組織"
   },
@@ -6456,8 +6476,16 @@
     "translation": "ポート"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "位置"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6520,6 +6548,10 @@
     "translation": "セキュリティー・グループ"
   },
   {
+    "id": "security groups:",
+    "translation": ""
+  },
+  {
     "id": "service",
     "translation": "サービス"
   },
@@ -6560,6 +6592,10 @@
     "translation": "サービス"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "共有"
   },
@@ -6570,6 +6606,10 @@
   {
     "id": "space",
     "translation": "スペース"
+  },
+  {
+    "id": "space quota:",
+    "translation": ""
   },
   {
     "id": "space quotas:",

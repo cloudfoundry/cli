@@ -3,6 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -129,12 +130,14 @@ var _ = Describe("Security Groups", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(securityGroups).To(Equal([]SecurityGroup{
 						{
-							GUID: "security-group-guid-1",
-							Name: "security-group-1",
+							GUID:  "security-group-guid-1",
+							Name:  "security-group-1",
+							Rules: []SecurityGroupRule{},
 						},
 						{
-							GUID: "security-group-guid-2",
-							Name: "security-group-2",
+							GUID:  "security-group-guid-2",
+							Name:  "security-group-2",
+							Rules: []SecurityGroupRule{},
 						},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -168,6 +171,364 @@ var _ = Describe("Security Groups", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("GetSpaceRunningSecurityGroupsBySpace", func() {
+		Context("when the space exists", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/spaces/some-space-guid/security_groups?page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "running-security-group-guid-1",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "running-security-group-name-1",
+								"description": "description-1",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "8080",
+										"destination": "198.41.191.47/1"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "80,443",
+										"destination": "254.41.191.47-254.44.255.255"
+									}
+								]
+							}
+						},
+						{
+							"metadata": {
+								"guid": "running-security-group-guid-2",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "running-security-group-name-2",
+								"description": "description-2",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "8080",
+										"destination": "198.41.191.47/24"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "80,443",
+										"destination": "254.41.191.4-254.44.255.4"
+									}
+								]
+							}
+						}
+					]
+				}`
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "running-security-group-guid-3",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "running-security-group-name-3",
+								"description": "description-3",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "32767",
+										"destination": "127.0.0.1/32"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "8008,4443",
+										"destination": "254.41.191.0-254.44.255.1"
+									}
+								]
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups", "page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the running security groups and all warnings", func() {
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+				Expect(securityGroups).To(ConsistOf(
+					SecurityGroup{
+						Name:        "running-security-group-name-1",
+						GUID:        "running-security-group-guid-1",
+						Description: "description-1",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "8080",
+								Destination: "198.41.191.47/1",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "80,443",
+								Destination: "254.41.191.47-254.44.255.255",
+							},
+						},
+					},
+					SecurityGroup{
+						Name:        "running-security-group-name-2",
+						GUID:        "running-security-group-guid-2",
+						Description: "description-2",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "8080",
+								Destination: "198.41.191.47/24",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "80,443",
+								Destination: "254.41.191.4-254.44.255.4",
+							},
+						},
+					},
+					SecurityGroup{
+						Name:        "running-security-group-name-3",
+						GUID:        "running-security-group-guid-3",
+						Description: "description-3",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "32767",
+								Destination: "127.0.0.1/32",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "8008,4443",
+								Destination: "254.41.191.0-254.44.255.1",
+							},
+						},
+					},
+				))
+			})
+		})
+
+		Context("when the client returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+						"code": 40004,
+						"description": "The space could not be found: some-space-guid",
+						"error_code": "CF-SpaceNotFound"
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+					Message: "The space could not be found: some-space-guid",
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				Expect(securityGroups).To(BeEmpty())
+			})
+		})
+	})
+
+	Describe("GetSpaceStagingSecurityGroupsBySpace", func() {
+		Context("when the space exists", func() {
+			BeforeEach(func() {
+				response1 := `{
+					"next_url": "/v2/spaces/some-space-guid/staging_security_groups?page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "staging-security-group-guid-1",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "staging-security-group-name-1",
+								"description": "description-1",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "8080",
+										"destination": "198.41.191.47/1"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "80,443",
+										"destination": "254.41.191.47-254.44.255.255"
+									}
+								]
+							}
+						},
+						{
+							"metadata": {
+								"guid": "staging-security-group-guid-2",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "staging-security-group-name-2",
+								"description": "description-2",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "8080",
+										"destination": "198.41.191.47/24"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "80,443",
+										"destination": "254.41.191.4-254.44.255.4"
+									}
+								]
+							}
+						}
+					]
+				}`
+				response2 := `{
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "staging-security-group-guid-3",
+								"updated_at": null
+							},
+							"entity": {
+								"name": "staging-security-group-name-3",
+								"description": "description-3",
+								"rules": [
+									{
+										"protocol": "udp",
+										"ports": "32767",
+										"destination": "127.0.0.1/32"
+									},
+									{
+										"protocol": "tcp",
+										"ports": "8008,4443",
+										"destination": "254.41.191.0-254.44.255.1"
+									}
+								]
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups", "page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
+
+			It("returns the staging security groups and all warnings", func() {
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
+				Expect(securityGroups).To(ConsistOf(
+					SecurityGroup{
+						Name:        "staging-security-group-name-1",
+						GUID:        "staging-security-group-guid-1",
+						Description: "description-1",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "8080",
+								Destination: "198.41.191.47/1",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "80,443",
+								Destination: "254.41.191.47-254.44.255.255",
+							},
+						},
+					},
+					SecurityGroup{
+						Name:        "staging-security-group-name-2",
+						GUID:        "staging-security-group-guid-2",
+						Description: "description-2",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "8080",
+								Destination: "198.41.191.47/24",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "80,443",
+								Destination: "254.41.191.4-254.44.255.4",
+							},
+						},
+					},
+					SecurityGroup{
+						Name:        "staging-security-group-name-3",
+						GUID:        "staging-security-group-guid-3",
+						Description: "description-3",
+						Rules: []SecurityGroupRule{
+							{
+								Protocol:    "udp",
+								Ports:       "32767",
+								Destination: "127.0.0.1/32",
+							},
+							{
+								Protocol:    "tcp",
+								Ports:       "8008,4443",
+								Destination: "254.41.191.0-254.44.255.1",
+							},
+						},
+					},
+				))
+			})
+		})
+
+		Context("when the client returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+						"code": 40004,
+						"description": "The space could not be found: some-space-guid",
+						"error_code": "CF-SpaceNotFound"
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+					Message: "The space could not be found: some-space-guid",
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				Expect(securityGroups).To(BeEmpty())
 			})
 		})
 	})
