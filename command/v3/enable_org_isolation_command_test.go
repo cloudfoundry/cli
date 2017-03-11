@@ -105,6 +105,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
 				Expect(fakeActor.EntitleIsolationSegmentToOrganizationByNameCallCount()).To(Equal(1))
+
 				isolationSegmentName, orgName := fakeActor.EntitleIsolationSegmentToOrganizationByNameArgsForCall(0)
 				Expect(orgName).To(Equal(org))
 				Expect(isolationSegmentName).To(Equal(isolationSegment))
