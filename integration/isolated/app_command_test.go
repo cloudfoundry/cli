@@ -16,6 +16,10 @@ import (
 )
 
 var _ = Describe("app command", func() {
+	BeforeEach(func() {
+		helpers.RunIfExperimental("app command refactor is still experimental")
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {

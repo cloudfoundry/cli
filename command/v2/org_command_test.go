@@ -44,6 +44,7 @@ var _ = Describe("org Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Organization = "some-org"
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
