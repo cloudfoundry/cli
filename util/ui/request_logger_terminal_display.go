@@ -21,12 +21,12 @@ func newRequestLoggerTerminalDisplay(ui *UI, lock *sync.Mutex) *RequestLoggerTer
 }
 
 func (display RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
-	display.ui.DisplayText(dump)
+	fmt.Fprintf(display.ui.Out, "%s\n", dump)
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
-	display.ui.DisplayText(RedactedValue)
+	fmt.Fprintf(display.ui.Out, "%s\n", RedactedValue)
 	return nil
 }
 
@@ -37,7 +37,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error 
 
 	sanitized, err := SanitizeJSON(body)
 	if err != nil {
-		display.ui.DisplayText(string(body))
+		fmt.Fprintf(display.ui.Out, "%s\n", string(body))
 	}
 
 	buff := new(bytes.Buffer)
@@ -46,47 +46,41 @@ func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error 
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(sanitized)
 	if err != nil {
-		display.ui.DisplayText(string(body))
+		fmt.Fprintf(display.ui.Out, "%s\n", string(body))
 	}
 
-	display.ui.DisplayText(buff.String())
+	fmt.Fprintf(display.ui.Out, "%s\n", buff.String())
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayHeader(name string, value string) error {
-	display.ui.DisplayPair(name, value)
+	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText(name), value)
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayHost(name string) error {
-	display.ui.DisplayPair("Host", name)
+	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText("Host"), name)
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
-	display.ui.DisplayText("{{.Method}} {{.URI}} {{.Proto}}", map[string]interface{}{
-		"Method": method,
-		"URI":    uri,
-		"Proto":  httpProtocol,
-	})
+	fmt.Fprintf(display.ui.Out, "%s %s %s\n", method, uri, httpProtocol)
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayResponseHeader(httpProtocol string, status string) error {
-	display.ui.DisplayText("{{.Proto}} {{.Status}}", map[string]interface{}{
-		"Proto":  httpProtocol,
-		"Status": status,
-	})
+	fmt.Fprintf(display.ui.Out, "%s %s\n", httpProtocol, status)
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayType(name string, requestDate time.Time) error {
-	display.ui.DisplayHeader(fmt.Sprintf("%s: [%s]", name, requestDate.Format(time.RFC3339)))
+	text := fmt.Sprintf("%s: [%s]", name, requestDate.Format(time.RFC3339))
+	fmt.Fprintf(display.ui.Out, "%s\n", display.ui.addFlavor(display.ui.TranslateText(text), defaultFgColor, true))
 	return nil
 }
 
 func (display *RequestLoggerTerminalDisplay) HandleInternalError(err error) {
-	display.ui.DisplayWarning(err.Error())
+	fmt.Fprintf(display.ui.Err, "%s\n", display.ui.TranslateText(err.Error()))
 }
 
 func (display *RequestLoggerTerminalDisplay) Start() error {
@@ -95,7 +89,7 @@ func (display *RequestLoggerTerminalDisplay) Start() error {
 }
 
 func (display *RequestLoggerTerminalDisplay) Stop() error {
+	fmt.Fprintf(display.ui.Out, "\n")
 	display.lock.Unlock()
-	display.ui.DisplayNewline()
 	return nil
 }
