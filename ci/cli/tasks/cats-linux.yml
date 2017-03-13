@@ -21,6 +21,7 @@ run:
 
     export GOPATH="${PWD}/cf-release-repo"
     export PATH="${GOPATH}/bin":${PATH}
+    export CF_DIAL_TIMEOUT=15
     export CONFIG=$PWD/cats-config/integration_config.json
 
     mkdir -p cf-release-repo/bin
