@@ -93,19 +93,19 @@ var _ = Describe("Verbose", func() {
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
-			Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo/bar", false),
+			Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false),
+			Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
-			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true),
+			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
 
 			Entry("CF_TRACE empty:, '-v': enables verbose", "", "", true),
 			Entry("CF_TRACE empty, config trace true: enables verbose", "", "true", false),
-			Entry("CF_TRACE empty, config trace file path, '-v': enables verbose AND logging to file", "", "/foo/bar", true),
+			Entry("CF_TRACE empty, config trace file path, '-v': enables verbose AND logging to file", "", "/foo", true),
 
-			Entry("CF_TRACE filepath, '-v': enables logging to file", "/foo/bar", "", true),
-			Entry("CF_TRACE filepath, config trace true: enables verbose AND logging to file", "/foo/bar", "true", false),
-			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true),
+			Entry("CF_TRACE filepath, '-v': enables logging to file", "/foo", "", true),
+			Entry("CF_TRACE filepath, config trace true: enables verbose AND logging to file", "/foo", "true", false),
+			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo", "/bar", true),
 		)
 
 		DescribeTable("displays verbose output to multiple files",
@@ -237,18 +237,18 @@ var _ = Describe("Verbose", func() {
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
 			Entry("CF_Trace true, config trace false: enables verbose", "true", "false", false),
-			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo/bar", false),
+			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
-			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true),
+			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo", true),
 
 			Entry("CF_TRACE empty:, '-v': enables verbose", "", "", true),
 			Entry("CF_TRACE empty, config trace true: enables verbose", "", "true", false),
-			Entry("CF_TRACE empty, config trace file path, '-v': enables verbose AND logging to file", "", "/foo/bar", true),
+			Entry("CF_TRACE empty, config trace file path, '-v': enables verbose AND logging to file", "", "/foo", true),
 
-			Entry("CF_TRACE filepath, '-v': enables logging to file", "/foo/bar", "", true),
-			Entry("CF_TRACE filepath, config trace true: enables verbose AND logging to file", "/foo/bar", "true", false),
-			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true),
+			Entry("CF_TRACE filepath, '-v': enables logging to file", "/foo", "", true),
+			Entry("CF_TRACE filepath, config trace true: enables verbose AND logging to file", "/foo", "true", false),
+			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo", "/bar", true),
 		)
 
 		DescribeTable("displays verbose output to multiple files",
