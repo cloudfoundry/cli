@@ -17,6 +17,8 @@ run:
 
     export DOMAIN=$(cat bosh-lite-lock/name)
     export API_ENDPOINT="https://api.${DOMAIN}"
+    export CF_DIAL_TIMEOUT=15
+
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH

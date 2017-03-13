@@ -1,5 +1,6 @@
 SET GOPATH=%CD%\go
 SET GATSPATH=%GOPATH%\src\code.cloudfoundry.org\cli
+SET CF_DIAL_TIMEOUT=15
 
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%
