@@ -254,41 +254,6 @@ some-prefixgg          hh            ii`))
 		})
 	})
 
-	// Covers the happy paths, additional cases are tested in TranslateText.
-	Describe("DisplayPair", func() {
-		It("displays the pair with map values substituted in to ui.Out", func() {
-			ui.DisplayPair(
-				"some-key",
-				"some-value with {{.SomeMapValue}}",
-				map[string]interface{}{
-					"SomeMapValue": "map-value",
-				})
-			Expect(ui.Out).To(Say("some-key: some-value with map-value\n"))
-		})
-
-		Context("when the locale is not set to english", func() {
-			BeforeEach(func() {
-				fakeConfig.LocaleReturns("fr-FR")
-
-				var err error
-				ui, err = NewUI(fakeConfig)
-				Expect(err).NotTo(HaveOccurred())
-
-				ui.Out = NewBuffer()
-			})
-
-			It("displays the translated pair with map values substituted in to ui.Out", func() {
-				ui.DisplayPair(
-					"ADVANCED",
-					"App {{.AppName}} does not exist.",
-					map[string]interface{}{
-						"AppName": "some-app-name",
-					})
-				Expect(ui.Out).To(Say("AVANCE: L'application some-app-name n'existe pas.\n"))
-			})
-		})
-	})
-
 	Describe("DisplayHeader", func() {
 		It("displays the header colorized and bolded to ui.Out", func() {
 			ui.DisplayHeader("some-header")

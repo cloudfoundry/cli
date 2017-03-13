@@ -144,11 +144,17 @@ func (ui *UI) RequestLoggerFileWriter(filePaths []string) *RequestLoggerFileWrit
 
 // DisplayOK outputs a bold green translated "OK" to UI.Out.
 func (ui *UI) DisplayOK() {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText("OK"), green, true))
 }
 
 // DisplayNewline outputs a newline to UI.Out.
 func (ui *UI) DisplayNewline() {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	fmt.Fprintf(ui.Out, "\n")
 }
 
@@ -156,6 +162,9 @@ func (ui *UI) DisplayNewline() {
 // allows for a boolean response. A default boolean response can be set with
 // defaultResponse.
 func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	response := defaultResponse
 	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...) + ui.addFlavor(">>", cyan, true))
 	interactivePrompt.Input = ui.In
@@ -168,6 +177,9 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 // be prepended to each row and padding adds the specified number of spaces
 // between columns.
 func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	if len(table) == 0 {
 		return
 	}
@@ -202,19 +214,18 @@ func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
 // DisplayText translates the template, substitutes in templateValues, and
 // outputs the result to ui.Out. Only the first map in templateValues is used.
 func (ui *UI) DisplayText(template string, templateValues ...map[string]interface{}) {
-	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, templateValues...))
-}
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
 
-// DisplayPair translates the attribute, translates the template, substitutes
-// templateValues into the template, and outputs the pair to ui.Out. Only the
-// first map in templateValues is used.
-func (ui *UI) DisplayPair(attribute string, template string, templateValues ...map[string]interface{}) {
-	fmt.Fprintf(ui.Out, "%s: %s\n", ui.TranslateText(attribute), ui.TranslateText(template, templateValues...))
+	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, templateValues...))
 }
 
 // DisplayHeader translates the header, bolds and adds the default color to the
 // header, and outputs the result to ui.Out.
 func (ui *UI) DisplayHeader(text string) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText(text), defaultFgColor, true))
 }
 
@@ -222,6 +233,9 @@ func (ui *UI) DisplayHeader(text string) {
 // templateValues, substitutes templateValues into the template, and outputs
 // the result to ui.Out. Only the first map in templateValues is used.
 func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[string]interface{}) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	firstTemplateValues := getFirstSet(templateValues)
 	for key, value := range firstTemplateValues {
 		firstTemplateValues[key] = ui.addFlavor(fmt.Sprint(value), cyan, true)
@@ -253,6 +267,10 @@ func (ui *UI) DisplayError(err error) {
 		errMsg = err.Error()
 	}
 	fmt.Fprintf(ui.Err, "%s\n", errMsg)
+
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText("FAILED"), red, true))
 }
 
@@ -260,6 +278,9 @@ const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
 
 // DisplayLogMessage formats and outputs a given log message.
 func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
 	var header string
 	if displayHeader {
 		time := message.Timestamp().In(ui.TimezoneLocation).Format(LogTimestampFormat)
