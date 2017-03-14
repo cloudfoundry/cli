@@ -71,7 +71,7 @@ var _ = Describe("enable-org-isolation command", func() {
 		Context("when the isolation segment does not exist", func() {
 			It("fails with isolation segment not found message", func() {
 				session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s…", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Isolation segment '%s' not found.", isolationSegmentName))
 				Eventually(session).Should(Exit(1))
@@ -92,7 +92,7 @@ var _ = Describe("enable-org-isolation command", func() {
 			Context("when the organization does not exist", func() {
 				It("fails with organization not found message", func() {
 					session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
-					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s…", isolationSegmentName, organizationName, userName))
+					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Organization '%s' not found.", organizationName))
 					Eventually(session).Should(Exit(1))
@@ -107,7 +107,7 @@ var _ = Describe("enable-org-isolation command", func() {
 
 				It("displays OK", func() {
 					session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
-					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s…", isolationSegmentName, organizationName, userName))
+					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -119,7 +119,7 @@ var _ = Describe("enable-org-isolation command", func() {
 
 					It("displays OK", func() {
 						session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
-						Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s…", isolationSegmentName, organizationName, userName))
+						Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})

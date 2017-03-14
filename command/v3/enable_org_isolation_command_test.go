@@ -98,7 +98,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 			It("displays the header and ok", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Enabling isolation segment segment1 for org some-org as banana…"))
+				Expect(testUI.Out).To(Say("Enabling isolation segment segment1 for org some-org as banana..."))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(testUI.Err).To(Say("I am a warning"))
@@ -124,7 +124,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				It("displays the header and error", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 
-					Expect(testUI.Out).To(Say("Enabling isolation segment segment1 for org some-org as banana…"))
+					Expect(testUI.Out).To(Say("Enabling isolation segment segment1 for org some-org as banana..."))
 
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))

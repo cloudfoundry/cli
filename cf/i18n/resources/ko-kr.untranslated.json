@@ -1196,8 +1196,8 @@
     "translation": "Empty file or folder"
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
-    "translation": ""
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Endpoint deprecated",

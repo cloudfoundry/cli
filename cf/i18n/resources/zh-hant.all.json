@@ -2428,7 +2428,7 @@
     "translation": "正在以 {{.Username}} 身分啟用組織 {{.OrgName}} 中服務 {{.ServiceName}} 之方案 {{.PlanName}} 的存取權..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {

@@ -2428,8 +2428,8 @@
     "translation": "Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
-    "translation": ""
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Enabling ssh support for '{{.AppName}}'...",

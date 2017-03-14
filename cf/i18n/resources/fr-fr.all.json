@@ -2428,7 +2428,7 @@
     "translation": "Activation de l'accès au plan {{.PlanName}} du service {{.ServiceName}} pour l'organisation {{.OrgName}} en tant que {{.Username}}..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
