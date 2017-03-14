@@ -145,6 +145,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 			})
 		}
 
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayTable("", table, 3)
 	}
 
