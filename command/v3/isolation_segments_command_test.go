@@ -1,6 +1,8 @@
 package v3_test
 
 import (
+	"errors"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -9,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -94,7 +95,7 @@ var _ = Describe("isolation-segments Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).To(Say("Getting isolation segments as banana..."))
-					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("OK\n\n"))
 					Expect(testUI.Out).To(Say("name\\s+orgs"))
 					Expect(testUI.Out).To(Say("some-iso-1"))
 					Expect(testUI.Out).To(Say("some-iso-2\\s+some-org-1"))
@@ -118,7 +119,7 @@ var _ = Describe("isolation-segments Command", func() {
 				It("displays the empty table", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(testUI.Out).To(Say("Getting isolation segments as banana..."))
-					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("OK\n\n"))
 					Expect(testUI.Out).To(Say("name\\s+orgs"))
 					Consistently(testUI.Out).ShouldNot(Say("[a-zA-Z]+"))
 

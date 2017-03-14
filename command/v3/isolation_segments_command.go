@@ -1,11 +1,12 @@
 package v3
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	"strings"
 )
 
 //go:generate counterfeiter . IsolationSegmentsActor
@@ -60,6 +61,7 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 
 	table := [][]string{
 		{
