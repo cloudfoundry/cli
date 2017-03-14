@@ -56,7 +56,7 @@ func (cmd EnableOrgIsolationCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"SegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		"OrgName":     cmd.RequiredArgs.OrganizationName,
 		"CurrentUser": user.Name,

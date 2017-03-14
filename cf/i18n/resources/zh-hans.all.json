@@ -2428,7 +2428,7 @@
     "translation": "正在以 {{.Username}} 身份启用对组织 {{.OrgName}} 的服务 {{.ServiceName}} 的套餐 {{.PlanName}} 的访问..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {

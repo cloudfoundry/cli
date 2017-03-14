@@ -2428,7 +2428,7 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직에서 사용할 {{.ServiceName}} 서비스의 {{.PlanName}} 플랜에 대한 액세스 사용 설정 중..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
