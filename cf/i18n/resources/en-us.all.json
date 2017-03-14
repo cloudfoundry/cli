@@ -6396,6 +6396,10 @@
     "translation": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}"
   },
   {
+    "id": "isolation segments:",
+    "translation": ""
+  },
+  {
     "id": "isolation-segments",
     "translation": ""
   },

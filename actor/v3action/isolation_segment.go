@@ -120,3 +120,20 @@ func (actor Actor) GetIsolationSegmentSummaries() ([]IsolationSegmentSummary, Wa
 	}
 	return isolationSegmentSummaries, allWarnings, nil
 }
+
+func (actor Actor) GetIsolationSegmentsByOrganization(orgGUID string) ([]IsolationSegment, Warnings, error) {
+	ccv3IsolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{
+		ccv3.OrganizationGUIDFilter: []string{orgGUID},
+	})
+	if err != nil {
+		return []IsolationSegment{}, Warnings(warnings), err
+	}
+
+	isolationSegments := make([]IsolationSegment, len(ccv3IsolationSegments))
+
+	for i, _ := range ccv3IsolationSegments {
+		isolationSegments[i] = IsolationSegment(ccv3IsolationSegments[i])
+	}
+
+	return isolationSegments, Warnings(warnings), nil
+}

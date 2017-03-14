@@ -4,6 +4,7 @@ import "sort"
 
 type OrganizationSummary struct {
 	Name        string
+	GUID        string
 	QuotaName   string
 	DomainNames []string
 	SpaceNames  []string
@@ -21,6 +22,8 @@ func (actor Actor) GetOrganizationSummaryByName(orgName string) (OrganizationSum
 	if err != nil {
 		return OrganizationSummary{}, allWarnings, err
 	}
+
+	orgSummary.GUID = org.GUID
 
 	domains, warnings, err := actor.GetOrganizationDomains(org.GUID)
 	allWarnings = append(allWarnings, warnings...)

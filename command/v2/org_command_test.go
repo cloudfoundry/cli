@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -24,6 +25,7 @@ var _ = Describe("org Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeOrgActor
+		fakeActorV3     *v2fakes.FakeOrgActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -33,18 +35,19 @@ var _ = Describe("org Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeOrgActor)
+		fakeActorV3 = new(v2fakes.FakeOrgActorV3)
 
 		cmd = OrgCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			ActorV3:     fakeActorV3,
 		}
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Organization = "some-org"
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
@@ -145,6 +148,7 @@ var _ = Describe("org Command", func() {
 				fakeActor.GetOrganizationSummaryByNameReturns(
 					v2action.OrganizationSummary{
 						Name: "some-org",
+						GUID: "some-org-guid",
 						DomainNames: []string{
 							"a-shared.com",
 							"b-private.com",
@@ -159,14 +163,24 @@ var _ = Describe("org Command", func() {
 					},
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil)
+
+				fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
+					[]v3action.IsolationSegment{
+						{Name: "isolation-segment-1"},
+						{Name: "isolation-segment-2"},
+					},
+					v3action.Warnings{"warning-3", "warning-4"},
+					nil)
 			})
 
-			It("displays warnings and a table with org domains, org quota and spaces", func() {
+			It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
 				Expect(executeErr).To(BeNil())
 
 				Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
+				Expect(testUI.Err).To(Say("warning-3"))
+				Expect(testUI.Err).To(Say("warning-4"))
 
 				Eventually(testUI.Out).Should(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
 
@@ -176,11 +190,17 @@ var _ = Describe("org Command", func() {
 
 				Eventually(testUI.Out).Should(Say("spaces:\\s+space1, space2"))
 
+				Eventually(testUI.Out).Should(Say("isolation segments:\\s+isolation-segment-1, isolation-segment-2"))
+
 				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
 				Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
 				orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
 				Expect(orgName).To(Equal("some-org"))
+
+				Expect(fakeActorV3.GetIsolationSegmentsByOrganizationCallCount()).To(Equal(1))
+				orgGuid := fakeActorV3.GetIsolationSegmentsByOrganizationArgsForCall(0)
+				Expect(orgGuid).To(Equal("some-org-guid"))
 			})
 		})
 
@@ -233,6 +253,23 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 				})
+			})
+		})
+
+		Context("when getting the org isolation segments returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("get org iso segs error")
+				fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
+					nil,
+					v3action.Warnings{"get iso seg warning"},
+					expectedErr)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(testUI.Err).To(Say("get iso seg warning"))
 			})
 		})
 	})
