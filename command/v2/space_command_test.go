@@ -323,7 +323,7 @@ var _ = Describe("space Command", func() {
 			Expect(spaceName).To(Equal("some-space"))
 
 			Eventually(testUI.Out).Should(Say("name:\\s+some-space"))
-			Eventually(testUI.Out).Should(Say("(?m)^\\s+security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description$"))
+			Eventually(testUI.Out).Should(Say("(?m)^\n^\\s+security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description$"))
 			Eventually(testUI.Out).Should(Say("#0\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+staging\\s+Public networks"))
 			Eventually(testUI.Out).Should(Say("(?m)^\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+running\\s+Public networks"))
 			Eventually(testUI.Out).Should(Say("#1\\s+more_public_networks\\s+11.0.0.0-169.253.255.255\\s+54321\\s+udp\\s+staging\\s+More public networks"))
