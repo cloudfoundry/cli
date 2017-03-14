@@ -1,15 +1,16 @@
 package v2
 
 import (
-	"os"
+	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . OrgActor
@@ -17,6 +18,12 @@ import (
 type OrgActor interface {
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSummaryByName(orgName string) (v2action.OrganizationSummary, v2action.Warnings, error)
+}
+
+//go:generate counterfeiter . OrgActorV3
+
+type OrgActorV3 interface {
+	GetIsolationSegmentsByOrganization(orgName string) ([]v3action.IsolationSegment, v3action.Warnings, error)
 }
 
 type OrgCommand struct {
@@ -29,6 +36,7 @@ type OrgCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       OrgActor
+	ActorV3     OrgActorV3
 }
 
 func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
@@ -36,23 +44,22 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui)
+	ccClient, _, err := shared.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, nil)
+
+	ccClientV3, err := sharedV3.NewClients(config, ui)
+	if err != nil {
+		return err
+	}
+	cmd.ActorV3 = v3action.NewActor(ccClientV3)
 
 	return nil
 }
 
 func (cmd OrgCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
@@ -97,11 +104,25 @@ func (cmd OrgCommand) displayOrgSummary() error {
 		return shared.HandleError(err)
 	}
 
+	isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
+	cmd.UI.DisplayWarnings(v3Warnings)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	isolationSegmentNames := []string{}
+	for _, iso := range isolationSegments {
+		isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+	}
+
+	sort.Strings(isolationSegmentNames)
+
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), orgSummary.Name},
 		{cmd.UI.TranslateText("domains:"), strings.Join(orgSummary.DomainNames, ", ")},
 		{cmd.UI.TranslateText("quota:"), orgSummary.QuotaName},
 		{cmd.UI.TranslateText("spaces:"), strings.Join(orgSummary.SpaceNames, ", ")},
+		{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")},
 	}
 	cmd.UI.DisplayTable("", table, 3)
 

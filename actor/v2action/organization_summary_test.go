@@ -109,6 +109,7 @@ var _ = Describe("Organization Summary Actions", func() {
 
 				Expect(orgSummary).To(Equal(OrganizationSummary{
 					Name:        "some-org",
+					GUID:        "some-org-guid",
 					QuotaName:   "some-org-quota",
 					DomainNames: []string{"private-domain-1", "private-domain-2", "shared-domain-1", "shared-domain-2"},
 					SpaceNames:  []string{"space-1", "space-2"},

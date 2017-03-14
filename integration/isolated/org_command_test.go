@@ -17,8 +17,6 @@ var _ = Describe("org command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("org command refactor is still experimental")
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.PrefixedRandomName("SPACE")
 	})
@@ -99,9 +97,11 @@ var _ = Describe("org command", func() {
 
 			Context("when no flags are used", func() {
 				var (
-					domainName string
-					quotaName  string
-					spaceName2 string
+					domainName            string
+					quotaName             string
+					spaceName2            string
+					isolationSegmentName1 string
+					isolationSegmentName2 string
 				)
 
 				BeforeEach(func() {
@@ -117,9 +117,24 @@ var _ = Describe("org command", func() {
 
 					spaceName2 = helpers.PrefixedRandomName("SPACE")
 					helpers.CreateSpace(spaceName2)
+
+					isolationSegmentName1 = helpers.IsolationSegmentName()
+					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName1)).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName1)).Should(Exit(0))
+
+					isolationSegmentName2 = helpers.IsolationSegmentName()
+					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName2)).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName2)).Should(Exit(0))
 				})
 
-				It("displays a table with org domains, quotas, spaces and space quotas and exits 0", func() {
+				// @TODO remove and add to cleanup script
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-org", "-f", orgName))
+					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName1))
+					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName2))
+				})
+
+				It("displays a table with org domains, quotas, spaces, space quotas and isolation segments, and exits 0", func() {
 					session := helpers.CF("org", orgName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session.Out).Should(Say("Getting info for org %s as %s...", orgName, userName))
@@ -135,6 +150,10 @@ var _ = Describe("org command", func() {
 					spacesSorted := []string{spaceName, spaceName2}
 					sort.Strings(spacesSorted)
 					Eventually(session.Out).Should(Say("spaces:\\s+%s, %s", spacesSorted[0], spacesSorted[1]))
+
+					isolationSegmentsSorted := []string{isolationSegmentName1, isolationSegmentName2}
+					sort.Strings(isolationSegmentsSorted)
+					Eventually(session.Out).Should(Say("isolation segments:\\s+%s, %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
 
 					Eventually(session).Should(Exit(0))
 				})

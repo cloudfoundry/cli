@@ -291,6 +291,55 @@ var _ = Describe("Isolation Segment Actions", func() {
 		})
 	})
 
+	Describe("GetIsolationSegmentsByOrganization", func() {
+		Context("when there are isolation segments entitled to this org", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetIsolationSegmentsReturns(
+					[]ccv3.IsolationSegment{
+						{Name: "some-iso-seg-1"},
+						{Name: "some-iso-seg-2"},
+					},
+					ccv3.Warnings{"get isolation segments warning"},
+					nil,
+				)
+			})
+
+			It("returns the isolation segments and warnings", func() {
+				isolationSegments, warnings, err := actor.GetIsolationSegmentsByOrganization("some-org-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(isolationSegments).To(ConsistOf(
+					IsolationSegment{Name: "some-iso-seg-1"},
+					IsolationSegment{Name: "some-iso-seg-2"},
+				))
+				Expect(warnings).To(ConsistOf("get isolation segments warning"))
+
+				Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
+
+				expectedQuery := url.Values{ccv3.OrganizationGUIDFilter: []string{"some-org-guid"}}
+				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(Equal(expectedQuery))
+			})
+		})
+
+		Context("when the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("some cc error")
+				fakeCloudControllerClient.GetIsolationSegmentsReturns(
+					[]ccv3.IsolationSegment{},
+					ccv3.Warnings{"get isolation segments warning"},
+					expectedError)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetIsolationSegmentsByOrganization("some-org-guid")
+				Expect(warnings).To(ConsistOf("get isolation segments warning"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	Describe("GetIsolationSegmentSummaries", func() {
 		Context("when getting isolation segments succeeds", func() {
 			BeforeEach(func() {
