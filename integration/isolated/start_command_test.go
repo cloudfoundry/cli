@@ -194,7 +194,7 @@ applications:
 					})
 				})
 
-				Context("when the app has *not* been staged", func() {
+				Context("when the app has *not* yet been staged", func() {
 					//TODO: Add Staging Timeout
 					Context("when the app does *not* stage properly", func() {
 						BeforeEach(func() {
@@ -210,8 +210,8 @@ applications:
 							session := helpers.CF("start", appName)
 							Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							Eventually(session.Err).Should(Say("Error restarting application: NoAppDetectedError"))
-							Eventually(session.Err).Should(Say(`TIP: Buildpacks are detected when the "cf push" is executed from within the directory that contains the app source code.`))
+							Eventually(session.Err).Should(Say("Error staging application: NoAppDetectedError"))
+							Eventually(session.Err).Should(Say(`TIP: Use 'cf buildpacks' to see a list of supported buildpacks.`))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -224,7 +224,7 @@ applications:
 							BeforeEach(func() {
 								appName = helpers.PrefixedRandomName("app")
 								helpers.WithHelloWorldApp(func(appDir string) {
-									Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start", "-b", "staticfile_buildpack", "-c", "giberrish")).Should(Exit(0))
+									Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start", "-b", "staticfile_buildpack", "-c", "gibberish")).Should(Exit(0))
 								})
 							})
 
@@ -233,7 +233,8 @@ applications:
 								session := helpers.CF("start", appName)
 								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-								Eventually(session.Err).Should(Say("Error restarting application: Start unsuccessful"))
+								Eventually(session.Err).Should(Say("Start unsuccessful"))
+								Eventually(session.Err).Should(Say("TIP: use 'cf logs .* --recent' for more information"))
 								Eventually(session).Should(Exit(1))
 							})
 						})

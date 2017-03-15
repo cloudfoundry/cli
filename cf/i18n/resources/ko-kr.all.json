@@ -2692,10 +2692,6 @@
     "translation": "애플리케이션을 다시 시작하는 중에 오류 발생: {{.Error}}"
   },
   {
-    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "스택을 검색하는 중에 오류 발생: "
   },
@@ -2710,6 +2706,10 @@
   {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Manifest 저장 중에 오류 발생: {{.Error}}"
+  },
+  {
+    "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
