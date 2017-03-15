@@ -36,7 +36,10 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 		DialTimeout:       settings.DialTimeout,
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})
-	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
+
+	for _, wrapper := range client.wrappers {
+		client.connection = wrapper.Wrap(client.connection)
+	}
 
 	apiInfo, resourceLinks, warnings, err := client.Info()
 	if err != nil {

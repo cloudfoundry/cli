@@ -79,12 +79,32 @@ type Client struct {
 	connection cloudcontroller.Connection
 	router     *internal.Router
 	userAgent  string
+	wrappers   []ConnectionWrapper
+}
+
+// Config allows the Client to be configured
+type Config struct {
+	// AppName is the name of the application/process using the client.
+	AppName string
+
+	// AppVersion is the version of the application/process using the client.
+	AppVersion string
+
+	// // JobPollingTimeout is the maximum amount of time a job polls for.
+	// JobPollingTimeout time.Duration
+
+	// // JobPollingInterval is the wait time between job polls.
+	// JobPollingInterval time.Duration
+
+	// Wrappers that apply to the client connection.
+	Wrappers []ConnectionWrapper
 }
 
 // NewClient returns a new Client.
-func NewClient(appName string, appVersion string) *Client {
-	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", appName, appVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
+func NewClient(config Config) *Client {
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", config.AppName, config.AppVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	return &Client{
 		userAgent: userAgent,
+		wrappers:  append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
 	}
 }

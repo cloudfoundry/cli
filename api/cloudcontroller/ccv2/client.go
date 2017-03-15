@@ -97,6 +97,7 @@ type Client struct {
 	connection cloudcontroller.Connection
 	router     *rata.RequestGenerator
 	userAgent  string
+	wrappers   []ConnectionWrapper
 }
 
 // Config allows the Client to be configured
@@ -112,6 +113,9 @@ type Config struct {
 
 	// JobPollingInterval is the wait time between job polls.
 	JobPollingInterval time.Duration
+
+	// Wrappers that apply to the client connection.
+	Wrappers []ConnectionWrapper
 }
 
 // NewClient returns a new Cloud Controller Client.
@@ -121,5 +125,6 @@ func NewClient(config Config) *Client {
 		userAgent:          userAgent,
 		jobPollingInterval: config.JobPollingInterval,
 		jobPollingTimeout:  config.JobPollingTimeout,
+		wrappers:           append([]ConnectionWrapper{newErrorWrapper()}, config.Wrappers...),
 	}
 }

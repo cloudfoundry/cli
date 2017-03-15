@@ -17,7 +17,27 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		}
 	}
 
-	ccClient := ccv3.NewClient(config.BinaryName(), config.BinaryVersion())
+	ccWrappers := []ccv3.ConnectionWrapper{}
+
+	verbose, location := config.Verbose()
+	if verbose {
+		ccWrappers = append(ccWrappers, ccWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
+	}
+	if location != nil {
+		ccWrappers = append(ccWrappers, ccWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
+	}
+
+	authWrapper := ccWrapper.NewUAAAuthentication(nil, config)
+
+	ccWrappers = append(ccWrappers, authWrapper)
+	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(2))
+
+	ccClient := ccv3.NewClient(ccv3.Config{
+		AppName:    config.BinaryName(),
+		AppVersion: config.BinaryVersion(),
+		Wrappers:   ccWrappers,
+	})
+
 	_, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
@@ -37,18 +57,15 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		URL:               ccClient.UAA(),
 	})
 
-	verbose, location := config.Verbose()
 	if verbose {
-		ccClient.WrapConnection(ccWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
 	}
 	if location != nil {
-		ccClient.WrapConnection(ccWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	ccClient.WrapConnection(ccWrapper.NewUAAAuthentication(uaaClient, config))
-	ccClient.WrapConnection(ccWrapper.NewRetryRequest(2))
+	uaaClient.WrapConnection(uaaWrapper.NewUAAAuthentication(uaaClient, config))
+	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(2))
 
 	return ccClient, nil
 }
