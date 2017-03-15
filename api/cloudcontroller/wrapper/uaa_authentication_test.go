@@ -25,6 +25,7 @@ var _ = Describe("UAA Authentication", func() {
 
 		wrapper cloudcontroller.Connection
 		request *http.Request
+		inner   *UAAAuthentication
 	)
 
 	BeforeEach(func() {
@@ -33,7 +34,7 @@ var _ = Describe("UAA Authentication", func() {
 		inMemoryCache = util.NewInMemoryTokenCache()
 		inMemoryCache.SetAccessToken("a-ok")
 
-		inner := NewUAAAuthentication(fakeClient, inMemoryCache)
+		inner = NewUAAAuthentication(fakeClient, inMemoryCache)
 		wrapper = inner.Wrap(fakeConnection)
 
 		request = &http.Request{
@@ -42,6 +43,21 @@ var _ = Describe("UAA Authentication", func() {
 	})
 
 	Describe("Make", func() {
+		Context("when the client is nil", func() {
+			BeforeEach(func() {
+				inner.SetClient(nil)
+
+				fakeConnection.MakeReturns(cloudcontroller.InvalidAuthTokenError{})
+			})
+
+			It("calls the connection without any side effects", func() {
+				wrapper.Make(request, nil)
+
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+			})
+		})
+
 		Context("when the token is valid", func() {
 			It("adds authentication headers", func() {
 				wrapper.Make(request, nil)

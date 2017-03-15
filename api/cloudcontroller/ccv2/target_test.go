@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +21,6 @@ var _ = Describe("Target", func() {
 
 	BeforeEach(func() {
 		serverAPIURL = server.URL()[8:]
-		client = NewClient(Config{AppName: "CF CLI API Target Test", AppVersion: "Unknown"})
 	})
 
 	Describe("TargetCF", func() {
@@ -52,7 +52,41 @@ var _ = Describe("Target", func() {
 			)
 		})
 
+		Context("when client has wrappers", func() {
+			var fakeWrapper1 *ccv2fakes.FakeConnectionWrapper
+			var fakeWrapper2 *ccv2fakes.FakeConnectionWrapper
+
+			BeforeEach(func() {
+				fakeWrapper1 = new(ccv2fakes.FakeConnectionWrapper)
+				fakeWrapper1.WrapReturns(fakeWrapper1)
+				fakeWrapper2 = new(ccv2fakes.FakeConnectionWrapper)
+				fakeWrapper2.WrapReturns(fakeWrapper2)
+
+				client = NewClient(Config{
+					AppName:    "CF CLI API Target Test",
+					AppVersion: "Unknown",
+					Wrappers:   []ConnectionWrapper{fakeWrapper1, fakeWrapper2},
+				})
+			})
+
+			It("calls wrap on all the wrappers", func() {
+				_, err := client.TargetCF(TargetSettings{
+					SkipSSLValidation: true,
+					URL:               server.URL(),
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeWrapper1.WrapCallCount()).To(Equal(1))
+				Expect(fakeWrapper2.WrapCallCount()).To(Equal(1))
+				Expect(fakeWrapper2.WrapArgsForCall(0)).To(Equal(fakeWrapper1))
+			})
+		})
+
 		Context("when passed a valid API URL", func() {
+			BeforeEach(func() {
+				client = NewClient(Config{AppName: "CF CLI API Target Test", AppVersion: "Unknown"})
+			})
+
 			Context("when the api has unverified SSL", func() {
 				Context("when setting the skip ssl flat", func() {
 					It("sets all the endpoints on the client", func() {

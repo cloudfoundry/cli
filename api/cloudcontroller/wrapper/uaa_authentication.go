@@ -49,9 +49,18 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 	return t
 }
 
+// SetClient sets the UAA client that the wrapper will use.
+func (t *UAAAuthentication) SetClient(client UAAClient) {
+	t.client = client
+}
+
 // Make adds authentication headers to the passed in request and then calls the
 // wrapped connection's Make
 func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+	if t.client == nil {
+		return t.connection.Make(request, passedResponse)
+	}
+
 	var (
 		err            error
 		rawRequestBody []byte

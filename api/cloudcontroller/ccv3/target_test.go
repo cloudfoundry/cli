@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,7 @@ var _ = Describe("Target", func() {
 	)
 
 	BeforeEach(func() {
-		client = NewClient("CF CLI API V3 Target Test", "Unknown")
+		client = NewClient(Config{AppName: "CF CLI API V3 Target Test", AppVersion: "Unknown"})
 	})
 
 	Describe("TargetCF", func() {
@@ -79,6 +80,44 @@ var _ = Describe("Target", func() {
 						http.Header{"X-Cf-Warnings": {"warning 2"}}),
 				),
 			)
+		})
+
+		Context("when client has wrappers", func() {
+			var fakeWrapper1 *ccv3fakes.FakeConnectionWrapper
+			var fakeWrapper2 *ccv3fakes.FakeConnectionWrapper
+
+			BeforeEach(func() {
+				fakeWrapper1 = new(ccv3fakes.FakeConnectionWrapper)
+				fakeWrapper1.WrapReturns(fakeWrapper1)
+				fakeWrapper2 = new(ccv3fakes.FakeConnectionWrapper)
+				fakeWrapper2.WrapReturns(fakeWrapper2)
+
+				fakeWrapper2.MakeStub = func(request *http.Request, passedResponse *cloudcontroller.Response) error {
+					apiInfo, ok := passedResponse.Result.(*APIInfo)
+					if ok { // Only caring about the first time Make is called, ignore all others
+						apiInfo.Links.CCV3.HREF = server.URL() + "/v3"
+					}
+					return nil
+				}
+
+				client = NewClient(Config{
+					AppName:    "CF CLI API Target Test",
+					AppVersion: "Unknown",
+					Wrappers:   []ConnectionWrapper{fakeWrapper1, fakeWrapper2},
+				})
+			})
+
+			It("calls wrap on all the wrappers", func() {
+				_, err := client.TargetCF(TargetSettings{
+					SkipSSLValidation: true,
+					URL:               server.URL(),
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeWrapper1.WrapCallCount()).To(Equal(1))
+				Expect(fakeWrapper2.WrapCallCount()).To(Equal(1))
+				Expect(fakeWrapper2.WrapArgsForCall(0)).To(Equal(fakeWrapper1))
+			})
 		})
 
 		Context("when passed a valid API URL", func() {
