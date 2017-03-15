@@ -1244,12 +1244,12 @@
     "translation": "Error removing plugin binary: "
   },
   {
-    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "id": "Error running task: {{.CloudControllerMessage}}",
     "translation": ""
   },
   {
-    "id": "Error running task: {{.CloudControllerMessage}}",
-    "translation": ""
+    "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
   },
   {
     "id": "Failed to create a local temporary zip file for the buildpack",

@@ -2692,10 +2692,6 @@
     "translation": "Fehler beim Neustarten der Anwendung: {{.Error}}"
   },
   {
-    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "Fehler beim Abrufen des Stack: "
   },
@@ -2710,6 +2706,10 @@
   {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Fehler beim Speichern des Manifests: {{.Error}}"
+  },
+  {
+    "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
