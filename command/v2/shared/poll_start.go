@@ -17,16 +17,20 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			if message.Staging() {
 				ui.DisplayLogMessage(message, false)
 			}
-		case _, ok := <-appStarting:
+		case appStart, ok := <-appStarting:
 			if !ok {
 				breakAppStart = true
+				break
 			}
 
-			ui.DisplayNewline()
-			ui.DisplayText("Waiting for app to start...")
+			if appStart {
+				ui.DisplayNewline()
+				ui.DisplayText("Waiting for app to start...")
+			}
 		case warning, ok := <-apiWarnings:
 			if !ok {
 				breakWarnings = true
+				break
 			}
 
 			ui.DisplayWarning(warning)
@@ -44,6 +48,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 		case apiErr, ok := <-apiErrs:
 			if !ok {
 				breakAPIErrs = true
+				break
 			}
 
 			switch err := apiErr.(type) {
@@ -57,9 +62,9 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case v2action.StartupTimeoutError:
 				return StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
+			default:
+				return HandleError(apiErr)
 			}
-
-			return HandleError(apiErr)
 		}
 
 		if breakAppStart && breakWarnings && breakAPIErrs {
