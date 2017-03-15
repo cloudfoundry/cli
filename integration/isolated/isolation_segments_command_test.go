@@ -63,21 +63,7 @@ var _ = Describe("isolation-segments command", func() {
 			helpers.LoginCF()
 		})
 
-		// TODO: Pending until revoke-isolation-segments is done (for cleanup)
-		PContext("when there are no isolation segments", func() {
-			It("returns an ok and displays just the shared isolation segment", func() {
-				userName, _ := helpers.GetCredentials()
-				session := helpers.CF("isolation-segments")
-				Eventually(session).Should(Say("Getting isolation segments as %s...", userName))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("name\\s+orgs"))
-				Eventually(session).Should(Say("shared"))
-				Consistently(session).ShouldNot(Say("[a-zA-Z]+"))
-			})
-		})
-
-		// TODO: Pending until revoke-isolation-segments is done (for cleanup)
-		PContext("when there are some isolation segments", func() {
+		Context("when there are some isolation segments", func() {
 			var isolationSegment1 string // No orgs assigned
 			var isolationSegment2 string // One org assigned
 			var isolationSegment3 string // Many orgs assigned
@@ -96,17 +82,10 @@ var _ = Describe("isolation-segments command", func() {
 
 				Eventually(helpers.CF("create-isolation-segment", isolationSegment1)).Should(Exit(0))
 				Eventually(helpers.CF("create-isolation-segment", isolationSegment2)).Should(Exit(0))
-				Eventually(helpers.CF("enable-org-isolation", isolationSegment2, org1)).Should(Exit(0))
 				Eventually(helpers.CF("create-isolation-segment", isolationSegment3)).Should(Exit(0))
-				Eventually(helpers.CF("enable-org-isolation", isolationSegment3, org1)).Should(Exit(0))
-				Eventually(helpers.CF("enable-org-isolation", isolationSegment3, org2)).Should(Exit(0))
-			})
-
-			// TODO: Delete this and add it to cleanup script after #138303919
-			AfterEach(func() {
-				Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegment1)).Should(Exit(0))
-				Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegment2)).Should(Exit(0))
-				Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegment3)).Should(Exit(0))
+				Eventually(helpers.CF("enable-org-isolation", org1, isolationSegment2)).Should(Exit(0))
+				Eventually(helpers.CF("enable-org-isolation", org1, isolationSegment3)).Should(Exit(0))
+				Eventually(helpers.CF("enable-org-isolation", org2, isolationSegment3)).Should(Exit(0))
 			})
 
 			It("returns an ok and displays the table", func() {
