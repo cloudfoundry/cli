@@ -67,5 +67,7 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 	uaaClient.WrapConnection(uaaWrapper.NewUAAAuthentication(uaaClient, config))
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(2))
 
+	authWrapper.SetClient(uaaClient)
+
 	return ccClient, nil
 }
