@@ -35,6 +35,7 @@ run:
 
     go get -u github.com/FiloSottile/gvt
     gvt update github.com/onsi/ginkgo
+    go get -u github.com/onsi/ginkgo/ginkgo
 
     # Redact passwords in output
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
