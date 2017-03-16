@@ -424,4 +424,89 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 		})
 	})
+
+	FDescribe("RevokeIsolationSegmentFromOrganizationByName", func() {
+		Context("when the isolation segment exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetIsolationSegmentsReturns([]ccv3.IsolationSegment{
+					{
+						Name: "iso-1",
+						GUID: "iso-1-guid-1",
+					},
+				}, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+			})
+
+			Context("when the organization exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns([]ccv3.Organization{
+						{
+							Name: "org-1",
+							GUID: "org-guid-1",
+						},
+					}, ccv3.Warnings{"get-orgs-warning-1"}, nil)
+				})
+
+				Context("when the revocation is successful", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationReturns(ccv3.Warnings{"revoke-warnings-1"}, nil)
+					})
+
+					It("returns the warnings", func() {
+						warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-1", "org-1")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1", "get-orgs-warning-1", "revoke-warnings-1"))
+
+						Expect(fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationCallCount()).To(Equal(1))
+						isoGUID, orgGUID := fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationArgsForCall(0)
+						Expect(isoGUID).To(Equal("iso-1-guid-1"))
+						Expect(orgGUID).To(Equal("org-guid-1"))
+					})
+				})
+
+				Context("when the revocation errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("Banana!")
+						fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationReturns(ccv3.Warnings{"revoke-warnings-1"}, expectedErr)
+					})
+
+					It("from Organization", func() {
+						warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-1", "org-1")
+						Expect(err).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1", "get-orgs-warning-1", "revoke-warnings-1"))
+					})
+				})
+			})
+
+			Context("when getting the organization errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns(nil, ccv3.Warnings{"get-orgs-warning-1"}, nil)
+				})
+
+				It("returns back the error", func() {
+					warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-1", "org-1")
+					Expect(err).To(MatchError(OrganizationNotFoundError{Name: "org-1"}))
+					Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1", "get-orgs-warning-1"))
+
+					Expect(fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Context("when getting the isolation segment errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetIsolationSegmentsReturns(nil, ccv3.Warnings{"get-entitled-orgs-warning-1"}, nil)
+			})
+
+			It("returns back the error", func() {
+				warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-2-org-1", "org-1")
+				Expect(err).To(MatchError(IsolationSegmentNotFoundError{Name: "iso-2-org-1"}))
+				Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(0))
+			})
+		})
+
+	})
 })

@@ -91,4 +91,65 @@ var _ = Describe("Relationship", func() {
 			})
 		})
 	})
+
+	Describe("RevokeIsolationSegmentFromOrganization ", func() {
+		Context("when relationship exists", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("revoke the relationship", func() {
+				warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(server.ReceivedRequests()).To(HaveLen(3))
+			})
+		})
+	})
+
+	Context("when relationship exists", func() {
+		BeforeEach(func() {
+			response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						}
+					]
+				}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodDelete, "/v3/isolation_segments/segment-guid/relationships/organizations/org-guid"),
+					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+		})
+
+		It("revoke the relationship", func() {
+			warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
+			Expect(err).To(MatchError(UnexpectedResponseError{
+				ResponseCode: http.StatusTeapot,
+				CCErrorResponse: CCErrorResponse{
+					[]CCError{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+					},
+				},
+			}))
+			Expect(warnings).To(ConsistOf("this is a warning"))
+
+			Expect(server.ReceivedRequests()).To(HaveLen(3))
+		})
+	})
 })

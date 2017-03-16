@@ -11,15 +11,16 @@ import "net/http"
 //
 // The const name should always be the const value + Request.
 const (
-	DeleteIsolationSegmentRequest                        = "DeleteIsolationSegment"
-	GetAppsRequest                                       = "GetApps"
-	GetAppTasksRequest                                   = "GetAppTasks"
-	GetIsolationSegmentsRequest                          = "GetIsolationSegments"
-	GetIsolationSegmentOrganizationsRequest              = "GetIsolationSegmentRelationshipOrganizations"
-	GetOrgsRequest                                       = "GetOrgs"
-	PostAppTasksRequest                                  = "PostAppTasks"
-	PostIsolationSegmentsRequest                         = "PostIsolationSegments"
-	PostIsolationSegmentRelationshipOrganizationsRequest = "PostIsolationSegmentRelationshipOrganizations"
+	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
+	GetAppsRequest                                        = "GetApps"
+	GetAppTasksRequest                                    = "GetAppTasks"
+	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
+	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
+	GetOrgsRequest                                        = "GetOrgs"
+	PostAppTasksRequest                                   = "PostAppTasks"
+	PostIsolationSegmentsRequest                          = "PostIsolationSegments"
+	PostIsolationSegmentRelationshipOrganizationsRequest  = "PostIsolationSegmentRelationshipOrganizations"
+	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 )
 
 const (
@@ -32,6 +33,7 @@ const (
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid/relationships/organizations/:org_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/tasks", Method: http.MethodGet, Name: GetAppTasksRequest, Resource: AppsResource},

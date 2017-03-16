@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . DisableOrgIsolationActor
@@ -29,11 +29,11 @@ func (cmd *DisableOrgIsolationCommand) Setup(config command.Config, ui command.U
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	// 	client, err := shared.NewClients(config, ui)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	cmd.Actor = v3action.NewActor(client)
+	client, err := shared.NewClients(config, ui)
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v3action.NewActor(client)
 
 	return nil
 }
