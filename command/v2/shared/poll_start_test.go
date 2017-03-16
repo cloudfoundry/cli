@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -25,6 +26,7 @@ var _ = Describe("Poll Start", func() {
 		apiWarnings chan string
 		apiErrs     chan error
 		err         error
+		block       chan bool
 	)
 
 	BeforeEach(func() {
@@ -37,11 +39,13 @@ var _ = Describe("Poll Start", func() {
 		appStarting = make(chan bool)
 		apiWarnings = make(chan string)
 		apiErrs = make(chan error)
+		block = make(chan bool)
 
 		err = errors.New("This should never occur.")
 
 		go func() {
 			err = PollStart(testUI, fakeConfig, messages, logErrs, appStarting, apiWarnings, apiErrs)
+			close(block)
 		}()
 	})
 
@@ -76,7 +80,8 @@ var _ = Describe("Poll Start", func() {
 			Eventually(testUI.Out).Should(Say("some log message"))
 			Consistently(testUI.Out).ShouldNot(Say("some other log messsage"))
 			Eventually(testUI.Err).Should(Say("some other warning"))
-			Eventually(func() error { return err }).Should(BeNil())
+			Eventually(block).Should(BeClosed())
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("passes and exits with no errors or duplicated output", func() {
@@ -88,60 +93,72 @@ var _ = Describe("Poll Start", func() {
 
 			Eventually(testUI.Out).Should(Say("\nWaiting for app to start..."))
 			Consistently(testUI.Out).ShouldNot(Say("\nWaiting for app to start..."))
-			Eventually(func() error { return err }).Should(BeNil())
+			Eventually(block).Should(BeClosed())
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 
-	Context("when there are API errors", func() {
-		It("StagingFailedError", func() {
-			apiErrs <- v2action.StagingFailedError{
-				Reason: "some staging failure reason",
-			}
-			Eventually(func() error { return err }).Should(MatchError(StagingFailedError{
-				Message:    "some staging failure reason",
-				BinaryName: "FiveThirtyEight"}))
-		})
+	DescribeTable("API Errors",
+		func(apiErr error, expectedErr error) {
+			apiErrs <- apiErr
+			Eventually(block).Should(BeClosed())
+			Expect(err).To(MatchError(expectedErr))
+		},
 
-		It("StagingTimeoutError", func() {
-			apiErrs <- v2action.StagingTimeoutError{
+		Entry("StagingFailedError",
+			v2action.StagingFailedError{
+				Reason: "some staging failure reason",
+			},
+			StagingFailedError{
+				Message:    "some staging failure reason",
+				BinaryName: "FiveThirtyEight",
+			},
+		),
+
+		Entry("StagingTimeoutError",
+			v2action.StagingTimeoutError{
 				Name:    "some staging timeout name",
 				Timeout: time.Second,
-			}
-			Eventually(func() error { return err }).Should(MatchError(StagingTimeoutError{
+			},
+			StagingTimeoutError{
 				AppName: "some staging timeout name",
-				Timeout: time.Second}))
-		})
+				Timeout: time.Second,
+			},
+		),
 
-		It("ApplicationInstanceCrashedError", func() {
-			apiErrs <- v2action.ApplicationInstanceCrashedError{
+		Entry("ApplicationInstanceCrashedError",
+			v2action.ApplicationInstanceCrashedError{
 				Name: "some application crashed name",
-			}
-			Eventually(func() error { return err }).Should(MatchError(UnsuccessfulStartError{
+			},
+			UnsuccessfulStartError{
 				AppName:    "some application crashed name",
-				BinaryName: "FiveThirtyEight"}))
-		})
+				BinaryName: "FiveThirtyEight",
+			},
+		),
 
-		It("ApplicationInstanceFlappingError", func() {
-			apiErrs <- v2action.ApplicationInstanceFlappingError{
+		Entry("ApplicationInstanceFlappingError",
+			v2action.ApplicationInstanceFlappingError{
 				Name: "some application flapping name",
-			}
-			Eventually(func() error { return err }).Should(MatchError(UnsuccessfulStartError{
+			},
+			UnsuccessfulStartError{
 				AppName:    "some application flapping name",
-				BinaryName: "FiveThirtyEight"}))
-		})
+				BinaryName: "FiveThirtyEight",
+			},
+		),
 
-		It("StartupTimeoutError", func() {
-			apiErrs <- v2action.StartupTimeoutError{
+		Entry("StartupTimeoutError",
+			v2action.StartupTimeoutError{
 				Name: "some application timeout name",
-			}
-			Eventually(func() error { return err }).Should(MatchError(StartupTimeoutError{
+			},
+			StartupTimeoutError{
 				AppName:    "some application timeout name",
-				BinaryName: "FiveThirtyEight"}))
-		})
+				BinaryName: "FiveThirtyEight",
+			},
+		),
 
-		It("any other error", func() {
-			apiErrs <- v2action.HTTPHealthCheckInvalidError{}
-			Eventually(func() error { return err }).Should(MatchError(HTTPHealthCheckInvalidError{}))
-		})
-	})
+		Entry("any other error",
+			v2action.HTTPHealthCheckInvalidError{},
+			HTTPHealthCheckInvalidError{},
+		),
+	)
 })
