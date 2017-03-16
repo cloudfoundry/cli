@@ -15,8 +15,8 @@ type DisableOrgIsolationActor interface {
 }
 type DisableOrgIsolationCommand struct {
 	RequiredArgs    flag.OrgIsolationArgs `positional-args:"yes"`
-	usage           interface{}           `usage:"CF_NAME enable-org-isolation ORG_NAME SEGMENT_NAME"`
-	relatedCommands interface{}           `related_commands:"create-isolation-segment, isolation-segments"`
+	usage           interface{}           `usage:"CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME"`
+	relatedCommands interface{}           `related_commands:"enable-org-isolation, isolation-segments"`
 
 	UI          command.UI
 	Config      command.Config
@@ -48,7 +48,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"SegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		"OrgName":     cmd.RequiredArgs.OrganizationName,
 		"CurrentUser": user.Name,
