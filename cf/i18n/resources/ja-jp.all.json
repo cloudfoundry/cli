@@ -4528,6 +4528,10 @@
     "translation": "ユーザーから組織の役割を削除します"
   },
   {
+    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} から環境変数 {{.VarName}} を削除しています..."
   },
@@ -4726,6 +4730,10 @@
   {
     "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
     "translation": "{{.Username}} としてステージング環境変数グループの内容を取得しています..."
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Route and domain management:",
@@ -6266,6 +6274,10 @@
   {
     "id": "details",
     "translation": "詳細"
+  },
+  {
+    "id": "disable-org-isolation",
+    "translation": ""
   },
   {
     "id": "disallowed",
