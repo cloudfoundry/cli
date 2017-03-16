@@ -18,7 +18,7 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.LoginCF()
 
 			helpers.SetConfig(func(config *configv3.Config) {
-				config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
+				config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
 				config.ConfigFile.TargetedOrganization.GUID = "fake-org"
 				config.ConfigFile.TargetedSpace.GUID = "fake-space"
 			})
@@ -47,7 +47,7 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.LoginCF()
 
 			helpers.SetConfig(func(config *configv3.Config) {
-				config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
+				config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
 				config.ConfigFile.TargetedOrganization.GUID = "fake-org"
 				config.ConfigFile.TargetedSpace.GUID = "fake-space"
 			})
