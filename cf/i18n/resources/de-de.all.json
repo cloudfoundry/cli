@@ -4528,6 +4528,10 @@
     "translation": "Eine Organisationsrolle von einem Benutzer entfernen"
   },
   {
+    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Entfernen der Umgebungsvariablen {{.VarName}} von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
@@ -4726,6 +4730,10 @@
   {
     "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
     "translation": "Abrufen des Inhalts der Staging-Umgebungsvariablengruppe als {{.Username}}..."
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Route and domain management:",
@@ -6266,6 +6274,10 @@
   {
     "id": "details",
     "translation": "Details"
+  },
+  {
+    "id": "disable-org-isolation",
+    "translation": ""
   },
   {
     "id": "disallowed",

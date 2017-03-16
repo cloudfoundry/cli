@@ -4528,6 +4528,10 @@
     "translation": "사용자에게서 조직 역할 제거"
   },
   {
+    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에서 환경 변수 {{.VarName}} 제거 중..."
   },
@@ -4726,6 +4730,10 @@
   {
     "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
     "translation": "{{.Username}}(으)로 스테이징 환경 변수 그룹의 컨텐츠 검색 중..."
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Route and domain management:",
@@ -6266,6 +6274,10 @@
   {
     "id": "details",
     "translation": "세부사항"
+  },
+  {
+    "id": "disable-org-isolation",
+    "translation": ""
   },
   {
     "id": "disallowed",

@@ -1540,6 +1540,10 @@
     "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
   },
   {
+    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Requested state:",
     "translation": ""
   },
@@ -1553,6 +1557,10 @@
   },
   {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },
   {
@@ -2077,6 +2085,10 @@
   },
   {
     "id": "destination",
+    "translation": ""
+  },
+  {
+    "id": "disable-org-isolation",
     "translation": ""
   },
   {
