@@ -31,7 +31,7 @@ var _ = Describe("New Clients", func() {
 
 	Context("when the api endpoint is not set", func() {
 		It("returns an error", func() {
-			_, _, err := NewClients(fakeConfig, testUI)
+			_, _, err := NewClients(fakeConfig, testUI, true)
 			Expect(err).To(MatchError(command.NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -48,7 +48,7 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, _, err := NewClients(fakeConfig, testUI)
+			_, _, err := NewClients(fakeConfig, testUI, true)
 			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk/v2/info: dial tcp: i/o timeout"))
 		})
 	})
@@ -59,8 +59,18 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("returns an error", func() {
-			_, _, err := NewClients(fakeConfig, testUI)
+			_, _, err := NewClients(fakeConfig, testUI, true)
 			Expect(err).To(HaveOccurred())
+		})
+	})
+
+	Context("when not targetting", func() {
+		It("does not target and returns no UAA client", func() {
+			ccClient, uaaClient, err := NewClients(fakeConfig, testUI, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ccClient).ToNot(BeNil())
+			Expect(uaaClient).To(BeNil())
+			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(0))
 		})
 	})
 })

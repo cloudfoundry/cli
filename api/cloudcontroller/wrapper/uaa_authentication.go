@@ -55,7 +55,8 @@ func (t *UAAAuthentication) SetClient(client UAAClient) {
 }
 
 // Make adds authentication headers to the passed in request and then calls the
-// wrapped connection's Make
+// wrapped connection's Make. If the client is not set on the wrapper, it will
+// not add any header or handle any authentication errors.
 func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	if t.client == nil {
 		return t.connection.Make(request, passedResponse)

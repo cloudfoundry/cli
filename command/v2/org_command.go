@@ -44,13 +44,13 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, _, err := shared.NewClients(config, ui)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, nil)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
 
-	ccClientV3, err := sharedV3.NewClients(config, ui)
+	ccClientV3, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

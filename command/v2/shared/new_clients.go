@@ -10,13 +10,7 @@ import (
 
 // NewClients creates a new V2 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client, error) {
-	if config.Target() == "" {
-		return nil, nil, command.NoAPISetError{
-			BinaryName: config.BinaryName(),
-		}
-	}
-
+func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Client, *uaa.Client, error) {
 	ccWrappers := []ccv2.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -41,6 +35,16 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 		JobPollingInterval: config.PollingInterval(),
 		Wrappers:           ccWrappers,
 	})
+
+	if !targetCF {
+		return ccClient, nil, nil
+	}
+
+	if config.Target() == "" {
+		return nil, nil, command.NoAPISetError{
+			BinaryName: config.BinaryName(),
+		}
+	}
 
 	_, err := ccClient.TargetCF(ccv2.TargetSettings{
 		URL:               config.Target(),
