@@ -72,7 +72,7 @@ func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance
 			})
 	}
 
-	ui.DisplayTable("", table, 3)
+	ui.DisplayNonWrappingTable("", table, 3)
 }
 
 // zuluDate converts the time to UTC and then formats it to ISO8601.

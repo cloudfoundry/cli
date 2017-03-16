@@ -128,12 +128,12 @@ func (cmd HelpCommand) displayAllCommands() {
 
 func (cmd HelpCommand) displayHelpFooter() {
 	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
-	cmd.UI.DisplayTable(allCommandsIndent, cmd.environmentalVariablesTableData(), 1)
+	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.environmentalVariablesTableData(), 1)
 
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
-	cmd.UI.DisplayTable(allCommandsIndent, cmd.globalOptionsTableData(), 25)
+	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.globalOptionsTableData(), 25)
 }
 
 func (cmd HelpCommand) displayCommonCommands() {
@@ -174,7 +174,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayTable(commonCommandsIndent, table, 4)
+		cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, table, 4)
 		cmd.UI.DisplayNewline()
 	}
 
@@ -197,11 +197,11 @@ func (cmd HelpCommand) displayCommonCommands() {
 	}
 
 	cmd.UI.DisplayHeader("Commands offered by installed plugins:")
-	cmd.UI.DisplayTable(commonCommandsIndent, table, 4)
+	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, table, 4)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("Global options:")
-	cmd.UI.DisplayTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
+	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayText("These are commonly used commands. Use 'cf help -a' to see all, with descriptions.")

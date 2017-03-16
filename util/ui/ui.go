@@ -18,6 +18,8 @@ import (
 	runewidth "github.com/mattn/go-runewidth"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"github.com/vito/go-interact/interact"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
@@ -173,10 +175,10 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	return response, err
 }
 
-// DisplayTable outputs a matrix of strings as a table to UI.Out. Prefix will
+// DisplayNonWrappingTable outputs a matrix of strings as a table to UI.Out. Prefix will
 // be prepended to each row and padding adds the specified number of spaces
 // between columns.
-func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
+func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding int) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
@@ -209,6 +211,100 @@ func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
 		}
 		fmt.Fprintf(ui.Out, "\n")
 	}
+}
+
+// DisplayTable outputs a matrix of strings as a table to UI.Out. Prefix will
+// be prepended to each row and padding adds the specified number of spaces
+// between columns.  The final columns may wrap to multiple lines but will
+// still be confined to the last column.  Wrapping will occur on word boundaries.
+func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
+	rows := len(table)
+	if rows == 0 {
+		return
+	}
+
+	columns := len(table[0])
+
+	// if we don't want to wrap the table columns
+	if columns < 2 || !terminal.IsTerminal(int(os.Stdout.Fd())) {
+		ui.DisplayNonWrappingTable(prefix, table, padding)
+		return
+	}
+
+	terminalWidth, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+
+	if err != nil {
+		ui.DisplayNonWrappingTable(prefix, table, padding)
+		return
+	}
+
+	ui.DisplayWrappingTableWithWidth(prefix, table, padding, terminalWidth)
+}
+
+func (ui *UI) DisplayWrappingTableWithWidth(prefix string, table [][]string, padding int, terminalWidth int) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	var columnPadding []int
+
+	rows := len(table)
+	columns := len(table[0])
+
+	for col := 0; col < columns-1; col++ {
+		var max int
+		for row := 0; row < rows; row++ {
+			if strLen := runewidth.StringWidth(table[row][col]); max < strLen {
+				max = strLen
+			}
+		}
+		columnPadding = append(columnPadding, max+padding)
+	}
+
+	spilloverPadding := len(prefix) + sum(columnPadding)
+	lastColumnWidth := terminalWidth - spilloverPadding
+
+	for row := 0; row < rows; row++ {
+		fmt.Fprintf(ui.Out, prefix)
+
+		// for all columns except last, add cell value and padding
+		for col := 0; col < columns-1; col++ {
+			var addedPadding int
+			if col+1 != columns {
+				addedPadding = columnPadding[col] - runewidth.StringWidth(table[row][col])
+			}
+			fmt.Fprintf(ui.Out, "%s%s", table[row][col], strings.Repeat(" ", addedPadding))
+		}
+
+		// for last column, add each word individually. If the added word would make the column exceed terminal width, create a new line and add padding
+		words := strings.Split(table[row][columns-1], " ")
+		currentWidth := 0
+
+		for _, word := range words {
+			wordWidth := runewidth.StringWidth(word)
+			if currentWidth == 0 {
+				currentWidth = wordWidth
+				fmt.Fprintf(ui.Out, "%s", word)
+			} else if wordWidth+1+currentWidth > lastColumnWidth {
+				fmt.Fprintf(ui.Out, "\n%s%s", strings.Repeat(" ", spilloverPadding), word)
+				currentWidth = wordWidth
+			} else {
+				fmt.Fprintf(ui.Out, " %s", word)
+				currentWidth += wordWidth + 1
+			}
+		}
+
+		fmt.Fprintf(ui.Out, "\n")
+	}
+}
+
+func sum(intSlice []int) int {
+	sum := 0
+
+	for _, i := range intSlice {
+		sum += i
+	}
+
+	return sum
 }
 
 // DisplayText translates the template, substitutes in templateValues, and

@@ -2,6 +2,7 @@ package ui_test
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -218,6 +219,28 @@ var _ = Describe("UI", func() {
 			Expect(ui.Out).To(Say(`some-prefixaaaaaaaaa   bb            ccccccc
 some-prefixdddd        eeeeeeeeeee   fff
 some-prefixgg          hh            ii`))
+		})
+	})
+
+	Describe("DisplayWrappingTableWithWidth", func() {
+		It("displays a table with the last column wrapping according to width", func() {
+			ui.DisplayWrappingTableWithWidth(" ",
+				[][]string{
+					{"wut0:", ""},
+					{"wut1:", "hi hi"},
+					{"wut2:", strings.Repeat("a", 9)},
+					{"wut3:", "hi hi " + strings.Repeat("a", 9)},
+					{"wut4:", strings.Repeat("a", 15) + " " + strings.Repeat("b", 15)},
+				},
+				2,
+				20)
+			Expect(ui.Out).To(Say(" wut0:  " + "\n"))
+			Expect(ui.Out).To(Say(" wut1:  " + "hi hi\n"))
+			Expect(ui.Out).To(Say(" wut2:  " + strings.Repeat("a", 9) + "\n"))
+			Expect(ui.Out).To(Say(" wut3:  hi hi\n"))
+			Expect(ui.Out).To(Say("        " + strings.Repeat("a", 9) + "\n"))
+			Expect(ui.Out).To(Say(" wut4:  " + strings.Repeat("a", 15) + "\n"))
+			Expect(ui.Out).To(Say("        " + strings.Repeat("b", 15) + "\n"))
 		})
 	})
 

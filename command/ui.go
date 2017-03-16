@@ -15,6 +15,7 @@ type UI interface {
 	DisplayHeader(text string)
 	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
 	DisplayNewline()
+	DisplayNonWrappingTable(prefix string, table [][]string, padding int)
 	DisplayOK()
 	DisplayTable(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
