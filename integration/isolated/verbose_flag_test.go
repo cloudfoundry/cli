@@ -1,14 +1,13 @@
 package isolated
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 
-	helpers "code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -196,7 +195,7 @@ var _ = Describe("Verbose", func() {
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
 				helpers.SetConfig(func(config *configv3.Config) {
-					config.ConfigFile.AccessToken = fmt.Sprintf("%sfoo", config.ConfigFile.AccessToken)
+					config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
 				})
 
 				var envMap map[string]string
@@ -262,7 +261,7 @@ var _ = Describe("Verbose", func() {
 				// Invalidate the access token to cause a token refresh in order to
 				// test the call to the UAA.
 				helpers.SetConfig(func(config *configv3.Config) {
-					config.ConfigFile.AccessToken = fmt.Sprintf("%sfoo", config.ConfigFile.AccessToken)
+					config.ConfigFile.AccessToken = helpers.InvalidAccessToken()
 				})
 
 				var envMap map[string]string
