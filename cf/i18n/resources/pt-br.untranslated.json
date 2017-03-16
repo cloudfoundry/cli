@@ -480,6 +480,10 @@
     "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
   },
   {
+    "id": "CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]"
   },
@@ -1580,8 +1584,8 @@
     "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
   },
   {
-    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "id": "Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": "Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Requested state:",

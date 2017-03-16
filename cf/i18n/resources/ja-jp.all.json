@@ -936,6 +936,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": ""
   },
@@ -4528,7 +4532,7 @@
     "translation": "ユーザーから組織の役割を削除します"
   },
   {
-    "id": "Removing entitlement from {{.OrgName}} to isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
+    "id": "Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
