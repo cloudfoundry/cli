@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -31,13 +30,12 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
-	ccClient := ccv2.NewClient(ccv2.Config{
-		AppName:            config.BinaryName(),
-		AppVersion:         config.BinaryVersion(),
-		JobPollingTimeout:  config.OverallPollingTimeout(),
-		JobPollingInterval: config.PollingInterval(),
-	})
-	cmd.Actor = v2action.NewActor(ccClient, nil)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, false)
+	if err != nil {
+		return err
+	}
+
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil

@@ -30,7 +30,7 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, uaaClient, err := shared.NewClients(config, ui)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

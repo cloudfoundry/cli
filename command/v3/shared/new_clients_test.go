@@ -31,7 +31,7 @@ var _ = Describe("New Clients", func() {
 
 	Context("when the api endpoint is not set", func() {
 		It("returns the NoAPISetError", func() {
-			_, err := NewClients(fakeConfig, testUI)
+			_, err := NewClients(fakeConfig, testUI, true)
 			Expect(err).To(MatchError(command.NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -44,7 +44,7 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("returns the ClientTargetError", func() {
-			_, err := NewClients(fakeConfig, testUI)
+			_, err := NewClients(fakeConfig, testUI, true)
 			Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
 		})
 	})
@@ -59,12 +59,21 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, err := NewClients(fakeConfig, testUI)
+			_, err := NewClients(fakeConfig, testUI, true)
 			if e, ok := err.(ClientTargetError); ok {
 				Expect(e.Message).To(MatchRegexp("https://potato.bananapants11122.co.uk: dial tcp.*i/o timeout"))
 			} else {
 				Fail("Expected err to be type ClientTargetError")
 			}
+		})
+	})
+
+	Context("when not targetting", func() {
+		It("does not target and returns no UAA client", func() {
+			ccClient, err := NewClients(fakeConfig, testUI, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ccClient).ToNot(BeNil())
+			Expect(fakeConfig.SkipSSLValidationCallCount()).To(Equal(0))
 		})
 	})
 })

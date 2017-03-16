@@ -10,13 +10,7 @@ import (
 
 // NewClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
-	if config.Target() == "" {
-		return nil, command.NoAPISetError{
-			BinaryName: config.BinaryName(),
-		}
-	}
-
+func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Client, error) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -37,6 +31,16 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		AppVersion: config.BinaryVersion(),
 		Wrappers:   ccWrappers,
 	})
+
+	if !targetCF {
+		return ccClient, nil
+	}
+
+	if config.Target() == "" {
+		return nil, command.NoAPISetError{
+			BinaryName: config.BinaryName(),
+		}
+	}
 
 	_, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),

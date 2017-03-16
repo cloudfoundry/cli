@@ -35,7 +35,7 @@ func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	client, err := shared.NewClients(config, ui)
+	client, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
