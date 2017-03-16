@@ -67,3 +67,20 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 	err = client.connection.Make(request, &response)
 	return relationships, response.Warnings, err
 }
+
+// RevokeIsolationSegmentFromOrganization will delete the relationship between
+// the isolation segment and the organization provided.
+func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, organizationGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
+		URIParams:   internal.Params{"guid": isolationSegmentGUID, "org_guid": organizationGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+
+	return response.Warnings, err
+}

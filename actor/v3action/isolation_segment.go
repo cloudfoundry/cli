@@ -137,3 +137,23 @@ func (actor Actor) GetIsolationSegmentsByOrganization(orgGUID string) ([]Isolati
 
 	return isolationSegments, Warnings(warnings), nil
 }
+
+func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (Warnings, error) {
+	segment, warnings, err := actor.GetIsolationSegmentByName(isolationSegmentName)
+	allWarnings := append(Warnings{}, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	apiWarnings, err := actor.CloudControllerClient.RevokeIsolationSegmentFromOrganization(segment.GUID, org.GUID)
+
+	allWarnings = append(allWarnings, apiWarnings...)
+	return allWarnings, err
+}
