@@ -425,7 +425,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		})
 	})
 
-	FDescribe("RevokeIsolationSegmentFromOrganizationByName", func() {
+	Describe("RevokeIsolationSegmentFromOrganizationByName", func() {
 		Context("when the isolation segment exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetIsolationSegmentsReturns([]ccv3.IsolationSegment{
