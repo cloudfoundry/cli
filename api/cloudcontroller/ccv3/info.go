@@ -3,7 +3,6 @@ package ccv3
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
@@ -80,12 +79,6 @@ func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 	if err != nil {
 		return APIInfo{}, ResourceLinks{}, warnings, err
 	}
-
-	// TODO: Remove this hack after CC adds proper IsolationSegment,
-	// Organizations, and Spaces resources to /v3.
-	info["isolation_segments"] = APILink{HREF: strings.Replace(info["tasks"].HREF, "tasks", "isolation_segments", 1)}
-	info["organizations"] = APILink{HREF: strings.Replace(info["tasks"].HREF, "tasks", "organizations", 1)}
-	info["spaces"] = APILink{HREF: strings.Replace(info["tasks"].HREF, "tasks", "spaces", 1)}
 
 	return rootResponse, info, warnings, nil
 }
