@@ -3,6 +3,12 @@ platform: linux
 
 image: docker:///busybox
 
+inputs:
+  - name: input
+
+outputs:
+  - name: param_to_file_output
+
 params:
   FILE_CONTENTS:
   OUTPUT_PATH:
@@ -14,4 +20,6 @@ run:
   - |
     set -eu
 
-    echo "$FILE_CONTENTS" > $OUTPUT_PATH
+    cp -r input/. params_to_file_output
+
+    echo "$FILE_CONTENTS" > params_to_file_output/$OUTPUT_PATH
