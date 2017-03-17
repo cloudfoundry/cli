@@ -18,8 +18,8 @@ var _ = Describe("bind-security-group command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("bind-security-group command refactor is still experimental")
 		orgName = helpers.NewOrgName()
-		spaceName1 = helpers.PrefixedRandomName("SPACE")
-		spaceName2 = helpers.PrefixedRandomName("SPACE")
+		spaceName1 = helpers.NewSpaceName()
+		spaceName2 = helpers.NewSpaceName()
 
 		helpers.LoginCF()
 	})
@@ -134,9 +134,9 @@ var _ = Describe("bind-security-group command", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName)
 						Eventually(session).Should(Exit(0))
 						userName, _ := helpers.GetCredentials()
-						Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
+						Expect(session.Out).To(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
 						Expect(session.Out).To(Say("OK"))
-						Expect(session.Out).To(Say("Assigning security group some-security-group to space SPACE.* in org %s as %s...", orgName, userName))
+						Expect(session.Out).To(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
 						Expect(session.Out).To(Say("OK"))
 						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
 					})

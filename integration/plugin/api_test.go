@@ -205,7 +205,7 @@ var _ = Describe("plugin API", func() {
 
 		BeforeEach(func() {
 			_, space1 = createTargetedOrgAndSpace()
-			space2 = helpers.PrefixedRandomName("SPACE")
+			space2 = helpers.NewSpaceName()
 			helpers.CreateSpace(space2)
 		})
 

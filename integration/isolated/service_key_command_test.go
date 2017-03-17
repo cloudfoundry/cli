@@ -23,7 +23,7 @@ var _ = Describe("service-key command", func() {
 
 	BeforeEach(func() {
 		org = NewOrgName()
-		space = PrefixedRandomName("SPACE")
+		space = NewSpaceName()
 		service = PrefixedRandomName("SERVICE")
 		servicePlan = PrefixedRandomName("SERVICE-PLAN")
 		serviceInstance = PrefixedRandomName("si")

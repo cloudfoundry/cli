@@ -20,7 +20,7 @@ var _ = Describe("space command", func() {
 		helpers.RunIfExperimental("space command refactor is still experimental")
 
 		orgName = helpers.NewOrgName()
-		spaceName = helpers.PrefixedRandomName("SPACE")
+		spaceName = helpers.NewSpaceName()
 	})
 
 	Describe("help", func() {

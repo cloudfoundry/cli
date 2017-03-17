@@ -100,7 +100,7 @@ var _ = Describe("run-task command", func() {
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
-			spaceName = helpers.PrefixedRandomName("SPACE")
+			spaceName = helpers.NewSpaceName()
 			appName = helpers.PrefixedRandomName("APP")
 
 			setupCF(orgName, spaceName)

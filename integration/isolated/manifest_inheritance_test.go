@@ -73,7 +73,7 @@ var _ = Describe("manifest inheritance in push command", func() {
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		spaceName = helpers.PrefixedRandomName("SPACE")
+		spaceName = helpers.NewSpaceName()
 		app1Name = helpers.PrefixedRandomName("app")
 		app2Name = helpers.PrefixedRandomName("app")
 

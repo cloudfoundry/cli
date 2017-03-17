@@ -18,7 +18,7 @@ var _ = Describe("org command", func() {
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		spaceName = helpers.PrefixedRandomName("SPACE")
+		spaceName = helpers.NewSpaceName()
 	})
 
 	Describe("help", func() {
@@ -115,7 +115,7 @@ var _ = Describe("org command", func() {
 					session = helpers.CF("set-quota", orgName, quotaName)
 					Eventually(session).Should(Exit(0))
 
-					spaceName2 = helpers.PrefixedRandomName("SPACE")
+					spaceName2 = helpers.NewSpaceName()
 					helpers.CreateSpace(spaceName2)
 
 					isolationSegmentName1 = helpers.IsolationSegmentName()

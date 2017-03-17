@@ -16,7 +16,7 @@ var _ = Describe("copy-source command", func() {
 	var appName1, appName2 string
 
 	BeforeEach(func() {
-		setupCF(helpers.NewOrgName(), helpers.PrefixedRandomName("SPACE"))
+		setupCF(helpers.NewOrgName(), helpers.NewSpaceName())
 
 		appName1 = helpers.PrefixedRandomName("hello")
 		appName2 = helpers.PrefixedRandomName("banana")

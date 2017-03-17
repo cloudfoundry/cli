@@ -88,7 +88,7 @@ var _ = Describe("unbind-service command", func() {
 
 		BeforeEach(func() {
 			org = helpers.NewOrgName()
-			space = helpers.PrefixedRandomName("SPACE")
+			space = helpers.NewSpaceName()
 			service = helpers.PrefixedRandomName("SERVICE")
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
