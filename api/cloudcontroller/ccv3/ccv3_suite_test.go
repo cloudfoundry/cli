@@ -93,6 +93,15 @@ func SetupV3Response() {
 			},
 			"tasks": {
 				"href": "SERVER_URL/v3/tasks"
+			},
+			"isolation_segments": {
+				"href": "SERVER_URL/v3/isolation_segments"
+			},
+			"organizations": {
+				"href": "SERVER_URL/v3/organizations"
+			},
+			"spaces": {
+				"href": "SERVER_URL/v3/spaces"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)
