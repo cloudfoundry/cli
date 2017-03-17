@@ -16,7 +16,7 @@ var _ = Describe("update-space-quota command", func() {
 	)
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		spaceName = helpers.PrefixedRandomName("SPACE")
+		spaceName = helpers.NewSpaceName()
 
 		setupCF(orgName, spaceName)
 		quotaName = helpers.QuotaName()

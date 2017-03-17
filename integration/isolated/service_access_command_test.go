@@ -19,7 +19,7 @@ var _ = Describe("service-access command", func() {
 
 		BeforeEach(func() {
 			orgName = NewOrgName()
-			spaceName = PrefixedRandomName("space")
+			spaceName = NewSpaceName()
 			setupCF(orgName, spaceName)
 
 			serviceBroker = NewServiceBroker(

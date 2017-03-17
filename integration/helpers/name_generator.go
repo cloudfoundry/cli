@@ -8,6 +8,10 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+func NewSpaceName() string {
+	return PrefixedRandomName("INTEGRATION-SPACE")
+}
+
 func RandomUsername() string {
 	return PrefixedRandomName("integration-user")
 }

@@ -80,7 +80,7 @@ func installTestPlugin() {
 
 func createTargetedOrgAndSpace() (string, string) {
 	org := helpers.NewOrgName()
-	space := helpers.PrefixedRandomName("SPACE")
+	space := helpers.NewSpaceName()
 	helpers.CreateOrgAndSpace(org, space)
 	helpers.TargetOrgAndSpace(org, space)
 	return org, space

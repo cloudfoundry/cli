@@ -31,7 +31,7 @@ var _ = Describe("env command", func() {
 	)
 
 	BeforeEach(func() {
-		setupCF(helpers.NewOrgName(), helpers.PrefixedRandomName("space"))
+		setupCF(helpers.NewOrgName(), helpers.NewSpaceName())
 
 		appName = helpers.PrefixedRandomName("app")
 

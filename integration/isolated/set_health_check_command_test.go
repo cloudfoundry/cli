@@ -110,7 +110,7 @@ var _ = Describe("set-health-check command", func() {
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
-			spaceName = helpers.PrefixedRandomName("SPACE")
+			spaceName = helpers.NewSpaceName()
 
 			setupCF(orgName, spaceName)
 		})

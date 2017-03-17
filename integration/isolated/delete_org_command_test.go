@@ -68,7 +68,7 @@ var _ = Describe("delete-org command", func() {
 			helpers.LoginCF()
 
 			orgName = helpers.NewOrgName()
-			helpers.CreateOrgAndSpace(orgName, helpers.PrefixedRandomName("space"))
+			helpers.CreateOrgAndSpace(orgName, helpers.NewSpaceName())
 		})
 
 		Context("when the -f flag not is provided", func() {
@@ -160,7 +160,7 @@ var _ = Describe("delete-org command", func() {
 			helpers.LoginCF()
 
 			orgName = helpers.NewOrgName()
-			spaceName := helpers.PrefixedRandomName("space")
+			spaceName := helpers.NewSpaceName()
 			helpers.CreateOrgAndSpace(orgName, spaceName)
 			helpers.TargetOrgAndSpace(orgName, spaceName)
 		})
