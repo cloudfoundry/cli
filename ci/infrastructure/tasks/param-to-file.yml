@@ -20,6 +20,6 @@ run:
   - |
     set -eu
 
-    cp -r input/. params_to_file_output
+    cp -r input/. param_to_file_output
 
-    echo "$FILE_CONTENTS" > params_to_file_output/$OUTPUT_PATH
+    echo "$FILE_CONTENTS" > param_to_file_output/$OUTPUT_PATH
