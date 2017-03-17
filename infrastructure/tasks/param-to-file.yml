@@ -1,0 +1,17 @@
+---
+platform: linux
+
+image: docker:///busybox
+
+params:
+  FILE_CONTENTS:
+  OUTPUT_PATH:
+
+run:
+  path: sh
+  args:
+  - -c
+  - |
+    set -eu
+
+    echo "$FILE_CONTENTS" > $OUTPUT_PATH
