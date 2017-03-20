@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -130,6 +131,11 @@ func (display *RequestLoggerFileWriter) HandleInternalError(err error) {
 func (display *RequestLoggerFileWriter) Start() error {
 	display.lock.Lock()
 	for _, filePath := range display.filePaths {
+		err := os.MkdirAll(filepath.Dir(filePath), os.ModeDir|os.ModePerm)
+		if err != nil {
+			return err
+		}
+
 		logFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 		if err != nil {
 			return err
