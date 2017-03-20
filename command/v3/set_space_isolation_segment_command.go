@@ -71,7 +71,7 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"SegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		"SpaceName":   cmd.RequiredArgs.SpaceName,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
@@ -91,6 +91,8 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Running applications in the space need a restart to be moved over to this isolation segment.")
 
 	return nil
 }

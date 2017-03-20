@@ -4800,6 +4800,10 @@
     "translation": "Running Environment Variable Groups:"
   },
   {
+    "id": "Running applications in the space need a restart to be moved over to this isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "SECURITY GROUP",
     "translation": "SECURITY GROUP"
   },
@@ -5030,10 +5034,6 @@
   {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
-  },
-  {
-    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-    "translation": ""
   },
   {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
@@ -5966,6 +5966,10 @@
   {
     "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
+  },
+  {
+    "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",

@@ -128,13 +128,15 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 				It("Displays the header and okay", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Setting isolation segment %s for space %s in org %s as banana...", isolationSegment, space, org))
+					Expect(testUI.Out).To(Say("Updating isolation segment of space %s in org %s as banana...", space, org))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
 					Expect(testUI.Err).To(Say("entitlement-warning"))
 					Expect(testUI.Err).To(Say("banana"))
+
+					Expect(testUI.Out).To(Say("Running applications in the space need a restart to be moved over to this isolation segment."))
 
 					Expect(fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceCallCount()).To(Equal(1))
 					isolationSegmentName, spaceGUID := fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceArgsForCall(0)
@@ -149,7 +151,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 				})
 
 				It("returns the warnings and error", func() {
-					Expect(testUI.Out).To(Say("Setting isolation segment %s for space %s in org %s as banana...", isolationSegment, space, org))
+					Expect(testUI.Out).To(Say("Updating isolation segment of space %s in org %s as banana...", space, org))
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
 					Expect(testUI.Err).To(Say("entitlement-warning"))
