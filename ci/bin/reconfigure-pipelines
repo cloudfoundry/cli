@@ -36,3 +36,5 @@ configure_pipeline cli \
 configure_pipeline infrastructure \
   $pipelines_path/infrastructure/pipeline.yml
 
+configure_pipeline hardknox \
+  $pipelines_path/infrastructure/hardknox.yml
