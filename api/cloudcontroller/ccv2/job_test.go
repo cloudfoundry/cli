@@ -269,7 +269,7 @@ var _ = Describe("Job", func() {
 					// If the jobPollingTimeout is less than the PollingInterval,
 					// then the margin may be too small, we should install not allow the
 					// jobPollingTimeout to be set to less than the PollingInterval
-					Expect(endTime).To(BeTemporally("~", startTime, 2*jobPollingTimeout))
+					Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
 				})
 			})
 		})
