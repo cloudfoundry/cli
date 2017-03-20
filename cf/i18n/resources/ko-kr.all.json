@@ -4540,7 +4540,7 @@
     "translation": "사용자에게서 조직 역할 제거"
   },
   {
-    "id": "Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...",
+    "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {

@@ -75,7 +75,7 @@ var _ = Describe("disable-org-isolation command", func() {
 
 			It("outputs an error and exits 1", func() {
 				session := helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Removing entitlement of isolation segment %s from organization %s as %s...", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Organization '%s' not found.", organizationName))
 				Eventually(session).Should(Exit(1))
@@ -85,7 +85,7 @@ var _ = Describe("disable-org-isolation command", func() {
 		Context("when the isolation segment does not exist", func() {
 			It("outputs an error and exits 1", func() {
 				session := helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Removing entitlement of isolation segment %s from organization %s as %s...", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Isolation segment '%s' not found.", isolationSegmentName))
 				Eventually(session).Should(Exit(1))
@@ -100,13 +100,13 @@ var _ = Describe("disable-org-isolation command", func() {
 
 			It("outputs a warning and exists 0", func() {
 				session := helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Removing entitlement of isolation segment %s from organization %s as %s...", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
 				// Tests idempotence
 				session = helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Removing entitlement of isolation segment %s from organization %s as %s...", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -121,7 +121,7 @@ var _ = Describe("disable-org-isolation command", func() {
 
 			It("displays OK", func() {
 				session := helpers.CF("disable-org-isolation", organizationName, isolationSegmentName)
-				Eventually(session).Should(Say("Removing entitlement of isolation segment %s from organization %s as %s...", isolationSegmentName, organizationName, userName))
+				Eventually(session).Should(Say("Removing entitlement to isolation segment %s from org %s as %s...", isolationSegmentName, organizationName, userName))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})

@@ -76,7 +76,7 @@ var _ = Describe("disable-org-isolation Command", func() {
 		})
 
 		It("Outputs a mesaage", func() {
-			Expect(testUI.Out).To(Say("Removing entitlement of isolation segment segment1 from organization org1 as admin..."))
+			Expect(testUI.Out).To(Say("Removing entitlement to isolation segment segment1 from org org1 as admin..."))
 		})
 
 		Context("when revoking is successful", func() {
