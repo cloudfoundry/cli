@@ -1,0 +1,153 @@
+---
+groups:
+- name: create
+  jobs:
+  - setup-infrastructure
+  - deploy-cf
+- name: delete
+  jobs:
+  - delete-cf
+  - delete-infrastructure
+
+resources:
+- name: cf-deployment-concourse-tasks
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
+    branch: master
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    path: ci
+- name: cf-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    branch: master
+- name: ops-files
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    branch: master
+
+# - name: bosh-lites-diego-pool
+#   type: pool
+#   source:
+#     uri: git@github.com:cloudfoundry/cli-pools
+#     private_key: {{cli-pools-github-private-key}}
+#     branch: master
+#     pool: bosh-lites-diego
+
+- name: state
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: {{cli-private-github-private-key-write}}
+    branch: master
+
+jobs:
+- name: setup-infrastructure
+  serial_groups: [hardknox]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+    - get: cli-ci
+  - task: generate-credentials
+    file: cli-ci/ci/infrastructure/tasks/param-to-file.yml
+    input_mapping:
+      input: state
+    params:
+      FILE_CONTENTS: {{google_account_creds}}
+      OUTPUT_PATH: ci/infrastructure/hardknox/google_account_creds.json
+  - task: setup-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-up/task.yml
+    input_mapping:
+      bbl-state: param_to_file_output
+    params:
+      BBL_IAAS: gcp
+      BBL_GCP_SERVICE_ACCOUNT_KEY: google_account_creds.json
+      BBL_GCP_PROJECT_ID: {{gcp_project}}
+      BBL_GCP_REGION: us-central1
+      BBL_GCP_ZONE: us-central1-f
+      BBL_LB_CERT: {{hardknox_cf_ssl_cert}}
+      BBL_LB_KEY: {{hardknox_cf_ssl_cert_private_key}}
+      LB_DOMAIN: hardknox.cli.ci.cf-app.com
+      BBL_ENV_NAME: hardknox
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+    ensure:
+      put: state
+      params:
+        repository: updated-bbl-state
+        rebase: true
+
+- name: deploy-cf
+  serial_groups: [hardknox]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+      passed: [setup-infrastructure]
+      trigger: true
+    - get: cf-deployment
+    - get: ops-files
+  - task: upload-stemcell
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
+    input_mapping:
+      bbl-state: state
+    params:
+      INFRASTRUCTURE: google
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+  - task: deploy-cf
+    file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
+    input_mapping:
+      bbl-state: state
+      vars-store: state
+    params:
+      SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
+      OPS_FILES: "operations/tcp-routing-gcp.yml"
+      REGENERATE_VARS_STORE: true
+      VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+    ensure:
+      put: state
+      params:
+        repository: updated-vars-store
+        rebase: true
+
+- name: delete-cf
+  serial_groups: [hardknox]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: delete-cf-deployment
+    file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
+    input_mapping:
+      bbl-state: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+
+- name: delete-infrastructure
+  serial_groups: [hardknox]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: destroy-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
+    input_mapping:
+      bbl-state: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+    ensure:
+      put: state
+      params:
+        repository: updated-bbl-state
+        rebase: true
