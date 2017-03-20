@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -192,6 +193,107 @@ var _ = Describe("Isolation Segments", func() {
 							{
 								Code:   10010,
 								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("GetIsolationSegment", func() {
+		Context("when the isolation segment exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-iso-guid",
+					"name": "an_isolation_segment"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments/some-iso-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the isolation segment and all warnings", func() {
+				isolationSegment, warnings, err := client.GetIsolationSegment("some-iso-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(isolationSegment).To(Equal(IsolationSegment{
+					Name: "an_isolation_segment",
+					GUID: "some-iso-guid",
+				}))
+			})
+		})
+
+		Context("when the isolation segment does not exist", func() {
+			BeforeEach(func() {
+				response := `
+				{
+					  "errors": [
+						    {
+									  "detail": "Isolation segment not found",
+							      "title": "CF-ResourceNotFound",
+							      "code": 10010
+						    }
+					  ]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments/some-iso-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a ResourceNotFoundError", func() {
+				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "Isolation segment not found"}))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Isolation Segment not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/isolation_segments/some-iso-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						[]CCError{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Isolation Segment not found",
 								Title:  "CF-ResourceNotFound",
 							},
 						},

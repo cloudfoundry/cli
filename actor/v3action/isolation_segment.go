@@ -36,6 +36,22 @@ func (e IsolationSegmentAlreadyExistsError) Error() string {
 	return fmt.Sprintf("Isolation Segment '%s' already exists.", e.Name)
 }
 
+func (actor Actor) GetIsolationSegmentBySpace(spaceGUID string) (IsolationSegment, Warnings, error) {
+	relationship, warnings, err := actor.CloudControllerClient.GetSpaceIsolationSegment(spaceGUID)
+	allWarnings := append(Warnings{}, warnings...)
+	if err != nil {
+		return IsolationSegment{}, allWarnings, err
+	}
+
+	isolationSegment, warnings, err := actor.CloudControllerClient.GetIsolationSegment(relationship.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return IsolationSegment{}, allWarnings, err
+	}
+
+	return IsolationSegment(isolationSegment), allWarnings, err
+}
+
 // CreateIsolationSegmentByName creates a given isolation segment.
 func (actor Actor) CreateIsolationSegmentByName(name string) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(name)

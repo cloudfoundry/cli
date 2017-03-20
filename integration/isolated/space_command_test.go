@@ -119,9 +119,10 @@ var _ = Describe("space command", func() {
 
 			Context("when no flags are used", func() {
 				var (
-					appName         string
-					spaceQuotaName  string
-					serviceInstance string
+					appName              string
+					spaceQuotaName       string
+					serviceInstance      string
+					isolationSegmentName string
 				)
 
 				BeforeEach(func() {
@@ -135,9 +136,13 @@ var _ = Describe("space command", func() {
 					spaceQuotaName = helpers.PrefixedRandomName("space-quota")
 					Eventually(helpers.CF("create-space-quota", spaceQuotaName)).Should(Exit(0))
 					Eventually(helpers.CF("set-space-quota", spaceName, spaceQuotaName)).Should(Exit(0))
+					isolationSegmentName = helpers.IsolationSegmentName()
+					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
+					Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
 				})
 
-				It("displays a table with space name, org, apps, services, space quota and security groups", func() {
+				It("displays a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
 					session := helpers.CF("space", spaceName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
@@ -146,6 +151,7 @@ var _ = Describe("space command", func() {
 					Eventually(session.Out).Should(Say("org:\\s+%s", orgName))
 					Eventually(session.Out).Should(Say("apps:\\s+%s", appName))
 					Eventually(session.Out).Should(Say("services:\\s+%s", serviceInstance))
+					Eventually(session.Out).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
 					Eventually(session.Out).Should(Say("space quota:\\s+%s", spaceQuotaName))
 					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks"))
 				})
@@ -161,6 +167,7 @@ var _ = Describe("space command", func() {
 					Eventually(session.Out).Should(Say("org:\\s+%s", orgName))
 					Eventually(session.Out).Should(Say("apps:"))
 					Eventually(session.Out).Should(Say("services:"))
+					Eventually(session.Out).Should(Say("isolation segment:"))
 					Eventually(session.Out).Should(Say("space quota:"))
 					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks\n\n"))
 

@@ -6428,6 +6428,10 @@
     "translation": "環境変数 CF_STARTUP_TIMEOUT の値が無効です\n{{.Err}}"
   },
   {
+    "id": "isolation segment:",
+    "translation": ""
+  },
+  {
     "id": "isolation segments:",
     "translation": ""
   },

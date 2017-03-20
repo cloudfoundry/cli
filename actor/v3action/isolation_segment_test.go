@@ -301,6 +301,69 @@ var _ = Describe("Isolation Segment Actions", func() {
 		})
 	})
 
+	Describe("GetIsolationSegmentBySpace", func() {
+		Context("when the retrieving the space isolation segment succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(ccv3.Relationship{
+					GUID: "some-iso-guid",
+				}, ccv3.Warnings{"I r warnings", "I are two warnings"},
+					nil,
+				)
+			})
+
+			Context("when retrieving the isolation segment succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetIsolationSegmentReturns(ccv3.IsolationSegment{
+						Name: "some-iso",
+					},
+						ccv3.Warnings{"iso-warnings-1", "iso-warnings-2"}, nil)
+				})
+
+				It("returns the warnings and IsolationSegment", func() {
+					isolationSegment, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "iso-warnings-1", "iso-warnings-2"))
+					Expect(isolationSegment).To(Equal(IsolationSegment{Name: "some-iso"}))
+
+					Expect(fakeCloudControllerClient.GetSpaceIsolationSegmentCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSpaceIsolationSegmentArgsForCall(0)).To(Equal("some-space-guid"))
+
+					Expect(fakeCloudControllerClient.GetIsolationSegmentCallCount()).To(Equal(1))
+					arg := fakeCloudControllerClient.GetIsolationSegmentArgsForCall(0)
+					Expect(arg).To(Equal("some-iso-guid"))
+				})
+			})
+
+			Context("when retrieving the isolation segment errors", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("foo bar")
+					fakeCloudControllerClient.GetIsolationSegmentReturns(ccv3.IsolationSegment{}, ccv3.Warnings{"iso-warnings-1", "iso-warnings-2"}, expectedErr)
+				})
+
+				It("returns the warnings and error", func() {
+					_, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+					Expect(err).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "iso-warnings-1", "iso-warnings-2"))
+				})
+			})
+		})
+
+		Context("when the retrieving the space isolation segment errors", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("foo bar")
+				fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(ccv3.Relationship{}, ccv3.Warnings{"I r warnings", "I are two warnings"}, expectedErr)
+			})
+
+			It("returns the warnings and error", func() {
+				_, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings"))
+			})
+		})
+	})
+
 	Describe("GetIsolationSegmentByName", func() {
 		Context("when the isolation segment exists", func() {
 			BeforeEach(func() {

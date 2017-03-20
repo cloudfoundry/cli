@@ -7,10 +7,12 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . SpaceActor
@@ -18,6 +20,12 @@ import (
 type SpaceActor interface {
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
 	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error)
+}
+
+//go:generate counterfeiter . SpaceActorV3
+
+type SpaceActorV3 interface {
+	GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
 }
 
 type SpaceCommand struct {
@@ -31,6 +39,7 @@ type SpaceCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       SpaceActor
+	ActorV3     SpaceActorV3
 }
 
 func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
@@ -43,6 +52,12 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, nil)
+
+	ccClientV3, err := sharedV3.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+	cmd.ActorV3 = v3action.NewActor(ccClientV3)
 
 	return nil
 }
@@ -99,11 +114,19 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		return err
 	}
 
+	//TODO: Check api version
+	isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
+	cmd.UI.DisplayWarnings(v3Warnings)
+	if err != nil {
+		return sharedV3.HandleError(err)
+	}
+
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), spaceSummary.SpaceName},
 		{cmd.UI.TranslateText("org:"), spaceSummary.OrgName},
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
+		{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
 		{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName},
 		{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")},
 	}

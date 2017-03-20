@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -24,6 +25,7 @@ var _ = Describe("space Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeSpaceActor
+		fakeActorV3     *v2fakes.FakeSpaceActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -33,12 +35,14 @@ var _ = Describe("space Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeSpaceActor)
+		fakeActorV3 = new(v2fakes.FakeSpaceActorV3)
 
 		cmd = SpaceCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			ActorV3:     fakeActorV3,
 		}
 
 		binaryName = "faceman"
@@ -163,6 +167,7 @@ var _ = Describe("space Command", func() {
 				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
 					v2action.SpaceSummary{
 						SpaceName:            "some-space",
+						SpaceGUID:            "some-space-guid",
 						OrgName:              "some-org",
 						AppNames:             []string{"app1", "app2", "app3"},
 						ServiceInstanceNames: []string{"service1", "service2", "service3"},
@@ -172,19 +177,30 @@ var _ = Describe("space Command", func() {
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
+
+				fakeActorV3.GetIsolationSegmentBySpaceReturns(
+					v3action.IsolationSegment{
+						Name: "some-isolation-segment",
+					},
+					v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+					nil,
+				)
 			})
 
-			It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
+			It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
 				Expect(executeErr).To(BeNil())
 
 				Eventually(testUI.Out).Should(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
+				Expect(testUI.Err).To(Say("v3-warning-1"))
+				Expect(testUI.Err).To(Say("v3-warning-2"))
 
 				Eventually(testUI.Out).Should(Say("name:\\s+some-space"))
 				Eventually(testUI.Out).Should(Say("org:\\s+some-org"))
 				Eventually(testUI.Out).Should(Say("apps:\\s+app1, app2, app3"))
 				Eventually(testUI.Out).Should(Say("services:\\s+service1, service2, service3"))
+				Eventually(testUI.Out).Should(Say("isolation segment:\\s+some-isolation-segment"))
 				Eventually(testUI.Out).Should(Say("space quota:\\s+some-space-quota"))
 				Eventually(testUI.Out).Should(Say("security groups:\\s+public_networks, dns, load_balancer"))
 
@@ -193,59 +209,81 @@ var _ = Describe("space Command", func() {
 				orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 				Expect(orgGUID).To(Equal("some-org-guid"))
 				Expect(spaceName).To(Equal("some-space"))
+
+				Expect(fakeActorV3.GetIsolationSegmentBySpaceCallCount()).To(Equal(1))
+				Expect(fakeActorV3.GetIsolationSegmentBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
+			})
+		})
+	})
+
+	Context("when getting the current user returns an error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = errors.New("getting current user error")
+			fakeConfig.CurrentUserReturns(
+				configv3.User{},
+				expectedErr)
+		})
+
+		It("returns the error", func() {
+			Expect(executeErr).To(MatchError(expectedErr))
+		})
+	})
+
+	Context("when getting the space summary returns an error", func() {
+		Context("when the error is translatable", func() {
+			BeforeEach(func() {
+				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
+					v2action.SpaceSummary{},
+					v2action.Warnings{"warning-1", "warning-2"},
+					v2action.SpaceNotFoundError{Name: "some-space"})
+			})
+
+			It("returns a translatable error and outputs all warnings", func() {
+				Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+
+				Expect(testUI.Err).To(Say("warning-1"))
+				Expect(testUI.Err).To(Say("warning-2"))
 			})
 		})
 
-		Context("when getting the current user returns an error", func() {
+		Context("when the error is not translatable", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("getting current user error")
-				fakeConfig.CurrentUserReturns(
-					configv3.User{},
+				expectedErr = errors.New("get space summary error")
+				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
+					v2action.SpaceSummary{},
+					v2action.Warnings{"warning-1", "warning-2"},
 					expectedErr)
 			})
 
-			It("returns the error", func() {
+			It("returns the error and all warnings", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
+
+				Expect(testUI.Err).To(Say("warning-1"))
+				Expect(testUI.Err).To(Say("warning-2"))
 			})
 		})
+	})
 
-		Context("when getting the space summary returns an error", func() {
-			Context("when the error is translatable", func() {
-				BeforeEach(func() {
-					fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
-						v2action.SpaceSummary{},
-						v2action.Warnings{"warning-1", "warning-2"},
-						v2action.SpaceNotFoundError{Name: "some-space"})
-				})
+	Context("when getting the isolation segment returns an error", func() {
+		var expectedErr error
 
-				It("returns a translatable error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+		BeforeEach(func() {
+			expectedErr = errors.New("get isolation segment error")
+			fakeActorV3.GetIsolationSegmentBySpaceReturns(
+				v3action.IsolationSegment{},
+				v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+				expectedErr)
+		})
 
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-				})
-			})
+		It("returns the error and all warnings", func() {
+			Expect(executeErr).To(MatchError(expectedErr))
 
-			Context("when the error is not translatable", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("get space summary error")
-					fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
-						v2action.SpaceSummary{},
-						v2action.Warnings{"warning-1", "warning-2"},
-						expectedErr)
-				})
-
-				It("returns the error and all warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-
-					Expect(testUI.Err).To(Say("warning-1"))
-					Expect(testUI.Err).To(Say("warning-2"))
-				})
-			})
+			Expect(testUI.Err).To(Say("v3-warning-1"))
+			Expect(testUI.Err).To(Say("v3-warning-2"))
 		})
 	})
 
