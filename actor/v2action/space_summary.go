@@ -13,6 +13,7 @@ type SecurityGroupRule struct {
 
 type SpaceSummary struct {
 	SpaceName            string
+	SpaceGUID            string
 	OrgName              string
 	AppNames             []string
 	ServiceInstanceNames []string
@@ -99,6 +100,7 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 
 	spaceSummary := SpaceSummary{
 		SpaceName:            name,
+		SpaceGUID:            space.GUID,
 		OrgName:              org.Name,
 		AppNames:             appNames,
 		ServiceInstanceNames: serviceInstanceNames,

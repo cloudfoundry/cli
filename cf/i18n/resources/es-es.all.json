@@ -6428,6 +6428,10 @@
     "translation": "valor no válido para la variable de entorno CF_STARTUP_TIMEOUT\n{{.Err}}"
   },
   {
+    "id": "isolation segment:",
+    "translation": ""
+  },
+  {
     "id": "isolation segments:",
     "translation": ""
   },

@@ -19,11 +19,11 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("AssignSpaceToIsolationSegment", func() {
-		Context("when the delete is successful", func() {
+		Context("when the assignment is successful", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": {
-						"guid": "some-relationship-guid-1"
+						"guid": "some-isolation-segment-guid"
 					}
 				}`
 
@@ -44,7 +44,35 @@ var _ = Describe("Relationship", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(relationship).To(Equal(Relationship{
-					GUID: "some-relationship-guid-1",
+					GUID: "some-isolation-segment-guid",
+				}))
+			})
+		})
+	})
+
+	Describe("GetSpaceIsolationSegment", func() {
+		Context("when getting the isolation segment is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"data": {
+						"guid": "some-isolation-segment-guid"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/spaces/some-space-guid/relationships/isolation_segment"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the relationship and warnings", func() {
+				relationship, warnings, err := client.GetSpaceIsolationSegment("some-space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship).To(Equal(Relationship{
+					GUID: "some-isolation-segment-guid",
 				}))
 			})
 		})

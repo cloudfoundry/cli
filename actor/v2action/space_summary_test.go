@@ -183,6 +183,7 @@ var _ = Describe("Space Summary Actions", func() {
 
 				Expect(spaceSummary).To(Equal(SpaceSummary{
 					SpaceName:            "some-space",
+					SpaceGUID:            "some-space-guid",
 					OrgName:              "some-org",
 					AppNames:             []string{"some-app-1", "some-app-2"},
 					ServiceInstanceNames: []string{"some-service-instance-1", "some-service-instance-2"},

@@ -98,6 +98,21 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 	return relationship, response.Warnings, err
 }
 
+func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSpaceRelationshipIsolationSegmentRequest,
+		URIParams:   internal.Params{"guid": spaceGUID},
+	})
+
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationship, response.Warnings, err
+}
+
 // EntitleIsolationSegmentToOrganizations will create a link between the
 // isolation segment and the list of organizations provided.
 func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUID string, organizationGUIDs []string) (RelationshipList, Warnings, error) {
