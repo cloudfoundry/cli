@@ -4800,6 +4800,10 @@
     "translation": "執行環境變數群組: "
   },
   {
+    "id": "Running applications in the space need a restart to be moved over to this isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "SECURITY GROUP",
     "translation": "安全群組"
   },
@@ -5030,10 +5034,6 @@
   {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分，針對組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 將環境變數 '{{.VarName}}' 設定為 '{{.VarValue}}'..."
-  },
-  {
-    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
-    "translation": ""
   },
   {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
@@ -5965,6 +5965,10 @@
   },
   {
     "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
+    "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
