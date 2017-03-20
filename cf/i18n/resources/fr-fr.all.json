@@ -4540,7 +4540,7 @@
     "translation": "Retirer un rôle d'organisation à un utilisateur"
   },
   {
-    "id": "Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...",
+    "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {

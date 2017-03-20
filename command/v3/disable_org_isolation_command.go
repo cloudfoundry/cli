@@ -48,7 +48,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Removing entitlement of isolation segment {{.SegmentName}} from organization {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"SegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		"OrgName":     cmd.RequiredArgs.OrganizationName,
 		"CurrentUser": user.Name,

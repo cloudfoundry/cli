@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 	"strings"
+	"time"
 
 	. "code.cloudfoundry.org/cli/util/ui"
 
