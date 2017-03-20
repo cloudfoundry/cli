@@ -297,3 +297,8 @@ type OrgIsolationArgs struct {
 	OrganizationName     string `positional-arg-name:"ORG_NAME" required:"true" description:"The organization name"`
 	IsolationSegmentName string `positional-arg-name:"SEGMENT_NAME" required:"true" description:"The isolation segment name"`
 }
+
+type SpaceIsolationArgs struct {
+	SpaceName            string `positional-arg-name:"SPACE_NAME" required:"true" description:"The space name"`
+	IsolationSegmentName string `positional-arg-name:"SEGMENT_NAME" required:"true" description:"The isolation segment name"`
+}

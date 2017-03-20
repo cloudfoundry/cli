@@ -396,6 +396,10 @@
     "translation": "为用户分配组织角色"
   },
   {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
+  },
+  {
     "id": "Assigned Value",
     "translation": "分配的值"
   },
@@ -1333,6 +1337,10 @@
   },
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
     "translation": ""
   },
   {
@@ -5024,6 +5032,10 @@
     "translation": "正在以 {{.CurrentUser}} 身份为组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}} 将环境变量 '{{.VarName}}' 设置为 '{{.VarValue}}'..."
   },
   {
+    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份为组织 {{.OrgName}} 设置配额 {{.QuotaName}}..."
   },
@@ -6629,6 +6641,10 @@
   },
   {
     "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
     "translation": ""
   },
   {

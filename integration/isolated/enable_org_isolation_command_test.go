@@ -83,12 +83,6 @@ var _ = Describe("enable-org-isolation command", func() {
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 			})
 
-			// TODO: Delete this and add it to cleanup script after #138303919
-			AfterEach(func() {
-				Eventually(helpers.CF("delete-org", "-f", organizationName)).Should(Exit(0))
-				Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName)).Should(Exit(0))
-			})
-
 			Context("when the organization does not exist", func() {
 				It("fails with organization not found message", func() {
 					session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)

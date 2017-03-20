@@ -76,6 +76,16 @@ func (actor Actor) EntitleIsolationSegmentToOrganizationByName(isolationSegmentN
 	return append(allWarnings, apiWarnings...), err
 }
 
+func (actor Actor) AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentName string, spaceGUID string) (Warnings, error) {
+	seg, warnings, err := actor.GetIsolationSegmentByName(isolationSegmentName)
+	if err != nil {
+		return warnings, err
+	}
+
+	_, apiWarnings, err := actor.CloudControllerClient.AssignSpaceToIsolationSegment(spaceGUID, seg.GUID)
+	return append(warnings, apiWarnings...), err
+}
+
 // GetIsolationSegmentByName returns the requested isolation segment.
 func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, Warnings, error) {
 	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{ccv3.NameFilter: []string{name}})

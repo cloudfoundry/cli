@@ -18,6 +18,38 @@ var _ = Describe("Relationship", func() {
 		client = NewTestClient()
 	})
 
+	Describe("AssignSpaceToIsolationSegment", func() {
+		Context("when the delete is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"data": {
+						"guid": "some-relationship-guid-1"
+					}
+				}`
+
+				requestBody := map[string]map[string]string{
+					"data": {"guid": "some-iso-guid"},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/spaces/some-space-guid/relationships/isolation_segment"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns all relationships and warnings", func() {
+				relationship, warnings, err := client.AssignSpaceToIsolationSegment("some-space-guid", "some-iso-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship).To(Equal(Relationship{
+					GUID: "some-relationship-guid-1",
+				}))
+			})
+		})
+	})
+
 	Describe("EntitleIsolationSegmentToOrganizations", func() {
 		Context("when the delete is successful", func() {
 			BeforeEach(func() {
