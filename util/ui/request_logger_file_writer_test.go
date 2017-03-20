@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/util/ui"
 
@@ -275,7 +276,8 @@ var _ = Describe("Request Logger File Writer", func() {
 			display = testUI.RequestLoggerFileWriter([]string{filepath.Join(pathName, "bar")})
 			err = display.Start()
 
-			Expect(err).To(MatchError(fmt.Sprintf("mkdir %s: not a directory", pathName)))
+			pathName = strings.Replace(pathName, `\`, `\\`, -1)
+			Expect(err).To(MatchError(MatchRegexp(fmt.Sprintf("mkdir %s", pathName))))
 		})
 	})
 })
