@@ -396,6 +396,10 @@
     "translation": "Asignar un rol de organización a un usuario"
   },
   {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
+  },
+  {
     "id": "Assigned Value",
     "translation": "Valor asignado"
   },
@@ -1333,6 +1337,10 @@
   },
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
     "translation": ""
   },
   {
@@ -5024,6 +5032,10 @@
     "translation": "Estableciendo una variable de entorno '{{.VarName}}' a '{{.VarValue}}' para la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.CurrentUser}}..."
   },
   {
+    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
     "translation": "Estableciendo la cuota {{.QuotaName}} en la organización {{.OrgName}} como {{.Username}}..."
   },
@@ -6629,6 +6641,10 @@
   },
   {
     "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
     "translation": ""
   },
   {

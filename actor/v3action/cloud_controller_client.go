@@ -10,6 +10,7 @@ import (
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
+	AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateIsolationSegment(name string) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)

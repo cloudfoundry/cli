@@ -396,6 +396,10 @@
     "translation": "사용자에게 조직 역할 지정"
   },
   {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
+  },
+  {
     "id": "Assigned Value",
     "translation": "지정된 값"
   },
@@ -1333,6 +1337,10 @@
   },
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
     "translation": ""
   },
   {
@@ -5024,6 +5032,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 환경 변수 {{.VarName}}을(를) '{{.VarValue}}'(으)로 설정 중..."
   },
   {
+    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직에 {{.QuotaName}} 할당량 설정 중..."
   },
@@ -6629,6 +6641,10 @@
   },
   {
     "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
     "translation": ""
   },
   {

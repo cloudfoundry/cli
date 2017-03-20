@@ -48,6 +48,10 @@
     "translation": "Application lifecycle:"
   },
   {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
+  },
+  {
     "id": "Basic ",
     "translation": "Basic "
   },
@@ -538,6 +542,10 @@
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
     "translation": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'"
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-space-quota SPACE_NAME SPACE_QUOTA_NAME",
@@ -1192,6 +1200,10 @@
     "translation": ""
   },
   {
+    "id": "Setting isolation segment {{.SegmentName}} for space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Since",
     "translation": ""
   },
@@ -1741,6 +1753,10 @@
   },
   {
     "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
     "translation": ""
   },
   {

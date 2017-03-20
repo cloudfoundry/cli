@@ -8,6 +8,38 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+// Relationship represents a one to one relationship.
+type Relationship struct {
+	GUID string
+}
+
+func (r Relationship) MarshalJSON() ([]byte, error) {
+	var ccRelationship struct {
+		Data struct {
+			GUID string `json:"guid"`
+		} `json:"data"`
+	}
+
+	ccRelationship.Data.GUID = r.GUID
+	return json.Marshal(ccRelationship)
+}
+
+func (r *Relationship) UnmarshalJSON(data []byte) error {
+	var ccRelationship struct {
+		Data struct {
+			GUID string `json:"guid"`
+		} `json:"data"`
+	}
+
+	err := json.Unmarshal(data, &ccRelationship)
+	if err != nil {
+		return err
+	}
+
+	r.GUID = ccRelationship.Data.GUID
+	return nil
+}
+
 // RelationshipList represents a one to many relationship.
 type RelationshipList struct {
 	GUIDs []string
@@ -30,19 +62,40 @@ func (r RelationshipList) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RelationshipList) UnmarshalJSON(data []byte) error {
-	var ccRelationship struct {
+	var ccRelationships struct {
 		Data []map[string]string `json:"data"`
 	}
 
-	err := json.Unmarshal(data, &ccRelationship)
+	err := json.Unmarshal(data, &ccRelationships)
 	if err != nil {
 		return err
 	}
 
-	for _, partner := range ccRelationship.Data {
+	for _, partner := range ccRelationships.Data {
 		r.GUIDs = append(r.GUIDs, partner["guid"])
 	}
 	return nil
+}
+
+func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
+	body, err := json.Marshal(Relationship{GUID: isolationSegmentGUID})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
+		URIParams:   internal.Params{"guid": spaceGUID},
+		Body:        bytes.NewBuffer(body),
+	})
+
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationship, response.Warnings, err
 }
 
 // EntitleIsolationSegmentToOrganizations will create a link between the
