@@ -243,20 +243,39 @@ var _ = Describe("Request Logger File Writer", func() {
 	})
 
 	Describe("when the log file path is invalid", func() {
-		AfterEach(func() {
-			display.Stop()
+		var pathName string
+
+		BeforeEach(func() {
+			tmpdir, err := ioutil.TempDir("", "request_logger")
+			Expect(err).ToNot(HaveOccurred())
+
+			pathName = filepath.Join(tmpdir, "/foo")
 		})
 
-		It("returns the os error when the log file is in the root directory", func() {
-			display = testUI.RequestLoggerFileWriter([]string{"/foo"})
+		AfterEach(func() {
+			display.Stop()
+			os.RemoveAll(tmpdir)
+		})
+
+		It("returns the os error when we unsuccessfully try to write to a file", func() {
+			os.Mkdir(pathName, os.ModeDir|os.ModePerm)
+			display = testUI.RequestLoggerFileWriter([]string{pathName})
 			err := display.Start()
-			Expect(err).To(MatchError("open /foo: permission denied"))
+
+			Expect(err).To(MatchError(fmt.Sprintf("open %s: is a directory", pathName)))
 		})
 
 		It("returns the os error when the parent directory for the log file is in the root directory", func() {
-			display = testUI.RequestLoggerFileWriter([]string{"/bar/foo"})
-			err := display.Start()
-			Expect(err).To(MatchError("mkdir /bar: permission denied"))
+			file, err := os.OpenFile(pathName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+			Expect(err).ToNot(HaveOccurred())
+			file.WriteString("hello world")
+			err = file.Close()
+			Expect(err).ToNot(HaveOccurred())
+
+			display = testUI.RequestLoggerFileWriter([]string{filepath.Join(pathName, "bar")})
+			err = display.Start()
+
+			Expect(err).To(MatchError(fmt.Sprintf("mkdir %s: not a directory", pathName)))
 		})
 	})
 })
