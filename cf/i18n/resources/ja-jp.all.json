@@ -5332,6 +5332,10 @@
     "translation": ""
   },
   {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
+  },
+  {
     "id": "Task workers are unavailable.",
     "translation": ""
   },
@@ -5541,10 +5545,6 @@
   },
   {
     "id": "The quota",
-    "translation": ""
-  },
-  {
-    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
     "translation": ""
   },
   {

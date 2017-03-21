@@ -101,7 +101,7 @@ func (t sortableTasksAscending) Swap(i int, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-func(t sortableTasksAscending) Less(i int, j int) bool {
+func (t sortableTasksAscending) Less(i int, j int) bool {
 	return t[i].SequenceID < t[j].SequenceID
 }
 
@@ -115,6 +115,6 @@ func (t sortableTasksDescending) Swap(i int, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-func(t sortableTasksDescending) Less(i int, j int) bool {
+func (t sortableTasksDescending) Less(i int, j int) bool {
 	return t[i].SequenceID > t[j].SequenceID
 }

@@ -1740,6 +1740,10 @@
     "translation": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}"
   },
   {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": "Task must have a droplet. Specify droplet or assign current droplet to app."
+  },
+  {
     "id": "Task workers are unavailable.",
     "translation": ""
   },
@@ -1938,10 +1942,6 @@
   {
     "id": "The quota",
     "translation": "The quota"
-  },
-  {
-    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
-    "translation": ""
   },
   {
     "id": "The security group",

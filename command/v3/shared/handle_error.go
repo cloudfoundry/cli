@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -16,7 +18,7 @@ func HandleError(err error) error {
 	case cloudcontroller.SSLValidationHostnameError:
 		return command.SSLCertErrorError{Message: e.Message}
 	case cloudcontroller.UnprocessableEntityError:
-		if e.Message == "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app." {
+		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
 			return RunTaskError{
 				Message: "App is not staged."}
 		}
