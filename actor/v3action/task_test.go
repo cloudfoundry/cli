@@ -128,7 +128,7 @@ var _ = Describe("Task Actions", func() {
 						Command:    "some-command",
 					}
 					fakeCloudControllerClient.GetApplicationTasksReturns(
-						[]ccv3.Task{task1, task2, task3},
+						[]ccv3.Task{task3, task1, task2},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -138,16 +138,20 @@ var _ = Describe("Task Actions", func() {
 					tasks, warnings, err := actor.GetApplicationTasks("some-app-guid", Descending)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(tasks).To(ConsistOf(Task(task1), Task(task2), Task(task3)))
+					Expect(tasks).To(Equal([]Task{Task(task3), Task(task2), Task(task1)}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-					Expect(fakeCloudControllerClient.GetApplicationTasksCallCount()).To(Equal(1))
+					tasks, warnings, err = actor.GetApplicationTasks("some-app-guid", Ascending)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(tasks).To(Equal([]Task{Task(task1), Task(task2), Task(task3)}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(fakeCloudControllerClient.GetApplicationTasksCallCount()).To(Equal(2))
 					appGUID, query := fakeCloudControllerClient.GetApplicationTasksArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
 					Expect(query).To(Equal(
-						url.Values{
-							"order_by": []string{"-created_at"},
-						},
+						url.Values{},
 					))
 				})
 			})
