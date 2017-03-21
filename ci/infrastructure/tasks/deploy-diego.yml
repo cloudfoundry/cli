@@ -13,6 +13,7 @@ inputs:
 - name: diego-repo
 - name: cflinuxfs2-rootfs-release
 - name: cf-networking
+- name: grootfs-release
 
 run:
   path: bash
@@ -27,6 +28,7 @@ run:
     bosh upload release garden-runc-release/release.tgz --skip-if-exists
     bosh upload release diego-release/release.tgz --skip-if-exists
     bosh upload release cf-networking/release.tgz --skip-if-exists
+    bosh upload release grootfs-release/release.tgz --skip-if-exists
 
     pushd diego-repo
       DIEGO_VERSION=$(bosh releases | grep diego | cut -d "|" -f 3 | cut -d "*" -f 1 | xargs)
