@@ -1,0 +1,23 @@
+---
+platform: linux
+
+image: docker:///busybox
+
+inputs:
+  - name: input1
+  - name: input2
+
+outputs:
+  - name: combine_inputs_output
+
+params:
+  COPY_PATHS:
+
+run:
+  path: sh
+  args:
+  - -c
+  - |
+    set -eux
+
+    cp -r $COPY_PATHS combine_inputs_output
