@@ -146,7 +146,7 @@ var _ = Describe("terminate-task command", func() {
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("The request is semantically invalid: Task state is SUCCEEDED and therefore cannot be canceled"))
+					Expect(session.Err).To(Say("Task state is SUCCEEDED and therefore cannot be canceled"))
 					Expect(session.Out).To(Say("FAILED"))
 				})
 			})
@@ -167,7 +167,7 @@ var _ = Describe("terminate-task command", func() {
 
 					session := helpers.CF("terminate-task", appName, "1")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("The request is semantically invalid: Task state is FAILED and therefore cannot be canceled"))
+					Expect(session.Err).To(Say("Task state is FAILED and therefore cannot be canceled"))
 					Expect(session.Out).To(Say("FAILED"))
 				})
 			})

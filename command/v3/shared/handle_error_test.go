@@ -39,6 +39,11 @@ var _ = Describe("HandleError", func() {
 			cloudcontroller.UnprocessableEntityError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."},
 			RunTaskError{Message: "App is not staged."}),
 
+		// This changed in CF254
+		Entry("cloudcontroller.UnprocessableEntityError with droplet message -> RunTaskError",
+			cloudcontroller.UnprocessableEntityError{Message: "Task must have a droplet. Specify droplet or assign current droplet to app."},
+			RunTaskError{Message: "App is not staged."}),
+
 		Entry("cloudcontroller.UnprocessableEntityError without droplet message -> original error",
 			unprocessableEntityError,
 			unprocessableEntityError),
