@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . DeleteIsolationSegmentActor
 
 type DeleteIsolationSegmentActor interface {
+	CloudControllerAPIVersion() string
 	DeleteIsolationSegmentByName(name string) (v3action.Warnings, error)
 }
 
@@ -41,13 +42,12 @@ func (cmd *DeleteIsolationSegmentCommand) Setup(config command.Config, ui comman
 }
 
 func (cmd DeleteIsolationSegmentCommand) Execute(args []string) error {
-	// TODO: Add version check
-	// err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
-	// if err != nil {
-	// 	return err
-	// }
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	if err != nil {
+		return err
+	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

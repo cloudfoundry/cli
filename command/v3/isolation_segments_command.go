@@ -12,6 +12,7 @@ import (
 //go:generate counterfeiter . IsolationSegmentsActor
 
 type IsolationSegmentsActor interface {
+	CloudControllerAPIVersion() string
 	GetIsolationSegmentSummaries() ([]v3action.IsolationSegmentSummary, v3action.Warnings, error)
 }
 
@@ -40,8 +41,12 @@ func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI)
 }
 
 func (cmd IsolationSegmentsCommand) Execute(args []string) error {
-	// TODO: Add version check
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

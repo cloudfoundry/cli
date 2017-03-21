@@ -1340,7 +1340,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
+    "id": "CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME",
     "translation": ""
   },
   {

@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . DisableOrgIsolationActor
 
 type DisableOrgIsolationActor interface {
+	CloudControllerAPIVersion() string
 	RevokeIsolationSegmentFromOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
 }
 type DisableOrgIsolationCommand struct {
@@ -39,7 +40,12 @@ func (cmd *DisableOrgIsolationCommand) Setup(config command.Config, ui command.U
 }
 
 func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}
