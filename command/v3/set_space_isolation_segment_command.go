@@ -24,7 +24,7 @@ type SetSpaceIsolationSegmentActorV2 interface {
 
 type SetSpaceIsolationSegmentCommand struct {
 	RequiredArgs    flag.SpaceIsolationArgs `positional-args:"yes"`
-	usage           interface{}             `usage:"CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME"`
+	usage           interface{}             `usage:"CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME"`
 	relatedCommands interface{}             `related_commands:"org, space"`
 
 	UI          command.UI
