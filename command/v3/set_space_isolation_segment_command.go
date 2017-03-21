@@ -13,6 +13,7 @@ import (
 //go:generate counterfeiter . SetSpaceIsolationSegmentActor
 
 type SetSpaceIsolationSegmentActor interface {
+	CloudControllerAPIVersion() string
 	AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentName string, spaceGUID string) (v3action.Warnings, error)
 }
 
@@ -55,13 +56,12 @@ func (cmd *SetSpaceIsolationSegmentCommand) Setup(config command.Config, ui comm
 }
 
 func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
-	// TODO: Add version check
-	// err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
-	// if err != nil {
-	// 	return err
-	// }
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	if err != nil {
+		return err
+	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

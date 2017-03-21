@@ -844,8 +844,8 @@
     "translation": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'"
   },
   {
-    "id": "CF_NAME set-space-isolation-segment SPACE SEGMENT_NAME",
-    "translation": ""
+    "id": "CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME",
+    "translation": "CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME"
   },
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",

@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . EnableOrgIsolationActor
 
 type EnableOrgIsolationActor interface {
+	CloudControllerAPIVersion() string
 	EntitleIsolationSegmentToOrganizationByName(isolationSegmentName string, orgName string) (v3action.Warnings, error)
 }
 
@@ -40,13 +41,12 @@ func (cmd *EnableOrgIsolationCommand) Setup(config command.Config, ui command.UI
 }
 
 func (cmd EnableOrgIsolationCommand) Execute(args []string) error {
-	// TODO: Add version check
-	// err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
-	// if err != nil {
-	// 	return err
-	// }
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	if err != nil {
+		return err
+	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}
