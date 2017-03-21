@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"sort"
 )
 
 // Task represents a V3 actor Task.
@@ -47,9 +48,6 @@ func (actor Actor) RunTask(appGUID string, command string, name string, memory u
 // appplication GUID.
 func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]Task, Warnings, error) {
 	query := url.Values{}
-	if sortOrder == Descending {
-		query.Add("order_by", "-created_at")
-	}
 
 	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, query)
 	actorWarnings := Warnings(warnings)
@@ -60,6 +58,12 @@ func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]T
 	allTasks := []Task{}
 	for _, task := range tasks {
 		allTasks = append(allTasks, Task(task))
+	}
+
+	if sortOrder == Descending {
+		sort.Sort(sortableTasksDescending(allTasks))
+	} else {
+		sort.Sort(sortableTasksAscending(allTasks))
 	}
 
 	return allTasks, actorWarnings, nil
@@ -85,4 +89,32 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 func (actor Actor) TerminateTask(taskGUID string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.UpdateTask(taskGUID)
 	return Task(task), Warnings(warnings), err
+}
+
+type sortableTasksAscending []Task
+
+func (t sortableTasksAscending) Len() int {
+	return len(t)
+}
+
+func (t sortableTasksAscending) Swap(i int, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func(t sortableTasksAscending) Less(i int, j int) bool {
+	return t[i].SequenceID < t[j].SequenceID
+}
+
+type sortableTasksDescending []Task
+
+func (t sortableTasksDescending) Len() int {
+	return len(t)
+}
+
+func (t sortableTasksDescending) Swap(i int, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func(t sortableTasksDescending) Less(i int, j int) bool {
+	return t[i].SequenceID > t[j].SequenceID
 }
