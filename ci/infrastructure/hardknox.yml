@@ -31,15 +31,6 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
     branch: master
-
-# - name: bosh-lites-diego-pool
-#   type: pool
-#   source:
-#     uri: git@github.com:cloudfoundry/cli-pools
-#     private_key: {{cli-pools-github-private-key}}
-#     branch: master
-#     pool: bosh-lites-diego
-
 - name: state
   type: git
   source:
@@ -95,6 +86,7 @@ jobs:
       trigger: true
     - get: cf-deployment
     - get: ops-files
+    - get: cli-ci
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
@@ -102,15 +94,22 @@ jobs:
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/hardknox
+  - task: copy-ops-files
+    file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
+    input_mapping:
+      input1: ops-files
+      input2: state
+    params:
+      COPY_PATHS: "input1/operations/tcp-routing-gcp.yml input2/ci/infrastructure/operations/isolation-segments.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
       bbl-state: state
       vars-store: state
+      ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
-      OPS_FILES: "operations/tcp-routing-gcp.yml"
-      REGENERATE_VARS_STORE: true
+      OPS_FILES: "tcp-routing-gcp.yml isolation-segments.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
