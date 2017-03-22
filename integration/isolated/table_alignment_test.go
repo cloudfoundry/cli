@@ -18,14 +18,16 @@ var _ = Describe("table alignment", func() {
 			setupCF(ReadOnlyOrg, ReadOnlySpace)
 		})
 
+		// Developer note: The spacing in this test is significant and explicit. Do
+		// not replace with a regex.
 		It("aligns the table correctly", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("target")
-			Eventually(session.Out).Should(Say("API endpoint:   %s", apiURL))
-			Eventually(session.Out).Should(Say(`API version:    [\d.]+`))
-			Eventually(session.Out).Should(Say("User:           %s", username))
-			Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-			Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+			Eventually(session.Out).Should(Say("api endpoint:   %s", apiURL))
+			Eventually(session.Out).Should(Say(`api version:    [\d.]+`))
+			Eventually(session.Out).Should(Say("user:           %s", username))
+			Eventually(session.Out).Should(Say("org:            %s", ReadOnlyOrg))
+			Eventually(session.Out).Should(Say("space:          %s", ReadOnlySpace))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -35,11 +37,13 @@ var _ = Describe("table alignment", func() {
 			setupCF(ReadOnlyOrg, ReadOnlySpace)
 		})
 
+		// Developer note: The spacing in this test is significant and explicit. Do
+		// not replace with a regex.
 		It("aligns the table correctly", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CFWithEnv(map[string]string{"LANG": "ja-JP.utf8"}, "target")
 			Eventually(session.Out).Should(Say("API エンドポイント:   %s", apiURL))
-			Eventually(session.Out).Should(Say(`API version:          [\d.]+`))
+			Eventually(session.Out).Should(Say("api version:          [\\d.]+"))
 			Eventually(session.Out).Should(Say("ユーザー:             %s", username))
 			Eventually(session.Out).Should(Say("組織:                 %s", ReadOnlyOrg))
 			Eventually(session.Out).Should(Say("スペース:             %s", ReadOnlySpace))

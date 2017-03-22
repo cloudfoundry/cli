@@ -169,7 +169,8 @@ var _ = Describe("space command", func() {
 					Eventually(session.Out).Should(Say("services:"))
 					Eventually(session.Out).Should(Say("isolation segment:"))
 					Eventually(session.Out).Should(Say("space quota:"))
-					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks\n\n"))
+					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks"))
+					Eventually(session.Out).Should(Say("\n\n"))
 
 					Eventually(session.Out).Should(Say("security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description"))
 					Eventually(session.Out).Should(Say("#0\\s+dns\\s+0.0.0.0/0\\s+53\\s+tcp\\s+running"))

@@ -190,8 +190,8 @@ var _ = Describe("delete-org command", func() {
 			Eventually(session).Should(Exit(0))
 
 			session = helpers.CF("target")
-			Eventually(session.Out).Should(Say("Org:            %s", ReadOnlyOrg))
-			Eventually(session.Out).Should(Say("Space:          %s", ReadOnlySpace))
+			Eventually(session.Out).Should(Say("org:\\s+%s", ReadOnlyOrg))
+			Eventually(session.Out).Should(Say("space:\\s+%s", ReadOnlySpace))
 			Eventually(session).Should(Exit(0))
 		})
 	})

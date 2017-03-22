@@ -196,20 +196,20 @@ func (cmd *TargetCommand) setSpace() error {
 // displayTargetTable neatly displays target information.
 func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 	table := [][]string{
-		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
-		{cmd.UI.TranslateText("User:"), user.Name},
+		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
+		{cmd.UI.TranslateText("user:"), user.Name},
 	}
 
 	if cmd.Config.HasTargetedOrganization() {
 		table = append(table, []string{
-			cmd.UI.TranslateText("Org:"), cmd.Config.TargetedOrganization().Name,
+			cmd.UI.TranslateText("org:"), cmd.Config.TargetedOrganization().Name,
 		})
 	}
 
 	if cmd.Config.HasTargetedSpace() {
 		table = append(table, []string{
-			cmd.UI.TranslateText("Space:"), cmd.Config.TargetedSpace().Name,
+			cmd.UI.TranslateText("space:"), cmd.Config.TargetedSpace().Name,
 		})
 	}
 	cmd.UI.DisplayTable("", table, 3)

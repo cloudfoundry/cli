@@ -236,10 +236,6 @@
     "translation": "API エンドポイント: {{.Endpoint}}"
   },
   {
-    "id": "API version:",
-    "translation": ""
-  },
-  {
     "id": "APPS",
     "translation": "アプリ"
   },
@@ -534,10 +530,6 @@
   {
     "id": "Buildpack {{.BuildpackName}} does not exist.",
     "translation": "ビルドパック {{.BuildpackName}} は存在していません。"
-  },
-  {
-    "id": "Buildpack:",
-    "translation": ""
   },
   {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
@@ -2452,10 +2444,6 @@
     "translation": "スペース '{{.SpaceName}}' に対する SSH サポートを有効にしています..."
   },
   {
-    "id": "Endpoint (for http type):",
-    "translation": "Endpoint (for http type):"
-  },
-  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -3172,10 +3160,6 @@
     "translation": "Health check type must be 'http' to set a health check HTTP endpoint."
   },
   {
-    "id": "Health check type:",
-    "translation": "health_check_type is {{.HealthCheckType}}"
-  },
-  {
     "id": "Hostname (e.g. my-subdomain)",
     "translation": "ホスト名 (例: my-subdomain)"
   },
@@ -3480,10 +3464,6 @@
     "translation": "インスタンスは負でない整数でなければなりません"
   },
   {
-    "id": "Instances:",
-    "translation": ""
-  },
-  {
     "id": "Invalid JSON response from server",
     "translation": "サーバーからの無効な JSON 応答"
   },
@@ -3618,10 +3598,6 @@
   {
     "id": "Last Operation",
     "translation": "最後の操作"
-  },
-  {
-    "id": "Last uploaded:",
-    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3873,10 +3849,6 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
-    "translation": ""
-  },
-  {
-    "id": "Name:",
     "translation": ""
   },
   {
@@ -4640,10 +4612,6 @@
     "translation": "pseudo-tty 割り振りを要求します"
   },
   {
-    "id": "Requested state:",
-    "translation": ""
-  },
-  {
     "id": "Requires SOURCE-APP TARGET-APP as arguments",
     "translation": "引数として SOURCE-APP TARGET-APP が必要です"
   },
@@ -4786,10 +4754,6 @@
   {
     "id": "Routes for this domain will be configured only on the specified router group",
     "translation": "このドメイン用の経路は指定されたルーター・グループ上でのみ構成されます"
-  },
-  {
-    "id": "Routes:",
-    "translation": ""
   },
   {
     "id": "Rules",
@@ -5184,10 +5148,6 @@
     "translation": "使用するスタック (スタックはオペレーティング・システムを含む事前ビルドされたファイル・システムであり、このファイル・システムはアプリを実行できます)"
   },
   {
-    "id": "Stack:",
-    "translation": ""
-  },
-  {
     "id": "Staging Environment Variable Groups:",
     "translation": "ステージング環境変数グループ:"
   },
@@ -5201,10 +5161,6 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Start command:",
     "translation": ""
   },
   {
@@ -5328,7 +5284,7 @@
     "translation": "スペース {{.SpaceName}} をターゲットにしました\n"
   },
   {
-    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
+    "id": "Task has been submitted successfully for execution.",
     "translation": ""
   },
   {
@@ -6200,6 +6156,14 @@
     "translation": "既に存在しています"
   },
   {
+    "id": "api endpoint:",
+    "translation": "API エンドポイント:"
+  },
+  {
+    "id": "api version:",
+    "translation": ""
+  },
+  {
     "id": "app",
     "translation": "アプリ"
   },
@@ -6356,6 +6320,10 @@
     "translation": "有効"
   },
   {
+    "id": "endpoint (for http type):",
+    "translation": ""
+  },
+  {
     "id": "env var '{{.PropertyName}}' should not be null",
     "translation": "環境変数 '{{.PropertyName}}' をヌルにすることはできません"
   },
@@ -6374,6 +6342,10 @@
   {
     "id": "free or paid",
     "translation": "無料または有料"
+  },
+  {
+    "id": "health check type:",
+    "translation": ""
   },
   {
     "id": "health_check_type is ",
@@ -6497,7 +6469,7 @@
   },
   {
     "id": "org:",
-    "translation": ""
+    "translation": "組織:"
   },
   {
     "id": "orgs",
@@ -6592,6 +6564,10 @@
     "translation": "経路"
   },
   {
+    "id": "routes:",
+    "translation": ""
+  },
+  {
     "id": "run-task",
     "translation": ""
   },
@@ -6676,6 +6652,10 @@
     "translation": "スペース割り当て量:"
   },
   {
+    "id": "space:",
+    "translation": "スペース:"
+  },
+  {
     "id": "spaces:",
     "translation": "スペース:"
   },
@@ -6728,6 +6708,10 @@
     "translation": "スタック:"
   },
   {
+    "id": "start command:",
+    "translation": ""
+  },
+  {
     "id": "start time",
     "translation": ""
   },
@@ -6750,6 +6734,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "1 リダイレクト後に停止されます"
+  },
+  {
+    "id": "task id:",
+    "translation": ""
+  },
+  {
+    "id": "task name:",
+    "translation": ""
   },
   {
     "id": "tasks",
@@ -6818,6 +6810,10 @@
   {
     "id": "user-provided",
     "translation": "ユーザー提供"
+  },
+  {
+    "id": "user:",
+    "translation": "ユーザー:"
   },
   {
     "id": "username",

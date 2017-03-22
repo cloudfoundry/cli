@@ -302,7 +302,7 @@ var _ = Describe("Start Command", func() {
 							Expect(testUI.Out).To(Say("message 2"))
 							Expect(testUI.Out).To(Say("message 3"))
 							Expect(testUI.Err).To(Say("timeout connecting to log server, no log will be shown"))
-							Expect(testUI.Out).To(Say("Name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("name:\\s+some-app"))
 						})
 					})
 
@@ -545,15 +545,15 @@ var _ = Describe("Start Command", func() {
 
 					It("displays the app summary and it's warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("Name:\\s+some-app"))
-						Expect(testUI.Out).To(Say("Requested state:\\s+started"))
-						Expect(testUI.Out).To(Say("Instances:\\s+1\\/3"))
-						Expect(testUI.Out).To(Say("Usage:\\s+128M x 3 instances"))
-						Expect(testUI.Out).To(Say("Routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-						Expect(testUI.Out).To(Say("Last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-						Expect(testUI.Out).To(Say("Stack:\\s+potatos"))
-						Expect(testUI.Out).To(Say("Buildpack:\\s+some-buildpack"))
-						Expect(testUI.Out).To(Say("Start command:\\s+some start command"))
+						Expect(testUI.Out).To(Say("name:\\s+some-app"))
+						Expect(testUI.Out).To(Say("requested state:\\s+started"))
+						Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
 
 						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})

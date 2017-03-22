@@ -29,18 +29,18 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 	routes := strings.Join(formattedRoutes, ", ")
 
 	table := [][]string{
-		{ui.TranslateText("Name:"), appSummary.Name},
-		{ui.TranslateText("Requested state:"), strings.ToLower(string(appSummary.State))},
-		{ui.TranslateText("Instances:"), instances},
-		{ui.TranslateText("Usage:"), usage},
-		{ui.TranslateText("Routes:"), routes},
-		{ui.TranslateText("Last uploaded:"), ui.UserFriendlyDate(appSummary.PackageUpdatedAt)},
-		{ui.TranslateText("Stack:"), appSummary.Stack.Name},
-		{ui.TranslateText("Buildpack:"), appSummary.Application.CalculatedBuildpack()},
+		{ui.TranslateText("name:"), appSummary.Name},
+		{ui.TranslateText("requested state:"), strings.ToLower(string(appSummary.State))},
+		{ui.TranslateText("instances:"), instances},
+		{ui.TranslateText("usage:"), usage},
+		{ui.TranslateText("routes:"), routes},
+		{ui.TranslateText("last uploaded:"), ui.UserFriendlyDate(appSummary.PackageUpdatedAt)},
+		{ui.TranslateText("stack:"), appSummary.Stack.Name},
+		{ui.TranslateText("buildpack:"), appSummary.Application.CalculatedBuildpack()},
 	}
 
 	if displayStartCommand {
-		table = append(table, []string{ui.TranslateText("Start command:"), appSummary.Application.DetectedStartCommand})
+		table = append(table, []string{ui.TranslateText("start command:"), appSummary.Application.DetectedStartCommand})
 	}
 
 	ui.DisplayTable("", table, 3)

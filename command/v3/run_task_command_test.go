@@ -157,8 +157,8 @@ var _ = Describe("run-task Command", func() {
 OK
 
 Task has been submitted successfully for execution.
-Task name:   31337ddd
-Task id:     3
+task name:   31337ddd
+task id:     3
 `))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2
@@ -196,8 +196,8 @@ get-application-warning-3`))
 OK
 
 Task has been submitted successfully for execution.
-Task name:   some-task-name
-Task id:     3`,
+task name:   some-task-name
+task id:     3`,
 						))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2
@@ -237,8 +237,8 @@ get-application-warning-3`))
 OK
 
 Task has been submitted successfully for execution.
-Task name:   some-task-name
-Task id:     3`,
+task name:   some-task-name
+task id:     3`,
 						))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2
@@ -278,8 +278,8 @@ get-application-warning-3`))
 OK
 
 Task has been submitted successfully for execution.
-Task name:   some-task-name
-Task id:     3`,
+task name:   some-task-name
+task id:     3`,
 						))
 						Expect(testUI.Err).To(Say(`get-application-warning-1
 get-application-warning-2

@@ -67,8 +67,8 @@ var _ = Describe("api Command", func() {
 
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("API endpoint:\\s+some-api-target"))
-				Expect(testUI.Out).To(Say("API version:\\s+some-version"))
+				Expect(testUI.Out).To(Say("api endpoint:\\s+some-api-target"))
+				Expect(testUI.Out).To(Say("api version:\\s+some-version"))
 			})
 		})
 
@@ -113,8 +113,8 @@ var _ = Describe("api Command", func() {
 						Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
 						Expect(testUI.Out).To(Say(`OK
 
-API endpoint:   some-api-target
-API version:    some-version`,
+api endpoint:   some-api-target
+api version:    some-version`,
 						))
 					})
 				})
@@ -136,8 +136,8 @@ API version:    some-version`,
 							Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
 							Expect(testUI.Out).To(Say(`OK
 
-API endpoint:   some-api-target
-API version:    some-version`,
+api endpoint:   some-api-target
+api version:    some-version`,
 							))
 						})
 					})
@@ -149,7 +149,7 @@ API version:    some-version`,
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
 							Expect(err).To(MatchError(command.InvalidSSLCertError{API: CCAPI}))
-							Expect(testUI.Out).ToNot(Say("API endpoint:\\s+some-api-target"))
+							Expect(testUI.Out).ToNot(Say("api endpoint:\\s+some-api-target"))
 						})
 					})
 				})

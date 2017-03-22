@@ -26,8 +26,8 @@ var _ = Describe("api command", func() {
 				It("outputs the current api", func() {
 					session := helpers.CF("api")
 
-					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", apiURL))
-					Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
+					Eventually(session).Should(Say("api endpoint:\\s+%s", apiURL))
+					Eventually(session).Should(Say("api version:\\s+\\d+\\.\\d+\\.\\d+"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -60,12 +60,9 @@ var _ = Describe("api command", func() {
 				})
 
 				It("outputs the user's target information", func() {
-					command := exec.Command("cf", "api")
-					session, err := Start(command, GinkgoWriter, GinkgoWriter)
-					Expect(err).NotTo(HaveOccurred())
-
-					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", target))
-					Eventually(session.Out).Should(Say("API version:\\s+%s", apiVersion))
+					session := helpers.CF("api")
+					Eventually(session).Should(Say("api endpoint:\\s+%s", target))
+					Eventually(session).Should(Say("api version:\\s+%s", apiVersion))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -77,11 +74,8 @@ var _ = Describe("api command", func() {
 			})
 
 			It("outputs that nothing is set", func() {
-				command := exec.Command("cf", "api")
-				session, err := Start(command, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session.Out).Should(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+				session := helpers.CF("api")
+				Eventually(session).Should(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -108,12 +102,10 @@ var _ = Describe("api command", func() {
 			})
 
 			It("clears the targetted context", func() {
-				command := exec.Command("cf", "api", "--unset")
-				session, err := Start(command, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
+				session := helpers.CF("api", "--unset")
 
-				Eventually(session.Out).Should(Say("Unsetting api endpoint..."))
-				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session).Should(Say("Unsetting api endpoint..."))
+				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
 				rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
@@ -150,26 +142,20 @@ var _ = Describe("api command", func() {
 			})
 
 			It("warns about skip SSL", func() {
-				command := exec.Command("cf", "api", apiURL)
-				session, err := Start(command, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
+				session := helpers.CF("api", apiURL)
+				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
 				Eventually(session.Err).Should(Say("SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
-				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 
 			It("sets the API endpoint", func() {
-				command := exec.Command("cf", "api", apiURL, "--skip-ssl-validation")
-				session, err := Start(command, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("API endpoint:\\s+%s", apiURL))
-				Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
+				session := helpers.CF("api", apiURL, "--skip-ssl-validation")
+				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("api endpoint:\\s+%s", apiURL))
+				Eventually(session).Should(Say("api version:\\s+\\d+\\.\\d+\\.\\d+"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -212,14 +198,11 @@ var _ = Describe("api command", func() {
 			})
 
 			It("falls back to http and gives a warning", func() {
-				command := exec.Command("cf", "api", server.URL(), "--skip-ssl-validation")
-				session, err := Start(command, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-
-				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", server.URL()))
-				Eventually(session.Out).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+				session := helpers.CF("api", server.URL(), "--skip-ssl-validation")
+				Eventually(session).Should(Say("Setting api endpoint to %s...", server.URL()))
+				Eventually(session).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -249,21 +232,16 @@ var _ = Describe("api command", func() {
 		})
 
 		It("logs in without any warnings", func() {
-			command := exec.Command("cf", "api", apiURL)
-			session, err := Start(command, GinkgoWriter, GinkgoWriter)
-			Expect(err).NotTo(HaveOccurred())
-
-			Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
-			Consistently(session.Out).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
-			Eventually(session.Out).Should(Say("OK"))
-			Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+			session := helpers.CF("api", apiURL)
+			Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
+			Consistently(session).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+			Eventually(session).Should(Say("OK"))
+			Eventually(session).Should(Say("Not logged in. Use 'cf login' to log in."))
 			Eventually(session).Should(Exit(0))
 		})
 
 		It("sets SSL Disabled in the config file to false", func() {
-			command := exec.Command("cf", "api", apiURL, skipSSLValidation)
-			session, err := Start(command, GinkgoWriter, GinkgoWriter)
-			Expect(err).NotTo(HaveOccurred())
+			session := helpers.CF("api", apiURL, skipSSLValidation)
 			Eventually(session).Should(Exit(0))
 
 			rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
@@ -278,9 +256,7 @@ var _ = Describe("api command", func() {
 	})
 
 	It("sets the config file", func() {
-		command := exec.Command("cf", "api", apiURL, skipSSLValidation)
-		session, err := Start(command, GinkgoWriter, GinkgoWriter)
-		Expect(err).NotTo(HaveOccurred())
+		session := helpers.CF("api", apiURL, skipSSLValidation)
 		Eventually(session).Should(Exit(0))
 
 		rawConfig, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
