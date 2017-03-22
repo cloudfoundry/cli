@@ -19,7 +19,7 @@ type DeleteIsolationSegmentCommand struct {
 	RequiredArgs    flag.IsolationSegmentName `positional-args:"yes"`
 	Force           bool                      `short:"f" description:"Force deletion without confirmation"`
 	usage           interface{}               `usage:"CF_NAME delete-isolation-segment SEGMENT_NAME"`
-	relatedCommands interface{}               `related_commands:"isolation-segments, remove-isolation-segment-org"`
+	relatedCommands interface{}               `related_commands:"disable-org-isolation, isolation-segments"`
 
 	UI          command.UI
 	Config      command.Config
