@@ -90,6 +90,7 @@ sudo yum install cf-cli
 | :---------------: | :---------------: |:---------------:| :------------:|
 | Installers | [pkg](https://cli.run.pivotal.io/stable?release=macosx64&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64&source=github) | [rpm](https://cli.run.pivotal.io/stable?release=redhat64&source=github) / [deb](https://cli.run.pivotal.io/stable?release=debian64&source=github) |
 | Binaries | [tgz](https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64-exe&source=github) | [tgz](https://cli.run.pivotal.io/stable?release=linux64-binary&source=github) |
+
 Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
 
 **Download examples** with curl for Mac OS X and Linux binaries
