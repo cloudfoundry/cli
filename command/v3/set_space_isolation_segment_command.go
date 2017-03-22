@@ -26,7 +26,7 @@ type SetSpaceIsolationSegmentActorV2 interface {
 type SetSpaceIsolationSegmentCommand struct {
 	RequiredArgs    flag.SpaceIsolationArgs `positional-args:"yes"`
 	usage           interface{}             `usage:"CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME"`
-	relatedCommands interface{}             `related_commands:"org, space"`
+	relatedCommands interface{}             `related_commands:"org, restart, space"`
 
 	UI          command.UI
 	Config      command.Config
@@ -92,7 +92,7 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Running applications in the space need a restart to be moved over to this isolation segment.")
+	cmd.UI.DisplayText("In order to move running applications to this isolation segment, they must be restarted.")
 
 	return nil
 }

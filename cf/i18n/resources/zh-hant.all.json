@@ -3224,6 +3224,10 @@
     "translation": "在 Windows PowerShell 中，使用雙引號跳出的 JSON: \"{\\\"valid\\\":\\\"json\\\"}\""
   },
   {
+    "id": "In order to move running applications to this isolation segment, they must be restarted.",
+    "translation": ""
+  },
+  {
     "id": "Include response headers in the output",
     "translation": "在輸出中包括回應標頭"
   },
@@ -4798,10 +4802,6 @@
   {
     "id": "Running Environment Variable Groups:",
     "translation": "執行環境變數群組: "
-  },
-  {
-    "id": "Running applications in the space need a restart to be moved over to this isolation segment.",
-    "translation": ""
   },
   {
     "id": "SECURITY GROUP",
