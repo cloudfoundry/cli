@@ -99,6 +99,11 @@ resources:
   source:
     repository: cloudfoundry-incubator/cf-routing-release
 
+- name: grootfs-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/grootfs-release
+
 - name: cf-routing-release-repo
   type: git
   source:
@@ -259,6 +264,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
@@ -372,6 +378,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
@@ -485,6 +492,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
@@ -597,6 +605,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - do:
     - task: deploy-diego
       file: cli/ci/infrastructure/tasks/deploy-diego.yml
@@ -715,6 +724,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
@@ -827,6 +837,7 @@ jobs:
     - get: cflinuxfs2-rootfs-release
     - get: cf-networking
     - get: cli
+    - get: grootfs-release
   - do:
     - task: deploy-diego
       file: cli/ci/infrastructure/tasks/deploy-diego.yml
