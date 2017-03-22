@@ -26,6 +26,7 @@ type SpaceActor interface {
 
 type SpaceActorV3 interface {
 	GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type SpaceCommand struct {
@@ -114,21 +115,26 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		return err
 	}
 
-	//TODO: Check api version
-	isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
-	cmd.UI.DisplayWarnings(v3Warnings)
-	if err != nil {
-		return sharedV3.HandleError(err)
-	}
-
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), spaceSummary.SpaceName},
 		{cmd.UI.TranslateText("org:"), spaceSummary.OrgName},
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
-		{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
 		{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName},
 		{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")},
+	}
+
+	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+	if apiCheck == nil {
+		isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
+		cmd.UI.DisplayWarnings(v3Warnings)
+		if err != nil {
+			return sharedV3.HandleError(err)
+		}
+
+		table = append(table[:4], append([][]string{
+			{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
+		}, table[4:]...)...)
 	}
 
 	cmd.UI.DisplayTable("", table, 3)

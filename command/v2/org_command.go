@@ -24,6 +24,7 @@ type OrgActor interface {
 
 type OrgActorV3 interface {
 	GetIsolationSegmentsByOrganization(orgName string) ([]v3action.IsolationSegment, v3action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type OrgCommand struct {
@@ -104,26 +105,30 @@ func (cmd OrgCommand) displayOrgSummary() error {
 		return shared.HandleError(err)
 	}
 
-	isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
-	cmd.UI.DisplayWarnings(v3Warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	isolationSegmentNames := []string{}
-	for _, iso := range isolationSegments {
-		isolationSegmentNames = append(isolationSegmentNames, iso.Name)
-	}
-
-	sort.Strings(isolationSegmentNames)
-
 	table := [][]string{
 		{cmd.UI.TranslateText("name:"), orgSummary.Name},
 		{cmd.UI.TranslateText("domains:"), strings.Join(orgSummary.DomainNames, ", ")},
 		{cmd.UI.TranslateText("quota:"), orgSummary.QuotaName},
 		{cmd.UI.TranslateText("spaces:"), strings.Join(orgSummary.SpaceNames, ", ")},
-		{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")},
 	}
+
+	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+	if apiCheck == nil {
+		isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
+		cmd.UI.DisplayWarnings(v3Warnings)
+		if err != nil {
+			return shared.HandleError(err)
+		}
+
+		isolationSegmentNames := []string{}
+		for _, iso := range isolationSegments {
+			isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+		}
+
+		sort.Strings(isolationSegmentNames)
+		table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
+	}
+
 	cmd.UI.DisplayTable("", table, 3)
 
 	return nil
