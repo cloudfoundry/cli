@@ -14,23 +14,23 @@ var _ = Describe("run-task command", func() {
 	Context("when --help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("run-task", "--help")
+			Eventually(session).Should(Say("NAME:"))
+			Eventually(session).Should(Say("   run-task - Run a one-off task on an app"))
+			Eventually(session).Should(Say("USAGE:"))
+			Eventually(session).Should(Say("   cf run-task APP_NAME COMMAND \\[-k DISK] \\[-m MEMORY\\] \\[--name TASK_NAME\\]"))
+			Eventually(session).Should(Say("TIP:"))
+			Eventually(session).Should(Say("   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs."))
+			Eventually(session).Should(Say("EXAMPLES:"))
+			Eventually(session).Should(Say(`   cf run-task my-app "bundle exec rake db:migrate" --name migrate`))
+			Eventually(session).Should(Say("ALIAS:"))
+			Eventually(session).Should(Say("   rt"))
+			Eventually(session).Should(Say("OPTIONS:"))
+			Eventually(session).Should(Say("   -k          Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
+			Eventually(session).Should(Say("   -m          Memory limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
+			Eventually(session).Should(Say("   --name      Name to give the task \\(generated if omitted\\)"))
+			Eventually(session).Should(Say("SEE ALSO:"))
+			Eventually(session).Should(Say("   logs, tasks, terminate-task"))
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say("NAME:"))
-			Expect(session.Out).To(Say("   run-task - Run a one-off task on an app"))
-			Expect(session.Out).To(Say("USAGE:"))
-			Expect(session.Out).To(Say("   cf run-task APP_NAME COMMAND \\[-k DISK] \\[-m MEMORY\\] \\[--name TASK_NAME\\]"))
-			Expect(session.Out).To(Say("TIP:"))
-			Expect(session.Out).To(Say("   Use 'cf logs' to display the logs of the app and all its tasks. If your task name is unique, grep this command's output for the task name to view task-specific logs."))
-			Expect(session.Out).To(Say("EXAMPLES:"))
-			Expect(session.Out).To(Say(`   cf run-task my-app "bundle exec rake db:migrate" --name migrate`))
-			Expect(session.Out).To(Say("ALIAS:"))
-			Expect(session.Out).To(Say("   rt"))
-			Expect(session.Out).To(Say("OPTIONS:"))
-			Expect(session.Out).To(Say("   -k          Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
-			Expect(session.Out).To(Say("   -m          Memory limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
-			Expect(session.Out).To(Say("   --name      Name to give the task \\(generated if omitted\\)"))
-			Expect(session.Out).To(Say("SEE ALSO:"))
-			Expect(session.Out).To(Say("   logs, tasks, terminate-task"))
 		})
 	})
 
@@ -42,9 +42,9 @@ var _ = Describe("run-task command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -55,9 +55,9 @@ var _ = Describe("run-task command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
@@ -69,9 +69,9 @@ var _ = Describe("run-task command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 
@@ -84,9 +84,9 @@ var _ = Describe("run-task command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 			})
 		})
 	})
@@ -116,36 +116,30 @@ var _ = Describe("run-task command", func() {
 			Context("when the task name is not provided", func() {
 				It("creates a new task", func() {
 					session := helpers.CF("run-task", appName, "echo hi")
-					Eventually(session).Should(Exit(0))
 					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Expect(session.Out).To(Say(`OK
-
-Task has been submitted successfully for execution.
-Task name:   .+
-Task id:     1`,
-					))
+					Eventually(session).Should(Say("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Task has been submitted successfully for execution."))
+					Eventually(session).Should(Say("task name:\\s+.+"))
+					Eventually(session).Should(Say("task id:\\s+1"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when the task name is provided", func() {
 				It("creates a new task with the provided name", func() {
 					session := helpers.CF("run-task", appName, "echo hi", "--name", "some-task-name")
-					Eventually(session).Should(Exit(0))
 					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Expect(session.Out).To(Say(`OK
+					Eventually(session).Should(Say("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Say("Task has been submitted successfully for execution."))
+					Eventually(session).Should(Say("task name:\\s+some-task-name"))
+					Eventually(session).Should(Say("task id:\\s+1"))
+					Eventually(session).Should(Exit(0))
 
-Task has been submitted successfully for execution.
-Task name:   some-task-name
-Task id:     1`,
-					))
-
-					Eventually(func() *Buffer {
-						taskSession := helpers.CF("tasks", appName)
-						Eventually(taskSession).Should(Exit(0))
-						return taskSession.Out
-					}).Should(Say("1\\s+some-task-name"))
+					taskSession := helpers.CF("tasks", appName)
+					Eventually(taskSession).Should(Say("1\\s+some-task-name"))
+					Eventually(taskSession).Should(Exit(0))
 				})
 			})
 
@@ -166,7 +160,7 @@ Task id:     1`,
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("tasks", appName, "-v")
-						Eventually(session.Out).Should(Say("\"disk_in_mb\": %d", diskSpace))
+						Eventually(session).Should(Say("\"disk_in_mb\": %d", diskSpace))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -177,7 +171,6 @@ Task id:     1`,
 					It("displays error and exits 1", func() {
 						session := helpers.CF("run-task", appName, "echo hi", "-m", "invalid")
 						Eventually(session.Err).Should(Say("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
-
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -189,7 +182,7 @@ Task id:     1`,
 						Eventually(session).Should(Exit(0))
 
 						session = helpers.CF("tasks", appName, "-v")
-						Eventually(session.Out).Should(Say("\"memory_in_mb\": %d", taskMemory))
+						Eventually(session).Should(Say("\"memory_in_mb\": %d", taskMemory))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -205,9 +198,9 @@ Task id:     1`,
 
 			It("fails and outputs task must have a droplet message", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(`Error running task: App is not staged.`))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say(`Error running task: App is not staged.`))
 			})
 		})
 
@@ -222,24 +215,22 @@ Task id:     1`,
 
 			It("creates a new task", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
-				Eventually(session).Should(Exit(0))
 				userName, _ := helpers.GetCredentials()
-				Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Expect(session.Out).To(Say(`OK
-
-Task has been submitted successfully for execution.
-Task name:   .+
-Task id:     1`,
-				))
+				Eventually(session).Should(Say("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Task has been submitted successfully for execution."))
+				Eventually(session).Should(Say("task name:\\s+.+"))
+				Eventually(session).Should(Say("task id:\\s+1"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 
 		Context("when the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say(fmt.Sprintf("App %s not found", appName)))
 			})
 		})
 	})

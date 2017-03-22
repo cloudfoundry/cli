@@ -20,10 +20,6 @@
     "translation": ""
   },
   {
-    "id": "API version:",
-    "translation": "API version:"
-  },
-  {
     "id": "All available CLI commands",
     "translation": "All available CLI commands"
   },
@@ -58,10 +54,6 @@
   {
     "id": "Before getting started:",
     "translation": "Before getting started:"
-  },
-  {
-    "id": "Buildpack:",
-    "translation": ""
   },
   {
     "id": "CANCELING",
@@ -900,10 +892,6 @@
     "translation": "Instance"
   },
   {
-    "id": "Instances:",
-    "translation": ""
-  },
-  {
     "id": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
     "translation": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
   },
@@ -932,10 +920,6 @@
     "translation": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
   },
   {
-    "id": "Last uploaded:",
-    "translation": ""
-  },
-  {
     "id": "List all isolation segments",
     "translation": ""
   },
@@ -957,10 +941,6 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
-    "translation": ""
-  },
-  {
-    "id": "Name:",
     "translation": ""
   },
   {
@@ -1112,10 +1092,6 @@
     "translation": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
-    "id": "Requested state:",
-    "translation": ""
-  },
-  {
     "id": "Resource matching API timed out; pushing all app files.",
     "translation": ""
   },
@@ -1146,10 +1122,6 @@
   {
     "id": "Routes",
     "translation": "Routes"
-  },
-  {
-    "id": "Routes:",
-    "translation": ""
   },
   {
     "id": "Run a one-off task on an app",
@@ -1216,15 +1188,7 @@
     "translation": "Space management:"
   },
   {
-    "id": "Stack:",
-    "translation": ""
-  },
-  {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Start command:",
     "translation": ""
   },
   {
@@ -1244,8 +1208,8 @@
     "translation": ""
   },
   {
-    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
-    "translation": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}"
+    "id": "Task has been submitted successfully for execution.",
+    "translation": ""
   },
   {
     "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
@@ -1616,6 +1580,14 @@
     "translation": ""
   },
   {
+    "id": "api endpoint:",
+    "translation": ""
+  },
+  {
+    "id": "api version:",
+    "translation": ""
+  },
+  {
     "id": "apps:",
     "translation": ""
   },
@@ -1669,6 +1641,14 @@
   },
   {
     "id": "enable-org-isolation",
+    "translation": ""
+  },
+  {
+    "id": "endpoint (for http type):",
+    "translation": ""
+  },
+  {
+    "id": "health check type:",
     "translation": ""
   },
   {
@@ -1736,6 +1716,10 @@
     "translation": "routes"
   },
   {
+    "id": "routes:",
+    "translation": ""
+  },
+  {
     "id": "run-task",
     "translation": ""
   },
@@ -1772,11 +1756,27 @@
     "translation": ""
   },
   {
+    "id": "space:",
+    "translation": ""
+  },
+  {
     "id": "sso-passcode",
     "translation": ""
   },
   {
+    "id": "start command:",
+    "translation": ""
+  },
+  {
     "id": "start time",
+    "translation": ""
+  },
+  {
+    "id": "task id:",
+    "translation": ""
+  },
+  {
+    "id": "task name:",
     "translation": ""
   },
   {
@@ -1801,6 +1801,10 @@
   },
   {
     "id": "user {{.User}} already exists",
+    "translation": ""
+  },
+  {
+    "id": "user:",
     "translation": ""
   },
   {

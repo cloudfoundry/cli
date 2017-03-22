@@ -177,15 +177,15 @@ applications:
 						session := helpers.CF("start", appName)
 						Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("Waiting for app to start..."))
-						Eventually(session).Should(Say("Name:              %s", appName))
-						Eventually(session).Should(Say("Requested state:   started"))
-						Eventually(session).Should(Say("Instances:         2/2"))
-						Eventually(session).Should(Say("Usage:             128M x 2 instances"))
-						Eventually(session).Should(Say("Routes:            %s.%s", appName, domainName))
-						Eventually(session).Should(Say("Last uploaded:"))
-						Eventually(session).Should(Say("Stack:             cflinuxfs2"))
-						Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
-						Eventually(session).Should(Say("Start command:     sh boot.sh"))
+						Eventually(session).Should(Say("name:              %s", appName))
+						Eventually(session).Should(Say("requested state:   started"))
+						Eventually(session).Should(Say("instances:         2/2"))
+						Eventually(session).Should(Say("usage:             128M x 2 instances"))
+						Eventually(session).Should(Say("routes:            %s.%s", appName, domainName))
+						Eventually(session).Should(Say("last uploaded:"))
+						Eventually(session).Should(Say("stack:             cflinuxfs2"))
+						Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
+						Eventually(session).Should(Say("start command:     sh boot.sh"))
 
 						Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
 						Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
@@ -195,7 +195,6 @@ applications:
 				})
 
 				Context("when the app has *not* yet been staged", func() {
-					//TODO: Add Staging Timeout
 					Context("when the app does *not* stage properly", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
@@ -217,9 +216,6 @@ applications:
 					})
 
 					Context("when the app stages properly", func() {
-						// TODO App timeout error
-						// TODO App crashed error
-
 						Context("when the app does *not* start properly", func() {
 							BeforeEach(func() {
 								appName = helpers.PrefixedRandomName("app")
@@ -272,15 +268,15 @@ applications:
 								Eventually(session).Should(Say("Uploading droplet..."))
 								Eventually(session).Should(Say("Waiting for app to start..."))
 
-								Eventually(session).Should(Say("Name:              %s", appName))
-								Eventually(session).Should(Say("Requested state:   started"))
-								Eventually(session).Should(Say("Instances:         2/2"))
-								Eventually(session).Should(Say("Usage:             128M x 2 instances"))
-								Eventually(session).Should(Say("Routes:            %s.%s", appName, domainName))
-								Eventually(session).Should(Say("Last uploaded:"))
-								Eventually(session).Should(Say("Stack:             cflinuxfs2"))
-								Eventually(session).Should(Say("Buildpack:         staticfile_buildpack"))
-								Eventually(session).Should(Say("Start command:     sh boot.sh"))
+								Eventually(session).Should(Say("name:              %s", appName))
+								Eventually(session).Should(Say("requested state:   started"))
+								Eventually(session).Should(Say("instances:         2/2"))
+								Eventually(session).Should(Say("usage:             128M x 2 instances"))
+								Eventually(session).Should(Say("routes:            %s.%s", appName, domainName))
+								Eventually(session).Should(Say("last uploaded:"))
+								Eventually(session).Should(Say("stack:             cflinuxfs2"))
+								Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
+								Eventually(session).Should(Say("start command:     sh boot.sh"))
 
 								Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
 								Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))

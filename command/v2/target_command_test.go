@@ -143,9 +143,9 @@ var _ = Describe("target Command", func() {
 						It("displays how to target an org and space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("API version:    1.2.3"))
-							Expect(testUI.Out).To(Say("User:           some-user"))
+							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("user:           some-user"))
 							Expect(testUI.Out).To(Say("No org or space targeted, use '%s target -o ORG -s SPACE'", binaryName))
 						})
 					})
@@ -162,10 +162,10 @@ var _ = Describe("target Command", func() {
 						It("displays the org and tip to target space", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("API version:    1.2.3"))
-							Expect(testUI.Out).To(Say("User:           some-user"))
-							Expect(testUI.Out).To(Say("Org:            some-org"))
+							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("user:           some-user"))
+							Expect(testUI.Out).To(Say("org:            some-org"))
 							Expect(testUI.Out).To(Say("No space targeted, use '%s target -s SPACE'", binaryName))
 						})
 					})
@@ -187,11 +187,11 @@ var _ = Describe("target Command", func() {
 						It("displays the org and space targeted ", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("API endpoint:   some-api-target"))
-							Expect(testUI.Out).To(Say("API version:    1.2.3"))
-							Expect(testUI.Out).To(Say("User:           some-user"))
-							Expect(testUI.Out).To(Say("Org:            some-org"))
-							Expect(testUI.Out).To(Say("Space:          some-space"))
+							Expect(testUI.Out).To(Say("api endpoint:   some-api-target"))
+							Expect(testUI.Out).To(Say("api version:    1.2.3"))
+							Expect(testUI.Out).To(Say("user:           some-user"))
+							Expect(testUI.Out).To(Say("org:            some-org"))
+							Expect(testUI.Out).To(Say("space:          some-space"))
 						})
 					})
 				})

@@ -32,8 +32,8 @@ var _ = Describe("unset-space-quota command", func() {
 		Eventually(session).Should(Say("Unassigning space quota %s from space %s", quotaName, spaceName))
 		Eventually(session).Should(Exit(0))
 
-		session = helpers.CF("space", spaceName)
-		Eventually(session).Should(Say("Space Quota:\\s+$"))
+		session = helpers.CF("space", spaceName, "-v")
+		Eventually(session).Should(Say(`"space_quota_definition_guid": null`))
 		Eventually(session).Should(Exit(0))
 	})
 })

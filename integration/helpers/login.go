@@ -1,8 +1,10 @@
 package helpers
 
 import (
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -31,6 +33,10 @@ func GetAPI() string {
 	if apiURL == "" {
 		return "https://api.bosh-lite.com"
 	}
+	if !strings.Contains(apiURL, "^http") {
+		apiURL = fmt.Sprintf("https://%s", apiURL)
+	}
+
 	return apiURL
 }
 

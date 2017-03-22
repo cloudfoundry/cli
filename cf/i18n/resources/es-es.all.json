@@ -236,10 +236,6 @@
     "translation": "Punto final de la API: {{.Endpoint}}"
   },
   {
-    "id": "API version:",
-    "translation": ""
-  },
-  {
     "id": "APPS",
     "translation": ""
   },
@@ -534,10 +530,6 @@
   {
     "id": "Buildpack {{.BuildpackName}} does not exist.",
     "translation": "El paquete de compilación {{.BuildpackName}} no existe."
-  },
-  {
-    "id": "Buildpack:",
-    "translation": ""
   },
   {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
@@ -2452,10 +2444,6 @@
     "translation": "Habilitando el soporte de ssh para el espacio '{{.SpaceName}}'..."
   },
   {
-    "id": "Endpoint (for http type):",
-    "translation": "Endpoint (for http type):"
-  },
-  {
     "id": "Endpoint deprecated",
     "translation": ""
   },
@@ -3172,10 +3160,6 @@
     "translation": "Health check type must be 'http' to set a health check HTTP endpoint."
   },
   {
-    "id": "Health check type:",
-    "translation": "health_check_type is {{.HealthCheckType}}"
-  },
-  {
     "id": "Hostname (e.g. my-subdomain)",
     "translation": "Nombre de host (p. ej. mi-subdominio)"
   },
@@ -3480,10 +3464,6 @@
     "translation": "La instancia debe ser un entero no negativo"
   },
   {
-    "id": "Instances:",
-    "translation": ""
-  },
-  {
     "id": "Invalid JSON response from server",
     "translation": "Respuesta JSON no válida del servidor"
   },
@@ -3618,10 +3598,6 @@
   {
     "id": "Last Operation",
     "translation": "Última operación"
-  },
-  {
-    "id": "Last uploaded:",
-    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3873,10 +3849,6 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
-    "translation": ""
-  },
-  {
-    "id": "Name:",
     "translation": ""
   },
   {
@@ -4640,10 +4612,6 @@
     "translation": "Solicitar asignación pseudo-tty"
   },
   {
-    "id": "Requested state:",
-    "translation": ""
-  },
-  {
     "id": "Requires SOURCE-APP TARGET-APP as arguments",
     "translation": "Requiere SOURCE-APP TARGET-APP como argumentos"
   },
@@ -4786,10 +4754,6 @@
   {
     "id": "Routes for this domain will be configured only on the specified router group",
     "translation": "Las rutas para este dominio se configurarán solo en el grupo de direccionador especificado"
-  },
-  {
-    "id": "Routes:",
-    "translation": ""
   },
   {
     "id": "Rules",
@@ -5184,10 +5148,6 @@
     "translation": "Pila a utilizar (una pila es un sistema de archivos preconfigurado, incluido un sistema operativo, que puede ejecutar apps)"
   },
   {
-    "id": "Stack:",
-    "translation": ""
-  },
-  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Grupos de variable de entorno de transferencia:"
   },
@@ -5201,10 +5161,6 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Start command:",
     "translation": ""
   },
   {
@@ -5328,7 +5284,7 @@
     "translation": "Espacio de destino {{.SpaceName}}\n"
   },
   {
-    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
+    "id": "Task has been submitted successfully for execution.",
     "translation": ""
   },
   {
@@ -6200,6 +6156,14 @@
     "translation": "ya existe"
   },
   {
+    "id": "api endpoint:",
+    "translation": ""
+  },
+  {
+    "id": "api version:",
+    "translation": ""
+  },
+  {
     "id": "app",
     "translation": ""
   },
@@ -6356,6 +6320,10 @@
     "translation": "habilitado"
   },
   {
+    "id": "endpoint (for http type):",
+    "translation": ""
+  },
+  {
     "id": "env var '{{.PropertyName}}' should not be null",
     "translation": "la variable de entorno '{{.PropertyName}}' no debería ser nula"
   },
@@ -6374,6 +6342,10 @@
   {
     "id": "free or paid",
     "translation": "gratuito o de pago"
+  },
+  {
+    "id": "health check type:",
+    "translation": ""
   },
   {
     "id": "health_check_type is ",
@@ -6592,6 +6564,10 @@
     "translation": "rutas"
   },
   {
+    "id": "routes:",
+    "translation": ""
+  },
+  {
     "id": "run-task",
     "translation": ""
   },
@@ -6676,6 +6652,10 @@
     "translation": "cuotas de espacio:"
   },
   {
+    "id": "space:",
+    "translation": ""
+  },
+  {
     "id": "spaces:",
     "translation": "espacios:"
   },
@@ -6728,6 +6708,10 @@
     "translation": "pila:"
   },
   {
+    "id": "start command:",
+    "translation": ""
+  },
+  {
     "id": "start time",
     "translation": ""
   },
@@ -6750,6 +6734,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "detenido después de una redirección"
+  },
+  {
+    "id": "task id:",
+    "translation": ""
+  },
+  {
+    "id": "task name:",
+    "translation": ""
   },
   {
     "id": "tasks",
@@ -6818,6 +6810,10 @@
   {
     "id": "user-provided",
     "translation": "proporcionada por el usuario"
+  },
+  {
+    "id": "user:",
+    "translation": ""
   },
   {
     "id": "username",

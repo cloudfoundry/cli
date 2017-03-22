@@ -19,13 +19,13 @@ var _ = Describe("Push with health check", func() {
 		Context("when displaying help in the refactor", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("push", "--help")
-				Eventually(session.Out).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
 				Eventually(session).Should(Exit(0))
 			})
 
 			It("displays health check timeout (-t) flag description", func() {
 				session := helpers.CF("push", "--help")
-				Eventually(session.Out).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
+				Eventually(session).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -50,13 +50,13 @@ var _ = Describe("Push with health check", func() {
 		Context("when displaying help in the old code", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("push")
-				Eventually(session.Out).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
+				Eventually(session).Should(Say("--health-check-type, -u\\s+Application health check type \\(Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/'\\)"))
 				Eventually(session).Should(Exit(1))
 			})
 
 			It("displays health check timeout (-t) flag description", func() {
 				session := helpers.CF("push")
-				Eventually(session.Out).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
+				Eventually(session).Should(Say("-t\\s+Time \\(in seconds\\) allowed to elapse between starting up an app and the first healthy response from the app"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -70,8 +70,8 @@ var _ = Describe("Push with health check", func() {
 						})
 
 						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+%s", healthCheckType))
-						Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+%s\n", endpoint))
+						Eventually(session).Should(Say("health check type:\\s+%s", healthCheckType))
+						Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+%s\n", endpoint))
 						Eventually(session).Should(Exit(0))
 					},
 
@@ -99,7 +99,7 @@ var _ = Describe("Push with health check", func() {
 
 						It("sets the endpoint to /", func() {
 							session := helpers.CF("get-health-check", appName)
-							Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+\\/\n"))
+							Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+\\/\n"))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -109,9 +109,8 @@ var _ = Describe("Push with health check", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
 
-						appGUID := helpers.AppGUID(appName)
-						session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-						Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+						session := helpers.CF("get-health-check", appName)
+						Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+/some-endpoint"))
 						Eventually(session).Should(Exit(0))
 					})
 
@@ -124,7 +123,7 @@ var _ = Describe("Push with health check", func() {
 
 						It("preserves the existing endpoint", func() {
 							session := helpers.CF("get-health-check", appName)
-							Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+\\/some-endpoint\n"))
+							Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+\\/some-endpoint\n"))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -137,9 +136,8 @@ var _ = Describe("Push with health check", func() {
 						})
 
 						It("preserves the existing endpoint", func() {
-							appGUID := helpers.AppGUID(appName)
-							session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-							Eventually(session.Out).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
+							session := helpers.CF("get-health-check", appName, "-v")
+							Eventually(session).Should(Say(`"health_check_http_endpoint": "/some-endpoint"`))
 							Eventually(session).Should(Exit(0))
 						})
 					})
@@ -166,8 +164,8 @@ applications:
 					})
 
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Health check type:\\s+%s", healthCheckType))
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+%s\n", endpoint))
+					Eventually(session).Should(Say("health check type:\\s+%s", healthCheckType))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+%s\n", endpoint))
 					Eventually(session).Should(Exit(0))
 				},
 
@@ -193,7 +191,7 @@ applications:
 						Expect(err).ToNot(HaveOccurred())
 
 						session := helpers.CF("push", "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")
-						Eventually(session.Out).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
+						Eventually(session).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -218,8 +216,8 @@ applications:
 					})
 
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/some-endpoint\n"))
+					Eventually(session).Should(Say("health check type:\\s+http"))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+/some-endpoint\n"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -257,8 +255,8 @@ applications:
 					})
 
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/new-endpoint\n"))
+					Eventually(session).Should(Say("health check type:\\s+http"))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+/new-endpoint\n"))
 					Eventually(session).Should(Exit(0))
 				})
 
@@ -293,8 +291,8 @@ applications:
 					})
 
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/some-endpoint\n"))
+					Eventually(session).Should(Say("health check type:\\s+http"))
+					Eventually(session).Should(Say("endpoint \\(for http type\\):\\s+/some-endpoint\n"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -318,7 +316,7 @@ applications:
 						})
 
 						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+port"))
+						Eventually(session).Should(Say("health check type:\\s+port"))
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -341,8 +339,8 @@ applications:
 						})
 
 						session := helpers.CF("get-health-check", appName)
-						Eventually(session.Out).Should(Say("Health check type:\\s+http"))
-						Eventually(session.Out).Should(Say("(?m)Endpoint \\(for http type\\):\\s+/$"))
+						Eventually(session).Should(Say("health check type:\\s+http"))
+						Eventually(session).Should(Say("(?m)endpoint \\(for http type\\):\\s+/$"))
 						Eventually(session).Should(Exit(0))
 					})
 				})

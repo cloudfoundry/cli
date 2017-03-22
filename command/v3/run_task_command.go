@@ -1,6 +1,8 @@
 package v3
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -83,13 +85,11 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText(`Task has been submitted successfully for execution.
-Task name:   {{.TaskName}}
-Task id:     {{.TaskSequenceID}}`,
-		map[string]interface{}{
-			"TaskName":       task.Name,
-			"TaskSequenceID": task.SequenceID,
-		})
+	cmd.UI.DisplayText("Task has been submitted successfully for execution.")
+	cmd.UI.DisplayTable("", [][]string{
+		{cmd.UI.TranslateText("task name:"), task.Name},
+		{cmd.UI.TranslateText("task id:"), fmt.Sprint(task.SequenceID)},
+	}, 3)
 
 	return nil
 }

@@ -30,7 +30,7 @@ var _ = Describe("set-space-quota command", func() {
 		Eventually(session).Should(Exit(0))
 
 		session = helpers.CF("space", spaceName)
-		Eventually(session).Should(Say("Space Quota:\\s+%s", quotaName))
+		Eventually(session).Should(Say("space quota:\\s+%s", quotaName))
 		Eventually(session).Should(Exit(0))
 	})
 })

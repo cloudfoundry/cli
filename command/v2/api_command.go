@@ -61,8 +61,8 @@ func (cmd *ApiCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTable("", [][]string{
-		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
-		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
+		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
+		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
 	}, 3)
 
 	user, err := cmd.Config.CurrentUser()

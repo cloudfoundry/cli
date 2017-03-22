@@ -146,7 +146,7 @@ var _ = Describe("set-health-check command", func() {
 					Eventually(session).Should(Exit(0))
 
 					getSession := helpers.CF("get-health-check", appName)
-					Eventually(getSession).Should(Say("Health check type:\\s+%s", settingType))
+					Eventually(getSession).Should(Say("health check type:\\s+%s", settingType))
 					Eventually(getSession).Should(Exit(0))
 				},
 				Entry("when setting the health-check-type to 'none'", "none"),
@@ -162,7 +162,7 @@ var _ = Describe("set-health-check command", func() {
 
 				It("sets the http health check endpoint to /", func() {
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/"))
+					Eventually(session.Out).Should(Say("endpoint \\(for http type\\):\\s+/"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -174,7 +174,7 @@ var _ = Describe("set-health-check command", func() {
 
 				It("sets the http health check endpoint to the given endpoint", func() {
 					session := helpers.CF("get-health-check", appName)
-					Eventually(session.Out).Should(Say("Endpoint \\(for http type\\):\\s+/foo"))
+					Eventually(session.Out).Should(Say("endpoint \\(for http type\\):\\s+/foo"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
