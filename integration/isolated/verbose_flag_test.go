@@ -3,7 +3,6 @@ package isolated
 import (
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -20,10 +19,7 @@ var _ = Describe("Verbose", func() {
 	Context("v2 legacy", func() {
 		DescribeTable("displays verbose output",
 			func(command func() *Session) {
-				login := exec.Command("cf", "auth", "admin", "admin")
-				loginSession, err := Start(login, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(loginSession).Should(Exit(0))
+				helpers.LoginCF()
 
 				session := command()
 				Eventually(session).Should(Say("REQUEST:"))
