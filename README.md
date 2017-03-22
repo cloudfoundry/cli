@@ -26,7 +26,7 @@
 ***Cloud Foundry CLI*** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
 Further documentation is at the [docs page for the
-CLI](https://docs.cloudfoundry.org/cf-cli).  
+CLI](https://docs.cloudfoundry.org/cf-cli).
 
 If you have any questions, ask away on the #cli channel in [our Slack
 community](http://slack.cloudfoundry.org/) and the
@@ -62,26 +62,26 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 **Mac OS X** (using [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap)):
 
 ```sh
-$ brew install cloudfoundry/tap/cf-cli
+brew install cloudfoundry/tap/cf-cli
 ```
 
 **Debian** and **Ubuntu** based Linux distributions:
 
 ```sh
 # ...first add the Cloud Foundry Foundation public key and package repository to your system
-$ wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-$ echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 # ...then, update your local package index, then finally install the cf CLI
-$ sudo apt-get update
-$ sudo apt-get install cf-cli
+sudo apt-get update
+sudo apt-get install cf-cli
 ```
 
 **Enterprise Linux** and **Fedora** systems (RHEL6/CentOS6 and up):
 ```sh
 # ...first configure the Cloud Foundry Foundation package repository
-$ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
 # ...then, install the cf CLI (which will also download and add the public key to your system)
-$ sudo yum install cf-cli
+sudo yum install cf-cli
 ```
 
 ### Installers and compressed binaries
@@ -95,16 +95,15 @@ Release notes, and 32 bit releases can be found [here](https://github.com/cloudf
 **Download examples** with curl for Mac OS X and Linux binaries
 ```sh
 # ...download & extract Mac OS X binary
-$ curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
+curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
 # ...or Linux 64-bit binary
-$ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
 # ...move it to /usr/local/bin or a location you know is in your $PATH
-$ mv cf /usr/local/bin
+mv cf /usr/local/bin
 # ...copy tab completion file on Ubuntu (takes affect after re-opening your shell)
-$ sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercontent.com/cloudfoundry/cli/master/ci/installers/completion/cf
+sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercontent.com/cloudfoundry/cli/master/ci/installers/completion/cf
 # ...and to confirm your cf CLI version
-$ cf --version
-cf version x.y.z+...
+cf --version
 ```
 
 #### Edge binaries
