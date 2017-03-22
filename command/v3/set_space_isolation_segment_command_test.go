@@ -136,7 +136,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("entitlement-warning"))
 					Expect(testUI.Err).To(Say("banana"))
 
-					Expect(testUI.Out).To(Say("Running applications in the space need a restart to be moved over to this isolation segment."))
+					Expect(testUI.Out).To(Say("In order to move running applications to this isolation segment, they must be restarted."))
 
 					Expect(fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceCallCount()).To(Equal(1))
 					isolationSegmentName, spaceGUID := fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceArgsForCall(0)

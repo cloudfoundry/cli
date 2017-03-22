@@ -1340,6 +1340,10 @@
     "translation": ""
   },
   {
+    "id": "In order to move running applications to this isolation segment, they must be restarted.",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
@@ -1625,10 +1629,6 @@
   },
   {
     "id": "Run a one-off task on an app",
-    "translation": ""
-  },
-  {
-    "id": "Running applications in the space need a restart to be moved over to this isolation segment.",
     "translation": ""
   },
   {
