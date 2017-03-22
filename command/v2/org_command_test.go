@@ -48,6 +48,7 @@ var _ = Describe("org Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.Organization = "some-org"
+		fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
 	})
 
 	JustBeforeEach(func() {
@@ -163,44 +164,79 @@ var _ = Describe("org Command", func() {
 					},
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil)
-
-				fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
-					[]v3action.IsolationSegment{
-						{Name: "isolation-segment-1"},
-						{Name: "isolation-segment-2"},
-					},
-					v3action.Warnings{"warning-3", "warning-4"},
-					nil)
 			})
 
-			It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
-				Expect(executeErr).To(BeNil())
+			Context("when api version is above 3.11.0", func() {
+				BeforeEach(func() {
+					fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
+						[]v3action.IsolationSegment{
+							{Name: "isolation-segment-1"},
+							{Name: "isolation-segment-2"},
+						},
+						v3action.Warnings{"warning-3", "warning-4"},
+						nil)
+					fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+				})
 
-				Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
-				Expect(testUI.Err).To(Say("warning-3"))
-				Expect(testUI.Err).To(Say("warning-4"))
+				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
+					Expect(executeErr).To(BeNil())
 
-				Eventually(testUI.Out).Should(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
+					Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("warning-3"))
+					Expect(testUI.Err).To(Say("warning-4"))
 
-				Eventually(testUI.Out).Should(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
+					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
 
-				Eventually(testUI.Out).Should(Say("quota:\\s+some-quota"))
+					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
 
-				Eventually(testUI.Out).Should(Say("spaces:\\s+space1, space2"))
+					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
 
-				Eventually(testUI.Out).Should(Say("isolation segments:\\s+isolation-segment-1, isolation-segment-2"))
+					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
 
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1, isolation-segment-2"))
 
-				Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
-				orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
-				Expect(orgName).To(Equal("some-org"))
+					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
-				Expect(fakeActorV3.GetIsolationSegmentsByOrganizationCallCount()).To(Equal(1))
-				orgGuid := fakeActorV3.GetIsolationSegmentsByOrganizationArgsForCall(0)
-				Expect(orgGuid).To(Equal("some-org-guid"))
+					Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
+					orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
+					Expect(orgName).To(Equal("some-org"))
+
+					Expect(fakeActorV3.GetIsolationSegmentsByOrganizationCallCount()).To(Equal(1))
+					orgGuid := fakeActorV3.GetIsolationSegmentsByOrganizationArgsForCall(0)
+					Expect(orgGuid).To(Equal("some-org-guid"))
+				})
+			})
+
+			Context("when api version is below 3.11.0", func() {
+				BeforeEach(func() {
+					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+				})
+
+				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
+					Expect(executeErr).To(BeNil())
+
+					Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+
+					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
+
+					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
+
+					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
+
+					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
+
+					Expect(testUI.Out).ToNot(Say("isolation segments:"))
+
+					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+
+					Expect(fakeActor.GetOrganizationSummaryByNameCallCount()).To(Equal(1))
+					orgName := fakeActor.GetOrganizationSummaryByNameArgsForCall(0)
+					Expect(orgName).To(Equal("some-org"))
+				})
 			})
 		})
 

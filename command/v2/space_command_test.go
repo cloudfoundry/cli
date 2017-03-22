@@ -48,6 +48,7 @@ var _ = Describe("space Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeConfig.ExperimentalReturns(true)
+		fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
 	})
 
 	JustBeforeEach(func() {
@@ -177,41 +178,74 @@ var _ = Describe("space Command", func() {
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
-
-				fakeActorV3.GetIsolationSegmentBySpaceReturns(
-					v3action.IsolationSegment{
-						Name: "some-isolation-segment",
-					},
-					v3action.Warnings{"v3-warning-1", "v3-warning-2"},
-					nil,
-				)
 			})
 
-			It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
-				Expect(executeErr).To(BeNil())
+			Context("when api version is above 3.11.0", func() {
+				BeforeEach(func() {
+					fakeActorV3.GetIsolationSegmentBySpaceReturns(
+						v3action.IsolationSegment{
+							Name: "some-isolation-segment",
+						},
+						v3action.Warnings{"v3-warning-1", "v3-warning-2"},
+						nil,
+					)
+					fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+				})
 
-				Eventually(testUI.Out).Should(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
-				Expect(testUI.Err).To(Say("warning-1"))
-				Expect(testUI.Err).To(Say("warning-2"))
-				Expect(testUI.Err).To(Say("v3-warning-1"))
-				Expect(testUI.Err).To(Say("v3-warning-2"))
+				It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
+					Expect(executeErr).To(BeNil())
 
-				Eventually(testUI.Out).Should(Say("name:\\s+some-space"))
-				Eventually(testUI.Out).Should(Say("org:\\s+some-org"))
-				Eventually(testUI.Out).Should(Say("apps:\\s+app1, app2, app3"))
-				Eventually(testUI.Out).Should(Say("services:\\s+service1, service2, service3"))
-				Eventually(testUI.Out).Should(Say("isolation segment:\\s+some-isolation-segment"))
-				Eventually(testUI.Out).Should(Say("space quota:\\s+some-space-quota"))
-				Eventually(testUI.Out).Should(Say("security groups:\\s+public_networks, dns, load_balancer"))
+					Eventually(testUI.Out).Should(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("v3-warning-1"))
+					Expect(testUI.Err).To(Say("v3-warning-2"))
 
-				Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
-				Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
-				orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
-				Expect(orgGUID).To(Equal("some-org-guid"))
-				Expect(spaceName).To(Equal("some-space"))
+					Expect(testUI.Out).To(Say("name:\\s+some-space"))
+					Expect(testUI.Out).To(Say("org:\\s+some-org"))
+					Expect(testUI.Out).To(Say("apps:\\s+app1, app2, app3"))
+					Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
+					Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
+					Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
+					Expect(testUI.Out).To(Say("security groups:\\s+public_networks, dns, load_balancer"))
 
-				Expect(fakeActorV3.GetIsolationSegmentBySpaceCallCount()).To(Equal(1))
-				Expect(fakeActorV3.GetIsolationSegmentBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
+					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+					Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
+					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(spaceName).To(Equal("some-space"))
+
+					Expect(fakeActorV3.GetIsolationSegmentBySpaceCallCount()).To(Equal(1))
+					Expect(fakeActorV3.GetIsolationSegmentBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
+				})
+			})
+
+			Context("when api version is below 3.11.0", func() {
+				BeforeEach(func() {
+					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+				})
+
+				It("displays warnings and a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
+					Expect(executeErr).To(BeNil())
+
+					Eventually(testUI.Out).Should(Say("Getting info for space some-space in org some-org as some-user\\.\\.\\."))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+
+					Expect(testUI.Out).To(Say("name:\\s+some-space"))
+					Expect(testUI.Out).To(Say("org:\\s+some-org"))
+					Expect(testUI.Out).To(Say("apps:\\s+app1, app2, app3"))
+					Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
+					Expect(testUI.Out).ToNot(Say("isolation segment:"))
+					Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
+					Expect(testUI.Out).To(Say("security groups:\\s+public_networks, dns, load_balancer"))
+
+					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
+					Expect(fakeActor.GetSpaceSummaryByOrganizationAndNameCallCount()).To(Equal(1))
+					orgGUID, spaceName := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(spaceName).To(Equal("some-space"))
+				})
 			})
 		})
 	})
