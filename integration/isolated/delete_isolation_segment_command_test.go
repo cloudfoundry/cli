@@ -24,7 +24,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf delete-isolation-segment SEGMENT_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("isolation-segments, remove-isolation-segment-org"))
+				Eventually(session).Should(Say("disable-org-isolation, isolation-segments"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
