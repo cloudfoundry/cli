@@ -6,9 +6,9 @@
 - Catches any non-defined flags, and any invalid flag values
 - Flags can come before or after the arguments. The followings are all valid inputs:
 ```bash
-$ testapp -i 100 -m 500 arg1 arg2   # flags go first
-$ testapp arg1 arg2 --i 100 -m 500  # flags go last
-$ testapp arg1 -i 100 arg2 -m=500   # flags go in between arguments
+testapp -i 100 -m 500 arg1 arg2   # flags go first
+testapp arg1 arg2 --i 100 -m 500  # flags go last
+testapp arg1 -i 100 arg2 -m=500   # flags go in between arguments
 ```
 The parsed results for all 3 statements are identical: `i=100`, `Args=[arg1, arg2]`, `m=500`
 
