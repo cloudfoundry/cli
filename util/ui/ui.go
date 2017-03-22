@@ -213,11 +213,12 @@ func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding i
 	}
 }
 
-// DisplayTable outputs a matrix of strings as a table to UI.Out. Prefix will
-// be prepended to each row and padding adds the specified number of spaces
-// between columns.  The final columns may wrap to multiple lines but will
-// still be confined to the last column.  Wrapping will occur on word boundaries.
-func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) {
+// DisplayKeyValueTable outputs a matrix of strings as a table to UI.Out.
+// Prefix will be prepended to each row and padding adds the specified number
+// of spaces between columns. The final columns may wrap to multiple lines but
+// will still be confined to the last column. Wrapping will occur on word
+// boundaries.
+func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int) {
 	rows := len(table)
 	if rows == 0 {
 		return

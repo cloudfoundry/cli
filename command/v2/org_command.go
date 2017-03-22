@@ -129,7 +129,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 		table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
 	}
 
-	cmd.UI.DisplayTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 
 	return nil
 }

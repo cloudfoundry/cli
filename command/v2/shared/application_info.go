@@ -43,7 +43,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 		table = append(table, []string{ui.TranslateText("start command:"), appSummary.Application.DetectedStartCommand})
 	}
 
-	ui.DisplayTable("", table, 3)
+	ui.DisplayKeyValueTable("", table, 3)
 	ui.DisplayNewline()
 
 	if len(appSummary.RunningInstances) == 0 {

@@ -74,7 +74,7 @@ func (cmd GetHealthCheckCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("endpoint (for http type):"), app.CalculatedHealthCheckEndpoint()},
 	}
 
-	cmd.UI.DisplayTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 
 	return nil
 }
