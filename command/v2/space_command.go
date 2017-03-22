@@ -137,7 +137,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		}, table[4:]...)...)
 	}
 
-	cmd.UI.DisplayTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 
 	if displaySecurityGroupRules {
 		table := [][]string{

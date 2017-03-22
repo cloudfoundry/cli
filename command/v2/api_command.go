@@ -60,7 +60,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 		return nil
 	}
 
-	cmd.UI.DisplayTable("", [][]string{
+	cmd.UI.DisplayKeyValueTable("", [][]string{
 		{cmd.UI.TranslateText("api endpoint:"), cmd.Config.Target()},
 		{cmd.UI.TranslateText("api version:"), cmd.Config.APIVersion()},
 	}, 3)

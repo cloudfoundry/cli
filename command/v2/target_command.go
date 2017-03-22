@@ -212,5 +212,5 @@ func (cmd *TargetCommand) displayTargetTable(user configv3.User) {
 			cmd.UI.TranslateText("space:"), cmd.Config.TargetedSpace().Name,
 		})
 	}
-	cmd.UI.DisplayTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 }

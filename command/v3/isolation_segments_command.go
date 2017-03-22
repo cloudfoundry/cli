@@ -85,6 +85,6 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 		)
 	}
 
-	cmd.UI.DisplayTable("", table, 3)
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 	return nil
 }

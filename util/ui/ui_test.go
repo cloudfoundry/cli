@@ -206,9 +206,9 @@ var _ = Describe("UI", func() {
 		})
 	})
 
-	Describe("DisplayTable", func() {
+	Describe("DisplayKeyValueTable", func() {
 		It("displays a string matrix as a table with the provided prefix and padding to ui.Out", func() {
-			ui.DisplayTable(
+			ui.DisplayKeyValueTable(
 				"some-prefix",
 				[][]string{
 					{"aaaaaaaaa", "bb", "ccccccc"},
