@@ -33,7 +33,7 @@ func GetAPI() string {
 	if apiURL == "" {
 		return "https://api.bosh-lite.com"
 	}
-	if !strings.Contains(apiURL, "^http") {
+	if !strings.HasPrefix(apiURL, "http") {
 		apiURL = fmt.Sprintf("https://%s", apiURL)
 	}
 
