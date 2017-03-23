@@ -14,7 +14,7 @@ var _ = Describe("Config", func() {
 		Context("when color is enabled", func() {
 			It("prints colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "true"}, "help")
-				Eventually(session).Should(Say("\x1b\\[38;1m"))
+				Eventually(session).Should(Say("\x1b\\[1m"))
 			})
 		})
 
@@ -22,7 +22,7 @@ var _ = Describe("Config", func() {
 			It("does not print colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "false"}, "help")
 				Eventually(session).Should(Exit(0))
-				Expect(session).NotTo(Say("\x1b\\[38;1m"))
+				Expect(session).NotTo(Say("\x1b\\[1m"))
 			})
 		})
 	})
