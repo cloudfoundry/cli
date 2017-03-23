@@ -84,6 +84,16 @@ sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundr
 sudo yum install cf-cli
 ```
 
+**SUSE Linux Enterprise** and **openSUSE** systems (SLES12/openSUSE Leap 42.1 and up):
+```sh
+# ...first configure the package repository for openSUSE Leap 42.2
+sudo zypper ar -r http://download.opensuse.org/repositories/Cloud:/Tools/openSUSE_Leap_42.2/Cloud:Tools.repo
+# or for SLES12 SP2
+sudo zypper ar -r http://download.opensuse.org/repositories/Cloud:/Tools/SLE_12_SP2/Cloud:Tools.repo
+# ...then, install the cf CLI (which will also download and add the public key to your system)
+sudo zypper in cf-cli
+```
+
 ### Installers and compressed binaries
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
