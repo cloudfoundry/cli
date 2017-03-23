@@ -1648,10 +1648,6 @@
     "translation": "BEFEHL"
   },
   {
-    "id": "CPU",
-    "translation": ""
-  },
-  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
@@ -2240,10 +2236,6 @@
     "translation": "Beschreibung: {{.ServiceDescription}}"
   },
   {
-    "id": "Details",
-    "translation": ""
-  },
-  {
     "id": "Did you mean?",
     "translation": "Meinten Sie?"
   },
@@ -2302,10 +2294,6 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "SSH-Zugriff für diesen Bereich nicht zulassen"
-  },
-  {
-    "id": "Disk",
-    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3804,10 +3792,6 @@
     "translation": "Maximale Anzahl von Routen, die mit reservierten Ports erstellt werden können (Standardwert: 0)"
   },
   {
-    "id": "Memory",
-    "translation": ""
-  },
-  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "Speicherbegrenzung (z.B. 256M, 1024M, 1G)"
   },
@@ -5090,10 +5074,6 @@
   {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Anzeigen von Zustand und Status für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
-  },
-  {
-    "id": "Since",
-    "translation": ""
   },
   {
     "id": "Skip assigning org role to user",

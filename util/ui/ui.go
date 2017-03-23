@@ -15,21 +15,13 @@ import (
 
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
+	"github.com/lunixbochs/vtclean"
+	isatty "github.com/mattn/go-isatty"
 	runewidth "github.com/mattn/go-runewidth"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"github.com/vito/go-interact/interact"
 
 	"golang.org/x/crypto/ssh/terminal"
-)
-
-const (
-	red   color.Attribute = color.FgRed
-	green                 = color.FgGreen
-	// yellow                         = color.FgYellow
-	// magenta                        = color.FgMagenta
-	cyan           = color.FgCyan
-	white          = color.FgWhite
-	defaultFgColor = 38
 )
 
 //go:generate counterfeiter . Config
@@ -149,7 +141,7 @@ func (ui *UI) DisplayOK() {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText("OK"), green, true))
+	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText("OK"), color.New(color.FgGreen, color.Bold)))
 }
 
 // DisplayNewline outputs a newline to UI.Out.
@@ -168,7 +160,7 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	defer ui.terminalLock.Unlock()
 
 	response := defaultResponse
-	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...) + ui.addFlavor(">>", cyan, true))
+	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...) + ui.modifyColor(">>", color.New(color.FgCyan, color.Bold)))
 	interactivePrompt.Input = ui.In
 	interactivePrompt.Output = ui.Out
 	err := interactivePrompt.Resolve(&response)
@@ -193,7 +185,7 @@ func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding i
 	for col := 0; col < columns; col++ {
 		var max int
 		for row := 0; row < rows; row++ {
-			if strLen := runewidth.StringWidth(table[row][col]); max < strLen {
+			if strLen := wordSize(table[row][col]); max < strLen {
 				max = strLen
 			}
 		}
@@ -203,11 +195,12 @@ func (ui *UI) DisplayNonWrappingTable(prefix string, table [][]string, padding i
 	for row := 0; row < rows; row++ {
 		fmt.Fprintf(ui.Out, prefix)
 		for col := 0; col < columns; col++ {
+			data := table[row][col]
 			var addedPadding int
 			if col+1 != columns {
-				addedPadding = columnPadding[col] - runewidth.StringWidth(table[row][col])
+				addedPadding = columnPadding[col] - wordSize(data)
 			}
-			fmt.Fprintf(ui.Out, "%s%s", table[row][col], strings.Repeat(" ", addedPadding))
+			fmt.Fprintf(ui.Out, "%s%s", data, strings.Repeat(" ", addedPadding))
 		}
 		fmt.Fprintf(ui.Out, "\n")
 	}
@@ -227,7 +220,7 @@ func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int)
 	columns := len(table[0])
 
 	// if we don't want to wrap the table columns
-	if columns < 2 || !terminal.IsTerminal(int(os.Stdout.Fd())) {
+	if columns < 2 || isatty.IsTerminal(os.Stdout.Fd()) {
 		ui.DisplayNonWrappingTable(prefix, table, padding)
 		return
 	}
@@ -240,6 +233,17 @@ func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int)
 	}
 
 	ui.DisplayWrappingTableWithWidth(prefix, table, padding, terminalWidth)
+}
+
+func (ui *UI) DisplayTableWithHeader(prefix string, table [][]string, padding int) {
+	if len(table) == 0 {
+		return
+	}
+	for i, str := range table[0] {
+		table[0][i] = ui.modifyColor(str, color.New(color.Bold))
+	}
+
+	ui.DisplayNonWrappingTable(prefix, table, padding)
 }
 
 func (ui *UI) DisplayWrappingTableWithWidth(prefix string, table [][]string, padding int, terminalWidth int) {
@@ -323,7 +327,7 @@ func (ui *UI) DisplayHeader(text string) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText(text), defaultFgColor, true))
+	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText(text), color.New(color.Bold)))
 }
 
 // DisplayTextWithFlavor translates the template, bolds and adds cyan color to
@@ -335,7 +339,7 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 
 	firstTemplateValues := getFirstSet(templateValues)
 	for key, value := range firstTemplateValues {
-		firstTemplateValues[key] = ui.addFlavor(fmt.Sprint(value), cyan, true)
+		firstTemplateValues[key] = ui.modifyColor(fmt.Sprint(value), color.New(color.FgCyan, color.Bold))
 	}
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
@@ -368,7 +372,7 @@ func (ui *UI) DisplayError(err error) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
-	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText("FAILED"), red, true))
+	fmt.Fprintf(ui.Out, "%s\n", ui.modifyColor(ui.TranslateText("FAILED"), color.New(color.FgRed, color.Bold)))
 }
 
 const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
@@ -393,29 +397,22 @@ func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
 	for _, line := range strings.Split(message.Message(), "\n") {
 		logLine := fmt.Sprintf("%s%s", header, strings.TrimRight(line, "\r\n"))
 		if message.Type() == "ERR" {
-			logLine = ui.addFlavor(logLine, red, false)
+			logLine = ui.modifyColor(logLine, color.New(color.FgRed))
 		}
 		fmt.Fprintf(ui.Out, "%s\n", logLine)
 	}
 }
 
-// addFlavor adds the provided text color and bold style to the text.
-func (ui *UI) addFlavor(text string, textColor color.Attribute, isBold bool) string {
+func (ui *UI) modifyColor(text string, colorPrinter *color.Color) string {
 	if len(text) == 0 {
 		return text
 	}
-
-	colorPrinter := color.New(textColor)
 
 	switch ui.colorEnabled {
 	case configv3.ColorEnabled:
 		colorPrinter.EnableColor()
 	case configv3.ColorDisabled:
 		colorPrinter.DisableColor()
-	}
-
-	if isBold {
-		colorPrinter = colorPrinter.Add(color.Bold)
 	}
 
 	return colorPrinter.SprintFunc()(text)
@@ -428,4 +425,9 @@ func getFirstSet(list []map[string]interface{}) map[string]interface{} {
 		return map[string]interface{}{}
 	}
 	return list[0]
+}
+
+func wordSize(str string) int {
+	cleanStr := vtclean.Clean(str, false)
+	return runewidth.StringWidth(cleanStr)
 }

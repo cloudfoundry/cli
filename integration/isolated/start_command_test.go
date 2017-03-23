@@ -187,7 +187,7 @@ applications:
 						Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
 						Eventually(session).Should(Say("start command:     sh boot.sh"))
 
-						Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
+						Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 						Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 						Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 						Eventually(session).Should(Exit(0))
@@ -278,7 +278,7 @@ applications:
 								Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
 								Eventually(session).Should(Say("start command:     sh boot.sh"))
 
-								Eventually(session).Should(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
+								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 								Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 								Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 								Eventually(session).Should(Exit(0))
