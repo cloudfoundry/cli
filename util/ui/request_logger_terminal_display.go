@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 type RequestLoggerTerminalDisplay struct {
@@ -75,7 +77,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayResponseHeader(httpProtocol 
 
 func (display *RequestLoggerTerminalDisplay) DisplayType(name string, requestDate time.Time) error {
 	text := fmt.Sprintf("%s: [%s]", name, requestDate.Format(time.RFC3339))
-	fmt.Fprintf(display.ui.Out, "%s\n", display.ui.addFlavor(display.ui.TranslateText(text), defaultFgColor, true))
+	fmt.Fprintf(display.ui.Out, "%s\n", display.ui.modifyColor(display.ui.TranslateText(text), color.New(color.Bold)))
 	return nil
 }
 

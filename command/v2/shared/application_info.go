@@ -55,7 +55,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 
 func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstanceWithStats) {
 	table := [][]string{
-		{"", "State", "Since", "CPU", "Memory", "Disk", "Details"},
+		{"", "state", "since", "cpu", "memory", "disk", "details"},
 	}
 
 	for _, instance := range instances {
@@ -72,7 +72,7 @@ func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance
 			})
 	}
 
-	ui.DisplayNonWrappingTable("", table, 3)
+	ui.DisplayTableWithHeader("", table, 3)
 }
 
 // zuluDate converts the time to UTC and then formats it to ISO8601.

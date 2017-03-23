@@ -1648,10 +1648,6 @@
     "translation": ""
   },
   {
-    "id": "CPU",
-    "translation": ""
-  },
-  {
     "id": "Can not provision instances of paid service plans",
     "translation": "无法供应付费服务套餐的实例"
   },
@@ -2240,10 +2236,6 @@
     "translation": "描述: {{.ServiceDescription}}"
   },
   {
-    "id": "Details",
-    "translation": ""
-  },
-  {
     "id": "Did you mean?",
     "translation": "您打算？"
   },
@@ -2302,10 +2294,6 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "不允许对空间进行 SSH 访问"
-  },
-  {
-    "id": "Disk",
-    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -3804,10 +3792,6 @@
     "translation": "可使用保留端口创建的最大路径数（缺省值: 0）"
   },
   {
-    "id": "Memory",
-    "translation": ""
-  },
-  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "内存限制（例如，256M、1024M、1G）"
   },
@@ -5090,10 +5074,6 @@
   {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份显示组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 的运行状况和状态..."
-  },
-  {
-    "id": "Since",
-    "translation": ""
   },
   {
     "id": "Skip assigning org role to user",

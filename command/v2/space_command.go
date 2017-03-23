@@ -175,7 +175,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		}
 
 		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayNonWrappingTable("", table, 3)
+		cmd.UI.DisplayTableWithHeader("", table, 3)
 	}
 
 	return nil

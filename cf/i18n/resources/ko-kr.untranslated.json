@@ -1124,10 +1124,6 @@
     "translation": ""
   },
   {
-    "id": "CPU",
-    "translation": ""
-  },
-  {
     "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
     "translation": ""
   },
@@ -1181,14 +1177,6 @@
   },
   {
     "id": "Deleting route {{.Route}} ...",
-    "translation": ""
-  },
-  {
-    "id": "Details",
-    "translation": ""
-  },
-  {
-    "id": "Disk",
     "translation": ""
   },
   {
@@ -1346,10 +1334,6 @@
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
     "translation": "Max wait time to establish a connection, including name resolution, in seconds"
-  },
-  {
-    "id": "Memory",
-    "translation": ""
   },
   {
     "id": "NEW_NAME",
@@ -1565,10 +1549,6 @@
   },
   {
     "id": "Set to 'port' or 'none'",
-    "translation": ""
-  },
-  {
-    "id": "Since",
     "translation": ""
   },
   {

@@ -17,6 +17,7 @@ var _ = Describe("UI", func() {
 	var (
 		ui         *UI
 		fakeConfig *uifakes.FakeConfig
+		out        *Buffer
 	)
 
 	BeforeEach(func() {
@@ -27,7 +28,8 @@ var _ = Describe("UI", func() {
 		ui, err = NewUI(fakeConfig)
 		Expect(err).NotTo(HaveOccurred())
 
-		ui.Out = NewBuffer()
+		out = NewBuffer()
+		ui.Out = out
 		ui.Err = NewBuffer()
 	})
 
@@ -244,6 +246,21 @@ some-prefixgg          hh            ii`))
 		})
 	})
 
+	Describe("DisplayTableWithHeader", func() {
+		It("makes the first row bold", func() {
+			ui.DisplayTableWithHeader(" ",
+				[][]string{
+					{"", "header1", "header2", "header3"},
+					{"#0", "data1", "data2", "data3"},
+				},
+				2)
+			Expect(ui.Out).To(Say("    \x1b\\[1mheader1\x1b\\[0m")) // Makes sure empty values are not bolded
+			Expect(ui.Out).To(Say("\x1b\\[1mheader2\x1b\\[0m"))
+			Expect(ui.Out).To(Say("\x1b\\[1mheader3\x1b\\[0m"))
+			Expect(ui.Out).To(Say("#0  data1    data2    data3"))
+		})
+	})
+
 	// Covers the happy paths, additional cases are tested in TranslateText.
 	Describe("DisplayText", func() {
 		It("displays the template with map values substituted in to ui.Out with a newline", func() {
@@ -280,7 +297,7 @@ some-prefixgg          hh            ii`))
 	Describe("DisplayHeader", func() {
 		It("displays the header colorized and bolded to ui.Out", func() {
 			ui.DisplayHeader("some-header")
-			Expect(ui.Out).To(Say("\x1b\\[38;1msome-header\x1b\\[0m"))
+			Expect(ui.Out).To(Say("\x1b\\[1msome-header\x1b\\[0m"))
 		})
 
 		Context("when the locale is not set to english", func() {
@@ -296,7 +313,7 @@ some-prefixgg          hh            ii`))
 
 			It("displays the translated header colorized and bolded to ui.Out", func() {
 				ui.DisplayHeader("FEATURE FLAGS")
-				Expect(ui.Out).To(Say("\x1b\\[38;1mINDICATEURS DE FONCTION\x1b\\[0m"))
+				Expect(ui.Out).To(Say("\x1b\\[1mINDICATEURS DE FONCTION\x1b\\[0m"))
 			})
 		})
 	})

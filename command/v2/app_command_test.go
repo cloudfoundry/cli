@@ -228,7 +228,7 @@ var _ = Describe("App Command", func() {
 					})
 
 					It("should not display the instance table", func() {
-						Expect(testUI.Out).NotTo(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk"))
+						Expect(testUI.Out).NotTo(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
 					})
 				})
 
@@ -273,7 +273,7 @@ var _ = Describe("App Command", func() {
 						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
 						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
 						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk\\s+Details"))
+						Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 						Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
 						Expect(testUI.Out).To(Say(`#1\s+crashed\s+2014-06-18T14:00:00Z\s+37.0%\s+100M of 128M\s+50M of 2G\s+potato`))
 

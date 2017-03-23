@@ -223,6 +223,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/lunixbochs/vtclean",
+			"repository": "https://github.com/lunixbochs/vtclean",
+			"vcs": "git",
+			"revision": "4428d67a89b36ecae7998e983e5814d0d9c45a04",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/mattn/go-colorable",
 			"repository": "https://github.com/mattn/go-colorable",
 			"vcs": "git",

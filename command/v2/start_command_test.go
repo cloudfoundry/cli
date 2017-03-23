@@ -560,7 +560,7 @@ var _ = Describe("Start Command", func() {
 
 					It("should display the instance table", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("State\\s+Since\\s+CPU\\s+Memory\\s+Disk"))
+						Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 						Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
 					})
 				})

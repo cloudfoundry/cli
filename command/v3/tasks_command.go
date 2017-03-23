@@ -112,7 +112,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 		})
 	}
 
-	cmd.UI.DisplayNonWrappingTable("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, 3)
 
 	return nil
 }
