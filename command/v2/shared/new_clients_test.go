@@ -49,7 +49,7 @@ var _ = Describe("New Clients", func() {
 
 		It("passes the value to the target", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true)
-			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk/v2/info: dial tcp: i/o timeout"))
+			Expect(err.Error()).To(MatchRegexp("TIP: If you are behind a firewall"))
 		})
 	})
 

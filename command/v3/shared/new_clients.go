@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -48,6 +49,9 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
+		if _, ok := err.(cloudcontroller.RequestError); ok {
+			return nil, HandleError(err)
+		}
 		return nil, ClientTargetError{Message: err.Error()}
 	}
 
