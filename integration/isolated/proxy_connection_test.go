@@ -15,28 +15,20 @@ var _ = Describe("proxy", func() {
 		proxyURL = "http://127.0.0.1:9999"
 	})
 
-	Context("V2 Legacy", func() {
-		It("handles a proxy", func() {
-			Skip("Figure out how to test not using API command")
-			helpers.SkipIfExperimental("error messages have changed in refactored code")
-			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
-			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	Context("V2", func() {
-		It("handles a proxy", func() {
+		It("errors when proxy is not setup properly", func() {
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
 			Eventually(session.Err).Should(Say("Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
+			Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	Context("V3", func() {
-		It("handles a proxy", func() {
+		It("errors when proxy is not setup properly", func() {
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "run-task", "app", "echo")
 			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy %s", apiURL, proxyURL))
+			Eventually(session.Err).Should(Say("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."))
 			Eventually(session).Should(Exit(1))
 		})
 	})

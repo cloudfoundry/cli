@@ -40,7 +40,7 @@ var _ = Describe("New Clients", func() {
 
 	Context("when the api does not exist", func() {
 		BeforeEach(func() {
-			fakeConfig.TargetReturns("http://4012493825site.com")
+			fakeConfig.TargetReturns("http://google.com")
 		})
 
 		It("returns the ClientTargetError", func() {
@@ -60,11 +60,7 @@ var _ = Describe("New Clients", func() {
 
 		It("passes the value to the target", func() {
 			_, err := NewClients(fakeConfig, testUI, true)
-			if e, ok := err.(ClientTargetError); ok {
-				Expect(e.Message).To(MatchRegexp("https://potato.bananapants11122.co.uk: dial tcp.*i/o timeout"))
-			} else {
-				Fail("Expected err to be type ClientTargetError")
-			}
+			Expect(err.Error()).To(MatchRegexp("TIP: If you are behind a firewall"))
 		})
 	})
 
