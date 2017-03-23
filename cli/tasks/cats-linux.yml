@@ -36,6 +36,15 @@ run:
     # Redact passwords in output
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
 
+    if [[ "$BACKEND" = "diego" ]]; then
+      api=$(jq .api -r < $CONFIG)
+      user=$(jq .admin_user -r < $CONFIG)
+      password=$(jq .admin_password -r < $CONFIG)
+      cf api ${api} --skip-ssl-validation
+      cf auth ${user} ${password}
+      cf enable-feature-flag diego_docker
+    fi
+
     SKIPS="-skip="
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
