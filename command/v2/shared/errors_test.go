@@ -41,6 +41,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JobTimeoutError", JobTimeoutError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 		Entry("StagingFailedError", StagingFailedError{}),
+		Entry("StagingFailedNoAppDetectedError", StagingFailedNoAppDetectedError{}),
 		Entry("StagingTimeoutError", StagingTimeoutError{}),
 		Entry("StartupTimeoutError", StartupTimeoutError{}),
 

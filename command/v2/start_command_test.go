@@ -446,7 +446,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns StagingFailedError", func() {
-							Expect(executeErr).To(MatchError(shared.StagingFailedError{BinaryName: "faceman", Message: "Something, but not nothing"}))
+							Expect(executeErr).To(MatchError(shared.StagingFailedError{Message: "Something, but not nothing"}))
 						})
 					})
 

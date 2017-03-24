@@ -105,13 +105,22 @@ var _ = Describe("Poll Start", func() {
 			Expect(err).To(MatchError(expectedErr))
 		},
 
+		Entry("StagingFailedNoAppDetectedError",
+			v2action.StagingFailedNoAppDetectedError{
+				Reason: "some staging failure reason",
+			},
+			StagingFailedNoAppDetectedError{
+				Message:    "some staging failure reason",
+				BinaryName: "FiveThirtyEight",
+			},
+		),
+
 		Entry("StagingFailedError",
 			v2action.StagingFailedError{
 				Reason: "some staging failure reason",
 			},
 			StagingFailedError{
-				Message:    "some staging failure reason",
-				BinaryName: "FiveThirtyEight",
+				Message: "some staging failure reason",
 			},
 		),
 

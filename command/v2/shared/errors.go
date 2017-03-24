@@ -110,19 +110,33 @@ func (e InvalidRefreshTokenError) Translate(translate func(string, ...interface{
 	return translate(e.Error())
 }
 
-type StagingFailedError struct {
+type StagingFailedNoAppDetectedError struct {
 	Message    string
 	BinaryName string
 }
 
-func (e StagingFailedError) Error() string {
+func (e StagingFailedNoAppDetectedError) Error() string {
 	return "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
+}
+
+func (e StagingFailedNoAppDetectedError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Message":          e.Message,
+		"BuildpackCommand": fmt.Sprintf("%s buildpacks", e.BinaryName),
+	})
+}
+
+type StagingFailedError struct {
+	Message string
+}
+
+func (e StagingFailedError) Error() string {
+	return "Error staging application: {{.Message}}"
 }
 
 func (e StagingFailedError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Message":          e.Message,
-		"BuildpackCommand": fmt.Sprintf("%s buildpacks", e.BinaryName),
+		"Message": e.Message,
 	})
 }
 
