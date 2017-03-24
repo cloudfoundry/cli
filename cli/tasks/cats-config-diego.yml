@@ -46,7 +46,7 @@ run:
       "use_http": false,
       "include_v3": $INCLUDE_V3,
       "include_apps": true,
-      "include_backend_compatibility": true,
+      "include_backend_compatibility": false,
       "include_detect": true,
       "include_docker": true,
       "include_internet_dependent": true,
