@@ -63,8 +63,8 @@ var _ = Describe("Application Summary Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationReturns(
 							map[int]ccv2.ApplicationInstanceStatus{
-								0: {ID: 0},
-								1: {ID: 1},
+								0: {ID: 0, IsolationSegment: "isolation-segment-1"},
+								1: {ID: 1, IsolationSegment: "isolation-segment-2"}, // should never happen; iso segs for 2 instances of the same app should match.
 							},
 							ccv2.Warnings{"stats-warning"},
 							nil)
@@ -77,7 +77,7 @@ var _ = Describe("Application Summary Actions", func() {
 							nil)
 					})
 
-					It("returns the application with instance information and warnings", func() {
+					It("returns the application with instance information and warnings and populates isolation segment from the first instance", func() {
 						app, warnings, err := actor.GetApplicationSummaryByNameAndSpace("some-app", "some-space-guid")
 						Expect(err).ToNot(HaveOccurred())
 						Expect(app).To(Equal(ApplicationSummary{
@@ -87,9 +87,10 @@ var _ = Describe("Application Summary Actions", func() {
 								State: ccv2.ApplicationStarted,
 							},
 							RunningInstances: []ApplicationInstanceWithStats{
-								{ID: 0},
-								{ID: 1},
+								{ID: 0, IsolationSegment: "isolation-segment-1"},
+								{ID: 1, IsolationSegment: "isolation-segment-2"},
 							},
+							IsolationSegment: "isolation-segment-1",
 						}))
 						Expect(warnings).To(ConsistOf("app-warning", "stats-warning", "instance-warning"))
 					})

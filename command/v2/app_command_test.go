@@ -26,6 +26,7 @@ var _ = Describe("App Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeAppActor
+		fakeActorV3     *v2fakes.FakeAppActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -35,30 +36,25 @@ var _ = Describe("App Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeAppActor)
+		fakeActorV3 = new(v2fakes.FakeAppActorV3)
 
 		cmd = AppCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			ActorV3:     fakeActorV3,
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-
-		// TODO: remove when experimental flag is removed
-		fakeConfig.ExperimentalReturns(true)
+		fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	// TODO: remove when experimental flag is removed
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking target fails", func() {
@@ -186,6 +182,7 @@ var _ = Describe("App Command", func() {
 							DetectedBuildpack: "some-buildpack",
 							State:             "STARTED",
 						},
+						IsolationSegment: "some-isolation-segment",
 						Stack: v2action.Stack{
 							Name: "potatos",
 						},
@@ -213,9 +210,13 @@ var _ = Describe("App Command", func() {
 					It("displays the app summary, 'no running instances' message, and all warnings", func() {
 						Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
 						Expect(testUI.Out).To(Say(""))
+
 						Expect(testUI.Out).To(Say("name:\\s+some-app"))
 						Expect(testUI.Out).To(Say("requested state:\\s+started"))
 						Expect(testUI.Out).To(Say("instances:\\s+0\\/3"))
+						// Note: in real life, iso segs are tied to *running* instances, so this field
+						// would be blank
+						Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
 						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
 						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
 						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
@@ -261,28 +262,66 @@ var _ = Describe("App Command", func() {
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("displays app summary, instance table, and all warnings", func() {
-						Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
-						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("name:\\s+some-app"))
-						Expect(testUI.Out).To(Say("requested state:\\s+started"))
-						Expect(testUI.Out).To(Say("instances:\\s+2\\/3"))
-						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-						Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
-						Expect(testUI.Out).To(Say(`#1\s+crashed\s+2014-06-18T14:00:00Z\s+37.0%\s+100M of 128M\s+50M of 2G\s+potato`))
+					Context("when api version is above 3.11.0", func() {
+						BeforeEach(func() {
+							fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+						})
 
-						Expect(testUI.Err).To(Say("app-summary-warning"))
+						It("displays app summary, instance table, and all warnings", func() {
+							Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("requested state:\\s+started"))
+							Expect(testUI.Out).To(Say("instances:\\s+2\\/3"))
+							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
+							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+							Expect(testUI.Out).To(Say(`#1\s+crashed\s+2014-06-18T14:00:00Z\s+37.0%\s+100M of 128M\s+50M of 2G\s+potato`))
 
-						Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-						appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-						Expect(appName).To(Equal("some-app"))
-						Expect(spaceGUID).To(Equal("some-space-guid"))
+							Expect(testUI.Err).To(Say("app-summary-warning"))
+
+							Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+							appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+							Expect(appName).To(Equal("some-app"))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+						})
+					})
+
+					Context("when api version is below 3.11.0", func() {
+						BeforeEach(func() {
+							fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+						})
+
+						It("displays app summary, instance table, and all warnings", func() {
+							Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as some-user..."))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("requested state:\\s+started"))
+							Expect(testUI.Out).To(Say("instances:\\s+2\\/3"))
+							Expect(testUI.Out).ToNot(Say("isolation segment:\\s+"))
+							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+							Expect(testUI.Out).To(Say(`#1\s+crashed\s+2014-06-18T14:00:00Z\s+37.0%\s+100M of 128M\s+50M of 2G\s+potato`))
+
+							Expect(testUI.Err).To(Say("app-summary-warning"))
+
+							Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+							appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+							Expect(appName).To(Equal("some-app"))
+							Expect(spaceGUID).To(Equal("some-space-guid"))
+						})
 					})
 				})
 			})
