@@ -98,7 +98,7 @@ jobs:
     file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
     input_mapping:
       input1: ops-files
-      input2: state
+      input2: cli-ci
     params:
       COPY_PATHS: "input1/operations/tcp-routing-gcp.yml input2/ci/infrastructure/operations/isolation-segments.yml input2/ci/infrastructure/operations/app-memory-override.yml"
   - task: deploy-cf
