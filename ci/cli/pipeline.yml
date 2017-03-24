@@ -212,6 +212,13 @@ resources:
   source:
     url: {{slack-webhook-url}}
 
+- name: vars-store
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: {{cli-private-github-private-key-write}}
+    branch: master
+
 groups:
 - name: cli
   jobs:
@@ -418,6 +425,7 @@ jobs:
       trigger: true
       passed: [build-binaries]
       depth: 3
+    - get: vars-store
     - get: cf-release-repo
       params:
         submodules:
@@ -432,9 +440,8 @@ jobs:
         acquire: true
   - do:
     - task: cats-config
-      file: cli-ci/ci/cli/tasks/cats-config.yml
+      file: cli-ci/ci/cli/tasks/cats-config-diego.yml
       params:
-        BACKEND: diego
         INCLUDE_V3: false
         BROKER_START_TIMEOUT: 330
         CF_PUSH_TIMEOUT: 210

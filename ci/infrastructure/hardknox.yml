@@ -100,7 +100,7 @@ jobs:
       input1: ops-files
       input2: cli-ci
     params:
-      COPY_PATHS: "input1/operations/tcp-routing-gcp.yml input2/ci/infrastructure/operations/isolation-segments.yml input2/ci/infrastructure/operations/app-memory-override.yml"
+      COPY_PATHS: "input1/operations/tcp-routing-gcp.yml input2/ci/infrastructure/operations/isolation-segments.yml input2/ci/infrastructure/operations/app-memory-override.yml input2/ci/infrastructure/operations/skip-ssl-override.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
@@ -109,7 +109,7 @@ jobs:
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
-      OPS_FILES: "tcp-routing-gcp.yml isolation-segments.yml app-memory-override.yml"
+      OPS_FILES: "tcp-routing-gcp.yml isolation-segments.yml app-memory-override.yml skip-ssl-override.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
