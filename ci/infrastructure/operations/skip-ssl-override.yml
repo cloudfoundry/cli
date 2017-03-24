@@ -1,0 +1,4 @@
+---
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_worker/properties/ssl/skip_cert_verify?
+  value: true
