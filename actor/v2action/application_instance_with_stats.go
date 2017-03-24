@@ -26,6 +26,9 @@ type ApplicationInstanceWithStats struct {
 	// ID is the instance ID.
 	ID int
 
+	// IsolationSegment that the app instance is currently running on.
+	IsolationSegment string
+
 	// Memory is the instance's memory usage in bytes.
 	Memory int
 
@@ -62,6 +65,7 @@ func (instance *ApplicationInstanceWithStats) setStats(ccAppStats ccv2.Applicati
 	instance.DiskQuota = ccAppStats.DiskQuota
 	instance.Memory = ccAppStats.Memory
 	instance.MemoryQuota = ccAppStats.MemoryQuota
+	instance.IsolationSegment = ccAppStats.IsolationSegment
 }
 
 func (instance *ApplicationInstanceWithStats) incomplete() {

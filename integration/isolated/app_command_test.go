@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -16,10 +15,6 @@ import (
 )
 
 var _ = Describe("app command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("app command refactor is still experimental")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -133,12 +128,18 @@ var _ = Describe("app command", func() {
 
 		Context("when the app does exist", func() {
 			var (
+				isoSegName string
 				domainName string
 				tcpDomain  helpers.Domain
 				appName    string
 			)
 
 			BeforeEach(func() {
+				isoSegName = "isolated-1"
+				Eventually(helpers.CF("create-isolation-segment", isoSegName)).Should(Exit(0))
+				Eventually(helpers.CF("enable-org-isolation", orgName, isoSegName)).Should(Exit(0))
+				Eventually(helpers.CF("set-space-isolation-segment", spaceName, isoSegName)).Should(Exit(0))
+
 				appName = helpers.PrefixedRandomName("app")
 				domainName = defaultSharedDomain()
 				tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
@@ -171,15 +172,16 @@ applications:
 			Context("when the app is started and has 2 instances", func() {
 				It("displays the app information with instances table", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:              %s", appName))
-					Eventually(session).Should(Say("requested state:   started"))
-					Eventually(session).Should(Say("instances:         2/2"))
-					Eventually(session).Should(Say("usage:             128M x 2 instances"))
-					Eventually(session).Should(Say("routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
-					Eventually(session).Should(Say("last uploaded:     \\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-					Eventually(session).Should(Say("stack:             cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
-
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say("instances:\\s+2/2"))
+					Eventually(session).Should(Say("isolation segment:\\s+%s", isoSegName))
+					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+					Eventually(session).Should(Say(""))
 					Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 					Eventually(session).Should(Say("#0\\s+running\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
 					Eventually(session).Should(Say("#1\\s+running\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ\\s+\\d+\\.\\d+%.*of 128M.*of 128M"))
@@ -194,14 +196,15 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:              %s", appName))
-					Eventually(session).Should(Say("requested state:   stopped"))
-					Eventually(session).Should(Say("instances:         0/2"))
-					Eventually(session).Should(Say("usage:             128M x 2 instances"))
-					Eventually(session).Should(Say("routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+stopped"))
+					Eventually(session).Should(Say("instances:\\s+0/2"))
+					Eventually(session).Should(Say("isolation segment:\\s+"))
+					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:1111", appName, domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack:             cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
 					Eventually(session).Should(Exit(0))
@@ -215,14 +218,15 @@ applications:
 
 				It("displays the app information", func() {
 					session := helpers.CF("app", appName)
-					Eventually(session).Should(Say("name:              %s", appName))
-					Eventually(session).Should(Say("requested state:   started"))
-					Eventually(session).Should(Say("instances:         0/0"))
-					Eventually(session).Should(Say("usage:             128M x 0 instances"))
-					Eventually(session).Should(Say("routes:            %s.%s, %s:1111", appName, domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Say("instances:\\s+0/0"))
+					Eventually(session).Should(Say("isolation segment:\\s+"))
+					Eventually(session).Should(Say("usage:\\s+128M x 0 instances"))
+					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:1111", appName, domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:"))
-					Eventually(session).Should(Say("stack:             cflinuxfs2"))
-					Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
+					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 
 					Eventually(session).Should(Say("There are no running instances of this app."))
 					Eventually(session).Should(Exit(0))

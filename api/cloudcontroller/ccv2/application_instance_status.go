@@ -22,6 +22,9 @@ type ApplicationInstanceStatus struct {
 	// ID is the instance ID.
 	ID int
 
+	// IsolationSegment that the app is currently running on.
+	IsolationSegment string
+
 	// Memory is the instance's memory usage in bytes.
 	Memory int
 
@@ -39,8 +42,9 @@ type ApplicationInstanceStatus struct {
 // response.
 func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	var ccInstance struct {
-		State string `json:"state"`
-		Stats struct {
+		State            string `json:"state"`
+		IsolationSegment string `json:"isolation_segment"`
+		Stats            struct {
 			Usage struct {
 				Disk   int     `json:"disk"`
 				Memory int     `json:"mem"`
@@ -58,6 +62,7 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	instance.CPU = ccInstance.Stats.Usage.CPU
 	instance.Disk = ccInstance.Stats.Usage.Disk
 	instance.DiskQuota = ccInstance.Stats.DiskQuota
+	instance.IsolationSegment = ccInstance.IsolationSegment
 	instance.Memory = ccInstance.Stats.Usage.Memory
 	instance.MemoryQuota = ccInstance.Stats.MemoryQuota
 	instance.State = ApplicationInstanceState(ccInstance.State)

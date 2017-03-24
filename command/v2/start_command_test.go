@@ -27,6 +27,7 @@ var _ = Describe("Start Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeStartActor
+		fakeActorV3     *v2fakes.FakeStartActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -36,12 +37,14 @@ var _ = Describe("Start Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeStartActor)
+		fakeActorV3 = new(v2fakes.FakeStartActorV3)
 
 		cmd = StartCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			ActorV3:     fakeActorV3,
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"
@@ -509,6 +512,7 @@ var _ = Describe("Start Command", func() {
 								State:                "STARTED",
 								DetectedStartCommand: "some start command",
 							},
+							IsolationSegment: "some-isolation-segment",
 							Stack: v2action.Stack{
 								Name: "potatos",
 							},
@@ -543,25 +547,61 @@ var _ = Describe("Start Command", func() {
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("displays the app summary and it's warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("name:\\s+some-app"))
-						Expect(testUI.Out).To(Say("requested state:\\s+started"))
-						Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+					Context("when the api version is at or above 3.11.0", func() {
+						BeforeEach(func() {
+							fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+						})
 
-						Expect(testUI.Err).To(Say("app-summary-warning"))
+						It("displays the app summary with isolation segments as well as warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("requested state:\\s+started"))
+							Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+							Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
+							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+							Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+							Expect(testUI.Err).To(Say("app-summary-warning"))
+						})
+
+						It("should display the instance table", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
+							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+						})
+
 					})
 
-					It("should display the instance table", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
-						Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+					Context("when the api version is below 3.11.0", func() {
+						BeforeEach(func() {
+							fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+						})
+
+						It("displays the app summary without isolation segments as well as warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("name:\\s+some-app"))
+							Expect(testUI.Out).To(Say("requested state:\\s+started"))
+							Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+							Expect(testUI.Out).NotTo(Say("isolation segment:"))
+							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+							Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+							Expect(testUI.Err).To(Say("app-summary-warning"))
+						})
+
+						It("should display the instance table", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("state\\s+since\\s+cpu\\s+memory\\s+disk"))
+							Expect(testUI.Out).To(Say(`#0\s+running\s+2014-06-19T01:18:37Z\s+73.0%\s+100M of 128M\s+50M of 2G\s+info from the backend`))
+						})
 					})
 				})
 			})

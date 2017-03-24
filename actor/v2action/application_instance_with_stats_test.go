@@ -44,12 +44,13 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 				fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationReturns(
 					map[int]ccv2.ApplicationInstanceStatus{
 						0: {
-							ID:          0,
-							CPU:         100,
-							Memory:      100,
-							MemoryQuota: 200,
-							Disk:        50,
-							DiskQuota:   100,
+							ID:               0,
+							CPU:              100,
+							Memory:           100,
+							MemoryQuota:      200,
+							Disk:             50,
+							DiskQuota:        100,
+							IsolationSegment: "some-isolation-segment",
 						},
 						1: {ID: 1, CPU: 200},
 					},
@@ -70,15 +71,16 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(instances).To(ConsistOf(
 					ApplicationInstanceWithStats{
-						ID:          0,
-						CPU:         100,
-						Memory:      100,
-						MemoryQuota: 200,
-						Disk:        50,
-						DiskQuota:   100,
-						Details:     "hello",
-						Since:       1485985587.12345,
-						State:       ApplicationInstanceState(ccv2.ApplicationInstanceRunning),
+						ID:               0,
+						CPU:              100,
+						Memory:           100,
+						MemoryQuota:      200,
+						Disk:             50,
+						DiskQuota:        100,
+						Details:          "hello",
+						IsolationSegment: "some-isolation-segment",
+						Since:            1485985587.12345,
+						State:            ApplicationInstanceState(ccv2.ApplicationInstanceRunning),
 					},
 					ApplicationInstanceWithStats{ID: 1, CPU: 200, Details: "hi", Since: 1485985587.567}))
 				Expect(warnings).To(ConsistOf(

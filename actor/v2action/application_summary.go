@@ -5,6 +5,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 type ApplicationSummary struct {
 	Application
 	Stack            Stack
+	IsolationSegment string
 	RunningInstances []ApplicationInstanceWithStats
 	Routes           []Route
 }
@@ -30,6 +31,10 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 		switch err.(type) {
 		case nil:
 			applicationSummary.RunningInstances = instances
+
+			if len(instances) > 0 {
+				applicationSummary.IsolationSegment = instances[0].IsolationSegment
+			}
 		case ApplicationInstancesNotFoundError:
 			// don't set instances in summary
 		default:

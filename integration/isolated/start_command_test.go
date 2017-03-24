@@ -177,15 +177,17 @@ applications:
 						session := helpers.CF("start", appName)
 						Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("Waiting for app to start..."))
-						Eventually(session).Should(Say("name:              %s", appName))
-						Eventually(session).Should(Say("requested state:   started"))
-						Eventually(session).Should(Say("instances:         2/2"))
-						Eventually(session).Should(Say("usage:             128M x 2 instances"))
-						Eventually(session).Should(Say("routes:            %s.%s", appName, domainName))
+
+						Eventually(session).Should(Say("name:\\s+%s", appName))
+						Eventually(session).Should(Say("requested state:\\s+started"))
+						Eventually(session).Should(Say("instances:\\s+2/2"))
+						Eventually(session).Should(Say("isolation segment:\\s+"))
+						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+						Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 						Eventually(session).Should(Say("last uploaded:"))
-						Eventually(session).Should(Say("stack:             cflinuxfs2"))
-						Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
-						Eventually(session).Should(Say("start command:     sh boot.sh"))
+						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+						Eventually(session).Should(Say("start command:\\s+sh boot.sh"))
 
 						Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 						Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
@@ -236,7 +238,12 @@ applications:
 						})
 
 						Context("when the app starts properly", func() {
+							var isoSegName string
 							BeforeEach(func() {
+								isoSegName = "isolated-1"
+								Eventually(helpers.CF("create-isolation-segment", isoSegName)).Should(Exit(0))
+								Eventually(helpers.CF("enable-org-isolation", orgName, isoSegName)).Should(Exit(0))
+								Eventually(helpers.CF("set-space-isolation-segment", spaceName, isoSegName)).Should(Exit(0))
 								appName = helpers.PrefixedRandomName("app")
 								domainName = defaultSharedDomain()
 								helpers.WithHelloWorldApp(func(appDir string) {
@@ -268,17 +275,19 @@ applications:
 								Eventually(session).Should(Say("Uploading droplet..."))
 								Eventually(session).Should(Say("Waiting for app to start..."))
 
-								Eventually(session).Should(Say("name:              %s", appName))
-								Eventually(session).Should(Say("requested state:   started"))
-								Eventually(session).Should(Say("instances:         2/2"))
-								Eventually(session).Should(Say("usage:             128M x 2 instances"))
-								Eventually(session).Should(Say("routes:            %s.%s", appName, domainName))
+								Eventually(session).Should(Say("name:\\s+%s", appName))
+								Eventually(session).Should(Say("requested state:\\s+started"))
+								Eventually(session).Should(Say("instances:\\s+2/2"))
+								Eventually(session).Should(Say("isolation segment:\\s+%s", isoSegName))
+								Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
+								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 								Eventually(session).Should(Say("last uploaded:"))
-								Eventually(session).Should(Say("stack:             cflinuxfs2"))
-								Eventually(session).Should(Say("buildpack:         staticfile_buildpack"))
-								Eventually(session).Should(Say("start command:     sh boot.sh"))
+								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
+								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
+								Eventually(session).Should(Say("start command:\\s+sh boot.sh"))
 
 								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
+
 								Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 								Eventually(session).Should(Say("#1\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
 								Eventually(session).Should(Exit(0))

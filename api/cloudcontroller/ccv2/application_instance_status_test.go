@@ -20,10 +20,10 @@ var _ = Describe("Application Instance Status", func() {
 	Describe("GetApplicationInstanceStatusesByApplication", func() {
 		Context("when the app is found", func() {
 			BeforeEach(func() {
-
 				response := `{
 					"0": {
 						"state": "RUNNING",
+						"isolation_segment": "some-isolation-segment",
 						"stats": {
 							"usage": {
 								"disk": 66392064,
@@ -45,6 +45,7 @@ var _ = Describe("Application Instance Status", func() {
 					},
 					"1": {
 						"state": "STARTING",
+						"isolation_segment": "some-isolation-segment",
 						"stats": {
 							"usage": {
 								"disk": 66392064,
@@ -80,26 +81,28 @@ var _ = Describe("Application Instance Status", func() {
 				Expect(instances).To(HaveLen(2))
 
 				Expect(instances[0]).To(Equal(ApplicationInstanceStatus{
-					CPU:         0.13511219703079957,
-					Disk:        66392064,
-					DiskQuota:   1073741824,
-					ID:          0,
-					Memory:      29880320,
-					MemoryQuota: 536870912,
-					State:       ApplicationInstanceRunning,
-					Uptime:      65007,
+					CPU:              0.13511219703079957,
+					Disk:             66392064,
+					DiskQuota:        1073741824,
+					ID:               0,
+					IsolationSegment: "some-isolation-segment",
+					Memory:           29880320,
+					MemoryQuota:      536870912,
+					State:            ApplicationInstanceRunning,
+					Uptime:           65007,
 				},
 				))
 
 				Expect(instances[1]).To(Equal(ApplicationInstanceStatus{
-					CPU:         0.13511219703079957,
-					Disk:        66392064,
-					DiskQuota:   1073741824,
-					ID:          1,
-					Memory:      29880320,
-					MemoryQuota: 536870912,
-					State:       ApplicationInstanceStarting,
-					Uptime:      65007,
+					CPU:              0.13511219703079957,
+					Disk:             66392064,
+					DiskQuota:        1073741824,
+					ID:               1,
+					IsolationSegment: "some-isolation-segment",
+					Memory:           29880320,
+					MemoryQuota:      536870912,
+					State:            ApplicationInstanceStarting,
+					Uptime:           65007,
 				},
 				))
 
