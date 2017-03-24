@@ -102,7 +102,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		return err
 	}
 
-	cmd.UI.DisplayText("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"TargetSpace": cmd.RequiredArgs.Space,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"CurrentUser": user.Name,
