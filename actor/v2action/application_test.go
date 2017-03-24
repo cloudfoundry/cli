@@ -123,6 +123,22 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 
+		Describe("StagingFailedNoAppDetected", func() {
+			Context("when staging the application fails due to a no app detected error", func() {
+				It("returns true", func() {
+					app.StagingFailedReason = "NoAppDetectedError"
+					Expect(app.StagingFailedNoAppDetected()).To(BeTrue())
+				})
+			})
+
+			Context("when staging the application fails due to any other reason", func() {
+				It("returns false", func() {
+					app.StagingFailedReason = "InsufficientResources"
+					Expect(app.StagingFailedNoAppDetected()).To(BeFalse())
+				})
+			})
+		})
+
 		Describe("Started", func() {
 			Context("when app is started", func() {
 				It("returns true", func() {
@@ -559,29 +575,58 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			Context("when the application fails to stage", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
-						return ccv2.Application{
-							GUID:                "some-app-guid",
-							Name:                "some-app",
-							Instances:           2,
-							PackageState:        ccv2.ApplicationPackageFailed,
-							StagingFailedReason: "OhNoes",
-						}, ccv2.Warnings{"app-warnings-1"}, nil
-					}
+				Context("due to a NoAppDetectedError", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+							return ccv2.Application{
+								GUID:                "some-app-guid",
+								Name:                "some-app",
+								Instances:           2,
+								PackageState:        ccv2.ApplicationPackageFailed,
+								StagingFailedReason: "NoAppDetectedError",
+							}, ccv2.Warnings{"app-warnings-1"}, nil
+						}
+					})
+
+					It("sends a StagingFailedNoAppDetectedError and stops polling", func() {
+						messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
 				})
 
-				It("sends a staging error and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+				Context("due to any other error", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+							return ccv2.Application{
+								GUID:                "some-app-guid",
+								Name:                "some-app",
+								Instances:           2,
+								PackageState:        ccv2.ApplicationPackageFailed,
+								StagingFailedReason: "OhNoes",
+							}, ccv2.Warnings{"app-warnings-1"}, nil
+						}
+					})
 
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
-					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-					Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
+					It("sends a StagingFailedError and stops polling", func() {
+						messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
 
-					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
 				})
 			})
 

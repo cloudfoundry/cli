@@ -53,7 +53,9 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 
 			switch err := apiErr.(type) {
 			case v2action.StagingFailedError:
-				return StagingFailedError{BinaryName: config.BinaryName(), Message: err.Error()}
+				return StagingFailedError{Message: err.Error()}
+			case v2action.StagingFailedNoAppDetectedError:
+				return StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
 			case v2action.StagingTimeoutError:
 				return StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
 			case v2action.ApplicationInstanceCrashedError:

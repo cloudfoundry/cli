@@ -40,6 +40,12 @@ func (application Application) StagingFailed() bool {
 	return application.PackageState == ccv2.ApplicationPackageFailed
 }
 
+// StagingFailedNoAppDetected returns true when the staging failed due to a
+// NoAppDetectedError.
+func (application Application) StagingFailedNoAppDetected() bool {
+	return application.StagingFailedReason == "NoAppDetectedError"
+}
+
 // Started returns true when the application is started.
 func (application Application) Started() bool {
 	return application.State == ccv2.ApplicationStarted
@@ -93,6 +99,15 @@ type StagingFailedError struct {
 }
 
 func (e StagingFailedError) Error() string {
+	return e.Reason
+}
+
+// StagingFailedNoAppDetectedError is returned when staging an application fails.
+type StagingFailedNoAppDetectedError struct {
+	Reason string
+}
+
+func (e StagingFailedNoAppDetectedError) Error() string {
 	return e.Reason
 }
 
@@ -255,6 +270,9 @@ func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<
 		case currentApplication.StagingCompleted():
 			return nil
 		case currentApplication.StagingFailed():
+			if currentApplication.StagingFailedNoAppDetected() {
+				return StagingFailedNoAppDetectedError{Reason: currentApplication.StagingFailedReason}
+			}
 			return StagingFailedError{Reason: currentApplication.StagingFailedReason}
 		}
 		time.Sleep(config.PollingInterval())

@@ -1236,6 +1236,10 @@
     "translation": ""
   },
   {
+    "id": "Error staging application: {{.Message}}",
+    "translation": ""
+  },
+  {
     "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
   },
