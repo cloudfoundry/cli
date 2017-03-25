@@ -7,8 +7,7 @@ image_resource:
     repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
 
 inputs:
-- name: cli-integration
-  path: go/src/code.cloudfoundry.org/cli
+- name: cli-ci
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: vars-store
@@ -22,13 +21,9 @@ run:
 
     export DOMAIN=$(cat bosh-lite-lock/name)
     export API_ENDPOINT="https://api.${DOMAIN}"
-    export CF_DIAL_TIMEOUT=15
     export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
 
-    export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
-
-    go get -u github.com/onsi/ginkgo/ginkgo
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
@@ -36,7 +31,5 @@ run:
       mv cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
 
-    cd $GOPATH/src/code.cloudfoundry.org/cli
-    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/isolated
-    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/global
-    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/plugin
+    cd cli-ci
+    CF_API=$API_ENDPOINT bin/cleanup-integration
