@@ -1,17 +1,12 @@
 ---
 platform: linux
-
-image_resource:
-  type: docker-image
-  source:
-    repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
+image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli-integration
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lite-lock
-- name: vars-store
 
 run:
   path: bash
@@ -23,7 +18,7 @@ run:
     export DOMAIN=$(cat bosh-lite-lock/name)
     export API_ENDPOINT="https://api.${DOMAIN}"
     export CF_DIAL_TIMEOUT=15
-    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
