@@ -451,7 +451,7 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: diego
-        NODES: 6
+        NODES: 16
     ensure:
       put: bosh-lites-diego-pool
       params:
