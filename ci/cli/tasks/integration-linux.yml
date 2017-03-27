@@ -7,18 +7,22 @@ inputs:
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lite-lock
+- name: vars-store
 
 run:
   path: bash
   args:
   - -c
   - |
+    set -e
+
+    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+
     set -ex
 
-    export DOMAIN=$(cat bosh-lite-lock/name)
-    export API_ENDPOINT="https://api.${DOMAIN}"
+    domain=$(cat bosh-lite-lock/name)
+    export CF_API="https://api.${domain}"
     export CF_DIAL_TIMEOUT=15
-
 
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
@@ -32,6 +36,5 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/isolated
-    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/global
-    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/plugin
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/isolated
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/global integration/plugin
