@@ -92,7 +92,15 @@ func (cmd TasksCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	table := [][]string{{"id", "name", "state", "start time", "command"}}
+	table := [][]string{
+		{
+			cmd.UI.TranslateText("id"),
+			cmd.UI.TranslateText("name"),
+			cmd.UI.TranslateText("state"),
+			cmd.UI.TranslateText("start time"),
+			cmd.UI.TranslateText("command"),
+		},
+	}
 	for _, task := range tasks {
 		t, err := time.Parse(time.RFC3339, task.CreatedAt)
 		if err != nil {

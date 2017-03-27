@@ -61,7 +61,15 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 
 func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstanceWithStats) {
 	table := [][]string{
-		{"", "state", "since", "cpu", "memory", "disk", "details"},
+		{
+			"",
+			ui.TranslateText("state"),
+			ui.TranslateText("since"),
+			ui.TranslateText("cpu"),
+			ui.TranslateText("memory"),
+			ui.TranslateText("disk"),
+			ui.TranslateText("details"),
+		},
 	}
 
 	for _, instance := range instances {
