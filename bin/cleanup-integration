@@ -44,4 +44,4 @@ cf delete-org -f temp-org
 cf curl /v2/users?results-per-page=100 | \
   jq -r .resources[].entity.username | \
   grep -i ^integration-user | \
-  xargs_func cf delete-user -f
+  xargs_func cf delete-user -f || echo
