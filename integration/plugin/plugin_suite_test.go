@@ -32,7 +32,7 @@ var (
 
 func TestGlobal(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Global Suite")
+	RunSpecs(t, "Plugin Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
