@@ -6,16 +6,23 @@ inputs:
 - name: cli-ci
 - name: cf-cli-binaries
 - name: bosh-lite-lock
+- name: vars-store
 
 run:
   path: bash
   args:
   - -c
   - |
+    set -e
+
+    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    # output password into a temp file for consumption by Windows
+    echo $CF_PASSWORD > vars-store/cf-password
+
     set -ex
 
-    export DOMAIN=$(cat bosh-lite-lock/name)
-    export API_ENDPOINT="https://api.${DOMAIN}"
+    domain=$(cat bosh-lite-lock/name)
+    export CF_API="https://api.${domain}"
 
     export PATH=$GOPATH/bin:$PATH
 
@@ -26,4 +33,4 @@ run:
     popd
 
     cd cli-ci
-    CF_API=$API_ENDPOINT bin/cleanup-integration
+    bin/cleanup-integration

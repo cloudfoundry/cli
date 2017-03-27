@@ -7,6 +7,7 @@ inputs:
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cli-ci
+- name: vars-store
 
 run:
   path: cli-ci/ci/cli/tasks/integration-windows.bat
