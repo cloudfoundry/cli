@@ -8,6 +8,9 @@ inputs:
 - name: bosh-lite-lock
 - name: vars-store
 
+outputs:
+- name: cleanup-integration-outputs
+
 run:
   path: bash
   args:
@@ -17,7 +20,7 @@ run:
 
     export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
     # output password into a temp file for consumption by Windows
-    echo $CF_PASSWORD > vars-store/cf-password
+    echo $CF_PASSWORD > cleanup-integration-outputs/cf-password
 
     set -ex
 
