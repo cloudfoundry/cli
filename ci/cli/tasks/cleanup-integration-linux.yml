@@ -13,11 +13,14 @@ run:
   args:
   - -c
   - |
+    set -e
+
+    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+
     set -ex
 
     domain=$(cat bosh-lite-lock/name)
-    api_endpoint="https://api.${domain}"
-    password=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    export CF_API="https://api.${domain}"
 
     export PATH=$GOPATH/bin:$PATH
 
@@ -28,4 +31,4 @@ run:
     popd
 
     cd cli-ci
-    CF_API=${api_endpoint} CF_PASSWORD=${password} bin/cleanup-integration
+    bin/cleanup-integration
