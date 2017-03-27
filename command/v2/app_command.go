@@ -3,11 +3,9 @@ package v2
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . AppActor
@@ -15,12 +13,6 @@ import (
 type AppActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
-}
-
-//go:generate counterfeiter . AppActorV3
-
-type AppActorV3 interface {
-	CloudControllerAPIVersion() string
 }
 
 type AppCommand struct {
@@ -33,7 +25,6 @@ type AppCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       AppActor
-	ActorV3     AppActorV3
 }
 
 func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
@@ -46,12 +37,6 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
-
-	ccClientV3, err := sharedV3.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-	cmd.ActorV3 = v3action.NewActor(ccClientV3)
 
 	return nil
 }
@@ -102,9 +87,7 @@ func (cmd AppCommand) displayAppSummary() error {
 		return shared.HandleError(err)
 	}
 
-	displayIsolationSegment := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0") == nil
-
-	shared.DisplayAppSummary(cmd.UI, appSummary, false, displayIsolationSegment)
+	shared.DisplayAppSummary(cmd.UI, appSummary, false)
 
 	return nil
 }
