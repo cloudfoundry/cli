@@ -7,12 +7,10 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . StartActor
@@ -21,12 +19,6 @@ type StartActor interface {
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (v2action.ApplicationSummary, v2action.Warnings, error)
 	StartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error)
-}
-
-//go:generate counterfeiter . StartActorV3
-
-type StartActorV3 interface {
-	CloudControllerAPIVersion() string
 }
 
 type StartCommand struct {
@@ -40,7 +32,6 @@ type StartCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       StartActor
-	ActorV3     StartActorV3
 	NOAAClient  *consumer.Consumer
 }
 
@@ -54,12 +45,6 @@ func (cmd *StartCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
-
-	ccClientV3, err := sharedV3.NewClients(config, ui, true)
-	if err != nil {
-		return err
-	}
-	cmd.ActorV3 = v3action.NewActor(ccClientV3)
 
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
@@ -122,8 +107,7 @@ func (cmd StartCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	displayIsolationSegment := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0") == nil
+	shared.DisplayAppSummary(cmd.UI, appSummary, true)
 
-	shared.DisplayAppSummary(cmd.UI, appSummary, true, displayIsolationSegment)
 	return nil
 }

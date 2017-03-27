@@ -26,7 +26,6 @@ var _ = Describe("App Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeAppActor
-		fakeActorV3     *v2fakes.FakeAppActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -36,21 +35,18 @@ var _ = Describe("App Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeAppActor)
-		fakeActorV3 = new(v2fakes.FakeAppActorV3)
 
 		cmd = AppCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			ActorV3:     fakeActorV3,
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
 	})
 
 	JustBeforeEach(func() {
@@ -259,12 +255,11 @@ var _ = Describe("App Command", func() {
 								Details:     "potato",
 							},
 						}
-						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					Context("when api version is above 3.11.0", func() {
+					Context("when the isolation segment is not empty", func() {
 						BeforeEach(func() {
-							fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
 						It("displays app summary, instance table, and all warnings", func() {
@@ -293,9 +288,10 @@ var _ = Describe("App Command", func() {
 						})
 					})
 
-					Context("when api version is below 3.11.0", func() {
+					Context("when the isolation segment is empty", func() {
 						BeforeEach(func() {
-							fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+							applicationSummary.IsolationSegment = ""
+							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
 						It("displays app summary, instance table, and all warnings", func() {

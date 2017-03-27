@@ -27,7 +27,6 @@ var _ = Describe("Start Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeStartActor
-		fakeActorV3     *v2fakes.FakeStartActorV3
 		binaryName      string
 		executeErr      error
 	)
@@ -37,14 +36,12 @@ var _ = Describe("Start Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeStartActor)
-		fakeActorV3 = new(v2fakes.FakeStartActorV3)
 
 		cmd = StartCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			ActorV3:     fakeActorV3,
 		}
 
 		cmd.RequiredArgs.AppName = "some-app"
@@ -543,13 +540,11 @@ var _ = Describe("Start Command", func() {
 								Details:     "info from the backend",
 							},
 						}
-
-						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					Context("when the api version is at or above 3.11.0", func() {
+					Context("when the isolation segment is not empty", func() {
 						BeforeEach(func() {
-							fakeActorV3.CloudControllerAPIVersionReturns("3.12.0")
+							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
 						It("displays the app summary with isolation segments as well as warnings", func() {
@@ -576,12 +571,13 @@ var _ = Describe("Start Command", func() {
 
 					})
 
-					Context("when the api version is below 3.11.0", func() {
+					Context("when the isolation segment is empty", func() {
 						BeforeEach(func() {
-							fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
+							applicationSummary.IsolationSegment = ""
+							fakeActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
-						It("displays the app summary without isolation segments as well as warnings", func() {
+						It("displays the app summary without isolation segment as well as warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 							Expect(testUI.Out).To(Say("name:\\s+some-app"))
 							Expect(testUI.Out).To(Say("requested state:\\s+started"))

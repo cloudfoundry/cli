@@ -12,7 +12,7 @@ import (
 
 // DisplayAppSummary displays the application summary to the UI, and optionally
 // the command to start the app.
-func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, displayStartCommand bool, displayIsolationSegment bool) {
+func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, displayStartCommand bool) {
 	instances := fmt.Sprintf("%d/%d", len(appSummary.RunningInstances), appSummary.Instances)
 
 	usage := ui.TranslateText(
@@ -43,7 +43,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 		table = append(table, []string{ui.TranslateText("start command:"), appSummary.Application.DetectedStartCommand})
 	}
 
-	if displayIsolationSegment {
+	if appSummary.IsolationSegment != "" {
 		table = append(table[:3], append([][]string{
 			{ui.TranslateText("isolation segment:"), appSummary.IsolationSegment},
 		}, table[3:]...)...)
