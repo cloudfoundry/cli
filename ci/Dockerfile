@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1.7
 
 RUN go get golang.org/x/tools/cmd/cover
 
@@ -45,3 +45,5 @@ RUN cd /tmp && \
   make install && \
   cd .. && \
   rm -rf osslsigncode-1.7.1
+
+RUN curl -L https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.1-linux-amd64 --output /usr/local/bin/bosh2 && chmod 0755 /usr/local/bin/bosh2
