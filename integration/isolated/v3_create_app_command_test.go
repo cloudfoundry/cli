@@ -16,6 +16,7 @@ var _ = Describe("v3-create-app command", func() {
 	)
 
 	BeforeEach(func() {
+		Skip("Requires CAPI 3.13+")
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
