@@ -177,7 +177,6 @@ applications:
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("instances:\\s+2/2"))
-						Eventually(session).Should(Say("isolation segment:\\s+"))
 						Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
 						Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 						Eventually(session).Should(Say("last uploaded:"))
