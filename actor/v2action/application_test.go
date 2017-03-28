@@ -61,32 +61,26 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("CalculatedHealthCheckEndpoint", func() {
-			var application Application
-
 			Context("when the health check type is http", func() {
 				BeforeEach(func() {
-					application = Application{
-						HealthCheckType:         "http",
-						HealthCheckHTTPEndpoint: "/some-endpoint",
-					}
+					app.HealthCheckType = "http"
+					app.HealthCheckHTTPEndpoint = "/some-endpoint"
 				})
 
 				It("returns the endpoint field", func() {
-					Expect(application.CalculatedHealthCheckEndpoint()).To(Equal(
+					Expect(app.CalculatedHealthCheckEndpoint()).To(Equal(
 						"/some-endpoint"))
 				})
 			})
 
 			Context("when the health check type is not http", func() {
 				BeforeEach(func() {
-					application = Application{
-						HealthCheckType:         "process",
-						HealthCheckHTTPEndpoint: "/some-endpoint",
-					}
+					app.HealthCheckType = "process"
+					app.HealthCheckHTTPEndpoint = "/some-endpoint"
 				})
 
 				It("returns the empty string", func() {
-					Expect(application.CalculatedHealthCheckEndpoint()).To(Equal(""))
+					Expect(app.CalculatedHealthCheckEndpoint()).To(Equal(""))
 				})
 			})
 		})
@@ -119,6 +113,28 @@ var _ = Describe("Application Actions", func() {
 				It("returns false", func() {
 					app.PackageState = ccv2.ApplicationPackageStaged
 					Expect(app.StagingFailed()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("StagingFailedMessage", func() {
+			Context("when the application has a staging failed description", func() {
+				BeforeEach(func() {
+					app.StagingFailedDescription = "An app was not successfully detected by any available buildpack"
+					app.StagingFailedReason = "NoAppDetectedError"
+				})
+				It("returns that description", func() {
+					Expect(app.StagingFailedMessage()).To(Equal("An app was not successfully detected by any available buildpack"))
+				})
+			})
+
+			Context("when the application does not have a staging failed description", func() {
+				BeforeEach(func() {
+					app.StagingFailedDescription = ""
+					app.StagingFailedReason = "NoAppDetectedError"
+				})
+				It("returns the staging failed code", func() {
+					Expect(app.StagingFailedMessage()).To(Equal("NoAppDetectedError"))
 				})
 			})
 		})
