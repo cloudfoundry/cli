@@ -16,6 +16,10 @@
     "translation": " does not exist as an available plugin repo."
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "API URL to target",
     "translation": "API URL to target"
   },
@@ -41,6 +45,10 @@
   },
   {
     "id": "App is not staged.",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} already exists.",
     "translation": ""
   },
   {
@@ -1100,6 +1108,10 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": "CF_NAME v3apps"
   },
@@ -1145,6 +1157,10 @@
   },
   {
     "id": "Create an isolation segment",
+    "translation": ""
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -1645,6 +1661,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {

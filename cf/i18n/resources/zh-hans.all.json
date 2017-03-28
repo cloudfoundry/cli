@@ -172,6 +172,10 @@
     "translation": "**注意: 插件是由可能不可信的作者编写的二进制文件。安装并使用插件所产生的风险，由您自行承担。\n\n要安装插件 {{.Plugin}} 吗？"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "用于与 Cloud Foundry 进行交互的命令行工具"
   },
@@ -322,6 +326,10 @@
   {
     "id": "App name is a required field",
     "translation": "应用程序名称是必填字段"
+  },
+  {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} does not exist.",
@@ -1620,6 +1628,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": ""
   },
@@ -1930,6 +1942,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "为服务实例创建密钥"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -5329,6 +5345,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {

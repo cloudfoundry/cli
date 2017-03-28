@@ -172,6 +172,10 @@
     "translation": "**Attention : les plug-in sont des fichiers binaires écrits par des auteurs potentiellement non fiables. L'installation et l'utilisation des plug-in relèvent de votre seule responsabilité.**\n\nVoulez-vous installer le plug-in {{.Plugin}} ?"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Outil de ligne de commande permettant d'interagir avec Cloud Foundry"
   },
@@ -322,6 +326,10 @@
   {
     "id": "App name is a required field",
     "translation": "Le nom de l'application est requis"
+  },
+  {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} does not exist.",
@@ -1620,6 +1628,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": ""
   },
@@ -1930,6 +1942,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "Créer une clé pour une instance de service"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -5329,6 +5345,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {

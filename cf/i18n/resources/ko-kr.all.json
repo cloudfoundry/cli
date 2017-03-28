@@ -172,6 +172,10 @@
     "translation": "**주의: 플러그인은 잠재적으로 신뢰할 수 없는 작성자가 쓴 2진입니다. 플러그인 설치와 사용에 따른 위험은 사용자의 몫입니다.**\n\n{{.Plugin}} 플러그인을 설치하시겠습니까?"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Cloud Foundry와 상호작용할 명령행 도구"
   },
@@ -322,6 +326,10 @@
   {
     "id": "App name is a required field",
     "translation": "앱 이름은 필수 필드임"
+  },
+  {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} does not exist.",
@@ -1620,6 +1628,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": ""
   },
@@ -1930,6 +1942,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "서비스 인스턴스의 키 작성"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -5329,6 +5345,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {
