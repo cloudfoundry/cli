@@ -126,4 +126,97 @@ var _ = Describe("Application", func() {
 			})
 		})
 	})
+
+	Describe("CreateApplication", func() {
+		Context("when the application successfully is created", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name"
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created app and warnings", func() {
+				app, warnings, err := client.CreateApplication(Application{
+					Name: "some-app-name",
+					Relationships: ApplicationRelationships{
+						Space: Relationship{GUID: "some-space-guid"},
+					},
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(app).To(Equal(Application{
+					Name: "some-app-name",
+					GUID: "some-app-guid",
+				}))
+			})
+		})
+
+		Context("when cc returns back an error or warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.CreateApplication(Application{})
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						[]CCError{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })
