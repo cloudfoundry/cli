@@ -219,13 +219,14 @@ func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int)
 
 	columns := len(table[0])
 
-	// if we don't want to wrap the table columns
-	if columns < 2 || isatty.IsTerminal(os.Stdout.Fd()) {
+	// Developer Note: The following is untested! Change at your own risk.
+	out, isFile := ui.Out.(*os.File)
+	if columns < 2 || !isFile || !isatty.IsTerminal(out.Fd()) {
 		ui.DisplayNonWrappingTable(prefix, table, padding)
 		return
 	}
 
-	terminalWidth, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+	terminalWidth, _, err := terminal.GetSize(int(out.Fd()))
 
 	if err != nil {
 		ui.DisplayNonWrappingTable(prefix, table, padding)
