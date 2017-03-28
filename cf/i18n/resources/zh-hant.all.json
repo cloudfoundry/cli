@@ -172,6 +172,10 @@
     "translation": "**注意: 外掛程式是由潛在未授信作者所編寫的二進位檔。您必須自行承擔安裝和使用外掛程式的風險。**\n\n您要安裝外掛程式 {{.Plugin}} 嗎？"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "要與 Cloud Foundry 互動的指令行工具"
   },
@@ -322,6 +326,10 @@
   {
     "id": "App name is a required field",
     "translation": "應用程式名稱是必要欄位"
+  },
+  {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} does not exist.",
@@ -1620,6 +1628,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": ""
   },
@@ -1930,6 +1942,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "建立服務實例的金鑰"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -5329,6 +5345,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {
