@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -18,6 +19,16 @@ type ApplicationNotFoundError struct {
 
 func (e ApplicationNotFoundError) Error() string {
 	return fmt.Sprintf("Application '%s' not found.", e.Name)
+}
+
+// ApplicationAlreadyExistsError represents the error that occurs when the
+// application already exists.
+type ApplicationAlreadyExistsError struct {
+	Name string
+}
+
+func (e ApplicationAlreadyExistsError) Error() string {
+	return fmt.Sprintf("Application '%s' already exists.", e.Name)
 }
 
 // GetApplicationByNameAndSpace returns the application with the given
@@ -36,4 +47,22 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	}
 
 	return Application(apps[0]), Warnings(warnings), nil
+}
+
+// CreateApplicationByNameAndSpace creates and returns the application with the given
+// name in the given space.
+func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
+	app, warnings, err := actor.CloudControllerClient.CreateApplication(
+		ccv3.Application{
+			Name: appName,
+			Relationships: ccv3.ApplicationRelationships{
+				Space: ccv3.Relationship{GUID: spaceGUID},
+			},
+		})
+
+	if _, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
+		return Application{}, Warnings(warnings), ApplicationAlreadyExistsError{Name: appName}
+	}
+
+	return Application(app), Warnings(warnings), err
 }

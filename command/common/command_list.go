@@ -8,7 +8,10 @@ import (
 var Commands commandList
 
 type commandList struct {
-	VerboseOrVersion                   bool                                         `short:"v" long:"version" description:"verbose and version flag"`
+	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
+
+	V3CreateApp v3.V3CreateAppCommand `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
+
 	AddPluginRepo                      v2.AddPluginRepoCommand                      `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
