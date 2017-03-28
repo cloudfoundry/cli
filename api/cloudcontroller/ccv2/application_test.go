@@ -38,6 +38,7 @@ var _ = Describe("Application", func() {
 							"package_state": "FAILED",
 							"package_updated_at": "2015-03-10T23:11:54Z",
 							"stack_guid": "some-stack-guid",
+							"staging_failed_description": "some-staging-failed-description",
 							"staging_failed_reason": "some-reason",
 							"state": "STOPPED"
 						}
@@ -59,21 +60,22 @@ var _ = Describe("Application", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(app).To(Equal(Application{
-					Buildpack:               "ruby 1.6.29",
-					DetectedBuildpack:       "",
-					DetectedStartCommand:    "echo 'I am a banana'",
-					DiskQuota:               586,
-					GUID:                    "app-guid-1",
-					HealthCheckType:         "port",
-					HealthCheckHTTPEndpoint: "/",
-					Instances:               13,
-					Memory:                  1024,
-					Name:                    "app-name-1",
-					PackageState:            ApplicationPackageFailed,
-					PackageUpdatedAt:        updatedAt,
-					StackGUID:               "some-stack-guid",
-					StagingFailedReason:     "some-reason",
-					State:                   ApplicationStopped,
+					Buildpack:                "ruby 1.6.29",
+					DetectedBuildpack:        "",
+					DetectedStartCommand:     "echo 'I am a banana'",
+					DiskQuota:                586,
+					GUID:                     "app-guid-1",
+					HealthCheckType:          "port",
+					HealthCheckHTTPEndpoint:  "/",
+					Instances:                13,
+					Memory:                   1024,
+					Name:                     "app-name-1",
+					PackageState:             ApplicationPackageFailed,
+					PackageUpdatedAt:         updatedAt,
+					StackGUID:                "some-stack-guid",
+					StagingFailedDescription: "some-staging-failed-description",
+					StagingFailedReason:      "some-reason",
+					State:                    ApplicationStopped,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

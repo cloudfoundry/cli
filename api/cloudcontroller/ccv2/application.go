@@ -68,6 +68,10 @@ type Application struct {
 	// StackGUID is the GUID for the Stack the application is running on.
 	StackGUID string `json:"-"`
 
+	// StagingFailedDescription is the verbose description of why the package
+	// failed to stage.
+	StagingFailedDescription string `json:"-"`
+
 	// StagingFailedReason is the reason why the package failed to stage.
 	StagingFailedReason string `json:"-"`
 
@@ -80,20 +84,21 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	var ccApp struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Buildpack               string     `json:"buildpack"`
-			DetectedBuildpack       string     `json:"detected_buildpack"`
-			DetectedStartCommand    string     `json:"detected_start_command"`
-			DiskQuota               int        `json:"disk_quota"`
-			HealthCheckType         string     `json:"health_check_type"`
-			HealthCheckHTTPEndpoint string     `json:"health_check_http_endpoint"`
-			Instances               int        `json:"instances"`
-			Memory                  int        `json:"memory"`
-			Name                    string     `json:"name"`
-			PackageState            string     `json:"package_state"`
-			PackageUpdatedAt        *time.Time `json:"package_updated_at"`
-			StackGUID               string     `json:"stack_guid"`
-			StagingFailedReason     string     `json:"staging_failed_reason"`
-			State                   string     `json:"state"`
+			Buildpack                string     `json:"buildpack"`
+			DetectedBuildpack        string     `json:"detected_buildpack"`
+			DetectedStartCommand     string     `json:"detected_start_command"`
+			DiskQuota                int        `json:"disk_quota"`
+			HealthCheckType          string     `json:"health_check_type"`
+			HealthCheckHTTPEndpoint  string     `json:"health_check_http_endpoint"`
+			Instances                int        `json:"instances"`
+			Memory                   int        `json:"memory"`
+			Name                     string     `json:"name"`
+			PackageState             string     `json:"package_state"`
+			PackageUpdatedAt         *time.Time `json:"package_updated_at"`
+			StackGUID                string     `json:"stack_guid"`
+			StagingFailedDescription string     `json:"staging_failed_description"`
+			StagingFailedReason      string     `json:"staging_failed_reason"`
+			State                    string     `json:"state"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccApp); err != nil {
@@ -112,6 +117,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.Name = ccApp.Entity.Name
 	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)
 	application.StackGUID = ccApp.Entity.StackGUID
+	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
 	application.State = ApplicationState(ccApp.Entity.State)
 

@@ -51,6 +51,16 @@ func (application Application) Started() bool {
 	return application.State == ccv2.ApplicationStarted
 }
 
+// StagingFailedMessage returns the verbose description of the failure or
+// the reason if the verbose description is empty.
+func (application Application) StagingFailedMessage() string {
+	if application.StagingFailedDescription != "" {
+		return application.StagingFailedDescription
+	}
+
+	return application.StagingFailedReason
+}
+
 // ApplicationInstanceCrashedError is returned when an instance crashes.
 type ApplicationInstanceCrashedError struct {
 	Name string
@@ -271,9 +281,9 @@ func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<
 			return nil
 		case currentApplication.StagingFailed():
 			if currentApplication.StagingFailedNoAppDetected() {
-				return StagingFailedNoAppDetectedError{Reason: currentApplication.StagingFailedReason}
+				return StagingFailedNoAppDetectedError{Reason: currentApplication.StagingFailedMessage()}
 			}
-			return StagingFailedError{Reason: currentApplication.StagingFailedReason}
+			return StagingFailedError{Reason: currentApplication.StagingFailedMessage()}
 		}
 		time.Sleep(config.PollingInterval())
 	}

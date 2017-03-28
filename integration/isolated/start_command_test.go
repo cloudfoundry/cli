@@ -14,10 +14,6 @@ import (
 )
 
 var _ = Describe("start command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("start command refactor is still experimental")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
@@ -197,7 +193,7 @@ applications:
 				})
 
 				Context("when the app has *not* yet been staged", func() {
-					Context("when the app does *not* stage properly", func() {
+					Context("when the app does *not* stage properly because the app was not detected by any buildpacks", func() {
 						BeforeEach(func() {
 							appName = helpers.PrefixedRandomName("app")
 							domainName = defaultSharedDomain()
@@ -206,12 +202,13 @@ applications:
 							})
 						})
 
-						It("displays the app logs and information with instances table", func() {
+						It("fails and displays the staging failure message", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("start", appName)
 							Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 
-							Eventually(session.Err).Should(Say("Error staging application: NoAppDetectedError"))
+							// The staticfile_buildback does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
+							Eventually(session.Err).Should(Say("Error staging application: An app was not successfully detected by any available buildpack"))
 							Eventually(session.Err).Should(Say(`TIP: Use 'cf buildpacks' to see a list of supported buildpacks.`))
 							Eventually(session).Should(Exit(1))
 						})
@@ -226,7 +223,7 @@ applications:
 								})
 							})
 
-							It("displays the app logs and information with instances table", func() {
+							It("fails and displays the start failure message", func() {
 								userName, _ := helpers.GetCredentials()
 								session := helpers.CF("start", appName)
 								Eventually(session).Should(Say("Starting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
