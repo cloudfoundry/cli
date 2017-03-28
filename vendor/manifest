@@ -315,25 +315,25 @@
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
+			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
 			"branch": "master",
-			"path": "curve25519",
+			"path": "/curve25519",
 			"notests": true
 		},
 		{
 			"importpath": "golang.org/x/crypto/ed25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
+			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
 			"branch": "master",
-			"path": "ed25519",
+			"path": "/ed25519",
 			"notests": true
 		},
 		{
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "13d9f6188e639cb843a0568d05540a4cec71cc14",
+			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
 			"branch": "master",
 			"path": "/ssh",
 			"notests": true
