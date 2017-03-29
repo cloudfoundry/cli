@@ -1,16 +1,17 @@
 ---
 platform: windows
 
-params:
-  NODES:
-
 inputs:
-- name: cf-release-repo
+- name: cf-acceptance-tests
+  path: gopath/src/github.com/cloudfoundry/cf-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cli
 - name: cli-ci
 - name: cats-config
+
+params:
+  NODES:
 
 run:
   path: cli-ci/ci/cli/tasks/cats-windows.bat
