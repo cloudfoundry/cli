@@ -3,7 +3,8 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
-- name: cf-release-repo
+- name: cf-acceptance-tests
+  path: gopath/src/github.com/cloudfoundry/cf-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cats-config
@@ -19,12 +20,12 @@ run:
   - |
     set -eux
 
-    export GOPATH="${PWD}/cf-release-repo"
+    export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
     export CF_DIAL_TIMEOUT=15
     export CONFIG=$PWD/cats-config/integration_config.json
 
-    mkdir -p cf-release-repo/bin
+    mkdir -p $GOPATH/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
       chmod +x cf-cli_linux_x86-64
