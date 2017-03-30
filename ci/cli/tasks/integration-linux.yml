@@ -18,7 +18,7 @@ run:
 
     export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
 
-    set -ex
+    set -x
 
     domain=$(cat bosh-lite-lock/name)
     export CF_API="https://api.${domain}"
@@ -36,5 +36,5 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/isolated
-    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs integration/global integration/plugin
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs -failFast integration/isolated
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs -failFast integration/global integration/plugin
