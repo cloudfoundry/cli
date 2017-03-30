@@ -35,7 +35,7 @@ var _ = Describe("space command", func() {
 				Eventually(session).Should(Say("--guid\\s+Retrieve and display the given space's guid\\.  All other output for the space is suppressed\\."))
 				Eventually(session).Should(Say("--security-group-rules\\s+Retrieve the rules for all the security groups associated with the space\\."))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("space-users"))
+				Eventually(session).Should(Say("set-space-isolation-segment, space-quota, space-users"))
 			})
 		})
 	})

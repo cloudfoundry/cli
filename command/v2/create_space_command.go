@@ -13,7 +13,7 @@ type CreateSpaceCommand struct {
 	Organization    string      `short:"o" description:"Organization"`
 	Quota           string      `short:"q" description:"Quota to assign to the newly created space"`
 	usage           interface{} `usage:"CF_NAME create-space SPACE [-o ORG] [-q SPACE_QUOTA]"`
-	relatedCommands interface{} `related_commands:"target, space-quotas, spaces"`
+	relatedCommands interface{} `related_commands:"set-space-isolation-segment, space-quotas, spaces, target"`
 }
 
 func (_ CreateSpaceCommand) Setup(config command.Config, ui command.UI) error {
