@@ -320,10 +320,6 @@
     "translation": "アプリのインスタンス制限"
   },
   {
-    "id": "App is not staged.",
-    "translation": ""
-  },
-  {
     "id": "App name is a required field",
     "translation": "アプリ名は必須フィールドです"
   },
@@ -2504,7 +2500,7 @@
     "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.Err}}"
   },
   {
-    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username found. Please use 'cf curl' to delete the user by guid instead.",
     "translation": ""
   },
   {
@@ -2702,10 +2698,6 @@
   {
     "id": "Error retrieving stacks: {{.Error}}",
     "translation": "スタックの取得時にエラーが発生しました: {{.Error}}"
-  },
-  {
-    "id": "Error running task: {{.CloudControllerMessage}}",
-    "translation": ""
   },
   {
     "id": "Error saving manifest: {{.Error}}",
@@ -3582,10 +3574,6 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "ユーザーの招待と管理、プランの選択と変更、および支払上限の設定を行います\n"
-  },
-  {
-    "id": "Isolation segment '{{.Name}}' not found.",
-    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5288,14 +5276,6 @@
     "translation": ""
   },
   {
-    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
-    "translation": ""
-  },
-  {
-    "id": "Task workers are unavailable.",
-    "translation": ""
-  },
-  {
     "id": "Terminate a running task of an app",
     "translation": ""
   },
@@ -6917,10 +6897,6 @@
   },
   {
     "id": "{{.MemorySize}} x {{.NumInstances}} instances",
-    "translation": ""
-  },
-  {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {
