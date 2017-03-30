@@ -39,12 +39,11 @@ resources:
     paths:
     - integration
 
-- name: cf-release-repo
+- name: cf-acceptance-tests
   type: git
   source:
-    uri: https://github.com/cloudfoundry/cf-release
-    branch: master
-    tag_filter: "v*"
+    uri: https://github.com/cloudfoundry/cf-acceptance-tests
+    branch: owned-by-cf-cli
 
 - name: cf-cli-binaries
   type: s3
@@ -355,10 +354,7 @@ jobs:
       trigger: true
       passed: [integration]
       depth: 3
-    - get: cf-release-repo
-      params:
-        submodules:
-        - src/github.com/cloudfoundry/cf-acceptance-tests
+    - get: cf-acceptance-tests
     - get: cf-cli-binaries
       passed: [integration]
     - get: cli-ci
@@ -399,10 +395,7 @@ jobs:
       trigger: true
       passed: [build-binaries]
       depth: 3
-    - get: cf-release-repo
-      params:
-        submodules:
-        - src/github.com/cloudfoundry/cf-acceptance-tests
+    - get: cf-acceptance-tests
     - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cli-ci
@@ -446,10 +439,7 @@ jobs:
       depth: 3
     - get: cf-cli-binaries
       passed: [build-binaries]
-    - get: cf-release-repo
-      params:
-        submodules:
-        - src/github.com/cloudfoundry/cf-acceptance-tests
+    - get: cf-acceptance-tests
     - get: cli-ci
       depth: 3
     - put: bosh-lite-lock
