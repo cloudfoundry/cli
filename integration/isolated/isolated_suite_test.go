@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"math/rand"
 	"regexp"
 	"testing"
 	"time"
@@ -29,7 +28,6 @@ var (
 
 func TestIsolated(t *testing.T) {
 	RegisterFailHandler(Fail)
-	rand.Seed(time.Now().Unix())
 	RunSpecs(t, "Isolated Integration Suite")
 }
 

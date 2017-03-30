@@ -147,7 +147,7 @@ applications:
   - route: %s
   - route: %s
   - route: manifest-host.%s/path
-  - route: %s:1100
+  - route: %s:0
 `, privateDomain.Name, sharedDomain.Name, sharedDomain.Name, tcpDomain.Name))
 				manifestPath = filepath.Join(appDir, "manifest.yml")
 				err = ioutil.WriteFile(manifestPath, manifestContents, 0666)
@@ -160,12 +160,12 @@ applications:
 			It("should set or replace the route's hostname with the flag value", func() {
 				defer os.RemoveAll(appDir)
 				var session *Session
-				session = helpers.CF("push", helpers.PrefixedRandomName("APP"), "-p", appDir, "-n", "flag-hostname", "-b", "staticfile_buildpack", "-f", manifestPath)
+				session = helpers.CF("push", helpers.PrefixedRandomName("APP"), "-p", appDir, "-n", "flag-hostname", "-b", "staticfile_buildpack", "-f", manifestPath, "--random-route")
 
 				Eventually(session).Should(Say("Creating route flag-hostname.%s...\nOK", privateDomain.Name))
 				Eventually(session).Should(Say("Creating route flag-hostname.%s...\nOK", sharedDomain.Name))
 				Eventually(session).Should(Say("Creating route flag-hostname.%s/path...\nOK", sharedDomain.Name))
-				Eventually(session).Should(Say("Creating route %s:1100...\nOK", tcpDomain.Name))
+				Eventually(session).Should(Say("Creating random route for %s...\nOK", tcpDomain.Name))
 				Eventually(session).Should(Exit(0))
 			})
 		})
