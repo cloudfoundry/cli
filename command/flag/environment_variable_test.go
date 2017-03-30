@@ -94,7 +94,7 @@ var _ = Describe("EnvironmentVariable", func() {
 
 				Context("when there are no matching environment variables", func() {
 					It("returns no matches", func() {
-						Expect(envVar.Complete("$Z")).To(BeEmpty())
+						Expect(envVar.Complete("$ZZZZ")).To(BeEmpty())
 					})
 				})
 			})
