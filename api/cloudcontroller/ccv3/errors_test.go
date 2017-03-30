@@ -86,21 +86,33 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 		})
 
 		Context("when the error is not from the cloud controller", func() {
-			BeforeEach(func() {
-				serverResponseCode = http.StatusTeapot
-				response = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
+			Context("and the raw status is 404", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusNotFound
+					response = "some not found message"
+				})
+				It("returns a NotFoundError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
+				})
 			})
 
-			It("returns a RawHTTPStatusError", func() {
-				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
-					StatusCode:  http.StatusTeapot,
-					RawResponse: []byte(response),
-					RequestIDs: []string{
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
-					},
-				}))
+			Context("and the raw status is another error", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusTeapot
+					response = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
+				})
+				It("returns a RawHTTPStatusError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
+						StatusCode:  http.StatusTeapot,
+						RawResponse: []byte(response),
+						RequestIDs: []string{
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+						},
+					}))
+				})
 			})
 		})
 
@@ -117,6 +129,23 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 						ResponseCode:    http.StatusUnauthorized,
 						CCErrorResponse: CCErrorResponse{Errors: []CCError{}},
 					}))
+				})
+			})
+
+			Context("when there no errors key in the response", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusNotFound
+					response = `
+						{
+							"code": 10000,
+							"description": "Unknown request",
+							"error_code": "CF-NotFound"
+						}`
+				})
+
+				It("returns a NotFoundError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
 				})
 			})
 
@@ -173,16 +202,6 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 					Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 				})
 
-				Context("when the error is not from the cloud controller API", func() {
-					BeforeEach(func() {
-						response = "an error not from the CC API"
-					})
-
-					It("returns a NotFoundError", func() {
-						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
-					})
-				})
 			})
 
 			Context("(422) Unprocessable Entity", func() {

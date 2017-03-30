@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"net/http"
 	"runtime"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("New Clients", func() {
@@ -38,14 +40,61 @@ var _ = Describe("New Clients", func() {
 		})
 	})
 
-	Context("when the api does not exist", func() {
+	Context("when hitting the target returns an error", func() {
+		var server *Server
 		BeforeEach(func() {
-			fakeConfig.TargetReturns("http://google.com")
+			server = NewTLSServer()
+
+			fakeConfig.TargetReturns(server.URL())
+			fakeConfig.SkipSSLValidationReturns(true)
 		})
 
-		It("returns the ClientTargetError", func() {
-			_, err := NewClients(fakeConfig, testUI, true)
-			Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
+		AfterEach(func() {
+			server.Close()
+		})
+
+		Context("that is a cloud controller request error", func() {
+			BeforeEach(func() {
+				fakeConfig.TargetReturns("https://127.0.0.1:9876")
+			})
+
+			It("returns a command api request error", func() {
+				_, err := NewClients(fakeConfig, testUI, true)
+				Expect(err).To(MatchError(ContainSubstring("Request error:")))
+			})
+
+		})
+
+		Context("that is a cloud controller api not found error", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusNotFound, "{}"),
+					),
+				)
+			})
+
+			It("returns a command api not found error", func() {
+				_, err := NewClients(fakeConfig, testUI, true)
+				Expect(err).To(MatchError(command.APINotFoundError{URL: server.URL()}))
+			})
+		})
+
+		Context("that is another error", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusOK, "invalid json"),
+					),
+				)
+			})
+
+			{
+				_, err := NewClients(fakeConfig, testUI, true)
+				Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
+			})
 		})
 	})
 

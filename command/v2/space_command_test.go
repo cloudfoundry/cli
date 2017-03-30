@@ -180,6 +180,16 @@ var _ = Describe("space Command", func() {
 				)
 			})
 
+			Context("when the v3 actor is nil", func() {
+				BeforeEach(func() {
+					cmd.ActorV3 = nil
+				})
+				It("displays the space summary with no isolation segment row", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(testUI.Out).ToNot(Say("isolation segment:"))
+				})
+			})
+
 			Context("when api version is above 3.11.0", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetIsolationSegmentBySpaceReturns(

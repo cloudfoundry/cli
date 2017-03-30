@@ -172,6 +172,15 @@ var _ = Describe("org Command", func() {
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
+			Context("when the v3 actor is nil", func() {
+				BeforeEach(func() {
+					cmd.ActorV3 = nil
+				})
+				It("displays the org summary with no isolation segment row", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(testUI.Out).ToNot(Say("isolation segments:"))
+				})
+			})
 
 			Context("when api version is above 3.11.0", func() {
 				BeforeEach(func() {

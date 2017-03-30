@@ -53,6 +53,10 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClientV3, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
+		// special case for no v3 API installed
+		if _, ok := err.(command.APINotFoundError); ok {
+			return nil
+		}
 		return err
 	}
 	cmd.ActorV3 = v3action.NewActor(ccClientV3)
@@ -112,21 +116,23 @@ func (cmd OrgCommand) displayOrgSummary() error {
 		{cmd.UI.TranslateText("spaces:"), strings.Join(orgSummary.SpaceNames, ", ")},
 	}
 
-	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
-	if apiCheck == nil {
-		isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
-		cmd.UI.DisplayWarnings(v3Warnings)
-		if err != nil {
-			return shared.HandleError(err)
-		}
+	if cmd.ActorV3 != nil {
+		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+		if apiCheck == nil {
+			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
+			cmd.UI.DisplayWarnings(v3Warnings)
+			if err != nil {
+				return shared.HandleError(err)
+			}
 
-		isolationSegmentNames := []string{}
-		for _, iso := range isolationSegments {
-			isolationSegmentNames = append(isolationSegmentNames, iso.Name)
-		}
+			isolationSegmentNames := []string{}
+			for _, iso := range isolationSegments {
+				isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+			}
 
-		sort.Strings(isolationSegmentNames)
-		table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
+			sort.Strings(isolationSegmentNames)
+			table = append(table, []string{cmd.UI.TranslateText("isolation segments:"), strings.Join(isolationSegmentNames, ", ")})
+		}
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
