@@ -24,5 +24,5 @@ popd
 go get -v -u github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs -failFast ./integration/isolated || exit 1
-ginkgo.exe -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeAllSpecs -failFast ./integration/global ./integration/plugin || exit 1
+ginkgo.exe -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -failFast ./integration/isolated || exit 1
+ginkgo.exe -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -failFast ./integration/global ./integration/plugin || exit 1
