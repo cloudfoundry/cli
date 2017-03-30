@@ -76,7 +76,11 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 	switch err.(type) {
 	case nil:
 		if len(users) > 1 {
-			return fmt.Errorf(T("Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.", map[string]interface{}{"Username": username}))
+			return fmt.Errorf(T(
+				"Error deleting user {{.Username}} \nMultiple users with that username found. Please use 'cf curl' to delete the user by guid instead.",
+				map[string]interface{}{
+					"Username": username,
+				}))
 		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()

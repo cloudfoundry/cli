@@ -22,10 +22,8 @@ var _ = Describe("delete-user command", func() {
 
 			BeforeEach(func() {
 				newUser = helpers.RandomUsername()
-				session := helpers.CF("create-user", newUser, "--origin", "ldap")
-				Eventually(session).Should(Exit(0))
-				session = helpers.CF("create-user", newUser, helpers.RandomPassword())
-				Eventually(session).Should(Exit(0))
+				Eventually(helpers.CF("create-user", newUser, "--origin", "ldap")).Should(Exit(0))
+				Eventually(helpers.CF("create-user", newUser, helpers.RandomPassword())).Should(Exit(0))
 			})
 
 			AfterEach(func() {
@@ -50,17 +48,16 @@ var _ = Describe("delete-user command", func() {
 
 				for _, user := range usersResponse.Resources {
 					if user.Entity.UserName == newUser {
-						session = helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v2/users/%s", user.Metadata.GUID))
-						Eventually(session).Should(Exit(0))
+						Eventually(helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v2/users/%s", user.Metadata.GUID))).Should(Exit(0))
 					}
 				}
 			})
 
-			It("errors with DuplicateUsernameError", func() {
+			FIt("errors with DuplicateUsernameError", func() {
 				session := helpers.CF("delete-user", "-f", newUser)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Error deleting user %s.", newUser))
-				Eventually(session.Out).Should(Say("Multiple users with that username returned. Please use 'cf curl' with specific origin instead."))
+				Eventually(session.Out).Should(Say("Error deleting user %s", newUser))
+				Eventually(session.Out).Should(Say("Multiple users with that username found. Please use 'cf curl' to delete the user by guid instead."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
