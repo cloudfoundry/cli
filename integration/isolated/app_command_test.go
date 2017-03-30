@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"path/filepath"
 	"strings"
 
@@ -133,7 +132,6 @@ var _ = Describe("app command", func() {
 				domainName string
 				tcpDomain  helpers.Domain
 				appName    string
-				port       string
 			)
 
 			BeforeEach(func() {
@@ -146,7 +144,6 @@ var _ = Describe("app command", func() {
 				domainName = defaultSharedDomain()
 				tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
 				tcpDomain.CreateWithRouterGroup("default-tcp")
-				port = fmt.Sprintf("%v", (rand.Int()%100 + 1024))
 				helpers.WithHelloWorldApp(func(appDir string) {
 					manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -157,14 +154,14 @@ applications:
   disk_quota: 128M
   routes:
   - route: %s.%s
-  - route: %s:%s
-`, appName, appName, domainName, tcpDomain.Name, port))
+  - route: %s:0
+`, appName, appName, domainName, tcpDomain.Name))
 					manifestPath := filepath.Join(appDir, "manifest.yml")
 					err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
 					// Create manifest
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack", "--random-route")).Should(Exit(0))
 				})
 			})
 
@@ -180,7 +177,7 @@ applications:
 					Eventually(session).Should(Say("instances:\\s+2/2"))
 					Eventually(session).Should(Say("isolation segment:\\s+%s", isoSegName))
 					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:%s", appName, domainName, tcpDomain.Name, port))
+					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -203,7 +200,7 @@ applications:
 					Eventually(session).Should(Say("requested state:\\s+stopped"))
 					Eventually(session).Should(Say("instances:\\s+0/2"))
 					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:%s", appName, domainName, tcpDomain.Name, port))
+					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:"))
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -224,7 +221,7 @@ applications:
 					Eventually(session).Should(Say("requested state:\\s+started"))
 					Eventually(session).Should(Say("instances:\\s+0/0"))
 					Eventually(session).Should(Say("usage:\\s+128M x 0 instances"))
-					Eventually(session).Should(Say("routes:\\s+%s.%s, %s:%s", appName, domainName, tcpDomain.Name, port))
+					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:"))
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
