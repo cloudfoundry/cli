@@ -5,12 +5,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export CF_DIAL_TIMEOUT=15
 
-ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 $@ integration/isolated
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 $@ integration/isolated
 
 if [[ -z $SKIP_OTHER ]]; then
   # The following two test suites **cannot** be run in parallel!!!
-  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 integration/global
-  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 integration/plugin
+  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/global
+  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/plugin
 fi
 
 $DIR/cleanup-integration
