@@ -56,8 +56,13 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClientV3, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
+		// special case for no v3 API installed
+		if _, ok := err.(command.APINotFoundError); ok {
+			return nil
+		}
 		return err
 	}
+
 	cmd.ActorV3 = v3action.NewActor(ccClientV3)
 
 	return nil
@@ -124,17 +129,19 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")},
 	}
 
-	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
-	if apiCheck == nil {
-		isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
-		cmd.UI.DisplayWarnings(v3Warnings)
-		if err != nil {
-			return sharedV3.HandleError(err)
-		}
+	if cmd.ActorV3 != nil {
+		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+		if apiCheck == nil {
+			isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
+			cmd.UI.DisplayWarnings(v3Warnings)
+			if err != nil {
+				return sharedV3.HandleError(err)
+			}
 
-		table = append(table[:4], append([][]string{
-			{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
-		}, table[4:]...)...)
+			table = append(table[:4], append([][]string{
+				{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
+			}, table[4:]...)...)
+		}
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

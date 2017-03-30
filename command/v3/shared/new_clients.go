@@ -52,6 +52,9 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 		if _, ok := err.(cloudcontroller.RequestError); ok {
 			return nil, HandleError(err)
 		}
+		if _, ok := err.(cloudcontroller.APINotFoundError); ok {
+			return nil, HandleError(err)
+		}
 		return nil, ClientTargetError{Message: err.Error()}
 	}
 

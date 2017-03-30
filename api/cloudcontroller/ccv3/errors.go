@@ -89,11 +89,19 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	// return the raw error.
 	var errorResponse CCErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
+
+	// error parsing json
 	if err != nil {
 		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
 			return cloudcontroller.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
 		}
 		return rawHTTPStatusErr
+	}
+
+	// 404 on root response; occurs when requesting the v3 capi and the v3 capi
+	// is not installed
+	if rawHTTPStatusErr.StatusCode == http.StatusNotFound && len(errorResponse.Errors) == 0 {
+		return cloudcontroller.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
 	}
 
 	errors := errorResponse.Errors
