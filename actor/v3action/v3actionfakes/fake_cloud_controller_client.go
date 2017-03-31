@@ -65,6 +65,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreatePackageStub        func(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
+	createPackageMutex       sync.RWMutex
+	createPackageArgsForCall []struct {
+		pkg ccv3.Package
+	}
+	createPackageReturns struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createPackageReturnsOnCall map[int]struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
 	DeleteIsolationSegmentStub        func(guid string) (ccv3.Warnings, error)
 	deleteIsolationSegmentMutex       sync.RWMutex
 	deleteIsolationSegmentArgsForCall []struct {
@@ -185,6 +200,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetPackageStub        func(guid string) (ccv3.Package, ccv3.Warnings, error)
+	getPackageMutex       sync.RWMutex
+	getPackageArgsForCall []struct {
+		guid string
+	}
+	getPackageReturns struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getPackageReturnsOnCall map[int]struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetSpaceIsolationSegmentStub        func(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	getSpaceIsolationSegmentMutex       sync.RWMutex
 	getSpaceIsolationSegmentArgsForCall []struct {
@@ -245,6 +275,22 @@ type FakeCloudControllerClient struct {
 	}
 	updateTaskReturnsOnCall map[int]struct {
 		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
+	UploadPackageStub        func(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
+	uploadPackageMutex       sync.RWMutex
+	uploadPackageArgsForCall []struct {
+		pkg         ccv3.Package
+		zipFilepath string
+	}
+	uploadPackageReturns struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
+	uploadPackageReturnsOnCall map[int]struct {
+		result1 ccv3.Package
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -450,6 +496,60 @@ func (fake *FakeCloudControllerClient) CreateIsolationSegmentReturnsOnCall(i int
 	}
 	fake.createIsolationSegmentReturnsOnCall[i] = struct {
 		result1 ccv3.IsolationSegment
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error) {
+	fake.createPackageMutex.Lock()
+	ret, specificReturn := fake.createPackageReturnsOnCall[len(fake.createPackageArgsForCall)]
+	fake.createPackageArgsForCall = append(fake.createPackageArgsForCall, struct {
+		pkg ccv3.Package
+	}{pkg})
+	fake.recordInvocation("CreatePackage", []interface{}{pkg})
+	fake.createPackageMutex.Unlock()
+	if fake.CreatePackageStub != nil {
+		return fake.CreatePackageStub(pkg)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createPackageReturns.result1, fake.createPackageReturns.result2, fake.createPackageReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreatePackageCallCount() int {
+	fake.createPackageMutex.RLock()
+	defer fake.createPackageMutex.RUnlock()
+	return len(fake.createPackageArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreatePackageArgsForCall(i int) ccv3.Package {
+	fake.createPackageMutex.RLock()
+	defer fake.createPackageMutex.RUnlock()
+	return fake.createPackageArgsForCall[i].pkg
+}
+
+func (fake *FakeCloudControllerClient) CreatePackageReturns(result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.CreatePackageStub = nil
+	fake.createPackageReturns = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreatePackageReturnsOnCall(i int, result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.CreatePackageStub = nil
+	if fake.createPackageReturnsOnCall == nil {
+		fake.createPackageReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Package
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createPackageReturnsOnCall[i] = struct {
+		result1 ccv3.Package
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -891,6 +991,60 @@ func (fake *FakeCloudControllerClient) GetOrganizationsReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error) {
+	fake.getPackageMutex.Lock()
+	ret, specificReturn := fake.getPackageReturnsOnCall[len(fake.getPackageArgsForCall)]
+	fake.getPackageArgsForCall = append(fake.getPackageArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("GetPackage", []interface{}{guid})
+	fake.getPackageMutex.Unlock()
+	if fake.GetPackageStub != nil {
+		return fake.GetPackageStub(guid)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getPackageReturns.result1, fake.getPackageReturns.result2, fake.getPackageReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetPackageCallCount() int {
+	fake.getPackageMutex.RLock()
+	defer fake.getPackageMutex.RUnlock()
+	return len(fake.getPackageArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetPackageArgsForCall(i int) string {
+	fake.getPackageMutex.RLock()
+	defer fake.getPackageMutex.RUnlock()
+	return fake.getPackageArgsForCall[i].guid
+}
+
+func (fake *FakeCloudControllerClient) GetPackageReturns(result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.GetPackageStub = nil
+	fake.getPackageReturns = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetPackageReturnsOnCall(i int, result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.GetPackageStub = nil
+	if fake.getPackageReturnsOnCall == nil {
+		fake.getPackageReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Package
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getPackageReturnsOnCall[i] = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSpaceIsolationSegment(spaceGUID string) (ccv3.Relationship, ccv3.Warnings, error) {
 	fake.getSpaceIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.getSpaceIsolationSegmentReturnsOnCall[len(fake.getSpaceIsolationSegmentArgsForCall)]
@@ -1109,6 +1263,61 @@ func (fake *FakeCloudControllerClient) UpdateTaskReturnsOnCall(i int, result1 cc
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error) {
+	fake.uploadPackageMutex.Lock()
+	ret, specificReturn := fake.uploadPackageReturnsOnCall[len(fake.uploadPackageArgsForCall)]
+	fake.uploadPackageArgsForCall = append(fake.uploadPackageArgsForCall, struct {
+		pkg         ccv3.Package
+		zipFilepath string
+	}{pkg, zipFilepath})
+	fake.recordInvocation("UploadPackage", []interface{}{pkg, zipFilepath})
+	fake.uploadPackageMutex.Unlock()
+	if fake.UploadPackageStub != nil {
+		return fake.UploadPackageStub(pkg, zipFilepath)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.uploadPackageReturns.result1, fake.uploadPackageReturns.result2, fake.uploadPackageReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UploadPackageCallCount() int {
+	fake.uploadPackageMutex.RLock()
+	defer fake.uploadPackageMutex.RUnlock()
+	return len(fake.uploadPackageArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UploadPackageArgsForCall(i int) (ccv3.Package, string) {
+	fake.uploadPackageMutex.RLock()
+	defer fake.uploadPackageMutex.RUnlock()
+	return fake.uploadPackageArgsForCall[i].pkg, fake.uploadPackageArgsForCall[i].zipFilepath
+}
+
+func (fake *FakeCloudControllerClient) UploadPackageReturns(result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.UploadPackageStub = nil
+	fake.uploadPackageReturns = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UploadPackageReturnsOnCall(i int, result1 ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.UploadPackageStub = nil
+	if fake.uploadPackageReturnsOnCall == nil {
+		fake.uploadPackageReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Package
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.uploadPackageReturnsOnCall[i] = struct {
+		result1 ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -1120,6 +1329,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createIsolationSegmentMutex.RLock()
 	defer fake.createIsolationSegmentMutex.RUnlock()
+	fake.createPackageMutex.RLock()
+	defer fake.createPackageMutex.RUnlock()
 	fake.deleteIsolationSegmentMutex.RLock()
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
@@ -1136,6 +1347,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getIsolationSegmentsMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
+	fake.getPackageMutex.RLock()
+	defer fake.getPackageMutex.RUnlock()
 	fake.getSpaceIsolationSegmentMutex.RLock()
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
 	fake.newTaskMutex.RLock()
@@ -1144,6 +1357,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.revokeIsolationSegmentFromOrganizationMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
 	defer fake.updateTaskMutex.RUnlock()
+	fake.uploadPackageMutex.RLock()
+	defer fake.uploadPackageMutex.RUnlock()
 	return fake.invocations
 }
 

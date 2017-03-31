@@ -13,24 +13,27 @@ import "net/http"
 const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
-	GetAppTasksRequest                                    = "GetAppTasks"
 	GetAppsRequest                                        = "GetApps"
+	GetAppTasksRequest                                    = "GetAppTasks"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
-	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
+	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
 	GetOrgsRequest                                        = "GetOrgs"
+	GetPackageRequest                                     = "GetPackage"
 	GetSpaceRelationshipIsolationSegmentRequest           = "GetSpaceRelationshipIsolationSegmentRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest         = "PatchSpaceRelationshipIsolationSegmentRequest"
 	PostApplicationRequest                                = "PostApplicationRequest"
 	PostAppTasksRequest                                   = "PostAppTasks"
 	PostIsolationSegmentRelationshipOrganizationsRequest  = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                          = "PostIsolationSegments"
+	PostPackageRequest                                    = "PostPackageRequest"
 )
 
 const (
 	AppsResource              = "apps"
 	IsolationSegmentsResource = "isolation_segments"
 	OrgsResource              = "organizations"
+	PackagesResource          = "packages"
 	SpaceResource             = "spaces"
 	TasksResource             = "tasks"
 )
@@ -39,6 +42,7 @@ const (
 var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
@@ -51,4 +55,5 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostApplicationRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
+	{Path: "/", Method: http.MethodPost, Name: PostPackageRequest, Resource: PackagesResource},
 }

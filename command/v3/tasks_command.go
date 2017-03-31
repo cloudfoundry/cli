@@ -47,7 +47,7 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(client)
+	cmd.Actor = v3action.NewActor(client, config)
 
 	return nil
 }

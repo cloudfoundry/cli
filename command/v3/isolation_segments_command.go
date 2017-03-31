@@ -35,7 +35,7 @@ func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(client)
+	cmd.Actor = v3action.NewActor(client, config)
 
 	return nil
 }

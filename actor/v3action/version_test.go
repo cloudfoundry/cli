@@ -15,7 +15,7 @@ var _ = Describe("Task Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient)
+		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
 	Describe("APIVersion", func() {

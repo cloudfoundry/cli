@@ -176,6 +176,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Uno strumento riga di comando per interagire con Cloud Foundry"
   },
@@ -1629,6 +1633,10 @@
   },
   {
     "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-create-package --name [name]",
     "translation": ""
   },
   {
@@ -5962,6 +5970,10 @@
   {
     "id": "Updating {{.AppName}} health_check_type to '{{.HealthCheckType}}'",
     "translation": "Aggiornamento di {{.AppName}} health_check_type a '{{.HealthCheckType}}'"
+  },
+  {
+    "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",

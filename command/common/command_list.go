@@ -10,7 +10,8 @@ var Commands commandList
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V3CreateApp v3.V3CreateAppCommand `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
+	V3CreateApp     v3.V3CreateAppCommand     `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
+	V3CreatePackage v3.V3CreatePackageCommand `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 
 	AddPluginRepo                      v2.AddPluginRepoCommand                      `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
