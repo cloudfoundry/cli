@@ -320,6 +320,10 @@
     "translation": "Limite istanze applicazione"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "Nome applicazione è un campo obbligatorio"
   },
@@ -2700,6 +2704,10 @@
     "translation": "Errore di recupero degli stack: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Errore di salvataggio del manifest: {{.Error}}"
   },
@@ -3574,6 +3582,10 @@
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
     "translation": "Invita e gestisci gli utenti, seleziona e modifica i piani e imposta i limiti di spesa\n"
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -5276,6 +5288,14 @@
     "translation": ""
   },
   {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
+  },
+  {
+    "id": "Task workers are unavailable.",
+    "translation": ""
+  },
+  {
     "id": "Terminate a running task of an app",
     "translation": ""
   },
@@ -6897,6 +6917,10 @@
   },
   {
     "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   },
   {
