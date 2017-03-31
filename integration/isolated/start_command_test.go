@@ -182,7 +182,7 @@ applications:
 						Eventually(session).Should(Say("last uploaded:"))
 						Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 						Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-						Eventually(session).Should(Say("start command:\\s+sh boot.sh"))
+						Eventually(session).Should(Say("start command:"))
 
 						Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 						Eventually(session).Should(Say("#0\\s+running\\s+.*\\d+\\.\\d+%.*of 128M.*of 128M"))
@@ -280,7 +280,7 @@ applications:
 								Eventually(session).Should(Say("last uploaded:"))
 								Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 								Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
-								Eventually(session).Should(Say("start command:\\s+sh boot.sh"))
+								Eventually(session).Should(Say("start command:"))
 
 								Eventually(session).Should(Say("state\\s+since\\s+cpu\\s+memory\\s+disk\\s+details"))
 
