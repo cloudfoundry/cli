@@ -60,6 +60,10 @@
     "translation": "App "
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} already exists.",
     "translation": ""
   },
@@ -1284,6 +1288,10 @@
     "translation": "Error removing plugin binary: "
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error staging application: {{.Message}}",
     "translation": ""
   },
@@ -1362,6 +1370,10 @@
   {
     "id": "Invalid flag: ",
     "translation": "Invalid flag: "
+  },
+  {
+    "id": "Isolation segment '{{.Name}}' not found.",
+    "translation": ""
   },
   {
     "id": "Isolation segment {{.IsolationSegmentName}} already exists.",
@@ -1689,6 +1701,14 @@
   },
   {
     "id": "Task has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
+  },
+  {
+    "id": "Task workers are unavailable.",
     "translation": ""
   },
   {
@@ -2333,6 +2353,10 @@
   },
   {
     "id": "{{.MemorySize}} x {{.NumInstances}} instances",
+    "translation": ""
+  },
+  {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
     "translation": ""
   }
 ]

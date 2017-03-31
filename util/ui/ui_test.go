@@ -150,7 +150,7 @@ var _ = Describe("UI", func() {
 
 		It("displays the passed in string", func() {
 			ui.DisplayBoolPrompt(false, "some-prompt", nil)
-			Expect(ui.Out).To(Say("some-prompt\x1b\\[36;1m>>\x1b\\[0m"))
+			Expect(ui.Out).To(Say("some-prompt \\[yN\\]:"))
 		})
 
 		Context("when the user chooses yes", func() {

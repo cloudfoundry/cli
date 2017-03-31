@@ -160,7 +160,7 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	defer ui.terminalLock.Unlock()
 
 	response := defaultResponse
-	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...) + ui.modifyColor(">>", color.New(color.FgCyan, color.Bold)))
+	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
 	interactivePrompt.Input = ui.In
 	interactivePrompt.Output = ui.Out
 	err := interactivePrompt.Resolve(&response)
