@@ -53,7 +53,7 @@ var _ = Describe("delete-user command", func() {
 				}
 			})
 
-			FIt("errors with DuplicateUsernameError", func() {
+			It("errors with DuplicateUsernameError", func() {
 				session := helpers.CF("delete-user", "-f", newUser)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Out).Should(Say("Error deleting user %s", newUser))
