@@ -16,12 +16,9 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
 	"github.com/lunixbochs/vtclean"
-	isatty "github.com/mattn/go-isatty"
 	runewidth "github.com/mattn/go-runewidth"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"github.com/vito/go-interact/interact"
-
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 //go:generate counterfeiter . Config
@@ -32,6 +29,10 @@ type Config interface {
 	ColorEnabled() configv3.ColorSetting
 	// Locale is the language to translate the output to
 	Locale() string
+	// IsTTY returns true when the ui has a TTY
+	IsTTY() bool
+	// TerminalWidth returns back the width of the terminal
+	TerminalWidth() int
 }
 
 //go:generate counterfeiter . TranslatableError
@@ -71,13 +72,16 @@ type UI struct {
 	terminalLock *sync.Mutex
 	fileLock     *sync.Mutex
 
+	IsTTY         bool
+	TerminalWidth int
+
 	TimezoneLocation *time.Location
 }
 
 // NewUI will return a UI object where Out is set to STDOUT, In is set to
 // STDIN, and Err is set to STDERR
-func NewUI(c Config) (*UI, error) {
-	translateFunc, err := GetTranslationFunc(c)
+func NewUI(config Config) (*UI, error) {
+	translateFunc, err := GetTranslationFunc(config)
 	if err != nil {
 		return nil, err
 	}
@@ -88,10 +92,12 @@ func NewUI(c Config) (*UI, error) {
 		In:               os.Stdin,
 		Out:              color.Output,
 		Err:              os.Stderr,
-		colorEnabled:     c.ColorEnabled(),
+		colorEnabled:     config.ColorEnabled(),
 		translate:        translateFunc,
 		terminalLock:     &sync.Mutex{},
 		fileLock:         &sync.Mutex{},
+		IsTTY:            config.IsTTY(),
+		TerminalWidth:    config.TerminalWidth(),
 		TimezoneLocation: location,
 	}, nil
 }
@@ -219,21 +225,12 @@ func (ui *UI) DisplayKeyValueTable(prefix string, table [][]string, padding int)
 
 	columns := len(table[0])
 
-	// Developer Note: The following is untested! Change at your own risk.
-	out, isFile := ui.Out.(*os.File)
-	if columns < 2 || !isFile || !isatty.IsTerminal(out.Fd()) {
+	if columns < 2 || !ui.IsTTY {
 		ui.DisplayNonWrappingTable(prefix, table, padding)
 		return
 	}
 
-	terminalWidth, _, err := terminal.GetSize(int(out.Fd()))
-
-	if err != nil {
-		ui.DisplayNonWrappingTable(prefix, table, padding)
-		return
-	}
-
-	ui.DisplayWrappingTableWithWidth(prefix, table, padding, terminalWidth)
+	ui.displayWrappingTableWithWidth(prefix, table, padding)
 }
 
 func (ui *UI) DisplayTableWithHeader(prefix string, table [][]string, padding int) {
@@ -247,7 +244,7 @@ func (ui *UI) DisplayTableWithHeader(prefix string, table [][]string, padding in
 	ui.DisplayNonWrappingTable(prefix, table, padding)
 }
 
-func (ui *UI) DisplayWrappingTableWithWidth(prefix string, table [][]string, padding int, terminalWidth int) {
+func (ui *UI) displayWrappingTableWithWidth(prefix string, table [][]string, padding int) {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
@@ -267,7 +264,7 @@ func (ui *UI) DisplayWrappingTableWithWidth(prefix string, table [][]string, pad
 	}
 
 	spilloverPadding := len(prefix) + sum(columnPadding)
-	lastColumnWidth := terminalWidth - spilloverPadding
+	lastColumnWidth := ui.TerminalWidth - spilloverPadding
 
 	for row := 0; row < rows; row++ {
 		fmt.Fprintf(ui.Out, prefix)

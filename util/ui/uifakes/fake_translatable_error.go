@@ -14,6 +14,9 @@ type FakeTranslatableError struct {
 	errorReturns     struct {
 		result1 string
 	}
+	errorReturnsOnCall map[int]struct {
+		result1 string
+	}
 	TranslateStub        func(func(string, ...interface{}) string) string
 	translateMutex       sync.RWMutex
 	translateArgsForCall []struct {
@@ -22,20 +25,26 @@ type FakeTranslatableError struct {
 	translateReturns struct {
 		result1 string
 	}
+	translateReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeTranslatableError) Error() string {
 	fake.errorMutex.Lock()
+	ret, specificReturn := fake.errorReturnsOnCall[len(fake.errorArgsForCall)]
 	fake.errorArgsForCall = append(fake.errorArgsForCall, struct{}{})
 	fake.recordInvocation("Error", []interface{}{})
 	fake.errorMutex.Unlock()
 	if fake.ErrorStub != nil {
 		return fake.ErrorStub()
-	} else {
-		return fake.errorReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.errorReturns.result1
 }
 
 func (fake *FakeTranslatableError) ErrorCallCount() int {
@@ -51,8 +60,21 @@ func (fake *FakeTranslatableError) ErrorReturns(result1 string) {
 	}{result1}
 }
 
+func (fake *FakeTranslatableError) ErrorReturnsOnCall(i int, result1 string) {
+	fake.ErrorStub = nil
+	if fake.errorReturnsOnCall == nil {
+		fake.errorReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.errorReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeTranslatableError) Translate(arg1 func(string, ...interface{}) string) string {
 	fake.translateMutex.Lock()
+	ret, specificReturn := fake.translateReturnsOnCall[len(fake.translateArgsForCall)]
 	fake.translateArgsForCall = append(fake.translateArgsForCall, struct {
 		arg1 func(string, ...interface{}) string
 	}{arg1})
@@ -60,9 +82,11 @@ func (fake *FakeTranslatableError) Translate(arg1 func(string, ...interface{}) s
 	fake.translateMutex.Unlock()
 	if fake.TranslateStub != nil {
 		return fake.TranslateStub(arg1)
-	} else {
-		return fake.translateReturns.result1
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.translateReturns.result1
 }
 
 func (fake *FakeTranslatableError) TranslateCallCount() int {
@@ -80,6 +104,18 @@ func (fake *FakeTranslatableError) TranslateArgsForCall(i int) func(string, ...i
 func (fake *FakeTranslatableError) TranslateReturns(result1 string) {
 	fake.TranslateStub = nil
 	fake.translateReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeTranslatableError) TranslateReturnsOnCall(i int, result1 string) {
+	fake.TranslateStub = nil
+	if fake.translateReturnsOnCall == nil {
+		fake.translateReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.translateReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }

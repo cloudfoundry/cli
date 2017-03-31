@@ -209,24 +209,8 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("DisplayKeyValueTable", func() {
-		It("displays a string matrix as a table with the provided prefix and padding to ui.Out", func() {
-			ui.DisplayKeyValueTable(
-				"some-prefix",
-				[][]string{
-					{"aaaaaaaaa", "bb", "ccccccc"},
-					{"dddd", "eeeeeeeeeee", "fff"},
-					{"gg", "hh", "ii"},
-				},
-				3)
-			Expect(ui.Out).To(Say(`some-prefixaaaaaaaaa   bb            ccccccc
-some-prefixdddd        eeeeeeeeeee   fff
-some-prefixgg          hh            ii`))
-		})
-	})
-
-	Describe("DisplayWrappingTableWithWidth", func() {
-		It("displays a table with the last column wrapping according to width", func() {
-			ui.DisplayWrappingTableWithWidth(" ",
+		JustBeforeEach(func() {
+			ui.DisplayKeyValueTable(" ",
 				[][]string{
 					{"wut0:", ""},
 					{"wut1:", "hi hi"},
@@ -234,15 +218,24 @@ some-prefixgg          hh            ii`))
 					{"wut3:", "hi hi " + strings.Repeat("a", 9)},
 					{"wut4:", strings.Repeat("a", 15) + " " + strings.Repeat("b", 15)},
 				},
-				2,
-				20)
-			Expect(ui.Out).To(Say(" wut0:  " + "\n"))
-			Expect(ui.Out).To(Say(" wut1:  " + "hi hi\n"))
-			Expect(ui.Out).To(Say(" wut2:  " + strings.Repeat("a", 9) + "\n"))
-			Expect(ui.Out).To(Say(" wut3:  hi hi\n"))
-			Expect(ui.Out).To(Say("        " + strings.Repeat("a", 9) + "\n"))
-			Expect(ui.Out).To(Say(" wut4:  " + strings.Repeat("a", 15) + "\n"))
-			Expect(ui.Out).To(Say("        " + strings.Repeat("b", 15) + "\n"))
+				2)
+		})
+
+		Context("in a TTY", func() {
+			BeforeEach(func() {
+				ui.IsTTY = true
+				ui.TerminalWidth = 20
+			})
+
+			It("displays a table with the last column wrapping according to width", func() {
+				Expect(ui.Out).To(Say(" wut0:  " + "\n"))
+				Expect(ui.Out).To(Say(" wut1:  " + "hi hi\n"))
+				Expect(ui.Out).To(Say(" wut2:  " + strings.Repeat("a", 9) + "\n"))
+				Expect(ui.Out).To(Say(" wut3:  hi hi\n"))
+				Expect(ui.Out).To(Say("        " + strings.Repeat("a", 9) + "\n"))
+				Expect(ui.Out).To(Say(" wut4:  " + strings.Repeat("a", 15) + "\n"))
+				Expect(ui.Out).To(Say("        " + strings.Repeat("b", 15) + "\n"))
+			})
 		})
 	})
 
@@ -477,7 +470,6 @@ some-prefixgg          hh            ii`))
 			message.MessageReturns("This is a log message\r\n")
 			message.TypeReturns("OUT")
 			message.TimestampReturns(time.Unix(1468969692, 0)) // "2016-07-19T16:08:12-07:00"
-			message.ApplicationIDReturns("app-guid")
 			message.SourceTypeReturns("APP/PROC/WEB")
 			message.SourceInstanceReturns("12")
 		})

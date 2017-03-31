@@ -339,6 +339,7 @@ var _ = Describe("Config", func() {
 				originalCFStagingTimeout string
 				originalCFStartupTimeout string
 				originalHTTPSProxy       string
+				originalForceTTY         string
 
 				config *Config
 			)
@@ -347,9 +348,11 @@ var _ = Describe("Config", func() {
 				originalCFStagingTimeout = os.Getenv("CF_STAGING_TIMEOUT")
 				originalCFStartupTimeout = os.Getenv("CF_STARTUP_TIMEOUT")
 				originalHTTPSProxy = os.Getenv("https_proxy")
+				originalForceTTY = os.Getenv("FORCE_TTY")
 				os.Setenv("CF_STAGING_TIMEOUT", "8675")
 				os.Setenv("CF_STARTUP_TIMEOUT", "309")
 				os.Setenv("https_proxy", "proxy.com")
+				os.Setenv("FORCE_TTY", "true")
 
 				var err error
 				config, err = LoadConfig()
@@ -361,12 +364,14 @@ var _ = Describe("Config", func() {
 				os.Setenv("CF_STAGING_TIMEOUT", originalCFStagingTimeout)
 				os.Setenv("CF_STARTUP_TIMEOUT", originalCFStartupTimeout)
 				os.Setenv("https_proxy", originalHTTPSProxy)
+				os.Setenv("FORCE_TTY", originalForceTTY)
 			})
 
 			It("overrides specific config values", func() {
 				Expect(config.StagingTimeout()).To(Equal(time.Duration(8675) * time.Minute))
 				Expect(config.StartupTimeout()).To(Equal(time.Duration(309) * time.Minute))
 				Expect(config.HTTPSProxy()).To(Equal("proxy.com"))
+				Expect(config.IsTTY()).To(BeTrue())
 			})
 		})
 

@@ -9,6 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"golang.org/x/crypto/ssh/terminal"
+
+	isatty "github.com/mattn/go-isatty"
+
 	"code.cloudfoundry.org/cli/version"
 )
 
@@ -104,6 +108,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		LCAll:            os.Getenv("LC_ALL"),
 		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
 		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
+		ForceTTY:         os.Getenv("FORCE_TTY"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -123,6 +128,17 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	if len(flags) > 0 {
 		config.Flags = flags[0]
+	}
+
+	// Developer Note: The following is untested! Change at your own risk.
+	terminalWidth, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		return nil, err
+	}
+
+	config.detectedSettings = detectedSettings{
+		tty:           isatty.IsTerminal(os.Stdout.Fd()),
+		terminalWidth: terminalWidth,
 	}
 
 	return &config, nil
@@ -156,6 +172,9 @@ type Config struct {
 
 	// Flags stores the configuration from gobal flags
 	Flags FlagOverride
+
+	// detectedSettings are settings detected when the config is loaded.
+	detectedSettings detectedSettings
 
 	pluginConfig PluginsConfig
 }
@@ -227,11 +246,18 @@ type EnvOverride struct {
 	LCAll            string
 	Experimental     string
 	CFDialTimeout    string
+	ForceTTY         string
 }
 
 // FlagOverride represents all the global flags passed to the CF CLI
 type FlagOverride struct {
 	Verbose bool
+}
+
+// detectedSettings are automatically detected settings determined by the CLI.
+type detectedSettings struct {
+	tty           bool
+	terminalWidth int
 }
 
 // Target returns the CC API URL
@@ -396,6 +422,27 @@ func (config *Config) Verbose() (bool, []string) {
 	verbose = config.Flags.Verbose || verbose
 
 	return verbose, filePath
+}
+
+// IsTTY returns true based off of:
+//   - The $FORCE_TTY is set to true/t/1
+//   - Detected from the STDOUT stream
+func (config *Config) IsTTY() bool {
+	if config.ENV.ForceTTY != "" {
+		envVal, err := strconv.ParseBool(config.ENV.ForceTTY)
+		if err == nil {
+			return envVal
+		}
+	}
+
+	return config.detectedSettings.tty
+}
+
+// TerminalWidth returns back the width of the terminal from when the config
+// was loaded. If the terminal width has changed since the config has loaded,
+// it will **not** return the new width.
+func (config *Config) TerminalWidth() int {
+	return config.detectedSettings.terminalWidth
 }
 
 // DialTimeout returns the timeout to use when dialing. This is based off of:
