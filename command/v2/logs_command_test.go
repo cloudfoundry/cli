@@ -48,23 +48,11 @@ var _ = Describe("logs command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		cmd.RequiredArgs.AppName = "some-app"
-		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	// TODO: remove when experimental flag is removed
-	Context("when CF_CLI_EXPERIMENTAL is set to true", func() {
-		BeforeEach(func() {
-			cmd.Recent = true
-		})
-
-		It("Displays the experimental warning message", func() {
-			Expect(testUI.Out).To(Say(command.ExperimentalWarning))
-		})
 	})
 
 	Context("when the checkTarget fails", func() {

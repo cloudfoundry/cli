@@ -17,8 +17,6 @@ var _ = Describe("space command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("space command refactor is still experimental")
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 	})
