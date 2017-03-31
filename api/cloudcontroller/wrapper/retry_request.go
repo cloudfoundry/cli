@@ -33,7 +33,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *cloudcont
 	var err error
 	var rawRequestBody []byte
 
-	if request.Body != nil {
+	if request.Body != nil && request.Method != http.MethodPost {
 		rawRequestBody, err = ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {

@@ -20,7 +20,8 @@ var _ = Describe("Retry Request", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			rawRequestBody := "banana pants"
-			request.Body = ioutil.NopCloser(strings.NewReader(rawRequestBody))
+			originalBody := ioutil.NopCloser(strings.NewReader(rawRequestBody))
+			request.Body = originalBody
 
 			response := &cloudcontroller.Response{
 				HTTPResponse: &http.Response{
@@ -33,6 +34,9 @@ var _ = Describe("Retry Request", func() {
 				StatusCode: responseStatusCode,
 			}
 			fakeConnection.MakeStub = func(req *http.Request, passedResponse *cloudcontroller.Response) error {
+				if request.Method == http.MethodPost {
+					Expect(originalBody).To(Equal(request.Body))
+				}
 				defer req.Body.Close()
 				body, err := ioutil.ReadAll(request.Body)
 				Expect(err).ToNot(HaveOccurred())
