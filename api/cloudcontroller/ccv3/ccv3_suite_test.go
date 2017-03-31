@@ -102,6 +102,9 @@ func SetupV3Response() {
 			},
 			"spaces": {
 				"href": "SERVER_URL/v3/spaces"
+			},
+			"packages": {
+				"href": "SERVER_URL/v3/packages"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)

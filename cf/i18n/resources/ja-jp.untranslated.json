@@ -24,6 +24,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "API URL to target",
     "translation": "API URL to target"
   },
@@ -1116,6 +1120,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-create-package --name [name]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3apps",
     "translation": "CF_NAME v3apps"
   },
@@ -1962,6 +1970,10 @@
   {
     "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Usage:",
