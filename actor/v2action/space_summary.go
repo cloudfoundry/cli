@@ -22,7 +22,7 @@ type SpaceSummary struct {
 	SecurityGroupRules   []SecurityGroupRule
 }
 
-func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name string) (SpaceSummary, Warnings, error) {
+func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name string, includeStagingSecurityGroupsRules bool) (SpaceSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	org, warnings, err := actor.GetOrganization(orgGUID)
@@ -85,13 +85,15 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, "running")...)
 	}
 
-	securityGroups, warnings, err = actor.GetSpaceStagingSecurityGroupsBySpace(space.GUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return SpaceSummary{}, allWarnings, err
-	}
-	for _, securityGroup := range securityGroups {
-		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, "staging")...)
+	if includeStagingSecurityGroupsRules {
+		securityGroups, warnings, err = actor.GetSpaceStagingSecurityGroupsBySpace(space.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return SpaceSummary{}, allWarnings, err
+		}
+		for _, securityGroup := range securityGroups {
+			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, "staging")...)
+		}
 	}
 
 	sort.Sort(sortableSecurityGroupRules(securityGroupRules))

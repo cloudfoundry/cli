@@ -16,15 +16,16 @@ import (
 //go:generate counterfeiter . SpaceActor
 
 type SpaceActor interface {
+	CloudControllerAPIVersion() string
 	GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (v2action.Space, v2action.Warnings, error)
-	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string) (v2action.SpaceSummary, v2action.Warnings, error)
+	GetSpaceSummaryByOrganizationAndName(orgGUID string, spaceName string, includeStagingSecurityGroupsRules bool) (v2action.SpaceSummary, v2action.Warnings, error)
 }
 
 //go:generate counterfeiter . SpaceActorV3
 
 type SpaceActorV3 interface {
-	GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
 	CloudControllerAPIVersion() string
+	GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
 }
 
 type SpaceCommand struct {
@@ -105,7 +106,10 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space)
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.74.0")
+	includeStagingSecurityGroupsRules := err == nil
+
+	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
