@@ -281,7 +281,8 @@ var _ = Describe("Package Actions", func() {
 			Context("when creating the zip errors", func() {
 				It("returns the warnings and the error", func() {
 					_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "/banana")
-					Expect(err).To(MatchError("open /banana: no such file or directory"))
+					// Windows returns back a different error message
+					Expect(err.Error()).To(MatchRegexp("open /banana: no such file or directory|The system cannot find the file specified"))
 					Expect(warnings).To(ConsistOf("some-app-warning"))
 				})
 			})
