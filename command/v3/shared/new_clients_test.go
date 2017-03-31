@@ -91,7 +91,7 @@ var _ = Describe("New Clients", func() {
 				)
 			})
 
-			{
+			It("returns the ClientTargetError", func() {
 				_, err := NewClients(fakeConfig, testUI, true)
 				Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
 			})
