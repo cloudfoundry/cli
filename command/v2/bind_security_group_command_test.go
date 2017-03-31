@@ -44,9 +44,6 @@ var _ = Describe("bind-security-group Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		// TODO: remove when experimental flag is removed
-		fakeConfig.ExperimentalReturns(true)
-
 		// Stubs for the happy path.
 		cmd.RequiredArgs.SecurityGroupName = "some-security-group"
 		cmd.RequiredArgs.OrganizationName = "some-org"
@@ -66,11 +63,6 @@ var _ = Describe("bind-security-group Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	// TODO: remove when experimental flag is removed
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking target fails", func() {

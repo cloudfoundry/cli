@@ -12,10 +12,6 @@ import (
 )
 
 var _ = Describe("Logs Command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("logs command refactor is still experimental")
-	})
-
 	Describe("help", func() {
 		It("displays command usage to output", func() {
 			session := helpers.CF("logs", "--help")

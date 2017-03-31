@@ -2,13 +2,11 @@ package v2
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -69,13 +67,6 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SpaceCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, false)
 
 	if err == nil {

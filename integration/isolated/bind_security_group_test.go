@@ -16,7 +16,6 @@ var _ = Describe("bind-security-group command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("bind-security-group command refactor is still experimental")
 		orgName = helpers.NewOrgName()
 		spaceName1 = helpers.NewSpaceName()
 		spaceName2 = helpers.NewSpaceName()
