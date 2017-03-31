@@ -92,7 +92,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("deletes the isolation segment", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s?", isolationSegmentName))
+						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
 
 						userName, _ := helpers.GetCredentials()
 						Eventually(session).Should(Say("Deleting isolation segment %s as %s...", isolationSegmentName, userName))
@@ -108,7 +108,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("cancels the deletion", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s?", isolationSegmentName))
+						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -121,7 +121,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 
 					It("cancels the deletion", func() {
 						session := helpers.CFWithStdin(buffer, "delete-isolation-segment", isolationSegmentName)
-						Eventually(session).Should(Say("Really delete the isolation segment %s?", isolationSegmentName))
+						Eventually(session).Should(Say("Really delete the isolation segment %s\\?", isolationSegmentName))
 						Eventually(session).Should(Say("Delete cancelled"))
 						Eventually(session).Should(Exit(0))
 					})

@@ -86,7 +86,7 @@ var _ = Describe("delete-org command", func() {
 				It("deletes the org", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?", orgName))
 					Eventually(session.Out).Should(Say("Deleting org %s as %s...", orgName, username))
 					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
@@ -101,7 +101,7 @@ var _ = Describe("delete-org command", func() {
 
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?", orgName))
 					Eventually(session.Out).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
@@ -115,7 +115,7 @@ var _ = Describe("delete-org command", func() {
 
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?", orgName))
 					Eventually(session.Out).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
@@ -132,9 +132,9 @@ var _ = Describe("delete-org command", func() {
 
 				It("asks again", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?", orgName))
 					Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
-					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?", orgName))
 					Eventually(session).Should(Exit(0))
 					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
