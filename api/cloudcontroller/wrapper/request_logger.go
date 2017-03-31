@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -88,7 +89,7 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 		return err
 	}
 
-	if request.Body != nil {
+	if request.Body != nil && strings.Contains(request.Header.Get("Content-Type"), "json") {
 		rawRequestBody, err := ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {

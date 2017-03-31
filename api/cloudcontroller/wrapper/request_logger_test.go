@@ -107,21 +107,34 @@ var _ = Describe("Request Logger", func() {
 		})
 
 		Context("when passed a body", func() {
-			var originalBody io.ReadCloser
-			BeforeEach(func() {
-				originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
-				request.Body = originalBody
+			Context("when the request's Content-Type is application/json", func() {
+				var originalBody io.ReadCloser
+				BeforeEach(func() {
+					request.Header.Set("Content-Type", "application/json")
+					originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
+					request.Body = originalBody
+				})
+
+				It("outputs the body", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
+
+					bytes, err := ioutil.ReadAll(request.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(bytes).To(Equal([]byte("foo")))
+				})
 			})
 
-			It("outputs the body", func() {
-				Expect(err).NotTo(HaveOccurred())
+			Context("when request's Content-Type is anything else", func() {
+				BeforeEach(func() {
+					request.Header.Set("Content-Type", "banana")
+				})
 
-				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
-
-				bytes, err := ioutil.ReadAll(request.Body)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(bytes).To(Equal([]byte("foo")))
+				It("does not display the body", func() {
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(1)) // Once for response body only
+				})
 			})
 		})
 
