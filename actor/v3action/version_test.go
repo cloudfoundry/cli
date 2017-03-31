@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Task Actions", func() {
+var _ = Describe("Version Check Actions", func() {
 	var (
 		actor                     Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
@@ -18,8 +18,8 @@ var _ = Describe("Task Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
-	Describe("APIVersion", func() {
-		It("returns back the CC API version", func() {
+	Describe("CloudControllerAPIVersion", func() {
+		It("returns the V3 CC API version", func() {
 			expectedVersion := "3.0.0-alpha.5"
 			fakeCloudControllerClient.CloudControllerAPIVersionReturns(expectedVersion)
 			Expect(actor.CloudControllerAPIVersion()).To(Equal(expectedVersion))
