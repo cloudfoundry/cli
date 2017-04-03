@@ -31,7 +31,7 @@ type Config interface {
 	Locale() string
 	// IsTTY returns true when the ui has a TTY
 	IsTTY() bool
-	// TerminalWidth returns back the width of the terminal
+	// TerminalWidth returns the width of the terminal
 	TerminalWidth() int
 }
 
@@ -40,7 +40,7 @@ type Config interface {
 // TranslatableError it wraps the error interface adding a way to set the
 // translation function on the error
 type TranslatableError interface {
-	// Returns back the untranslated error string
+	// Returns the untranslated error string
 	Error() string
 	Translate(func(string, ...interface{}) string) string
 }
