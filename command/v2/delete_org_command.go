@@ -52,7 +52,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		promptMessage := "Really delete the org {{.OrgName}} and everything associated with it?"
+		promptMessage := "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?"
 		deleteOrg, promptErr := cmd.UI.DisplayBoolPrompt(false, promptMessage, map[string]interface{}{"OrgName": cmd.RequiredArgs.Organization})
 
 		if promptErr != nil {

@@ -4464,7 +4464,7 @@
     "translation": ""
   },
   {
-    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": ""
   },
   {
@@ -5640,6 +5640,10 @@
     "translation": ""
   },
   {
+    "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+    "translation": "모든 조직에서 이 도메인을 공유합니다.\n이 도메인을 삭제하면 연관된 모든 라우트가 제거되고 이 도메인이 있는 앱에 도달할 수 없습니다.\n{{.DomainName}} 도메인을 삭제하시겠습니까? "
+  },
+  {
     "id": "This command",
     "translation": "이 명령"
   },
@@ -5654,10 +5658,6 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "이 명령에는 라우팅 API가 필요합니다. 대상 엔드포인트에서 해당 항목이 사용으로 설정되지 않았음을 보고합니다."
-  },
-  {
-    "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-    "translation": "모든 조직에서 이 도메인을 공유합니다.\n이 도메인을 삭제하면 연관된 모든 라우트가 제거되고 이 도메인이 있는 앱에 도달할 수 없습니다.\n{{.DomainName}} 도메인을 삭제하시겠습니까? "
   },
   {
     "id": "This is for backwards compatibility",

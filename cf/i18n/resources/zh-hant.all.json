@@ -4464,7 +4464,7 @@
     "translation": ""
   },
   {
-    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": ""
   },
   {
@@ -5640,6 +5640,10 @@
     "translation": ""
   },
   {
+    "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+    "translation": "此網域是在所有組織之間共用。\n刪除它會移除所有關聯的路徑，並且將具有此網域的任何應用程式設為無法連接。\n您確定要刪除網域 {{.DomainName}} 嗎？"
+  },
+  {
     "id": "This command",
     "translation": "這個指令"
   },
@@ -5654,10 +5658,6 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "這個指令需要「遞送 API」。您的目標端點回報它尚未啟用。"
-  },
-  {
-    "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-    "translation": "此網域是在所有組織之間共用。\n刪除它會移除所有關聯的路徑，並且將具有此網域的任何應用程式設為無法連接。\n您確定要刪除網域 {{.DomainName}} 嗎？"
   },
   {
     "id": "This is for backwards compatibility",

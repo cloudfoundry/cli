@@ -4464,7 +4464,7 @@
     "translation": ""
   },
   {
-    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": ""
   },
   {
@@ -5640,6 +5640,10 @@
     "translation": ""
   },
   {
+    "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+    "translation": "Este dominio se comparte a través de todas las organizaciones.\nLa supresión eliminará todas las rutas asociadas, y convertirá en inalcanzable cualquier app con este dominio.\n¿Está seguro de que desea suprimir el dominio {{.DomainName}}? "
+  },
+  {
     "id": "This command",
     "translation": "Este mandato"
   },
@@ -5654,10 +5658,6 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "Esta mandato requiere la API de direccionamiento. Los informes de puntos finales de destino no están habilitados."
-  },
-  {
-    "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-    "translation": "Este dominio se comparte a través de todas las organizaciones.\nLa supresión eliminará todas las rutas asociadas, y convertirá en inalcanzable cualquier app con este dominio.\n¿Está seguro de que desea suprimir el dominio {{.DomainName}}? "
   },
   {
     "id": "This is for backwards compatibility",
