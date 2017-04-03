@@ -2108,7 +2108,7 @@ func (fake *FakeCloudControllerClient) GetStackReturnsOnCall(i int, result1 ccv2
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error) {
 	fake.newUserMutex.Lock()
 	ret, specificReturn := fake.newUserReturnsOnCall[len(fake.newUserArgsForCall)]
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {

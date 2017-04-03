@@ -101,7 +101,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
 				Expect(fakeActor.CreateIsolationSegmentByNameCallCount()).To(Equal(1))
-				Expect(fakeActor.CreateIsolationSegmentByNameArgsForCall(0)).To(Equal(isolationSegment))
+				Expect(fakeActor.CreateIsolationSegmentByNameArgsForCall(0)).To(Equal(v3action.IsolationSegment{Name: isolationSegment}))
 			})
 		})
 

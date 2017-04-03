@@ -146,12 +146,9 @@ var _ = Describe("run-task Command", func() {
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, memory, disk := fakeActor.RunTaskArgsForCall(0)
+						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("some command"))
-						Expect(name).To(Equal(""))
-						Expect(memory).To(BeEquivalentTo(0))
-						Expect(disk).To(BeEquivalentTo(0))
+						Expect(task).To(Equal(v3action.Task{Command: "some command"}))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
@@ -187,10 +184,9 @@ get-application-warning-3`))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, _, _ := fakeActor.RunTaskArgsForCall(0)
+						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("some command"))
-						Expect(name).To(Equal("some-task-name"))
+						Expect(task).To(Equal(v3action.Task{Command: "some command", Name: "some-task-name"}))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
@@ -227,11 +223,13 @@ get-application-warning-3`))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, _, disk := fakeActor.RunTaskArgsForCall(0)
+						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("some command"))
-						Expect(name).To(Equal("some-task-name"))
-						Expect(disk).To(BeEquivalentTo(321))
+						Expect(task).To(Equal(v3action.Task{
+							Command:  "some command",
+							Name:     "some-task-name",
+							DiskInMB: 321,
+						}))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
@@ -268,11 +266,13 @@ get-application-warning-3`))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 
 						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-						appGUID, command, name, memory, _ := fakeActor.RunTaskArgsForCall(0)
+						appGUID, task := fakeActor.RunTaskArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(command).To(Equal("some command"))
-						Expect(name).To(Equal("some-task-name"))
-						Expect(memory).To(BeEquivalentTo(123))
+						Expect(task).To(Equal(v3action.Task{
+							Command:    "some command",
+							Name:       "some-task-name",
+							MemoryInMB: 123,
+						}))
 
 						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK

@@ -5,8 +5,9 @@ import (
 	"net/url"
 	"strconv"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"sort"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 // Task represents a V3 actor Task.
@@ -33,15 +34,15 @@ func (e TaskNotFoundError) Error() string {
 
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
-func (actor Actor) RunTask(appGUID string, command string, name string, memory uint64, disk uint64) (Task, Warnings, error) {
-	task, warnings, err := actor.CloudControllerClient.NewTask(appGUID, command, name, memory, disk)
+func (actor Actor) RunTask(appGUID string, task Task) (Task, Warnings, error) {
+	createdTask, warnings, err := actor.CloudControllerClient.CreateApplicationTask(appGUID, ccv3.Task(task))
 	if err != nil {
 		if e, ok := err.(ccv3.TaskWorkersUnavailableError); ok {
 			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}
 		}
 	}
 
-	return Task(task), Warnings(warnings), err
+	return Task(createdTask), Warnings(warnings), err
 }
 
 // GetApplicationTasks returns a list of tasks associated with the provided

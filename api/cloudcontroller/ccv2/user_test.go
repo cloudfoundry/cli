@@ -16,7 +16,7 @@ var _ = Describe("User", func() {
 		client = NewTestClient()
 	})
 
-	Describe("NewUser", func() {
+	Describe("CreateUser", func() {
 		Context("when an error does not occur", func() {
 			BeforeEach(func() {
 				response := `{
@@ -49,7 +49,7 @@ var _ = Describe("User", func() {
 			})
 
 			It("creates and returns the user and all warnings", func() {
-				user, warnings, err := client.NewUser("some-uaa-guid")
+				user, warnings, err := client.CreateUser("some-uaa-guid")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(user).To(Equal(User{GUID: "some-guid"}))
@@ -73,7 +73,7 @@ var _ = Describe("User", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.NewUser("some-uaa-guid")
+				_, warnings, err := client.CreateUser("some-uaa-guid")
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: 418,
 					CCErrorResponse: CCErrorResponse{

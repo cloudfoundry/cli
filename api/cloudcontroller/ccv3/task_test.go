@@ -19,15 +19,14 @@ var _ = Describe("Task", func() {
 		client = NewTestClient()
 	})
 
-	Describe("NewTask", func() {
+	Describe("CreateApplicationTask", func() {
 		Context("when the application exists", func() {
 			var response string
 
 			BeforeEach(func() {
-				//TODO: check if latest CC API returns this format
 				response = `{
-  "sequence_id": 3
-}`
+					"sequence_id": 3
+				}`
 			})
 
 			Context("when the name is empty", func() {
@@ -42,7 +41,7 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "", 0, 0)
+					task, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command"})
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{SequenceID: 3}))
@@ -62,7 +61,7 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "some-task-name", 0, 0)
+					task, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command", Name: "some-task-name"})
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{SequenceID: 3}))
@@ -73,9 +72,9 @@ var _ = Describe("Task", func() {
 			Context("when the disk size is not 0", func() {
 				BeforeEach(func() {
 					response := `{
-  "disk_in_mb": 123,
-  "sequence_id": 3
-}`
+						"disk_in_mb": 123,
+						"sequence_id": 3
+					}`
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
@@ -86,7 +85,7 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings with the provided disk size", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "", 0, uint64(123))
+					task, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command", DiskInMB: uint64(123)})
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{DiskInMB: uint64(123), SequenceID: 3}))
@@ -97,9 +96,9 @@ var _ = Describe("Task", func() {
 			Context("when the memory is not 0", func() {
 				BeforeEach(func() {
 					response := `{
-  "memory_in_mb": 123,
-  "sequence_id": 3
-}`
+						"memory_in_mb": 123,
+						"sequence_id": 3
+					}`
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
@@ -110,7 +109,7 @@ var _ = Describe("Task", func() {
 				})
 
 				It("creates and returns the task and all warnings with the provided memory", func() {
-					task, warnings, err := client.NewTask("some-app-guid", "some command", "", uint64(123), 0)
+					task, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command", MemoryInMB: uint64(123)})
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(task).To(Equal(Task{MemoryInMB: uint64(123), SequenceID: 3}))
@@ -123,19 +122,19 @@ var _ = Describe("Task", func() {
 		Context("when the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-    {
-      "code": 10010,
-      "detail": "App not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
@@ -145,7 +144,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.NewTask("some-app-guid", "some command", "", 0, 0)
+				_, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command"})
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
@@ -172,45 +171,45 @@ var _ = Describe("Task", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
-  "pagination": {
-    "next": {
-      "href": "%s/v3/apps/some-app-guid/tasks?per_page=2&page=2"
-    }
-  },
-  "resources": [
-    {
-      "guid": "task-1-guid",
-      "sequence_id": 1,
-      "name": "task-1",
-      "command": "some-command",
-      "state": "SUCCEEDED",
-      "created_at": "2016-11-07T05:59:01Z"
-    },
-    {
-      "guid": "task-2-guid",
-      "sequence_id": 2,
-      "name": "task-2",
-      "command": "some-command",
-      "state": "FAILED",
-      "created_at": "2016-11-07T06:59:01Z"
-    }
-  ]
-}`, server.URL())
+					"pagination": {
+						"next": {
+							"href": "%s/v3/apps/some-app-guid/tasks?per_page=2&page=2"
+						}
+					},
+					"resources": [
+						{
+							"guid": "task-1-guid",
+							"sequence_id": 1,
+							"name": "task-1",
+							"command": "some-command",
+							"state": "SUCCEEDED",
+							"created_at": "2016-11-07T05:59:01Z"
+						},
+						{
+							"guid": "task-2-guid",
+							"sequence_id": 2,
+							"name": "task-2",
+							"command": "some-command",
+							"state": "FAILED",
+							"created_at": "2016-11-07T06:59:01Z"
+						}
+					]
+				}`, server.URL())
 				response2 := `{
-  "pagination": {
-    "next": null
-  },
-  "resources": [
-    {
-      "guid": "task-3-guid",
-      "sequence_id": 3,
-      "name": "task-3",
-      "command": "some-command",
-      "state": "RUNNING",
-      "created_at": "2016-11-07T07:59:01Z"
-    }
-  ]
-}`
+					"pagination": {
+						"next": null
+					},
+					"resources": [
+						{
+							"guid": "task-3-guid",
+							"sequence_id": 3,
+							"name": "task-3",
+							"command": "some-command",
+							"state": "RUNNING",
+							"created_at": "2016-11-07T07:59:01Z"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks", "per_page=2"),
@@ -262,14 +261,14 @@ var _ = Describe("Task", func() {
 		Context("when the application does not exist", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10010,
-      "detail": "App not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks"),
@@ -287,19 +286,19 @@ var _ = Describe("Task", func() {
 		Context("when the cloud controller returns errors and warnings", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-    {
-      "code": 10010,
-      "detail": "App not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks"),
@@ -370,19 +369,19 @@ var _ = Describe("Task", func() {
 		Context("when the request fails", func() {
 			BeforeEach(func() {
 				response := `{
-  "errors": [
-    {
-      "code": 10008,
-      "detail": "The request is semantically invalid: command presence",
-      "title": "CF-UnprocessableEntity"
-    },
-    {
-      "code": 10010,
-      "detail": "App not found",
-      "title": "CF-ResourceNotFound"
-    }
-  ]
-}`
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "App not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPut, "/v3/tasks/some-task-guid/cancel"),

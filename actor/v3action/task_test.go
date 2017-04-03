@@ -25,7 +25,7 @@ var _ = Describe("Task Actions", func() {
 	Describe("RunTask", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.NewTaskReturns(
+				fakeCloudControllerClient.CreateApplicationTaskReturns(
 					ccv3.Task{
 						SequenceID: 3,
 					},
@@ -38,7 +38,13 @@ var _ = Describe("Task Actions", func() {
 			})
 
 			It("creates and returns the task and all warnings", func() {
-				task, warnings, err := actor.RunTask("some-app-guid", "some command", "some-task-name", 123, 321)
+				expectedTask := Task{
+					Command:    "some command",
+					Name:       "some-task-name",
+					MemoryInMB: 123,
+					DiskInMB:   321,
+				}
+				task, warnings, err := actor.RunTask("some-app-guid", expectedTask)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(task).To(Equal(Task{
@@ -46,23 +52,26 @@ var _ = Describe("Task Actions", func() {
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-				Expect(fakeCloudControllerClient.NewTaskCallCount()).To(Equal(1))
-				appGUIDArg, commandArg, name, memory, disk := fakeCloudControllerClient.NewTaskArgsForCall(0)
+				Expect(fakeCloudControllerClient.CreateApplicationTaskCallCount()).To(Equal(1))
+				appGUIDArg, taskArg := fakeCloudControllerClient.CreateApplicationTaskArgsForCall(0)
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
-				Expect(commandArg).To(Equal("some command"))
-				Expect(name).To(Equal("some-task-name"))
-				Expect(memory).To(BeEquivalentTo(123))
-				Expect(disk).To(BeEquivalentTo(321))
+				Expect(taskArg).To(Equal(ccv3.Task(expectedTask)))
 			})
 		})
 
 		Context("when the cloud controller client returns an error", func() {
-			Context("when the cloud controller error is generic", func() {
-				var expectedErr error
+			var warnings Warnings
+			var err error
+			var expectedErr error
 
+			JustBeforeEach(func() {
+				_, warnings, err = actor.RunTask("some-app-guid", Task{Command: "some command"})
+			})
+
+			Context("when the cloud controller error is generic", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a CloudControllerClient Error")
-					fakeCloudControllerClient.NewTaskReturns(
+					fakeCloudControllerClient.CreateApplicationTaskReturns(
 						ccv3.Task{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						expectedErr,
@@ -70,7 +79,6 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns the same error and all warnings", func() {
-					_, warnings, err := actor.RunTask("some-app-guid", "some command", "", 0, 0)
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
@@ -78,16 +86,16 @@ var _ = Describe("Task Actions", func() {
 
 			Context("when the error is a TaskWorkersUnavailableError", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.NewTaskReturns(
+					fakeCloudControllerClient.CreateApplicationTaskReturns(
 						ccv3.Task{},
-						nil,
+						ccv3.Warnings{"warning-1", "warning-2"},
 						ccv3.TaskWorkersUnavailableError{Message: "banana babans"},
 					)
 				})
 
-				It("returns a TaskWorkersUnavailableError", func() {
-					_, _, err := actor.RunTask("some-app-guid", "some command", "", 0, 0)
+				It("returns a TaskWorkersUnavailableError and all warnings", func() {
 					Expect(err).To(MatchError(TaskWorkersUnavailableError{Message: "banana babans"}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})
 		})

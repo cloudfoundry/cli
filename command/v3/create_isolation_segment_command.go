@@ -12,7 +12,7 @@ import (
 
 type CreateIsolationSegmentActor interface {
 	CloudControllerAPIVersion() string
-	CreateIsolationSegmentByName(name string) (v3action.Warnings, error)
+	CreateIsolationSegmentByName(isolationSegment v3action.IsolationSegment) (v3action.Warnings, error)
 }
 
 type CreateIsolationSegmentCommand struct {
@@ -61,7 +61,9 @@ func (cmd CreateIsolationSegmentCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.CreateIsolationSegmentByName(cmd.RequiredArgs.IsolationSegmentName)
+	warnings, err := cmd.Actor.CreateIsolationSegmentByName(v3action.IsolationSegment{
+		Name: cmd.RequiredArgs.IsolationSegmentName,
+	})
 	cmd.UI.DisplayWarnings(warnings)
 	if _, ok := err.(v3action.IsolationSegmentAlreadyExistsError); ok {
 		cmd.UI.DisplayWarning("Isolation segment {{.IsolationSegmentName}} already exists.", map[string]interface{}{
