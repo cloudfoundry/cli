@@ -90,7 +90,7 @@ func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) error {
 	}
 
 	if !force {
-		answer := cmd.ui.Confirm(T("This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ", map[string]interface{}{"DomainName": domainName}))
+		answer := cmd.ui.Confirm(T("This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ", map[string]interface{}{"DomainName": domainName}))
 
 		if !answer {
 			return nil
