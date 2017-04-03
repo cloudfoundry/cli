@@ -2,6 +2,8 @@ package isolated
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -121,6 +123,9 @@ var _ = Describe("space command", func() {
 					spaceQuotaName       string
 					serviceInstance      string
 					isolationSegmentName string
+					securityGroupName    string
+					securityGroupRules   *os.File
+					err                  error
 				)
 
 				BeforeEach(func() {
@@ -138,6 +143,20 @@ var _ = Describe("space command", func() {
 					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
 					Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
+
+					securityGroupName = helpers.PrefixedRandomName("aaaaaaaaaaa")
+					securityGroupRules, err = ioutil.TempFile("", "security-group-rules")
+					Expect(err).ToNot(HaveOccurred())
+
+					securityGroupRules.Write([]byte(`[]`))
+
+					Eventually(helpers.CF("create-security-group", securityGroupName, securityGroupRules.Name())).Should(Exit(0))
+					Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-security-group", securityGroupName, "-f")).Should(Exit(0))
+					os.Remove(securityGroupRules.Name())
 				})
 
 				It("displays a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
@@ -151,44 +170,88 @@ var _ = Describe("space command", func() {
 					Eventually(session.Out).Should(Say("services:\\s+%s", serviceInstance))
 					Eventually(session.Out).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
 					Eventually(session.Out).Should(Say("space quota:\\s+%s", spaceQuotaName))
-					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks"))
+					Eventually(session.Out).Should(Say("security groups:\\s+.*%s", securityGroupName))
 				})
 			})
 
 			Context("when the security group rules flag is used", func() {
+				var (
+					securityGroupName   string
+					securityGroupRules  *os.File
+					securityGroupName2  string
+					securityGroupRules2 *os.File
+					err                 error
+				)
+
+				BeforeEach(func() {
+					securityGroupName = helpers.PrefixedRandomName("aaaaaaaaaaa")
+					securityGroupRules, err = ioutil.TempFile("", "security-group-rules")
+					Expect(err).ToNot(HaveOccurred())
+
+					securityGroupRules.Write([]byte(`
+						[
+							{
+								"protocol": "tcp",
+								"destination": "1.2.3.4/24",
+								"ports": "80,443",
+								"description": "some security group"
+							}
+						]
+					`))
+
+					Eventually(helpers.CF("create-security-group", securityGroupName, securityGroupRules.Name())).Should(Exit(0))
+					Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
+
+					securityGroupName2 = helpers.PrefixedRandomName("aaaaaaaaaaz")
+					securityGroupRules2, err = ioutil.TempFile("", "security-group-rules")
+					Expect(err).ToNot(HaveOccurred())
+
+					securityGroupRules2.Write([]byte(`
+						[
+							{
+								"protocol": "tcp",
+								"destination": "5.7.9.11/24",
+								"ports": "80,443",
+								"description": "some other security group"
+							},
+							{
+								"protocol": "udp",
+								"destination": "92.0.0.1/24",
+								"ports": "80,443",
+								"description": "some other other security group"
+							}
+						]
+					`))
+
+					Eventually(helpers.CF("create-security-group", securityGroupName2, securityGroupRules2.Name())).Should(Exit(0))
+					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					Eventually(helpers.CF("delete-security-group", securityGroupName, "-f")).Should(Exit(0))
+					os.Remove(securityGroupRules.Name())
+					Eventually(helpers.CF("delete-security-group", securityGroupName2, "-f")).Should(Exit(0))
+					os.Remove(securityGroupRules2.Name())
+				})
+
 				It("displays the space information as well as all security group rules", func() {
 					session := helpers.CF("space", "--security-group-rules", spaceName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
 
-					Eventually(session.Out).Should(Say("name:\\s+%s", spaceName))
-					Eventually(session.Out).Should(Say("org:\\s+%s", orgName))
+					Eventually(session.Out).Should(Say("name:"))
+					Eventually(session.Out).Should(Say("org:"))
 					Eventually(session.Out).Should(Say("apps:"))
 					Eventually(session.Out).Should(Say("services:"))
 					Eventually(session.Out).Should(Say("isolation segment:"))
 					Eventually(session.Out).Should(Say("space quota:"))
-					Eventually(session.Out).Should(Say("security groups:\\s+dns, load_balancer, public_networks"))
+					Eventually(session.Out).Should(Say("security groups:"))
 					Eventually(session.Out).Should(Say("\n\n"))
 
 					Eventually(session.Out).Should(Say("security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description"))
-					Eventually(session.Out).Should(Say("#0\\s+dns\\s+0.0.0.0/0\\s+53\\s+tcp\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+dns\\s+0.0.0.0/0\\s+53\\s+udp\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+dns\\s+0.0.0.0/0\\s+53\\s+tcp\\s+staging"))
-					Eventually(session.Out).Should(Say("\\s+dns\\s+0.0.0.0/0\\s+53\\s+udp\\s+staging"))
-
-					Eventually(session.Out).Should(Say("#1\\s+load_balancer\\s+10.244.0.34\\s+all\\s+running"))
-
-					Eventually(session.Out).Should(Say("#2\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+all\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+all\\s+staging"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+11.0.0.0-169.253.255.255\\s+all\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+11.0.0.0-169.253.255.255\\s+all\\s+staging"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+169.255.0.0-172.15.255.255\\s+all\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+169.255.0.0-172.15.255.255\\s+all\\s+staging"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+172.32.0.0-192.167.255.255\\s+all\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+172.32.0.0-192.167.255.255\\s+all\\s+staging"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+192.169.0.0-255.255.255.255\\s+all\\s+running"))
-					Eventually(session.Out).Should(Say("\\s+public_networks\\s+192.169.0.0-255.255.255.255\\s+all\\s+staging"))
-
+					Eventually(session.Out).Should(Say("#0\\s+%s\\s+1.2.3.4/24\\s+80,443\\s+tcp\\s+running", securityGroupName))
+					Eventually(session.Out).Should(Say("#1\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+running", securityGroupName2))
+					Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+running", securityGroupName2))
 				})
 			})
 		})
