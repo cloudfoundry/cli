@@ -3,8 +3,6 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -93,8 +91,10 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 // UpdateTask cancels a task.
 func (client *Client) UpdateTask(taskGUID string) (Task, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    fmt.Sprintf("%s/v3/tasks/%s/cancel", client.cloudControllerURL, taskGUID),
-		Method: http.MethodPut,
+		RequestName: internal.PutTaskCancelRequest,
+		URIParams: internal.Params{
+			"guid": taskGUID,
+		},
 	})
 	if err != nil {
 		return Task{}, nil, err
