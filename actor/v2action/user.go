@@ -12,7 +12,7 @@ func (actor Actor) NewUser(username string, password string, origin string) (Use
 		return User{}, nil, err
 	}
 
-	ccUser, ccWarnings, err := actor.CloudControllerClient.NewUser(uaaUser.ID)
+	ccUser, ccWarnings, err := actor.CloudControllerClient.CreateUser(uaaUser.ID)
 
 	return User(ccUser), Warnings(ccWarnings), err
 }

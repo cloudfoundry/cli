@@ -21,15 +21,10 @@ type Task struct {
 	DiskInMB   uint64 `json:"disk_in_mb,omitempty"`
 }
 
-// NewTask runs a command in the Application environment associated with the
-// provided Application GUID.
-func (client *Client) NewTask(appGUID string, command string, name string, memory uint64, disk uint64) (Task, Warnings, error) {
-	bodyBytes, err := json.Marshal(Task{
-		Command:    command,
-		Name:       name,
-		MemoryInMB: memory,
-		DiskInMB:   disk,
-	})
+// CreateApplicationTask runs a command in the Application environment
+// associated with the provided Application GUID.
+func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Warnings, error) {
+	bodyBytes, err := json.Marshal(task)
 	if err != nil {
 		return Task{}, nil, err
 	}
@@ -45,17 +40,13 @@ func (client *Client) NewTask(appGUID string, command string, name string, memor
 		return Task{}, nil, err
 	}
 
-	var task Task
+	var responseTask Task
 	response := cloudcontroller.Response{
-		Result: &task,
+		Result: &responseTask,
 	}
 
 	err = client.connection.Make(request, &response)
-	if err != nil {
-		return Task{}, response.Warnings, err
-	}
-
-	return task, response.Warnings, nil
+	return responseTask, response.Warnings, err
 }
 
 // GetApplicationTasks returns a list of tasks associated with the provided

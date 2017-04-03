@@ -34,7 +34,7 @@ type CloudControllerClient interface {
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error)
-	NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
+	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)

@@ -14,7 +14,7 @@ import (
 
 type RunTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	RunTask(appGUID string, command string, name string, memory uint64, disk uint64) (v3action.Task, v3action.Warnings, error)
+	RunTask(appGUID string, task v3action.Task) (v3action.Task, v3action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
@@ -77,7 +77,21 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command, cmd.Name, cmd.Memory.Size, cmd.Disk.Size)
+	inputTask := v3action.Task{
+		Command: cmd.RequiredArgs.Command,
+	}
+
+	if cmd.Name != "" {
+		inputTask.Name = cmd.Name
+	}
+	if cmd.Disk.Size != 0 {
+		inputTask.DiskInMB = cmd.Disk.Size
+	}
+	if cmd.Memory.Size != 0 {
+		inputTask.MemoryInMB = cmd.Memory.Size
+	}
+
+	task, warnings, err := cmd.Actor.RunTask(application.GUID, inputTask)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

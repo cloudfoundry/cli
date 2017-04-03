@@ -36,10 +36,16 @@
 //   Top Level Endpoint: spaces
 //   Return Value: []ServiceInstance
 //
+//   Method Name: CreateApplicationTask
+//   Endpoint: /v3/apps/:application_guid/task
+//   Action Name: Post
+//   Top Level Endpoint: apps
+//   Return Value: []Task
+//
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:
 //   HTTP Command -> Action Name
-//   POST -> New
+//   POST -> Create
 //   GET -> Get
 //   PUT -> Update
 //   DELETE -> Delete

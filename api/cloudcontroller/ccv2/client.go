@@ -39,7 +39,7 @@
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:
 //   HTTP Command -> Action Name
-//   POST -> New
+//   POST -> Create
 //   GET -> Get
 //   PUT -> Update
 //   DELETE -> Delete

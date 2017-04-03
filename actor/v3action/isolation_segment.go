@@ -53,10 +53,10 @@ func (actor Actor) GetIsolationSegmentBySpace(spaceGUID string) (IsolationSegmen
 }
 
 // CreateIsolationSegmentByName creates a given isolation segment.
-func (actor Actor) CreateIsolationSegmentByName(name string) (Warnings, error) {
-	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(name)
+func (actor Actor) CreateIsolationSegmentByName(isolationSegment IsolationSegment) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(ccv3.IsolationSegment(isolationSegment))
 	if _, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
-		return Warnings(warnings), IsolationSegmentAlreadyExistsError{Name: name}
+		return Warnings(warnings), IsolationSegmentAlreadyExistsError{Name: isolationSegment.Name}
 	}
 	return Warnings(warnings), err
 }

@@ -45,7 +45,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the queried applications and all warnings", func() {
-				isolationSegment, warnings, err := client.CreateIsolationSegment(name)
+				isolationSegment, warnings, err := client.CreateIsolationSegment(IsolationSegment{Name: name})
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(isolationSegment).To(Equal(IsolationSegment{
@@ -76,7 +76,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateIsolationSegment(name)
+				_, warnings, err := client.CreateIsolationSegment(IsolationSegment{Name: name})
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{

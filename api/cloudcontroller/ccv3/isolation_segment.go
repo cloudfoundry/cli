@@ -18,8 +18,8 @@ type IsolationSegment struct {
 // CreateIsolationSegment will create an Isolation Segment on the Cloud
 // Controller. Note: This will not validate that the placement tag exists in
 // the diego cluster.
-func (client *Client) CreateIsolationSegment(name string) (IsolationSegment, Warnings, error) {
-	body, err := json.Marshal(IsolationSegment{Name: name})
+func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) (IsolationSegment, Warnings, error) {
+	body, err := json.Marshal(isolationSegment)
 	if err != nil {
 		return IsolationSegment{}, nil, err
 	}
@@ -32,13 +32,13 @@ func (client *Client) CreateIsolationSegment(name string) (IsolationSegment, War
 		return IsolationSegment{}, nil, err
 	}
 
-	var isolationSegment IsolationSegment
+	var responseIsolationSegment IsolationSegment
 	response := cloudcontroller.Response{
-		Result: &isolationSegment,
+		Result: &responseIsolationSegment,
 	}
 
 	err = client.connection.Make(request, &response)
-	return isolationSegment, response.Warnings, err
+	return responseIsolationSegment, response.Warnings, err
 }
 
 // GetIsolationSegments lists isolation segments with optional filters.
@@ -67,6 +67,8 @@ func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment
 	return fullIsolationSegmentsList, warnings, err
 }
 
+// GetIsolationSegment returns back the requested isolation segment that
+// matches the GUID.
 func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentRequest,

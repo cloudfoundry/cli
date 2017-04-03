@@ -25,14 +25,11 @@ type FakeRunTaskActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	RunTaskStub        func(appGUID string, command string, name string, memory uint64, disk uint64) (v3action.Task, v3action.Warnings, error)
+	RunTaskStub        func(appGUID string, task v3action.Task) (v3action.Task, v3action.Warnings, error)
 	runTaskMutex       sync.RWMutex
 	runTaskArgsForCall []struct {
 		appGUID string
-		command string
-		name    string
-		memory  uint64
-		disk    uint64
+		task    v3action.Task
 	}
 	runTaskReturns struct {
 		result1 v3action.Task
@@ -112,20 +109,17 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRunTaskActor) RunTask(appGUID string, command string, name string, memory uint64, disk uint64) (v3action.Task, v3action.Warnings, error) {
+func (fake *FakeRunTaskActor) RunTask(appGUID string, task v3action.Task) (v3action.Task, v3action.Warnings, error) {
 	fake.runTaskMutex.Lock()
 	ret, specificReturn := fake.runTaskReturnsOnCall[len(fake.runTaskArgsForCall)]
 	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
 		appGUID string
-		command string
-		name    string
-		memory  uint64
-		disk    uint64
-	}{appGUID, command, name, memory, disk})
-	fake.recordInvocation("RunTask", []interface{}{appGUID, command, name, memory, disk})
+		task    v3action.Task
+	}{appGUID, task})
+	fake.recordInvocation("RunTask", []interface{}{appGUID, task})
 	fake.runTaskMutex.Unlock()
 	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(appGUID, command, name, memory, disk)
+		return fake.RunTaskStub(appGUID, task)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -139,10 +133,10 @@ func (fake *FakeRunTaskActor) RunTaskCallCount() int {
 	return len(fake.runTaskArgsForCall)
 }
 
-func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, string, string, uint64, uint64) {
+func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, v3action.Task) {
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
-	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command, fake.runTaskArgsForCall[i].name, fake.runTaskArgsForCall[i].memory, fake.runTaskArgsForCall[i].disk
+	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].task
 }
 
 func (fake *FakeRunTaskActor) RunTaskReturns(result1 v3action.Task, result2 v3action.Warnings, result3 error) {
