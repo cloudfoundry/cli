@@ -4,14 +4,13 @@ package configv3
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
-
-	isatty "github.com/mattn/go-isatty"
 
 	"code.cloudfoundry.org/cli/version"
 )
@@ -131,13 +130,19 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	// Developer Note: The following is untested! Change at your own risk.
-	terminalWidth, _, err := terminal.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		return nil, err
+	isTTY := terminal.IsTerminal(int(os.Stdout.Fd()))
+	terminalWidth := math.MaxInt32
+
+	if isTTY {
+		var err error
+		terminalWidth, _, err = terminal.GetSize(int(os.Stdout.Fd()))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	config.detectedSettings = detectedSettings{
-		tty:           isatty.IsTerminal(os.Stdout.Fd()),
+		tty:           isTTY,
 		terminalWidth: terminalWidth,
 	}
 
@@ -438,7 +443,7 @@ func (config *Config) IsTTY() bool {
 	return config.detectedSettings.tty
 }
 
-// TerminalWidth returns back the width of the terminal from when the config
+// TerminalWidth returns the width of the terminal from when the config
 // was loaded. If the terminal width has changed since the config has loaded,
 // it will **not** return the new width.
 func (config *Config) TerminalWidth() int {
