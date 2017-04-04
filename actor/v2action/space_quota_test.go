@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -52,7 +52,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 
 		Context("when the space quota does not exist", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSpaceQuotaReturns(ccv2.SpaceQuota{}, nil, cloudcontroller.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetSpaceQuotaReturns(ccv2.SpaceQuota{}, nil, ccerror.ResourceNotFoundError{})
 			})
 
 			It("returns an SpaceQuotaNotFoundError", func() {

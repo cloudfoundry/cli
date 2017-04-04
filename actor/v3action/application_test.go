@@ -6,7 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -167,7 +167,7 @@ var _ = Describe("Application Actions", func() {
 				fakeCloudControllerClient.CreateApplicationReturns(
 					ccv3.Application{},
 					ccv3.Warnings{"some-warning"},
-					cloudcontroller.UnprocessableEntityError{},
+					ccerror.UnprocessableEntityError{},
 				)
 			})
 

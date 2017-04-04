@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -62,7 +62,7 @@ var _ = Describe("Domain", func() {
 
 			It("returns an error", func() {
 				domain, _, err := client.GetSharedDomain("shared-domain-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The domain could not be found: shared-domain-guid",
 				}))
 				Expect(domain).To(Equal(Domain{}))
@@ -115,7 +115,7 @@ var _ = Describe("Domain", func() {
 
 			It("returns an error", func() {
 				domain, _, err := client.GetPrivateDomain("private-domain-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The domain could not be found: private-domain-guid",
 				}))
 				Expect(domain).To(Equal(Domain{}))
@@ -224,8 +224,8 @@ var _ = Describe("Domain", func() {
 
 			It("returns the warnings and error", func() {
 				domains, warnings, err := client.GetSharedDomains()
-				Expect(err).To(MatchError(UnexpectedResponseError{
-					CCErrorResponse: CCErrorResponse{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        1,
 						Description: "some error description",
 						ErrorCode:   "CF-SomeError",
@@ -356,7 +356,7 @@ var _ = Describe("Domain", func() {
 			})
 			It("returns the warnings and error", func() {
 				domains, warnings, err := client.GetOrganizationPrivateDomains("some-org-guid", []Query{})
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The organization could not be found: glah",
 				}))
 				Expect(domains).To(Equal([]Domain{}))

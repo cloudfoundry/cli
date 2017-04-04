@@ -3,26 +3,25 @@ package shared
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
-	case cloudcontroller.APINotFoundError:
+	case ccerror.APINotFoundError:
 		return command.APINotFoundError{URL: e.URL}
-	case cloudcontroller.RequestError:
+	case ccerror.RequestError:
 		return command.APIRequestError{Err: e.Err}
-	case cloudcontroller.SSLValidationHostnameError:
+	case ccerror.SSLValidationHostnameError:
 		return command.SSLCertErrorError{Message: e.Message}
-	case cloudcontroller.UnverifiedServerError:
+	case ccerror.UnverifiedServerError:
 		return command.InvalidSSLCertError{API: e.URL}
 
-	case ccv2.JobFailedError:
+	case ccerror.JobFailedError:
 		return JobFailedError{JobGUID: e.JobGUID}
-	case ccv2.JobTimeoutError:
+	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
 
 	case uaa.InvalidAuthTokenError:

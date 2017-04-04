@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -84,10 +85,10 @@ var _ = Describe("Package", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetPackage("some-pkg-guid")
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -189,10 +190,10 @@ var _ = Describe("Package", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.CreatePackage(Package{})
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -296,7 +297,7 @@ var _ = Describe("Package", func() {
 		Context("when the package does not have an upload link", func() {
 			It("returns an UploadLinkNotFoundError", func() {
 				_, _, err := client.UploadPackage(Package{GUID: "some-pkg-guid", State: PackageStateAwaitingUpload}, "/path/to/foo")
-				Expect(err).To(MatchError(UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
+				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
 			})
 		})
 	})

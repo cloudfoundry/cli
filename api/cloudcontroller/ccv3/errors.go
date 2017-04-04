@@ -2,60 +2,11 @@ package ccv3
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
-
-// CCErrorResponse represents a generic Cloud Controller V3 error response.
-type CCErrorResponse struct {
-	Errors []CCError `json:"errors"`
-}
-
-// CCError represents a cloud controller error.
-type CCError struct {
-	Code   int    `json:"code"`
-	Detail string `json:"detail"`
-	Title  string `json:"title"`
-}
-
-// UnexpectedResponseError is returned when the client gets an error that has
-// not been accounted for.
-type UnexpectedResponseError struct {
-	CCErrorResponse
-
-	ResponseCode int
-	RequestIDs   []string
-}
-
-func (e UnexpectedResponseError) Error() string {
-	messages := []string{
-		"Unexpected Response",
-		fmt.Sprintf("Response Code: %d", e.ResponseCode),
-	}
-
-	for _, id := range e.RequestIDs {
-		messages = append(messages, fmt.Sprintf("Request ID:    %s", id))
-	}
-
-	for _, ccError := range e.CCErrorResponse.Errors {
-		messages = append(messages, fmt.Sprintf("Code: %d, Title: %s, Detail: %s", ccError.Code, ccError.Title, ccError.Detail))
-	}
-
-	return strings.Join(messages, "\n")
-}
-
-// TaskWorkersUnavailableError represents the case when no Diego workers are
-// available.
-type TaskWorkersUnavailableError struct {
-	Message string
-}
-
-func (e TaskWorkersUnavailableError) Error() string {
-	return e.Message
-}
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
@@ -78,22 +29,22 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
-	if rawHTTPStatusErr, ok := err.(cloudcontroller.RawHTTPStatusError); ok {
+	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {
 		return convert(rawHTTPStatusErr)
 	}
 	return err
 }
 
-func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
+func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
 	// return the raw error.
-	var errorResponse CCErrorResponse
+	var errorResponse ccerror.V3ErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
 
 	// error parsing json
 	if err != nil {
 		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
-			return cloudcontroller.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
+			return ccerror.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
 		}
 		return rawHTTPStatusErr
 	}
@@ -101,14 +52,14 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	// 404 on root response; occurs when requesting the v3 capi and the v3 capi
 	// is not installed
 	if rawHTTPStatusErr.StatusCode == http.StatusNotFound && len(errorResponse.Errors) == 0 {
-		return cloudcontroller.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
+		return ccerror.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
 	}
 
 	errors := errorResponse.Errors
 	if len(errors) == 0 {
-		return UnexpectedResponseError{
+		return ccerror.V3UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
-			CCErrorResponse: errorResponse,
+			V3ErrorResponse: errorResponse,
 		}
 	}
 
@@ -119,25 +70,25 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized: // 401
 		if firstErr.Title == "CF-InvalidAuthToken" {
-			return cloudcontroller.InvalidAuthTokenError{Message: firstErr.Detail}
+			return ccerror.InvalidAuthTokenError{Message: firstErr.Detail}
 		}
-		return cloudcontroller.UnauthorizedError{Message: firstErr.Detail}
+		return ccerror.UnauthorizedError{Message: firstErr.Detail}
 	case http.StatusForbidden: // 403
-		return cloudcontroller.ForbiddenError{Message: firstErr.Detail}
+		return ccerror.ForbiddenError{Message: firstErr.Detail}
 	case http.StatusNotFound: // 404
-		return cloudcontroller.ResourceNotFoundError{Message: firstErr.Detail}
+		return ccerror.ResourceNotFoundError{Message: firstErr.Detail}
 	case http.StatusUnprocessableEntity: // 422
-		return cloudcontroller.UnprocessableEntityError{Message: firstErr.Detail}
+		return ccerror.UnprocessableEntityError{Message: firstErr.Detail}
 	case http.StatusServiceUnavailable: // 503
 		if firstErr.Title == "CF-TaskWorkersUnavailable" {
-			return TaskWorkersUnavailableError{Message: firstErr.Detail}
+			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
 		}
-		return cloudcontroller.ServiceUnavailableError{Message: firstErr.Detail}
+		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
 	default:
-		return UnexpectedResponseError{
+		return ccerror.V3UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
 			RequestIDs:      rawHTTPStatusErr.RequestIDs,
-			CCErrorResponse: errorResponse,
+			V3ErrorResponse: errorResponse,
 		}
 	}
 	return nil

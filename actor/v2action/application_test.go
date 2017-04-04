@@ -6,7 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	"github.com/cloudfoundry/sonde-go/events"
@@ -199,7 +199,7 @@ var _ = Describe("Application Actions", func() {
 
 		Context("when the application does not exist", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationReturns(ccv2.Application{}, nil, cloudcontroller.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetApplicationReturns(ccv2.Application{}, nil, ccerror.ResourceNotFoundError{})
 			})
 
 			It("returns an ApplicationNotFoundError", func() {

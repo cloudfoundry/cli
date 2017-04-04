@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	. "github.com/onsi/ginkgo"
@@ -30,7 +31,7 @@ var _ = Describe("Retry Request", func() {
 			}
 
 			fakeConnection := new(cloudcontrollerfakes.FakeConnection)
-			expectedErr := cloudcontroller.RawHTTPStatusError{
+			expectedErr := ccerror.RawHTTPStatusError{
 				StatusCode: responseStatusCode,
 			}
 			fakeConnection.MakeStub = func(req *http.Request, passedResponse *cloudcontroller.Response) error {

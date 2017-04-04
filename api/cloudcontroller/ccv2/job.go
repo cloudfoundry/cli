@@ -2,35 +2,13 @@ package ccv2
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
-
-// JobFailedError represents a failed Cloud Controller Job. It wraps the error
-// returned back from the Cloud Controller.
-type JobFailedError struct {
-	JobGUID string
-	Message string
-}
-
-func (e JobFailedError) Error() string {
-	return fmt.Sprintf("Job (%s) failed: %s", e.JobGUID, e.Message)
-}
-
-// JobTimeoutError is returned from PollJob when the OverallPollingTimeout has
-// been reached.
-type JobTimeoutError struct {
-	JobGUID string
-	Timeout time.Duration
-}
-
-func (e JobTimeoutError) Error() string {
-	return fmt.Sprintf("Job (%s) polling has reached the maximum timeout of %s seconds", e.JobGUID, e.Timeout)
-}
 
 // JobStatus is the current state of a job.
 type JobStatus string
@@ -126,7 +104,7 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		}
 
 		if job.Failed() {
-			return allWarnings, JobFailedError{
+			return allWarnings, ccerror.JobFailedError{
 				JobGUID: originalJobGUID,
 				Message: job.Error,
 			}
@@ -139,7 +117,7 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		time.Sleep(client.jobPollingInterval)
 	}
 
-	return allWarnings, JobTimeoutError{
+	return allWarnings, ccerror.JobTimeoutError{
 		JobGUID: originalJobGUID,
 		Timeout: client.jobPollingTimeout,
 	}

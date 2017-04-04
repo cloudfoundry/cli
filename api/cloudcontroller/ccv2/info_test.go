@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
@@ -87,7 +87,7 @@ var _ = Describe("Info", func() {
 
 		It("returns back an APINotFoundError", func() {
 			_, _, err := client.Info()
-			Expect(err).To(MatchError(cloudcontroller.APINotFoundError{URL: server.URL()}))
+			Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
 		})
 	})
 })

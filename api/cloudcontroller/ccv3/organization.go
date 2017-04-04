@@ -3,7 +3,7 @@ package ccv3
 import (
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -28,7 +28,7 @@ func (client *Client) GetOrganizations(query url.Values) ([]Organization, Warnin
 		if app, ok := item.(Organization); ok {
 			fullOrgsList = append(fullOrgsList, app)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Organization{},
 				Unexpected: item,
 			}
@@ -55,7 +55,7 @@ func (client *Client) GetIsolationSegmentOrganizationsByIsolationSegment(isolati
 		if app, ok := item.(Organization); ok {
 			fullOrgsList = append(fullOrgsList, app)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Organization{},
 				Unexpected: item,
 			}

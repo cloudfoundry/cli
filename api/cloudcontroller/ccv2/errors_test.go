@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
@@ -18,32 +18,6 @@ var _ = Describe("Error Wrapper", func() {
 
 		client *Client
 	)
-
-	Describe("UnexpectedResponseError", func() {
-		Describe("Error", func() {
-			It("formats the error", func() {
-				err := UnexpectedResponseError{
-					ResponseCode: 123,
-					CCErrorResponse: CCErrorResponse{
-						Code:        456,
-						Description: "some-error-description",
-						ErrorCode:   "some-error-code",
-					},
-					RequestIDs: []string{
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
-					},
-				}
-				Expect(err.Error()).To(Equal(`Unexpected Response
-Response code: 123
-CC code:       456
-CC error code: some-error-code
-Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95
-Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f
-Description:   some-error-description`))
-			})
-		})
-	})
 
 	Describe("Make", func() {
 		BeforeEach(func() {
@@ -79,7 +53,7 @@ Description:   some-error-description`))
 
 			It("returns a RawHTTPStatusError", func() {
 				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
+				Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
 					RequestIDs: []string{
@@ -106,7 +80,7 @@ Description:   some-error-description`))
 
 					It("returns a BadRequestError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.BadRequestError{
+						Expect(err).To(MatchError(ccerror.BadRequestError{
 							Message: "bad request",
 						}))
 					})
@@ -122,7 +96,7 @@ Description:   some-error-description`))
 
 					It("returns a NotStagedError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(NotStagedError{
+						Expect(err).To(MatchError(ccerror.NotStagedError{
 							Message: "App has not finished staging",
 						}))
 					})
@@ -138,7 +112,7 @@ Description:   some-error-description`))
 
 					It("returns an InstancesError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(InstancesError{
+						Expect(err).To(MatchError(ccerror.InstancesError{
 							Message: "instances went bananas",
 						}))
 					})
@@ -155,7 +129,7 @@ Description:   some-error-description`))
 
 					It("returns an AppStoppedStatsError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(AppStoppedStatsError{
+						Expect(err).To(MatchError(ccerror.ApplicationStoppedStatsError{
 							Message: "Could not fetch stats for stopped app: some-app",
 						}))
 					})
@@ -170,7 +144,7 @@ Description:   some-error-description`))
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.UnauthorizedError{Message: "SomeCC Error Message"}))
+						Expect(err).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
 
@@ -185,7 +159,7 @@ Description:   some-error-description`))
 
 					It("returns an InvalidAuthTokenError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
 			})
@@ -197,7 +171,7 @@ Description:   some-error-description`))
 
 				It("returns a ForbiddenError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.ForbiddenError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -209,7 +183,7 @@ Description:   some-error-description`))
 				Context("when the error is a json response from the cloud controller", func() {
 					It("returns a ResourceNotFoundError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+						Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 					})
 				})
 
@@ -220,7 +194,7 @@ Description:   some-error-description`))
 
 					It("returns a NotFoundError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
+						Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
 					})
 				})
 			})
@@ -232,7 +206,7 @@ Description:   some-error-description`))
 
 				It("returns a UnprocessableEntityError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -243,9 +217,9 @@ Description:   some-error-description`))
 
 				It("returns an UnexpectedResponseError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(UnexpectedResponseError{
+					Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 						ResponseCode: http.StatusTeapot,
-						CCErrorResponse: CCErrorResponse{
+						V2ErrorResponse: ccerror.V2ErrorResponse{
 							Code:        777,
 							Description: "SomeCC Error Message",
 							ErrorCode:   "CF-SomeError",

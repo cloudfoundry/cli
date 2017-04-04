@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -105,10 +106,10 @@ var _ = Describe("Application", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -198,10 +199,10 @@ var _ = Describe("Application", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.CreateApplication(Application{})
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",

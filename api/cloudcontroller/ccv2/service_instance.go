@@ -3,7 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -72,7 +72,7 @@ func (client *Client) GetServiceInstances(queries []Query) ([]ServiceInstance, W
 		if instance, ok := item.(ServiceInstance); ok {
 			fullInstancesList = append(fullInstancesList, instance)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   ServiceInstance{},
 				Unexpected: item,
 			}
@@ -107,7 +107,7 @@ func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProv
 		if instance, ok := item.(ServiceInstance); ok {
 			fullInstancesList = append(fullInstancesList, instance)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   ServiceInstance{},
 				Unexpected: item,
 			}

@@ -1,9 +1,10 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type OrganizationQuota ccv2.OrganizationQuota
@@ -19,7 +20,7 @@ func (e OrganizationQuotaNotFoundError) Error() string {
 func (actor Actor) GetOrganizationQuota(guid string) (OrganizationQuota, Warnings, error) {
 	orgQuota, warnings, err := actor.CloudControllerClient.GetOrganizationQuota(guid)
 
-	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return OrganizationQuota{}, Warnings(warnings), OrganizationQuotaNotFoundError{GUID: guid}
 	}
 

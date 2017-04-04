@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
 // APIInfo represents a GET response from the '/' endpoint of the cloud
@@ -100,8 +101,8 @@ func (client *Client) rootResponse() (APIInfo, Warnings, error) {
 
 	err = client.connection.Make(request, &response)
 	if err != nil {
-		if _, ok := err.(cloudcontroller.NotFoundError); ok {
-			return APIInfo{}, nil, cloudcontroller.APINotFoundError{URL: client.cloudControllerURL}
+		if _, ok := err.(ccerror.NotFoundError); ok {
+			return APIInfo{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 		}
 		return APIInfo{}, response.Warnings, err
 	}

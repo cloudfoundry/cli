@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 )
 
@@ -79,7 +80,7 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcon
 	request.Header.Set("Authorization", t.cache.AccessToken())
 
 	err = t.connection.Make(request, passedResponse)
-	if _, ok := err.(cloudcontroller.InvalidAuthTokenError); ok {
+	if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
 		var token uaa.RefreshToken
 		token, err = t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {

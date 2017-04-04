@@ -1,7 +1,7 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -25,7 +25,7 @@ func (actor Actor) GetApplicationInstancesByApplication(guid string) (map[int]Ap
 	ccAppInstances, warnings, err := actor.CloudControllerClient.GetApplicationInstancesByApplication(guid)
 
 	switch err.(type) {
-	case cloudcontroller.ResourceNotFoundError, ccv2.NotStagedError, ccv2.InstancesError:
+	case ccerror.ResourceNotFoundError, ccerror.NotStagedError, ccerror.InstancesError:
 		return nil, Warnings(warnings), ApplicationInstancesNotFoundError{ApplicationGUID: guid}
 	}
 

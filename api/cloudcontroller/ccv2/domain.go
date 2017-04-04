@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -92,7 +93,7 @@ func (client *Client) GetSharedDomains() ([]Domain, Warnings, error) {
 		if domain, ok := item.(Domain); ok {
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Domain{},
 				Unexpected: item,
 			}
@@ -119,7 +120,7 @@ func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries []Qu
 		if domain, ok := item.(Domain); ok {
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Domain{},
 				Unexpected: item,
 			}

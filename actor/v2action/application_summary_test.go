@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -101,7 +102,7 @@ var _ = Describe("Application Summary Actions", func() {
 						fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationReturns(
 							nil,
 							ccv2.Warnings{"stats-warning"},
-							ccv2.AppStoppedStatsError{})
+							ccerror.ApplicationStoppedStatsError{})
 					})
 
 					It("returns the empty list of instances and all warnings", func() {

@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -56,7 +57,7 @@ func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment
 		if isolationSegment, ok := item.(IsolationSegment); ok {
 			fullIsolationSegmentsList = append(fullIsolationSegmentsList, isolationSegment)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   IsolationSegment{},
 				Unexpected: item,
 			}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/ccv3fakes"
 
@@ -156,7 +157,7 @@ var _ = Describe("Target", func() {
 					SkipSSLValidation: true,
 					URL:               server.URL(),
 				})
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})
 		})

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -69,7 +70,7 @@ func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warning
 		if org, ok := item.(Organization); ok {
 			fullOrgsList = append(fullOrgsList, org)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Organization{},
 				Unexpected: item,
 			}

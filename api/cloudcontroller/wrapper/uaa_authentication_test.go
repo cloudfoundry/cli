@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
@@ -47,7 +48,7 @@ var _ = Describe("UAA Authentication", func() {
 			BeforeEach(func() {
 				inner.SetClient(nil)
 
-				fakeConnection.MakeReturns(cloudcontroller.InvalidAuthTokenError{})
+				fakeConnection.MakeReturns(ccerror.InvalidAuthTokenError{})
 			})
 
 			It("calls the connection without any side effects", func() {
@@ -115,7 +116,7 @@ var _ = Describe("UAA Authentication", func() {
 
 					if makeCount == 0 {
 						makeCount += 1
-						return cloudcontroller.InvalidAuthTokenError{}
+						return ccerror.InvalidAuthTokenError{}
 					} else {
 						return nil
 					}

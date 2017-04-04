@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -162,7 +163,7 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 		if app, ok := item.(Application); ok {
 			fullAppsList = append(fullAppsList, app)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Application{},
 				Unexpected: item,
 			}
@@ -214,7 +215,7 @@ func (client *Client) GetRouteApplications(routeGUID string, queryParams []Query
 		if app, ok := item.(Application); ok {
 			fullAppsList = append(fullAppsList, app)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Application{},
 				Unexpected: item,
 			}
