@@ -54,7 +54,6 @@ type Consumer struct {
 	idleTimeout          time.Duration
 	callback             func()
 	callbackLock         sync.RWMutex
-	proxy                func(*http.Request) (*url.URL, error)
 	debugPrinter         DebugPrinter
 	client               *http.Client
 	dialer               websocket.Dialer
@@ -69,21 +68,31 @@ type Consumer struct {
 
 // New creates a new consumer to a trafficcontroller.
 func New(trafficControllerUrl string, tlsConfig *tls.Config, proxy func(*http.Request) (*url.URL, error)) *Consumer {
-	transport := &http.Transport{Proxy: proxy, TLSClientConfig: tlsConfig, TLSHandshakeTimeout: internal.Timeout, DisableKeepAlives: true}
-	consumer := &Consumer{
+	if proxy == nil {
+		proxy = http.ProxyFromEnvironment
+	}
+
+	return &Consumer{
 		trafficControllerUrl: trafficControllerUrl,
-		proxy:                proxy,
 		debugPrinter:         nullDebugPrinter{},
 		client: &http.Client{
-			Transport: transport,
-			Timeout:   internal.Timeout,
+			Transport: &http.Transport{
+				Proxy:               proxy,
+				TLSClientConfig:     tlsConfig,
+				TLSHandshakeTimeout: internal.Timeout,
+				DisableKeepAlives:   true,
+			},
+			Timeout: internal.Timeout,
 		},
 		minRetryDelay: int64(DefaultMinRetryDelay),
 		maxRetryDelay: int64(DefaultMaxRetryDelay),
 		maxRetryCount: int64(DefaultMaxRetryCount),
+		dialer: websocket.Dialer{
+			HandshakeTimeout: internal.Timeout,
+			Proxy:            proxy,
+			TLSClientConfig:  tlsConfig,
+		},
 	}
-	consumer.dialer = websocket.Dialer{HandshakeTimeout: internal.Timeout, NetDial: consumer.proxyDial, TLSClientConfig: tlsConfig}
-	return consumer
 }
 
 type httpError struct {
