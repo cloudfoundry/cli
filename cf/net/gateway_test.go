@@ -1,9 +1,11 @@
 package net_test
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -145,6 +147,7 @@ var _ = Describe("Gateway", func() {
 	Describe("PerformRequestForJSONResponse()", func() {
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
+			ccServer.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 			config.SetAPIEndpoint(ccServer.URL())
 		})
 
@@ -204,6 +207,7 @@ var _ = Describe("Gateway", func() {
 					apiServer = httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 						queryParams = request.URL.RawQuery
 					}))
+					apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 					ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 				})
 
@@ -264,6 +268,7 @@ var _ = Describe("Gateway", func() {
 
 					config.SetAsyncTimeout(30)
 					ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+					apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 				})
 
 				AfterEach(func() {
@@ -331,6 +336,8 @@ var _ = Describe("Gateway", func() {
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 		})
 
 		AfterEach(func() {
@@ -393,6 +400,8 @@ var _ = Describe("Gateway", func() {
 					writer,
 					`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`)
 			}))
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 
 			fileToUpload, err = ioutil.TempFile("", "test-gateway")
 			strings.NewReader("expected body").WriteTo(fileToUpload)
@@ -438,6 +447,7 @@ var _ = Describe("Gateway", func() {
 			}))
 
 			uaaGateway.SetTrustedCerts(authServer.TLS.Certificates)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 		})
 
 		AfterEach(func() {
@@ -487,6 +497,7 @@ var _ = Describe("Gateway", func() {
 				}`}))
 			defer apiServer.Close()
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
@@ -504,6 +515,7 @@ var _ = Describe("Gateway", func() {
 					"code": 333, "description": "bad request"
 				}`}))
 			defer apiServer.Close()
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
@@ -526,6 +538,7 @@ var _ = Describe("Gateway", func() {
 			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				fmt.Fprintln(w, `{}`)
 			}))
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 			request, _ = ccGateway.NewRequest("POST", apiServer.URL+"/v2/foo", "the-access-token", nil)
 		})
 
@@ -611,6 +624,8 @@ var _ = Describe("Gateway", func() {
 			ccGateway.SetTokenRefresher(authRepo)
 
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
+			apiServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
+			authServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
 		})

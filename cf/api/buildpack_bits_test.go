@@ -2,9 +2,11 @@ package api_test
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -135,6 +137,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 			It("fails when the server's SSL cert cannot be verified", func() {
 				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
+				fileServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 				defer fileServer.Close()
 
 				_, _, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/example-buildpack.zip")

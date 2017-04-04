@@ -1,8 +1,10 @@
 package api_test
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -77,6 +79,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
+		testServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 		gateway = net.NewCloudControllerGateway(coreConfig, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(gateway)
