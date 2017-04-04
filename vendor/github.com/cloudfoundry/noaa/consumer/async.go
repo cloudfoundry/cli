@@ -1,12 +1,9 @@
 package consumer
 
 import (
-	"bufio"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -397,18 +394,18 @@ func (c *Consumer) establishWebsocketConnection(path, authToken string) (*websoc
 }
 
 func (c *Consumer) tryWebsocketConnection(path, token string) (*websocket.Conn, *httpError) {
-	header := http.Header{"Origin": []string{"http://localhost"}, "Authorization": []string{token}}
-	URL := c.trafficControllerUrl + path
+	header := http.Header{"Origin": []string{c.trafficControllerUrl}, "Authorization": []string{token}}
+	url := c.trafficControllerUrl + path
 
-	c.debugPrinter.Print("WEBSOCKET REQUEST:",
+	c.debugPrinter.Print("WEBSOCKET REQUEST",
 		"GET "+path+" HTTP/1.1\n"+
 			"Host: "+c.trafficControllerUrl+"\n"+
 			"Upgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Version: 13\nSec-WebSocket-Key: [HIDDEN]\n"+
 			headersString(header))
 
-	ws, resp, err := c.dialer.Dial(URL, header)
+	ws, resp, err := c.dialer.Dial(url, header)
 	if resp != nil {
-		c.debugPrinter.Print("WEBSOCKET RESPONSE:",
+		c.debugPrinter.Print("WEBSOCKET RESPONSE",
 			resp.Proto+" "+resp.Status+"\n"+
 				headersString(resp.Header))
 	}
@@ -428,61 +425,6 @@ func (c *Consumer) tryWebsocketConnection(path, token string) (*websocket.Conn, 
 		return nil, httpErr
 	}
 	return ws, nil
-}
-
-func (c *Consumer) proxyDial(network, addr string) (net.Conn, error) {
-	targetUrl, err := url.Parse("http://" + addr)
-	if err != nil {
-		return nil, err
-	}
-
-	proxy := c.proxy
-	if proxy == nil {
-		proxy = http.ProxyFromEnvironment
-	}
-
-	proxyUrl, err := proxy(&http.Request{URL: targetUrl})
-	if err != nil {
-		return nil, err
-	}
-	if proxyUrl == nil {
-		return net.Dial(network, addr)
-	}
-
-	connectHeader := make(http.Header)
-	if user := proxyUrl.User; user != nil {
-		proxyUser := user.Username()
-		if proxyPassword, passwordSet := user.Password(); passwordSet {
-			credential := base64.StdEncoding.EncodeToString([]byte(proxyUser + ":" + proxyPassword))
-			connectHeader.Set("Proxy-Authorization", "Basic "+credential)
-		}
-	}
-
-	proxyConn, err := net.Dial(network, proxyUrl.Host)
-	if err != nil {
-		return nil, err
-	}
-
-	connectReq := &http.Request{
-		Method: "CONNECT",
-		URL:    targetUrl,
-		Host:   targetUrl.Host,
-		Header: connectHeader,
-	}
-	connectReq.Write(proxyConn)
-
-	connectResp, err := http.ReadResponse(bufio.NewReader(proxyConn), connectReq)
-	if err != nil {
-		proxyConn.Close()
-		return nil, err
-	}
-	if connectResp.StatusCode != http.StatusOK {
-		f := strings.SplitN(connectResp.Status, " ", 2)
-		proxyConn.Close()
-		return nil, errors.New(f[1])
-	}
-
-	return proxyConn, nil
 }
 
 func headersString(header http.Header) string {
