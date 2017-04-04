@@ -1,6 +1,6 @@
 ---
 resource_types:
-# using temp tracker resource until https://github.com/concourse/tracker-resource/issues/17 is fixed
+# TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
 - name: tracker-resource-fixed
   type: docker-image
   source:
@@ -177,7 +177,7 @@ resources:
     branch: master
     pool: bosh-lites-diego
 
-# using temp tracker resource until https://github.com/concourse/tracker-resource/issues/17 is fixed
+# TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
 - name: cf-cli-tracker
   type: tracker-resource-fixed
   source:
@@ -329,8 +329,9 @@ jobs:
         params:
           channel: '#cli-firehose'
           text: "windows integration failed :("
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-linux.yml
       on_failure:
@@ -338,13 +339,13 @@ jobs:
         params:
           channel: '#cli-firehose'
           text: "linux integration failed :("
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
   on_failure:
     put: hardknox-pool
     params:
       release: bosh-lite-lock
-  ensure:
-    task: cleanup-integration
-    file: cli-ci/ci/cli/tasks/cleanup-integration.yml
 
 - name: cats-diego
   serial: true
@@ -377,15 +378,15 @@ jobs:
       params:
         BACKEND: diego
         NODES: 16
-    ensure:
-      put: hardknox-pool
-      params:
-        release: bosh-lite-lock
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-firehose'
-        text: "cats diego failed :("
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-firehose'
+          text: "cats diego failed :("
+      ensure:
+        put: hardknox-pool
+        params:
+          release: bosh-lite-lock
 
 - name: cats-linux
   serial: true
@@ -419,15 +420,15 @@ jobs:
       params:
         BACKEND: dea
         NODES: 10
-    on_failure:
-      put: slack-alert
-      params:
-        channel: '#cli-firehose'
-        text: "cats linux failed :("
-    ensure:
-      put: bosh-lites-dea-pool
-      params:
-        release: bosh-lite-lock
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-firehose'
+          text: "cats linux failed :("
+      ensure:
+        put: bosh-lites-dea-pool
+        params:
+          release: bosh-lite-lock
 
 - name: cats-windows
   serial: true
@@ -460,15 +461,15 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-windows.yml
       params:
         NODES: 10
-    ensure:
-      put: bosh-lites-dea-pool
-      params:
-        release: bosh-lite-lock
-    on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-firehose'
-         text: "cats windows failed :("
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats windows failed :("
+      ensure:
+        put: bosh-lites-dea-pool
+        params:
+          release: bosh-lite-lock
 
 - name: create-installers
   serial: true
@@ -548,7 +549,7 @@ jobs:
     - put: edge-windows-installer-64
       params:
         file: winstallers/cf-cli-installer_winx64.zip
-    # using temp tracker resource until https://github.com/concourse/tracker-resource/issues/17 is fixed
+    # TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
     - put: cf-cli-tracker
       params:
         repos:
