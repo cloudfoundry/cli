@@ -153,7 +153,7 @@ var _ = Describe("Logs Command", func() {
 					session := helpers.CF("logs", appName, "--recent")
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("%s \\[API/0\\]\\s+OUT Created app with guid %s", helpers.ISO8601Regex, helpers.GUIDRegex))
+					Eventually(session).Should(Say("%s \\[API/\\d+\\]\\s+OUT Created app with guid %s", helpers.ISO8601Regex, helpers.GUIDRegex))
 					Eventually(session).Should(Exit(0))
 				})
 			})
