@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -68,7 +69,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 		if task, ok := item.(Task); ok {
 			fullTasksList = append(fullTasksList, task)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Task{},
 				Unexpected: item,
 			}

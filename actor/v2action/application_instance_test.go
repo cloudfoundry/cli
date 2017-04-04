@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -135,7 +135,7 @@ var _ = Describe("Application Instance Actions", func() {
 					fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
 						nil,
 						nil,
-						cloudcontroller.ResourceNotFoundError{})
+						ccerror.ResourceNotFoundError{})
 				})
 
 				It("returns an ApplicationInstancesNotFoundError", func() {
@@ -150,7 +150,7 @@ var _ = Describe("Application Instance Actions", func() {
 						fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
 							nil,
 							nil,
-							ccv2.NotStagedError{})
+							ccerror.NotStagedError{})
 					})
 
 					It("returns an ApplicationInstancesNotFoundError", func() {
@@ -165,7 +165,7 @@ var _ = Describe("Application Instance Actions", func() {
 					fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
 						nil,
 						nil,
-						ccv2.InstancesError{})
+						ccerror.InstancesError{})
 				})
 
 				It("returns an ApplicationInstancesNotFoundError", func() {

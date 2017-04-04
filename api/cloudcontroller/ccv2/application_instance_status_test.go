@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -127,7 +127,7 @@ var _ = Describe("Application Instance Status", func() {
 
 			It("returns the error and warnings", func() {
 				_, warnings, err := client.GetApplicationInstanceStatusesByApplication("some-app-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The app could not be found: some-app-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

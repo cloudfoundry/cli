@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -55,7 +55,7 @@ func (actor Actor) GetIsolationSegmentBySpace(spaceGUID string) (IsolationSegmen
 // CreateIsolationSegmentByName creates a given isolation segment.
 func (actor Actor) CreateIsolationSegmentByName(isolationSegment IsolationSegment) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(ccv3.IsolationSegment(isolationSegment))
-	if _, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
+	if _, ok := err.(ccerror.UnprocessableEntityError); ok {
 		return Warnings(warnings), IsolationSegmentAlreadyExistsError{Name: isolationSegment.Name}
 	}
 	return Warnings(warnings), err

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -86,7 +87,7 @@ func (client *Client) GetSecurityGroups(queries []Query) ([]SecurityGroup, Warni
 		if securityGroup, ok := item.(SecurityGroup); ok {
 			securityGroupsList = append(securityGroupsList, securityGroup)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   SecurityGroup{},
 				Unexpected: item,
 			}
@@ -123,7 +124,7 @@ func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string
 		if securityGroup, ok := item.(SecurityGroup); ok {
 			securityGroupsList = append(securityGroupsList, securityGroup)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   SecurityGroup{},
 				Unexpected: item,
 			}

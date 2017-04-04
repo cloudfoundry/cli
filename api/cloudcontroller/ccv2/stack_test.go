@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -67,7 +67,7 @@ var _ = Describe("Stack", func() {
 
 			It("returns the error and warnings", func() {
 				_, warnings, err := client.GetStack("some-stack-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The stack could not be found: some-stack-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

@@ -1,7 +1,7 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -19,7 +19,7 @@ func (e DomainNotFoundError) Error() string {
 
 // TODO: Move into own file or add function to CCV2/3
 func isResourceNotFoundError(err error) bool {
-	_, isResourceNotFound := err.(cloudcontroller.ResourceNotFoundError)
+	_, isResourceNotFound := err.(ccerror.ResourceNotFoundError)
 	return isResourceNotFound
 }
 

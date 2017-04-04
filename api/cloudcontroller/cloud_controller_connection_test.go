@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -142,7 +143,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					err = connection.Make(request, &response)
 					Expect(err).To(HaveOccurred())
 
-					requestErr, ok := err.(RequestError)
+					requestErr, ok := err.(ccerror.RequestError)
 					Expect(ok).To(BeTrue())
 					Expect(requestErr.Error()).To(MatchRegexp(".*http://garbledyguk.com/v2/foo.*[nN]o such host"))
 				})
@@ -166,7 +167,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 						var response Response
 						err = connection.Make(request, &response)
-						Expect(err).To(MatchError(UnverifiedServerError{URL: server.URL()}))
+						Expect(err).To(MatchError(ccerror.UnverifiedServerError{URL: server.URL()}))
 					})
 				})
 			})
@@ -194,7 +195,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 						var response Response
 						err = connection.Make(request, &response)
-						Expect(err).To(MatchError(SSLValidationHostnameError{
+						Expect(err).To(MatchError(ccerror.SSLValidationHostnameError{
 							Message: "x509: certificate is valid for example.com, not loopback.cli.ci.cf-app.com",
 						}))
 					})
@@ -224,7 +225,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					var response Response
 					err = connection.Make(request, &response)
-					Expect(err).To(MatchError(RawHTTPStatusError{
+					Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
 						StatusCode:  http.StatusNotFound,
 						RawResponse: []byte(ccResponse),
 						RequestIDs:  []string{"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95", "6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f"},

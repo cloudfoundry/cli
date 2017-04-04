@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -95,7 +95,7 @@ func (actor Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([
 	allWarnings = append(allWarnings, apiWarnings...)
 
 	switch err.(type) {
-	case cloudcontroller.ResourceNotFoundError, ccv2.AppStoppedStatsError:
+	case ccerror.ResourceNotFoundError, ccerror.ApplicationStoppedStatsError:
 		return nil, allWarnings, ApplicationInstancesNotFoundError{ApplicationGUID: guid}
 	case nil:
 		// continue

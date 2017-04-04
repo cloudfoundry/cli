@@ -3,7 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -51,7 +51,7 @@ func (client *Client) GetSpaces(queries []Query) ([]Space, Warnings, error) {
 		if space, ok := item.(Space); ok {
 			fullSpacesList = append(fullSpacesList, space)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Space{},
 				Unexpected: item,
 			}

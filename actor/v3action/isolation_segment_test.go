@@ -6,7 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -70,7 +70,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 					fakeCloudControllerClient.CreateIsolationSegmentReturns(
 						ccv3.IsolationSegment{},
 						ccv3.Warnings{"warning-1", "warning-2"},
-						cloudcontroller.UnprocessableEntityError{},
+						ccerror.UnprocessableEntityError{},
 					)
 				})
 

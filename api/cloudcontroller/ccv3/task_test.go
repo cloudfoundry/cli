@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -145,10 +145,10 @@ var _ = Describe("Task", func() {
 
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.CreateApplicationTask("some-app-guid", Task{Command: "some command"})
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -279,7 +279,7 @@ var _ = Describe("Task", func() {
 
 			It("returns a ResourceNotFoundError", func() {
 				_, _, err := client.GetApplicationTasks("some-app-guid", nil)
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "App not found"}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "App not found"}))
 			})
 		})
 
@@ -309,10 +309,10 @@ var _ = Describe("Task", func() {
 
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.GetApplicationTasks("some-app-guid", nil)
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -392,10 +392,10 @@ var _ = Describe("Task", func() {
 
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.UpdateTask("some-task-guid")
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",

@@ -3,7 +3,7 @@ package v2action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -22,7 +22,7 @@ func (e StackNotFoundError) Error() string {
 func (actor Actor) GetStack(guid string) (Stack, Warnings, error) {
 	stack, warnings, err := actor.CloudControllerClient.GetStack(guid)
 
-	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return Stack{}, Warnings(warnings), StackNotFoundError{GUID: guid}
 	}
 

@@ -2,65 +2,11 @@ package ccv2
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
-
-// CCErrorResponse represents a generic Cloud Controller V2 error response.
-type CCErrorResponse struct {
-	Code        int    `json:"code"`
-	Description string `json:"description"`
-	ErrorCode   string `json:"error_code"`
-}
-
-// UnexpectedResponseError is returned when the client gets an error that has
-// not been accounted for.
-type UnexpectedResponseError struct {
-	CCErrorResponse
-
-	RequestIDs   []string
-	ResponseCode int
-}
-
-func (e UnexpectedResponseError) Error() string {
-	message := fmt.Sprintf("Unexpected Response\nResponse code: %d\nCC code:       %d\nCC error code: %s", e.ResponseCode, e.Code, e.ErrorCode)
-	for _, id := range e.RequestIDs {
-		message = fmt.Sprintf("%s\nRequest ID:    %s", message, id)
-	}
-	return fmt.Sprintf("%s\nDescription:   %s", message, e.Description)
-}
-
-// AppStoppedStatsError is returned when requesting instance information from a
-// stopped app.
-type AppStoppedStatsError struct {
-	Message string
-}
-
-func (e AppStoppedStatsError) Error() string {
-	return e.Message
-}
-
-// NotStagedError is returned when requesting instance information from a
-// not staged app.
-type NotStagedError struct {
-	Message string
-}
-
-func (e NotStagedError) Error() string {
-	return e.Message
-}
-
-// InstancesError is returned when requesting instance information encounters
-// an error.
-type InstancesError struct {
-	Message string
-}
-
-func (e InstancesError) Error() string {
-	return e.Message
-}
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status
 // codes to an error.
@@ -83,20 +29,20 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
-	if rawHTTPStatusErr, ok := err.(cloudcontroller.RawHTTPStatusError); ok {
+	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {
 		return convert(rawHTTPStatusErr)
 	}
 	return err
 }
 
-func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
+func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
 	// return the raw error.
-	var errorResponse CCErrorResponse
+	var errorResponse ccerror.V2ErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
 	if err != nil {
 		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
-			return cloudcontroller.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
+			return ccerror.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
 		}
 		return rawHTTPStatusErr
 	}
@@ -107,14 +53,14 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	case http.StatusUnauthorized: // 401
 		return handleUnauthorized(errorResponse)
 	case http.StatusForbidden: // 403
-		return cloudcontroller.ForbiddenError{Message: errorResponse.Description}
+		return ccerror.ForbiddenError{Message: errorResponse.Description}
 	case http.StatusNotFound: // 404
-		return cloudcontroller.ResourceNotFoundError{Message: errorResponse.Description}
+		return ccerror.ResourceNotFoundError{Message: errorResponse.Description}
 	case http.StatusUnprocessableEntity: // 422
-		return cloudcontroller.UnprocessableEntityError{Message: errorResponse.Description}
+		return ccerror.UnprocessableEntityError{Message: errorResponse.Description}
 	default:
-		return UnexpectedResponseError{
-			CCErrorResponse: errorResponse,
+		return ccerror.V2UnexpectedResponseError{
+			V2ErrorResponse: errorResponse,
 			RequestIDs:      rawHTTPStatusErr.RequestIDs,
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
 		}
@@ -122,23 +68,23 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	return nil
 }
 
-func handleBadRequest(errorResponse CCErrorResponse) error {
+func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 	switch errorResponse.ErrorCode {
 	case "CF-AppStoppedStatsError":
-		return AppStoppedStatsError{Message: errorResponse.Description}
+		return ccerror.ApplicationStoppedStatsError{Message: errorResponse.Description}
 	case "CF-InstancesError":
-		return InstancesError{Message: errorResponse.Description}
+		return ccerror.InstancesError{Message: errorResponse.Description}
 	case "CF-NotStaged":
-		return NotStagedError{Message: errorResponse.Description}
+		return ccerror.NotStagedError{Message: errorResponse.Description}
 	default:
-		return cloudcontroller.BadRequestError{Message: errorResponse.Description}
+		return ccerror.BadRequestError{Message: errorResponse.Description}
 	}
 }
 
-func handleUnauthorized(errorResponse CCErrorResponse) error {
+func handleUnauthorized(errorResponse ccerror.V2ErrorResponse) error {
 	if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
-		return cloudcontroller.InvalidAuthTokenError{Message: errorResponse.Description}
+		return ccerror.InvalidAuthTokenError{Message: errorResponse.Description}
 	}
 
-	return cloudcontroller.UnauthorizedError{Message: errorResponse.Description}
+	return ccerror.UnauthorizedError{Message: errorResponse.Description}
 }

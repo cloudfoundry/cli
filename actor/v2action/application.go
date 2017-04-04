@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -146,7 +146,7 @@ func (e StartupTimeoutError) Error() string {
 func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplication(guid)
 
-	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return Application{}, Warnings(warnings), ApplicationNotFoundError{GUID: guid}
 	}
 

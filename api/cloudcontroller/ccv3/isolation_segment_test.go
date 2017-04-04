@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -77,10 +77,10 @@ var _ = Describe("Isolation Segments", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.CreateIsolationSegment(IsolationSegment{Name: name})
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -181,10 +181,10 @@ var _ = Describe("Isolation Segments", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetIsolationSegments(url.Values{})
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -252,7 +252,7 @@ var _ = Describe("Isolation Segments", func() {
 			It("returns a ResourceNotFoundError", func() {
 				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "Isolation segment not found"}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Isolation segment not found"}))
 			})
 		})
 
@@ -282,10 +282,10 @@ var _ = Describe("Isolation Segments", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetIsolationSegment("some-iso-guid")
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -348,10 +348,10 @@ var _ = Describe("Isolation Segments", func() {
 
 			It("returns the error and all warnings", func() {
 				warnings, err := client.DeleteIsolationSegment("some-iso-guid")
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						[]CCError{
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",

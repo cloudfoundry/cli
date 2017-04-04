@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -162,7 +162,7 @@ var _ = Describe("Job", func() {
 
 			It("returns a JobFailedError", func() {
 				warnings, err := client.PollJob(Job{GUID: "some-job-guid"})
-				Expect(err).To(MatchError(JobFailedError{
+				Expect(err).To(MatchError(ccerror.JobFailedError{
 					JobGUID: "some-job-guid",
 					Message: jobFailureMessage,
 				}))
@@ -251,7 +251,7 @@ var _ = Describe("Job", func() {
 				It("raises a JobTimeoutError", func() {
 					_, err := client.PollJob(Job{GUID: "some-job-guid"})
 
-					Expect(err).To(MatchError(JobTimeoutError{
+					Expect(err).To(MatchError(ccerror.JobTimeoutError{
 						Timeout: jobPollingTimeout,
 						JobGUID: "some-job-guid",
 					}))
@@ -398,7 +398,7 @@ var _ = Describe("Job", func() {
 			It("returns an error and all warnings", func() {
 				_, warnings, err := client.DeleteOrganization("some-org-guid")
 
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The organization could not be found: some-org-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))

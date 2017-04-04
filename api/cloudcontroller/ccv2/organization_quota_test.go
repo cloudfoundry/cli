@@ -1,12 +1,13 @@
 package ccv2_test
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"net/http"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
-	"net/http"
 )
 
 var _ = Describe("OrganizationQuota", func() {
@@ -64,7 +65,7 @@ var _ = Describe("OrganizationQuota", func() {
 
 			It("returns the error", func() {
 				_, warnings, err := client.GetOrganizationQuota("some-org-quota-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Quota Definition could not be found: some-org-quota-guid",
 				}))
 				Expect(warnings).To(Equal(Warnings{"warning-1"}))

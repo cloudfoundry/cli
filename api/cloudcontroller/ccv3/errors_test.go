@@ -3,7 +3,7 @@ package ccv3_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -18,41 +18,6 @@ var _ = Describe("Error Wrapper", func() {
 
 		client *Client
 	)
-
-	Describe("UnexpectedResponseError", func() {
-		Describe("Error", func() {
-			It("returns all of the errors joined with newlines", func() {
-				err := UnexpectedResponseError{
-					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						Errors: []CCError{
-							{
-								Code:   282010,
-								Detail: "detail 1",
-								Title:  "title-1",
-							},
-							{
-								Code:   10242013,
-								Detail: "detail 2",
-								Title:  "title-2",
-							},
-						},
-					},
-					RequestIDs: []string{
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
-					},
-				}
-
-				Expect(err.Error()).To(Equal(`Unexpected Response
-Response Code: 418
-Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95
-Request ID:    6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f
-Code: 282010, Title: title-1, Detail: detail 1
-Code: 10242013, Title: title-2, Detail: detail 2`))
-			})
-		})
-	})
 
 	Describe("Make", func() {
 		BeforeEach(func() {
@@ -93,7 +58,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				})
 				It("returns a NotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
+					Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
 				})
 			})
 
@@ -104,7 +69,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				})
 				It("returns a RawHTTPStatusError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
+					Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
 						StatusCode:  http.StatusTeapot,
 						RawResponse: []byte(response),
 						RequestIDs: []string{
@@ -125,9 +90,9 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns an UnexpectedResponseError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(UnexpectedResponseError{
+					Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 						ResponseCode:    http.StatusUnauthorized,
-						CCErrorResponse: CCErrorResponse{Errors: []CCError{}},
+						V3ErrorResponse: ccerror.V3ErrorResponse{Errors: []ccerror.V3Error{}},
 					}))
 				})
 			})
@@ -145,7 +110,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a NotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
+					Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
 				})
 			})
 
@@ -157,7 +122,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.UnauthorizedError{Message: "SomeCC Error Message"}))
+						Expect(err).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
 
@@ -176,7 +141,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 					It("returns an InvalidAuthTokenError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(cloudcontroller.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
 			})
@@ -188,7 +153,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a ForbiddenError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.ForbiddenError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -199,7 +164,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a ResourceNotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 				})
 
 			})
@@ -211,7 +176,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a UnprocessableEntityError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -222,7 +187,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a ServiceUnavailableError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(cloudcontroller.ServiceUnavailableError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(ccerror.ServiceUnavailableError{Message: "SomeCC Error Message"}))
 				})
 
 				Context("when the title is 'CF-TaskWorkersUnavailable'", func() {
@@ -240,7 +205,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 					It("returns a TaskWorkersUnavailableError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
+						Expect(err).To(MatchError(ccerror.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
 					})
 				})
 			})
@@ -252,10 +217,10 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns an UnexpectedResponseError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(UnexpectedResponseError{
+					Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 						ResponseCode: http.StatusTeapot,
-						CCErrorResponse: CCErrorResponse{
-							Errors: []CCError{
+						V3ErrorResponse: ccerror.V3ErrorResponse{
+							Errors: []ccerror.V3Error{
 								{
 									Code:   777,
 									Detail: "SomeCC Error Message",

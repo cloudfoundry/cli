@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -298,7 +298,7 @@ get-application-warning-3`))
 
 						BeforeEach(func() {
 							expectedErr = errors.New("request-error")
-							returnedErr = cloudcontroller.RequestError{Err: expectedErr}
+							returnedErr = ccerror.RequestError{Err: expectedErr}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
 								nil,
@@ -314,7 +314,7 @@ get-application-warning-3`))
 						var returnedErr error
 
 						BeforeEach(func() {
-							returnedErr = cloudcontroller.UnverifiedServerError{URL: "some-url"}
+							returnedErr = ccerror.UnverifiedServerError{URL: "some-url"}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
 								v3action.Application{GUID: "some-app-guid"},
 								nil,

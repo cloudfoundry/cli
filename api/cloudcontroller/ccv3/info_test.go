@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
@@ -116,7 +116,7 @@ var _ = Describe("Info", func() {
 
 			It("returns an APINotFoundError", func() {
 				_, _, _, err := client.Info()
-				Expect(err).To(MatchError(cloudcontroller.APINotFoundError{URL: server.URL()}))
+				Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
 			})
 		})
 
@@ -130,7 +130,7 @@ var _ = Describe("Info", func() {
 
 			It("returns the same error", func() {
 				_, _, warnings, err := client.Info()
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
@@ -178,7 +178,7 @@ var _ = Describe("Info", func() {
 
 			It("returns the same error", func() {
 				_, _, warnings, err := client.Info()
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "Not found, lol"}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Not found, lol"}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})
 		})

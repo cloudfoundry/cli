@@ -3,6 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -67,9 +68,9 @@ var _ = Describe("Organization", func() {
 			It("returns an error and all warnings", func() {
 				_, warnings, err := client.GetOrganization("some-org-guid")
 
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10001,
 						Description: "Some Error",
 						ErrorCode:   "CF-SomeError",
@@ -178,9 +179,9 @@ var _ = Describe("Organization", func() {
 			It("returns an error and all warnings", func() {
 				_, warnings, err := client.GetOrganizations(nil)
 
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10001,
 						Description: "Some Error",
 						ErrorCode:   "CF-SomeError",

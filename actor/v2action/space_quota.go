@@ -3,7 +3,7 @@ package v2action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -20,7 +20,7 @@ func (e SpaceQuotaNotFoundError) Error() string {
 func (actor Actor) GetSpaceQuota(guid string) (SpaceQuota, Warnings, error) {
 	spaceQuota, warnings, err := actor.CloudControllerClient.GetSpaceQuota(guid)
 
-	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return SpaceQuota{}, Warnings(warnings), SpaceQuotaNotFoundError{GUID: guid}
 	}
 

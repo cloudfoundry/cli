@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -178,7 +178,7 @@ var _ = Describe("Security Group Actions", func() {
 				fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
 					nil,
 					nil,
-					cloudcontroller.ResourceNotFoundError{})
+					ccerror.ResourceNotFoundError{})
 			})
 
 			It("returns an SpaceNotFoundError", func() {
@@ -247,7 +247,7 @@ var _ = Describe("Security Group Actions", func() {
 				fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
 					nil,
 					nil,
-					cloudcontroller.ResourceNotFoundError{})
+					ccerror.ResourceNotFoundError{})
 			})
 
 			It("returns an SpaceNotFoundError", func() {

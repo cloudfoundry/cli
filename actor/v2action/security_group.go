@@ -3,7 +3,7 @@ package v2action
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -79,7 +79,7 @@ func (actor Actor) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]Sec
 func processSecurityGroups(spaceGUID string, ccv2SecurityGroups []ccv2.SecurityGroup, warnings Warnings, err error) ([]SecurityGroup, Warnings, error) {
 	if err != nil {
 		switch err.(type) {
-		case cloudcontroller.ResourceNotFoundError:
+		case ccerror.ResourceNotFoundError:
 			return []SecurityGroup{}, warnings, SpaceNotFoundError{GUID: spaceGUID}
 		default:
 			return []SecurityGroup{}, warnings, err

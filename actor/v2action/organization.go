@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -39,7 +39,7 @@ func (e MultipleOrganizationsFoundError) Error() string {
 func (actor Actor) GetOrganization(guid string) (Organization, Warnings, error) {
 	org, warnings, err := actor.CloudControllerClient.GetOrganization(guid)
 
-	if _, ok := err.(cloudcontroller.ResourceNotFoundError); ok {
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 		return Organization{}, Warnings(warnings), OrganizationNotFoundError{GUID: guid}
 	}
 

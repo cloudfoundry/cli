@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -35,7 +36,7 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 		if app, ok := item.(Application); ok {
 			fullAppsList = append(fullAppsList, app)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Application{},
 				Unexpected: item,
 			}

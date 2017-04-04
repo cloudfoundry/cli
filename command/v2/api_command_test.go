@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -144,7 +144,7 @@ api version:    some-version`,
 
 					Context("when no additional flags are passed", func() {
 						BeforeEach(func() {
-							fakeActor.SetTargetReturns(nil, cloudcontroller.UnverifiedServerError{URL: CCAPI})
+							fakeActor.SetTargetReturns(nil, ccerror.UnverifiedServerError{URL: CCAPI})
 						})
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
@@ -208,14 +208,14 @@ api version:    some-version`,
 		Context("when the URL host does not exist", func() {
 			var (
 				CCAPI      string
-				requestErr cloudcontroller.RequestError
+				requestErr ccerror.RequestError
 			)
 
 			BeforeEach(func() {
 				CCAPI = "i.do.not.exist.com"
 				cmd.OptionalArgs.URL = CCAPI
 
-				requestErr = cloudcontroller.RequestError{Err: errors.New("I am an error")}
+				requestErr = ccerror.RequestError{Err: errors.New("I am an error")}
 				fakeActor.SetTargetReturns(nil, requestErr)
 			})
 

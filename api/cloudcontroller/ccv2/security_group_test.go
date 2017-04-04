@@ -3,7 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -53,9 +53,9 @@ var _ = Describe("Security Groups", func() {
 			It("returns an error and all warnings", func() {
 				warnings, err := client.AssociateSpaceWithSecurityGroup("security-group-guid", "space-guid")
 
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10001,
 						Description: "Some Error",
 						ErrorCode:   "CF-SomeError",
@@ -162,9 +162,9 @@ var _ = Describe("Security Groups", func() {
 			It("returns an error and all warnings", func() {
 				_, warnings, err := client.GetSecurityGroups(nil)
 
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10001,
 						Description: "Some Error",
 						ErrorCode:   "CF-SomeError",
@@ -345,7 +345,7 @@ var _ = Describe("Security Groups", func() {
 
 			It("returns the error and warnings", func() {
 				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
@@ -524,7 +524,7 @@ var _ = Describe("Security Groups", func() {
 
 			It("returns the error and warnings", func() {
 				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

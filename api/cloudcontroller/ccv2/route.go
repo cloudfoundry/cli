@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -56,7 +57,7 @@ func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) 
 		if route, ok := item.(Route); ok {
 			fullRoutesList = append(fullRoutesList, route)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Route{},
 				Unexpected: item,
 			}
@@ -84,7 +85,7 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]R
 		if route, ok := item.(Route); ok {
 			fullRoutesList = append(fullRoutesList, route)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   Route{},
 				Unexpected: item,
 			}

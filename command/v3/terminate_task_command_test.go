@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
@@ -180,7 +180,7 @@ var _ = Describe("terminate-task Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("request-error")
-						returnedErr = cloudcontroller.RequestError{Err: expectedErr}
+						returnedErr = ccerror.RequestError{Err: expectedErr}
 					})
 
 					Context("when getting the app returns the error", func() {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -352,7 +352,7 @@ var _ = Describe("Application", func() {
 					GUID:            "some-app-guid",
 					HealthCheckType: "some-health-check-type",
 				})
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
@@ -378,7 +378,7 @@ var _ = Describe("Application", func() {
 
 			It("returns an error", func() {
 				_, _, err := client.GetRouteApplications("some-route-guid", nil)
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The route could not be found: some-route-guid",
 				}))
 			})

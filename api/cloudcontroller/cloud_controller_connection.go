@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
 // CloudControllerConnection represents a connection to the Cloud Controller
@@ -65,15 +67,15 @@ func (connection *CloudControllerConnection) processRequestErrors(request *http.
 	case *url.Error:
 		switch urlErr := e.Err.(type) {
 		case x509.UnknownAuthorityError:
-			return UnverifiedServerError{
+			return ccerror.UnverifiedServerError{
 				URL: request.URL.String(),
 			}
 		case x509.HostnameError:
-			return SSLValidationHostnameError{
+			return ccerror.SSLValidationHostnameError{
 				Message: urlErr.Error(),
 			}
 		default:
-			return RequestError{Err: e}
+			return ccerror.RequestError{Err: e}
 		}
 	default:
 		return err
@@ -120,7 +122,7 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 
 func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
 	if response.StatusCode >= 400 {
-		return RawHTTPStatusError{
+		return ccerror.RawHTTPStatusError{
 			StatusCode:  response.StatusCode,
 			RawResponse: passedResponse.RawResponse,
 			RequestIDs:  response.Header["X-Vcap-Request-Id"],

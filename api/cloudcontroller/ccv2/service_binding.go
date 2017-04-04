@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -42,7 +43,7 @@ func (client *Client) GetServiceBindings(queries []Query) ([]ServiceBinding, War
 		if binding, ok := item.(ServiceBinding); ok {
 			fullBindingsList = append(fullBindingsList, binding)
 		} else {
-			return cloudcontroller.UnknownObjectInListError{
+			return ccerror.UnknownObjectInListError{
 				Expected:   ServiceBinding{},
 				Unexpected: item,
 			}

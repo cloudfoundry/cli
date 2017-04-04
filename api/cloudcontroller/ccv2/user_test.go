@@ -3,6 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -74,9 +75,9 @@ var _ = Describe("User", func() {
 
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.CreateUser("some-uaa-guid")
-				Expect(err).To(MatchError(UnexpectedResponseError{
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: 418,
-					CCErrorResponse: CCErrorResponse{
+					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        10008,
 						Description: "The request is semantically invalid: command presence",
 						ErrorCode:   "CF-UnprocessableEntity",

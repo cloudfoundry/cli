@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -65,7 +65,7 @@ var _ = Describe("Org Actions", func() {
 				fakeCloudControllerClient.GetOrganizationReturns(
 					ccv2.Organization{},
 					ccv2.Warnings{"warning-1", "warning-2"},
-					cloudcontroller.ResourceNotFoundError{},
+					ccerror.ResourceNotFoundError{},
 				)
 			})
 

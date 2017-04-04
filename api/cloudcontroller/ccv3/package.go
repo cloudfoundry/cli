@@ -3,13 +3,13 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -41,14 +41,6 @@ type Package struct {
 
 type PackageRelationships struct {
 	Application Relationship `json:"app"`
-}
-
-type UploadLinkNotFoundError struct {
-	PackageGUID string
-}
-
-func (e UploadLinkNotFoundError) Error() string {
-	return fmt.Sprintf("Upload link not found in for package with GUID %s", e.PackageGUID)
 }
 
 // GetPackage returns the package with the given GUID.
@@ -96,7 +88,7 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
 	link, ok := pkg.Links["upload"]
 	if !ok {
-		return Package{}, nil, UploadLinkNotFoundError{PackageGUID: pkg.GUID}
+		return Package{}, nil, ccerror.UploadLinkNotFoundError{PackageGUID: pkg.GUID}
 	}
 
 	body, contentType, err := client.createUploadStream(fileToUpload, "bits")

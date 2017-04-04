@@ -5,8 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
@@ -24,20 +23,20 @@ var _ = Describe("HandleError", func() {
 			Expect(actualErr).To(MatchError(expectedErr))
 		},
 
-		Entry("cloudcontroller.RequestError -> APIRequestError",
-			cloudcontroller.RequestError{Err: err},
+		Entry("ccerror.RequestError -> APIRequestError",
+			ccerror.RequestError{Err: err},
 			command.APIRequestError{Err: err}),
 
-		Entry("cloudcontroller.UnverifiedServerError -> InvalidSSLCertError",
-			cloudcontroller.UnverifiedServerError{URL: "some-url"},
+		Entry("ccerror.UnverifiedServerError -> InvalidSSLCertError",
+			ccerror.UnverifiedServerError{URL: "some-url"},
 			command.InvalidSSLCertError{API: "some-url"}),
 
-		Entry("cloudcontroller.SSLValidationHostnameError -> SSLCertErrorError",
-			cloudcontroller.SSLValidationHostnameError{Message: "some-message"},
+		Entry("ccerror.SSLValidationHostnameError -> SSLCertErrorError",
+			ccerror.SSLValidationHostnameError{Message: "some-message"},
 			command.SSLCertErrorError{Message: "some-message"}),
 
-		Entry("cloudcontroller.APINotFoundError -> APINotFoundError",
-			cloudcontroller.APINotFoundError{URL: "some-url"},
+		Entry("ccerror.APINotFoundError -> APINotFoundError",
+			ccerror.APINotFoundError{URL: "some-url"},
 			command.APINotFoundError{URL: "some-url"}),
 
 		Entry("v2action.ApplicationNotFoundError -> ApplicationNotFoundError",
@@ -52,12 +51,12 @@ var _ = Describe("HandleError", func() {
 			v2action.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			command.ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
-		Entry("ccv2.JobFailedError -> JobFailedError",
-			ccv2.JobFailedError{JobGUID: "some-job-guid"},
+		Entry("ccerror.JobFailedError -> JobFailedError",
+			ccerror.JobFailedError{JobGUID: "some-job-guid"},
 			JobFailedError{JobGUID: "some-job-guid"}),
 
-		Entry("ccv2.JobTimeoutError -> JobTimeoutError",
-			ccv2.JobTimeoutError{JobGUID: "some-job-guid"},
+		Entry("ccerror.JobTimeoutError -> JobTimeoutError",
+			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			JobTimeoutError{JobGUID: "some-job-guid"}),
 
 		Entry("v2action.OrganizationNotFoundError -> OrgNotFoundError",

@@ -5,24 +5,24 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
-	case cloudcontroller.APINotFoundError:
+	case ccerror.APINotFoundError:
 		return command.APINotFoundError{URL: e.URL}
-	case cloudcontroller.RequestError:
+	case ccerror.RequestError:
 		return command.APIRequestError{Err: e.Err}
-	case cloudcontroller.SSLValidationHostnameError:
+	case ccerror.SSLValidationHostnameError:
 		return command.SSLCertErrorError{Message: e.Message}
-	case cloudcontroller.UnprocessableEntityError:
+	case ccerror.UnprocessableEntityError:
 		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
 			return RunTaskError{
 				Message: "App is not staged."}
 		}
-	case cloudcontroller.UnverifiedServerError:
+	case ccerror.UnverifiedServerError:
 		return command.InvalidSSLCertError{API: e.URL}
 
 	case sharedaction.NotLoggedInError:
