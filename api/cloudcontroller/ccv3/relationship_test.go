@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -294,7 +293,7 @@ var _ = Describe("Relationship", func() {
 
 			It("returns the relationship and warnings", func() {
 				_, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Organization not found",
 				}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
