@@ -14,15 +14,15 @@ func (e RunTaskError) Translate(translate func(string, ...interface{}) string) s
 	})
 }
 
-type ClientTargetError struct {
+type V3APIDoesNotExistError struct {
 	Message string
 }
 
-func (e ClientTargetError) Error() string {
+func (e V3APIDoesNotExistError) Error() string {
 	return "{{.Message}}\nNote that this command requires CF API version 3.0.0+."
 }
 
-func (e ClientTargetError) Translate(translate func(string, ...interface{}) string) string {
+func (e V3APIDoesNotExistError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Message": e.Message,
 	})

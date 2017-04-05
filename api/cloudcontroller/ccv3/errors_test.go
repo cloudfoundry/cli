@@ -97,23 +97,6 @@ var _ = Describe("Error Wrapper", func() {
 				})
 			})
 
-			Context("when there no errors key in the response", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusNotFound
-					response = `
-						{
-							"code": 10000,
-							"description": "Unknown request",
-							"error_code": "CF-NotFound"
-						}`
-				})
-
-				It("returns a NotFoundError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
-				})
-			})
-
 			Context("(401) Unauthorized", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusUnauthorized

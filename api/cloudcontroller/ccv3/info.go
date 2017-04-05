@@ -54,7 +54,7 @@ func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Info returns back endpoint and API information from /v3.
+// Info returns endpoint and API information from /v3.
 func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 	rootResponse, warnings, err := client.rootResponse()
 	if err != nil {
@@ -84,7 +84,7 @@ func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 	return rootResponse, info, warnings, nil
 }
 
-// rootResponse return the CC API root document.
+// rootResponse returns the CC API root document.
 func (client *Client) rootResponse() (APIInfo, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,

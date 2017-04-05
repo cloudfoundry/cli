@@ -49,12 +49,6 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 		return rawHTTPStatusErr
 	}
 
-	// 404 on root response; occurs when requesting the v3 capi and the v3 capi
-	// is not installed
-	if rawHTTPStatusErr.StatusCode == http.StatusNotFound && len(errorResponse.Errors) == 0 {
-		return ccerror.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
-	}
-
 	errors := errorResponse.Errors
 	if len(errors) == 0 {
 		return ccerror.V3UnexpectedResponseError{
