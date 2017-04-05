@@ -117,7 +117,7 @@ var HelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "ISOLATION SEGMENTS:",
 		CommandList: [][]string{
-			{"isolation-segments", "create-isolation-segment", "delete-isolation-segment", "enable-org-isolation", "disable-org-isolation", "set-space-isolation-segment"},
+			{"isolation-segments", "create-isolation-segment", "delete-isolation-segment", "enable-org-isolation", "disable-org-isolation", "set-space-isolation-segment", "reset-space-isolation-segment"},
 		},
 	},
 	{
