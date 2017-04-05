@@ -558,6 +558,8 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("ISOLATION SEGMENTS:"))
 				Expect(testUI.Out).To(Say("   isolation-segments\\s+List all isolation segments"))
 				Expect(testUI.Out).To(Say("   create-isolation-segment\\s+Create an isolation segment"))
+				Expect(testUI.Out).To(Say("   set-space-isolation-segment\\s+Assign the isolation segment that apps in a space are started in"))
+				Expect(testUI.Out).To(Say("   reset-space-isolation-segment\\s+Reset the isolation segment assignment of a space to the org's default"))
 
 				Expect(testUI.Out).To(Say("FEATURE FLAGS:"))
 				Expect(testUI.Out).To(Say("   feature-flags\\s+Retrieve list of feature flags with status of each flag-able feature"))

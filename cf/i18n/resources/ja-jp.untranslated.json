@@ -72,6 +72,14 @@
     "translation": "Application lifecycle:"
   },
   {
+    "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
+    "translation": ""
+  },
+  {
+    "id": "Applications in this space will be placed in the platform default isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "Assign the isolation segment that apps in a space are started in",
     "translation": ""
   },
@@ -710,6 +718,10 @@
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nEXAMPLES:\\n   CF_NAME repo-plugins -r PrivateRepo",
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nEXAMPLES:\\n   CF_NAME repo-plugins -r PrivateRepo"
+  },
+  {
+    "id": "CF_NAME reset-space-isolation-segment SPACE_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME restage APP_NAME",
@@ -1528,6 +1540,14 @@
     "translation": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Reset the isolation segment assignment of a space to the org's default",
+    "translation": ""
+  },
+  {
+    "id": "Resetting isolation segment assignment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Resource matching API timed out; pushing all app files.",
     "translation": ""
   },
@@ -1549,6 +1569,10 @@
   },
   {
     "id": "Run a one-off task on an app",
+    "translation": ""
+  },
+  {
+    "id": "Running applications need a restart to be moved there.",
     "translation": ""
   },
   {
@@ -2114,6 +2138,10 @@
   {
     "id": "repo-plugins",
     "translation": "repo-plugins"
+  },
+  {
+    "id": "reset-space-isolation-segment",
+    "translation": ""
   },
   {
     "id": "routes:",

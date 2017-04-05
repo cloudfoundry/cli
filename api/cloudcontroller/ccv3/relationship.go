@@ -9,6 +9,7 @@ import (
 )
 
 // Relationship represents a one to one relationship.
+// An empty GUID will be marshaled as `null`.
 type Relationship struct {
 	GUID string
 }
@@ -16,11 +17,13 @@ type Relationship struct {
 func (r Relationship) MarshalJSON() ([]byte, error) {
 	var ccRelationship struct {
 		Data struct {
-			GUID string `json:"guid"`
+			GUID *string `json:"guid"`
 		} `json:"data"`
 	}
 
-	ccRelationship.Data.GUID = r.GUID
+	if r.GUID != "" {
+		ccRelationship.Data.GUID = &r.GUID
+	}
 	return json.Marshal(ccRelationship)
 }
 
@@ -103,6 +106,9 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 		RequestName: internal.GetSpaceRelationshipIsolationSegmentRequest,
 		URIParams:   internal.Params{"guid": spaceGUID},
 	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
 
 	var relationship Relationship
 	response := cloudcontroller.Response{
@@ -151,4 +157,22 @@ func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUI
 	err = client.connection.Make(request, &response)
 
 	return response.Warnings, err
+}
+
+func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetOrganizationDefaultIsolationSegmentRequest,
+		URIParams:   internal.Params{"guid": orgGUID},
+	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
+
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationship, response.Warnings, err
 }

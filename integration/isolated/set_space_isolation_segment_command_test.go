@@ -28,7 +28,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf set-space-isolation-segment SPACE_NAME SEGMENT_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("org, restart, space"))
+				Eventually(session).Should(Say("org, reset-space-isolation-segment, restart, space"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

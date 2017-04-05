@@ -18,6 +18,7 @@ const (
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
+	GetOrganizationDefaultIsolationSegmentRequest         = "GetOrganizationDefaultIsolationSegment"
 	GetOrgsRequest                                        = "GetOrgs"
 	GetPackageRequest                                     = "GetPackage"
 	GetSpaceRelationshipIsolationSegmentRequest           = "GetSpaceRelationshipIsolationSegmentRequest"
@@ -52,6 +53,7 @@ var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationDefaultIsolationSegmentRequest, Resource: OrgsResource},
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
 	{Path: "/:guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest, Resource: IsolationSegmentsResource},

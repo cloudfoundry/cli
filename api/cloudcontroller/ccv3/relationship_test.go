@@ -1,8 +1,10 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -17,6 +19,36 @@ var _ = Describe("Relationship", func() {
 
 	BeforeEach(func() {
 		client = NewTestClient()
+	})
+
+	Describe("Relationship.MarshalJSON", func() {
+		Context("when the isolation segment is specified by name", func() {
+			It("contains the name in the marshaled JSON", func() {
+				body, err := json.Marshal(Relationship{GUID: "some-iso-guid"})
+				expectedJSON := `{
+					"data": {
+						"guid": "some-iso-guid"
+					}
+				}`
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(body).To(MatchJSON(expectedJSON))
+			})
+		})
+
+		Context("when the isolation segment is the empty string", func() {
+			It("contains null in the marshaled JSON", func() {
+				body, err := json.Marshal(Relationship{GUID: ""})
+				expectedJSON := `{
+					"data": {
+						"guid": null
+					}
+				}`
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(body).To(MatchJSON(expectedJSON))
+			})
+		})
 	})
 
 	Describe("AssignSpaceToIsolationSegment", func() {
@@ -211,6 +243,62 @@ var _ = Describe("Relationship", func() {
 			Expect(warnings).To(ConsistOf("this is a warning"))
 
 			Expect(server.ReceivedRequests()).To(HaveLen(3))
+		})
+	})
+
+	Describe("GetOrganizationDefaultIsolationSegment", func() {
+		Context("when getting the isolation segment is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"data": {
+						"guid": "some-isolation-segment-guid"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the relationship and warnings", func() {
+				relationship, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship).To(Equal(Relationship{
+					GUID: "some-isolation-segment-guid",
+				}))
+			})
+		})
+
+		Context("when getting the isolation segment fails with an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"detail": "Organization not found",
+							"title": "CF-ResourceNotFound",
+							"code": 10010
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the relationship and warnings", func() {
+				_, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
+					Message: "Organization not found",
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
 		})
 	})
 })
