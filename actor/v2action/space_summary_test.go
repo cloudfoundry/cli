@@ -88,15 +88,16 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
 						[]ccv2.SecurityGroup{
 							{
-								Name:        "some-shared-security-group",
-								Description: "Some shared walking group",
+								Name: "some-shared-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some shared walking group",
 										Destination: "0.0.0.0-5.6.7.8",
 										Ports:       "80,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some shared walking group too",
 										Destination: "127.10.10.10-127.10.10.255",
 										Ports:       "80,4443",
 										Protocol:    "udp",
@@ -104,15 +105,16 @@ var _ = Describe("Space Summary Actions", func() {
 								},
 							},
 							{
-								Name:        "some-running-security-group",
-								Description: "Some running walking group",
+								Name: "some-running-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some running walking group",
 										Destination: "127.0.0.1-127.0.0.255",
 										Ports:       "8080,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some running walking group too",
 										Destination: "127.20.20.20-127.20.20.25",
 										Ports:       "80,4443",
 										Protocol:    "udp",
@@ -126,15 +128,16 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
 						[]ccv2.SecurityGroup{
 							{
-								Name:        "some-shared-security-group",
-								Description: "Some shared cinematic group",
+								Name: "some-shared-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some shared cinematic group",
 										Destination: "0.0.0.0-5.6.7.8",
 										Ports:       "80,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some shared cinematic group too",
 										Destination: "127.10.10.10-127.10.10.255",
 										Ports:       "80,4443",
 										Protocol:    "udp",
@@ -142,15 +145,16 @@ var _ = Describe("Space Summary Actions", func() {
 								},
 							},
 							{
-								Name:        "some-staging-security-group",
-								Description: "Some staging cinematic group",
+								Name: "some-staging-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some staging cinematic group",
 										Destination: "127.5.5.1-127.6.6.255",
 										Ports:       "32767,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some staging cinematic group too",
 										Destination: "127.25.20.20-127.25.20.25",
 										Ports:       "80,9999",
 										Protocol:    "udp",
@@ -201,7 +205,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-running-security-group",
-								Description: "Some running walking group",
+								Description: "Some running walking group too",
 								Destination: "127.20.20.20-127.20.20.25",
 								Lifecycle:   "running",
 								Ports:       "80,4443",
@@ -225,7 +229,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-shared-security-group",
-								Description: "Some shared walking group",
+								Description: "Some shared walking group too",
 								Destination: "127.10.10.10-127.10.10.255",
 								Lifecycle:   "running",
 								Ports:       "80,4443",
@@ -233,7 +237,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-shared-security-group",
-								Description: "Some shared cinematic group",
+								Description: "Some shared cinematic group too",
 								Destination: "127.10.10.10-127.10.10.255",
 								Lifecycle:   "staging",
 								Ports:       "80,4443",
@@ -241,7 +245,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-staging-security-group",
-								Description: "Some staging cinematic group",
+								Description: "Some staging cinematic group too",
 								Destination: "127.25.20.20-127.25.20.25",
 								Lifecycle:   "staging",
 								Ports:       "80,9999",
@@ -731,15 +735,16 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceReturns(
 						[]ccv2.SecurityGroup{
 							{
-								Name:        "some-shared-security-group",
-								Description: "Some shared walking group",
+								Name: "some-shared-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some shared walking group",
 										Destination: "0.0.0.0-5.6.7.8",
 										Ports:       "80,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some shared walking group too",
 										Destination: "127.10.10.10-127.10.10.255",
 										Ports:       "80,4443",
 										Protocol:    "udp",
@@ -747,15 +752,16 @@ var _ = Describe("Space Summary Actions", func() {
 								},
 							},
 							{
-								Name:        "some-running-security-group",
-								Description: "Some running walking group",
+								Name: "some-running-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
+										Description: "Some running walking group",
 										Destination: "127.0.0.1-127.0.0.255",
 										Ports:       "8080,443",
 										Protocol:    "tcp",
 									},
 									{
+										Description: "Some running walking group too",
 										Destination: "127.20.20.20-127.20.20.25",
 										Ports:       "80,4443",
 										Protocol:    "udp",
@@ -804,7 +810,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-running-security-group",
-								Description: "Some running walking group",
+								Description: "Some running walking group too",
 								Destination: "127.20.20.20-127.20.20.25",
 								Lifecycle:   "running",
 								Ports:       "80,4443",
@@ -820,7 +826,7 @@ var _ = Describe("Space Summary Actions", func() {
 							},
 							{
 								Name:        "some-shared-security-group",
-								Description: "Some shared walking group",
+								Description: "Some shared walking group too",
 								Destination: "127.10.10.10-127.10.10.255",
 								Lifecycle:   "running",
 								Ports:       "80,4443",

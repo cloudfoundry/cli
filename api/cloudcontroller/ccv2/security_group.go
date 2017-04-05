@@ -9,16 +9,16 @@ import (
 )
 
 type SecurityGroupRule struct {
+	Description string
 	Destination string
 	Ports       string
 	Protocol    string
 }
 
 type SecurityGroup struct {
-	Description string
-	GUID        string
-	Name        string
-	Rules       []SecurityGroupRule
+	GUID  string
+	Name  string
+	Rules []SecurityGroupRule
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Security Group response
@@ -26,10 +26,10 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 	var ccSecurityGroup struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			GUID        string `json:"guid"`
-			Name        string `json:"name"`
-			Description string `json:"description"`
-			Rules       []struct {
+			GUID  string `json:"guid"`
+			Name  string `json:"name"`
+			Rules []struct {
+				Description string `json:"description"`
 				Destination string `json:"destination"`
 				Ports       string `json:"ports"`
 				Protocol    string `json:"protocol"`
@@ -43,9 +43,9 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 
 	securityGroup.GUID = ccSecurityGroup.Metadata.GUID
 	securityGroup.Name = ccSecurityGroup.Entity.Name
-	securityGroup.Description = ccSecurityGroup.Entity.Description
 	securityGroup.Rules = make([]SecurityGroupRule, len(ccSecurityGroup.Entity.Rules))
 	for i, ccRule := range ccSecurityGroup.Entity.Rules {
+		securityGroup.Rules[i].Description = ccRule.Description
 		securityGroup.Rules[i].Destination = ccRule.Destination
 		securityGroup.Rules[i].Ports = ccRule.Ports
 		securityGroup.Rules[i].Protocol = ccRule.Protocol

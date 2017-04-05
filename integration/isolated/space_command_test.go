@@ -209,16 +209,16 @@ var _ = Describe("space command", func() {
 					securityGroupRules2.Write([]byte(`
 						[
 							{
-								"protocol": "tcp",
-								"destination": "5.7.9.11/24",
-								"ports": "80,443",
-								"description": "some other security group"
-							},
-							{
 								"protocol": "udp",
 								"destination": "92.0.0.1/24",
 								"ports": "80,443",
 								"description": "some other other security group"
+							},
+							{
+								"protocol": "tcp",
+								"destination": "5.7.9.11/24",
+								"ports": "80,443",
+								"description": "some other security group"
 							}
 						]
 					`))
@@ -249,9 +249,9 @@ var _ = Describe("space command", func() {
 					Eventually(session.Out).Should(Say("\n\n"))
 
 					Eventually(session.Out).Should(Say("security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description"))
-					Eventually(session.Out).Should(Say("#0\\s+%s\\s+1.2.3.4/24\\s+80,443\\s+tcp\\s+running", securityGroupName))
-					Eventually(session.Out).Should(Say("#1\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+running", securityGroupName2))
-					Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+running", securityGroupName2))
+					Eventually(session.Out).Should(Say("#0\\s+%s\\s+1.2.3.4/24\\s+80,443\\s+tcp\\s+running\\s+some security group", securityGroupName))
+					Eventually(session.Out).Should(Say("#1\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+running\\s+some other security group", securityGroupName2))
+					Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+running\\s+some other other security group", securityGroupName2))
 				})
 			})
 		})

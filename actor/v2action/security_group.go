@@ -126,7 +126,7 @@ func extractSecurityGroupRules(securityGroup SecurityGroup, lifecycle string) []
 	for i, rule := range securityGroup.Rules {
 		securityGroupRules[i] = SecurityGroupRule{
 			Name:        securityGroup.Name,
-			Description: securityGroup.Description,
+			Description: rule.Description,
 			Destination: rule.Destination,
 			Lifecycle:   lifecycle,
 			Ports:       rule.Ports,

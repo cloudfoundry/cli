@@ -188,16 +188,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "running-security-group-name-1",
-								"description": "description-1",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "8080",
+										"description": "description-1",
 										"destination": "198.41.191.47/1"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "80,443",
+										"description": "description-2",
 										"destination": "254.41.191.47-254.44.255.255"
 									}
 								]
@@ -210,16 +211,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "running-security-group-name-2",
-								"description": "description-2",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "8080",
+										"description": "description-3",
 										"destination": "198.41.191.47/24"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "80,443",
+										"description": "description-4",
 										"destination": "254.41.191.4-254.44.255.4"
 									}
 								]
@@ -237,16 +239,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "running-security-group-name-3",
-								"description": "description-3",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "32767",
+										"description": "description-5",
 										"destination": "127.0.0.1/32"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "8008,4443",
+										"description": "description-6",
 										"destination": "254.41.191.0-254.44.255.1"
 									}
 								]
@@ -274,52 +277,55 @@ var _ = Describe("Security Groups", func() {
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
 					SecurityGroup{
-						Name:        "running-security-group-name-1",
-						GUID:        "running-security-group-guid-1",
-						Description: "description-1",
+						Name: "running-security-group-name-1",
+						GUID: "running-security-group-guid-1",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "8080",
+								Description: "description-1",
 								Destination: "198.41.191.47/1",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "80,443",
+								Description: "description-2",
 								Destination: "254.41.191.47-254.44.255.255",
 							},
 						},
 					},
 					SecurityGroup{
-						Name:        "running-security-group-name-2",
-						GUID:        "running-security-group-guid-2",
-						Description: "description-2",
+						Name: "running-security-group-name-2",
+						GUID: "running-security-group-guid-2",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "8080",
+								Description: "description-3",
 								Destination: "198.41.191.47/24",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "80,443",
+								Description: "description-4",
 								Destination: "254.41.191.4-254.44.255.4",
 							},
 						},
 					},
 					SecurityGroup{
-						Name:        "running-security-group-name-3",
-						GUID:        "running-security-group-guid-3",
-						Description: "description-3",
+						Name: "running-security-group-name-3",
+						GUID: "running-security-group-guid-3",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "32767",
+								Description: "description-5",
 								Destination: "127.0.0.1/32",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "8008,4443",
+								Description: "description-6",
 								Destination: "254.41.191.0-254.44.255.1",
 							},
 						},
@@ -367,16 +373,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "staging-security-group-name-1",
-								"description": "description-1",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "8080",
+										"description": "description-1",
 										"destination": "198.41.191.47/1"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "80,443",
+										"description": "description-2",
 										"destination": "254.41.191.47-254.44.255.255"
 									}
 								]
@@ -389,16 +396,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "staging-security-group-name-2",
-								"description": "description-2",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "8080",
+										"description": "description-3",
 										"destination": "198.41.191.47/24"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "80,443",
+										"description": "description-4",
 										"destination": "254.41.191.4-254.44.255.4"
 									}
 								]
@@ -416,16 +424,17 @@ var _ = Describe("Security Groups", func() {
 							},
 							"entity": {
 								"name": "staging-security-group-name-3",
-								"description": "description-3",
 								"rules": [
 									{
 										"protocol": "udp",
 										"ports": "32767",
+										"description": "description-5",
 										"destination": "127.0.0.1/32"
 									},
 									{
 										"protocol": "tcp",
 										"ports": "8008,4443",
+										"description": "description-6",
 										"destination": "254.41.191.0-254.44.255.1"
 									}
 								]
@@ -453,52 +462,55 @@ var _ = Describe("Security Groups", func() {
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
 					SecurityGroup{
-						Name:        "staging-security-group-name-1",
-						GUID:        "staging-security-group-guid-1",
-						Description: "description-1",
+						Name: "staging-security-group-name-1",
+						GUID: "staging-security-group-guid-1",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "8080",
+								Description: "description-1",
 								Destination: "198.41.191.47/1",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "80,443",
+								Description: "description-2",
 								Destination: "254.41.191.47-254.44.255.255",
 							},
 						},
 					},
 					SecurityGroup{
-						Name:        "staging-security-group-name-2",
-						GUID:        "staging-security-group-guid-2",
-						Description: "description-2",
+						Name: "staging-security-group-name-2",
+						GUID: "staging-security-group-guid-2",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "8080",
+								Description: "description-3",
 								Destination: "198.41.191.47/24",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "80,443",
+								Description: "description-4",
 								Destination: "254.41.191.4-254.44.255.4",
 							},
 						},
 					},
 					SecurityGroup{
-						Name:        "staging-security-group-name-3",
-						GUID:        "staging-security-group-guid-3",
-						Description: "description-3",
+						Name: "staging-security-group-name-3",
+						GUID: "staging-security-group-guid-3",
 						Rules: []SecurityGroupRule{
 							{
 								Protocol:    "udp",
 								Ports:       "32767",
+								Description: "description-5",
 								Destination: "127.0.0.1/32",
 							},
 							{
 								Protocol:    "tcp",
 								Ports:       "8008,4443",
+								Description: "description-6",
 								Destination: "254.41.191.0-254.44.255.1",
 							},
 						},
