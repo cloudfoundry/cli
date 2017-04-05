@@ -145,7 +145,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.environmentVariableGroupRepo = environmentvariablegroups.NewCloudControllerRepository(config, cloudControllerGateway)
 	loc.copyAppSourceRepo = copyapplicationsource.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
 
-	client := v3client.NewClient(config.APIEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken(), config.UAAOAuthClient(), config.UAAOAuthClientSecret())
+	client := v3client.NewClient(config.APIEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
 	loc.v3Repository = repository.NewRepository(config, client)
 
 	return

@@ -105,7 +105,7 @@
 			"importpath": "github.com/cloudfoundry/go-ccapi/v3/client",
 			"repository": "https://github.com/cloudfoundry/go-ccapi",
 			"vcs": "git",
-			"revision": "aea9dd6bb3a3b4a7c0d439b17b74ab795ff2946e",
+			"revision": "71998966d470aeafdb4acabf79a75e444d6f78f6",
 			"branch": "master",
 			"path": "/v3/client",
 			"notests": true
@@ -114,7 +114,7 @@
 			"importpath": "github.com/cloudfoundry/go-ccapi/v3/routing",
 			"repository": "https://github.com/cloudfoundry/go-ccapi",
 			"vcs": "git",
-			"revision": "aea9dd6bb3a3b4a7c0d439b17b74ab795ff2946e",
+			"revision": "71998966d470aeafdb4acabf79a75e444d6f78f6",
 			"branch": "master",
 			"path": "/v3/routing",
 			"notests": true

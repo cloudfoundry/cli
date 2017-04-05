@@ -21,16 +21,12 @@ type TokenRefresher interface {
 type tokenRefresher struct {
 	uaaRequestGenerator *rata.RequestGenerator
 	httpClient          *http.Client
-	cfOAuthClient       string
-	cfOAuthClientSecret string
 }
 
-func NewTokenRefresher(uaaEndpoint string, cfOAuthClient, cfOAuthClientSecret string) TokenRefresher {
+func NewTokenRefresher(uaaEndpoint string) TokenRefresher {
 	return &tokenRefresher{
 		uaaRequestGenerator: rata.NewRequestGenerator(uaaEndpoint, routing.UAARoutes),
 		httpClient:          &http.Client{},
-		cfOAuthClient:       cfOAuthClient,
-		cfOAuthClientSecret: cfOAuthClientSecret,
 	}
 }
 
@@ -45,8 +41,8 @@ func (t tokenRefresher) Refresh(oldRefreshToken string) (string, string, error) 
 		"grant_type":    {"refresh_token"},
 		"scope":         {""},
 	}
-	auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(t.cfOAuthClient+":"+t.cfOAuthClientSecret))
-	req.Header.Set("Authorization", auth)
+
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.URL.RawQuery = data.Encode()
