@@ -352,7 +352,6 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      trigger: true
       passed: [integration]
       depth: 3
     - get: cf-acceptance-tests
@@ -362,6 +361,7 @@ jobs:
       depth: 3
     - get: vars-store
     - get: bosh-lite-lock
+      trigger: true
       passed: [integration]
       resource: hardknox-pool
   - do:
