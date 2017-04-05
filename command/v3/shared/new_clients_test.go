@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
@@ -53,7 +54,7 @@ var _ = Describe("New Clients", func() {
 			server.Close()
 		})
 
-		Context("that is a cloud controller request error", func() {
+		Context("when the error is a cloud controller request error", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("https://127.0.0.1:9876")
 			})
@@ -65,12 +66,12 @@ var _ = Describe("New Clients", func() {
 
 		})
 
-		Context("that is a cloud controller api not found error", func() {
+		Context("when the error is a cloud controller api not found error", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/"),
-						RespondWith(http.StatusNotFound, "{}"),
+						RespondWith(http.StatusNotFound, "something which is not json"),
 					),
 				)
 			})
@@ -81,19 +82,36 @@ var _ = Describe("New Clients", func() {
 			})
 		})
 
-		Context("that is another error", func() {
+		Context("when the error is a V3UnexpectedResponseError and the status code is 404", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/"),
-						RespondWith(http.StatusOK, "invalid json"),
+						RespondWith(http.StatusNotFound, "{}"),
 					),
 				)
 			})
 
-			It("returns the ClientTargetError", func() {
+			It("returns a V3APIDoesNotExistError", func() {
 				_, err := NewClients(fakeConfig, testUI, true)
-				Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
+				expectedErr := ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusNotFound}
+				Expect(err).To(MatchError(V3APIDoesNotExistError{Message: expectedErr.Error()}))
+			})
+		})
+
+		Context("when the error is generic and the body is valid json", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusTeapot, `{ "some-error": "invalid" }`),
+					),
+				)
+			})
+
+			It("returns a V3UnexpectedResponseError", func() {
+				_, err := NewClients(fakeConfig, testUI, true)
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusTeapot}))
 			})
 		})
 	})

@@ -55,11 +55,9 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClientV3, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
-		// special case for no v3 API installed
-		if _, ok := err.(command.APINotFoundError); ok {
-			return nil
+		if _, ok := err.(sharedV3.V3APIDoesNotExistError); !ok {
+			return err
 		}
-		return err
 	}
 
 	cmd.ActorV3 = v3action.NewActor(ccClientV3, config)
