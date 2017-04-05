@@ -33,8 +33,8 @@ type client struct {
 	updatedRefreshToken string
 }
 
-func NewClient(ccEndpoint, uaaEndpoint, accessToken, refreshToken, cfOAuthClient, cfOAuthClientSecret string) Client {
-	tokenRefresher := NewTokenRefresher(uaaEndpoint, cfOAuthClient, cfOAuthClientSecret)
+func NewClient(ccEndpoint, uaaEndpoint, accessToken, refreshToken string) Client {
+	tokenRefresher := NewTokenRefresher(uaaEndpoint)
 	baseFetcher := NewBaseFetcher(tokenRefresher, refreshToken)
 	return &client{
 		ccEndpoint:   ccEndpoint,
