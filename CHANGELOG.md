@@ -1,3 +1,216 @@
+## 6.26.0
+* Bump version to 6.26.0
+* fix running app count, add red color to app and start commands
+* pipeline to order retro cheese
+* remove v3apps command
+* cf space displays org default iso seg if the space doesn't have one
+* adds the NOTICE file for the go-ccapi dependency
+* display security group rule descriptions in space summary
+* prevent `cf space` and `cf org` from throwing
+* corrected the error message which is displayed
+* fix cloudcontroller errors and v3 NewActor params
+* reset-space-isolation-segment command
+* trigger cats-diego on the bosh-lock rather than cli
+* update the go-ccapi dependency to latest
+* move all the api errors into a single package
+* properly use 'on_failure' and 'ensure' in pipeline
+* update noaa library to latest
+* log integration test does not hardcode API/0
+* removed bosh lites 3, 4, and 5 from the infrastructure pipeline
+* cloud_controller_worker was moved to cc-worker instance group
+* make everything consistent in v2 and v3
+* robustify space command integration tests
+* make timestamp regex match more real possible times
+* updated delete-org prompt message to say what it may delete
+* check to see whether tty before measuring terminal
+* move tty detection into config
+* perform v2 api check before fetching staging security group rules
+* remove experimental flag from refactored commands
+* fix tests that failed due to staticfile_buildpack changes
+* windows!!!
+* create-package command
+* updated integration tests not to test for ">" in prompts
+* do not output non-json request bodies
+* do not reread body for POST requests, it's unnecessary
+* removed ">>" from confirmation prompts
+* do not focus tests in master :(
+* repair a typo
+* improved the error message when deleting a username that is not unique
+* cleanup-integration deletes 1000 users per run
+* prevent future time-sinks by calling cleanup early
+* don't error out if user does not have CAPI v3
+* formatted vendored code
+* updated the sections "Installers" and "Binaries" that are auto generated in the release notes
+* updated "SEE ALSO:" help text for create-space and space commands
+* Merge pull request #1106 from glyn/tolerate-$ZSH
+* Merge pull request #1107 from alphagov/update_crypto
+* increase slow spec threshold from 30 to 60 in integration tests
+* use random ports for TCP routes to prevent collisions
+* configure the pipeline to consume cf-acceptance-tests instead of cf-release
+* reconfigure the pipeline to consume cf-acceptance-tests directly
+* Prevent test failing under zsh
+* add missing translations
+* add skip
+* Add v3-create-app
+* added a test as a reminder that we should remove the API version checks in 6 months time
+* Update crypto library
+* edit cf start integration test to not check for isolation segment row
+* display verbose staging failure message upon `cf start [app name]`
+* reconfigure pipeline to run integration tests and cats-diego in serial on hardknox
+* fix tty toggle
+* prevent the last command in cleanup-integration from killing the pipeline task
+* remove v3 version check from app and start commands
+* randomize port numbers to reduce chance of collision
+* pass credentials the concourse way
+* run integration-windows with 16 nodes
+* move integration-windows over to hardknox
+* add translations
+* hide CF_PASSWORD from output
+* revert back to using CLI's docker image
+* pin to golang 1.7 and add `bosh2` to our docker
+* update the number of nodes for cats-diego to 16
+* revert (for the weekend) changes made to integration-linux
+* ensure that cleanup is called against hardknox
+* make integration-linux run against hardknox
+* adding isolation segment info to cf app and start command
+* only display tip on NoAppDetectedErrors
+* cats-diego now runs agains hardknox
+* replace entire map instead of single value
+* add override to skip ssl verification for cc worker
+* remove backend compatibility tests for diego-only
+* space command displays variables with color
+* updated the hardknox pipeline to get ops files from the cli repo
+* wrap RequestErrors in HandleError
+* enable diego_docker for CATS
+* move infrastructure ops files to cli repo (instead of cli-private)
+* repair config task yml
+* concourse task to generate cats config for hardknox
+* tables with headers display lowercase bold headers
+* rename ui.DisplayTable to ui.DisplayKeyValueTable
+* make lookup case insensitive
+* repair API endpoint prefixing in login test helper
+* fix integration test login
+* lowercase all the things
+* add ops-file for overriding memory defaults
+* update related commands on isolation segment commands
+* correct command name in help text for related command, delete-isolation-segment
+* add the grootfs-release to the infrastructure pipeline
+* don't rebuild unless we say so
+* debug pipeline
+* pipeline to deploy hardknox enviroment
+* fixed rendering row under table
+* Merge pull request #1094 from jfmyers9/master
+* fixed title render issue
+* fixed rendering issue
+* org and space commands do not mention isolation segments on old APIs
+* v3 isolation segments commands check minimum api version
+* edit usage text for set-space-isolation-segment
+* space command shows assigned isolation segment
+* update task integration tests to reflect change in CC error message
+* added grootfs-release to the infrastructure pipeline
+* sort tasks by sequence id in the actor layer
+* add task to combine inputs into single outputs dir
+* improved action message for the revoke org isolation command
+* Merge branch 'master' of https://github.com/cloudfoundry/cli
+* make error message windows-compliant
+* updated ui flavor text
+* fix pipeline
+* org managers can set a space's isolation segment
+* create intermediate dirs for log files in
+* remove hack to add links, new V3 API min is 3.12.0
+* fix output name
+* param-to-file task has input and output
+* Concourse task to write a param to a file
+* created NewSpaceName for use integration tests
+* new helper method for returning a new access token
+* let's just try deleting this
+* lets try updating ginkgo?
+* implement wrappable table for all relevant commannds
+* add integration test for disable-org-isolation
+* unify CC client creation
+* update ginkgo and gomega dependencies
+* unfocus tests
+* update translations
+* fix races in test
+* add disable-org-isolation command
+* add UI for DisableOrgIsolation
+* Repaired PollStart and added unit tests
+* Reworded error string
+* add delete-isolation-segment to cleanup script
+* don't forget to set auth client like in V2!
+* commands timeout properly and display /v2/info with -v
+* installation instructions should be copy/pasteable
+* add an extra newline after ok message when listing isolation segments
+* replace unicode elipses with ascii
+* add isolation segment row to cf org command
+* Add space between key-value table and security rules
+* only use one level of directories for log files
+* set the CF_DIAL_TIMEOUT
+* adding additional locking around all ui display
+* Revert "remove experimental flag from app and org"
+* mutex all the things!
+* Merge pull request #1090 from fujitsu-cf/typo_correction
+* Corrected a typo in the command line, `cf config -locale` to `cf config --locale`
+* Merge branch 'master' of https://github.com/cloudfoundry/cli
+* change argument order to match help text
+* change argument order to match help text
+* new isolation-segments command
+* update log integration tests until
+* use read only org/space for target tests
+* use consistent import pattern for command tests
+* extra object is unnecessary, just omit extra fields
+* Space command refactor
+* standardize and document  v3 API request constant naming convention
+* documentation for v2 API request constant naming convention
+* add mutex in start/stop of RequestLoggerTerminalDisplay
+* fixed minor typos
+* remove experimental flag from app and org
+* working version of refactored log command
+* updated the PR section of the contributor's guide
+* display assigning text with flavor
+* only regenerate i18n resource prior to bump
+* standardize rata request names
+* fixed integration
+* Repair the ability to use URLs for {create,update}-buildpack
+* enable org isolation command layer
+* enable isolation segment actor and api methods and tests
+* Merge pull request #1083 from artdevjs/patch-1
+* deliberately skip install step in travis build
+* remove ginkgo install on Travis CI
+* edit /bin/test to build ginkgo from vendor
+* translations for bind-security-group
+* api layer for binding security group to space
+* actor layer for bind-security-group
+* Replace shell variable with rpm build macro
+* added integration tests and fini command layer for bind-security-group
+* bind-security-group integration tests and some command layer code
+* add to master help, display warning if iso seg already exists
+* add delete-isolation-segment command
+* fixed layout
+* moved code contribution section to top, mention refactor
+* fixed text prompt translations
+* Update README.md
+* added noaa max retries
+* fixed it done
+* fixed race conditions in v2action
+* update to the latest NOAA library
+* start command displays verbose noaa logging
+* fixed noaa client error handling during polling
+* filter and display only staging log messages on cf start
+* added more error handling in start command
+* added appStarting display
+* don't wait for a 0 instance app to start
+* don't error on RetryError, don't fail start if logging fails
+* add support to create isolation segments
+* update counterfeiter fakes
+* switch pipelines from `cf-netman` to `cf-networking`
+* org command uses org summary actor
+* fixed app command unit tests
+* cf app displays user friendly date
+* added example line for tab completion for binary downloads
+* updated CHANGELOG with v6.25.0 plugin changes
+* updated README with v6.25.0 plugin changes
+
 ## 6.25.0
 * Bump version to 6.25.0
 * add bash completion to red hat rpm
