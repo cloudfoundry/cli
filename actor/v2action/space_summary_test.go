@@ -683,6 +683,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Organization{
 							GUID: "some-org-guid",
 							Name: "some-org",
+							DefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
 						},
 						ccv2.Warnings{"warning-1", "warning-2"},
 						nil)
@@ -792,13 +793,14 @@ var _ = Describe("Space Summary Actions", func() {
 					}))
 
 					Expect(spaceSummary).To(Equal(SpaceSummary{
-						SpaceName:            "some-space",
-						SpaceGUID:            "some-space-guid",
-						OrgName:              "some-org",
-						AppNames:             []string{"some-app-1", "some-app-2"},
-						ServiceInstanceNames: []string{"some-service-instance-1", "some-service-instance-2"},
-						SpaceQuotaName:       "some-space-quota",
-						SecurityGroupNames:   []string{"some-running-security-group", "some-shared-security-group"},
+						SpaceName: "some-space",
+						SpaceGUID: "some-space-guid",
+						OrgName:   "some-org",
+						OrgDefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
+						AppNames:                       []string{"some-app-1", "some-app-2"},
+						ServiceInstanceNames:           []string{"some-service-instance-1", "some-service-instance-2"},
+						SpaceQuotaName:                 "some-space-quota",
+						SecurityGroupNames:             []string{"some-running-security-group", "some-shared-security-group"},
 						SecurityGroupRules: []SecurityGroupRule{
 							{
 								Name:        "some-running-security-group",

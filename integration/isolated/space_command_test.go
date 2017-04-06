@@ -174,6 +174,28 @@ var _ = Describe("space command", func() {
 				})
 			})
 
+			Context("when the space does not have an isolation segment and its org has a default isolation segment", func() {
+				var orgIsolationSegmentName string
+
+				BeforeEach(func() {
+					orgIsolationSegmentName = helpers.IsolationSegmentName()
+					Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))
+					orgIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)
+					orgGUID := helpers.GetOrgGUID(orgName)
+
+					Eventually(helpers.CF("curl", "-X", "PATCH",
+						fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
+						"-d", fmt.Sprintf(`{"data":{"guid":"%s"}`, orgIsolationSegmentGUID))).Should(Exit(0))
+				})
+
+				It("shows the org default isolation segment", func() {
+					session := helpers.CF("space", spaceName)
+					Eventually(session.Out).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
 			Context("when the security group rules flag is used", func() {
 				var (
 					securityGroupName   string

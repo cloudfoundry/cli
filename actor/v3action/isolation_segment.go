@@ -36,14 +36,33 @@ func (e IsolationSegmentAlreadyExistsError) Error() string {
 	return fmt.Sprintf("Isolation Segment '%s' already exists.", e.Name)
 }
 
-func (actor Actor) GetIsolationSegmentBySpace(spaceGUID string) (IsolationSegment, Warnings, error) {
+// GetEffectiveIsolationSegmentBySpace returns the space's effective isolation
+// segment.
+//
+// If the space has its own isolation segment, that will be returned.
+//
+// If the space does not have one, the organization's default isolation segment
+// (GUID passed in) will be returned.
+//
+// If the space does not have one and the passed in organization default
+// isolation segment GUID is empty, a NoRelationshipError will be returned.
+func (actor Actor) GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (IsolationSegment, Warnings, error) {
 	relationship, warnings, err := actor.CloudControllerClient.GetSpaceIsolationSegment(spaceGUID)
 	allWarnings := append(Warnings{}, warnings...)
 	if err != nil {
 		return IsolationSegment{}, allWarnings, err
 	}
 
-	isolationSegment, warnings, err := actor.CloudControllerClient.GetIsolationSegment(relationship.GUID)
+	effectiveGUID := relationship.GUID
+	if effectiveGUID == "" {
+		if orgDefaultIsolationSegmentGUID != "" {
+			effectiveGUID = orgDefaultIsolationSegmentGUID
+		} else {
+			return IsolationSegment{}, allWarnings, NoRelationshipError{}
+		}
+	}
+
+	isolationSegment, warnings, err := actor.CloudControllerClient.GetIsolationSegment(effectiveGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return IsolationSegment{}, allWarnings, err

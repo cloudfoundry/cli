@@ -301,7 +301,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		})
 	})
 
-	Describe("GetIsolationSegmentBySpace", func() {
+	Describe("GetEffectiveIsolationSegmentBySpace", func() {
 		Context("when the retrieving the space isolation segment succeeds", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(ccv3.Relationship{
@@ -320,7 +320,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 				})
 
 				It("returns the warnings and IsolationSegment", func() {
-					isolationSegment, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+					isolationSegment, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "iso-warnings-1", "iso-warnings-2"))
 					Expect(isolationSegment).To(Equal(IsolationSegment{Name: "some-iso"}))
@@ -342,9 +342,54 @@ var _ = Describe("Isolation Segment Actions", func() {
 				})
 
 				It("returns the warnings and error", func() {
-					_, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+					_, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "")
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "iso-warnings-1", "iso-warnings-2"))
+				})
+			})
+
+			Context("when the space does not have an isolation segment", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceIsolationSegmentReturns(ccv3.Relationship{
+						GUID: "",
+					}, ccv3.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				Context("when no org isolation segment is passed in", func() {
+					It("returns NoRelationshipError", func() {
+						_, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "")
+						Expect(err).To(MatchError(NoRelationshipError{}))
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					})
+				})
+
+				Context("when an org default isolation segment is passed", func() {
+					Context("when retrieving the isolation segment is successful", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetIsolationSegmentReturns(
+								ccv3.IsolationSegment{
+									Name: "some-iso-segment",
+									GUID: "some-org-default-isolation-segment-guid",
+								},
+								ccv3.Warnings{"warning-3", "warning-4"},
+								nil)
+						})
+
+						It("returns the org's default isolation segment", func() {
+							isolationSegment, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "some-org-default-isolation-segment-guid")
+							Expect(isolationSegment).To(Equal(IsolationSegment{
+								Name: "some-iso-segment",
+								GUID: "some-org-default-isolation-segment-guid",
+							}))
+							Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+							Expect(err).ToNot(HaveOccurred())
+
+							Expect(fakeCloudControllerClient.GetIsolationSegmentCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetIsolationSegmentArgsForCall(0)).To(Equal("some-org-default-isolation-segment-guid"))
+						})
+					})
 				})
 			})
 		})
@@ -357,7 +402,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				_, warnings, err := actor.GetIsolationSegmentBySpace("some-space-guid")
+				_, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "")
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings"))
 			})

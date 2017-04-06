@@ -144,7 +144,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
 					Eventually(session).Should(Exit(0))
 
-					Eventually(helpers.CF("space", spaceName)).Should(Say("(?m)isolation segment:\\s*$"))
+					Eventually(helpers.CF("space", spaceName)).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
 				})
 			})
 		})

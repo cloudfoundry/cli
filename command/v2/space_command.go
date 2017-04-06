@@ -25,7 +25,7 @@ type SpaceActor interface {
 
 type SpaceActorV3 interface {
 	CloudControllerAPIVersion() string
-	GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
+	GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
 }
 
 type SpaceCommand struct {
@@ -118,24 +118,20 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		{cmd.UI.TranslateText("org:"), spaceSummary.OrgName},
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
-		{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName},
-		{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")},
 	}
 
-	if cmd.ActorV3 != nil {
-		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
-		if apiCheck == nil {
-			isolationSegment, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentBySpace(spaceSummary.SpaceGUID)
-			cmd.UI.DisplayWarnings(v3Warnings)
-			if err != nil {
-				return sharedV3.HandleError(err)
-			}
-
-			table = append(table[:4], append([][]string{
-				{cmd.UI.TranslateText("isolation segment:"), isolationSegment.Name},
-			}, table[4:]...)...)
-		}
+	isolationSegmentRow, err := cmd.isolationSegmentRow(spaceSummary)
+	if err != nil {
+		return err
 	}
+	if isolationSegmentRow != nil {
+		table = append(table, isolationSegmentRow)
+	}
+
+	table = append(table,
+		[]string{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName})
+	table = append(table,
+		[]string{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")})
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 
@@ -179,4 +175,29 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	}
 
 	return nil
+}
+
+func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) ([]string, error) {
+	if cmd.ActorV3 == nil {
+		return nil, nil
+	}
+
+	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+	if apiCheck != nil {
+		return nil, nil
+	}
+
+	isolationSegmentName := ""
+	isolationSegment, v3Warnings, err := cmd.ActorV3.GetEffectiveIsolationSegmentBySpace(
+		spaceSummary.SpaceGUID, spaceSummary.OrgDefaultIsolationSegmentGUID)
+	cmd.UI.DisplayWarnings(v3Warnings)
+	if err == nil {
+		isolationSegmentName = isolationSegment.Name
+	} else {
+		if _, ok := err.(v3action.NoRelationshipError); !ok {
+			return nil, err
+		}
+	}
+
+	return []string{cmd.UI.TranslateText("isolation segment:"), isolationSegmentName}, nil
 }
