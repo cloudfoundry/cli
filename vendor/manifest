@@ -102,14 +102,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry/go-ccapi",
-			"repository": "https://github.com/cloudfoundry/go-ccapi",
-			"vcs": "git",
-			"revision": "71998966d470aeafdb4acabf79a75e444d6f78f6",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/cloudfoundry/gosteno",
 			"repository": "https://github.com/cloudfoundry/gosteno",
 			"vcs": "git",
