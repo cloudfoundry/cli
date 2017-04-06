@@ -31,8 +31,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
-	"code.cloudfoundry.org/cli/cf/v3/repository"
-	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
@@ -76,8 +74,6 @@ type RepositoryLocator struct {
 	featureFlagRepo                 featureflags.FeatureFlagRepository
 	environmentVariableGroupRepo    environmentvariablegroups.Repository
 	copyAppSourceRepo               copyapplicationsource.Repository
-
-	v3Repository repository.Repository
 }
 
 const noaaRetryDefaultTimeout = 5 * time.Second
@@ -144,9 +140,6 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.featureFlagRepo = featureflags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
 	loc.environmentVariableGroupRepo = environmentvariablegroups.NewCloudControllerRepository(config, cloudControllerGateway)
 	loc.copyAppSourceRepo = copyapplicationsource.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
-
-	client := v3client.NewClient(config.APIEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
-	loc.v3Repository = repository.NewRepository(config, client)
 
 	return
 }
@@ -484,13 +477,4 @@ func (locator RepositoryLocator) SetCopyApplicationSourceRepository(repo copyapp
 
 func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copyapplicationsource.Repository {
 	return locator.copyAppSourceRepo
-}
-
-func (locator RepositoryLocator) GetV3Repository() repository.Repository {
-	return locator.v3Repository
-}
-
-func (locator RepositoryLocator) SetV3Repository(r repository.Repository) RepositoryLocator {
-	locator.v3Repository = r
-	return locator
 }
