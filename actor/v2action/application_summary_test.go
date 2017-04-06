@@ -12,22 +12,40 @@ import (
 )
 
 var _ = Describe("Application Summary Actions", func() {
-	var (
-		actor                     Actor
-		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-		app                       ccv2.Application
-	)
-
-	BeforeEach(func() {
-		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
-		app = ccv2.Application{
-			GUID: "some-app-guid",
-			Name: "some-app",
-		}
+	Describe("ApplicationSummary", func() {
+		Describe("StartingOrRunningInstanceCount", func() {
+			It("only counts the running and starting instances", func() {
+				app := ApplicationSummary{
+					RunningInstances: []ApplicationInstanceWithStats{
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceCrashed)},
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceDown)},
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceFlapping)},
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceRunning)},
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceStarting)},
+						{State: ApplicationInstanceState(ccv2.ApplicationInstanceUnknown)},
+					},
+				}
+				Expect(app.StartingOrRunningInstanceCount()).To(Equal(2))
+			})
+		})
 	})
 
 	Describe("GetApplicationSummaryByNameSpace", func() {
+		var (
+			actor                     Actor
+			fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+			app                       ccv2.Application
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil)
+			app = ccv2.Application{
+				GUID: "some-app-guid",
+				Name: "some-app",
+			}
+		})
+
 		Context("when the application does not exist", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(

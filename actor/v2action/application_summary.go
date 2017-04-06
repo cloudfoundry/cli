@@ -10,6 +10,17 @@ type ApplicationSummary struct {
 	Routes           []Route
 }
 
+func (app ApplicationSummary) StartingOrRunningInstanceCount() int {
+	count := 0
+	for _, instance := range app.RunningInstances {
+		if instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceStarting) ||
+			instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceRunning) {
+			count += 1
+		}
+	}
+	return count
+}
+
 func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID string) (ApplicationSummary, Warnings, error) {
 	var allWarnings Warnings
 

@@ -6,14 +6,14 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
-// Custom fake was written for this under customv2fakes
-
 // UI is the interface to STDOUT
 type UI interface {
 	DisplayBoolPrompt(defaultResponse bool, template string, templateValues ...map[string]interface{}) (bool, error)
 	DisplayError(err error)
 	DisplayHeader(text string)
+	DisplayInstancesTableForApp(table [][]string)
 	DisplayKeyValueTable(prefix string, table [][]string, padding int)
+	DisplayKeyValueTableForApp(table [][]string)
 	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
 	DisplayNewline()
 	DisplayNonWrappingTable(prefix string, table [][]string, padding int)

@@ -13,7 +13,7 @@ import (
 // DisplayAppSummary displays the application summary to the UI, and optionally
 // the command to start the app.
 func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, displayStartCommand bool) {
-	instances := fmt.Sprintf("%d/%d", len(appSummary.RunningInstances), appSummary.Instances)
+	instances := fmt.Sprintf("%d/%d", appSummary.StartingOrRunningInstanceCount(), appSummary.Instances)
 
 	usage := ui.TranslateText(
 		"{{.MemorySize}} x {{.NumInstances}} instances",
@@ -49,7 +49,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 		}, table[3:]...)...)
 	}
 
-	ui.DisplayKeyValueTable("", table, 3)
+	ui.DisplayKeyValueTableForApp(table)
 	ui.DisplayNewline()
 
 	if len(appSummary.RunningInstances) == 0 {
@@ -86,7 +86,7 @@ func displayAppInstances(ui command.UI, instances []v2action.ApplicationInstance
 			})
 	}
 
-	ui.DisplayTableWithHeader("", table, 3)
+	ui.DisplayInstancesTableForApp(table)
 }
 
 // zuluDate converts the time to UTC and then formats it to ISO8601.
