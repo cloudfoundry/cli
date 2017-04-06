@@ -18,17 +18,18 @@ type FakeSpaceActorV3 struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetIsolationSegmentBySpaceStub        func(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
-	getIsolationSegmentBySpaceMutex       sync.RWMutex
-	getIsolationSegmentBySpaceArgsForCall []struct {
-		spaceGUID string
+	GetEffectiveIsolationSegmentBySpaceStub        func(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error)
+	getEffectiveIsolationSegmentBySpaceMutex       sync.RWMutex
+	getEffectiveIsolationSegmentBySpaceArgsForCall []struct {
+		spaceGUID                      string
+		orgDefaultIsolationSegmentGUID string
 	}
-	getIsolationSegmentBySpaceReturns struct {
+	getEffectiveIsolationSegmentBySpaceReturns struct {
 		result1 v3action.IsolationSegment
 		result2 v3action.Warnings
 		result3 error
 	}
-	getIsolationSegmentBySpaceReturnsOnCall map[int]struct {
+	getEffectiveIsolationSegmentBySpaceReturnsOnCall map[int]struct {
 		result1 v3action.IsolationSegment
 		result2 v3action.Warnings
 		result3 error
@@ -77,54 +78,55 @@ func (fake *FakeSpaceActorV3) CloudControllerAPIVersionReturnsOnCall(i int, resu
 	}{result1}
 }
 
-func (fake *FakeSpaceActorV3) GetIsolationSegmentBySpace(spaceGUID string) (v3action.IsolationSegment, v3action.Warnings, error) {
-	fake.getIsolationSegmentBySpaceMutex.Lock()
-	ret, specificReturn := fake.getIsolationSegmentBySpaceReturnsOnCall[len(fake.getIsolationSegmentBySpaceArgsForCall)]
-	fake.getIsolationSegmentBySpaceArgsForCall = append(fake.getIsolationSegmentBySpaceArgsForCall, struct {
-		spaceGUID string
-	}{spaceGUID})
-	fake.recordInvocation("GetIsolationSegmentBySpace", []interface{}{spaceGUID})
-	fake.getIsolationSegmentBySpaceMutex.Unlock()
-	if fake.GetIsolationSegmentBySpaceStub != nil {
-		return fake.GetIsolationSegmentBySpaceStub(spaceGUID)
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefaultIsolationSegmentGUID string) (v3action.IsolationSegment, v3action.Warnings, error) {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.Lock()
+	ret, specificReturn := fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall[len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)]
+	fake.getEffectiveIsolationSegmentBySpaceArgsForCall = append(fake.getEffectiveIsolationSegmentBySpaceArgsForCall, struct {
+		spaceGUID                      string
+		orgDefaultIsolationSegmentGUID string
+	}{spaceGUID, orgDefaultIsolationSegmentGUID})
+	fake.recordInvocation("GetEffectiveIsolationSegmentBySpace", []interface{}{spaceGUID, orgDefaultIsolationSegmentGUID})
+	fake.getEffectiveIsolationSegmentBySpaceMutex.Unlock()
+	if fake.GetEffectiveIsolationSegmentBySpaceStub != nil {
+		return fake.GetEffectiveIsolationSegmentBySpaceStub(spaceGUID, orgDefaultIsolationSegmentGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getIsolationSegmentBySpaceReturns.result1, fake.getIsolationSegmentBySpaceReturns.result2, fake.getIsolationSegmentBySpaceReturns.result3
+	return fake.getEffectiveIsolationSegmentBySpaceReturns.result1, fake.getEffectiveIsolationSegmentBySpaceReturns.result2, fake.getEffectiveIsolationSegmentBySpaceReturns.result3
 }
 
-func (fake *FakeSpaceActorV3) GetIsolationSegmentBySpaceCallCount() int {
-	fake.getIsolationSegmentBySpaceMutex.RLock()
-	defer fake.getIsolationSegmentBySpaceMutex.RUnlock()
-	return len(fake.getIsolationSegmentBySpaceArgsForCall)
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceCallCount() int {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.RLock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
+	return len(fake.getEffectiveIsolationSegmentBySpaceArgsForCall)
 }
 
-func (fake *FakeSpaceActorV3) GetIsolationSegmentBySpaceArgsForCall(i int) string {
-	fake.getIsolationSegmentBySpaceMutex.RLock()
-	defer fake.getIsolationSegmentBySpaceMutex.RUnlock()
-	return fake.getIsolationSegmentBySpaceArgsForCall[i].spaceGUID
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceArgsForCall(i int) (string, string) {
+	fake.getEffectiveIsolationSegmentBySpaceMutex.RLock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
+	return fake.getEffectiveIsolationSegmentBySpaceArgsForCall[i].spaceGUID, fake.getEffectiveIsolationSegmentBySpaceArgsForCall[i].orgDefaultIsolationSegmentGUID
 }
 
-func (fake *FakeSpaceActorV3) GetIsolationSegmentBySpaceReturns(result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
-	fake.GetIsolationSegmentBySpaceStub = nil
-	fake.getIsolationSegmentBySpaceReturns = struct {
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceReturns(result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
+	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
+	fake.getEffectiveIsolationSegmentBySpaceReturns = struct {
 		result1 v3action.IsolationSegment
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSpaceActorV3) GetIsolationSegmentBySpaceReturnsOnCall(i int, result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
-	fake.GetIsolationSegmentBySpaceStub = nil
-	if fake.getIsolationSegmentBySpaceReturnsOnCall == nil {
-		fake.getIsolationSegmentBySpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeSpaceActorV3) GetEffectiveIsolationSegmentBySpaceReturnsOnCall(i int, result1 v3action.IsolationSegment, result2 v3action.Warnings, result3 error) {
+	fake.GetEffectiveIsolationSegmentBySpaceStub = nil
+	if fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall == nil {
+		fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall = make(map[int]struct {
 			result1 v3action.IsolationSegment
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.getIsolationSegmentBySpaceReturnsOnCall[i] = struct {
+	fake.getEffectiveIsolationSegmentBySpaceReturnsOnCall[i] = struct {
 		result1 v3action.IsolationSegment
 		result2 v3action.Warnings
 		result3 error
@@ -136,8 +138,8 @@ func (fake *FakeSpaceActorV3) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.getIsolationSegmentBySpaceMutex.RLock()
-	defer fake.getIsolationSegmentBySpaceMutex.RUnlock()
+	fake.getEffectiveIsolationSegmentBySpaceMutex.RLock()
+	defer fake.getEffectiveIsolationSegmentBySpaceMutex.RUnlock()
 	return fake.invocations
 }
 

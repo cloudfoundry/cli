@@ -94,7 +94,8 @@ var _ = Describe("Organization", func() {
 							},
 							"entity": {
 								"name": "org-1",
-								"quota_definition_guid": "some-quota-guid"
+								"quota_definition_guid": "some-quota-guid",
+								"default_isolation_segment_guid": "some-default-isolation-segment-guid"
 							}
 						},
 						{
@@ -152,10 +153,30 @@ var _ = Describe("Organization", func() {
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(orgs).To(Equal([]Organization{
-						{GUID: "org-guid-1", Name: "org-1", QuotaDefinitionGUID: "some-quota-guid"},
-						{GUID: "org-guid-2", Name: "org-2", QuotaDefinitionGUID: "some-quota-guid"},
-						{GUID: "org-guid-3", Name: "org-3", QuotaDefinitionGUID: "some-quota-guid"},
-						{GUID: "org-guid-4", Name: "org-4", QuotaDefinitionGUID: "some-quota-guid"},
+						{
+							GUID:                        "org-guid-1",
+							Name:                        "org-1",
+							QuotaDefinitionGUID:         "some-quota-guid",
+							DefaultIsolationSegmentGUID: "some-default-isolation-segment-guid",
+						},
+						{
+							GUID:                        "org-guid-2",
+							Name:                        "org-2",
+							QuotaDefinitionGUID:         "some-quota-guid",
+							DefaultIsolationSegmentGUID: "",
+						},
+						{
+							GUID:                        "org-guid-3",
+							Name:                        "org-3",
+							QuotaDefinitionGUID:         "some-quota-guid",
+							DefaultIsolationSegmentGUID: "",
+						},
+						{
+							GUID:                        "org-guid-4",
+							Name:                        "org-4",
+							QuotaDefinitionGUID:         "some-quota-guid",
+							DefaultIsolationSegmentGUID: "",
+						},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})

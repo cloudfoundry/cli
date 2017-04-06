@@ -12,14 +12,15 @@ type SecurityGroupRule struct {
 }
 
 type SpaceSummary struct {
-	SpaceName            string
-	SpaceGUID            string
-	OrgName              string
-	AppNames             []string
-	ServiceInstanceNames []string
-	SpaceQuotaName       string
-	SecurityGroupNames   []string
-	SecurityGroupRules   []SecurityGroupRule
+	SpaceName                      string
+	SpaceGUID                      string
+	OrgName                        string
+	OrgDefaultIsolationSegmentGUID string
+	AppNames                       []string
+	ServiceInstanceNames           []string
+	SpaceQuotaName                 string
+	SecurityGroupNames             []string
+	SecurityGroupRules             []SecurityGroupRule
 }
 
 func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name string, includeStagingSecurityGroupsRules bool) (SpaceSummary, Warnings, error) {
@@ -101,14 +102,15 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 	sort.Strings(securityGroupNames)
 
 	spaceSummary := SpaceSummary{
-		SpaceName:            name,
-		SpaceGUID:            space.GUID,
-		OrgName:              org.Name,
-		AppNames:             appNames,
-		ServiceInstanceNames: serviceInstanceNames,
-		SpaceQuotaName:       spaceQuota.Name,
-		SecurityGroupNames:   securityGroupNames,
-		SecurityGroupRules:   securityGroupRules,
+		SpaceName: name,
+		SpaceGUID: space.GUID,
+		OrgName:   org.Name,
+		OrgDefaultIsolationSegmentGUID: org.DefaultIsolationSegmentGUID,
+		AppNames:                       appNames,
+		ServiceInstanceNames:           serviceInstanceNames,
+		SpaceQuotaName:                 spaceQuota.Name,
+		SecurityGroupNames:             securityGroupNames,
+		SecurityGroupRules:             securityGroupRules,
 	}
 
 	return spaceSummary, allWarnings, nil
