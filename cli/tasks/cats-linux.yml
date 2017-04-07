@@ -48,9 +48,6 @@ run:
 
     SKIPS="-skip="
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
-    [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
-    [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
-    SKIPS="${SKIPS}dotnet-core|"
     SKIPS="${SKIPS}transparently proxies both reserved|"
 
     # Remove trailing |
