@@ -19,8 +19,9 @@ resources:
         username: {{sendgrid_username}}
       from: cf-cli-eng@pivotal.io
       to:
-        - cf-cli-eng@pivotal.io
         - ask@pivotal.io
+        - mboedicker@pivotal.io
+        - nwei@pivotal.io
   - name: weekly-trigger
     type: cron
     source:
