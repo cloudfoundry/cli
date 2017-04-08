@@ -128,17 +128,15 @@ var _ = Describe("app command", func() {
 
 		Context("when the app does exist", func() {
 			var (
-				isoSegName string
 				domainName string
 				tcpDomain  helpers.Domain
 				appName    string
 			)
 
 			BeforeEach(func() {
-				isoSegName = "isolated-1"
-				Eventually(helpers.CF("create-isolation-segment", isoSegName)).Should(Exit(0))
-				Eventually(helpers.CF("enable-org-isolation", orgName, isoSegName)).Should(Exit(0))
-				Eventually(helpers.CF("set-space-isolation-segment", spaceName, isoSegName)).Should(Exit(0))
+				Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
+				Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
+				Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
 
 				appName = helpers.PrefixedRandomName("app")
 				domainName = defaultSharedDomain()
@@ -175,7 +173,7 @@ applications:
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Say("requested state:\\s+started"))
 					Eventually(session).Should(Say("instances:\\s+2/2"))
-					Eventually(session).Should(Say("isolation segment:\\s+%s", isoSegName))
+					Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
 					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
