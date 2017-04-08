@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	CFEventuallyTimeout = 300 * time.Second
+	CFEventuallyTimeout  = 300 * time.Second
+	RealIsolationSegment = "persistent_isolation_segment"
 )
 
 var (

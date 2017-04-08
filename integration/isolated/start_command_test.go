@@ -234,12 +234,10 @@ applications:
 						})
 
 						Context("when the app starts properly", func() {
-							var isoSegName string
 							BeforeEach(func() {
-								isoSegName = "isolated-1"
-								Eventually(helpers.CF("create-isolation-segment", isoSegName)).Should(Exit(0))
-								Eventually(helpers.CF("enable-org-isolation", orgName, isoSegName)).Should(Exit(0))
-								Eventually(helpers.CF("set-space-isolation-segment", spaceName, isoSegName)).Should(Exit(0))
+								Eventually(helpers.CF("create-isolation-segment", RealIsolationSegment)).Should(Exit(0))
+								Eventually(helpers.CF("enable-org-isolation", orgName, RealIsolationSegment)).Should(Exit(0))
+								Eventually(helpers.CF("set-space-isolation-segment", spaceName, RealIsolationSegment)).Should(Exit(0))
 								appName = helpers.PrefixedRandomName("app")
 								domainName = defaultSharedDomain()
 								helpers.WithHelloWorldApp(func(appDir string) {
@@ -274,7 +272,7 @@ applications:
 								Eventually(session).Should(Say("name:\\s+%s", appName))
 								Eventually(session).Should(Say("requested state:\\s+started"))
 								Eventually(session).Should(Say("instances:\\s+2/2"))
-								Eventually(session).Should(Say("isolation segment:\\s+%s", isoSegName))
+								Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 								Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
 								Eventually(session).Should(Say("routes:\\s+%s.%s", appName, domainName))
 								Eventually(session).Should(Say("last uploaded:"))
