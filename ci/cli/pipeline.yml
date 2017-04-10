@@ -342,7 +342,7 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-  on_failure:
+  ensure:
     put: hardknox-pool
     params:
       release: bosh-lite-lock
@@ -357,13 +357,14 @@ jobs:
     - get: cf-acceptance-tests
     - get: cf-cli-binaries
       passed: [integration]
+      trigger: true
     - get: cli-ci
       depth: 3
     - get: vars-store
-    - get: bosh-lite-lock
-      trigger: true
-      passed: [integration]
+    - put: bosh-lite-lock
       resource: hardknox-pool
+      params:
+        acquire: true
   - do:
     - task: cats-config
       file: cli-ci/ci/cli/tasks/cats-config-diego.yml
@@ -383,10 +384,10 @@ jobs:
         params:
           channel: '#cli-firehose'
           text: "cats diego failed :("
-      ensure:
-        put: hardknox-pool
-        params:
-          release: bosh-lite-lock
+  ensure:
+    put: hardknox-pool
+    params:
+      release: bosh-lite-lock
 
 - name: cats-linux
   serial: true
