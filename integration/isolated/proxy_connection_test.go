@@ -12,7 +12,7 @@ var _ = Describe("proxy", func() {
 	var proxyURL string
 
 	BeforeEach(func() {
-		proxyURL = "http://127.0.0.1:9999"
+		proxyURL = "127.0.0.1:9999"
 	})
 
 	Context("V2", func() {
