@@ -2,3 +2,6 @@
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/diego?/temporary_local_tps
   value: true
+- type: replace
+  path: /instance_groups/name=isolated-diego-cell/vm_type
+  value: m3.large
