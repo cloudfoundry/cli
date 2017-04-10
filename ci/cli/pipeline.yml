@@ -303,11 +303,11 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      trigger: true
       passed: [build-binaries]
       depth: 3
     - get: cf-cli-binaries
       passed: [build-binaries]
+      trigger: true
     - get: cli-ci
       depth: 3
     - get: cli-integration
