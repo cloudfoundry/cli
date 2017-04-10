@@ -64,11 +64,13 @@ func pushHelloWorldAppWithManifests(manifests []string) {
 
 var _ = Describe("manifest inheritance in push command", func() {
 	var (
-		orgName    string
-		spaceName  string
-		domainName string
-		app1Name   string
-		app2Name   string
+		orgName     string
+		spaceName   string
+		domainName  string
+		app1Name    string
+		app2Name    string
+		app1MemSize int
+		app2MemSize int
 	)
 
 	BeforeEach(func() {
@@ -76,6 +78,8 @@ var _ = Describe("manifest inheritance in push command", func() {
 		spaceName = helpers.NewSpaceName()
 		app1Name = helpers.PrefixedRandomName("app")
 		app2Name = helpers.PrefixedRandomName("app")
+		app1MemSize = 32
+		app2MemSize = 32
 
 		setupCF(orgName, spaceName)
 
@@ -94,7 +98,7 @@ var _ = Describe("manifest inheritance in push command", func() {
 ---
 applications:
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   buildpack: staticfile_buildpack
   path: {some-dir}
@@ -105,7 +109,7 @@ applications:
     BAR: bar
     FOO: foo
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   buildpack: staticfile_buildpack
   path: {some-dir}
@@ -115,7 +119,7 @@ applications:
   env:
     BAR: bar
     FOO: foo
-`, app1Name, domainName, domainName, app2Name, domainName, domainName)})
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName)})
 			})
 
 			It("pushes the same applications properties", func() {
@@ -126,7 +130,7 @@ applications:
    "hi\.%s"
   \]`, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: bar
 FOO: foo
@@ -141,7 +145,7 @@ FOO: foo
    "hi\.%s"
   \]`, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: bar
 FOO: foo
@@ -155,7 +159,7 @@ FOO: foo
 			BeforeEach(func() {
 				pushHelloWorldAppWithManifests([]string{fmt.Sprintf(`
 ---
-memory: 128M
+memory: %dM
 disk_quota: 128M
 buildpack: staticfile_buildpack
 path: {some-dir}
@@ -168,7 +172,7 @@ env:
 applications:
 - name: %s
 - name: %s
-`, domainName, domainName, app1Name, app2Name)})
+`, app1MemSize, domainName, domainName, app1Name, app2Name)})
 			})
 
 			It("pushes the same global properties", func() {
@@ -179,7 +183,7 @@ applications:
    "hi\.%s"
   \]`, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: bar
 FOO: foo
@@ -194,7 +198,7 @@ FOO: foo
    "hi\.%s"
   \]`, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: bar
 FOO: foo
@@ -209,7 +213,7 @@ FOO: foo
 				pushHelloWorldAppWithManifests([]string{fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
-memory: 256M
+memory: 64M
 disk_quota: 256M
 routes:
 - route: global-1.%s
@@ -219,7 +223,7 @@ env:
   FOO: global
 applications:
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -229,7 +233,7 @@ applications:
     BAR: app
     BAZ: app
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -238,7 +242,7 @@ applications:
   env:
     BAR: app
     BAZ: app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName)})
+`, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName)})
 			})
 
 			It("pushes with application properties taking precedence; values are overwritten, lists are appended, and maps are merged", func() {
@@ -251,7 +255,7 @@ applications:
    "app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: app
 BAZ: app
@@ -269,7 +273,7 @@ FOO: global
    "app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: app
 BAZ: app
@@ -290,7 +294,7 @@ FOO: global
 inherit: {some-parent}
 applications:
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -300,7 +304,7 @@ applications:
     BAR: child-app
     BAZ: child-app
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -309,13 +313,13 @@ applications:
   env:
     BAR: child-app
     BAZ: child-app
-`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 applications:
 - name: %s
   buildpack: staticfile_buildpack
-  memory: 256M
+  memory: %dM
   disk_quota: 256M
   path: {some-dir}
   routes:
@@ -327,7 +331,7 @@ applications:
     FOO: parent-app
 - name: %s
   buildpack: staticfile_buildpack
-  memory: 256M
+  memory: %dM
   disk_quota: 256M
   path: {some-dir}
   routes:
@@ -337,7 +341,7 @@ applications:
     BAR: parent-app
     BAZ: parent-app
     FOO: parent-app
-`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 				})
 			})
 
@@ -351,7 +355,7 @@ applications:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: child-app
@@ -369,7 +373,7 @@ FOO: parent-app
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: child-app
@@ -388,7 +392,7 @@ FOO: parent-app
 inherit: {some-parent}
 applications:
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -398,7 +402,7 @@ applications:
     BAR: child-app
     BAZ: child-app
 - name: %s
-  memory: 128M
+  memory: %dM
   disk_quota: 128M
   path: {some-dir}
   routes:
@@ -407,11 +411,11 @@ applications:
   env:
     BAR: child-app
     BAZ: child-app
-`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
-memory: 256M
+memory: 64M
 disk_quota: 256M
 path: {some-dir}
 routes:
@@ -436,7 +440,7 @@ env:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: child-app
@@ -454,7 +458,7 @@ FOO: parent-global
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: child-app
@@ -472,8 +476,8 @@ FOO: parent-global
 ---
 inherit: {some-parent}
 buildpack: staticfile_buildpack
-memory: 128M
-disk_quota: 128M
+memory: 64M
+disk_quota: 256M
 path: {some-dir}
 routes:
 - route: child-global-1.%s
@@ -486,8 +490,8 @@ env:
 ---
 applications:
 - name: %s
-  memory: 256M
-  disk_quota: 256M
+  memory: %dM
+  disk_quota: 128M
   path: {some-dir}
   routes:
   - route: parent-app-1.%s
@@ -497,8 +501,8 @@ applications:
     BAZ: parent-app
     FOO: parent-app
 - name: %s
-  memory: 256M
-  disk_quota: 256M
+  memory: %dM
+  disk_quota: 128M
   path: {some-dir}
   routes:
   - route: parent-app-1.%s
@@ -507,7 +511,7 @@ applications:
     BAR: parent-app
     BAZ: parent-app
     FOO: parent-app
-`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 				})
 				SetDefaultEventuallyTimeout(300 * time.Second)
 			})
@@ -521,8 +525,8 @@ applications:
    "parent-app-1\.%s",
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": 256`))
+				Eventually(session.Out).Should(Say(`"disk": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: parent-app
 BAZ: parent-app
@@ -538,8 +542,8 @@ FOO: parent-app
    "parent-app-1\.%s",
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": 256`))
+				Eventually(session.Out).Should(Say(`"disk": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: parent-app
 BAZ: parent-app
@@ -555,7 +559,7 @@ FOO: parent-app
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
-memory: 128M
+memory: %dM
 disk_quota: 128M
 path: {some-dir}
 routes:
@@ -564,11 +568,11 @@ routes:
 env:
   BAR: child-global
   FOO: child-global
-`, domainName, domainName),
+`, app1MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
-memory: 256M
+memory: 64M
 disk_quota: 256M
 path: {some-dir}
 routes:
@@ -595,7 +599,7 @@ applications:
    "child-global-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-global
 BAZ: parent-global
@@ -613,7 +617,7 @@ FOO: child-global
    "child-global-2\.%s"
   \]`, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-global
 BAZ: parent-global
@@ -641,7 +645,7 @@ env:
   FIZ: child-global
 applications:
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -651,7 +655,7 @@ applications:
     BAR: child-app
     FOO: child-app
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -660,7 +664,7 @@ applications:
   env:
     BAR: child-app
     FOO: child-app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
@@ -694,7 +698,7 @@ applications:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-global
@@ -715,7 +719,7 @@ FOO: child-app
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-global
@@ -733,7 +737,7 @@ FOO: child-app
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
-memory: 128M
+memory: %dM
 disk_quota: 128M
 path: {some-dir}
 routes:
@@ -761,7 +765,7 @@ applications:
   env:
     BAR: child-app
     FOO: child-app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1MemSize, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
@@ -806,7 +810,7 @@ applications:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -827,7 +831,7 @@ FOO: child-app
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -847,7 +851,7 @@ FOO: child-app
 inherit: {some-parent}
 applications:
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -857,7 +861,7 @@ applications:
     BAR: child-app
     FOO: child-app
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -866,7 +870,7 @@ applications:
   env:
     BAR: child-app
     FOO: child-app
-`, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
@@ -920,7 +924,7 @@ applications:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -941,7 +945,7 @@ FOO: child-app
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -980,7 +984,7 @@ env:
   ZOOM: parent-global
 applications:
 - name: %s
-  memory: 256M
+  memory: %dM
   disk_quota: 256M
   path: {some-dir}
   routes:
@@ -990,7 +994,7 @@ applications:
     FOO: parent-app
     BAZ: parent-app
 - name: %s
-  memory: 256M
+  memory: %dM
   disk_quota: 256M
   path: {some-dir}
   routes:
@@ -999,7 +1003,7 @@ applications:
   env:
     FOO: parent-app
     BAZ: parent-app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 				})
 			})
 
@@ -1015,7 +1019,7 @@ applications:
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": 256`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAZ: parent-app
 FIZ: child-global
@@ -1036,7 +1040,7 @@ ZOOM: parent-global
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": 256`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAZ: parent-app
 FIZ: child-global
@@ -1065,7 +1069,7 @@ env:
   FIZ: child-global
 applications:
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -1075,7 +1079,7 @@ applications:
     FOO: child-app
     BAR: child-app
 - name: %s
-  memory: 64M
+  memory: %dM
   disk_quota: 64M
   path: {some-dir}
   routes:
@@ -1084,7 +1088,7 @@ applications:
   env:
     FOO: child-app
     BAR: child-app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
@@ -1139,7 +1143,7 @@ applications:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -1166,7 +1170,7 @@ ZOOM: parent-global
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 64`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 BAZ: parent-app
@@ -1187,7 +1191,7 @@ ZOOM: parent-global
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
-memory: 128M
+memory: %dM
 path: {some-dir}
 routes:
 - route: child-global-1.%s
@@ -1214,7 +1218,7 @@ applications:
   env:
     FOO: child-app
     BAR: child-app
-`, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+`, app1MemSize, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
@@ -1262,7 +1266,7 @@ env:
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 FIZ: child-global
@@ -1289,7 +1293,7 @@ ZOOM: parent-global
    "child-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: child-app
 FIZ: child-global
@@ -1308,7 +1312,7 @@ ZOOM: parent-global
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
-memory: 128M
+memory: %dM
 path: {some-dir}
 routes:
 - route: child-global-1.%s
@@ -1317,7 +1321,7 @@ env:
   FOO: child-global
   FIZ: child-global
   JUNE: child-global
-`, domainName, domainName),
+`, app1MemSize, domainName, domainName),
 					fmt.Sprintf(`
 ---
 inherit: {some-parent}
@@ -1385,7 +1389,7 @@ env:
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: parent-app
 FIZ: child-global
@@ -1413,7 +1417,7 @@ ZOOM: parent-global
    "parent-app-2\.%s"
   \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
 				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": 128`))
+				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
 				Eventually(session.Out).Should(Say(`User-Provided:
 BAR: parent-app
 FIZ: child-global
