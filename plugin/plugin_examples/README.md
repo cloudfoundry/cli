@@ -67,7 +67,9 @@ The interface uses a `Run(...)` method as the main entry point between the CLI a
   - A struct `plugin.CliConnection` that contains methods for invoking cf CLI commands
   - A string array that contains the arguments passed from the `cf` process
 
-The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum Cli version required (optional), the commands it implements, and help text for each command that users can display with `cf help`.
+The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum CLI version required (optional), the commands it implements, and help text for each command that users can display with `cf help`.
+
+Plugin names with spaces must be enclosed in quotes when installed and uninstalled (e.g.: `cf install-plugin "my plugin"`). We recommend that plugin names not contain spaces to prevent the command shell from interpreting the name as multiple words.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface.
 
