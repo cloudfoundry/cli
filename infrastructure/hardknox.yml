@@ -120,7 +120,7 @@ jobs:
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
-      OPS_FILES: "tcp-routing-gcp.yml cli-isolation-cell-overrides.yml add-persistent-isolation-segment-diego-cell.yml app-memory-override.yml skip-ssl-override.yml scale-to-one-az.yml"
+      OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml app-memory-override.yml skip-ssl-override.yml scale-to-one-az.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
