@@ -14,8 +14,9 @@ import (
 )
 
 type DummyResponse struct {
-	Val1 string `json:"val1"`
-	Val2 int    `json:"val2"`
+	Val1 string      `json:"val1"`
+	Val2 int         `json:"val2"`
+	Val3 interface{} `json:"val3,omitempty"`
 }
 
 var _ = Describe("Cloud Controller Connection", func() {
@@ -32,7 +33,8 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				response := `{
 					"val1":"2.59.0",
-					"val2":2
+					"val2":2,
+					"val3":1111111111111111111
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -58,6 +60,17 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					Expect(body.Val1).To(Equal("2.59.0"))
 					Expect(body.Val2).To(Equal(2))
+				})
+
+				It("keeps numbers unmarshalled to interfaces as interfaces", func() {
+					var body DummyResponse
+					response := Response{
+						Result: &body,
+					}
+
+					err := connection.Make(request, &response)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(fmt.Sprint(body.Val3)).To(Equal("1111111111111111111"))
 				})
 			})
 
