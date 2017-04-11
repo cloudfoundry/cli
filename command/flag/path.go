@@ -12,13 +12,13 @@ import (
 type Path string
 
 func (_ Path) Complete(prefix string) []flags.Completion {
-	return completeWithNoFormatting(prefix)
+	return completeWithTilde(prefix)
 }
 
 type PathWithExistenceCheck string
 
 func (_ PathWithExistenceCheck) Complete(prefix string) []flags.Completion {
-	return completeWithNoFormatting(prefix)
+	return completeWithTilde(prefix)
 }
 
 func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
@@ -40,7 +40,7 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 type PathWithExistenceCheckOrURL string
 
 func (_ PathWithExistenceCheckOrURL) Complete(prefix string) []flags.Completion {
-	return completeWithNoFormatting(prefix)
+	return completeWithTilde(prefix)
 }
 
 func (p *PathWithExistenceCheckOrURL) UnmarshalFlag(path string) error {
@@ -68,9 +68,24 @@ func (_ PathWithAt) Complete(prefix string) []flags.Completion {
 		return nil
 	}
 
+	prefix = prefix[1:]
+
+	var homeDir string
+	if strings.HasPrefix(prefix, "~/") {
+		// when $HOME is empty this will complete on /, however this is not tested
+		homeDir = os.Getenv("HOME")
+		prefix = fmt.Sprintf("%s%s", homeDir, prefix[1:])
+	}
+
 	return findMatches(
-		fmt.Sprintf("%s*", prefix[1:]),
+		fmt.Sprintf("%s*", prefix),
 		func(path string) string {
+			if homeDir != "" {
+				newPath, err := filepath.Rel(homeDir, path)
+				if err == nil {
+					path = filepath.Join("~", newPath)
+				}
+			}
 			return fmt.Sprintf("@%s", path)
 		})
 }
@@ -80,7 +95,7 @@ type PathWithBool string
 func (_ PathWithBool) Complete(prefix string) []flags.Completion {
 	return append(
 		completions([]string{"true", "false"}, prefix, false),
-		completeWithNoFormatting(prefix)...,
+		completeWithTilde(prefix)...,
 	)
 }
 
@@ -99,19 +114,31 @@ func findMatches(pattern string, formatMatch func(string) string) []flags.Comple
 
 		formattedMatch := formatMatch(path)
 		if info.IsDir() {
-			matches = append(matches, flags.Completion{Item: fmt.Sprintf("%s/", formattedMatch)})
-		} else {
-			matches = append(matches, flags.Completion{Item: formattedMatch})
+			formattedMatch = fmt.Sprintf("%s/", formattedMatch)
 		}
+		matches = append(matches, flags.Completion{Item: formattedMatch})
 	}
 
 	return matches
 }
 
-func completeWithNoFormatting(prefix string) []flags.Completion {
+func completeWithTilde(prefix string) []flags.Completion {
+	var homeDir string
+	if strings.HasPrefix(prefix, "~/") {
+		// when $HOME is empty this will complete on /, however this is not tested
+		homeDir = os.Getenv("HOME")
+		prefix = fmt.Sprintf("%s%s", homeDir, prefix[1:])
+	}
+
 	return findMatches(
 		fmt.Sprintf("%s*", prefix),
 		func(path string) string {
+			if homeDir != "" {
+				newPath, err := filepath.Rel(homeDir, path)
+				if err == nil {
+					path = filepath.Join("~", newPath)
+				}
+			}
 			return path
 		})
 }
