@@ -19,14 +19,17 @@ func TestConfig(t *testing.T) {
 func setup() string {
 	homeDir, err := ioutil.TempDir("", "cli-config-tests")
 	Expect(err).NotTo(HaveOccurred())
-	os.Setenv("CF_HOME", homeDir)
+	err = os.Setenv("CF_HOME", homeDir)
+	Expect(err).NotTo(HaveOccurred())
 	return homeDir
 }
 
 func teardown(homeDir string) {
 	if homeDir != "" {
-		os.RemoveAll(homeDir)
-		os.Unsetenv("CF_HOME")
+		err := os.RemoveAll(homeDir)
+		Expect(err).ToNot(HaveOccurred())
+		err = os.Unsetenv("CF_HOME")
+		Expect(err).ToNot(HaveOccurred())
 	}
 }
 
