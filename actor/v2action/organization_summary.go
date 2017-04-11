@@ -3,8 +3,7 @@ package v2action
 import "sort"
 
 type OrganizationSummary struct {
-	Name        string
-	GUID        string
+	Organization
 	QuotaName   string
 	DomainNames []string
 	SpaceNames  []string
@@ -13,17 +12,15 @@ type OrganizationSummary struct {
 func (actor Actor) GetOrganizationSummaryByName(orgName string) (OrganizationSummary, Warnings, error) {
 	var allWarnings Warnings
 
-	orgSummary := OrganizationSummary{
-		Name: orgName,
-	}
-
 	org, warnings, err := actor.GetOrganizationByName(orgName)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return OrganizationSummary{}, allWarnings, err
 	}
 
-	orgSummary.GUID = org.GUID
+	orgSummary := OrganizationSummary{
+		Organization: org,
+	}
 
 	domains, warnings, err := actor.GetOrganizationDomains(org.GUID)
 	allWarnings = append(allWarnings, warnings...)

@@ -155,8 +155,10 @@ var _ = Describe("org Command", func() {
 
 				fakeActor.GetOrganizationSummaryByNameReturns(
 					v2action.OrganizationSummary{
-						Name: "some-org",
-						GUID: "some-org-guid",
+						Organization: v2action.Organization{
+							Name: "some-org",
+							GUID: "some-org-guid",
+						},
 						DomainNames: []string{
 							"a-shared.com",
 							"b-private.com",

@@ -108,8 +108,11 @@ var _ = Describe("Organization Summary Actions", func() {
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Value).To(Equal("some-org-guid"))
 
 				Expect(orgSummary).To(Equal(OrganizationSummary{
-					Name:        "some-org",
-					GUID:        "some-org-guid",
+					Organization: Organization{
+						Name:                "some-org",
+						GUID:                "some-org-guid",
+						QuotaDefinitionGUID: "some-quota-definition-guid",
+					},
 					QuotaName:   "some-org-quota",
 					DomainNames: []string{"private-domain-1", "private-domain-2", "shared-domain-1", "shared-domain-2"},
 					SpaceNames:  []string{"space-1", "space-2"},

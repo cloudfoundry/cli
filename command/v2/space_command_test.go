@@ -162,9 +162,11 @@ var _ = Describe("space Command", func() {
 
 				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
 					v2action.SpaceSummary{
-						SpaceName: "some-space",
-						SpaceGUID: "some-space-guid",
-						OrgName:   "some-org",
+						Space: v2action.Space{
+							Name: "some-space",
+							GUID: "some-space-guid",
+						},
+						OrgName: "some-org",
 						OrgDefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
 						AppNames:                       []string{"app1", "app2", "app3"},
 						ServiceInstanceNames:           []string{"service1", "service2", "service3"},
@@ -374,7 +376,9 @@ var _ = Describe("space Command", func() {
 
 			fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
 				v2action.SpaceSummary{
-					SpaceName:            "some-space",
+					Space: v2action.Space{
+						Name: "some-space",
+					},
 					OrgName:              "some-org",
 					AppNames:             []string{"app1", "app2", "app3"},
 					ServiceInstanceNames: []string{"service1", "service2", "service3"},
