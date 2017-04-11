@@ -157,7 +157,7 @@ var _ = Describe("plugins Command", func() {
 				Eventually(testUI.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Eventually(testUI.Out).Should(Say(""))
 				Eventually(testUI.Out).Should(Say("plugin name\\s+version\\s+sha1"))
-				Eventually(testUI.Out).Should(Say("Sorted-first\\s+1\\.1\\.0\\s+736f6d652d74657874da39a3ee5e6b4b0d3255bfef95601890afd80709"))
+				Eventually(testUI.Out).Should(Say("Sorted-first\\s+1\\.1\\.0\\s+2142a57cb8587400fa7f4ee492f25cf07567f4a5"))
 				Eventually(testUI.Out).Should(Say("sorted-second\\s+N/A\\s+N/A"))
 			})
 		})

@@ -121,7 +121,7 @@ var _ = Describe("Config", func() {
 				})
 
 				It("returns the sha1 value", func() {
-					Expect(plugin.CalculateSHA1()).To(Equal("666f6fda39a3ee5e6b4b0d3255bfef95601890afd80709"))
+					Expect(plugin.CalculateSHA1()).To(Equal("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"))
 				})
 			})
 
