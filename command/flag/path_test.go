@@ -1,6 +1,7 @@
 package flag_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -56,10 +57,10 @@ var _ = Describe("path types", func() {
 					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
-						flags.Completion{Item: "~add/"},
+						flags.Completion{Item: fmt.Sprintf("~add%c", os.PathSeparator)},
 						flags.Completion{Item: "~abd"},
-						flags.Completion{Item: "add/"},
-						flags.Completion{Item: "aee/"},
+						flags.Completion{Item: fmt.Sprintf("add%c", os.PathSeparator)},
+						flags.Completion{Item: fmt.Sprintf("aee%c", os.PathSeparator)},
 						flags.Completion{Item: "tfg"},
 						flags.Completion{Item: "ABCD"},
 					))
@@ -73,8 +74,8 @@ var _ = Describe("path types", func() {
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "abc"},
 							flags.Completion{Item: "abd"},
-							flags.Completion{Item: "add/"},
-							flags.Completion{Item: "aee/"},
+							flags.Completion{Item: fmt.Sprintf("add%c", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("aee%c", os.PathSeparator)},
 						))
 					})
 
@@ -89,7 +90,7 @@ var _ = Describe("path types", func() {
 						matches := path.Complete("~")
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "~abd"},
-							flags.Completion{Item: "~add/"},
+							flags.Completion{Item: fmt.Sprintf("~add%c", os.PathSeparator)},
 						))
 					})
 				})
@@ -142,10 +143,10 @@ var _ = Describe("path types", func() {
 					It("returns matching paths in $HOME", func() {
 						matches := path.Complete("~/")
 						Expect(matches).To(ConsistOf(
-							flags.Completion{Item: "~/abc"},
-							flags.Completion{Item: "~/def"},
-							flags.Completion{Item: "~/adir/"},
-							flags.Completion{Item: "~/bdir/"},
+							flags.Completion{Item: fmt.Sprintf("~%cabc", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("~%cdef", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("~%cadir%c", os.PathSeparator, os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("~%cbdir%c", os.PathSeparator, os.PathSeparator)},
 						))
 					})
 				})
@@ -192,8 +193,8 @@ var _ = Describe("path types", func() {
 					It("returns matching paths in $HOME", func() {
 						matches := path.Complete("~/a")
 						Expect(matches).To(ConsistOf(
-							flags.Completion{Item: "~/abc"},
-							flags.Completion{Item: "~/adir/"},
+							flags.Completion{Item: fmt.Sprintf("~%cabc", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("~%cadir%c", os.PathSeparator, os.PathSeparator)},
 						))
 					})
 				})
@@ -300,10 +301,10 @@ var _ = Describe("path types", func() {
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
-							flags.Completion{Item: "@~add/"},
+							flags.Completion{Item: fmt.Sprintf("@~add%c", os.PathSeparator)},
 							flags.Completion{Item: "@~abd"},
-							flags.Completion{Item: "@add/"},
-							flags.Completion{Item: "@aee/"},
+							flags.Completion{Item: fmt.Sprintf("@add%c", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("@aee%c", os.PathSeparator)},
 							flags.Completion{Item: "@tfg"},
 							flags.Completion{Item: "@ABCD"},
 						))
@@ -317,8 +318,8 @@ var _ = Describe("path types", func() {
 							Expect(matches).To(ConsistOf(
 								flags.Completion{Item: "@abc"},
 								flags.Completion{Item: "@abd"},
-								flags.Completion{Item: "@add/"},
-								flags.Completion{Item: "@aee/"},
+								flags.Completion{Item: fmt.Sprintf("@add%c", os.PathSeparator)},
+								flags.Completion{Item: fmt.Sprintf("@aee%c", os.PathSeparator)},
 							))
 						})
 
@@ -379,10 +380,10 @@ var _ = Describe("path types", func() {
 					It("returns matching paths in $HOME", func() {
 						matches := pathWithAt.Complete("@~/")
 						Expect(matches).To(ConsistOf(
-							flags.Completion{Item: "@~/abc"},
-							flags.Completion{Item: "@~/def"},
-							flags.Completion{Item: "@~/adir/"},
-							flags.Completion{Item: "@~/bdir/"},
+							flags.Completion{Item: fmt.Sprintf("@~%cabc", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("@~%cdef", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("@~%cadir%c", os.PathSeparator, os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("@~%cbdir%c", os.PathSeparator, os.PathSeparator)},
 						))
 					})
 				})
@@ -429,8 +430,8 @@ var _ = Describe("path types", func() {
 					It("returns matching paths in $HOME", func() {
 						matches := pathWithAt.Complete("@~/a")
 						Expect(matches).To(ConsistOf(
-							flags.Completion{Item: "@~/abc"},
-							flags.Completion{Item: "@~/adir/"},
+							flags.Completion{Item: fmt.Sprintf("@~%cabc", os.PathSeparator)},
+							flags.Completion{Item: fmt.Sprintf("@~%cadir%c", os.PathSeparator, os.PathSeparator)},
 						))
 					})
 				})
@@ -450,10 +451,10 @@ var _ = Describe("path types", func() {
 						flags.Completion{Item: "false"},
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
-						flags.Completion{Item: "add/"},
+						flags.Completion{Item: fmt.Sprintf("add%c", os.PathSeparator)},
 						flags.Completion{Item: "~abd"},
-						flags.Completion{Item: "~add/"},
-						flags.Completion{Item: "aee/"},
+						flags.Completion{Item: fmt.Sprintf("~add%c", os.PathSeparator)},
+						flags.Completion{Item: fmt.Sprintf("aee%c", os.PathSeparator)},
 						flags.Completion{Item: "tfg"},
 						flags.Completion{Item: "ABCD"},
 					))
