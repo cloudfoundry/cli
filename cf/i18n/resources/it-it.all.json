@@ -1796,6 +1796,10 @@
     "translation": "Calcolo di sha1 per i plug-in installati, questa operazione potrebbe richiedere alcuni minuti in corso..."
   },
   {
+    "id": "Computing sha1 for installed plugins, this may take a while...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Connesso, dump dei log recenti per l'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso...\n"
   },
@@ -3730,6 +3734,10 @@
   {
     "id": "Listing Installed Plugins...",
     "translation": "Elenco dei plug-in installati in corso..."
+  },
+  {
+    "id": "Listing installed plugins...",
+    "translation": ""
   },
   {
     "id": "Local port forward specification. This flag can be defined more than once.",
@@ -6264,6 +6272,14 @@
     "translation": ""
   },
   {
+    "id": "command help",
+    "translation": ""
+  },
+  {
+    "id": "command name",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": ""
   },
@@ -6534,6 +6550,10 @@
   {
     "id": "plans",
     "translation": "piani"
+  },
+  {
+    "id": "plugin name",
+    "translation": ""
   },
   {
     "id": "port",

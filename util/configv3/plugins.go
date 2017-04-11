@@ -1,7 +1,9 @@
 package configv3
 
 import (
+	"crypto/sha1"
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -31,6 +33,19 @@ type Plugin struct {
 	Location string         `json:"Location"`
 	Version  PluginVersion  `json:"Version"`
 	Commands PluginCommands `json:"Commands"`
+}
+
+// CalculateSHA1 returns the sha1 value of the plugin executable. If an error
+// is encountered calculating sha1, N/A is returned
+func (p Plugin) CalculateSHA1() string {
+	fileSHA := ""
+	contents, err := ioutil.ReadFile(p.Location)
+	if err != nil {
+		fileSHA = "N/A"
+	} else {
+		fileSHA = fmt.Sprintf("%x", sha1.New().Sum(contents))
+	}
+	return fileSHA
 }
 
 // PluginVersion is the plugin version information
