@@ -13,6 +13,10 @@ import (
 )
 
 var _ = Describe("plugins command", func() {
+	BeforeEach(func() {
+		helpers.RunIfExperimental("Running experimental plugins command tests")
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
@@ -33,6 +37,7 @@ var _ = Describe("plugins command", func() {
 	Context("when no plugins are installed", func() {
 		It("displays an empty table", func() {
 			session := helpers.CF("plugins")
+			Eventually(session).Should(Say("Listing installed plugins..."))
 			Eventually(session).Should(Say("plugin name\\s+version\\s+command name\\s+command help"))
 			Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 			Eventually(session).Should(Exit(0))
@@ -41,7 +46,8 @@ var _ = Describe("plugins command", func() {
 		Context("when the --checksum flag is provided", func() {
 			It("displays an empty checksum table", func() {
 				session := helpers.CF("plugins", "--checksum")
-				Eventually(session).Should(Say("plugin name\\s+sha1"))
+				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
+				Eventually(session).Should(Say("plugin name\\s+version\\s+sha1"))
 				Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -134,12 +140,13 @@ var _ = Describe("plugins command", func() {
 
 			It("displays the installed plugins in alphabetical order", func() {
 				session := helpers.CF("plugins")
+				Eventually(session).Should(Say("Listing installed plugins..."))
 				Eventually(session).Should(Say("plugin name\\s+version\\s+command name\\s+command help"))
-				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+Better-command\\s+some-better-command"))
 				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+command-1\\s+some-command-1"))
+				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+Better-command\\s+some-better-command"))
 				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+command-2\\s+some-command-2"))
-				Eventually(session).Should(Say("i-should-be-sorted-second\\s+1\\.0\\.0\\s+Some-other-command\\s+some-other-command"))
 				Eventually(session).Should(Say("i-should-be-sorted-second\\s+1\\.0\\.0\\s+some-command\\s+some-command"))
+				Eventually(session).Should(Say("i-should-be-sorted-second\\s+1\\.0\\.0\\s+Some-other-command\\s+some-other-command"))
 				Eventually(session).Should(Say("sorted-third\\s+2\\.0\\.1\\s+banana-command\\s+banana-command"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -231,6 +238,7 @@ var _ = Describe("plugins command", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				session := helpers.CF("plugins", "--checksum")
+				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Eventually(session).Should(Say("plugin name\\s+sha1"))
 				Eventually(session).Should(Say("some-plugin\\s+88c2539b1dea4debfb127510c15c2aaebc3297a6"))
 				Eventually(session).Should(Exit(0))
@@ -242,7 +250,6 @@ var _ = Describe("plugins command", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
-					Eventually(session).Should(Say("plugin name\\s+sha1"))
 					Eventually(session).Should(Say("some-plugin\\s+N/A"))
 					Eventually(session).Should(Exit(0))
 				})
