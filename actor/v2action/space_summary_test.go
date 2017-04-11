@@ -187,8 +187,11 @@ var _ = Describe("Space Summary Actions", func() {
 					}))
 
 					Expect(spaceSummary).To(Equal(SpaceSummary{
-						SpaceName:            "some-space",
-						SpaceGUID:            "some-space-guid",
+						Space: Space{
+							Name: "some-space",
+							GUID: "some-space-guid",
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid",
+						},
 						OrgName:              "some-org",
 						AppNames:             []string{"some-app-1", "some-app-2"},
 						ServiceInstanceNames: []string{"some-service-instance-1", "some-service-instance-2"},
@@ -793,9 +796,12 @@ var _ = Describe("Space Summary Actions", func() {
 					}))
 
 					Expect(spaceSummary).To(Equal(SpaceSummary{
-						SpaceName: "some-space",
-						SpaceGUID: "some-space-guid",
-						OrgName:   "some-org",
+						Space: Space{
+							Name: "some-space",
+							GUID: "some-space-guid",
+							SpaceQuotaDefinitionGUID: "some-space-quota-guid",
+						},
+						OrgName: "some-org",
 						OrgDefaultIsolationSegmentGUID: "some-org-default-isolation-segment-guid",
 						AppNames:                       []string{"some-app-1", "some-app-2"},
 						ServiceInstanceNames:           []string{"some-service-instance-1", "some-service-instance-2"},

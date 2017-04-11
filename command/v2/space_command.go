@@ -114,7 +114,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	}
 
 	table := [][]string{
-		{cmd.UI.TranslateText("name:"), spaceSummary.SpaceName},
+		{cmd.UI.TranslateText("name:"), spaceSummary.Name},
 		{cmd.UI.TranslateText("org:"), spaceSummary.OrgName},
 		{cmd.UI.TranslateText("apps:"), strings.Join(spaceSummary.AppNames, ", ")},
 		{cmd.UI.TranslateText("services:"), strings.Join(spaceSummary.ServiceInstanceNames, ", ")},
@@ -189,7 +189,7 @@ func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) 
 
 	isolationSegmentName := ""
 	isolationSegment, v3Warnings, err := cmd.ActorV3.GetEffectiveIsolationSegmentBySpace(
-		spaceSummary.SpaceGUID, spaceSummary.OrgDefaultIsolationSegmentGUID)
+		spaceSummary.GUID, spaceSummary.OrgDefaultIsolationSegmentGUID)
 	cmd.UI.DisplayWarnings(v3Warnings)
 	if err == nil {
 		isolationSegmentName = isolationSegment.Name
