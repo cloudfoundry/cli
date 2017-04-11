@@ -3,6 +3,7 @@ package flag_test
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/command/flag"
 	flags "github.com/jessevdk/go-flags"
@@ -27,12 +28,12 @@ var _ = Describe("path types", func() {
 		err = os.Chdir(tempDir)
 		Expect(err).ToNot(HaveOccurred())
 
-		for _, filename := range []string{"abc", "abd", "tfg", "ABCD"} {
+		for _, filename := range []string{"abc", "abd", "~abd", "tfg", "ABCD"} {
 			err = ioutil.WriteFile(filename, []byte{}, 0400)
 			Expect(err).ToNot(HaveOccurred())
 		}
 
-		for _, dir := range []string{"add", "aee"} {
+		for _, dir := range []string{"~add", "add", "aee"} {
 			err := os.Mkdir(dir, os.ModeDir)
 			Expect(err).ToNot(HaveOccurred())
 		}
@@ -52,10 +53,11 @@ var _ = Describe("path types", func() {
 			Context("when the prefix is empty", func() {
 				It("returns all files and directories", func() {
 					matches := path.Complete("")
-					Expect(matches).To(HaveLen(6))
 					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
+						flags.Completion{Item: "~add/"},
+						flags.Completion{Item: "~abd"},
 						flags.Completion{Item: "add/"},
 						flags.Completion{Item: "aee/"},
 						flags.Completion{Item: "tfg"},
@@ -68,7 +70,6 @@ var _ = Describe("path types", func() {
 				Context("when there are matching paths", func() {
 					It("returns the matching paths", func() {
 						matches := path.Complete("a")
-						Expect(matches).To(HaveLen(4))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "abc"},
 							flags.Completion{Item: "abd"},
@@ -79,9 +80,16 @@ var _ = Describe("path types", func() {
 
 					It("is case sensitive", func() {
 						matches := path.Complete("A")
-						Expect(matches).To(HaveLen(1))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "ABCD"},
+						))
+					})
+
+					It("finds files starting with '~'", func() {
+						matches := path.Complete("~")
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "~abd"},
+							flags.Completion{Item: "~add/"},
 						))
 					})
 				})
@@ -89,6 +97,104 @@ var _ = Describe("path types", func() {
 				Context("when there are no matching paths", func() {
 					It("returns no matches", func() {
 						Expect(path.Complete("z")).To(BeEmpty())
+					})
+				})
+			})
+
+			Context("when the prefix is ~/", func() {
+				var prevHome string
+
+				BeforeEach(func() {
+					prevHome = os.Getenv("HOME")
+				})
+
+				AfterEach(func() {
+					os.Setenv("HOME", prevHome)
+				})
+
+				Context("when $HOME is set", func() {
+					var (
+						tempDir string
+						err     error
+					)
+
+					BeforeEach(func() {
+						tempDir, err = ioutil.TempDir("", "")
+						Expect(err).ToNot(HaveOccurred())
+						os.Setenv("HOME", tempDir)
+
+						for _, filename := range []string{"abc", "def"} {
+							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							Expect(err).ToNot(HaveOccurred())
+						}
+
+						for _, dir := range []string{"adir", "bdir"} {
+							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					})
+
+					AfterEach(func() {
+						err = os.RemoveAll(tempDir)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("returns matching paths in $HOME", func() {
+						matches := path.Complete("~/")
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "~/abc"},
+							flags.Completion{Item: "~/def"},
+							flags.Completion{Item: "~/adir/"},
+							flags.Completion{Item: "~/bdir/"},
+						))
+					})
+				})
+			})
+
+			Context("when the prefix starts with ~/", func() {
+				var prevHome string
+
+				BeforeEach(func() {
+					prevHome = os.Getenv("HOME")
+				})
+
+				AfterEach(func() {
+					os.Setenv("HOME", prevHome)
+				})
+
+				Context("when $HOME is set", func() {
+					var (
+						tempDir string
+						err     error
+					)
+
+					BeforeEach(func() {
+						tempDir, err = ioutil.TempDir("", "")
+						Expect(err).ToNot(HaveOccurred())
+						os.Setenv("HOME", tempDir)
+
+						for _, filename := range []string{"abc", "def"} {
+							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							Expect(err).ToNot(HaveOccurred())
+						}
+
+						for _, dir := range []string{"adir", "bdir"} {
+							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					})
+
+					AfterEach(func() {
+						err = os.RemoveAll(tempDir)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("returns matching paths in $HOME", func() {
+						matches := path.Complete("~/a")
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "~/abc"},
+							flags.Completion{Item: "~/adir/"},
+						))
 					})
 				})
 			})
@@ -191,10 +297,11 @@ var _ = Describe("path types", func() {
 				Context("when there are no characters after the @", func() {
 					It("returns all files and directories", func() {
 						matches := pathWithAt.Complete("@")
-						Expect(matches).To(HaveLen(6))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "@abc"},
 							flags.Completion{Item: "@abd"},
+							flags.Completion{Item: "@~add/"},
+							flags.Completion{Item: "@~abd"},
 							flags.Completion{Item: "@add/"},
 							flags.Completion{Item: "@aee/"},
 							flags.Completion{Item: "@tfg"},
@@ -207,7 +314,6 @@ var _ = Describe("path types", func() {
 					Context("when there are matching paths", func() {
 						It("returns the matching paths", func() {
 							matches := pathWithAt.Complete("@a")
-							Expect(matches).To(HaveLen(4))
 							Expect(matches).To(ConsistOf(
 								flags.Completion{Item: "@abc"},
 								flags.Completion{Item: "@abd"},
@@ -218,7 +324,6 @@ var _ = Describe("path types", func() {
 
 						It("is case sensitive", func() {
 							matches := pathWithAt.Complete("@A")
-							Expect(matches).To(HaveLen(1))
 							Expect(matches).To(ConsistOf(
 								flags.Completion{Item: "@ABCD"},
 							))
@@ -232,6 +337,104 @@ var _ = Describe("path types", func() {
 					})
 				})
 			})
+
+			Context("when the prefix is @~/", func() {
+				var prevHome string
+
+				BeforeEach(func() {
+					prevHome = os.Getenv("HOME")
+				})
+
+				AfterEach(func() {
+					os.Setenv("HOME", prevHome)
+				})
+
+				Context("when $HOME is set", func() {
+					var (
+						tempDir string
+						err     error
+					)
+
+					BeforeEach(func() {
+						tempDir, err = ioutil.TempDir("", "")
+						Expect(err).ToNot(HaveOccurred())
+						os.Setenv("HOME", tempDir)
+
+						for _, filename := range []string{"abc", "def"} {
+							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							Expect(err).ToNot(HaveOccurred())
+						}
+
+						for _, dir := range []string{"adir", "bdir"} {
+							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					})
+
+					AfterEach(func() {
+						err = os.RemoveAll(tempDir)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("returns matching paths in $HOME", func() {
+						matches := pathWithAt.Complete("@~/")
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "@~/abc"},
+							flags.Completion{Item: "@~/def"},
+							flags.Completion{Item: "@~/adir/"},
+							flags.Completion{Item: "@~/bdir/"},
+						))
+					})
+				})
+			})
+
+			Context("when the prefix starts with @~/", func() {
+				var prevHome string
+
+				BeforeEach(func() {
+					prevHome = os.Getenv("HOME")
+				})
+
+				AfterEach(func() {
+					os.Setenv("HOME", prevHome)
+				})
+
+				Context("when $HOME is set", func() {
+					var (
+						tempDir string
+						err     error
+					)
+
+					BeforeEach(func() {
+						tempDir, err = ioutil.TempDir("", "")
+						Expect(err).ToNot(HaveOccurred())
+						os.Setenv("HOME", tempDir)
+
+						for _, filename := range []string{"abc", "def"} {
+							err = ioutil.WriteFile(filepath.Join(tempDir, filename), []byte{}, 0400)
+							Expect(err).ToNot(HaveOccurred())
+						}
+
+						for _, dir := range []string{"adir", "bdir"} {
+							err = os.Mkdir(filepath.Join(tempDir, dir), os.ModeDir)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					})
+
+					AfterEach(func() {
+						err = os.RemoveAll(tempDir)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("returns matching paths in $HOME", func() {
+						matches := pathWithAt.Complete("@~/a")
+						Expect(matches).To(ConsistOf(
+							flags.Completion{Item: "@~/abc"},
+							flags.Completion{Item: "@~/adir/"},
+						))
+					})
+				})
+			})
 		})
 	})
 
@@ -242,13 +445,14 @@ var _ = Describe("path types", func() {
 			Context("when the prefix is empty", func() {
 				It("returns bool choices and all files and directories", func() {
 					matches := pathWithBool.Complete("")
-					Expect(matches).To(HaveLen(8))
 					Expect(matches).To(ConsistOf(
 						flags.Completion{Item: "true"},
 						flags.Completion{Item: "false"},
 						flags.Completion{Item: "abc"},
 						flags.Completion{Item: "abd"},
 						flags.Completion{Item: "add/"},
+						flags.Completion{Item: "~abd"},
+						flags.Completion{Item: "~add/"},
 						flags.Completion{Item: "aee/"},
 						flags.Completion{Item: "tfg"},
 						flags.Completion{Item: "ABCD"},
@@ -260,7 +464,6 @@ var _ = Describe("path types", func() {
 				Context("when there are matching bool/paths", func() {
 					It("returns the matching bool/paths", func() {
 						matches := pathWithBool.Complete("t")
-						Expect(matches).To(HaveLen(2))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "true"},
 							flags.Completion{Item: "tfg"},
@@ -269,7 +472,6 @@ var _ = Describe("path types", func() {
 
 					It("paths are case sensitive", func() {
 						matches := pathWithBool.Complete("A")
-						Expect(matches).To(HaveLen(1))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "ABCD"},
 						))
@@ -277,7 +479,6 @@ var _ = Describe("path types", func() {
 
 					It("bools are not case sensitive", func() {
 						matches := pathWithBool.Complete("Tr")
-						Expect(matches).To(HaveLen(1))
 						Expect(matches).To(ConsistOf(
 							flags.Completion{Item: "true"},
 						))
