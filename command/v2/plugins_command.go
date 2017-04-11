@@ -1,9 +1,6 @@
 package v2
 
 import (
-	"crypto/sha1"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 
@@ -59,30 +56,17 @@ func (cmd PluginsCommand) Execute(_ []string) error {
 
 func (cmd PluginsCommand) calculatePluginChecksums(sortedPluginNames []string, plugins map[string]configv3.Plugin) [][]string {
 	table := [][]string{{"plugin name", "version", "sha1"}}
-
 	for _, pluginName := range sortedPluginNames {
 		plugin := plugins[pluginName]
-
-		fileSHA := ""
-		contents, err := ioutil.ReadFile(plugin.Location)
-		if err != nil {
-			fileSHA = "N/A"
-		} else {
-			fileSHA = fmt.Sprintf("%x", sha1.New().Sum(contents))
-		}
-
-		table = append(table, []string{pluginName, plugin.Version.String(), fileSHA})
+		table = append(table, []string{pluginName, plugin.Version.String(), plugin.CalculateSHA1()})
 	}
-
 	return table
 }
 
 func (cmd PluginsCommand) getPluginCommands(sortedPluginNames []string, plugins map[string]configv3.Plugin) [][]string {
 	table := [][]string{{"plugin name", "version", "command name", "command help"}}
-
-	var plugin configv3.Plugin
 	for _, pluginName := range sortedPluginNames {
-		plugin = plugins[pluginName]
+		plugin := plugins[pluginName]
 		for _, command := range plugin.Commands {
 			table = append(table, []string{pluginName, plugin.Version.String(), command.CommandName(), command.HelpText})
 		}

@@ -1796,6 +1796,10 @@
     "translation": "설치된 플러그인의 sha1을 계산 중입니다. 계산하는 데 시간이 걸릴 수 있습니다 ..."
   },
   {
+    "id": "Computing sha1 for installed plugins, this may take a while...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "연결됨, {{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 있는 {{.AppName}} 앱의 최근 로그 덤프 중...\n"
   },
@@ -3730,6 +3734,10 @@
   {
     "id": "Listing Installed Plugins...",
     "translation": "설치된 플러그인 나열 중..."
+  },
+  {
+    "id": "Listing installed plugins...",
+    "translation": ""
   },
   {
     "id": "Local port forward specification. This flag can be defined more than once.",
@@ -6264,6 +6272,14 @@
     "translation": ""
   },
   {
+    "id": "command help",
+    "translation": ""
+  },
+  {
+    "id": "command name",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": "CPU"
   },
@@ -6534,6 +6550,10 @@
   {
     "id": "plans",
     "translation": "플랜"
+  },
+  {
+    "id": "plugin name",
+    "translation": ""
   },
   {
     "id": "port",

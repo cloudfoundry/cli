@@ -1796,6 +1796,10 @@
     "translation": "Computing sha1 for installed plugins, this may take a while ..."
   },
   {
+    "id": "Computing sha1 for installed plugins, this may take a while...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
   },
@@ -3730,6 +3734,10 @@
   {
     "id": "Listing Installed Plugins...",
     "translation": "Listing Installed Plugins..."
+  },
+  {
+    "id": "Listing installed plugins...",
+    "translation": ""
   },
   {
     "id": "Local port forward specification. This flag can be defined more than once.",
@@ -6264,6 +6272,14 @@
     "translation": "cf target -s"
   },
   {
+    "id": "command help",
+    "translation": ""
+  },
+  {
+    "id": "command name",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": "cpu"
   },
@@ -6534,6 +6550,10 @@
   {
     "id": "plans",
     "translation": "plans"
+  },
+  {
+    "id": "plugin name",
+    "translation": ""
   },
   {
     "id": "port",

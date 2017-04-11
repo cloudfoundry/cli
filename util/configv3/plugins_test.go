@@ -1,6 +1,7 @@
 package configv3_test
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -94,6 +95,58 @@ var _ = Describe("Config", func() {
 			return filepath.Join(homeDir, "foo", ".cf", "plugins"), filepath.Join(homeDir, "foo")
 		}),
 	)
+
+	Describe("Plugin", func() {
+		Describe("CalculateSHA1", func() {
+			var plugin Plugin
+
+			Context("when no errors are encountered calculating the sha1 value", func() {
+				var file *os.File
+
+				BeforeEach(func() {
+					var err error
+					file, err = ioutil.TempFile("", "")
+					defer file.Close()
+					Expect(err).NotTo(HaveOccurred())
+
+					err = ioutil.WriteFile(file.Name(), []byte("foo"), 0600)
+					Expect(err).NotTo(HaveOccurred())
+
+					plugin.Location = file.Name()
+				})
+
+				AfterEach(func() {
+					err := os.Remove(file.Name())
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("returns the sha1 value", func() {
+					Expect(plugin.CalculateSHA1()).To(Equal("666f6fda39a3ee5e6b4b0d3255bfef95601890afd80709"))
+				})
+			})
+
+			Context("when an error is encountered calculating the sha1 value", func() {
+				var dirPath string
+
+				BeforeEach(func() {
+					var err error
+					dirPath, err = ioutil.TempDir("", "")
+					Expect(err).NotTo(HaveOccurred())
+
+					plugin.Location = dirPath
+				})
+
+				AfterEach(func() {
+					err := os.RemoveAll(dirPath)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("returns 'N/A'", func() {
+					Expect(plugin.CalculateSHA1()).To(Equal("N/A"))
+				})
+			})
+		})
+	})
 
 	Describe("PluginVersion", func() {
 		var version PluginVersion

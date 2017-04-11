@@ -1796,6 +1796,10 @@
     "translation": "正在計算所安裝外掛程式的 sha1，這可能需要一些時間... "
   },
   {
+    "id": "Computing sha1 for installed plugins, this may take a while...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "已連接，正在以 {{.Username}} 身分傾出組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的最近日誌...\n"
   },
@@ -3730,6 +3734,10 @@
   {
     "id": "Listing Installed Plugins...",
     "translation": "正在列出已安裝的外掛程式..."
+  },
+  {
+    "id": "Listing installed plugins...",
+    "translation": ""
   },
   {
     "id": "Local port forward specification. This flag can be defined more than once.",
@@ -6264,6 +6272,14 @@
     "translation": ""
   },
   {
+    "id": "command help",
+    "translation": ""
+  },
+  {
+    "id": "command name",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": ""
   },
@@ -6534,6 +6550,10 @@
   {
     "id": "plans",
     "translation": "方案"
+  },
+  {
+    "id": "plugin name",
+    "translation": ""
   },
   {
     "id": "port",

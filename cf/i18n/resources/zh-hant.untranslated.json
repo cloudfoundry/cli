@@ -1168,6 +1168,10 @@
     "translation": "Commands offered by installed plugins:"
   },
   {
+    "id": "Computing sha1 for installed plugins, this may take a while...",
+    "translation": ""
+  },
+  {
     "id": "Could not find service",
     "translation": "Could not find service"
   },
@@ -1377,6 +1381,10 @@
   },
   {
     "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
+    "id": "Listing installed plugins...",
     "translation": ""
   },
   {
@@ -2108,6 +2116,14 @@
     "translation": "cf target -s"
   },
   {
+    "id": "command help",
+    "translation": ""
+  },
+  {
+    "id": "command name",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": "cpu"
   },
@@ -2173,6 +2189,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "plugin name",
     "translation": ""
   },
   {
