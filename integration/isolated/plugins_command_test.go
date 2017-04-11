@@ -239,8 +239,8 @@ var _ = Describe("plugins command", func() {
 
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
-				Eventually(session).Should(Say("plugin name\\s+sha1"))
-				Eventually(session).Should(Say("some-plugin\\s+88c2539b1dea4debfb127510c15c2aaebc3297a6"))
+				Eventually(session).Should(Say("plugin name\\s+version\\s+sha1"))
+				Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+88c2539b1dea4debfb127510c15c2aaebc3297a6"))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -250,7 +250,7 @@ var _ = Describe("plugins command", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
-					Eventually(session).Should(Say("some-plugin\\s+N/A"))
+					Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+N/A"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
