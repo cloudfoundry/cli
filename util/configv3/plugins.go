@@ -43,7 +43,7 @@ func (p Plugin) CalculateSHA1() string {
 	if err != nil {
 		fileSHA = "N/A"
 	} else {
-		fileSHA = fmt.Sprintf("%x", sha1.New().Sum(contents))
+		fileSHA = fmt.Sprintf("%x", sha1.Sum(contents))
 	}
 	return fileSHA
 }
