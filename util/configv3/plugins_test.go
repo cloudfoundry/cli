@@ -182,7 +182,7 @@ var _ = Describe("Config", func() {
 
 		Describe("CommandName", func() {
 			It("returns the name of the command", func() {
-				cmd.Name = "some-command"
+				cmd = PluginCommand{Name: "some-command"}
 				Expect(cmd.CommandName()).To(Equal("some-command"))
 			})
 
