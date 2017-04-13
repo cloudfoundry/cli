@@ -1,9 +1,8 @@
-package isolated
+package plugin
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -15,6 +14,8 @@ import (
 var _ = Describe("plugins command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("Running experimental plugins command tests")
+		// This removes plugin artefacts from other plugin tests
+		uninstallTestPlugin()
 	})
 
 	Describe("help", func() {
@@ -38,6 +39,7 @@ var _ = Describe("plugins command", func() {
 		It("displays an empty table", func() {
 			session := helpers.CF("plugins")
 			Eventually(session).Should(Say("Listing installed plugins..."))
+			Eventually(session).Should(Say(""))
 			Eventually(session).Should(Say("plugin name\\s+version\\s+command name\\s+command help"))
 			Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 			Eventually(session).Should(Exit(0))
@@ -47,6 +49,7 @@ var _ = Describe("plugins command", func() {
 			It("displays an empty checksum table", func() {
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
+				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("plugin name\\s+version\\s+sha1"))
 				Consistently(session).ShouldNot(Say("[a-za-z0-9]+"))
 				Eventually(session).Should(Exit(0))
@@ -55,92 +58,26 @@ var _ = Describe("plugins command", func() {
 	})
 
 	Context("when plugins are installed", func() {
-		var (
-			pathToPlugins string
-			pluginConfig  string
-		)
-
-		BeforeEach(func() {
-			pathToPlugins = fmt.Sprintf("%s/.cf/plugins", homeDir)
-			err := os.MkdirAll(pathToPlugins, 0700)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			err := os.RemoveAll(pathToPlugins)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		JustBeforeEach(func() {
-			err := ioutil.WriteFile(fmt.Sprintf("%s/config.json", pathToPlugins), []byte(pluginConfig), 0600)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
 		Context("when there are multiple plugins", func() {
 			BeforeEach(func() {
-				pluginConfig = `{
-					"Plugins": {
-						"sorted-third": {
-							"Location": "plugin-dir/plugin-3",
-							"Version": {
-								"Major": 2,
-								"Minor": 0,
-								"Build": 1
-							},
-							"Commands": [
-								{
-									"Name": "banana-command",
-									"HelpText": "banana-command"
-								}
-							]
-						},
-						"I-should-be-sorted-first": {
-							"Location": "plugin-dir/plugin-1",
-							"Version": {
-								"Major": 1,
-								"Minor": 2,
-								"Build": 0
-							},
-							"Commands": [
-								{
-									"Name": "command-1",
-									"HelpText": "some-command-1"
-								},
-								{
-									"Name": "Better-command",
-									"HelpText": "some-better-command"
-								},
-								{
-									"Name": "command-2",
-									"HelpText": "some-command-2"
-								}
-							]
-						},
-						"i-should-be-sorted-second": {
-							"Location": "plugin-dir/plugin-2",
-							"Version": {
-								"Major": 1,
-								"Minor": 0,
-								"Build": 0
-							},
-							"Commands": [
-								{
-									"Name": "some-command",
-									"HelpText": "some-command"
-								},
-								{
-									"Name": "Some-other-command",
-									"HelpText": "some-other-command"
-								}
-							]
-						}
-					}
-				}`
+				helpers.CreateBasicPlugin("I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
+					{Name: "command-1", Help: "some-command-1"},
+					{Name: "Better-command", Help: "some-better-command"},
+					{Name: "command-2", Help: "some-command-2"},
+				})
+				helpers.CreateBasicPlugin("sorted-third", "2.0.1", []helpers.PluginCommand{
+					{Name: "banana-command", Help: "banana-command"},
+				})
+				helpers.CreateBasicPlugin("i-should-be-sorted-second", "1.0.0", []helpers.PluginCommand{
+					{Name: "some-command", Help: "some-command"},
+					{Name: "Some-other-command", Help: "some-other-command"},
+				})
 			})
 
 			It("displays the installed plugins in alphabetical order", func() {
 				session := helpers.CF("plugins")
 				Eventually(session).Should(Say("Listing installed plugins..."))
+				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("plugin name\\s+version\\s+command name\\s+command help"))
 				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+command-1\\s+some-command-1"))
 				Eventually(session).Should(Say("I-should-be-sorted-first\\s+1\\.2\\.0\\s+Better-command\\s+some-better-command"))
@@ -154,24 +91,9 @@ var _ = Describe("plugins command", func() {
 
 		Context("when plugin version information is 0.0.0", func() {
 			BeforeEach(func() {
-				pluginConfig = `{
-					"Plugins": {
-						"some-plugin": {
-							"Location": "plugin-dir/some-plugin",
-							"Version": {
-								"Major": 0,
-								"Minor": 0,
-								"Build": 0
-							},
-							"Commands": [
-								{
-									"Name": "banana-command",
-									"HelpText": "banana-command"
-								}
-							]
-						}
-					}
-				}`
+				helpers.CreateBasicPlugin("some-plugin", "0.0.0", []helpers.PluginCommand{
+					{Name: "banana-command", Help: "banana-command"},
+				})
 			})
 
 			It("displays N/A for the plugin's version", func() {
@@ -183,25 +105,9 @@ var _ = Describe("plugins command", func() {
 
 		Context("when a plugin command has an alias", func() {
 			BeforeEach(func() {
-				pluginConfig = `{
-					"Plugins": {
-						"some-plugin": {
-							"Location": "plugin-dir/some-plugin",
-							"Version": {
-								"Major": 1,
-								"Minor": 0,
-								"Build": 0
-							},
-							"Commands": [
-								{
-									"Name": "banana-command",
-									"Alias": "bc",
-									"HelpText": "banana-command"
-								}
-							]
-						}
-					}
-				}`
+				helpers.CreateBasicPlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+					{Name: "banana-command", Alias: "bc", Help: "banana-command"},
+				})
 			})
 
 			It("displays the command name and it's alias", func() {
@@ -213,40 +119,23 @@ var _ = Describe("plugins command", func() {
 
 		Context("when the --checksum flag is provided", func() {
 			BeforeEach(func() {
-				pluginConfig = fmt.Sprintf(`{
-					"Plugins": {
-						"some-plugin": {
-							"Location": "%s/some-plugin",
-							"Version": {
-								"Major": 1,
-								"Minor": 0,
-								"Build": 0
-							},
-							"Commands": [
-								{
-									"Name": "banana-command",
-									"HelpText": "banana-command"
-								}
-							]
-						}
-					}
-				}`, pathToPlugins)
+				helpers.CreateBasicPlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+					{Name: "banana-command", Help: "banana-command"},
+				})
 			})
 
 			It("displays the sha1 value for each installed plugin", func() {
-				err := ioutil.WriteFile(fmt.Sprintf("%s/some-plugin", pathToPlugins), []byte("some-text-to-sha"), 0600)
-				Expect(err).NotTo(HaveOccurred())
-
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
+				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("plugin name\\s+version\\s+sha1"))
-				Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+88c2539b1dea4debfb127510c15c2aaebc3297a6"))
+				Eventually(session).Should(Say("some-plugin\\s+1\\.0\\.0\\s+ee3f5d2802f8b332fae9589fc367537ff75a41b0"))
 				Eventually(session).Should(Exit(0))
 			})
 
 			Context("when an error is encountered calculating the sha1 value", func() {
 				It("displays N/A for the plugin's sha1", func() {
-					err := ioutil.WriteFile(fmt.Sprintf("%s/some-plugin", pathToPlugins), []byte("some-text-to-sha"), 0000)
+					err := os.Remove(filepath.Join(homeDir, ".cf/plugins/configurable_plugin.some-plugin"))
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
@@ -255,5 +144,6 @@ var _ = Describe("plugins command", func() {
 				})
 			})
 		})
+
 	})
 })
