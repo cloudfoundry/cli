@@ -2,16 +2,14 @@ package plugin
 
 import (
 	"regexp"
+	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-
-	"testing"
 )
 
 const (
@@ -75,6 +73,11 @@ var _ = AfterEach(func() {
 
 func installTestPlugin() {
 	session := helpers.CF("install-plugin", "-f", testPluginPath)
+	Eventually(session).Should(Exit(0))
+}
+
+func uninstallTestPlugin() {
+	session := helpers.CF("uninstall-plugin", "CF-CLI-Integration-Test-Plugin")
 	Eventually(session).Should(Exit(0))
 }
 
