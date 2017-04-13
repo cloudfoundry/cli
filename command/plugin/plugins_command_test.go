@@ -1,11 +1,11 @@
-package v2_test
+package plugin_test
 
 import (
 	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/v2"
+	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"

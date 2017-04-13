@@ -1,6 +1,7 @@
 package common
 
 import (
+	"code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v3"
 )
@@ -13,7 +14,7 @@ type commandList struct {
 	V3CreateApp     v3.V3CreateAppCommand     `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
 	V3CreatePackage v3.V3CreatePackageCommand `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 
-	AddPluginRepo                      v2.AddPluginRepoCommand                      `command:"add-plugin-repo" description:"Add a new plugin repository"`
+	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
@@ -80,9 +81,9 @@ type commandList struct {
 	Files                              v2.FilesCommand                              `command:"files" alias:"f" description:"Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"`
 	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
-	InstallPlugin                      v2.InstallPluginCommand                      `command:"install-plugin" description:"Install CLI plugin"`
+	InstallPlugin                      plugin.InstallPluginCommand                  `command:"install-plugin" description:"Install CLI plugin"`
 	IsolationSegments                  v3.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
-	ListPluginRepos                    v2.ListPluginReposCommand                    `command:"list-plugin-repos" description:"List all the added plugin repositories"`
+	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v2.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v2.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Logs                               v2.LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
@@ -94,20 +95,20 @@ type commandList struct {
 	OrgUsers                           v2.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Org                                v2.OrgCommand                                `command:"org" description:"Show org info"`
 	Passwd                             v2.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
-	Plugins                            v2.PluginsCommand                            `command:"plugins" description:"List all available plugin commands"`
+	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List all available plugin commands"`
 	PurgeServiceInstance               v2.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v2.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v2.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v2.QuotaCommand                              `command:"quota" description:"Show quota info"`
-	RemovePluginRepo                   v2.RemovePluginRepoCommand                   `command:"remove-plugin-repo" description:"Remove a plugin repository"`
+	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	RenameBuildpack                    v2.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v2.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
 	RenameServiceBroker                v2.RenameServiceBrokerCommand                `command:"rename-service-broker" description:"Rename a service broker"`
 	RenameService                      v2.RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
 	RenameSpace                        v2.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
 	Rename                             v2.RenameCommand                             `command:"rename" description:"Rename an app"`
-	RepoPlugins                        v2.RepoPluginsCommand                        `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
+	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
 	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the isolation segment assignment of a space to the org's default"`
 	Restage                            v2.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v2.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
@@ -160,7 +161,7 @@ type commandList struct {
 	UnbindSecurityGroup                v2.UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
 	UnbindService                      v2.UnbindServiceCommand                      `command:"unbind-service" alias:"us" description:"Unbind a service instance from an app"`
 	UnbindStagingSecurityGroup         v2.UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group" description:"Unbind a security group from the set of security groups for staging applications"`
-	UninstallPlugin                    v2.UninstallPluginCommand                    `command:"uninstall-plugin" description:"Uninstall the plugin defined in command argument"`
+	UninstallPlugin                    plugin.UninstallPluginCommand                `command:"uninstall-plugin" description:"Uninstall the plugin defined in command argument"`
 	UnmapRoute                         v2.UnmapRouteCommand                         `command:"unmap-route" description:"Remove a url route from an app"`
 	UnsetEnv                           v2.UnsetEnvCommand                           `command:"unset-env" description:"Remove an env variable"`
 	UnsetOrgRole                       v2.UnsetOrgRoleCommand                       `command:"unset-org-role" description:"Remove an org role from a user"`
