@@ -56,21 +56,13 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
-    - get: cli-ci
-  - task: generate-credentials
-    file: cli-ci/ci/infrastructure/tasks/param-to-file.yml
-    input_mapping:
-      input: state
-    params:
-      FILE_CONTENTS: {{google_account_creds}}
-      OUTPUT_PATH: ci/infrastructure/hardknox/google_account_creds.json
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
-      bbl-state: param_to_file_output
+      bbl-state: state
     params:
       BBL_IAAS: gcp
-      BBL_GCP_SERVICE_ACCOUNT_KEY: google_account_creds.json
+      BBL_GCP_SERVICE_ACCOUNT_KEY: {{google_account_creds}}
       BBL_GCP_PROJECT_ID: {{gcp_project}}
       BBL_GCP_REGION: us-central1
       BBL_GCP_ZONE: us-central1-f
