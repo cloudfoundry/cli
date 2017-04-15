@@ -67,6 +67,7 @@ var _ = Describe("Config", func() {
 			Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
 			Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 			Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
+			Expect(config.LogLevel()).To(Equal(0))
 
 			Expect(config.PluginRepos()).To(Equal([]PluginRepos{{
 				Name: "CF-Community",
@@ -509,6 +510,22 @@ var _ = Describe("Config", func() {
 				Expect(conf.BinaryVersion()).To(Equal("0.0.0-unknown-version"))
 			})
 		})
+
+		DescribeTable("LogLevel",
+			func(envVal string, expectedLevel int) {
+				config := Config{ENV: EnvOverride{CFLogLevel: envVal}}
+				Expect(config.LogLevel()).To(Equal(expectedLevel))
+			},
+
+			Entry("Default to 0", "", 0),
+			Entry("panic returns 0", "panic", 0),
+			Entry("fatal returns 1", "fatal", 1),
+			Entry("error returns 2", "error", 2),
+			Entry("warn returns 3", "warn", 3),
+			Entry("info returns 4", "info", 4),
+			Entry("debug returns 5", "debug", 5),
+			Entry("dEbUg returns 5", "dEbUg", 5),
+		)
 	})
 
 	Describe("Write Config", func() {

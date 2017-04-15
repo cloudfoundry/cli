@@ -19,6 +19,36 @@ func CF(args ...string) *Session {
 	return session
 }
 
+type CFEnv struct {
+	WorkingDirectory string
+	EnvVars          map[string]string
+	stdin            io.Reader
+}
+
+func CustomCF(cfEnv CFEnv, args ...string) *Session {
+	command := exec.Command("cf", args...)
+	if cfEnv.stdin != nil {
+		command.Stdin = cfEnv.stdin
+	}
+	if cfEnv.WorkingDirectory != "" {
+		command.Dir = cfEnv.WorkingDirectory
+	}
+
+	if cfEnv.EnvVars != nil {
+		env := os.Environ()
+		for key, val := range cfEnv.EnvVars {
+			env = AddOrReplaceEnvironment(env, key, val)
+		}
+	}
+
+	session, err := Start(
+		command,
+		NewPrefixedWriter("OUT: ", GinkgoWriter),
+		NewPrefixedWriter("ERR: ", GinkgoWriter))
+	Expect(err).NotTo(HaveOccurred())
+	return session
+}
+
 func CFWithStdin(stdin io.Reader, args ...string) *Session {
 	command := exec.Command("cf", args...)
 	command.Stdin = stdin

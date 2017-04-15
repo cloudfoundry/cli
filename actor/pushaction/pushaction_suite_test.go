@@ -1,6 +1,8 @@
-package v2_test
+package pushaction_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -9,11 +11,12 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func TestV2(t *testing.T) {
+func TestPushAction(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V2 Command Suite")
+	RunSpecs(t, "Push Actions Suite")
 }
 
 var _ = BeforeEach(func() {
+	SetDefaultEventuallyTimeout(3 * time.Second)
 	log.SetLevel(log.PanicLevel)
 })

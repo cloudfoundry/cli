@@ -12,6 +12,10 @@ func NewSpaceName() string {
 	return PrefixedRandomName("INTEGRATION-SPACE")
 }
 
+func NewAppName() string {
+	return PrefixedRandomName("INTEGRATION-APP")
+}
+
 func RandomUsername() string {
 	return PrefixedRandomName("integration-user")
 }
