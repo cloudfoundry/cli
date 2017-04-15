@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +22,10 @@ func WithHelloWorldApp(f func(dir string)) {
 	defer os.RemoveAll(dir)
 
 	tempfile := filepath.Join(dir, "index.html")
-	err = ioutil.WriteFile(tempfile, []byte("hello world"), 0666)
+	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %d", rand.Int())), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
@@ -37,6 +42,9 @@ func WithBananaPantsApp(f func(dir string)) {
 
 	tempfile := filepath.Join(dir, "index.html")
 	err = ioutil.WriteFile(tempfile, []byte("Banana Pants"), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)

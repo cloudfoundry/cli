@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
 	"code.cloudfoundry.org/cli/util/ui"
+	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -153,6 +154,9 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		if err != nil {
 			return err
 		}
+
+		log.SetOutput(os.Stderr)
+		log.SetLevel(log.Level(cfConfig.LogLevel()))
 
 		err = extendedCmd.Setup(cfConfig, commandUI)
 		if err != nil {

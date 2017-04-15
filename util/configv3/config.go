@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -108,6 +109,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
 		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
 		ForceTTY:         os.Getenv("FORCE_TTY"),
+		CFLogLevel:       os.Getenv("CF_LOG_LEVEL"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -252,6 +254,7 @@ type EnvOverride struct {
 	Experimental     string
 	CFDialTimeout    string
 	ForceTTY         string
+	CFLogLevel       string
 }
 
 // FlagOverride represents all the global flags passed to the CF CLI
@@ -441,6 +444,34 @@ func (config *Config) IsTTY() bool {
 	}
 
 	return config.detectedSettings.tty
+}
+
+// LogLevel returns the global log level. The levels follow Logrus's log level
+// scheme. This value is based off of:
+//   - The $CF_LOG_LEVEL and an int/warn/info/etc...
+//   - Defaults to PANIC/0 (ie no logging)
+func (config *Config) LogLevel() int {
+	if config.ENV.CFLogLevel != "" {
+		envVal, err := strconv.ParseInt(config.ENV.CFLogLevel, 10, 32)
+		if err == nil {
+			return int(envVal)
+		}
+
+		switch strings.ToLower(config.ENV.CFLogLevel) {
+		case "fatal":
+			return 1
+		case "error":
+			return 2
+		case "warn":
+			return 3
+		case "info":
+			return 4
+		case "debug":
+			return 5
+		}
+	}
+
+	return 0
 }
 
 // TerminalWidth returns the width of the terminal from when the config

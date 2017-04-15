@@ -42,9 +42,22 @@ func GetOrgGUID(orgName string) string {
 	return strings.TrimSpace(string(session.Out.Contents()))
 }
 
+func GetSpaceGUID(spaceName string) string {
+	session := CF("space", "--guid", spaceName)
+	Eventually(session).Should(Exit(0))
+	return strings.TrimSpace(string(session.Out.Contents()))
+}
+
 func QuickDeleteOrg(orgName string) {
 	guid := GetOrgGUID(orgName)
 	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
+	session := CF("curl", "-X", "DELETE", url)
+	Eventually(session).Should(Exit(0))
+}
+
+func QuickDeleteSpace(spaceName string) {
+	guid := GetSpaceGUID(spaceName)
+	url := fmt.Sprintf("/v2/spaces/%s?recursive=true&async=true", guid)
 	session := CF("curl", "-X", "DELETE", url)
 	Eventually(session).Should(Exit(0))
 }
