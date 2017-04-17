@@ -9,6 +9,21 @@ import (
 )
 
 type FakeV2Actor struct {
+	CreateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
+	createApplicationMutex       sync.RWMutex
+	createApplicationArgsForCall []struct {
+		application v2action.Application
+	}
+	createApplicationReturns struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
+	createApplicationReturnsOnCall map[int]struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
 	GetApplicationByNameAndSpaceStub        func(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
@@ -25,8 +40,77 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	UpdateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
+	updateApplicationMutex       sync.RWMutex
+	updateApplicationArgsForCall []struct {
+		application v2action.Application
+	}
+	updateApplicationReturns struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
+	updateApplicationReturnsOnCall map[int]struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeV2Actor) CreateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
+	fake.createApplicationMutex.Lock()
+	ret, specificReturn := fake.createApplicationReturnsOnCall[len(fake.createApplicationArgsForCall)]
+	fake.createApplicationArgsForCall = append(fake.createApplicationArgsForCall, struct {
+		application v2action.Application
+	}{application})
+	fake.recordInvocation("CreateApplication", []interface{}{application})
+	fake.createApplicationMutex.Unlock()
+	if fake.CreateApplicationStub != nil {
+		return fake.CreateApplicationStub(application)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createApplicationReturns.result1, fake.createApplicationReturns.result2, fake.createApplicationReturns.result3
+}
+
+func (fake *FakeV2Actor) CreateApplicationCallCount() int {
+	fake.createApplicationMutex.RLock()
+	defer fake.createApplicationMutex.RUnlock()
+	return len(fake.createApplicationArgsForCall)
+}
+
+func (fake *FakeV2Actor) CreateApplicationArgsForCall(i int) v2action.Application {
+	fake.createApplicationMutex.RLock()
+	defer fake.createApplicationMutex.RUnlock()
+	return fake.createApplicationArgsForCall[i].application
+}
+
+func (fake *FakeV2Actor) CreateApplicationReturns(result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.CreateApplicationStub = nil
+	fake.createApplicationReturns = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) CreateApplicationReturnsOnCall(i int, result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.CreateApplicationStub = nil
+	if fake.createApplicationReturnsOnCall == nil {
+		fake.createApplicationReturnsOnCall = make(map[int]struct {
+			result1 v2action.Application
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.createApplicationReturnsOnCall[i] = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeV2Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error) {
@@ -84,11 +168,69 @@ func (fake *FakeV2Actor) GetApplicationByNameAndSpaceReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
+	fake.updateApplicationMutex.Lock()
+	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
+	fake.updateApplicationArgsForCall = append(fake.updateApplicationArgsForCall, struct {
+		application v2action.Application
+	}{application})
+	fake.recordInvocation("UpdateApplication", []interface{}{application})
+	fake.updateApplicationMutex.Unlock()
+	if fake.UpdateApplicationStub != nil {
+		return fake.UpdateApplicationStub(application)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationReturns.result1, fake.updateApplicationReturns.result2, fake.updateApplicationReturns.result3
+}
+
+func (fake *FakeV2Actor) UpdateApplicationCallCount() int {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	return len(fake.updateApplicationArgsForCall)
+}
+
+func (fake *FakeV2Actor) UpdateApplicationArgsForCall(i int) v2action.Application {
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
+	return fake.updateApplicationArgsForCall[i].application
+}
+
+func (fake *FakeV2Actor) UpdateApplicationReturns(result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.UpdateApplicationStub = nil
+	fake.updateApplicationReturns = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) UpdateApplicationReturnsOnCall(i int, result1 v2action.Application, result2 v2action.Warnings, result3 error) {
+	fake.UpdateApplicationStub = nil
+	if fake.updateApplicationReturnsOnCall == nil {
+		fake.updateApplicationReturnsOnCall = make(map[int]struct {
+			result1 v2action.Application
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationReturnsOnCall[i] = struct {
+		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createApplicationMutex.RLock()
+	defer fake.createApplicationMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
+	fake.updateApplicationMutex.RLock()
+	defer fake.updateApplicationMutex.RUnlock()
 	return fake.invocations
 }
 

@@ -520,6 +520,10 @@
     "translation": "{{.CurrentUser}} として経路 {{.URL}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内のサービス・インスタンス {{.ServiceInstanceName}} にバインドしています..."
   },
   {
+    "id": "Binding routes...",
+    "translation": ""
+  },
+  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "{{.username}} としてセキュリティー・グループ {{.security_group}} を実行用のデフォルトにバインドしています"
   },
@@ -2008,6 +2012,10 @@
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} の経路 {{.URL}} を作成しています..."
   },
   {
+    "id": "Creating routes...",
+    "translation": ""
+  },
+  {
     "id": "Creating security group {{.security_group}} as {{.username}}",
     "translation": "{{.username}} としてセキュリティー・グループ {{.security_group}} を作成しています"
   },
@@ -2966,6 +2974,10 @@
   {
     "id": "Getting all services from marketplace...",
     "translation": "マーケットプレイスからすべてのサービスを取得しています..."
+  },
+  {
+    "id": "Getting app info...",
+    "translation": ""
   },
   {
     "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4397,6 +4409,10 @@
   },
   {
     "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "translation": ""
+  },
+  {
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
@@ -6000,12 +6016,20 @@
     "translation": "{{.AppName}} health_check_type を '{{.HealthCheckType}}' に更新しています"
   },
   {
+    "id": "Upload complete",
+    "translation": ""
+  },
+  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "次のパスからアプリ・ファイルをアップロードしています: {{.Path}}"
+  },
+  {
+    "id": "Uploading application...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",

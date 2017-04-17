@@ -21,8 +21,8 @@ const (
 	GetAppInstancesRequest                = "GetAppInstances"
 	GetAppRequest                         = "GetApp"
 	GetAppRoutesRequest                   = "GetAppRoutes"
-	GetAppStatsRequest                    = "GetAppStats"
 	GetAppsRequest                        = "GetApps"
+	GetAppStatsRequest                    = "GetAppStats"
 	GetInfoRequest                        = "GetInfo"
 	GetJobRequest                         = "GetJob"
 	GetOrganizationPrivateDomainsRequest  = "GetOrganizationPrivateDomains"
@@ -41,10 +41,11 @@ const (
 	GetSpaceRoutesRequest                 = "GetSpaceRoutes"
 	GetSpaceRunningSecurityGroupsRequest  = "GetSpaceRunningSecurityGroups"
 	GetSpaceServiceInstancesRequest       = "GetSpaceServiceInstances"
-	GetSpaceStagingSecurityGroupsRequest  = "GetSpaceStagingSecurityGroups"
 	GetSpacesRequest                      = "GetSpaces"
+	GetSpaceStagingSecurityGroupsRequest  = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                       = "GetStack"
 	GetUsersRequest                       = "GetUsers"
+	PostAppRequest                        = "PostApp"
 	PutAppRequest                         = "PutApp"
 	PutSecurityGroupSpaceRequest          = "PutSecurityGroupSpace"
 )
@@ -53,6 +54,7 @@ const (
 // URLs.
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: GetAppsRequest},
+	{Path: "/v2/apps", Method: http.MethodPost, Name: PostAppRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: GetAppRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: PutAppRequest},
 	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: GetAppInstancesRequest},

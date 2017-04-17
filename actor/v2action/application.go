@@ -142,6 +142,12 @@ func (e StartupTimeoutError) Error() string {
 	return fmt.Sprintf("Timed out waiting for application '%s' to start", e.Name)
 }
 
+// CreateApplication creates an application.
+func (actor Actor) CreateApplication(application Application) (Application, Warnings, error) {
+	app, warnings, err := actor.CloudControllerClient.CreateApplication(ccv2.Application(application))
+	return Application(app), Warnings(warnings), err
+}
+
 // GetApplication returns the application
 func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplication(guid)
@@ -351,4 +357,10 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 	}
 
 	return app, allWarnings, nil
+}
+
+// UpdateApplication updates an application.
+func (actor Actor) UpdateApplication(application Application) (Application, Warnings, error) {
+	app, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application(application))
+	return Application(app), Warnings(warnings), err
 }

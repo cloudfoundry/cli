@@ -520,6 +520,10 @@
     "translation": "Associazione della rotta {{.URL}} all'istanza del servizio {{.ServiceInstanceName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.CurrentUser}} in corso..."
   },
   {
+    "id": "Binding routes...",
+    "translation": ""
+  },
+  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "Esecuzione del bind del gruppo di sicurezza {{.security_group}} alle impostazioni predefinite per l'esecuzione come {{.username}}"
   },
@@ -2008,6 +2012,10 @@
     "translation": "Creazione della rotta {{.URL}} per l'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
   {
+    "id": "Creating routes...",
+    "translation": ""
+  },
+  {
     "id": "Creating security group {{.security_group}} as {{.username}}",
     "translation": "Creazione del gruppo di sicurezza {{.security_group}} come {{.username}}"
   },
@@ -2966,6 +2974,10 @@
   {
     "id": "Getting all services from marketplace...",
     "translation": "Richiamo di tutti i servizi dal marketplace in corso..."
+  },
+  {
+    "id": "Getting app info...",
+    "translation": ""
   },
   {
     "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4397,6 +4409,10 @@
   },
   {
     "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "translation": ""
+  },
+  {
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
@@ -6000,12 +6016,20 @@
     "translation": "Aggiornamento di {{.AppName}} health_check_type a '{{.HealthCheckType}}'"
   },
   {
+    "id": "Upload complete",
+    "translation": ""
+  },
+  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "Caricamento dei file di applicazione da: {{.Path}}"
+  },
+  {
+    "id": "Uploading application...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",

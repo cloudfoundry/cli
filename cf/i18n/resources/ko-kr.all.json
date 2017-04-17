@@ -520,6 +520,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.ServiceInstanceName}} 서비스 인스턴스에 {{.URL}} 라우트 바인드 중..."
   },
   {
+    "id": "Binding routes...",
+    "translation": ""
+  },
+  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "{{.username}}(으)로 실행하기 위해 보안 그룹 {{.security_group}}을(를) 기본값에 바인딩"
   },
@@ -2008,6 +2012,10 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.URL}} 라우트 작성 중..."
   },
   {
+    "id": "Creating routes...",
+    "translation": ""
+  },
+  {
     "id": "Creating security group {{.security_group}} as {{.username}}",
     "translation": "{{.username}}(으)로 보안 그룹 {{.security_group}} 작성"
   },
@@ -2966,6 +2974,10 @@
   {
     "id": "Getting all services from marketplace...",
     "translation": "마켓플레이스에서 모든 서비스를 가져오는 중.."
+  },
+  {
+    "id": "Getting app info...",
+    "translation": ""
   },
   {
     "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4397,6 +4409,10 @@
   },
   {
     "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "translation": ""
+  },
+  {
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
@@ -6000,12 +6016,20 @@
     "translation": "{{.AppName}} health_check_type을 '{{.HealthCheckType}}'(으)로 업데이트"
   },
   {
+    "id": "Upload complete",
+    "translation": ""
+  },
+  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "업로드 중인 앱 파일 원본 위치: {{.Path}}"
+  },
+  {
+    "id": "Uploading application...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",

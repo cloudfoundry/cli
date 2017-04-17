@@ -73,6 +73,8 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V2PushCommand) Execute(args []string) error {
+	cmd.UI.DisplayWarning(command.ExperimentalWarning)
+
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
@@ -81,25 +83,25 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	log.Info("collating flags")
 	cliSettings, err := cmd.GetCommandLineSettings()
 	if err != nil {
-		log.Errorf("error reading flags: %s", err.Error())
+		log.Errorf("error reading flags: %v", err)
 		return shared.HandleError(err)
 	}
 
 	//TODO: Read in manifest
 	log.Info("merging manifest and command flags")
-	manifests, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, nil)
+	manifestApplications, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, nil)
 	if err != nil {
-		log.Errorf("error during merge manifest: %s", err.Error())
+		log.Errorf("error during merge manifest: %v", err)
 		return shared.HandleError(err)
 	}
 
 	cmd.UI.DisplayText("Getting app info...")
 
 	log.Info("converting manifests to ApplicationConfigs")
-	appConfigs, warnings, err := cmd.Actor.ConvertToApplicationConfig(cmd.Config.TargetedSpace().GUID, manifests)
+	appConfigs, warnings, err := cmd.Actor.ConvertToApplicationConfig(cmd.Config.TargetedSpace().GUID, manifestApplications)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		log.Errorf("error converting manifest: %s", err.Error())
+		log.Errorf("error converting manifest: %v", err)
 		return shared.HandleError(err)
 	}
 
@@ -138,7 +140,7 @@ func (cmd V2PushCommand) processApplyStreams(appConfig pushaction.ApplicationCon
 		select {
 		case event, ok := <-eventStream:
 			if !ok {
-				log.Debug("recieved event stream closed")
+				log.Debug("received event stream closed")
 				eventClosed = true
 				break
 			}
@@ -149,20 +151,20 @@ func (cmd V2PushCommand) processApplyStreams(appConfig pushaction.ApplicationCon
 			}
 		case warnings, ok := <-warningsStream:
 			if !ok {
-				log.Debug("recieved warnings stream closed")
+				log.Debug("received warnings stream closed")
 				warningsClosed = true
 			}
 			cmd.UI.DisplayWarnings(warnings)
 		case err, ok := <-errorStream:
 			if !ok {
-				log.Debug("recieved error stream closed")
+				log.Debug("received error stream closed")
 				warningsClosed = true
 			}
 			return err
 		}
 
 		if eventClosed && warningsClosed && complete {
-			log.Info("breaking apply display loop")
+			log.Debug("breaking apply display loop")
 			break
 		}
 	}
@@ -171,7 +173,7 @@ func (cmd V2PushCommand) processApplyStreams(appConfig pushaction.ApplicationCon
 }
 
 func (cmd V2PushCommand) processEvent(appConfig pushaction.ApplicationConfig, event pushaction.Event) (bool, error) {
-	log.Infof("recieved apply event: %s", event)
+	log.Infof("received apply event: %s", event)
 
 	switch event {
 	case pushaction.ApplicationCreated:

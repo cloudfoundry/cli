@@ -31,7 +31,7 @@ const (
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
-	Buildpack string `json:"-"`
+	Buildpack string `json:"buildpack,omitempty"`
 
 	// DetectedBuildpack is the buildpack automatically detected.
 	DetectedBuildpack string `json:"-"`
@@ -43,7 +43,7 @@ type Application struct {
 	DiskQuota int `json:"-"`
 
 	// GUID is the unique application identifier.
-	GUID string `json:"-"`
+	GUID string `json:"guid,omitempty"`
 
 	// HealthCheckType is the type of health check that will be done to the app.
 	HealthCheckType string `json:"health_check_type,omitempty"`
@@ -58,13 +58,16 @@ type Application struct {
 	Memory int `json:"-"`
 
 	// Name is the name given to the application.
-	Name string `json:"-"`
+	Name string `json:"name,omitempty"`
 
 	// PackageState represents the staging state of the application bits.
 	PackageState ApplicationPackageState `json:"-"`
 
 	// PackageUpdatedAt is the last time the app bits were updated. In RFC3339.
 	PackageUpdatedAt time.Time `json:"-"`
+
+	// SpaceGUID is the GUID of the app's space.
+	SpaceGUID string `json:"space_guid,omitempty"`
 
 	// StackGUID is the GUID for the Stack the application is running on.
 	StackGUID string `json:"-"`
@@ -128,6 +131,31 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// CreateApplication creates a cloud controller application in with the given
+// settings. SpaceGUID and Name are the only required fields.
+func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
+	body, err := json.Marshal(app)
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostAppRequest,
+		Body:        bytes.NewBuffer(body),
+	})
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	var updatedApp Application
+	response := cloudcontroller.Response{
+		Result: &updatedApp,
+	}
+
+	err = client.connection.Make(request, &response)
+	return updatedApp, response.Warnings, err
+}
+
 // GetApplication returns back an Application.
 func (client *Client) GetApplication(guid string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -174,7 +202,11 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 	return fullAppsList, warnings, err
 }
 
+// UpdateApplication updates the application with the given GUID.
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
+	appGUID := app.GUID
+	app.GUID = ""
+
 	body, err := json.Marshal(app)
 	if err != nil {
 		return Application{}, nil, err
@@ -182,7 +214,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutAppRequest,
-		URIParams:   Params{"app_guid": app.GUID},
+		URIParams:   Params{"app_guid": appGUID},
 		Body:        bytes.NewBuffer(body),
 	})
 	if err != nil {
