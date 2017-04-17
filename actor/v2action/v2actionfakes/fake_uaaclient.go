@@ -9,18 +9,18 @@ import (
 )
 
 type FakeUAAClient struct {
-	NewUserStub        func(username string, password string, origin string) (uaa.User, error)
-	newUserMutex       sync.RWMutex
-	newUserArgsForCall []struct {
+	CreateUserStub        func(username string, password string, origin string) (uaa.User, error)
+	createUserMutex       sync.RWMutex
+	createUserArgsForCall []struct {
 		username string
 		password string
 		origin   string
 	}
-	newUserReturns struct {
+	createUserReturns struct {
 		result1 uaa.User
 		result2 error
 	}
-	newUserReturnsOnCall map[int]struct {
+	createUserReturnsOnCall map[int]struct {
 		result1 uaa.User
 		result2 error
 	}
@@ -28,54 +28,54 @@ type FakeUAAClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) NewUser(username string, password string, origin string) (uaa.User, error) {
-	fake.newUserMutex.Lock()
-	ret, specificReturn := fake.newUserReturnsOnCall[len(fake.newUserArgsForCall)]
-	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
+func (fake *FakeUAAClient) CreateUser(username string, password string, origin string) (uaa.User, error) {
+	fake.createUserMutex.Lock()
+	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
+	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
 		username string
 		password string
 		origin   string
 	}{username, password, origin})
-	fake.recordInvocation("NewUser", []interface{}{username, password, origin})
-	fake.newUserMutex.Unlock()
-	if fake.NewUserStub != nil {
-		return fake.NewUserStub(username, password, origin)
+	fake.recordInvocation("CreateUser", []interface{}{username, password, origin})
+	fake.createUserMutex.Unlock()
+	if fake.CreateUserStub != nil {
+		return fake.CreateUserStub(username, password, origin)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.newUserReturns.result1, fake.newUserReturns.result2
+	return fake.createUserReturns.result1, fake.createUserReturns.result2
 }
 
-func (fake *FakeUAAClient) NewUserCallCount() int {
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
-	return len(fake.newUserArgsForCall)
+func (fake *FakeUAAClient) CreateUserCallCount() int {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return len(fake.createUserArgsForCall)
 }
 
-func (fake *FakeUAAClient) NewUserArgsForCall(i int) (string, string, string) {
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
-	return fake.newUserArgsForCall[i].username, fake.newUserArgsForCall[i].password, fake.newUserArgsForCall[i].origin
+func (fake *FakeUAAClient) CreateUserArgsForCall(i int) (string, string, string) {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return fake.createUserArgsForCall[i].username, fake.createUserArgsForCall[i].password, fake.createUserArgsForCall[i].origin
 }
 
-func (fake *FakeUAAClient) NewUserReturns(result1 uaa.User, result2 error) {
-	fake.NewUserStub = nil
-	fake.newUserReturns = struct {
+func (fake *FakeUAAClient) CreateUserReturns(result1 uaa.User, result2 error) {
+	fake.CreateUserStub = nil
+	fake.createUserReturns = struct {
 		result1 uaa.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) NewUserReturnsOnCall(i int, result1 uaa.User, result2 error) {
-	fake.NewUserStub = nil
-	if fake.newUserReturnsOnCall == nil {
-		fake.newUserReturnsOnCall = make(map[int]struct {
+func (fake *FakeUAAClient) CreateUserReturnsOnCall(i int, result1 uaa.User, result2 error) {
+	fake.CreateUserStub = nil
+	if fake.createUserReturnsOnCall == nil {
+		fake.createUserReturnsOnCall = make(map[int]struct {
 			result1 uaa.User
 			result2 error
 		})
 	}
-	fake.newUserReturnsOnCall[i] = struct {
+	fake.createUserReturnsOnCall[i] = struct {
 		result1 uaa.User
 		result2 error
 	}{result1, result2}
@@ -84,8 +84,8 @@ func (fake *FakeUAAClient) NewUserReturnsOnCall(i int, result1 uaa.User, result2
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
 	return fake.invocations
 }
 

@@ -37,8 +37,8 @@ type newUserResponse struct {
 	ID string `json:"id"`
 }
 
-// NewUser creates a new UAA user account with the provided password.
-func (client *Client) NewUser(user string, password string, origin string) (User, error) {
+// CreateUser creates a new UAA user account with the provided password.
+func (client *Client) CreateUser(user string, password string, origin string) (User, error) {
 	userRequest := newUserRequestBody{
 		Username: user,
 		Password: password,
@@ -61,7 +61,7 @@ func (client *Client) NewUser(user string, password string, origin string) (User
 	}
 
 	request, err := client.newRequest(requestOptions{
-		RequestName: internal.NewUserRequest,
+		RequestName: internal.PostUserRequest,
 		Header: http.Header{
 			"Content-Type": {"application/json"},
 		},

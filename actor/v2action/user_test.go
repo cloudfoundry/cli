@@ -24,7 +24,7 @@ var _ = Describe("User Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, fakeUAAClient)
 	})
 
-	Describe("NewUser", func() {
+	Describe("CreateUser", func() {
 		var (
 			actualUser     User
 			actualWarnings Warnings
@@ -32,7 +32,7 @@ var _ = Describe("User Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			actualUser, actualWarnings, actualErr = actor.NewUser("some-new-user", "some-password", "some-origin")
+			actualUser, actualWarnings, actualErr = actor.CreateUser("some-new-user", "some-password", "some-origin")
 		})
 
 		Context("when no API errors occur", func() {
@@ -42,13 +42,13 @@ var _ = Describe("User Actions", func() {
 				createdUser = ccv2.User{
 					GUID: "new-user-cc-guid",
 				}
-				fakeUAAClient.NewUserReturns(
+				fakeUAAClient.CreateUserReturns(
 					uaa.User{
 						ID: "new-user-uaa-id",
 					},
 					nil,
 				)
-				fakeCloudControllerClient.NewUserReturns(
+				fakeCloudControllerClient.CreateUserReturns(
 					createdUser,
 					ccv2.Warnings{
 						"warning-1",
@@ -64,14 +64,14 @@ var _ = Describe("User Actions", func() {
 				Expect(actualUser).To(Equal(User(createdUser)))
 				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
 
-				Expect(fakeUAAClient.NewUserCallCount()).To(Equal(1))
-				username, password, origin := fakeUAAClient.NewUserArgsForCall(0)
+				Expect(fakeUAAClient.CreateUserCallCount()).To(Equal(1))
+				username, password, origin := fakeUAAClient.CreateUserArgsForCall(0)
 				Expect(username).To(Equal("some-new-user"))
 				Expect(password).To(Equal("some-password"))
 				Expect(origin).To(Equal("some-origin"))
 
-				Expect(fakeCloudControllerClient.NewUserCallCount()).To(Equal(1))
-				uaaUserID := fakeCloudControllerClient.NewUserArgsForCall(0)
+				Expect(fakeCloudControllerClient.CreateUserCallCount()).To(Equal(1))
+				uaaUserID := fakeCloudControllerClient.CreateUserArgsForCall(0)
 				Expect(uaaUserID).To(Equal("new-user-uaa-id"))
 			})
 		})
@@ -81,7 +81,7 @@ var _ = Describe("User Actions", func() {
 
 			BeforeEach(func() {
 				returnedErr = errors.New("some UAA error")
-				fakeUAAClient.NewUserReturns(
+				fakeUAAClient.CreateUserReturns(
 					uaa.User{
 						ID: "new-user-uaa-id",
 					},
@@ -99,13 +99,13 @@ var _ = Describe("User Actions", func() {
 
 			BeforeEach(func() {
 				returnedErr = errors.New("CC error")
-				fakeUAAClient.NewUserReturns(
+				fakeUAAClient.CreateUserReturns(
 					uaa.User{
 						ID: "new-user-uaa-id",
 					},
 					nil,
 				)
-				fakeCloudControllerClient.NewUserReturns(
+				fakeCloudControllerClient.CreateUserReturns(
 					ccv2.User{},
 					ccv2.Warnings{
 						"warning-1",

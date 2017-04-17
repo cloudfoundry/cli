@@ -95,7 +95,7 @@ var _ = Describe("create-user Command", func() {
 
 			Context("when origin is not UAA or the empty string", func() {
 				BeforeEach(func() {
-					fakeActor.NewUserReturns(
+					fakeActor.CreateUserReturns(
 						v2action.User{GUID: "new-user-cc-guid"},
 						v2action.Warnings{"warning"},
 						nil)
@@ -105,8 +105,8 @@ var _ = Describe("create-user Command", func() {
 				It("creates the user and displays all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.NewUserCallCount()).To(Equal(1))
-					username, password, origin := fakeActor.NewUserArgsForCall(0)
+					Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
+					username, password, origin := fakeActor.CreateUserArgsForCall(0)
 					Expect(username).To(Equal("some-user"))
 					Expect(password).To(Equal(""))
 					Expect(origin).To(Equal("some-origin"))
@@ -121,7 +121,7 @@ var _ = Describe("create-user Command", func() {
 
 		Context("when no errors occur", func() {
 			BeforeEach(func() {
-				fakeActor.NewUserReturns(
+				fakeActor.CreateUserReturns(
 					v2action.User{GUID: "new-user-cc-guid"},
 					v2action.Warnings{"warning"},
 					nil)
@@ -131,8 +131,8 @@ var _ = Describe("create-user Command", func() {
 			It("creates the user and displays all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeActor.NewUserCallCount()).To(Equal(1))
-				username, password, origin := fakeActor.NewUserArgsForCall(0)
+				Expect(fakeActor.CreateUserCallCount()).To(Equal(1))
+				username, password, origin := fakeActor.CreateUserArgsForCall(0)
 				Expect(username).To(Equal("some-user"))
 				Expect(password).To(Equal("some-password"))
 				Expect(origin).To(Equal("some-origin"))
@@ -150,7 +150,7 @@ var _ = Describe("create-user Command", func() {
 
 				BeforeEach(func() {
 					returnedErr = errors.New("non-translatable error")
-					fakeActor.NewUserReturns(
+					fakeActor.CreateUserReturns(
 						v2action.User{},
 						v2action.Warnings{"warning-1", "warning-2"},
 						returnedErr)
@@ -168,7 +168,7 @@ var _ = Describe("create-user Command", func() {
 
 				BeforeEach(func() {
 					returnedErr = uaa.ConflictError{}
-					fakeActor.NewUserReturns(
+					fakeActor.CreateUserReturns(
 						v2action.User{},
 						v2action.Warnings{"warning-1", "warning-2"},
 						returnedErr)

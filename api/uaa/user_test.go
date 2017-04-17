@@ -18,7 +18,7 @@ var _ = Describe("User", func() {
 		client = NewTestUAAClientAndStore()
 	})
 
-	Describe("NewUser", func() {
+	Describe("CreateUser", func() {
 		Context("when no errors occur", func() {
 			Context("when creating user with origin", func() {
 				BeforeEach(func() {
@@ -35,7 +35,7 @@ var _ = Describe("User", func() {
 				})
 
 				It("creates a new user", func() {
-					user, err := client.NewUser("new-user", "", "some-origin")
+					user, err := client.CreateUser("new-user", "", "some-origin")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(user).To(Equal(User{
@@ -58,7 +58,7 @@ var _ = Describe("User", func() {
 				})
 
 				It("creates a new user", func() {
-					user, err := client.NewUser("new-user", "new-password", "")
+					user, err := client.CreateUser("new-user", "new-password", "")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(user).To(Equal(User{
@@ -84,7 +84,7 @@ var _ = Describe("User", func() {
 			})
 
 			It("returns the error", func() {
-				_, err := client.NewUser("new-user", "new-password", "")
+				_, err := client.CreateUser("new-user", "new-password", "")
 				Expect(err).To(MatchError(RawHTTPStatusError{
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
