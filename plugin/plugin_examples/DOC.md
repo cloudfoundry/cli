@@ -1,5 +1,5 @@
 
-##Plugin API
+## Plugin API
 We wrote the Plugin API to make it easy for plugins to consume output from calling CLI commands.  Previously, plugins needed to parse the terminal output which was not optimal.  Before we wrote the API, only 2 methods were available to plugins: 
 ```
 CliCommand()
