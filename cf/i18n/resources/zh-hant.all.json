@@ -520,6 +520,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分將路徑 {{.URL}} 新增至組織 {{.OrgName}}/空間 {{.SpaceName}} 中的服務實例 {{.ServiceInstanceName}}..."
   },
   {
+    "id": "Binding routes...",
+    "translation": ""
+  },
+  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "正在將安全群組 {{.security_group}} 連結至以 {{.username}} 身分執行的預設值"
   },
@@ -2008,6 +2012,10 @@
     "translation": "正在以 {{.Username}} 身分建立組織 {{.OrgName}}/空間 {{.SpaceName}} 的路徑 {{.URL}}..."
   },
   {
+    "id": "Creating routes...",
+    "translation": ""
+  },
+  {
     "id": "Creating security group {{.security_group}} as {{.username}}",
     "translation": "正在以 {{.username}} 身分建立安全群組 {{.security_group}}"
   },
@@ -2966,6 +2974,10 @@
   {
     "id": "Getting all services from marketplace...",
     "translation": "正在從市場取得所有服務..."
+  },
+  {
+    "id": "Getting app info...",
+    "translation": ""
   },
   {
     "id": "Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4397,6 +4409,10 @@
   },
   {
     "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
+    "translation": ""
+  },
+  {
+    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
@@ -6000,12 +6016,20 @@
     "translation": "正在將 {{.AppName}} health_check_type 更新為 '{{.HealthCheckType}}'"
   },
   {
+    "id": "Upload complete",
+    "translation": ""
+  },
+  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "正在從 {{.Path}} 上傳應用程式檔案"
+  },
+  {
+    "id": "Uploading application...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",

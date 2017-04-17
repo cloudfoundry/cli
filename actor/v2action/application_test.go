@@ -170,6 +170,98 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("CreateApplication", func() {
+		Context("when the create is successful", func() {
+			var expectedApp ccv2.Application
+			BeforeEach(func() {
+				expectedApp = ccv2.Application{
+					GUID:      "some-app-guid",
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				fakeCloudControllerClient.CreateApplicationReturns(expectedApp, ccv2.Warnings{"some-app-warning-1"}, nil)
+			})
+
+			It("creates and returns the application", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				app, warnings, err := actor.CreateApplication(newApp)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
+				Expect(app).To(Equal(Application(expectedApp)))
+
+				Expect(fakeCloudControllerClient.CreateApplicationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(ccv2.Application(newApp)))
+			})
+		})
+
+		Context("when the client returns back an error", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("some create app error")
+				fakeCloudControllerClient.CreateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"some-app-warning-1"}, expectedErr)
+			})
+
+			It("returns warnings and an error", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				_, warnings, err := actor.CreateApplication(newApp)
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+	})
+
+	Describe("UpdateApplication", func() {
+		Context("when the update is successful", func() {
+			var expectedApp ccv2.Application
+			BeforeEach(func() {
+				expectedApp = ccv2.Application{
+					GUID:      "some-app-guid",
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				fakeCloudControllerClient.UpdateApplicationReturns(expectedApp, ccv2.Warnings{"some-app-warning-1"}, nil)
+			})
+
+			It("updates and returns the application", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				app, warnings, err := actor.UpdateApplication(newApp)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
+				Expect(app).To(Equal(Application(expectedApp)))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(ccv2.Application(newApp)))
+			})
+		})
+
+		Context("when the client returns back an error", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("some update app error")
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"some-app-warning-1"}, expectedErr)
+			})
+
+			It("returns warnings and an error", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				_, warnings, err := actor.UpdateApplication(newApp)
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+	})
+
 	Describe("GetApplication", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {

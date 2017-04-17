@@ -565,6 +565,13 @@
     ". Process to uninstall ...",
     "Error invoking plugin: ",
     "An unexpected type of error",
+    "breaking apply display loop",
+    "collating flags",
+    "converting manifests to ApplicationConfigs",
+    "merging manifest and command flags",
+    "received error stream closed",
+    "received event stream closed",
+    "received warnings stream closed",
 
     "(?i).*(?:token|password).*",
     "Host",

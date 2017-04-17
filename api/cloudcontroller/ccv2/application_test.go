@@ -18,6 +18,74 @@ var _ = Describe("Application", func() {
 		client = NewTestClient()
 	})
 
+	Describe("CreateApplication", func() {
+		Context("when the update is successful", func() {
+			Context("when setting the minimum", func() { // are we **only** encoding the things we want
+				BeforeEach(func() {
+					response := `
+						{
+							"metadata": {
+								"guid": "some-app-guid"
+							},
+							"entity": {
+								"name": "some-app-name",
+								"space_guid": "some-space-guid"
+							}
+						}`
+					requestBody := map[string]string{
+						"name":       "some-app-name",
+						"space_guid": "some-space-guid",
+					}
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v2/apps"),
+							VerifyJSONRepresenting(requestBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the created object and warnings", func() {
+					app, warnings, err := client.CreateApplication(Application{
+						Name:      "some-app-name",
+						SpaceGUID: "some-space-guid",
+					})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(app).To(Equal(Application{
+						GUID: "some-app-guid",
+						Name: "some-app-name",
+					}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
+			})
+		})
+
+		Context("when the create returns an error", func() {
+			BeforeEach(func() {
+				response := `
+					{
+						"description": "Request invalid due to parse error: Field: name, Error: Missing field name, Field: space_guid, Error: Missing field space_guid",
+						"error_code": "CF-MessageParseError",
+						"code": 1001
+					}
+			`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/apps"),
+						RespondWith(http.StatusBadRequest, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := client.CreateApplication(Application{})
+				Expect(err).To(MatchError(ccerror.BadRequestError{Message: "Request invalid due to parse error: Field: name, Error: Missing field name, Field: space_guid, Error: Missing field space_guid"}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetApplication", func() {
 		BeforeEach(func() {
 			response := `{
