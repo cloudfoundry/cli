@@ -2508,7 +2508,7 @@
 * Sanitize now works on passwords containing double quotes
 * Change how space tip is presented to user - add quotes. 
 
-##6.12.4
+## 6.12.4
 * Merge pull request #589 from cloudfoundry/usage-on-unadorned-push Provide usage on unadorned push
 * Provide usage on unadorned push [#103419480]
 * Update dependencies away from code.google.com [#103336616]
@@ -2527,7 +2527,7 @@
 * fix panic in create-app-manifest [#101367528]
 * remove inappropriate error message
 
-##6.12.3
+## 6.12.3
 * Insert debug messages into CI script
 * Merge pull request #544 from cloudfoundry/code-tidy Code tidy
 * Merge pull request #523 from zachgersh/master Unmarshal the extra field, get documentation url
@@ -2644,7 +2644,7 @@
 * SpaceManager and SpaceAuditor should receive 403 [#87481016]
 * Reduce API calls when CRU operations of service keys [#93578300]
 
-##6.12.2
+## 6.12.2
 * convert create-service to non-codegangsta [#97061558]
 * remove used constructor in cmd logs 
 * convert marketplace to non-codegangsta [#97061558] 
@@ -2676,7 +2676,7 @@
 * Update README.md
 * fix bug in plugin API HasAPIEndpoint() 
 
-##6.12.1
+## 6.12.1
 * improve method to compare domains of local and redirecting target [98132086]
 * Updated config repo fake
 * only copy Authorization header when redirecting to same base domain [98132086]
@@ -2686,7 +2686,7 @@
 * security-groups to not use inline-relation-depth to populate spaces model [96033766]
 * add spaces_url field to SecurityGroup model [96033766]
 
-##6.12.0 
+## 6.12.0 
 * Merge pull request #487 from cloudfoundry/96912324-disable-service-access-performance
   - Improve performance of disable-service-access
 * Update plugin_examples/README.md 
@@ -2917,7 +2917,7 @@ getSpaces returns SpaceSummary
 * Fixed error message when there is a mismatch in the order of arguments for create-buildpack. Story in CLI [#82598260].
 * Removed as admin.. clause from create-user since it is confusing. Story in CLI [#74893356].
 
-##v6.11.3
+## v6.11.3
 * Improve Tip for bind-service command [#94153632]
 * fix bug where app's PackageState is incorrectly set in restage [#93382608]
 * Merge branch 'hwcf-issue-32' of https://github.com/HuaweiTech/cli into HuaweiTech-hwcf-issue-32
@@ -2948,7 +2948,7 @@ getSpaces returns SpaceSummary
 * add delete service key command [#87062548]
 * Fix for stack and stacks command
 
-##v6.11.2
+## v6.11.2
 * not renewing noaa consumer on every push instead, we instruct noaa to stop reconnecting in the background
 * hardcode doppler endpoints into config getter [#93208696]
 * Fix for stack and stacks command
@@ -2957,7 +2957,7 @@ getSpaces returns SpaceSummary
 * Merge pull request #396 from xingzhou/service_key_list added service keys command
 * minor fixes for max's comments on service key list PR [#87057920]
 
-##v6.11.1
+## v6.11.1
 * close channel properly during re-auth when connecting with noaa [#92716720]
 * 20 second timeout for connecting to logging server while pushing [#92702342]
 * mutex to avoid race condition [#92702342]
@@ -2968,7 +2968,7 @@ getSpaces returns SpaceSummary
 * fix panicing when slice contains invalid values [#92135482]
 * Updated gi18n binary name
 
-##v6.11.0
+## v6.11.0
 * Fixed more version checking tests 
 * Fixed version check tests 
 * Changed update message to min-cli-version, not min-reccommended-version 
@@ -3080,7 +3080,7 @@ updated without talking to the service broker.
 * ginkgo matcher to assert string output order 
 * Adding a way to see Security Group Rules
 
-##v6.10.0
+## v6.10.0
 * rename default plugin repo
 * Update README.md 
 * Merge pull request #349 
@@ -3144,7 +3144,7 @@ updated without talking to the service broker.
 * `create-app-manifest` now named the file <app-name>_manifest.yml [#86561764]
 * Update README.md 
 
-##v6.9.0 
+## v6.9.0 
 * Merge PR #333: CLI sends async request for service instance provisioning
 * Revert "new command user-provided-services" [#79188196]
 * cf service(s) emits 'available' for services that do have a state. [#86181724]
@@ -3233,7 +3233,7 @@ updated without talking to the service broker.
 * remove unsed code in mainfest.go 
 * Fix in clearing space fields of config data on cf space-delete 
 
-##v6.8.0
+## v6.8.0
 * Allows plugin to be installed from an Url [#80043644]
 * Allows mutliple plugins with blank aliases. [#84241752]
 * Remove commented line in update_service_test 
@@ -3345,7 +3345,7 @@ updated without talking to the service broker.
 * User is warned when creating a service that incurs cost 
 * edit cf CLI dev guide README 
 
-##v6.7.0
+## v6.7.0
 * Display correct information about app in copy-source -Restart app.Start/Stop/Restart/WatchStaging by passing org and
 space name instead of assuming config contained correct information [finishes #81219748]
 
@@ -3444,7 +3444,7 @@ printing a long line of empty spaces [finish #79025838]
 
 * cf exit gracefully when i18n.T() is not initialized for configurations [Finishes #80759488]
 
-##v6.6.2
+## v6.6.2
 * Bump version to 6.6.2
 * Update usage text for install/uninstall-plugin [finishes #80770062][finishes #80701742]
 * Move test setup into beforeEach of plan_builder_test
@@ -3521,7 +3521,7 @@ invalid config in the home directory (the real home dir) [finishes #79305568]
 * First pass at rpc model - have hardcoded port 20001
 - sleep for 3 seconds waiting for rpc server [Finishes #78397654]
 
-##v6.6.1
+## v6.6.1
 * Bump version to 6.6.1
 * fix argument in callCoreCommand()
 * Fix http_test.go to be OS independent [#79151902]
