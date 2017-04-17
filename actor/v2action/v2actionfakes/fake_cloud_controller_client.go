@@ -428,17 +428,17 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	NewUserStub        func(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
-	newUserMutex       sync.RWMutex
-	newUserArgsForCall []struct {
+	CreateUserStub        func(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
+	createUserMutex       sync.RWMutex
+	createUserArgsForCall []struct {
 		uaaUserID string
 	}
-	newUserReturns struct {
+	createUserReturns struct {
 		result1 ccv2.User
 		result2 ccv2.Warnings
 		result3 error
 	}
-	newUserReturnsOnCall map[int]struct {
+	createUserReturnsOnCall map[int]struct {
 		result1 ccv2.User
 		result2 ccv2.Warnings
 		result3 error
@@ -2109,53 +2109,53 @@ func (fake *FakeCloudControllerClient) GetStackReturnsOnCall(i int, result1 ccv2
 }
 
 func (fake *FakeCloudControllerClient) CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error) {
-	fake.newUserMutex.Lock()
-	ret, specificReturn := fake.newUserReturnsOnCall[len(fake.newUserArgsForCall)]
-	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
+	fake.createUserMutex.Lock()
+	ret, specificReturn := fake.createUserReturnsOnCall[len(fake.createUserArgsForCall)]
+	fake.createUserArgsForCall = append(fake.createUserArgsForCall, struct {
 		uaaUserID string
 	}{uaaUserID})
-	fake.recordInvocation("NewUser", []interface{}{uaaUserID})
-	fake.newUserMutex.Unlock()
-	if fake.NewUserStub != nil {
-		return fake.NewUserStub(uaaUserID)
+	fake.recordInvocation("CreateUser", []interface{}{uaaUserID})
+	fake.createUserMutex.Unlock()
+	if fake.CreateUserStub != nil {
+		return fake.CreateUserStub(uaaUserID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.newUserReturns.result1, fake.newUserReturns.result2, fake.newUserReturns.result3
+	return fake.createUserReturns.result1, fake.createUserReturns.result2, fake.createUserReturns.result3
 }
 
-func (fake *FakeCloudControllerClient) NewUserCallCount() int {
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
-	return len(fake.newUserArgsForCall)
+func (fake *FakeCloudControllerClient) CreateUserCallCount() int {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return len(fake.createUserArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) NewUserArgsForCall(i int) string {
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
-	return fake.newUserArgsForCall[i].uaaUserID
+func (fake *FakeCloudControllerClient) CreateUserArgsForCall(i int) string {
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
+	return fake.createUserArgsForCall[i].uaaUserID
 }
 
-func (fake *FakeCloudControllerClient) NewUserReturns(result1 ccv2.User, result2 ccv2.Warnings, result3 error) {
-	fake.NewUserStub = nil
-	fake.newUserReturns = struct {
+func (fake *FakeCloudControllerClient) CreateUserReturns(result1 ccv2.User, result2 ccv2.Warnings, result3 error) {
+	fake.CreateUserStub = nil
+	fake.createUserReturns = struct {
 		result1 ccv2.User
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) NewUserReturnsOnCall(i int, result1 ccv2.User, result2 ccv2.Warnings, result3 error) {
-	fake.NewUserStub = nil
-	if fake.newUserReturnsOnCall == nil {
-		fake.newUserReturnsOnCall = make(map[int]struct {
+func (fake *FakeCloudControllerClient) CreateUserReturnsOnCall(i int, result1 ccv2.User, result2 ccv2.Warnings, result3 error) {
+	fake.CreateUserStub = nil
+	if fake.createUserReturnsOnCall == nil {
+		fake.createUserReturnsOnCall = make(map[int]struct {
 			result1 ccv2.User
 			result2 ccv2.Warnings
 			result3 error
 		})
 	}
-	fake.newUserReturnsOnCall[i] = struct {
+	fake.createUserReturnsOnCall[i] = struct {
 		result1 ccv2.User
 		result2 ccv2.Warnings
 		result3 error
@@ -2657,8 +2657,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceStagingSecurityGroupsBySpaceMutex.RUnlock()
 	fake.getStackMutex.RLock()
 	defer fake.getStackMutex.RUnlock()
-	fake.newUserMutex.RLock()
-	defer fake.newUserMutex.RUnlock()
+	fake.createUserMutex.RLock()
+	defer fake.createUserMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.targetCFMutex.RLock()

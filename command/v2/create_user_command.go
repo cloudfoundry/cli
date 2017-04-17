@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter . CreateUserActor
 
 type CreateUserActor interface {
-	NewUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error)
+	CreateUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error)
 }
 
 type CreateUserCommand struct {
@@ -70,7 +70,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		"TargetUser": cmd.Args.Username,
 	})
 
-	_, warnings, err := cmd.Actor.NewUser(cmd.Args.Username, password, cmd.Origin)
+	_, warnings, err := cmd.Actor.CreateUser(cmd.Args.Username, password, cmd.Origin)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
