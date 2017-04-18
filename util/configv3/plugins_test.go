@@ -327,13 +327,17 @@ var _ = Describe("Config", func() {
 
 		Context("when an error is encountered", func() {
 			BeforeEach(func() {
-				err := os.Chmod(filepath.Join(homeDir, ".cf", "plugins", "config.json"), 0000)
+				pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
+				err := os.Remove(pluginConfigPath)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Mkdir(pluginConfigPath, 0700)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("returns the error", func() {
 				err := config.WritePluginConfig()
-				Expect(err).To(MatchError(MatchRegexp("permission denied")))
+				_, ok := err.(*os.PathError)
+				Expect(ok).To(BeTrue())
 			})
 		})
 	})
