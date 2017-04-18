@@ -127,6 +127,15 @@ func (cmd *Scale) Execute(c flags.FlagContext) error {
 
 	if c.IsSet("i") {
 		instances := c.Int("i")
+		if instances == 0 {
+			response := cmd.ui.Confirm(T("Are you sure you want to scale {{.AppName}} to 0 instances?",
+				map[string]interface{}{
+					"AppName": terminal.EntityNameColor(currentApp.Name),
+				}))
+			if !response {
+				return
+			}
+		}
 		params.InstanceCount = &instances
 	}
 

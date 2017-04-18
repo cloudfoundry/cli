@@ -4912,6 +4912,11 @@
     "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Are you sure you want to scale {{.AppName}} to 0 instances?",
+    "translation": "Are you sure you want to scale {{.AppName}} to 0 instances?",
+    "modified": false
+  },
+  {
     "id": "Security Groups:",
     "translation": "Security Groups:"
   },
