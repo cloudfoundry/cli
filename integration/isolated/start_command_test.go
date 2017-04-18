@@ -3,6 +3,7 @@ package isolated
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -197,6 +198,8 @@ applications:
 							appName = helpers.PrefixedRandomName("app")
 							domainName = defaultSharedDomain()
 							helpers.WithHelloWorldApp(func(appDir string) {
+								err := os.Remove(filepath.Join(appDir, "Staticfile"))
+								Expect(err).ToNot(HaveOccurred())
 								Eventually(helpers.CF("push", appName, "-p", appDir, "--no-start")).Should(Exit(0))
 							})
 						})
