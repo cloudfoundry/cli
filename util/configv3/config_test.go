@@ -567,13 +567,17 @@ var _ = Describe("Config", func() {
 				err := WriteConfig(config)
 				Expect(err).ToNot(HaveOccurred())
 
-				err = os.Chmod(filepath.Join(homeDir, ".cf", "config.json"), 0000)
+				configFilePath := filepath.Join(homeDir, ".cf", "config.json")
+				err = os.Remove(configFilePath)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Mkdir(configFilePath, 0700)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("returns the error", func() {
 				err := WriteConfig(config)
-				Expect(err).To(MatchError(MatchRegexp("permission denied")))
+				_, ok := err.(*os.PathError)
+				Expect(ok).To(BeTrue())
 			})
 		})
 	})
