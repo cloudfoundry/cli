@@ -144,7 +144,7 @@ var _ = Describe("Logs Command", func() {
 					response, err := http.Get(fmt.Sprintf("http://%s.%s", appName, defaultSharedDomain()))
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.StatusCode).To(Equal(http.StatusOK))
-					Eventually(session).Should(Say("%s \\[APP/PROC/WEB/0\\]\\s+OUT .*? \"GET / HTTP/1.1\" 200 11", helpers.ISO8601Regex))
+					Eventually(session).Should(Say("%s \\[APP/PROC/WEB/0\\]\\s+OUT .*? \"GET / HTTP/1.1\" 200 \\d+", helpers.ISO8601Regex))
 				})
 			})
 

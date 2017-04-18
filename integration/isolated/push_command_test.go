@@ -184,11 +184,11 @@ applications:
 					Expect(err).ToNot(HaveOccurred())
 
 					session := helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")
-					Eventually(session.Out).Should(Say("Uploading .+, 2 files"))
+					Eventually(session.Out).Should(Say("Uploading .+, 3 files"))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")
-					Eventually(session.Out).Should(Say("Uploading .+, 1 files"))
+					Eventually(session.Out).Should(Say("Uploading .+, 2 files"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
