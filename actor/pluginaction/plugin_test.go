@@ -111,18 +111,18 @@ var _ = Describe("UninstallPlugin", func() {
 
 		Context("when deleting the plugin binary returns any other error", func() {
 			BeforeEach(func() {
-				err = os.Chmod(pluginHome, 0000)
+				err = os.Remove(binaryPath)
 				Expect(err).ToNot(HaveOccurred())
-			})
-
-			AfterEach(func() {
-				err = os.Chmod(pluginHome, 0700)
+				err = os.Mkdir(binaryPath, 0700)
+				Expect(err).ToNot(HaveOccurred())
+				err = ioutil.WriteFile(filepath.Join(binaryPath, "foooooo"), nil, 0500)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("does not return the error and removes the plugin config", func() {
 				err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-				Expect(err).To(MatchError(MatchRegexp("permission denied")))
+				_, ok := err.(*os.PathError)
+				Expect(ok).To(BeTrue())
 
 				Expect(fakeConfig.RemovePluginCallCount()).To(Equal(0))
 				Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(0))
