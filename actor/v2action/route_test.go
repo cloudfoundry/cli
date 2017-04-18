@@ -250,7 +250,7 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the application routes and any warnings", func() {
-				routes, warnings, err := actor.GetApplicationRoutes("application-guid", nil)
+				routes, warnings, err := actor.GetApplicationRoutes("application-guid")
 				Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)).To(Equal("application-guid"))
 				Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(2))
@@ -286,7 +286,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
-					routes, warnings, err := actor.GetApplicationRoutes("application-guid", nil)
+					routes, warnings, err := actor.GetApplicationRoutes("application-guid")
 					Expect(warnings).To(ConsistOf("application-routes-warning"))
 					Expect(err).To(MatchError("get-application-routes-error"))
 					Expect(routes).To(BeNil())
@@ -308,7 +308,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
-					routes, warnings, err := actor.GetApplicationRoutes("application-guid", nil)
+					routes, warnings, err := actor.GetApplicationRoutes("application-guid")
 					Expect(warnings).To(ConsistOf("domain-warning"))
 					Expect(err).To(MatchError("get-domain-error"))
 					Expect(routes).To(BeNil())
@@ -334,26 +334,8 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the warnings", func() {
-				_, warnings, _ := actor.GetApplicationRoutes("application-guid", nil)
+				_, warnings, _ := actor.GetApplicationRoutes("application-guid")
 				Expect(warnings).To(ConsistOf("application-routes-warning", "domain-warning"))
-			})
-		})
-
-		Context("when a query parameter exists", func() {
-			It("passes the query to the client", func() {
-				expectedQuery := []ccv2.Query{
-					{
-						Filter:   ccv2.AppGUIDFilter,
-						Operator: ccv2.EqualOperator,
-						Value:    "application-guid",
-					}}
-
-				_, _, err := actor.GetApplicationRoutes("application-guid", expectedQuery)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(fakeCloudControllerClient.GetApplicationRoutesCallCount()).To(Equal(1))
-				_, query := fakeCloudControllerClient.GetApplicationRoutesArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
 			})
 		})
 	})
@@ -384,7 +366,7 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the space routes and any warnings", func() {
-				routes, warnings, err := actor.GetSpaceRoutes("space-guid", nil)
+				routes, warnings, err := actor.GetSpaceRoutes("space-guid")
 				Expect(fakeCloudControllerClient.GetSpaceRoutesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)).To(Equal("space-guid"))
 				Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(2))
@@ -420,7 +402,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
-					routes, warnings, err := actor.GetSpaceRoutes("space-guid", nil)
+					routes, warnings, err := actor.GetSpaceRoutes("space-guid")
 					Expect(warnings).To(ConsistOf("space-routes-warning"))
 					Expect(err).To(MatchError("get-space-routes-error"))
 					Expect(routes).To(BeNil())
@@ -442,7 +424,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
-					routes, warnings, err := actor.GetSpaceRoutes("space-guid", nil)
+					routes, warnings, err := actor.GetSpaceRoutes("space-guid")
 					Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSharedDomainArgsForCall(0)).To(Equal("domain-1-guid"))
 
@@ -468,26 +450,8 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the warnings", func() {
-				_, warnings, _ := actor.GetSpaceRoutes("space-guid", nil)
+				_, warnings, _ := actor.GetSpaceRoutes("space-guid")
 				Expect(warnings).To(ConsistOf("space-routes-warning", "domain-warning"))
-			})
-		})
-
-		Context("when a query parameter exists", func() {
-			It("passes the query to the client", func() {
-				expectedQuery := []ccv2.Query{
-					{
-						Filter:   ccv2.SpaceGUIDFilter,
-						Operator: ccv2.EqualOperator,
-						Value:    "space-guid",
-					}}
-
-				_, _, err := actor.GetSpaceRoutes("space-guid", expectedQuery)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(fakeCloudControllerClient.GetSpaceRoutesCallCount()).To(Equal(1))
-				_, query := fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
 			})
 		})
 	})

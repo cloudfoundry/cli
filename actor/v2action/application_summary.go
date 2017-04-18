@@ -53,7 +53,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 		}
 	}
 
-	routes, warnings, err := actor.GetApplicationRoutes(app.GUID, nil)
+	routes, warnings, err := actor.GetApplicationRoutes(app.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
