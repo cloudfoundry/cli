@@ -114,14 +114,14 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
 	if _, err := os.Stat(pluginFilePath); os.IsNotExist(err) {
-		config.pluginConfig = PluginsConfig{}
+		config.pluginsConfig = PluginsConfig{}
 	} else {
 		file, err := ioutil.ReadFile(pluginFilePath)
 		if err != nil {
 			return nil, err
 		}
 
-		err = json.Unmarshal(file, &config.pluginConfig)
+		err = json.Unmarshal(file, &config.pluginsConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +183,7 @@ type Config struct {
 	// detectedSettings are settings detected when the config is loaded.
 	detectedSettings detectedSettings
 
-	pluginConfig PluginsConfig
+	pluginsConfig PluginsConfig
 }
 
 // CFConfig represents .cf/config.json

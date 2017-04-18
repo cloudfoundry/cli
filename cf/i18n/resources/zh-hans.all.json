@@ -4340,12 +4340,20 @@
     "translation": "请求的插件没有可用于您操作系统的二进制文件: "
   },
   {
+    "id": "Plugin {{.Name}} does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "插件 {{.PluginName}} 已成功卸载。"
   },
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
     "translation": "插件 {{.PluginName}} V{{.Version}} 已成功安装。"
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
+    "translation": ""
   },
   {
     "id": "Port for the TCP route",
@@ -5886,6 +5894,10 @@
   {
     "id": "Unexpected error has occurred:\n{{.Error}}",
     "translation": "发生意外错误: \n{{.Error}}"
+  },
+  {
+    "id": "Uninstall CLI plugin",
+    "translation": ""
   },
   {
     "id": "Uninstall the plugin defined in command argument",

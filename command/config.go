@@ -23,9 +23,11 @@ type Config interface {
 	Locale() string
 	MinCLIVersion() string
 	OverallPollingTimeout() time.Duration
+	PluginHome() string
 	Plugins() map[string]configv3.Plugin
 	PollingInterval() time.Duration
 	RefreshToken() string
+	RemovePlugin(string)
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
@@ -35,12 +37,13 @@ type Config interface {
 	SkipSSLValidation() bool
 	StagingTimeout() time.Duration
 	StartupTimeout() time.Duration
-	Target() string
 	TargetedOrganization() configv3.Organization
 	TargetedSpace() configv3.Space
-	UAAOAuthClient() string
+	Target() string
 	UAAOAuthClientSecret() string
+	UAAOAuthClient() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
 	Verbose() (bool, []string)
+	WritePluginConfig() error
 }

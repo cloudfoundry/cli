@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"code.cloudfoundry.org/cli/plugin"
@@ -17,14 +18,14 @@ var (
 	version        string
 )
 
-type ConfigurablePlugin struct {
+type ConfigurablePluginFailsUninstall struct{}
+
+func (_ *ConfigurablePluginFailsUninstall) Run(cliConnection plugin.CliConnection, args []string) {
+	fmt.Fprintf(os.Stderr, "I'm failing...I'm failing...\n")
+	os.Exit(1)
 }
 
-func (_ *ConfigurablePlugin) Run(cliConnection plugin.CliConnection, args []string) {
-	fmt.Printf("%s\n", strings.Join(os.Args, " "))
-}
-
-func (_ *ConfigurablePlugin) GetMetadata() plugin.PluginMetadata {
+func (_ *ConfigurablePluginFailsUninstall) GetMetadata() plugin.PluginMetadata {
 	v1, _ := semver.Make(version)
 	metadata := plugin.PluginMetadata{
 		Name: pluginName,
@@ -49,6 +50,10 @@ func (_ *ConfigurablePlugin) GetMetadata() plugin.PluginMetadata {
 	return metadata
 }
 
+func uninstalling() {
+	os.Remove(filepath.Join(os.TempDir(), "uninstall-test-file-for-test_1.exe"))
+}
+
 func main() {
-	plugin.Start(new(ConfigurablePlugin))
+	plugin.Start(new(ConfigurablePluginFailsUninstall))
 }

@@ -528,8 +528,9 @@ var _ = Describe("Config", func() {
 		)
 	})
 
-	Describe("Write Config", func() {
+	Describe("WriteConfig", func() {
 		var config *Config
+
 		BeforeEach(func() {
 			config = &Config{
 				ConfigFile: CFConfig{
@@ -543,20 +544,37 @@ var _ = Describe("Config", func() {
 			}
 		})
 
-		It("writes ConfigFile to homeDir/.cf/config.json", func() {
-			err := WriteConfig(config)
-			Expect(err).ToNot(HaveOccurred())
+		Context("when no errors are encountered", func() {
+			It("writes ConfigFile to homeDir/.cf/config.json", func() {
+				err := WriteConfig(config)
+				Expect(err).ToNot(HaveOccurred())
 
-			file, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
-			Expect(err).ToNot(HaveOccurred())
+				file, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+				Expect(err).ToNot(HaveOccurred())
 
-			var writtenCFConfig CFConfig
-			err = json.Unmarshal(file, &writtenCFConfig)
-			Expect(err).ToNot(HaveOccurred())
+				var writtenCFConfig CFConfig
+				err = json.Unmarshal(file, &writtenCFConfig)
+				Expect(err).ToNot(HaveOccurred())
 
-			Expect(writtenCFConfig.ConfigVersion).To(Equal(config.ConfigFile.ConfigVersion))
-			Expect(writtenCFConfig.Target).To(Equal(config.ConfigFile.Target))
-			Expect(writtenCFConfig.ColorEnabled).To(Equal(config.ConfigFile.ColorEnabled))
+				Expect(writtenCFConfig.ConfigVersion).To(Equal(config.ConfigFile.ConfigVersion))
+				Expect(writtenCFConfig.Target).To(Equal(config.ConfigFile.Target))
+				Expect(writtenCFConfig.ColorEnabled).To(Equal(config.ConfigFile.ColorEnabled))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			BeforeEach(func() {
+				err := WriteConfig(config)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = os.Chmod(filepath.Join(homeDir, ".cf", "config.json"), 0000)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the error", func() {
+				err := WriteConfig(config)
+				Expect(err).To(MatchError(MatchRegexp("permission denied")))
+			})
 		})
 	})
 

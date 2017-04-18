@@ -575,7 +575,7 @@ var _ = Describe("help Command", func() {
 
 				Expect(testUI.Out).To(Say("ADD/REMOVE PLUGIN:"))
 				Expect(testUI.Out).To(Say("   plugins\\s+List all available plugin commands"))
-				Expect(testUI.Out).To(Say("   uninstall-plugin\\s+Uninstall the plugin defined in command argument"))
+				Expect(testUI.Out).To(Say("   uninstall-plugin\\s+Uninstall CLI plugin"))
 
 				Expect(testUI.Out).To(Say("INSTALLED PLUGIN COMMANDS:"))
 				Expect(testUI.Out).To(Say("   enable-diego\\s+enable Diego support for an app"))

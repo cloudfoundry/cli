@@ -1,11 +1,13 @@
 package configv3
 
 import (
-	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
 
@@ -28,6 +30,10 @@ type PluginsConfig struct {
 	Plugins map[string]Plugin `json:"Plugins"`
 }
 
+func (pluginsConfig *PluginsConfig) removePlugin(pluginName string) {
+	delete(pluginsConfig.Plugins, pluginName)
+}
+
 // Plugin represents the plugin as a whole, not be confused with PluginCommand
 type Plugin struct {
 	Location string         `json:"Location"`
@@ -38,14 +44,13 @@ type Plugin struct {
 // CalculateSHA1 returns the sha1 value of the plugin executable. If an error
 // is encountered calculating sha1, N/A is returned
 func (p Plugin) CalculateSHA1() string {
-	fileSHA := ""
-	contents, err := ioutil.ReadFile(p.Location)
+	fileSHA, err := util.NewSha1Checksum(p.Location).ComputeFileSha1()
+
 	if err != nil {
-		fileSHA = "N/A"
-	} else {
-		fileSHA = fmt.Sprintf("%x", sha1.Sum(contents))
+		return "N/A"
 	}
-	return fileSHA
+
+	return fmt.Sprintf("%x", fileSHA)
 }
 
 // PluginVersion is the plugin version information
@@ -93,9 +98,9 @@ type PluginUsageDetails struct {
 	Options map[string]string `json:"Options"`
 }
 
-// PluginHome returns the plugin configuration directory based off:
-//   1. The $CF_PLUGIN_HOME environment variable if set
-//   2. Defaults to the home diretory (outlined in LoadConfig)/.cf/plugins
+// PluginHome returns the plugin configuration directory to:
+//   1. The $CF_PLUGIN_HOME/.cf/plugins environment variable if set
+//   2. Defaults to the home directory (outlined in LoadConfig)/.cf/plugins
 func (config *Config) PluginHome() string {
 	if config.ENV.CFPluginHome != "" {
 		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
@@ -106,11 +111,35 @@ func (config *Config) PluginHome() string {
 
 // Plugins returns back the plugin configuration read from the plugin home
 func (config *Config) Plugins() map[string]Plugin {
-	return config.pluginConfig.Plugins
+	return config.pluginsConfig.Plugins
 }
 
 // PluginRepos returns the currently configured plugin repositories from the
 // .cf/config.json
 func (config *Config) PluginRepos() []PluginRepos {
 	return config.ConfigFile.PluginRepos
+}
+
+// RemovePlugin removes the specified plugin from PluginsConfig idempotently
+func (config *Config) RemovePlugin(pluginName string) {
+	config.pluginsConfig.removePlugin(pluginName)
+}
+
+// WritePluginConfig writes the plugin config to config.json in the plugin home
+// directory.
+func (config *Config) WritePluginConfig() error {
+	// Marshal JSON
+	rawConfig, err := json.MarshalIndent(config.pluginsConfig, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	pluginFileDir := filepath.Join(config.PluginHome())
+	err = os.MkdirAll(pluginFileDir, 0700)
+	if err != nil {
+		return err
+	}
+
+	// Write to file
+	return ioutil.WriteFile(filepath.Join(pluginFileDir, "config.json"), rawConfig, 0600)
 }
