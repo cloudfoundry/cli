@@ -1556,6 +1556,14 @@
     "translation": ""
   },
   {
+    "id": "Plugin {{.Name}} does not exist.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -2046,6 +2054,10 @@
   {
     "id": "Unable to retrieve information for bound application GUID ",
     "translation": "Unable to retrieve information for bound application GUID "
+  },
+  {
+    "id": "Uninstall CLI plugin",
+    "translation": ""
   },
   {
     "id": "Unmap an HTTP route:\\n      CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\\n\\n   Unmap a TCP route:\\n      CF_NAME unmap-route APP_NAME DOMAIN --port PORT\\n\\nEXAMPLES:\\n   CF_NAME unmap-route my-app example.com                              # example.com\\n   CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\\n   CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000",

@@ -11,8 +11,7 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 $@ integration/isolated
 
 if [[ -z $SKIP_OTHER ]]; then
   # The following two test suites **cannot** be run in parallel!!!
-  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/global
-  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/plugin
+  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/global integration/plugin
 fi
 
 $DIR/cleanup-integration

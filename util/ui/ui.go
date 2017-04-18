@@ -142,6 +142,10 @@ func (ui *UI) RequestLoggerFileWriter(filePaths []string) *RequestLoggerFileWrit
 	return newRequestLoggerFileWriter(ui, ui.fileLock, filePaths)
 }
 
+func (ui *UI) Writer() io.Writer {
+	return ui.Out
+}
+
 // DisplayOK outputs a bold green translated "OK" to UI.Out.
 func (ui *UI) DisplayOK() {
 	ui.terminalLock.Lock()

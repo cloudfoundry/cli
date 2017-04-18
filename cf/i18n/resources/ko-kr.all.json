@@ -4340,12 +4340,20 @@
     "translation": "요청된 플러그인에 사용자의 OS에서 사용 가능한 2진이 없습니다. "
   },
   {
+    "id": "Plugin {{.Name}} does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "{{.PluginName}} 플러그인이 설치 제거되었습니다."
   },
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
     "translation": "{{.PluginName}} 플러그인 v{{.Version}}이(가) 설치되었습니다."
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
+    "translation": ""
   },
   {
     "id": "Port for the TCP route",
@@ -5886,6 +5894,10 @@
   {
     "id": "Unexpected error has occurred:\n{{.Error}}",
     "translation": "예기치 못한 오류 발생:\n{{.Error}}"
+  },
+  {
+    "id": "Uninstall CLI plugin",
+    "translation": ""
   },
   {
     "id": "Uninstall the plugin defined in command argument",

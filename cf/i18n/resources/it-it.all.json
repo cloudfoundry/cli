@@ -4340,12 +4340,20 @@
     "translation": "Il plug-in richiesto non ha alcun binario disponibile per il tuo SO: "
   },
   {
+    "id": "Plugin {{.Name}} does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "Plug-in {{.PluginName}} disinstallato correttamente."
   },
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
     "translation": "Plug-in {{.PluginName}} v{{.Version}} installato correttamente."
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
+    "translation": ""
   },
   {
     "id": "Port for the TCP route",
@@ -5886,6 +5894,10 @@
   {
     "id": "Unexpected error has occurred:\n{{.Error}}",
     "translation": "Si è verificato un errore imprevisto: \n{{.Error}}"
+  },
+  {
+    "id": "Uninstall CLI plugin",
+    "translation": ""
   },
   {
     "id": "Uninstall the plugin defined in command argument",

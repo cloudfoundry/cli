@@ -16,6 +16,14 @@ type PluginCommand struct {
 }
 
 func CreateBasicPlugin(name string, version string, pluginCommands []PluginCommand) {
+	createBasicPlugin("configurable_plugin", name, version, pluginCommands)
+}
+
+func CreateBasicFailingPlugin(name string, version string, pluginCommands []PluginCommand) {
+	createBasicPlugin("configurable_plugin_fails_uninstall", name, version, pluginCommands)
+}
+
+func createBasicPlugin(pluginType string, name string, version string, pluginCommands []PluginCommand) {
 	commands := []string{}
 	commandHelps := []string{}
 	commandAliases := []string{}
@@ -25,8 +33,16 @@ func CreateBasicPlugin(name string, version string, pluginCommands []PluginComma
 		commandHelps = append(commandHelps, command.Help)
 	}
 
-	pluginPath, err := Build("code.cloudfoundry.org/cli/integration/assets/configurable_plugin", "-o", name, "-ldflags",
-		fmt.Sprintf("-X main.pluginName=%s -X main.version=%s -X main.commands=%s -X main.commandHelps=%s -X main.commandAliases=%s", name, version, strings.Join(commands, ","), strings.Join(commandHelps, ","), strings.Join(commandAliases, ",")))
+	pluginPath, err := Build(fmt.Sprintf("code.cloudfoundry.org/cli/integration/assets/%s", pluginType),
+		"-o",
+		name,
+		"-ldflags",
+		fmt.Sprintf("-X main.pluginName=%s -X main.version=%s -X main.commands=%s -X main.commandHelps=%s -X main.commandAliases=%s",
+			name,
+			version,
+			strings.Join(commands, ","),
+			strings.Join(commandHelps, ","),
+			strings.Join(commandAliases, ",")))
 	Expect(err).ToNot(HaveOccurred())
 
 	// gexec.Build builds the plugin with the name of the dir in the plugin path (configurable_plugin)

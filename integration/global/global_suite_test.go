@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	CFEventuallyTimeout = 30 * time.Second
+	CFEventuallyTimeout   = 30 * time.Second
+	CFConsistentlyTimeout = 500 * time.Millisecond
 )
 
 var (
@@ -28,6 +29,7 @@ func TestGlobal(t *testing.T) {
 var _ = SynchronizedBeforeSuite(func() []byte {
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
+	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
 
 	// Setup common environment variables
 	helpers.TurnOffColors()

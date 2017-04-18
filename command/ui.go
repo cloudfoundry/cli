@@ -1,6 +1,7 @@
 package command
 
 import (
+	"io"
 	"time"
 
 	"code.cloudfoundry.org/cli/util/ui"
@@ -27,4 +28,5 @@ type UI interface {
 	RequestLoggerTerminalDisplay() *ui.RequestLoggerTerminalDisplay
 	TranslateText(template string, data ...map[string]interface{}) string
 	UserFriendlyDate(input time.Time) string
+	Writer() io.Writer
 }

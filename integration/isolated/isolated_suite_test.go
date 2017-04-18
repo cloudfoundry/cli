@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	CFEventuallyTimeout  = 300 * time.Second
-	RealIsolationSegment = "persistent_isolation_segment"
+	CFEventuallyTimeout   = 300 * time.Second
+	CFConsistentlyTimeout = 500 * time.Millisecond
+	RealIsolationSegment  = "persistent_isolation_segment"
 )
 
 var (
@@ -37,6 +38,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 }, func(_ []byte) {
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
+	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
 
 	// Setup common environment variables
 	helpers.TurnOffColors()

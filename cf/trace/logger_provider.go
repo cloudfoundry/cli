@@ -9,14 +9,14 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
-func NewLogger(writer io.Writer, verbose bool, cfTrace, configTrace string) Printer {
+func NewLogger(writer io.Writer, verbose bool, boolsOrPaths ...string) Printer {
 	LoggingToStdout = verbose
 
 	var printers []Printer
 
 	stdoutLogger := NewWriterPrinter(writer, true)
 
-	for _, path := range []string{cfTrace, configTrace} {
+	for _, path := range boolsOrPaths {
 		b, err := strconv.ParseBool(path)
 		LoggingToStdout = LoggingToStdout || b
 
