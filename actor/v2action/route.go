@@ -52,7 +52,7 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		allWarnings    Warnings
 	)
 
-	routes, warnings, err := actor.GetSpaceRoutes(spaceGUID, nil)
+	routes, warnings, err := actor.GetSpaceRoutes(spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -78,9 +78,9 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 }
 
 // GetApplicationRoutes returns a list of routes associated with the provided Application GUID
-func (actor Actor) GetApplicationRoutes(applicationGUID string, query []ccv2.Query) ([]Route, Warnings, error) {
+func (actor Actor) GetApplicationRoutes(applicationGUID string) ([]Route, Warnings, error) {
 	var allWarnings Warnings
-	ccv2Routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(applicationGUID, query)
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(applicationGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -92,9 +92,9 @@ func (actor Actor) GetApplicationRoutes(applicationGUID string, query []ccv2.Que
 }
 
 // GetSpaceRoutes returns a list of routes associated with the provided Space GUID
-func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route, Warnings, error) {
+func (actor Actor) GetSpaceRoutes(spaceGUID string) ([]Route, Warnings, error) {
 	var allWarnings Warnings
-	ccv2Routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, query)
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
