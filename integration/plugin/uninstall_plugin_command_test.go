@@ -98,7 +98,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			BeforeEach(func() {
 				pluginsRootDir = filepath.Join(homeDir, ".cf", "plugins")
 				executablePath = filepath.Join(pluginsRootDir, "banana-plugin-name-1")
-				ftmp.Printf("executablePath = %s\n", executablePath)
+				fmt.Printf("executablePath = %s\n", executablePath)
 				rawConfig := fmt.Sprintf(`
 				{
 					"Plugins": {
