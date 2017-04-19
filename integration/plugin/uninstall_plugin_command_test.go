@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -97,7 +98,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 			BeforeEach(func() {
 				pluginsRootDir = filepath.Join(homeDir, ".cf", "plugins")
-				executablePath = filepath.Join(pluginsRootDir, "banana-plugin-name-1")
+				executablePath = strings.Replace(filepath.Join(pluginsRootDir, "banana-plugin-name-1"), "\\", "\\\\", -1)
 				rawConfig := fmt.Sprintf(`
 				{
 					"Plugins": {
