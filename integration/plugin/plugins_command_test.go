@@ -16,8 +16,6 @@ import (
 var _ = Describe("plugins command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("Running experimental plugins command tests")
-		// This removes plugin artefacts from other plugin tests
-		uninstallTestPlugin()
 	})
 
 	Describe("help", func() {

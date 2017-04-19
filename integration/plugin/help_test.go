@@ -10,6 +10,14 @@ import (
 )
 
 var _ = Describe("help", func() {
+	BeforeEach(func() {
+		installTestPlugin()
+	})
+
+	AfterEach(func() {
+		uninstallTestPlugin()
+	})
+
 	It("displays the plugin commands in master help", func() {
 		session := helpers.CF("help")
 		Eventually(session).Should(Say("TestPluginCommandWithAlias"))

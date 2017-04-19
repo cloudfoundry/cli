@@ -14,11 +14,6 @@ import (
 )
 
 var _ = Describe("uninstall-plugin command", func() {
-	BeforeEach(func() {
-		// This removes plugin artefacts from other plugin tests
-		uninstallTestPlugin()
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
