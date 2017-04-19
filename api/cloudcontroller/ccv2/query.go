@@ -12,19 +12,23 @@ type QueryFilter string
 type QueryOperator string
 
 const (
-	// AppGUIDFilter is the name of the App GUID filter.
+	// AppGUIDFilter is the name of the 'app_guid' filter.
 	AppGUIDFilter QueryFilter = "app_guid"
-	// OrganizationGUIDFilter is the name of the organization GUID filter.
+	// DomainGUIDFilter is the name of the 'domain_guid' filter.
+	DomainGUIDFilter QueryFilter = "domain_guid"
+	// OrganizationGUIDFilter is the name of the 'organization_guid' filter.
 	OrganizationGUIDFilter QueryFilter = "organization_guid"
-	// RouteGUIDFilter is the name of the route GUID filter.
+	// RouteGUIDFilter is the name of the 'route_guid' filter.
 	RouteGUIDFilter QueryFilter = "route_guid"
-	// ServiceInstanceGUIDFilter is the name of the service instance GUID filter.
+	// ServiceInstanceGUIDFilter is the name of the 'service_instance_guid' filter.
 	ServiceInstanceGUIDFilter QueryFilter = "service_instance_guid"
-	// SpaceGUIDFilter is the name of the space GUID filter.
+	// SpaceGUIDFilter is the name of the 'space_guid' filter.
 	SpaceGUIDFilter QueryFilter = "space_guid"
 
-	// NameFilter is the name of the name filter.
+	// NameFilter is the name of the 'name' filter.
 	NameFilter QueryFilter = "name"
+	// HostFilter is the name of the 'host' filter.
+	HostFilter QueryFilter = "host"
 )
 
 const (

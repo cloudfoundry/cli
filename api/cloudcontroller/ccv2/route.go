@@ -2,6 +2,9 @@ package ccv2
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -15,6 +18,7 @@ type Route struct {
 	Path       string
 	Port       int
 	DomainGUID string
+	SpaceGUID  string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Route response.
@@ -26,6 +30,7 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 			Path       string `json:"path"`
 			Port       int    `json:"port"`
 			DomainGUID string `json:"domain_guid"`
+			SpaceGUID  string `json:"space_guid"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccRoute); err != nil {
@@ -37,6 +42,7 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	route.Path = ccRoute.Entity.Path
 	route.Port = ccRoute.Entity.Port
 	route.DomainGUID = ccRoute.Entity.DomainGUID
+	route.SpaceGUID = ccRoute.Entity.SpaceGUID
 	return nil
 }
 
@@ -96,6 +102,32 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]R
 	return fullRoutesList, warnings, err
 }
 
+// GetRoutes returns a list of Routes based off of the provided queries.
+func (client *Client) GetRoutes(queryParams []Query) ([]Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRoutesRequest,
+		Query:       FormatQueryParameters(queryParams),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullRoutesList []Route
+	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
+		if route, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, route)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Route{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullRoutesList, warnings, err
+}
+
 // DeleteRoute deletes the Route associated with the provided Route GUID.
 func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -109,4 +141,36 @@ func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 	var response cloudcontroller.Response
 	err = client.connection.Make(request, &response)
 	return response.Warnings, err
+}
+
+// CheckRoute returns true if the route exists in the CF instance. DomainGUID
+// is required for check.
+func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouteReservedRequest,
+		URIParams:   map[string]string{"domain_guid": route.DomainGUID},
+	})
+	if err != nil {
+		return false, nil, err
+	}
+
+	queryParams := url.Values{}
+	if route.Host != "" {
+		queryParams.Add("host", route.Host)
+	}
+	if route.Path != "" {
+		queryParams.Add("path", route.Path)
+	}
+	if route.Port != 0 {
+		queryParams.Add("port", fmt.Sprint(route.Port))
+	}
+	request.URL.RawQuery = queryParams.Encode()
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+		return false, response.Warnings, nil
+	}
+
+	return response.HTTPResponse.StatusCode == http.StatusNoContent, response.Warnings, err
 }

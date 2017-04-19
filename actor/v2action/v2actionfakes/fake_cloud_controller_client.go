@@ -277,6 +277,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetRoutesStub        func(queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
+	getRoutesMutex       sync.RWMutex
+	getRoutesArgsForCall []struct {
+		queries []ccv2.Query
+	}
+	getRoutesReturns struct {
+		result1 []ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getRoutesReturnsOnCall map[int]struct {
+		result1 []ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetSecurityGroupsStub        func(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	getSecurityGroupsMutex       sync.RWMutex
 	getSecurityGroupsArgsForCall []struct {
@@ -1558,6 +1573,65 @@ func (fake *FakeCloudControllerClient) GetRouteApplicationsReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetRoutes(queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
+	var queriesCopy []ccv2.Query
+	if queries != nil {
+		queriesCopy = make([]ccv2.Query, len(queries))
+		copy(queriesCopy, queries)
+	}
+	fake.getRoutesMutex.Lock()
+	ret, specificReturn := fake.getRoutesReturnsOnCall[len(fake.getRoutesArgsForCall)]
+	fake.getRoutesArgsForCall = append(fake.getRoutesArgsForCall, struct {
+		queries []ccv2.Query
+	}{queriesCopy})
+	fake.recordInvocation("GetRoutes", []interface{}{queriesCopy})
+	fake.getRoutesMutex.Unlock()
+	if fake.GetRoutesStub != nil {
+		return fake.GetRoutesStub(queries)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getRoutesReturns.result1, fake.getRoutesReturns.result2, fake.getRoutesReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetRoutesCallCount() int {
+	fake.getRoutesMutex.RLock()
+	defer fake.getRoutesMutex.RUnlock()
+	return len(fake.getRoutesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetRoutesArgsForCall(i int) []ccv2.Query {
+	fake.getRoutesMutex.RLock()
+	defer fake.getRoutesMutex.RUnlock()
+	return fake.getRoutesArgsForCall[i].queries
+}
+
+func (fake *FakeCloudControllerClient) GetRoutesReturns(result1 []ccv2.Route, result2 ccv2.Warnings, result3 error) {
+	fake.GetRoutesStub = nil
+	fake.getRoutesReturns = struct {
+		result1 []ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetRoutesReturnsOnCall(i int, result1 []ccv2.Route, result2 ccv2.Warnings, result3 error) {
+	fake.GetRoutesStub = nil
+	if fake.getRoutesReturnsOnCall == nil {
+		fake.getRoutesReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.Route
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getRoutesReturnsOnCall[i] = struct {
+		result1 []ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetSecurityGroups(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
 	var queriesCopy []ccv2.Query
 	if queries != nil {
@@ -2706,6 +2780,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getPrivateDomainMutex.RUnlock()
 	fake.getRouteApplicationsMutex.RLock()
 	defer fake.getRouteApplicationsMutex.RUnlock()
+	fake.getRoutesMutex.RLock()
+	defer fake.getRoutesMutex.RUnlock()
 	fake.getSecurityGroupsMutex.RLock()
 	defer fake.getSecurityGroupsMutex.RUnlock()
 	fake.getServiceBindingsMutex.RLock()
