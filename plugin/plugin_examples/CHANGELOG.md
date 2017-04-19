@@ -65,7 +65,7 @@ Added the following commands to cli_connection.go:
 ```
 
 # Changes in v6.11.0
--Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.
+- Plugins now have a hook-in that is called when the plugin is uninstalled, allowing cleanup of files.
 
 # Changes in v6.10.0
 [CF-Community Plugin Repository](https://github.com/cloudfoundry-incubator/cli-plugin-repo) introduced.
