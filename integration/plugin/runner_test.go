@@ -9,7 +9,15 @@ import (
 
 var _ = Describe("running plugins", func() {
 	Describe("plugin command alias", func() {
-		It("can call a command by it's alias", func() {
+		BeforeEach(func() {
+			installTestPlugin()
+		})
+
+		AfterEach(func() {
+			uninstallTestPlugin()
+		})
+
+		It("can call a command by its alias", func() {
 			confirmTestPluginOutput("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "You called Test Plugin Command With Alias!")
 		})
 	})

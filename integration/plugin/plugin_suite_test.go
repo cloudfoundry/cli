@@ -35,6 +35,8 @@ func TestGlobal(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	return nil
+}, func(path []byte) {
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 	SetDefaultConsistentlyDuration(CFConsistentlyTimeout)
@@ -51,11 +53,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	panicTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_panic")
 	Expect(err).ToNot(HaveOccurred())
-	return nil
-}, func(path []byte) {
-	if GinkgoParallelNode() != 1 {
-		Fail("Test suite cannot run in parallel")
-	}
 })
 
 var _ = AfterSuite(func() {
@@ -65,8 +62,6 @@ var _ = AfterSuite(func() {
 var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	apiURL, skipSSLValidation = helpers.SetAPI()
-	helpers.LoginCF()
-	installTestPlugin()
 })
 
 var _ = AfterEach(func() {
@@ -118,6 +113,7 @@ func confirmTestPluginOutput(command string, output ...string) {
 	}
 	Eventually(session).Should(Exit(0))
 }
+
 func confirmTestPluginOutputWithArg(command string, arg string, output ...string) {
 	session := helpers.CF(command, arg)
 	for _, val := range output {

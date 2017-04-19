@@ -36,5 +36,5 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -failFast integration/isolated
-    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs -failFast integration/global integration/plugin
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global

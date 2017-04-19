@@ -7,11 +7,11 @@ export CF_DIAL_TIMEOUT=15
 
 $DIR/cleanup-integration
 
-ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 $@ integration/isolated
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 $@ integration/isolated integration/plugin
 
 if [[ -z $SKIP_OTHER ]]; then
-  # The following two test suites **cannot** be run in parallel!!!
-  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/global integration/plugin
+  # The following test suite **cannot** be run in parallel!!!
+  ginkgo -r -randomizeAllSpecs -slowSpecThreshold=60 integration/global
 fi
 
 $DIR/cleanup-integration

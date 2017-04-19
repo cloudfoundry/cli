@@ -11,6 +11,15 @@ import (
 )
 
 var _ = Describe("plugin API", func() {
+	BeforeEach(func() {
+		installTestPlugin()
+		helpers.LoginCF()
+	})
+
+	AfterEach(func() {
+		uninstallTestPlugin()
+	})
+
 	Describe("AccessToken", func() {
 		It("returns the access token", func() {
 			confirmTestPluginOutput("AccessToken", "bearer [\\w\\d\\.]+")
