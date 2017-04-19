@@ -37,7 +37,7 @@ func (c *DemoCmd) GetMetadata() plugin.PluginMetadata {
 				Name:     "list-apps",
 				HelpText: "curl /v2/apps to get a list of apps",
 				UsageDetails: plugin.Usage{
-					Usage: "cf demo-curl [--started | --stopped]",
+					Usage: "cf list-apps [--started | --stopped]",
 					Options: map[string]string{
 						"--started": "Shows only apps that are started",
 						"--stopped": "Shows only apps that are stopped",

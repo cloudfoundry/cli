@@ -80,9 +80,8 @@ To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/
 Uninstall of the plugin needs to be explicitly handled. When a user calls the `cf uninstall-plugin` command, CLI notifies the plugin via a call with `CLI-MESSAGE-UNINSTALL` as the first item in `[]args` from within the plugin's `Run(...)` method.
 
 ### Test Driven Development (TDD)
-2 libraries are available for TDD
-- `FakeCliConnection`: stub/mock the `plugin.CliConnection` object with this fake [See example](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples/call_cli_cmd/main)
-- `Test RPC server`: a RPC server to be used as a back end for the plugin. Allows plugin to be tested as a stand along binary without replying on CLI as a back end. [See example](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples/test_rpc_server_example)
+An example which was developed using TDD is available:
+- `Test RPC server`: an RPC server to be used as a back-end for the plugin. It allows the plugin to be tested as a stand alone binary without replying on CLI as a back-end. [See example](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples/test_rpc_server_example)
 
 ### Using Command Line Arguments
 
@@ -101,7 +100,7 @@ You can invoke CLI commands with `cliConnection.CliCommand([]args)` from within 
 
 The `cliConnection.CliCommand([]args)` returns the output printed by the command and an error. The output is returned as a slice of strings. The error will be present if the call to the CLI command fails.
 
-See the [calling CLI commands example](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/call_cli_cmd/main/call_cli_cmd.go) included in this repo.
+See the [test plugin example](https://github.com/cloudfoundry/cli/blob/master/integration/assets/test_plugin/test_plugin.go) included in this repo.
 
 ### Creating Interactive Plugins
 
