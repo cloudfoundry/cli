@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -89,20 +91,72 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("and the user does not have the correct filesystem perms to remove the plugin's executable", func() {
-			It("exits with an error, and does not remove the plugin", func() {
-				pluginsRootDir := filepath.Join(homeDir, ".cf", "plugins")
-				err := os.Chmod(pluginsRootDir, 0555)
-				Expect(err).ToNot(HaveOccurred())
+		Context("and the user cannot remove the plugin's executable", func() {
+			var executablePath string
+			var pluginsRootDir string
 
+			BeforeEach(func() {
+				pluginsRootDir = filepath.Join(homeDir, ".cf", "plugins")
+				executablePath = filepath.Join(pluginsRootDir, "banana-plugin-name-1")
+				rawConfig := fmt.Sprintf(`
+				{
+					"Plugins": {
+						"banana-plugin-name-1": {
+							"Location": "%s",
+							"Version": {
+								"Major": 1,
+								"Minor": 0,
+								"Build": 1
+							},
+							"Commands": [
+								{
+									"Name": "enable-diego",
+									"Alias": "",
+									"HelpText": "enable Diego support for an app",
+									"UsageDetails": {
+										"Usage": "cf enable-diego APP_NAME",
+										"Options": null
+									}
+								}
+							]
+						},
+						"banana-plugin-name-2": {
+							"Location": "%s",
+							"Version": {
+								"Major": 1,
+								"Minor": 0,
+								"Build": 1
+							},
+							"Commands": [
+								{
+									"Name": "enable-banana",
+									"Alias": "",
+									"HelpText": "enable banana support for an app",
+									"UsageDetails": {
+										"Usage": "cf enable-banana APP_NAME",
+										"Options": null
+									}
+								}
+							]
+						}
+					}
+				}`, executablePath)
+
+				os.MkdirAll(pluginsRootDir, 0700)
+				err := ioutil.WriteFile(filepath.Join(pluginsRootDir, "config.json"), []byte(rawConfig), 644)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.MkdirAll(executablePath, 0700)
+				Expect(err).ToNot(HaveOccurred())
+				err = ioutil.WriteFile(filepath.Join(executablePath, "foooooooo"), nil, 644)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("exits with an error, and does not remove the plugin", func() {
 				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
 				Eventually(session.Out).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("remove.*banana-plugin-name-1: permission denied"))
+				Eventually(session.Err).Should(Say("banana-plugin-name-1: permission denied"))
 				Eventually(session).Should(Exit(1))
-
-				err = os.Chmod(pluginsRootDir, 0755)
-				Expect(err).ToNot(HaveOccurred())
 
 				session = helpers.CF("plugins")
 				Eventually(session.Out).Should(Say("banana-plugin-name-1"))
