@@ -91,14 +91,13 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("and the user cannot remove the plugin's executable", func() {
+		Context("and the user cannot remove the plugin's executable (NON_WINDOWS)", func() {
 			var executablePath string
 			var pluginsRootDir string
 
 			BeforeEach(func() {
 				pluginsRootDir = filepath.Join(homeDir, ".cf", "plugins")
 				executablePath = filepath.Join(pluginsRootDir, "banana-plugin-name-1")
-				fmt.Printf("executablePath = %s\n", executablePath)
 				rawConfig := fmt.Sprintf(`
 				{
 					"Plugins": {
@@ -141,7 +140,7 @@ var _ = Describe("uninstall-plugin command", func() {
 							]
 						}
 					}
-				}`, executablePath)
+				}`, executablePath, executablePath)
 
 				os.MkdirAll(pluginsRootDir, 0700)
 				err := ioutil.WriteFile(filepath.Join(pluginsRootDir, "config.json"), []byte(rawConfig), 644)
