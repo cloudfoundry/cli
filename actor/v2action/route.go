@@ -8,11 +8,13 @@ import (
 
 // Route represents a CLI Route.
 type Route struct {
-	GUID   string
-	Host   string
-	Domain string
-	Path   string
-	Port   int
+	GUID       string
+	SpaceGUID  string
+	DomainGUID string
+	Host       string
+	Domain     string
+	Path       string
+	Port       int
 }
 
 // String formats the route in a human readable format.
@@ -42,6 +44,16 @@ type OrphanedRoutesNotFoundError struct{}
 // Error method to display the error message.
 func (e OrphanedRoutesNotFoundError) Error() string {
 	return fmt.Sprintf("No orphaned routes were found.")
+}
+
+// RouteNotFoundError is returned when a route cannot be found
+type RouteNotFoundError struct {
+	Host       string
+	DomainGUID string
+}
+
+func (e RouteNotFoundError) Error() string {
+	return fmt.Sprintf("Route with host %s and domain guid %s not found", e.Host, e.DomainGUID)
 }
 
 // GetOrphanedRoutesBySpace returns a list of orphaned routes associated with
@@ -77,7 +89,8 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 	return orphanedRoutes, allWarnings, nil
 }
 
-// GetApplicationRoutes returns a list of routes associated with the provided Application GUID
+// GetApplicationRoutes returns a list of routes associated with the provided
+// Application GUID.
 func (actor Actor) GetApplicationRoutes(applicationGUID string) ([]Route, Warnings, error) {
 	var allWarnings Warnings
 	ccv2Routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(applicationGUID, nil)
@@ -91,7 +104,8 @@ func (actor Actor) GetApplicationRoutes(applicationGUID string) ([]Route, Warnin
 	return routes, append(allWarnings, domainWarnings...), err
 }
 
-// GetSpaceRoutes returns a list of routes associated with the provided Space GUID
+// GetSpaceRoutes returns a list of routes associated with the provided Space
+// GUID.
 func (actor Actor) GetSpaceRoutes(spaceGUID string) ([]Route, Warnings, error) {
 	var allWarnings Warnings
 	ccv2Routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, nil)
@@ -111,6 +125,29 @@ func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
 	return Warnings(warnings), err
 }
 
+// GetRouteByHostAndDomain returns the HTTP route with the matching host and
+// the associate domain GUID.
+func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Route, Warnings, error) {
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetRoutes([]ccv2.Query{
+		{Filter: ccv2.HostFilter, Operator: ccv2.EqualOperator, Value: host},
+		{Filter: ccv2.DomainGUIDFilter, Operator: ccv2.EqualOperator, Value: domainGUID},
+	})
+	if err != nil {
+		return Route{}, Warnings(warnings), err
+	}
+
+	if len(ccv2Routes) == 0 {
+		return Route{}, Warnings(warnings), RouteNotFoundError{Host: host, DomainGUID: domainGUID}
+	}
+
+	routes, domainWarnings, err := actor.applyDomain(ccv2Routes)
+	if err != nil {
+		return Route{}, append(Warnings(warnings), domainWarnings...), err
+	}
+
+	return routes[0], append(Warnings(warnings), domainWarnings...), err
+}
+
 func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, error) {
 	var routes []Route
 	var allWarnings Warnings
@@ -122,11 +159,13 @@ func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, erro
 			return nil, allWarnings, err
 		}
 		routes = append(routes, Route{
-			GUID:   ccv2Route.GUID,
-			Host:   ccv2Route.Host,
-			Domain: domain.Name,
-			Path:   ccv2Route.Path,
-			Port:   ccv2Route.Port,
+			GUID:       ccv2Route.GUID,
+			SpaceGUID:  ccv2Route.SpaceGUID,
+			DomainGUID: ccv2Route.DomainGUID,
+			Host:       ccv2Route.Host,
+			Domain:     domain.Name,
+			Path:       ccv2Route.Path,
+			Port:       ccv2Route.Port,
 		})
 	}
 

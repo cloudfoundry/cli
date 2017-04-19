@@ -238,7 +238,6 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("GetOrganizationDomains", func() {
 		Context("when the organization has both shared and private domains", func() {
-
 			BeforeEach(func() {
 				sharedDomain := ccv2.Domain{
 					Name: "some-shared-domain",
@@ -254,13 +253,13 @@ var _ = Describe("Domain Actions", func() {
 				fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns([]ccv2.Domain{privateDomain, otherPrivateDomain}, ccv2.Warnings{"private domains warning"}, nil)
 			})
 
-			It("returns a concatenated slice with shared and private domains", func() {
+			It("returns a concatenated slice with private then shared domains", func() {
 				domains, warnings, err := actor.GetOrganizationDomains("some-org-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domains).To(Equal([]Domain{
-					{Name: "some-shared-domain"},
 					{Name: "some-private-domain"},
 					{Name: "some-other-private-domain"},
+					{Name: "some-shared-domain"},
 				}))
 				Expect(warnings).To(ConsistOf("shared domains warning", "private domains warning"))
 
@@ -287,6 +286,7 @@ var _ = Describe("Domain Actions", func() {
 				Expect(warnings).To(ConsistOf("shared domains warning"))
 			})
 		})
+
 		Context("when get organization private domains returns an error", func() {
 			var expectedErr error
 
