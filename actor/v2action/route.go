@@ -8,18 +8,17 @@ import (
 
 // Route represents a CLI Route.
 type Route struct {
-	GUID       string
-	SpaceGUID  string
-	DomainGUID string
-	Host       string
-	Domain     string
-	Path       string
-	Port       int
+	Domain    Domain
+	GUID      string
+	Host      string
+	Path      string
+	Port      int
+	SpaceGUID string
 }
 
 // String formats the route in a human readable format.
 func (r Route) String() string {
-	routeString := r.Domain
+	routeString := r.Domain.Name
 
 	if r.Port != 0 {
 		routeString = fmt.Sprintf("%s:%d", routeString, r.Port)
@@ -159,13 +158,12 @@ func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, erro
 			return nil, allWarnings, err
 		}
 		routes = append(routes, Route{
-			GUID:       ccv2Route.GUID,
-			SpaceGUID:  ccv2Route.SpaceGUID,
-			DomainGUID: ccv2Route.DomainGUID,
-			Host:       ccv2Route.Host,
-			Domain:     domain.Name,
-			Path:       ccv2Route.Path,
-			Port:       ccv2Route.Port,
+			Domain:    domain,
+			GUID:      ccv2Route.GUID,
+			Host:      ccv2Route.Host,
+			Path:      ccv2Route.Path,
+			Port:      ccv2Route.Port,
+			SpaceGUID: ccv2Route.SpaceGUID,
 		})
 	}
 

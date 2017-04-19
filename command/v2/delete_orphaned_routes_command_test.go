@@ -161,15 +161,19 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 							routes = []v2action.Route{
 								{
-									GUID:   "route-1-guid",
-									Host:   "route-1",
-									Domain: "bosh-lite.com",
-									Path:   "/path",
+									GUID: "route-1-guid",
+									Host: "route-1",
+									Domain: v2action.Domain{
+										Name: "bosh-lite.com",
+									},
+									Path: "/path",
 								},
 								{
-									GUID:   "route-2-guid",
-									Host:   "route-2",
-									Domain: "bosh-lite.com",
+									GUID: "route-2-guid",
+									Host: "route-2",
+									Domain: v2action.Domain{
+										Name: "bosh-lite.com",
+									},
 								},
 							}
 

@@ -271,13 +271,17 @@ var _ = Describe("Start Command", func() {
 								},
 								Routes: []v2action.Route{
 									{
-										Host:   "banana",
-										Domain: "fruit.com",
-										Path:   "/hi",
+										Host: "banana",
+										Domain: v2action.Domain{
+											Name: "fruit.com",
+										},
+										Path: "/hi",
 									},
 									{
-										Domain: "foobar.com",
-										Port:   13,
+										Domain: v2action.Domain{
+											Name: "foobar.com",
+										},
+										Port: 13,
 									},
 								},
 							}
@@ -507,13 +511,17 @@ var _ = Describe("Start Command", func() {
 							},
 							Routes: []v2action.Route{
 								{
-									Host:   "banana",
-									Domain: "fruit.com",
-									Path:   "/hi",
+									Host: "banana",
+									Domain: v2action.Domain{
+										Name: "fruit.com",
+									},
+									Path: "/hi",
 								},
 								{
-									Domain: "foobar.com",
-									Port:   13,
+									Domain: v2action.Domain{
+										Name: "foobar.com",
+									},
+									Port: 13,
 								},
 							},
 						}
