@@ -83,14 +83,18 @@ var _ = Describe("Route Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(orphanedRoutes).To(ConsistOf([]Route{
 					{
-						GUID:       "orphaned-route-guid-1",
-						Domain:     "some-domain.com",
-						DomainGUID: "some-domain-guid",
+						GUID: "orphaned-route-guid-1",
+						Domain: Domain{
+							Name: "some-domain.com",
+							GUID: "some-domain-guid",
+						},
 					},
 					{
-						GUID:       "orphaned-route-guid-2",
-						Domain:     "some-other-domain.com",
-						DomainGUID: "some-other-domain-guid",
+						GUID: "orphaned-route-guid-2",
+						Domain: Domain{
+							Name: "some-other-domain.com",
+							GUID: "some-other-domain-guid",
+						},
 					},
 				}))
 
@@ -248,7 +252,8 @@ var _ = Describe("Route Actions", func() {
 					},
 				}, ccv2.Warnings{"get-application-routes-warning"}, nil)
 
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{Name: "domain"}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturnsOnCall(0, ccv2.Domain{Name: "domain.com"}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturnsOnCall(1, ccv2.Domain{Name: "other-domain.com"}, nil, nil)
 			})
 
 			It("returns the application routes and any warnings", func() {
@@ -263,22 +268,24 @@ var _ = Describe("Route Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
-						GUID:       "route-guid-1",
-						SpaceGUID:  "some-space-guid",
-						DomainGUID: "domain-1-guid",
-						Host:       "host",
-						Domain:     "domain",
-						Path:       "/path",
-						Port:       1234,
+						Domain: Domain{
+							Name: "domain.com",
+						},
+						GUID:      "route-guid-1",
+						Host:      "host",
+						Path:      "/path",
+						Port:      1234,
+						SpaceGUID: "some-space-guid",
 					},
 					{
-						GUID:       "route-guid-2",
-						SpaceGUID:  "some-space-guid",
-						DomainGUID: "domain-2-guid",
-						Host:       "host",
-						Domain:     "domain",
-						Path:       "/path",
-						Port:       1234,
+						Domain: Domain{
+							Name: "other-domain.com",
+						},
+						GUID:      "route-guid-2",
+						Host:      "host",
+						Path:      "/path",
+						Port:      1234,
+						SpaceGUID: "some-space-guid",
 					},
 				}))
 			})
@@ -369,10 +376,8 @@ var _ = Describe("Route Actions", func() {
 						DomainGUID: "domain-2-guid",
 					},
 				}, ccv2.Warnings{"get-space-routes-warning"}, nil)
-				fakeCloudControllerClient.GetSharedDomainReturns(
-					ccv2.Domain{
-						Name: "domain",
-					}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturnsOnCall(0, ccv2.Domain{Name: "domain.com"}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturnsOnCall(1, ccv2.Domain{Name: "other-domain.com"}, nil, nil)
 			})
 
 			It("returns the space routes and any warnings", func() {
@@ -387,22 +392,24 @@ var _ = Describe("Route Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
-						GUID:       "route-guid-1",
-						SpaceGUID:  "some-space-guid",
-						DomainGUID: "domain-1-guid",
-						Host:       "host",
-						Domain:     "domain",
-						Path:       "/path",
-						Port:       1234,
+						Domain: Domain{
+							Name: "domain.com",
+						},
+						GUID:      "route-guid-1",
+						Host:      "host",
+						Path:      "/path",
+						Port:      1234,
+						SpaceGUID: "some-space-guid",
 					},
 					{
-						GUID:       "route-guid-2",
-						SpaceGUID:  "some-space-guid",
-						DomainGUID: "domain-2-guid",
-						Host:       "host",
-						Domain:     "domain",
-						Path:       "/path",
-						Port:       1234,
+						Domain: Domain{
+							Name: "other-domain.com",
+						},
+						GUID:      "route-guid-2",
+						Host:      "host",
+						Path:      "/path",
+						Port:      1234,
+						SpaceGUID: "some-space-guid",
 					},
 				}))
 			})
@@ -509,7 +516,7 @@ var _ = Describe("Route Actions", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetSharedDomainReturns(
 						ccv2.Domain{
-							Name: "domain",
+							Name: "domain.com",
 						}, ccv2.Warnings{"get-domain-warning"}, nil)
 				})
 
@@ -517,13 +524,14 @@ var _ = Describe("Route Actions", func() {
 					Expect(warnings).To(ConsistOf("get-routes-warning", "get-domain-warning"))
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(route).To(Equal(Route{
-						GUID:       "route-guid-1",
-						SpaceGUID:  "some-space-guid",
-						DomainGUID: "domain-1-guid",
-						Host:       "host",
-						Domain:     "domain",
-						Path:       "/path",
-						Port:       1234,
+						Domain: Domain{
+							Name: "domain.com",
+						},
+						GUID:      "route-guid-1",
+						Host:      "host",
+						Path:      "/path",
+						Port:      1234,
+						SpaceGUID: "some-space-guid",
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
@@ -581,10 +589,12 @@ var _ = Describe("Route Actions", func() {
 	Describe("Route", func() {
 		DescribeTable("String", func(host string, domain string, path string, port int, expectedValue string) {
 			route := Route{
-				Host:   host,
-				Domain: domain,
-				Path:   path,
-				Port:   port,
+				Host: host,
+				Domain: Domain{
+					Name: domain,
+				},
+				Path: path,
+				Port: port,
 			}
 			Expect(route.String()).To(Equal(expectedValue))
 		},
