@@ -18,7 +18,7 @@ Note: All contributions must be sent using GitHub Pull Requests.
 
 # Development Environment Setup
 
-## Install Golang 1.7.1 or higher
+## Install Golang 1.8 or higher
 
 Documentation on installing Golang and setting the `GOROOT`, `GOPATH` and `PATH` environment variables can be found [here](https://golang.org/doc/install).
 
