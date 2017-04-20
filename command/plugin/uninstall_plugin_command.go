@@ -26,13 +26,13 @@ type UninstallPluginCommand struct {
 func (cmd *UninstallPluginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.Actor = pluginaction.NewActor(config)
+	cmd.Actor = pluginaction.NewActor(config, nil)
 	return nil
 }
 
 func (cmd UninstallPluginCommand) Execute(args []string) error {
 	pluginName := cmd.RequiredArgs.PluginName
-	plugin, exist := cmd.Config.Plugins()[pluginName]
+	plugin, exist := cmd.Config.GetPlugin(pluginName)
 	if !exist {
 		return shared.PluginNotFoundError{Name: pluginName}
 	}

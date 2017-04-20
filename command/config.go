@@ -18,13 +18,15 @@ type Config interface {
 	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
 	Experimental() bool
+	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	HasTargetedOrganization() bool
 	HasTargetedSpace() bool
 	Locale() string
 	MinCLIVersion() string
 	OverallPollingTimeout() time.Duration
 	PluginHome() string
-	Plugins() map[string]configv3.Plugin
+	Plugins() []configv3.Plugin
+	PluginRepositories() []configv3.PluginRepository
 	PollingInterval() time.Duration
 	RefreshToken() string
 	RemovePlugin(string)

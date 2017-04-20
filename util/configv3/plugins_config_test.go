@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Config", func() {
+var _ = Describe("PluginsConfig", func() {
 	var homeDir string
 
 	BeforeEach(func() {
@@ -71,7 +71,8 @@ var _ = Describe("Config", func() {
 			plugins := config.Plugins()
 			Expect(plugins).ToNot(BeEmpty())
 
-			plugin := plugins["Diego-Enabler"]
+			plugin := plugins[0]
+			Expect(plugin.Name).To(Equal("Diego-Enabler"))
 			Expect(plugin.Location).To(Equal("~/.cf/plugins/diego-enabler_darwin_amd64"))
 			Expect(plugin.Version.Major).To(Equal(1))
 			Expect(plugin.Commands).To(HaveLen(2))
@@ -146,6 +147,24 @@ var _ = Describe("Config", func() {
 				})
 			})
 		})
+
+		Describe("PluginCommands", func() {
+			It("returns the plugin's commands sorted by command name", func() {
+				plugin := Plugin{
+					Commands: []PluginCommand{
+						{Name: "T-sort"},
+						{Name: "sort-2"},
+						{Name: "sort-1"},
+					},
+				}
+
+				Expect(plugin.PluginCommands()).To(Equal([]PluginCommand{
+					PluginCommand{Name: "sort-1"},
+					PluginCommand{Name: "sort-2"},
+					PluginCommand{Name: "T-sort"},
+				}))
+			})
+		})
 	})
 
 	Describe("PluginVersion", func() {
@@ -198,14 +217,15 @@ var _ = Describe("Config", func() {
 		})
 	})
 
-	Describe("RemovePlugin", func() {
-		var (
-			config *Config
-			err    error
-		)
+	Describe("Config", func() {
+		Describe("RemovePlugin", func() {
+			var (
+				config *Config
+				err    error
+			)
 
-		BeforeEach(func() {
-			rawConfig := `
+			BeforeEach(func() {
+				rawConfig := `
 {
   "Plugins": {
     "Diego-Enabler": {
@@ -248,23 +268,23 @@ var _ = Describe("Config", func() {
     }
   }
 }`
-			setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
+				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
-			config, err = LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-		})
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
 
-		Context("when the plugin exists", func() {
-			It("removes the plugin from the config", func() {
-				plugins := config.Plugins()
+			Context("when the plugin exists", func() {
+				It("removes the plugin from the config", func() {
+					plugins := config.Plugins()
 
-				_, found := plugins["Diego-Enabler"]
-				Expect(found).To(BeTrue())
+					Expect(plugins).To(HaveLen(2))
+					Expect(plugins[0].Name).To(Equal("Diego-Enabler"))
 
-				config.RemovePlugin("Diego-Enabler")
+					config.RemovePlugin("Diego-Enabler")
 
-				_, found = plugins["Diego-Enabler"]
-				Expect(found).To(BeFalse())
+					Expect(config.Plugins()).To(HaveLen(1))
+				})
 			})
 
 			Context("when the plugin does not exist", func() {
@@ -273,13 +293,12 @@ var _ = Describe("Config", func() {
 				})
 			})
 		})
-	})
 
-	Describe("WritePluginConfig", func() {
-		var config *Config
+		Describe("WritePluginConfig", func() {
+			var config *Config
 
-		BeforeEach(func() {
-			rawConfig := `
+			BeforeEach(func() {
+				rawConfig := `
 {
 	"Plugins": {
 		"Diego-Enabler": {
@@ -303,41 +322,103 @@ var _ = Describe("Config", func() {
 		}
 	}
 }`
-			setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
+				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
-			var err error
-			config, err = LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		Context("when no errors are encountered", func() {
-			It("writes the plugin config to pluginHome/.cf/plugin/config.json", func() {
-				plugin := config.Plugins()["Diego-Enabler"]
-				plugin.Location = "BAR"
-				config.Plugins()["Diego-Enabler"] = plugin
-
-				err := config.WritePluginConfig()
+				var err error
+				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
+			})
 
-				newConfig, err := LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(newConfig.Plugins()["Diego-Enabler"].Location).To(Equal("BAR"))
+			Context("when no errors are encountered", func() {
+				It("writes the plugin config to pluginHome/.cf/plugin/config.json", func() {
+					config.RemovePlugin("Diego-Enabler")
+
+					err := config.WritePluginConfig()
+					Expect(err).ToNot(HaveOccurred())
+
+					newConfig, err := LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(newConfig.Plugins()).To(HaveLen(0))
+				})
+			})
+
+			Context("when an error is encountered", func() {
+				BeforeEach(func() {
+					pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
+					err := os.Remove(pluginConfigPath)
+					Expect(err).ToNot(HaveOccurred())
+					err = os.Mkdir(pluginConfigPath, 0700)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns the error", func() {
+					err := config.WritePluginConfig()
+					_, ok := err.(*os.PathError)
+					Expect(ok).To(BeTrue())
+				})
 			})
 		})
 
-		Context("when an error is encountered", func() {
+		Describe("Plugins", func() {
 			BeforeEach(func() {
-				pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
-				err := os.Remove(pluginConfigPath)
+				rawConfig := `
+				{
+					"Plugins": {
+						"Q-plugin": {},
+						"plugin-2": {},
+						"plugin-1": {}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+			})
+
+			It("returns the pluging sorted by name", func() {
+				config, err := LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
-				err = os.Mkdir(pluginConfigPath, 0700)
+				Expect(config.Plugins()).To(Equal([]Plugin{
+					{Name: "plugin-1"},
+					{Name: "plugin-2"},
+					{Name: "Q-plugin"},
+				}))
+			})
+		})
+
+		Describe("GetPlugin", func() {
+			var (
+				config *Config
+				err    error
+			)
+
+			BeforeEach(func() {
+				rawConfig := `
+				{
+					"Plugins": {
+						"plugin-1": {},
+						"plugin-2": {}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("returns the error", func() {
-				err := config.WritePluginConfig()
-				_, ok := err.(*os.PathError)
-				Expect(ok).To(BeTrue())
+			It("returns the plugin and true if it exists", func() {
+				plugin, exist := config.GetPlugin("plugin-1")
+				Expect(exist).To(BeTrue())
+				Expect(plugin).To(Equal(Plugin{Name: "plugin-1"}))
+				plugin, exist = config.GetPlugin("plugin-2")
+				Expect(exist).To(BeTrue())
+				Expect(plugin).To(Equal(Plugin{Name: "plugin-2"}))
+			})
+
+			It("returns an empty plugin and false if it doesn't exist", func() {
+				plugin, exist := config.GetPlugin("does-not-exist")
+				Expect(exist).To(BeFalse())
+				Expect(plugin).To(Equal(Plugin{}))
 			})
 		})
 	})

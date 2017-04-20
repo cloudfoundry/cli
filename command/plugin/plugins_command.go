@@ -1,52 +1,55 @@
 package plugin
 
 import (
-	"os"
-	"sort"
+	"strings"
 
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/plugin/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/sorting"
 )
+
+//go:generate counterfeiter . PluginsActor
+
+type PluginsActor interface {
+	GetOutdatedPlugins() ([]pluginaction.OutdatedPlugin, error)
+}
 
 type PluginsCommand struct {
 	Checksum        bool        `long:"checksum" description:"Compute and show the sha1 value of the plugin binary file"`
-	usage           interface{} `usage:"CF_NAME plugins [--checksum]"`
+	Outdated        bool        `long:"outdated" description:"Search the plugin repositories for new versions of installed plugins"`
+	usage           interface{} `usage:"CF_NAME plugins [--checksum | --outdated]"`
 	relatedCommands interface{} `related_commands:"install-plugin, repo-plugins, uninstall-plugin"`
 
 	UI     command.UI
 	Config command.Config
+	Actor  PluginsActor
 }
 
 func (cmd *PluginsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
+	pluginClient := shared.NewClient(config, ui)
+	cmd.Actor = pluginaction.NewActor(config, pluginClient)
 	return nil
 }
 
 func (cmd PluginsCommand) Execute(_ []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
+	switch {
+	case cmd.Outdated:
+		return cmd.displayOutdatedPlugins()
+	case cmd.Checksum:
+		return cmd.displayPluginChecksums(cmd.Config.Plugins())
+	default:
+		return cmd.displayPluginCommands(cmd.Config.Plugins())
 	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
+}
 
-	plugins := cmd.Config.Plugins()
-	sortedPluginNames := sorting.Alphabetic{}
-	for pluginName, _ := range plugins {
-		sortedPluginNames = append(sortedPluginNames, pluginName)
-	}
-	sort.Sort(sortedPluginNames)
-
-	var table [][]string
-	if cmd.Checksum {
-		cmd.UI.DisplayText("Computing sha1 for installed plugins, this may take a while...")
-		table = cmd.calculatePluginChecksums(sortedPluginNames, plugins)
-	} else {
-		cmd.UI.DisplayText("Listing installed plugins...")
-		table = cmd.getPluginCommands(sortedPluginNames, plugins)
+func (cmd PluginsCommand) displayPluginChecksums(plugins []configv3.Plugin) error {
+	cmd.UI.DisplayText("Computing sha1 for installed plugins, this may take a while...")
+	table := [][]string{{"plugin name", "version", "sha1"}}
+	for _, plugin := range plugins {
+		table = append(table, []string{plugin.Name, plugin.Version.String(), plugin.CalculateSHA1()})
 	}
 
 	cmd.UI.DisplayNewline()
@@ -54,22 +57,47 @@ func (cmd PluginsCommand) Execute(_ []string) error {
 	return nil
 }
 
-func (cmd PluginsCommand) calculatePluginChecksums(sortedPluginNames []string, plugins map[string]configv3.Plugin) [][]string {
-	table := [][]string{{"plugin name", "version", "sha1"}}
-	for _, pluginName := range sortedPluginNames {
-		plugin := plugins[pluginName]
-		table = append(table, []string{pluginName, plugin.Version.String(), plugin.CalculateSHA1()})
+func (cmd PluginsCommand) displayOutdatedPlugins() error {
+	repos := cmd.Config.PluginRepositories()
+	if len(repos) == 0 {
+		return shared.NoPluginRepositoriesError{}
 	}
-	return table
+	repoNames := make([]string, len(repos))
+	for i := range repos {
+		repoNames[i] = repos[i].Name
+	}
+	cmd.UI.DisplayText("Searching {{.RepoNames}} for newer versions of installed plugins...",
+		map[string]interface{}{
+			"RepoNames": strings.Join(repoNames, ", "),
+		})
+
+	outdatedPlugins, err := cmd.Actor.GetOutdatedPlugins()
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	table := [][]string{{"plugin name", "version", "latest version"}}
+
+	for _, plugin := range outdatedPlugins {
+		table = append(table, []string{plugin.Name, plugin.CurrentVersion, plugin.LatestVersion})
+	}
+
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	return nil
 }
 
-func (cmd PluginsCommand) getPluginCommands(sortedPluginNames []string, plugins map[string]configv3.Plugin) [][]string {
+func (cmd PluginsCommand) displayPluginCommands(plugins []configv3.Plugin) error {
+	cmd.UI.DisplayText("Listing installed plugins...")
 	table := [][]string{{"plugin name", "version", "command name", "command help"}}
-	for _, pluginName := range sortedPluginNames {
-		plugin := plugins[pluginName]
-		for _, command := range plugin.Commands {
-			table = append(table, []string{pluginName, plugin.Version.String(), command.CommandName(), command.HelpText})
+	for _, plugin := range plugins {
+		for _, command := range plugin.PluginCommands() {
+			table = append(table, []string{plugin.Name, plugin.Version.String(), command.CommandName(), command.HelpText})
 		}
 	}
-	return table
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	return nil
 }

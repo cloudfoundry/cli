@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("UninstallPlugin", func() {
 	var (
-		actor                 *Actor
+		actor                 Actor
 		binaryPath            string
 		fakeConfig            *pluginactionfakes.FakeConfig
 		fakePluginUninstaller *pluginactionfakes.FakePluginUninstaller
@@ -31,17 +31,10 @@ var _ = Describe("UninstallPlugin", func() {
 		err = ioutil.WriteFile(binaryPath, nil, 0600)
 		Expect(err).ToNot(HaveOccurred())
 
-		plugins := map[string]configv3.Plugin{
-			"some-plugin": {
-				Location: binaryPath,
-			},
-		}
-
 		fakePluginUninstaller = new(pluginactionfakes.FakePluginUninstaller)
 		fakeConfig = new(pluginactionfakes.FakeConfig)
-		actor = NewActor(fakeConfig)
+		actor = NewActor(fakeConfig, nil)
 
-		fakeConfig.PluginsReturns(plugins)
 	})
 
 	AfterEach(func() {
@@ -49,6 +42,10 @@ var _ = Describe("UninstallPlugin", func() {
 	})
 
 	Context("when the plugin does not exist", func() {
+		BeforeEach(func() {
+			fakeConfig.GetPluginReturns(configv3.Plugin{}, false)
+		})
+
 		It("returns a PluginNotFoundError", func() {
 			err := actor.UninstallPlugin(fakePluginUninstaller, "some-non-existent-plugin")
 			Expect(err).To(MatchError(PluginNotFoundError{Name: "some-non-existent-plugin"}))
@@ -56,12 +53,20 @@ var _ = Describe("UninstallPlugin", func() {
 	})
 
 	Context("when the plugin exists", func() {
+		BeforeEach(func() {
+			fakeConfig.GetPluginReturns(configv3.Plugin{
+				Name:     "some-plugin",
+				Location: binaryPath,
+			}, true)
+		})
+
 		Context("when no errors are encountered", func() {
 			It("runs the plugin cleanup, deletes the binary and removes the plugin config", func() {
 				err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeConfig.PluginsCallCount()).To(Equal(1))
+				Expect(fakeConfig.GetPluginCallCount()).To(Equal(1))
+				Expect(fakeConfig.GetPluginArgsForCall(0)).To(Equal("some-plugin"))
 
 				Expect(fakePluginUninstaller.UninstallCallCount()).To(Equal(1))
 				Expect(fakePluginUninstaller.UninstallArgsForCall(0)).To(Equal(binaryPath))

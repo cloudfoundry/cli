@@ -13,7 +13,6 @@ import (
 var _ = Describe("plugin API", func() {
 	BeforeEach(func() {
 		installTestPlugin()
-		helpers.LoginCF()
 	})
 
 	AfterEach(func() {

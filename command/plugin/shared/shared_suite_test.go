@@ -1,10 +1,10 @@
 package shared_test
 
 import (
-	"testing"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"testing"
 )
 
 func TestShared(t *testing.T) {

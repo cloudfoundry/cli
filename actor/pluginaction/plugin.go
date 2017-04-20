@@ -23,7 +23,7 @@ type PluginUninstaller interface {
 }
 
 func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) error {
-	plugin, exist := actor.config.Plugins()[name]
+	plugin, exist := actor.config.GetPlugin(name)
 	if !exist {
 		return PluginNotFoundError{Name: name}
 	}
