@@ -10,78 +10,72 @@ type ApplicationConfig struct {
 	CurrentApplication v2action.Application
 	DesiredApplication v2action.Application
 
+	CurrentRoutes []v2action.Route
+	DesiredRoutes []v2action.Route
+
 	TargetedSpaceGUID string
 	Path              string
 }
 
-func (actor Actor) Apply(config ApplicationConfig) (<-chan Event, <-chan Warnings, <-chan error) {
-	eventStream := make(chan Event)
-	warningsStream := make(chan Warnings)
-	errorStream := make(chan error)
-
-	go func() {
-		log.Debug("starting apply thread")
-		defer close(eventStream)
-		defer close(warningsStream)
-		defer close(errorStream)
-
-		if config.CurrentApplication.GUID != "" {
-			log.Debugf("updating application: %#v", config.DesiredApplication)
-			_, warnings, err := actor.V2Actor.UpdateApplication(config.DesiredApplication)
-			warningsStream <- Warnings(warnings)
-			if err != nil {
-				log.Errorf("error updating application: %v", err)
-				errorStream <- err
-				return
-			}
-			eventStream <- ApplicationUpdated
-		} else {
-			log.Debugf("creating application: %#v", config.DesiredApplication)
-			_, warnings, err := actor.V2Actor.CreateApplication(config.DesiredApplication)
-			warningsStream <- Warnings(warnings)
-			if err != nil {
-				log.Errorf("error creating application: %v", err)
-				errorStream <- err
-				return
-			}
-			eventStream <- ApplicationCreated
-		}
-
-		log.Debug("sending complete")
-		eventStream <- Complete
-		log.Debug("sent complete")
-	}()
-
-	return eventStream, warningsStream, errorStream
-}
-
-func (actor Actor) ConvertToApplicationConfig(spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
+func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings
 
 	log.Infof("iterating through %d app configuration(s)", len(apps))
 	for _, app := range apps {
-		log.Infof("searching for app %s", app.Name)
+		config := ApplicationConfig{
+			TargetedSpaceGUID: spaceGUID,
+			Path:              app.Path,
+		}
 
-		foundApp, v2Warnings, err := actor.V2Actor.GetApplicationByNameAndSpace(app.Name, spaceGUID)
+		log.Infoln("searching for app", app.Name)
+		appExists, foundApp, v2Warnings, err := actor.FindOrReturnParialApp(app.Name, spaceGUID)
 		warnings = append(warnings, v2Warnings...)
-		if _, ok := err.(v2action.ApplicationNotFoundError); ok {
-			log.Warnf("unable to find app %s in current space (GUID: %s)", app.Name, spaceGUID)
-		} else if err != nil {
-			log.Errorf("error finding app %s", app.Name)
+		if err != nil {
+			log.Errorln("app lookup:", err)
 			return nil, warnings, err
 		}
 
-		config := ApplicationConfig{
-			CurrentApplication: foundApp,
-			DesiredApplication: foundApp,
-			TargetedSpaceGUID:  spaceGUID,
-			Path:               app.Path,
+		if appExists {
+			log.Debugf("found app: %#v", foundApp)
+			config.CurrentApplication = foundApp
+			config.DesiredApplication = foundApp
+
+			log.Info("looking up application routes")
+			var routes []v2action.Route
+			var routeWarnings v2action.Warnings
+			routes, routeWarnings, err = actor.V2Actor.GetApplicationRoutes(foundApp.GUID)
+			warnings = append(warnings, routeWarnings...)
+			if err != nil {
+				log.Errorln("existing routes lookup:", err)
+				return nil, warnings, err
+			}
+			config.CurrentRoutes = routes
+		} else {
+			log.Debug("using empty app as base")
+			config.DesiredApplication.Name = app.Name
+			config.DesiredApplication.SpaceGUID = spaceGUID
 		}
 
-		config.DesiredApplication.Name = app.Name
-		config.DesiredApplication.SpaceGUID = spaceGUID
+		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID)
+		warnings = append(warnings, routeWarnings...)
+		if err != nil {
+			log.Errorln("getting default route:", err)
+			return nil, warnings, err
+		}
+		config.DesiredRoutes = []v2action.Route{defaultRoute}
+
 		configs = append(configs, config)
 	}
+
 	return configs, warnings, nil
+}
+
+func (actor Actor) FindOrReturnParialApp(appName string, spaceGUID string) (bool, v2action.Application, v2action.Warnings, error) {
+	foundApp, v2Warnings, err := actor.V2Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if _, ok := err.(v2action.ApplicationNotFoundError); ok {
+		log.Warnf("unable to find app %s in current space (GUID: %s)", appName, spaceGUID)
+		return false, v2action.Application{}, v2Warnings, nil
+	}
+	return true, foundApp, v2Warnings, err
 }

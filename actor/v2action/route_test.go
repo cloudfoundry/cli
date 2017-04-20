@@ -586,6 +586,59 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("CheckRoute", func() {
+		Context("when the API calls succeed", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"some-check-route-warnings"}, nil)
+			})
+
+			It("returns the bool and warnings", func() {
+				exists, warnings, err := actor.CheckRoute(Route{
+					Host: "some-host",
+					Domain: Domain{
+						GUID: "some-domain-guid",
+					},
+					Path: "some-path",
+					Port: 42,
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-check-route-warnings"))
+				Expect(exists).To(BeTrue())
+
+				Expect(fakeCloudControllerClient.CheckRouteCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.CheckRouteArgsForCall(0)).To(Equal(ccv2.Route{
+					Host:       "some-host",
+					DomainGUID: "some-domain-guid",
+					Path:       "some-path",
+					Port:       42,
+				}))
+			})
+		})
+
+		Context("when the cc returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("booo")
+				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"some-check-route-warnings"}, expectedErr)
+			})
+
+			It("returns the bool and warnings", func() {
+				exists, warnings, err := actor.CheckRoute(Route{
+					Host: "some-host",
+					Domain: Domain{
+						GUID: "some-domain-guid",
+					},
+				})
+
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("some-check-route-warnings"))
+				Expect(exists).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("Route", func() {
 		DescribeTable("String", func(host string, domain string, path string, port int, expectedValue string) {
 			route := Route{

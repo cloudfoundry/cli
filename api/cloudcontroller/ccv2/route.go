@@ -144,7 +144,7 @@ func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 }
 
 // CheckRoute returns true if the route exists in the CF instance. DomainGUID
-// is required for check.
+// is required for check. This call will only work for CC API 2.55 or higher.
 func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteReservedRequest,

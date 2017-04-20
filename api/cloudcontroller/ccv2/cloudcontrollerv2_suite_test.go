@@ -2,6 +2,7 @@ package ccv2_test
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -40,7 +41,11 @@ var _ = BeforeEach(func() {
 })
 
 func NewTestClient(passed ...Config) *Client {
-	SetupV2InfoResponse()
+	return NewClientWithCustomAPIVersion("2.23.0", passed...)
+}
+
+func NewClientWithCustomAPIVersion(apiVersion string, passed ...Config) *Client {
+	SetupV2InfoResponse(apiVersion)
 
 	var config Config
 	if len(passed) > 0 {
@@ -61,9 +66,9 @@ func NewTestClient(passed ...Config) *Client {
 	return client
 }
 
-func SetupV2InfoResponse() {
+func SetupV2InfoResponse(apiVersion string) {
 	serverAPIURL := server.URL()[8:]
-	response := `{
+	response := fmt.Sprintf(`{
 		"name":"",
 		"build":"",
 		"support":"http://support.cloudfoundry.com",
@@ -73,14 +78,14 @@ func SetupV2InfoResponse() {
 		"token_endpoint":"https://uaa.APISERVER",
 		"min_cli_version":null,
 		"min_recommended_cli_version":null,
-		"api_version":"2.59.0",
+		"api_version":"%s",
 		"app_ssh_endpoint":"ssh.APISERVER",
 		"app_ssh_host_key_fingerprint":"a6:d1:08:0b:b0:cb:9b:5f:c4:ba:44:2a:97:26:19:8a",
 		"routing_endpoint": "https://APISERVER/routing",
 		"app_ssh_oauth_client":"ssh-proxy",
 		"logging_endpoint":"wss://loggregator.APISERVER",
 		"doppler_logging_endpoint":"wss://doppler.APISERVER"
-	}`
+	}`, apiVersion)
 	response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
 	server.AppendHandlers(
 		CombineHandlers(

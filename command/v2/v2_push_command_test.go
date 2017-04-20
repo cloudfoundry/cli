@@ -80,7 +80,7 @@ var _ = Describe("v2-push Command", func() {
 	Context("when the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.HasTargetedOrganizationReturns(true)
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-organization"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{GUID: "some-org-guid", Name: "some-org"})
 			fakeConfig.HasTargetedSpaceReturns(true)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{GUID: "some-space-guid", Name: "some-space"})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
@@ -167,7 +167,8 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 
 						Expect(fakeActor.ConvertToApplicationConfigCallCount()).To(Equal(1))
-						spaceGUID, manifests := fakeActor.ConvertToApplicationConfigArgsForCall(0)
+						orgGUID, spaceGUID, manifests := fakeActor.ConvertToApplicationConfigArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(manifests).To(Equal(appManifests))
 					})
@@ -187,8 +188,8 @@ var _ = Describe("v2-push Command", func() {
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Creating app %s in org %s / space %s as %s...", appName, "some-organization", "some-space", "some-user"))
-						Expect(testUI.Out).To(Say("Updating app %s in org %s / space %s as %s...", appName, "some-organization", "some-space", "some-user"))
+						Expect(testUI.Out).To(Say("Creating app %s in org %s / space %s as %s...", appName, "some-org", "some-space", "some-user"))
+						Expect(testUI.Out).To(Say("Updating app %s in org %s / space %s as %s...", appName, "some-org", "some-space", "some-user"))
 						Expect(testUI.Out).To(Say("Creating routes..."))
 						Expect(testUI.Out).To(Say("Binding routes..."))
 						Expect(testUI.Out).To(Say("Uploading application..."))

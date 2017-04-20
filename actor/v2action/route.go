@@ -147,6 +147,16 @@ func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Rout
 	return routes[0], append(Warnings(warnings), domainWarnings...), err
 }
 
+func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
+	exists, warnings, err := actor.CloudControllerClient.CheckRoute(ccv2.Route{
+		Host:       route.Host,
+		Path:       route.Path,
+		Port:       route.Port,
+		DomainGUID: route.Domain.GUID,
+	})
+	return exists, Warnings(warnings), err
+}
+
 func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, error) {
 	var routes []Route
 	var allWarnings Warnings

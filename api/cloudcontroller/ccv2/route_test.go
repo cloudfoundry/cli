@@ -553,108 +553,118 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("CheckRoute", func() {
-		Context("with minimum params", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid"),
-						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("does not contain any params", func() {
-				_, warnings, err := client.CheckRoute(Route{DomainGUID: "some-domain-guid"})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-			})
+		Context("API Version < 2.55.0", func() {
+			// Figure it out
 		})
 
-		Context("with all the params", func() {
+		Context("API Version >= 2.55.0", func() {
 			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host&path=some-path&port=42"),
-						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+				client = NewClientWithCustomAPIVersion("2.55.0")
 			})
 
-			It("returns true", func() {
-				exists, warnings, err := client.CheckRoute(Route{
-					Host:       "some-host",
-					DomainGUID: "some-domain-guid",
-					Path:       "some-path",
-					Port:       42,
+			Context("with minimum params", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid"),
+							RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
 				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-				Expect(exists).To(BeTrue())
-			})
-		})
 
-		Context("when the route exists", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
-						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+				It("does not contain any params", func() {
+					_, warnings, err := client.CheckRoute(Route{DomainGUID: "some-domain-guid"})
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 
-			It("returns true", func() {
-				exists, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-				Expect(exists).To(BeTrue())
-			})
-		})
+			Context("with all the params", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host&path=some-path&port=42"),
+							RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
 
-		Context("when the route does not exist", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
-						RespondWith(http.StatusNotFound, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+				It("contains all requested parameters", func() {
+					exists, warnings, err := client.CheckRoute(Route{
+						Host:       "some-host",
+						DomainGUID: "some-domain-guid",
+						Path:       "some-path",
+						Port:       42,
+					})
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+					Expect(exists).To(BeTrue())
+				})
 			})
 
-			It("returns false", func() {
-				exists, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
-				Expect(exists).To(BeFalse())
-			})
-		})
+			Context("when the route exists", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
+							RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
 
-		Context("when the CC errors", func() {
-			BeforeEach(func() {
-				response := `{
+				It("returns true", func() {
+					exists, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+					Expect(exists).To(BeTrue())
+				})
+			})
+
+			Context("when the route does not exist", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
+							RespondWith(http.StatusNotFound, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns false", func() {
+					exists, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+					Expect(exists).To(BeFalse())
+				})
+			})
+
+			Context("when the CC errors", func() {
+				BeforeEach(func() {
+					response := `{
 				"code": 777,
 				"description": "The route could not be found: some-route-guid",
 				"error_code": "CF-WUT"
 			}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
-						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/routes/reserved/domain/some-domain-guid", "host=some-host"),
+							RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
 
-			It("returns the error", func() {
-				_, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
-				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
-					V2ErrorResponse: ccerror.V2ErrorResponse{
-						Code:        777,
-						Description: "The route could not be found: some-route-guid",
-						ErrorCode:   "CF-WUT",
-					},
-					ResponseCode: http.StatusTeapot,
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				It("returns the error", func() {
+					_, warnings, err := client.CheckRoute(Route{Host: "some-host", DomainGUID: "some-domain-guid"})
+					Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+						V2ErrorResponse: ccerror.V2ErrorResponse{
+							Code:        777,
+							Description: "The route could not be found: some-route-guid",
+							ErrorCode:   "CF-WUT",
+						},
+						ResponseCode: http.StatusTeapot,
+					}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
 			})
 		})
 	})

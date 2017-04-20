@@ -14,191 +14,185 @@ import (
 
 var _ = Describe("Application Config", func() {
 	var (
-		actor  *Actor
-		v2fake *pushactionfakes.FakeV2Actor
+		actor       *Actor
+		fakeV2Actor *pushactionfakes.FakeV2Actor
 	)
 
 	BeforeEach(func() {
-		v2fake = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(v2fake)
-	})
-
-	Describe("Apply", func() {
-		var (
-			eventStream    <-chan Event
-			warningsStream <-chan Warnings
-			errorStream    <-chan error
-
-			config ApplicationConfig
-		)
-		BeforeEach(func() {
-			config = ApplicationConfig{
-				DesiredApplication: v2action.Application{
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
-				},
-			}
-		})
-
-		JustBeforeEach(func() {
-			eventStream, warningsStream, errorStream = actor.Apply(config)
-		})
-
-		AfterEach(func() {
-			Eventually(warningsStream).Should(BeClosed())
-			Eventually(eventStream).Should(BeClosed())
-			Eventually(errorStream).Should(BeClosed())
-		})
-
-		Context("when the app exists", func() {
-			BeforeEach(func() {
-				config.CurrentApplication = v2action.Application{
-					Name:      "some-app-name",
-					GUID:      "some-app-guid",
-					SpaceGUID: "some-space-guid",
-					Buildpack: "java",
-				}
-				config.DesiredApplication = v2action.Application{
-					Name:      "some-app-name",
-					GUID:      "some-app-guid",
-					SpaceGUID: "some-space-guid",
-					Buildpack: "ruby",
-				}
-			})
-
-			Context("when the update is successful", func() {
-				BeforeEach(func() {
-					v2fake.UpdateApplicationReturns(v2action.Application{}, v2action.Warnings{"update-warning"}, nil)
-				})
-
-				It("updates the application", func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("update-warning")))
-					Eventually(eventStream).Should(Receive(Equal(ApplicationUpdated)))
-					Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-					Expect(v2fake.UpdateApplicationCallCount()).To(Equal(1))
-					Expect(v2fake.UpdateApplicationArgsForCall(0)).To(Equal(v2action.Application{
-						Name:      "some-app-name",
-						GUID:      "some-app-guid",
-						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
-					}))
-				})
-			})
-
-			Context("when the update errors", func() {
-				var expectedErr error
-				BeforeEach(func() {
-					expectedErr = errors.New("oh my")
-					v2fake.UpdateApplicationReturns(v2action.Application{}, v2action.Warnings{"update-warning"}, expectedErr)
-				})
-
-				It("returns warnings and error and stops", func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("update-warning")))
-					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(eventStream).ShouldNot(Receive(Equal(ApplicationUpdated)))
-				})
-			})
-		})
-
-		Context("when the app does not exist", func() {
-			Context("when the creation is successful", func() {
-				BeforeEach(func() {
-					v2fake.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"create-warning"}, nil)
-				})
-
-				It("creates the application", func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("create-warning")))
-					Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-					Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-					Expect(v2fake.CreateApplicationCallCount()).To(Equal(1))
-					Expect(v2fake.CreateApplicationArgsForCall(0)).To(Equal(v2action.Application{
-						Name:      "some-app-name",
-						SpaceGUID: "some-space-guid",
-					}))
-				})
-			})
-
-			Context("when the creation errors", func() {
-				var expectedErr error
-				BeforeEach(func() {
-					expectedErr = errors.New("oh my")
-					v2fake.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"create-warning"}, expectedErr)
-				})
-
-				It("returns warnings and error and stops", func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("create-warning")))
-					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(eventStream).ShouldNot(Receive(Equal(ApplicationCreated)))
-				})
-			})
-		})
+		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
+		actor = NewActor(fakeV2Actor)
 	})
 
 	Describe("ConvertToApplicationConfig", func() {
 		var (
+			appName      string
+			orgGUID      string
 			spaceGUID    string
+			domain       v2action.Domain
 			manifestApps []manifest.Application
 
 			configs    []ApplicationConfig
 			warnings   Warnings
 			executeErr error
+
+			firstConfig ApplicationConfig
 		)
 
 		BeforeEach(func() {
+			appName = "some-app"
+			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
 			manifestApps = []manifest.Application{{
-				Name: "some-app",
+				Name: appName,
 				Path: "some-path",
 			}}
+
+			domain = v2action.Domain{
+				Name: "private-domain.com",
+				GUID: "some-private-domain-guid",
+			}
+			// Prevents NoDomainsFoundError
+			fakeV2Actor.GetOrganizationDomainsReturns(
+				[]v2action.Domain{domain},
+				v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"},
+				nil,
+			)
 		})
 
 		JustBeforeEach(func() {
-			configs, warnings, executeErr = actor.ConvertToApplicationConfig(spaceGUID, manifestApps)
+			configs, warnings, executeErr = actor.ConvertToApplicationConfig(orgGUID, spaceGUID, manifestApps)
+			if len(configs) > 0 {
+				firstConfig = configs[0]
+			}
 		})
 
 		Context("when the application exists", func() {
 			var app v2action.Application
+			var route v2action.Route
 
 			BeforeEach(func() {
 				app = v2action.Application{
-					Name:      "some-app",
+					Name:      appName,
 					GUID:      "some-app-guid",
 					SpaceGUID: spaceGUID,
 				}
 
-				v2fake.GetApplicationByNameAndSpaceReturns(app, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
+				route = v2action.Route{
+					Domain: v2action.Domain{
+						Name: "some-domain.com",
+						GUID: "some-domain-guid",
+					},
+					Host:      app.Name,
+					GUID:      "route-guid",
+					SpaceGUID: spaceGUID,
+				}
+
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
 			})
 
-			It("sets the current and desired application to the current", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
-				Expect(configs).To(Equal([]ApplicationConfig{{
-					CurrentApplication: app,
-					DesiredApplication: app,
-					TargetedSpaceGUID:  spaceGUID,
-					Path:               "some-path",
-				}}))
+			Context("when retrieving the application's routes is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{route}, v2action.Warnings{"app-route-warnings"}, nil)
+				})
+
+				It("sets the current and desired application to the current", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
+					Expect(firstConfig.CurrentApplication).To(Equal(app))
+					Expect(firstConfig.DesiredApplication).To(Equal(app))
+					Expect(firstConfig.Path).To(Equal("some-path"))
+					Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
+
+					Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					appName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appName).To(Equal(app.Name))
+					Expect(passedSpaceGUID).To(Equal(spaceGUID))
+				})
+
+				It("sets the current routes", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
+					Expect(firstConfig.CurrentRoutes).To(ConsistOf(route))
+				})
+			})
+
+			Context("when retrieving the application's routes errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("dios mio")
+					fakeV2Actor.GetApplicationRoutesReturns(nil, v2action.Warnings{"app-route-warnings"}, expectedErr)
+				})
+
+				It("sets the current and desired application to the current", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings"))
+
+					Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GetApplicationRoutesArgsForCall(0)).To(Equal(app.GUID))
+				})
 			})
 		})
 
-		Describe("when the application does not exist", func() {
+		Context("when the application does not exist", func() {
 			BeforeEach(func() {
-				v2fake.GetApplicationByNameAndSpaceReturns(v2action.Application{}, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, v2action.ApplicationNotFoundError{})
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, v2action.ApplicationNotFoundError{})
 			})
 
 			It("creates a new application and sets it to the desired application", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "private-domain-warnings", "shared-domain-warnings"))
+				Expect(firstConfig.CurrentApplication).To(Equal(v2action.Application{}))
+				Expect(firstConfig.DesiredApplication).To(Equal(v2action.Application{
+					Name:      "some-app",
+					SpaceGUID: spaceGUID,
+				}))
+				Expect(firstConfig.Path).To(Equal("some-path"))
+				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
+			})
+		})
+
+		Context("when retrieving the application errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("dios mio")
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
-				Expect(configs).To(Equal([]ApplicationConfig{{
-					DesiredApplication: v2action.Application{
-						Name:      "some-app",
-						SpaceGUID: spaceGUID,
-					},
-					TargetedSpaceGUID: spaceGUID,
-					Path:              "some-path",
-				}}))
+			})
+		})
+
+		Context("when retrieving the default route is successful", func() {
+			BeforeEach(func() {
+				// Assumes new route
+				fakeV2Actor.CheckRouteReturns(false, v2action.Warnings{"get-route-warnings"}, nil)
+			})
+
+			It("adds the route to desired routes", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+				Expect(firstConfig.DesiredRoutes).To(ConsistOf(v2action.Route{
+					Host:   appName,
+					Domain: domain,
+				}))
+			})
+		})
+
+		Context("when retrieving the default route errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("dios mio")
+				fakeV2Actor.CheckRouteReturns(false, v2action.Warnings{"get-route-warnings"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 			})
 		})
 	})
