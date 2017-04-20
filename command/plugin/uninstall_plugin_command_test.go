@@ -27,16 +27,15 @@ var _ = Describe("uninstall-plugin command", func() {
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
-		plugins := map[string]configv3.Plugin{
-			"some-plugin": configv3.Plugin{
-				Version: configv3.PluginVersion{
-					Major: 1,
-					Minor: 2,
-					Build: 3,
-				},
+		somePlugin := configv3.Plugin{
+			Name: "some-plugin",
+			Version: configv3.PluginVersion{
+				Major: 1,
+				Minor: 2,
+				Build: 3,
 			},
 		}
-		fakeConfig.PluginsReturns(plugins)
+		fakeConfig.GetPluginReturns(somePlugin, true)
 		fakeActor = new(pluginfakes.FakeUninstallPluginActor)
 
 		cmd = UninstallPluginCommand{

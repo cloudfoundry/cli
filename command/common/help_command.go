@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"math"
-	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -11,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command/common/internal"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/util/configv3"
-	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 const (
@@ -329,20 +327,12 @@ func (cmd HelpCommand) findPlugin() (sharedaction.CommandInfo, bool) {
 	return sharedaction.CommandInfo{}, false
 }
 
-func (cmd HelpCommand) getSortedPluginCommands() configv3.PluginCommands {
+func (cmd HelpCommand) getSortedPluginCommands() []configv3.PluginCommand {
 	plugins := cmd.Config.Plugins()
 
-	sortedPluginNames := sorting.Alphabetic{}
-	for plugin, _ := range plugins {
-		sortedPluginNames = append(sortedPluginNames, plugin)
-	}
-	sort.Sort(sortedPluginNames)
-
-	pluginCommands := configv3.PluginCommands{}
-	for _, pluginName := range sortedPluginNames {
-		sortedCommands := plugins[pluginName].Commands
-		sort.Sort(sortedCommands)
-		pluginCommands = append(pluginCommands, sortedCommands...)
+	var pluginCommands []configv3.PluginCommand
+	for _, plugin := range plugins {
+		pluginCommands = append(pluginCommands, plugin.PluginCommands()...)
 	}
 
 	return pluginCommands

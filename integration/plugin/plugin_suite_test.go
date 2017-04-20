@@ -62,6 +62,8 @@ var _ = AfterSuite(func() {
 var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	apiURL, skipSSLValidation = helpers.SetAPI()
+	helpers.LoginCF()
+	Eventually(helpers.CF("remove-plugin-repo", "CF-Community")).Should(Exit(0))
 })
 
 var _ = AfterEach(func() {

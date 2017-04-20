@@ -71,7 +71,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 				ConfigVersion: 3,
 				Target:        DefaultTarget,
 				ColorEnabled:  DefaultColorEnabled,
-				PluginRepos: []PluginRepos{{
+				PluginRepositories: []PluginRepository{{
 					Name: DefaultPluginRepoName,
 					URL:  DefaultPluginRepoURL,
 				}},
@@ -124,6 +124,11 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		err = json.Unmarshal(file, &config.pluginsConfig)
 		if err != nil {
 			return nil, err
+		}
+
+		for name, plugin := range config.pluginsConfig.Plugins {
+			plugin.Name = name
+			config.pluginsConfig.Plugins[name] = plugin
 		}
 	}
 
@@ -188,28 +193,28 @@ type Config struct {
 
 // CFConfig represents .cf/config.json
 type CFConfig struct {
-	ConfigVersion            int           `json:"ConfigVersion"`
-	Target                   string        `json:"Target"`
-	APIVersion               string        `json:"APIVersion"`
-	AuthorizationEndpoint    string        `json:"AuthorizationEndpoint"`
-	DopplerEndpoint          string        `json:"DopplerEndPoint"`
-	UAAEndpoint              string        `json:"UaaEndpoint"`
-	RoutingEndpoint          string        `json:"RoutingAPIEndpoint"`
-	AccessToken              string        `json:"AccessToken"`
-	SSHOAuthClient           string        `json:"SSHOAuthClient"`
-	UAAOAuthClient           string        `json:"UAAOAuthClient"`
-	UAAOAuthClientSecret     string        `json:"UAAOAuthClientSecret"`
-	RefreshToken             string        `json:"RefreshToken"`
-	TargetedOrganization     Organization  `json:"OrganizationFields"`
-	TargetedSpace            Space         `json:"SpaceFields"`
-	SkipSSLValidation        bool          `json:"SSLDisabled"`
-	AsyncTimeout             int           `json:"AsyncTimeout"`
-	Trace                    string        `json:"Trace"`
-	ColorEnabled             string        `json:"ColorEnabled"`
-	Locale                   string        `json:"Locale"`
-	PluginRepos              []PluginRepos `json:"PluginRepos"`
-	MinCLIVersion            string        `json:"MinCLIVersion"`
-	MinRecommendedCLIVersion string        `json:"MinRecommendedCLIVersion"`
+	ConfigVersion            int                `json:"ConfigVersion"`
+	Target                   string             `json:"Target"`
+	APIVersion               string             `json:"APIVersion"`
+	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
+	DopplerEndpoint          string             `json:"DopplerEndPoint"`
+	UAAEndpoint              string             `json:"UaaEndpoint"`
+	RoutingEndpoint          string             `json:"RoutingAPIEndpoint"`
+	AccessToken              string             `json:"AccessToken"`
+	SSHOAuthClient           string             `json:"SSHOAuthClient"`
+	UAAOAuthClient           string             `json:"UAAOAuthClient"`
+	UAAOAuthClientSecret     string             `json:"UAAOAuthClientSecret"`
+	RefreshToken             string             `json:"RefreshToken"`
+	TargetedOrganization     Organization       `json:"OrganizationFields"`
+	TargetedSpace            Space              `json:"SpaceFields"`
+	SkipSSLValidation        bool               `json:"SSLDisabled"`
+	AsyncTimeout             int                `json:"AsyncTimeout"`
+	Trace                    string             `json:"Trace"`
+	ColorEnabled             string             `json:"ColorEnabled"`
+	Locale                   string             `json:"Locale"`
+	PluginRepositories       []PluginRepository `json:"PluginRepos"`
+	MinCLIVersion            string             `json:"MinCLIVersion"`
+	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
 }
 
 // Organization contains basic information about the targeted organization

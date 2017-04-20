@@ -1152,7 +1152,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME plugins [--checksum]",
+    "id": "CF_NAME plugins [--checksum | --outdated]",
     "translation": ""
   },
   {
@@ -1858,6 +1858,10 @@
   {
     "id": "Could not find space {{.Space}} in organization {{.Org}}",
     "translation": "{{.Org}} 조직에서 {{.Space}} 영역을 찾을 수 없음"
+  },
+  {
+    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
+    "translation": ""
   },
   {
     "id": "Could not serialize information",
@@ -3964,6 +3968,10 @@
     "translation": "조직을 찾을 수 없음"
   },
   {
+    "id": "No plugin repositories registered to search for plugin updates.",
+    "translation": ""
+  },
+  {
     "id": "No router groups found",
     "translation": "라우터 그룹을 찾을 수 없음"
   },
@@ -4334,6 +4342,10 @@
   {
     "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
     "translation": "이름이 \"{{.repoName}}\"인 플러그인 저장소가 이미 있습니다. 다른 이름을 사용하십시오."
+  },
+  {
+    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
+    "translation": ""
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
@@ -4918,6 +4930,14 @@
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 스케일링 중..."
+  },
+  {
+    "id": "Search the plugin repositories for new versions of installed plugins",
+    "translation": ""
+  },
+  {
+    "id": "Searching {{.RepoNames}} for newer versions of installed plugins...",
+    "translation": ""
   },
   {
     "id": "Security Groups:",
@@ -6510,6 +6530,10 @@
   {
     "id": "last uploaded:",
     "translation": "마지막으로 업로드함:"
+  },
+  {
+    "id": "latest version",
+    "translation": ""
   },
   {
     "id": "lifecycle",

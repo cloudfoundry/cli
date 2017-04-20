@@ -1152,7 +1152,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME plugins [--checksum]",
+    "id": "CF_NAME plugins [--checksum | --outdated]",
     "translation": ""
   },
   {
@@ -1858,6 +1858,10 @@
   {
     "id": "Could not find space {{.Space}} in organization {{.Org}}",
     "translation": "Konnte keinen Bereich {{.Space}} in Organisation {{.Org}} finden"
+  },
+  {
+    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
+    "translation": ""
   },
   {
     "id": "Could not serialize information",
@@ -3964,6 +3968,10 @@
     "translation": "Keine Organisationen gefunden"
   },
   {
+    "id": "No plugin repositories registered to search for plugin updates.",
+    "translation": ""
+  },
+  {
     "id": "No router groups found",
     "translation": "Keine Routergruppen gefunden"
   },
@@ -4334,6 +4342,10 @@
   {
     "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
     "translation": "Plug-in-Repository mit dem Namen \"{{.repoName}}\" ist bereits vorhanden. Bitte verwenden Sie einen anderen Namen."
+  },
+  {
+    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
+    "translation": ""
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
@@ -4918,6 +4930,14 @@
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Skalieren von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
+  },
+  {
+    "id": "Search the plugin repositories for new versions of installed plugins",
+    "translation": ""
+  },
+  {
+    "id": "Searching {{.RepoNames}} for newer versions of installed plugins...",
+    "translation": ""
   },
   {
     "id": "Security Groups:",
@@ -6510,6 +6530,10 @@
   {
     "id": "last uploaded:",
     "translation": "Letztes Hochladen:"
+  },
+  {
+    "id": "latest version",
+    "translation": ""
   },
   {
     "id": "lifecycle",
