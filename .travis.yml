@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.7
+  - 1.8
 go_import_path: code.cloudfoundry.org/cli
 install: true # no-op; install ginkgo from vendor using bin/test
 script:  bin/test -nodes=2 -compilers=2
