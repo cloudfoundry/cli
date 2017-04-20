@@ -7,6 +7,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 // CloudControllerClient is a Cloud Controller V2 client.
 type CloudControllerClient interface {
 	AssociateSpaceWithSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
+	CheckRoute(route ccv2.Route) (bool, ccv2.Warnings, error)
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
