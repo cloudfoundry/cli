@@ -3,6 +3,7 @@ package v2action
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
@@ -53,6 +54,29 @@ type RouteNotFoundError struct {
 
 func (e RouteNotFoundError) Error() string {
 	return fmt.Sprintf("Route with host %s and domain guid %s not found", e.Host, e.DomainGUID)
+}
+
+// RouteInDifferentSpaceError is returned when the route exists in a different
+// space than the one requesting it.
+type RouteInDifferentSpaceError struct {
+	Route string
+}
+
+func (e RouteInDifferentSpaceError) Error() string {
+	return fmt.Sprintf("route registered to another space")
+}
+
+func (actor Actor) BindRouteToApplication(routeGUID string, appGUID string) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.BindRouteToApplication(routeGUID, appGUID)
+	if _, ok := err.(ccerror.InvalidRelationError); ok {
+		return Warnings(warnings), RouteInDifferentSpaceError{}
+	}
+	return Warnings(warnings), err
+}
+
+func (actor Actor) CreateRoute(route Route, generatePort bool) (Route, Warnings, error) {
+	returnedRoute, warnings, err := actor.CloudControllerClient.CreateRoute(actorToCCRoute(route), generatePort)
+	return ccToActorRoute(returnedRoute, route.Domain), Warnings(warnings), err
 }
 
 // GetOrphanedRoutesBySpace returns a list of orphaned routes associated with
@@ -148,12 +172,7 @@ func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Rout
 }
 
 func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
-	exists, warnings, err := actor.CloudControllerClient.CheckRoute(ccv2.Route{
-		Host:       route.Host,
-		Path:       route.Path,
-		Port:       route.Port,
-		DomainGUID: route.Domain.GUID,
-	})
+	exists, warnings, err := actor.CloudControllerClient.CheckRoute(actorToCCRoute(route))
 	return exists, Warnings(warnings), err
 }
 
@@ -167,15 +186,29 @@ func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, erro
 		if err != nil {
 			return nil, allWarnings, err
 		}
-		routes = append(routes, Route{
-			Domain:    domain,
-			GUID:      ccv2Route.GUID,
-			Host:      ccv2Route.Host,
-			Path:      ccv2Route.Path,
-			Port:      ccv2Route.Port,
-			SpaceGUID: ccv2Route.SpaceGUID,
-		})
+		routes = append(routes, ccToActorRoute(ccv2Route, domain))
 	}
 
 	return routes, allWarnings, nil
+}
+
+func actorToCCRoute(route Route) ccv2.Route {
+	return ccv2.Route{
+		DomainGUID: route.Domain.GUID,
+		Host:       route.Host,
+		Path:       route.Path,
+		Port:       route.Port,
+		SpaceGUID:  route.SpaceGUID,
+	}
+}
+
+func ccToActorRoute(ccv2Route ccv2.Route, domain Domain) Route {
+	return Route{
+		Domain:    domain,
+		GUID:      ccv2Route.GUID,
+		Host:      ccv2Route.Host,
+		Path:      ccv2Route.Path,
+		Port:      ccv2Route.Port,
+		SpaceGUID: ccv2Route.SpaceGUID,
+	}
 }

@@ -74,6 +74,8 @@ func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
 		return ccerror.ApplicationStoppedStatsError{Message: errorResponse.Description}
 	case "CF-InstancesError":
 		return ccerror.InstancesError{Message: errorResponse.Description}
+	case "CF-InvalidRelation":
+		return ccerror.InvalidRelationError{Message: errorResponse.Description}
 	case "CF-NotStaged":
 		return ccerror.NotStagedError{Message: errorResponse.Description}
 	default:

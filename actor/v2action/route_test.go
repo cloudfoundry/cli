@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -20,6 +21,138 @@ var _ = Describe("Route Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil)
+	})
+
+	Describe("BindRouteToApplication", func() {
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.BindRouteToApplicationReturns(
+					ccv2.Route{},
+					ccv2.Warnings{"bind warning"},
+					nil)
+			})
+
+			It("binds the route to the application and returns all warnings", func() {
+				warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("bind warning"))
+
+				Expect(fakeCloudControllerClient.BindRouteToApplicationCallCount()).To(Equal(1))
+				routeGUID, appGUID := fakeCloudControllerClient.BindRouteToApplicationArgsForCall(0)
+				Expect(routeGUID).To(Equal("some-route-guid"))
+				Expect(appGUID).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			Context("InvalidRelationError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.BindRouteToApplicationReturns(
+						ccv2.Route{},
+						ccv2.Warnings{"bind warning"},
+						ccerror.InvalidRelationError{})
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+					Expect(err).To(MatchError(RouteInDifferentSpaceError{}))
+					Expect(warnings).To(ConsistOf("bind warning"))
+				})
+			})
+
+			Context("generic error", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("bind route failed")
+					fakeCloudControllerClient.BindRouteToApplicationReturns(
+						ccv2.Route{},
+						ccv2.Warnings{"bind warning"},
+						expectedErr)
+				})
+
+				It("returns the error", func() {
+					warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+					Expect(err).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("bind warning"))
+				})
+			})
+		})
+	})
+
+	Describe("CreateRoute", func() {
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateRouteReturns(
+					ccv2.Route{
+						GUID:       "some-route-guid",
+						Host:       "some-host",
+						Path:       "some-path",
+						Port:       3333,
+						DomainGUID: "some-domain-guid",
+						SpaceGUID:  "some-space-guid",
+					},
+					ccv2.Warnings{"create route warning"},
+					nil)
+			})
+
+			It("creates the route and returns all warnings", func() {
+				route, warnings, err := actor.CreateRoute(
+					Route{
+						Domain: Domain{
+							Name: "some-domain",
+							GUID: "some-domain-guid",
+						},
+						Host:      "some-host",
+						Path:      "some-path",
+						Port:      3333,
+						SpaceGUID: "some-space-guid",
+					},
+					true)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("create route warning"))
+				Expect(route).To(Equal(Route{
+					Domain: Domain{
+						Name: "some-domain",
+						GUID: "some-domain-guid",
+					},
+					GUID:      "some-route-guid",
+					Host:      "some-host",
+					Path:      "some-path",
+					Port:      3333,
+					SpaceGUID: "some-space-guid",
+				}))
+
+				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+				passedRoute, generatePort := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+				Expect(passedRoute).To(Equal(ccv2.Route{
+					DomainGUID: "some-domain-guid",
+					Host:       "some-host",
+					Path:       "some-path",
+					Port:       3333,
+					SpaceGUID:  "some-space-guid",
+				}))
+				Expect(generatePort).To(BeTrue())
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("bind route failed")
+				fakeCloudControllerClient.CreateRouteReturns(
+					ccv2.Route{},
+					ccv2.Warnings{"create route warning"},
+					expectedErr)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.CreateRoute(Route{}, true)
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("create route warning"))
+			})
+		})
 	})
 
 	Describe("GetOrphanedRoutesBySpace", func() {

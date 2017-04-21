@@ -118,6 +118,23 @@ var _ = Describe("Error Wrapper", func() {
 					})
 				})
 
+				Context("when creating a relation that is invalid", func() {
+					BeforeEach(func() {
+						response = `{
+							"code": 1002,
+							"description": "The requested app relation is invalid: the app and route must belong to the same space",
+							"error_code": "CF-InvalidRelation"
+						}`
+					})
+
+					It("returns an InvalidRelationError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(ccerror.InvalidRelationError{
+							Message: "The requested app relation is invalid: the app and route must belong to the same space",
+						}))
+					})
+				})
+
 				Context("getting stats for a stopped app", func() {
 					BeforeEach(func() {
 						response = `{
