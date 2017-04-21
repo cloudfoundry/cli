@@ -15,15 +15,17 @@ type PluginCommand struct {
 	Help  string
 }
 
-func CreateBasicPlugin(name string, version string, pluginCommands []PluginCommand) {
-	createBasicPlugin("configurable_plugin", name, version, pluginCommands)
+func InstallConfigurablePlugin(name string, version string, pluginCommands []PluginCommand) {
+	path := BuildConfigurablePlugin("configurable_plugin", name, version, pluginCommands)
+	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
 }
 
-func CreateBasicFailingPlugin(name string, version string, pluginCommands []PluginCommand) {
-	createBasicPlugin("configurable_plugin_fails_uninstall", name, version, pluginCommands)
+func InstallConfigurablePluginFailsUninstall(name string, version string, pluginCommands []PluginCommand) {
+	path := BuildConfigurablePlugin("configurable_plugin_fails_uninstall", name, version, pluginCommands)
+	Eventually(CF("install-plugin", "-f", path)).Should(Exit(0))
 }
 
-func createBasicPlugin(pluginType string, name string, version string, pluginCommands []PluginCommand) {
+func BuildConfigurablePlugin(pluginType string, name string, version string, pluginCommands []PluginCommand) string {
 	commands := []string{}
 	commandHelps := []string{}
 	commandAliases := []string{}
@@ -54,5 +56,5 @@ func createBasicPlugin(pluginType string, name string, version string, pluginCom
 	err = os.Rename(pluginPath, uniquePath)
 	Expect(err).ToNot(HaveOccurred())
 
-	Eventually(CF("install-plugin", "-f", uniquePath)).Should(Exit(0))
+	return uniquePath
 }

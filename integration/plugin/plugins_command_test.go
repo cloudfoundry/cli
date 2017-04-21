@@ -68,15 +68,15 @@ var _ = Describe("plugins command", func() {
 	Context("when plugins are installed", func() {
 		Context("when there are multiple plugins", func() {
 			BeforeEach(func() {
-				helpers.CreateBasicPlugin("I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("I-should-be-sorted-first", "1.2.0", []helpers.PluginCommand{
 					{Name: "command-1", Help: "some-command-1"},
 					{Name: "Better-command", Help: "some-better-command"},
 					{Name: "command-2", Help: "some-command-2"},
 				})
-				helpers.CreateBasicPlugin("sorted-third", "2.0.1", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("sorted-third", "2.0.1", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
-				helpers.CreateBasicPlugin("i-should-be-sorted-second", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("i-should-be-sorted-second", "1.0.0", []helpers.PluginCommand{
 					{Name: "some-command", Help: "some-command"},
 					{Name: "Some-other-command", Help: "some-other-command"},
 				})
@@ -99,7 +99,7 @@ var _ = Describe("plugins command", func() {
 
 		Context("when plugin version information is 0.0.0", func() {
 			BeforeEach(func() {
-				helpers.CreateBasicPlugin("some-plugin", "0.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("some-plugin", "0.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
 			})
@@ -113,7 +113,7 @@ var _ = Describe("plugins command", func() {
 
 		Context("when a plugin command has an alias", func() {
 			BeforeEach(func() {
-				helpers.CreateBasicPlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Alias: "bc", Help: "banana-command"},
 				})
 			})
@@ -127,7 +127,7 @@ var _ = Describe("plugins command", func() {
 
 		Context("when the --checksum flag is provided", func() {
 			BeforeEach(func() {
-				helpers.CreateBasicPlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
 			})
@@ -162,7 +162,7 @@ var _ = Describe("plugins command", func() {
 		Context("when the --outdated flag is provided", func() {
 			Context("when there are no repos", func() {
 				BeforeEach(func() {
-					helpers.CreateBasicPlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
+					helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 						{Name: "banana-command", Alias: "bc", Help: "banana-command"},
 					})
 				})
@@ -200,10 +200,10 @@ var _ = Describe("plugins command", func() {
 
 				Context("when nothing is outdated", func() {
 					BeforeEach(func() {
-						helpers.CreateBasicPlugin("plugin-1", "1.0.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-1", "1.0.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.CreateBasicPlugin("plugin-2", "2.0.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-2", "2.0.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -225,10 +225,10 @@ var _ = Describe("plugins command", func() {
 
 				Context("when the plugins are outdated", func() {
 					BeforeEach(func() {
-						helpers.CreateBasicPlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.CreateBasicPlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -284,10 +284,10 @@ var _ = Describe("plugins command", func() {
 
 				Context("when plugins are outdated", func() {
 					BeforeEach(func() {
-						helpers.CreateBasicPlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.CreateBasicPlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
 					})
@@ -304,13 +304,13 @@ var _ = Describe("plugins command", func() {
 
 				Context("when the same plugin is outdated from multiple repositories", func() {
 					BeforeEach(func() {
-						helpers.CreateBasicPlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-1", "0.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-1", Help: "banana-command"},
 						})
-						helpers.CreateBasicPlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-2", "1.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-2", Help: "banana-command"},
 						})
-						helpers.CreateBasicPlugin("plugin-3", "2.9.0", []helpers.PluginCommand{
+						helpers.InstallConfigurablePlugin("plugin-3", "2.9.0", []helpers.PluginCommand{
 							{Name: "banana-command-3", Help: "banana-command"},
 						})
 					})
