@@ -4344,10 +4344,6 @@
     "translation": "名稱為 \"{{.repoName}}\" 的外掛程式儲存庫已存在，請使用另一個名稱。"
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "所要求的外掛程式沒有可供您 OS 使用的二進位檔: "
   },

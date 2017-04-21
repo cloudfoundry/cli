@@ -24,19 +24,6 @@ func (e NoPluginRepositoriesError) Translate(translate func(string, ...interface
 	return translate(e.Error())
 }
 
-// PluginRepositoryNotFoundError is returned when the plugin Repository was not found.
-type PluginRepositoryNotFoundError struct {
-	Name string
-}
-
-func (e PluginRepositoryNotFoundError) Error() string {
-	return "Plugin repository '{{.RepositoryName}}' was not found."
-}
-
-func (e PluginRepositoryNotFoundError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{"RepositoryName": e.Name})
-}
-
 // GettingPluginRepositoryError is returned when there's an error
 // accessing the plugin repository
 type GettingPluginRepositoryError struct {

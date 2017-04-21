@@ -37,6 +37,5 @@ var _ = Describe("Translatable Errors", func() {
 
 		Entry("PluginNotFoundError", PluginNotFoundError{}),
 		Entry("NoPluginRepositoriesError", NoPluginRepositoriesError{}),
-		Entry("PluginRepositoryNotFoundError", PluginRepositoryNotFoundError{}),
 	)
 })

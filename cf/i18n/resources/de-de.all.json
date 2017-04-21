@@ -4344,10 +4344,6 @@
     "translation": "Plug-in-Repository mit dem Namen \"{{.repoName}}\" ist bereits vorhanden. Bitte verwenden Sie einen anderen Namen."
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "Das angeforderte Plug-in verfügt über keine Binärdatei für Ihr Betriebssystem: "
   },
