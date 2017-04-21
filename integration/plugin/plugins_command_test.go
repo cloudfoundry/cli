@@ -1,8 +1,6 @@
 package plugin
 
 import (
-	"crypto/sha1"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -133,17 +131,13 @@ var _ = Describe("plugins command", func() {
 			})
 
 			It("displays the sha1 value for each installed plugin", func() {
-				f, err := os.Open(filepath.Join(homeDir, ".cf/plugins/configurable_plugin.some-plugin"))
-				Expect(err).ToNot(HaveOccurred())
-				h := sha1.New()
-				_, err = io.Copy(h, f)
-				Expect(err).ToNot(HaveOccurred())
-				calculatedSha := h.Sum(nil)
+				calculatedSha := helpers.Sha1Sum(
+					filepath.Join(homeDir, ".cf/plugins/configurable_plugin.some-plugin"))
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("plugin name\\s+version\\s+sha1"))
-				Eventually(session.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%x", calculatedSha))
+				Eventually(session.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", calculatedSha))
 				Eventually(session).Should(Exit(0))
 			})
 
