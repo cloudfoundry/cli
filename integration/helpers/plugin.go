@@ -47,7 +47,10 @@ func createBasicPlugin(pluginType string, name string, version string, pluginCom
 
 	// gexec.Build builds the plugin with the name of the dir in the plugin path (configurable_plugin)
 	// in case this function is called multiple times, the plugins need to be unique to be installed
-	uniquePath := fmt.Sprintf("%s.%s", pluginPath, name)
+
+	// also remove the .exe that gexec adds on Windows so the filename is always the
+	// same in tests
+	uniquePath := fmt.Sprintf("%s.%s", strings.TrimSuffix(pluginPath, ".exe"), name)
 	err = os.Rename(pluginPath, uniquePath)
 	Expect(err).ToNot(HaveOccurred())
 
