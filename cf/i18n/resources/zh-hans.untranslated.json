@@ -1536,10 +1536,6 @@
     "translation": ""
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin {{.Name}} does not exist.",
     "translation": ""
   },

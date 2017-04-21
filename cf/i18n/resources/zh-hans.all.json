@@ -4344,10 +4344,6 @@
     "translation": "名为 '{{.repoName}}' 的插件存储库已存在，请使用其他名称。"
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "请求的插件没有可用于您操作系统的二进制文件: "
   },

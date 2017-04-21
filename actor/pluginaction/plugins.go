@@ -12,6 +12,17 @@ type OutdatedPlugin struct {
 	LatestVersion  string
 }
 
+// GettingPluginRepositoryError is returned when there's an error
+// accessing the plugin repository
+type GettingPluginRepositoryError struct {
+	Name    string
+	Message string
+}
+
+func (e GettingPluginRepositoryError) Error() string {
+	return fmt.Sprintf("Could not get plugin repository '%s': %s", e.Name, e.Message)
+}
+
 func (actor Actor) GetOutdatedPlugins() ([]OutdatedPlugin, error) {
 	var outdatedPlugins []OutdatedPlugin
 
@@ -60,33 +71,4 @@ func lessThan(version1 string, version2 string) bool {
 	}
 
 	return v1.LT(v2)
-}
-
-// GettingPluginRepositoryError is returned when there's an error
-// accessing the plugin repository
-type GettingPluginRepositoryError struct {
-	Name    string
-	Message string
-}
-
-func (e GettingPluginRepositoryError) Error() string {
-	return fmt.Sprintf("Could not get plugin repository '%s': %s", e.Name, e.Message)
-}
-
-// PluginRepositoryNotFoundError is returned when the plugin Repository was not found.
-type PluginRepositoryNotFoundError struct {
-	Name string
-}
-
-func (e PluginRepositoryNotFoundError) Error() string {
-	return fmt.Sprintf("Plugin repository '%s' was not found.", e.Name)
-}
-
-// NoPluginRepositoriesError is returned when no plugin repositories
-// are found.
-type NoPluginRepositoriesError struct {
-}
-
-func (e NoPluginRepositoriesError) Error() string {
-	return "No plugin repositories added."
 }

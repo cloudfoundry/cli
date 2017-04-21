@@ -4344,10 +4344,6 @@
     "translation": "El repositorio de plugin denominado \"{{.repoName}}\" ya existe; utilice otro nombre."
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "El plugin solicitado no tiene ningún binario disponible para el sistema operativo: "
   },

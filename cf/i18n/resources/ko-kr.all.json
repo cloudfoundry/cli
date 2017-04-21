@@ -4344,10 +4344,6 @@
     "translation": "이름이 \"{{.repoName}}\"인 플러그인 저장소가 이미 있습니다. 다른 이름을 사용하십시오."
   },
   {
-    "id": "Plugin repository '{{.RepositoryName}}' was not found.",
-    "translation": ""
-  },
-  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "요청된 플러그인에 사용자의 OS에서 사용 가능한 2진이 없습니다. "
   },
