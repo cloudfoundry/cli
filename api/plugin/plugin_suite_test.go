@@ -2,9 +2,7 @@ package plugin_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"log"
-	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/plugin"
 	. "github.com/onsi/ginkgo"
@@ -39,18 +37,5 @@ var _ = BeforeEach(func() {
 })
 
 func NewTestClient() *Client {
-	client := NewClient(Config{SkipSSLValidation: true, AppName: "CF CLI API Pluting Test", AppVersion: "Unknown"})
-	return client
-}
-
-func testPluginRepositoryServer(pluginRepo PluginRepository) string {
-	jsonBytes, err := json.Marshal(pluginRepo)
-	Expect(err).ToNot(HaveOccurred())
-
-	server.AppendHandlers(
-		VerifyRequest(http.MethodGet, "/list"),
-		RespondWith(http.StatusOK, string(jsonBytes)),
-	)
-
-	return server.URL()
+	return NewClient(Config{SkipSSLValidation: true, AppName: "CF CLI API Plugin Test", AppVersion: "Unknown"})
 }

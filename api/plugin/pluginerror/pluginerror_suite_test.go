@@ -9,5 +9,5 @@ import (
 
 func TestCcerror(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cloud Controller Errors Suite")
+	RunSpecs(t, "Plugin Errors Suite")
 }

@@ -52,7 +52,7 @@ func (connection *PluginConnection) Make(request *http.Request, passedResponse *
 	return connection.populateResponse(response, passedResponse)
 }
 
-// some errors
+// processRequestError handles errors that occur while making the request.
 func (connection *PluginConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:

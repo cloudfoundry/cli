@@ -20,7 +20,7 @@ var _ = Describe("PluginRepository", func() {
 	})
 
 	Describe("GetPluginRepository", func() {
-		Context("when the url is a CF CLI plugin repo", func() {
+		Context("when the url points to a valid CF CLI plugin repo", func() {
 			BeforeEach(func() {
 				response := `{
 					"plugins": [
@@ -46,8 +46,6 @@ var _ = Describe("PluginRepository", func() {
 
 			It("returns the plugin repository", func() {
 				pluginRepository, err := client.GetPluginRepository(server.URL())
-				// server.URL() with trailing slash
-				// server.URL with list already
 				Expect(err).ToNot(HaveOccurred())
 				Expect(pluginRepository).To(Equal(PluginRepository{
 					Plugins: []Plugin{
@@ -66,14 +64,14 @@ var _ = Describe("PluginRepository", func() {
 			})
 
 			Context("when the URL has a trailing slash", func() {
-				It("hits the /list endpoint on the URL", func() {
+				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})
 
 			Context("when the URL has a trailing '/list'", func() {
-				It("hits the /list endpoint on the URL", func() {
+				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/list", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})

@@ -2,13 +2,10 @@ package plugin
 
 import "net/http"
 
-// newHTTPRequest returns a constructed HTTP.Request with some defaults.
+// newGETRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request options are not filled in.
-func (client *Client) newHTTPGetRequest(url string) (*http.Request, error) {
-	var request *http.Request
-	var err error
-
-	request, err = http.NewRequest(
+func (client *Client) newGETRequest(url string) (*http.Request, error) {
+	request, err := http.NewRequest(
 		http.MethodGet,
 		url,
 		nil,
