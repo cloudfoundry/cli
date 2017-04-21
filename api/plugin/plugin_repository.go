@@ -20,7 +20,7 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 	}
 	parsedURL.Path = "/list"
 
-	request, err := client.newHTTPGetRequest(parsedURL.String())
+	request, err := client.newGETRequest(parsedURL.String())
 	if err != nil {
 		return PluginRepository{}, err
 	}

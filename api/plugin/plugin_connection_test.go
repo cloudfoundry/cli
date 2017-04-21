@@ -111,7 +111,7 @@ var _ = Describe("Plugin Connection", func() {
 			})
 		})
 
-		Describe("Errors", func() {
+		Describe("Request errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
 					connection = NewConnection(false, 0)
@@ -183,19 +183,47 @@ var _ = Describe("Plugin Connection", func() {
 					})
 				})
 			})
+		})
 
-			Describe("RawHTTPStatusError", func() {
-				var pluginResponse string
+		Describe("4xx and 5xx response codes", func() {
+			Context("when the requested resource does not exist (404)", func() {
 				BeforeEach(func() {
-					pluginResponse = `{
+					pluginResponse := `{
 						"error":"not found"
 						"description": "The requested resource could not be found but may be available in the future. Subsequent requests by the client are permissible",
 					}`
-
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodGet, "/list"),
 							RespondWith(http.StatusNotFound, pluginResponse),
+						),
+					)
+				})
+
+				It("returns a NotFoundError", func() {
+					request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/list", server.URL()), nil)
+					Expect(err).ToNot(HaveOccurred())
+
+					var response Response
+					err = connection.Make(request, &response)
+					Expect(err).To(MatchError(pluginerror.NotFoundError{}))
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
+			})
+
+			Context("when any other 4xx or 5xx response codes are encountered", func() {
+				var rawResponse string
+
+				BeforeEach(func() {
+					rawResponse = `{
+						"error":"some error"
+						"description": "some error description",
+					}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/list"),
+							RespondWith(http.StatusTeapot, rawResponse),
 						),
 					)
 				})
@@ -206,7 +234,10 @@ var _ = Describe("Plugin Connection", func() {
 
 					var response Response
 					err = connection.Make(request, &response)
-					Expect(err).To(MatchError(pluginerror.NotFoundError{}))
+					Expect(err).To(MatchError(pluginerror.RawHTTPStatusError{
+						StatusCode:  http.StatusTeapot,
+						RawResponse: []byte(rawResponse),
+					}))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})
