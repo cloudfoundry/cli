@@ -83,7 +83,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	log.Info("collating flags")
 	cliSettings, err := cmd.GetCommandLineSettings()
 	if err != nil {
-		log.Errorf("reading flags: %v", err)
+		log.Errorln("reading flags:", err)
 		return shared.HandleError(err)
 	}
 
@@ -91,7 +91,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	log.Info("merging manifest and command flags")
 	manifestApplications, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, nil)
 	if err != nil {
-		log.Errorf("merging manifest: %v", err)
+		log.Errorln("merging manifest:", err)
 		return shared.HandleError(err)
 	}
 
@@ -105,12 +105,12 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		log.Errorf("converting manifest: %v", err)
+		log.Errorln("converting manifest:", err)
 		return shared.HandleError(err)
 	}
 
 	for _, appConfig := range appConfigs {
-		log.Infof("starting create/update: %s", appConfig.DesiredApplication.Name)
+		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
 		eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig)
 		err := cmd.processApplyStreams(appConfig, eventStream, warningsStream, errorStream)
 		if err != nil {
@@ -177,7 +177,7 @@ func (cmd V2PushCommand) processApplyStreams(appConfig pushaction.ApplicationCon
 }
 
 func (cmd V2PushCommand) processEvent(appConfig pushaction.ApplicationConfig, event pushaction.Event) (bool, error) {
-	log.Infof("received apply event: %s", event)
+	log.Infoln("received apply event:", event)
 
 	switch event {
 	case pushaction.ApplicationCreated:

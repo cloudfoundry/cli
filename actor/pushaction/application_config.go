@@ -57,7 +57,7 @@ func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, 
 			config.DesiredApplication.SpaceGUID = spaceGUID
 		}
 
-		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID)
+		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID, spaceGUID)
 		warnings = append(warnings, routeWarnings...)
 		if err != nil {
 			log.Errorln("getting default route:", err)

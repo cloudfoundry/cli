@@ -21,8 +21,8 @@ const (
 	GetAppInstancesRequest                = "GetAppInstances"
 	GetAppRequest                         = "GetApp"
 	GetAppRoutesRequest                   = "GetAppRoutes"
-	GetAppStatsRequest                    = "GetAppStats"
 	GetAppsRequest                        = "GetApps"
+	GetAppStatsRequest                    = "GetAppStats"
 	GetInfoRequest                        = "GetInfo"
 	GetJobRequest                         = "GetJob"
 	GetOrganizationPrivateDomainsRequest  = "GetOrganizationPrivateDomains"
@@ -43,12 +43,14 @@ const (
 	GetSpaceRoutesRequest                 = "GetSpaceRoutes"
 	GetSpaceRunningSecurityGroupsRequest  = "GetSpaceRunningSecurityGroups"
 	GetSpaceServiceInstancesRequest       = "GetSpaceServiceInstances"
-	GetSpaceStagingSecurityGroupsRequest  = "GetSpaceStagingSecurityGroups"
 	GetSpacesRequest                      = "GetSpaces"
+	GetSpaceStagingSecurityGroupsRequest  = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                       = "GetStack"
 	GetUsersRequest                       = "GetUsers"
 	PostAppRequest                        = "PostApp"
+	PostRouteRequest                      = "PostRoute"
 	PutAppRequest                         = "PutApp"
+	PutBindRouteAppRequest                = "PutBindRouteApp"
 	PutSecurityGroupSpaceRequest          = "PutSecurityGroupSpace"
 )
 
@@ -71,8 +73,10 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
 	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionRequest},
 	{Path: "/v2/routes", Method: http.MethodGet, Name: GetRoutesRequest},
+	{Path: "/v2/routes", Method: http.MethodPost, Name: PostRouteRequest},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
 	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: GetRouteAppsRequest},
+	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodPut, Name: PutBindRouteAppRequest},
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},

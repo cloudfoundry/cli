@@ -1,6 +1,7 @@
 package ccv2
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,12 +14,12 @@ import (
 
 // Route represents a Cloud Controller Route.
 type Route struct {
-	GUID       string
-	Host       string
-	Path       string
-	Port       int
-	DomainGUID string
-	SpaceGUID  string
+	GUID       string `json:"-"`
+	Host       string `json:"host,omitempty"`
+	Path       string `json:"path,omitempty"`
+	Port       int    `json:"port,omitempty"`
+	DomainGUID string `json:"domain_guid"`
+	SpaceGUID  string `json:"space_guid"`
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Route response.
@@ -46,8 +47,64 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GetApplicationRoutes returns a list of Routes associated with the provided Application
-// GUID, and filtered by the provided queries.
+// BindRouteToApplication binds the given route to the given application.
+func (client *Client) BindRouteToApplication(routeGUID string, appGUID string) (Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutBindRouteAppRequest,
+		URIParams: map[string]string{
+			"app_guid":   appGUID,
+			"route_guid": routeGUID,
+		},
+	})
+	if err != nil {
+		return Route{}, nil, err
+	}
+
+	var route Route
+	response := cloudcontroller.Response{
+		Result: &route,
+	}
+	err = client.connection.Make(request, &response)
+
+	return route, response.Warnings, err
+}
+
+// CreateRoute creates the route with the given properties; SpaceGUID and
+// DomainGUID are required. Set generatePort true to generate a random port on
+// the cloud controller. generatePort takes precedence over manually specified
+// port. Setting the port and generatePort only works with CC API 2.53.0 or
+// higher and when TCP router groups are enabled.
+func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnings, error) {
+	body, err := json.Marshal(route)
+	if err != nil {
+		return Route{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostRouteRequest,
+		Body:        bytes.NewBuffer(body),
+	})
+	if err != nil {
+		return Route{}, nil, err
+	}
+
+	if generatePort {
+		query := url.Values{}
+		query.Add("generate_port", "true")
+		request.URL.RawQuery = query.Encode()
+	}
+
+	var updatedRoute Route
+	response := cloudcontroller.Response{
+		Result: &updatedRoute,
+	}
+
+	err = client.connection.Make(request, &response)
+	return updatedRoute, response.Warnings, err
+}
+
+// GetApplicationRoutes returns a list of Routes associated with the provided
+// Application GUID, and filtered by the provided queries.
 func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppRoutesRequest,

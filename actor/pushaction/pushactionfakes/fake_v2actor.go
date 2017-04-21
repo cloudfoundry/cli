@@ -9,6 +9,20 @@ import (
 )
 
 type FakeV2Actor struct {
+	BindRouteToApplicationStub        func(routeGUID string, appGUID string) (v2action.Warnings, error)
+	bindRouteToApplicationMutex       sync.RWMutex
+	bindRouteToApplicationArgsForCall []struct {
+		routeGUID string
+		appGUID   string
+	}
+	bindRouteToApplicationReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	bindRouteToApplicationReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	CheckRouteStub        func(route v2action.Route) (bool, v2action.Warnings, error)
 	checkRouteMutex       sync.RWMutex
 	checkRouteArgsForCall []struct {
@@ -36,6 +50,22 @@ type FakeV2Actor struct {
 	}
 	createApplicationReturnsOnCall map[int]struct {
 		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}
+	CreateRouteStub        func(route v2action.Route, generatePort bool) (v2action.Route, v2action.Warnings, error)
+	createRouteMutex       sync.RWMutex
+	createRouteArgsForCall []struct {
+		route        v2action.Route
+		generatePort bool
+	}
+	createRouteReturns struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}
+	createRouteReturnsOnCall map[int]struct {
+		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -118,6 +148,58 @@ type FakeV2Actor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeV2Actor) BindRouteToApplication(routeGUID string, appGUID string) (v2action.Warnings, error) {
+	fake.bindRouteToApplicationMutex.Lock()
+	ret, specificReturn := fake.bindRouteToApplicationReturnsOnCall[len(fake.bindRouteToApplicationArgsForCall)]
+	fake.bindRouteToApplicationArgsForCall = append(fake.bindRouteToApplicationArgsForCall, struct {
+		routeGUID string
+		appGUID   string
+	}{routeGUID, appGUID})
+	fake.recordInvocation("BindRouteToApplication", []interface{}{routeGUID, appGUID})
+	fake.bindRouteToApplicationMutex.Unlock()
+	if fake.BindRouteToApplicationStub != nil {
+		return fake.BindRouteToApplicationStub(routeGUID, appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.bindRouteToApplicationReturns.result1, fake.bindRouteToApplicationReturns.result2
+}
+
+func (fake *FakeV2Actor) BindRouteToApplicationCallCount() int {
+	fake.bindRouteToApplicationMutex.RLock()
+	defer fake.bindRouteToApplicationMutex.RUnlock()
+	return len(fake.bindRouteToApplicationArgsForCall)
+}
+
+func (fake *FakeV2Actor) BindRouteToApplicationArgsForCall(i int) (string, string) {
+	fake.bindRouteToApplicationMutex.RLock()
+	defer fake.bindRouteToApplicationMutex.RUnlock()
+	return fake.bindRouteToApplicationArgsForCall[i].routeGUID, fake.bindRouteToApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeV2Actor) BindRouteToApplicationReturns(result1 v2action.Warnings, result2 error) {
+	fake.BindRouteToApplicationStub = nil
+	fake.bindRouteToApplicationReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) BindRouteToApplicationReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.BindRouteToApplicationStub = nil
+	if fake.bindRouteToApplicationReturnsOnCall == nil {
+		fake.bindRouteToApplicationReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.bindRouteToApplicationReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeV2Actor) CheckRoute(route v2action.Route) (bool, v2action.Warnings, error) {
@@ -223,6 +305,61 @@ func (fake *FakeV2Actor) CreateApplicationReturnsOnCall(i int, result1 v2action.
 	}
 	fake.createApplicationReturnsOnCall[i] = struct {
 		result1 v2action.Application
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) CreateRoute(route v2action.Route, generatePort bool) (v2action.Route, v2action.Warnings, error) {
+	fake.createRouteMutex.Lock()
+	ret, specificReturn := fake.createRouteReturnsOnCall[len(fake.createRouteArgsForCall)]
+	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
+		route        v2action.Route
+		generatePort bool
+	}{route, generatePort})
+	fake.recordInvocation("CreateRoute", []interface{}{route, generatePort})
+	fake.createRouteMutex.Unlock()
+	if fake.CreateRouteStub != nil {
+		return fake.CreateRouteStub(route, generatePort)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createRouteReturns.result1, fake.createRouteReturns.result2, fake.createRouteReturns.result3
+}
+
+func (fake *FakeV2Actor) CreateRouteCallCount() int {
+	fake.createRouteMutex.RLock()
+	defer fake.createRouteMutex.RUnlock()
+	return len(fake.createRouteArgsForCall)
+}
+
+func (fake *FakeV2Actor) CreateRouteArgsForCall(i int) (v2action.Route, bool) {
+	fake.createRouteMutex.RLock()
+	defer fake.createRouteMutex.RUnlock()
+	return fake.createRouteArgsForCall[i].route, fake.createRouteArgsForCall[i].generatePort
+}
+
+func (fake *FakeV2Actor) CreateRouteReturns(result1 v2action.Route, result2 v2action.Warnings, result3 error) {
+	fake.CreateRouteStub = nil
+	fake.createRouteReturns = struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) CreateRouteReturnsOnCall(i int, result1 v2action.Route, result2 v2action.Warnings, result3 error) {
+	fake.CreateRouteStub = nil
+	if fake.createRouteReturnsOnCall == nil {
+		fake.createRouteReturnsOnCall = make(map[int]struct {
+			result1 v2action.Route
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.createRouteReturnsOnCall[i] = struct {
+		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -503,10 +640,14 @@ func (fake *FakeV2Actor) UpdateApplicationReturnsOnCall(i int, result1 v2action.
 func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.bindRouteToApplicationMutex.RLock()
+	defer fake.bindRouteToApplicationMutex.RUnlock()
 	fake.checkRouteMutex.RLock()
 	defer fake.checkRouteMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
+	fake.createRouteMutex.RLock()
+	defer fake.createRouteMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()

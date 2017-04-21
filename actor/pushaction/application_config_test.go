@@ -176,8 +176,9 @@ var _ = Describe("Application Config", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 				Expect(firstConfig.DesiredRoutes).To(ConsistOf(v2action.Route{
-					Host:   appName,
-					Domain: domain,
+					Domain:    domain,
+					Host:      appName,
+					SpaceGUID: spaceGUID,
 				}))
 			})
 		})

@@ -77,13 +77,26 @@ var _ = Describe("Routes", func() {
 			})
 
 			Context("when the route exists in a different space", func() {
-				BeforeEach(func() {
-					fakeV2Actor.GetRouteByHostAndDomainReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+				Context("when the user has access to the space the route is in", func() {
+					BeforeEach(func() {
+						fakeV2Actor.GetRouteByHostAndDomainReturns(v2action.Route{SpaceGUID: "some-other-space-guid"}, v2action.Warnings{"get-route-warnings"}, nil)
+					})
+
+					It("returns a RouteInDifferentSpaceError and warnings", func() {
+						Expect(executeErr).To(MatchError(v2action.RouteInDifferentSpaceError{Route: "some-host.some-domain.com"}))
+						Expect(warnings).To(ConsistOf("check-route-warnings", "get-route-warnings"))
+					})
 				})
 
-				It("returns a RouteInDifferentSpaceError and warnings", func() {
-					Expect(executeErr).To(MatchError(RouteInDifferentSpaceError{Route: "some-host.some-domain.com"}))
-					Expect(warnings).To(ConsistOf("check-route-warnings", "get-route-warnings"))
+				Context("when the user cannot see the space the route is in", func() {
+					BeforeEach(func() {
+						fakeV2Actor.GetRouteByHostAndDomainReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+					})
+
+					It("returns a RouteInDifferentSpaceError and warnings", func() {
+						Expect(executeErr).To(MatchError(v2action.RouteInDifferentSpaceError{Route: "some-host.some-domain.com"}))
+						Expect(warnings).To(ConsistOf("check-route-warnings", "get-route-warnings"))
+					})
 				})
 			})
 
@@ -131,8 +144,9 @@ var _ = Describe("Routes", func() {
 
 	Describe("GetRouteWithDefaultDomain", func() {
 		var (
-			host    string
-			orgGUID string
+			host      string
+			orgGUID   string
+			spaceGUID string
 
 			defaultRoute v2action.Route
 			warnings     Warnings
@@ -144,6 +158,7 @@ var _ = Describe("Routes", func() {
 		BeforeEach(func() {
 			host = "some-app"
 			orgGUID = "some-org-guid"
+			spaceGUID = "some-space-guid"
 
 			domain = v2action.Domain{
 				Name: "private-domain.com",
@@ -152,7 +167,7 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			defaultRoute, warnings, executeErr = actor.GetRouteWithDefaultDomain(host, orgGUID)
+			defaultRoute, warnings, executeErr = actor.GetRouteWithDefaultDomain(host, orgGUID, spaceGUID)
 		})
 
 		Context("when retrieving the domains is successful", func() {
@@ -174,13 +189,13 @@ var _ = Describe("Routes", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 
-					Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: host}))
+					Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: host, SpaceGUID: spaceGUID}))
 
 					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
 					Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
 
 					Expect(fakeV2Actor.CheckRouteCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.CheckRouteArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: host}))
+					Expect(fakeV2Actor.CheckRouteArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: host, SpaceGUID: spaceGUID}))
 				})
 			})
 
