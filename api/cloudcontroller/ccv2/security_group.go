@@ -134,3 +134,24 @@ func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string
 
 	return securityGroupsList, warnings, err
 }
+
+// RemoveSpaceFromSecurityGroup disassociates a security group, specified by
+// its GUID, from a space, which is also specified by its GUID.
+func (client *Client) RemoveSpaceFromSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteSecurityGroupSpaceRequest,
+		URIParams: Params{
+			"security_group_guid": securityGroupGUID,
+			"space_guid":          spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}

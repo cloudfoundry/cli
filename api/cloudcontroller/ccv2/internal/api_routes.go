@@ -15,6 +15,7 @@ import (
 //
 // The const name should always be the const value + Request.
 const (
+	DeleteSecurityGroupSpaceRequest       = "DeleteSecurityGroupSpace"
 	DeleteOrganizationRequest             = "DeleteOrganization"
 	DeleteRouteRequest                    = "DeleteRoute"
 	DeleteServiceBindingRequest           = "DeleteServiceBinding"
@@ -81,6 +82,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupSpaceRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},

@@ -3468,6 +3468,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: the required arguments `{{.ArgumentName1}}`, `{{.ArgumentName2}}`, and `{{.ArgumentName3}}` were not provided",
+    "translation": ""
+  },
+  {
     "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
     "translation": "json 格式不正確: 檔案: {{.JSONFile}}\n\t\t\n有效的 JSON 檔案範例:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
@@ -4074,6 +4078,10 @@
   {
     "id": "OPTIONS:",
     "translation": "選項:"
+  },
+  {
+    "id": "ORG",
+    "translation": ""
   },
   {
     "id": "ORG ADMIN",
@@ -4846,6 +4854,10 @@
   {
     "id": "SECURITY GROUP:",
     "translation": "安全群組:"
+  },
+  {
+    "id": "SECURITY_GROUP",
+    "translation": ""
   },
   {
     "id": "SEE ALSO:",
@@ -5894,6 +5906,10 @@
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分取消路徑 {{.URL}} 與組織 {{.OrgName}}/空間 {{.SpaceName}} 中的服務實例 {{.ServiceInstanceName}} 的連結..."
+  },
+  {
+    "id": "Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}",
+    "translation": ""
   },
   {
     "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",

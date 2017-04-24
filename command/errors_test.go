@@ -50,6 +50,8 @@ var _ = Describe("Translatable Errors", func() {
 
 		// Parse errors.
 		Entry("ParseArgumentError", ParseArgumentError{}),
+		Entry("RequiredArgumentError", RequiredArgumentError{}),
+		Entry("ThreeRequiredArgumentsError", ThreeRequiredArgumentsError{}),
 
 		// Version errors.
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),

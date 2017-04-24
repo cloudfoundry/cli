@@ -3468,6 +3468,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: the required arguments `{{.ArgumentName1}}`, `{{.ArgumentName2}}`, and `{{.ArgumentName3}}` were not provided",
+    "translation": ""
+  },
+  {
     "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
     "translation": "誤った json 形式: file: {{.JSONFile}}\n\t\t\n有効な json ファイルの例:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
@@ -4074,6 +4078,10 @@
   {
     "id": "OPTIONS:",
     "translation": "オプション:"
+  },
+  {
+    "id": "ORG",
+    "translation": ""
   },
   {
     "id": "ORG ADMIN",
@@ -4846,6 +4854,10 @@
   {
     "id": "SECURITY GROUP:",
     "translation": "セキュリティー・グループ:"
+  },
+  {
+    "id": "SECURITY_GROUP",
+    "translation": ""
   },
   {
     "id": "SEE ALSO:",
@@ -5894,6 +5906,10 @@
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のサービス・インスタンス {{.ServiceInstanceName}} から経路 {{.URL}} をアンバインドしています..."
+  },
+  {
+    "id": "Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}",
+    "translation": ""
   },
   {
     "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",

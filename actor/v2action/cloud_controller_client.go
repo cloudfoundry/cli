@@ -41,6 +41,7 @@ type CloudControllerClient interface {
 	GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error)
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
+	RemoveSpaceFromSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 
