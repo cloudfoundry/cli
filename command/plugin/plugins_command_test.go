@@ -31,6 +31,8 @@ var _ = Describe("plugins Command", func() {
 		fakeActor = new(pluginfakes.FakePluginsActor)
 		cmd = PluginsCommand{UI: testUI, Config: fakeConfig, Actor: fakeActor}
 		cmd.Checksum = false
+
+		fakeConfig.BinaryNameReturns("faceman")
 	})
 
 	JustBeforeEach(func() {
@@ -43,7 +45,7 @@ var _ = Describe("plugins Command", func() {
 
 			Expect(testUI.Out).To(Say("Listing installed plugins..."))
 			Expect(testUI.Out).To(Say(""))
-			Expect(testUI.Out).To(Say("plugin name\\s+version\\s+command name\\s+command help"))
+			Expect(testUI.Out).To(Say("plugin\\s+version\\s+command name\\s+command help"))
 			Expect(testUI.Out).ToNot(Say("[A-Za-z0-9]+"))
 		})
 
@@ -57,7 +59,7 @@ var _ = Describe("plugins Command", func() {
 
 				Expect(testUI.Out).To(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Expect(testUI.Out).To(Say(""))
-				Expect(testUI.Out).To(Say("plugin name\\s+version\\s+sha1"))
+				Expect(testUI.Out).To(Say("plugin\\s+version\\s+sha1"))
 				Expect(testUI.Out).ToNot(Say("[A-Za-z0-9]+"))
 			})
 		})
@@ -115,7 +117,7 @@ var _ = Describe("plugins Command", func() {
 
 			Expect(testUI.Out).To(Say("Listing installed plugins..."))
 			Expect(testUI.Out).To(Say(""))
-			Expect(testUI.Out).To(Say("plugin name\\s+version\\s+command name\\s+command help"))
+			Expect(testUI.Out).To(Say("plugin\\s+version\\s+command name\\s+command help"))
 			Expect(testUI.Out).To(Say("Sorted-first\\s+1\\.1\\.0\\s+command-1, c\\s+help-command-1"))
 			Expect(testUI.Out).To(Say("Sorted-first\\s+1\\.1\\.0\\s+command-2\\s+help-command-2"))
 			Expect(testUI.Out).To(Say("sorted-second\\s+N/A\\s+bar\\s+help-bar"))
@@ -153,7 +155,7 @@ var _ = Describe("plugins Command", func() {
 
 				Expect(testUI.Out).To(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Expect(testUI.Out).To(Say(""))
-				Expect(testUI.Out).To(Say("plugin name\\s+version\\s+sha1"))
+				Expect(testUI.Out).To(Say("plugin\\s+version\\s+sha1"))
 				Expect(testUI.Out).To(Say("Sorted-first\\s+1\\.1\\.0\\s+2142a57cb8587400fa7f4ee492f25cf07567f4a5"))
 				Expect(testUI.Out).To(Say("sorted-second\\s+N/A\\s+N/A"))
 			})
@@ -206,8 +208,7 @@ var _ = Describe("plugins Command", func() {
 
 						Expect(testUI.Out).To(Say("Searching repo-1, repo-2 for newer versions of installed plugins..."))
 						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("plugin name\\s+version\\s+latest version"))
-						Expect(testUI.Out).ToNot(Say("[A-Za-z0-9]+"))
+						Expect(testUI.Out).To(Say("plugin\\s+version\\s+latest version\\n\\nUse 'faceman install-plugin' to update a plugin to the latest version\\."))
 
 						Expect(fakeActor.GetOutdatedPluginsCallCount()).To(Equal(1))
 					})
@@ -228,9 +229,11 @@ var _ = Describe("plugins Command", func() {
 
 						Expect(testUI.Out).To(Say("Searching repo-1, repo-2 for newer versions of installed plugins..."))
 						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("plugin name\\s+version\\s+latest version"))
+						Expect(testUI.Out).To(Say("plugin\\s+version\\s+latest version"))
 						Expect(testUI.Out).To(Say("plugin-1\\s+1.0.0\\s+2.0.0"))
 						Expect(testUI.Out).To(Say("plugin-2\\s+2.0.0\\s+3.0.0"))
+						Expect(testUI.Out).To(Say(""))
+						Expect(testUI.Out).To(Say("Use 'faceman install-plugin' to update a plugin to the latest version\\."))
 					})
 				})
 			})

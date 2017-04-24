@@ -1644,6 +1644,10 @@
     "translation": "Usage:"
   },
   {
+    "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
     "id": "Version",
     "translation": "Version"
   },
@@ -1800,8 +1804,8 @@
     "translation": "plans"
   },
   {
-    "id": "plugin name",
-    "translation": ""
+    "id": "plugin",
+    "translation": "plugin"
   },
   {
     "id": "port",
