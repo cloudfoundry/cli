@@ -6076,6 +6076,10 @@
     "translation": ""
   },
   {
+    "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
     "id": "Use '{{.Command}}' for more information",
     "translation": "Use '{{.Command}}' para obter mais informações"
   },
@@ -6608,7 +6612,7 @@
     "translation": "planos"
   },
   {
-    "id": "plugin name",
+    "id": "plugin",
     "translation": ""
   },
   {

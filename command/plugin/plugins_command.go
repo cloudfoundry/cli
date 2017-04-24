@@ -47,7 +47,7 @@ func (cmd PluginsCommand) Execute(_ []string) error {
 
 func (cmd PluginsCommand) displayPluginChecksums(plugins []configv3.Plugin) error {
 	cmd.UI.DisplayText("Computing sha1 for installed plugins, this may take a while...")
-	table := [][]string{{"plugin name", "version", "sha1"}}
+	table := [][]string{{"plugin", "version", "sha1"}}
 	for _, plugin := range plugins {
 		table = append(table, []string{plugin.Name, plugin.Version.String(), plugin.CalculateSHA1()})
 	}
@@ -66,7 +66,7 @@ func (cmd PluginsCommand) displayOutdatedPlugins() error {
 	for i := range repos {
 		repoNames[i] = repos[i].Name
 	}
-	cmd.UI.DisplayText("Searching {{.RepoNames}} for newer versions of installed plugins...",
+	cmd.UI.DisplayTextWithFlavor("Searching {{.RepoNames}} for newer versions of installed plugins...",
 		map[string]interface{}{
 			"RepoNames": strings.Join(repoNames, ", "),
 		})
@@ -76,7 +76,7 @@ func (cmd PluginsCommand) displayOutdatedPlugins() error {
 		return shared.HandleError(err)
 	}
 
-	table := [][]string{{"plugin name", "version", "latest version"}}
+	table := [][]string{{"plugin", "version", "latest version"}}
 
 	for _, plugin := range outdatedPlugins {
 		table = append(table, []string{plugin.Name, plugin.CurrentVersion, plugin.LatestVersion})
@@ -85,12 +85,17 @@ func (cmd PluginsCommand) displayOutdatedPlugins() error {
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTableWithHeader("", table, 3)
 
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.", map[string]interface{}{
+		"BinaryName": cmd.Config.BinaryName(),
+	})
+
 	return nil
 }
 
 func (cmd PluginsCommand) displayPluginCommands(plugins []configv3.Plugin) error {
 	cmd.UI.DisplayText("Listing installed plugins...")
-	table := [][]string{{"plugin name", "version", "command name", "command help"}}
+	table := [][]string{{"plugin", "version", "command name", "command help"}}
 	for _, plugin := range plugins {
 		for _, command := range plugin.PluginCommands() {
 			table = append(table, []string{plugin.Name, plugin.Version.String(), command.CommandName(), command.HelpText})

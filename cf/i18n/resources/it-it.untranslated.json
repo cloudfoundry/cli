@@ -1648,6 +1648,10 @@
     "translation": "Usage:"
   },
   {
+    "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
     "id": "Waiting for app to start...",
     "translation": ""
   },
@@ -1796,8 +1800,8 @@
     "translation": ""
   },
   {
-    "id": "plugin name",
-    "translation": ""
+    "id": "plugin",
+    "translation": "plugin"
   },
   {
     "id": "ports",
