@@ -37,6 +37,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "code.cloudfoundry.org/ykk",
+			"repository": "https://github.com/cloudfoundry/ykk",
+			"vcs": "git",
+			"revision": "e4df4ce2fd4dc34b9b2e7bf09107074692cda53c",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Azure/go-ansiterm",
 			"repository": "https://github.com/Azure/go-ansiterm",
 			"vcs": "git",
