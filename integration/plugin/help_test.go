@@ -24,7 +24,7 @@ var _ = Describe("help", func() {
 		Eventually(session).Should(Exit(0))
 	})
 
-	DescribeTable("displays indivual plugin help",
+	DescribeTable("displays individual plugin help",
 		func(helpCommand ...string) {
 			session := helpers.CF(helpCommand...)
 			Eventually(session).Should(Say("TestPluginCommandWithAlias"))
