@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Targgeting", func() {
+var _ = Describe("Targeting", func() {
 	var (
 		actor             Actor
 		skipSSLValidation bool
