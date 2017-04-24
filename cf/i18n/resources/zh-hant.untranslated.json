@@ -1348,6 +1348,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: the required arguments `{{.ArgumentName1}}`, `{{.ArgumentName2}}`, and `{{.ArgumentName3}}` were not provided",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
     "translation": ""
   },
@@ -1442,6 +1446,10 @@
   {
     "id": "Not supported on windows",
     "translation": "Not supported on windows"
+  },
+  {
+    "id": "ORG",
+    "translation": ""
   },
   {
     "id": "One-time passcode",
@@ -1637,6 +1645,10 @@
   },
   {
     "id": "Running applications need a restart to be moved there.",
+    "translation": ""
+  },
+  {
+    "id": "SECURITY_GROUP",
     "translation": ""
   },
   {
@@ -2054,6 +2066,10 @@
   {
     "id": "Unable to retrieve information for bound application GUID ",
     "translation": "Unable to retrieve information for bound application GUID "
+  },
+  {
+    "id": "Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}",
+    "translation": ""
   },
   {
     "id": "Uninstall CLI plugin",

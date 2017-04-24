@@ -180,6 +180,9 @@ func handleError(err error, commandUI UI) error {
 	if _, isRequiredArgumentError := err.(command.RequiredArgumentError); isRequiredArgumentError {
 		return ParseErr
 	}
+	if _, isThreeRequiredArgumentsError := err.(command.ThreeRequiredArgumentsError); isThreeRequiredArgumentsError {
+		return ParseErr
+	}
 
 	return ErrFailed
 }

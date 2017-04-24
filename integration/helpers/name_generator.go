@@ -16,6 +16,10 @@ func NewAppName() string {
 	return PrefixedRandomName("INTEGRATION-APP")
 }
 
+func NewSecGroupName() string {
+	return PrefixedRandomName("INTEGRATION-SEC-GROUP")
+}
+
 func RandomUsername() string {
 	return PrefixedRandomName("integration-user")
 }

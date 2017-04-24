@@ -7,23 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-// <<<<<<< HEAD
-// // SecurityGroup represents a CF SecurityGroup.
-// type SecurityGroup struct {
-// 	Name        string
-// 	GUID        string
-// 	Protocol    string
-// 	Destination string
-// 	Ports       string
-// 	Description string
-// }
-
-// =======
-
-// Domain represents a CLI Domain.
+// SecurityGroup represents a CF SecurityGroup.
 type SecurityGroup ccv2.SecurityGroup
-
-// >>>>>>> WIP - first part of actor layer
 
 // SecurityGroupNotFoundError is returned when a requested security group is
 // not found.
@@ -33,6 +18,11 @@ type SecurityGroupNotFoundError struct {
 
 func (e SecurityGroupNotFoundError) Error() string {
 	return fmt.Sprintf("Security group '%s' not found.", e.Name)
+}
+
+func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.AssociateSpaceWithSecurityGroup(securityGroupGUID, spaceGUID)
+	return Warnings(warnings), err
 }
 
 func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGroup, Warnings, error) {
@@ -59,11 +49,6 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 	return securityGroup, Warnings(warnings), nil
 }
 
-func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.AssociateSpaceWithSecurityGroup(securityGroupGUID, spaceGUID)
-	return Warnings(warnings), err
-}
-
 // GetDomain returns the shared or private domain associated with the provided
 // Domain GUID.
 func (actor Actor) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string) ([]SecurityGroup, Warnings, error) {
@@ -74,6 +59,68 @@ func (actor Actor) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string) ([]Sec
 func (actor Actor) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]SecurityGroup, Warnings, error) {
 	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceStagingSecurityGroupsBySpace(spaceGUID)
 	return processSecurityGroups(spaceGUID, ccv2SecurityGroups, Warnings(warnings), err)
+}
+
+func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	securityGroup, warnings, err := actor.GetSecurityGroupByName(securityGroupName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.unbindSecurityGroupAndSpace(securityGroup.GUID, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	return allWarnings, err
+}
+
+func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	securityGroup, warnings, err := actor.GetSecurityGroupByName(securityGroupName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	space, warnings, err := actor.GetSpaceByOrganizationAndName(org.GUID, spaceName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.unbindSecurityGroupAndSpace(securityGroup.GUID, space.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	return allWarnings, err
+}
+
+func (actor Actor) unbindSecurityGroupAndSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.RemoveSpaceFromSecurityGroup(securityGroupGUID, spaceGUID)
+	return Warnings(warnings), err
+}
+
+func extractSecurityGroupRules(securityGroup SecurityGroup, lifecycle string) []SecurityGroupRule {
+	securityGroupRules := make([]SecurityGroupRule, len(securityGroup.Rules))
+
+	for i, rule := range securityGroup.Rules {
+		securityGroupRules[i] = SecurityGroupRule{
+			Name:        securityGroup.Name,
+			Description: rule.Description,
+			Destination: rule.Destination,
+			Lifecycle:   lifecycle,
+			Ports:       rule.Ports,
+			Protocol:    rule.Protocol,
+		}
+	}
+
+	return securityGroupRules
 }
 
 func processSecurityGroups(spaceGUID string, ccv2SecurityGroups []ccv2.SecurityGroup, warnings Warnings, err error) ([]SecurityGroup, Warnings, error) {
@@ -118,21 +165,4 @@ func (s sortableSecurityGroupRules) Less(i int, j int) bool {
 		return false
 	}
 	return s[i].Lifecycle < s[j].Lifecycle
-}
-
-func extractSecurityGroupRules(securityGroup SecurityGroup, lifecycle string) []SecurityGroupRule {
-	securityGroupRules := make([]SecurityGroupRule, len(securityGroup.Rules))
-
-	for i, rule := range securityGroup.Rules {
-		securityGroupRules[i] = SecurityGroupRule{
-			Name:        securityGroup.Name,
-			Description: rule.Description,
-			Destination: rule.Destination,
-			Lifecycle:   lifecycle,
-			Ports:       rule.Ports,
-			Protocol:    rule.Protocol,
-		}
-	}
-
-	return securityGroupRules
 }

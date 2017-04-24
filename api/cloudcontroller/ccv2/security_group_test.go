@@ -544,4 +544,57 @@ var _ = Describe("Security Groups", func() {
 			})
 		})
 	})
+
+	Describe("RemoveSpaceFromSecurityGroup", func() {
+		var (
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = client.RemoveSpaceFromSecurityGroup("security-group-guid", "space-guid")
+		})
+
+		Context("when the client call is successful", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/security_groups/security-group-guid/spaces/space-guid"),
+						RespondWith(http.StatusOK, nil, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns all warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1"}))
+			})
+		})
+
+		Context("when the client call is unsuccessful", func() {
+			BeforeEach(func() {
+				response := `{
+  "code": 10001,
+  "description": "Some Error",
+  "error_code": "CF-SomeError"
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/security_groups/security-group-guid/spaces/space-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
 })

@@ -133,8 +133,8 @@ type BindSecurityGroupArgs struct {
 
 type UnbindSecurityGroupArgs struct {
 	SecurityGroupName string `positional-arg-name:"SECURITY_GROUP" required:"true" description:"The security group name"`
-	OrganizationName  string `positional-arg-name:"ORG" required:"true" description:"The organization group name"`
-	SpaceName         string `positional-arg-name:"SPACE" required:"true" description:"The space name"`
+	OrganizationName  string `positional-arg-name:"ORG" description:"The organization group name"`
+	SpaceName         string `positional-arg-name:"SPACE" description:"The space name"`
 }
 
 type FilesArgs struct {

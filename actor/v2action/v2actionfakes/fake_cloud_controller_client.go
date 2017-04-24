@@ -533,6 +533,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	RemoveSpaceFromSecurityGroupStub        func(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
+	removeSpaceFromSecurityGroupMutex       sync.RWMutex
+	removeSpaceFromSecurityGroupArgsForCall []struct {
+		securityGroupGUID string
+		spaceGUID         string
+	}
+	removeSpaceFromSecurityGroupReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	removeSpaceFromSecurityGroupReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	TargetCFStub        func(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
@@ -2567,6 +2581,58 @@ func (fake *FakeCloudControllerClient) PollJobReturnsOnCall(i int, result1 ccv2.
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) RemoveSpaceFromSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error) {
+	fake.removeSpaceFromSecurityGroupMutex.Lock()
+	ret, specificReturn := fake.removeSpaceFromSecurityGroupReturnsOnCall[len(fake.removeSpaceFromSecurityGroupArgsForCall)]
+	fake.removeSpaceFromSecurityGroupArgsForCall = append(fake.removeSpaceFromSecurityGroupArgsForCall, struct {
+		securityGroupGUID string
+		spaceGUID         string
+	}{securityGroupGUID, spaceGUID})
+	fake.recordInvocation("RemoveSpaceFromSecurityGroup", []interface{}{securityGroupGUID, spaceGUID})
+	fake.removeSpaceFromSecurityGroupMutex.Unlock()
+	if fake.RemoveSpaceFromSecurityGroupStub != nil {
+		return fake.RemoveSpaceFromSecurityGroupStub(securityGroupGUID, spaceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.removeSpaceFromSecurityGroupReturns.result1, fake.removeSpaceFromSecurityGroupReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) RemoveSpaceFromSecurityGroupCallCount() int {
+	fake.removeSpaceFromSecurityGroupMutex.RLock()
+	defer fake.removeSpaceFromSecurityGroupMutex.RUnlock()
+	return len(fake.removeSpaceFromSecurityGroupArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) RemoveSpaceFromSecurityGroupArgsForCall(i int) (string, string) {
+	fake.removeSpaceFromSecurityGroupMutex.RLock()
+	defer fake.removeSpaceFromSecurityGroupMutex.RUnlock()
+	return fake.removeSpaceFromSecurityGroupArgsForCall[i].securityGroupGUID, fake.removeSpaceFromSecurityGroupArgsForCall[i].spaceGUID
+}
+
+func (fake *FakeCloudControllerClient) RemoveSpaceFromSecurityGroupReturns(result1 ccv2.Warnings, result2 error) {
+	fake.RemoveSpaceFromSecurityGroupStub = nil
+	fake.removeSpaceFromSecurityGroupReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) RemoveSpaceFromSecurityGroupReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.RemoveSpaceFromSecurityGroupStub = nil
+	if fake.removeSpaceFromSecurityGroupReturnsOnCall == nil {
+		fake.removeSpaceFromSecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.removeSpaceFromSecurityGroupReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error) {
 	fake.targetCFMutex.Lock()
 	ret, specificReturn := fake.targetCFReturnsOnCall[len(fake.targetCFArgsForCall)]
@@ -3025,6 +3091,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getStackMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
+	fake.removeSpaceFromSecurityGroupMutex.RLock()
+	defer fake.removeSpaceFromSecurityGroupMutex.RUnlock()
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
