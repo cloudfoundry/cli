@@ -7,6 +7,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"testing"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func TestV2Action(t *testing.T) {
@@ -16,4 +18,5 @@ func TestV2Action(t *testing.T) {
 
 var _ = BeforeEach(func() {
 	SetDefaultEventuallyTimeout(3 * time.Second)
+	log.SetLevel(log.PanicLevel)
 })
