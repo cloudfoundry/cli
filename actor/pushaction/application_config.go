@@ -29,7 +29,7 @@ func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, 
 		}
 
 		log.Infoln("searching for app", app.Name)
-		appExists, foundApp, v2Warnings, err := actor.FindOrReturnParialApp(app.Name, spaceGUID)
+		appExists, foundApp, v2Warnings, err := actor.FindOrReturnPartialApp(app.Name, spaceGUID)
 		warnings = append(warnings, v2Warnings...)
 		if err != nil {
 			log.Errorln("app lookup:", err)
@@ -71,7 +71,7 @@ func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, 
 	return configs, warnings, nil
 }
 
-func (actor Actor) FindOrReturnParialApp(appName string, spaceGUID string) (bool, v2action.Application, v2action.Warnings, error) {
+func (actor Actor) FindOrReturnPartialApp(appName string, spaceGUID string) (bool, v2action.Application, v2action.Warnings, error) {
 	foundApp, v2Warnings, err := actor.V2Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if _, ok := err.(v2action.ApplicationNotFoundError); ok {
 		log.Warnf("unable to find app %s in current space (GUID: %s)", appName, spaceGUID)
