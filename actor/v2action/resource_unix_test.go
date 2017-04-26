@@ -46,10 +46,10 @@ var _ = Describe("Resource Actions", func() {
 			err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0644)
 			Expect(err).ToNot(HaveOccurred())
 
-			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0771)
+			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0751)
 			Expect(err).ToNot(HaveOccurred())
 
-			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0665)
+			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0655)
 			Expect(err).ToNot(HaveOccurred())
 
 			resources = []Resource{
@@ -93,8 +93,8 @@ var _ = Describe("Resource Actions", func() {
 				Expect(reader.File[4].Name).To(Equal("tmpFile3"))
 
 				Expect(reader.File[2].Mode()).To(Equal(os.FileMode(0644)))
-				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0771)))
-				Expect(reader.File[4].Mode()).To(Equal(os.FileMode(0665)))
+				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0751)))
+				Expect(reader.File[4].Mode()).To(Equal(os.FileMode(0655)))
 			})
 		})
 	})
