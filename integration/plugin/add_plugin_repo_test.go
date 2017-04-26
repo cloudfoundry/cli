@@ -15,6 +15,10 @@ import (
 )
 
 var _ = Describe("add-plugin-repo command", func() {
+	BeforeEach(func() {
+		helpers.RunIfExperimental("skipping until approved")
+	})
+
 	Describe("help", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
