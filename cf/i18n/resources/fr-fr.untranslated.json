@@ -88,8 +88,8 @@
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
-    "translation": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo"
   },
   {
     "id": "CF_NAME api [URL]",
@@ -768,6 +768,10 @@
     "translation": ""
   },
   {
+    "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
+    "translation": ""
+  },
+  {
     "id": "Could not find service",
     "translation": "Could not find service"
   },
@@ -1097,6 +1101,10 @@
   },
   {
     "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to unbind",
+    "translation": ""
+  },
+  {
+    "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
     "translation": ""
   },
   {
@@ -1969,6 +1977,14 @@
   },
   {
     "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
+    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
+    "translation": ""
+  },
+  {
+    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
     "translation": ""
   },
   {

@@ -101,9 +101,7 @@ func (connection *PluginConnection) populateResponse(response *http.Response, pa
 }
 
 func (*PluginConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
-	if response.StatusCode == 404 {
-		return pluginerror.NotFoundError{}
-	} else if response.StatusCode >= 400 {
+	if response.StatusCode >= 400 {
 		return pluginerror.RawHTTPStatusError{
 			StatusCode:  response.StatusCode,
 			RawResponse: passedResponse.RawResponse,

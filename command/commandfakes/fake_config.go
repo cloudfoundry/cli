@@ -19,6 +19,12 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	AddPluginRepositoryStub        func(name string, url string)
+	addPluginRepositoryMutex       sync.RWMutex
+	addPluginRepositoryArgsForCall []struct {
+		name string
+		url  string
+	}
 	APIVersionStub        func() string
 	aPIVersionMutex       sync.RWMutex
 	aPIVersionArgsForCall []struct{}
@@ -374,6 +380,31 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 	fake.accessTokenReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeConfig) AddPluginRepository(name string, url string) {
+	fake.addPluginRepositoryMutex.Lock()
+	fake.addPluginRepositoryArgsForCall = append(fake.addPluginRepositoryArgsForCall, struct {
+		name string
+		url  string
+	}{name, url})
+	fake.recordInvocation("AddPluginRepository", []interface{}{name, url})
+	fake.addPluginRepositoryMutex.Unlock()
+	if fake.AddPluginRepositoryStub != nil {
+		fake.AddPluginRepositoryStub(name, url)
+	}
+}
+
+func (fake *FakeConfig) AddPluginRepositoryCallCount() int {
+	fake.addPluginRepositoryMutex.RLock()
+	defer fake.addPluginRepositoryMutex.RUnlock()
+	return len(fake.addPluginRepositoryArgsForCall)
+}
+
+func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
+	fake.addPluginRepositoryMutex.RLock()
+	defer fake.addPluginRepositoryMutex.RUnlock()
+	return fake.addPluginRepositoryArgsForCall[i].name, fake.addPluginRepositoryArgsForCall[i].url
 }
 
 func (fake *FakeConfig) APIVersion() string {
@@ -1730,6 +1761,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.addPluginRepositoryMutex.RLock()
+	defer fake.addPluginRepositoryMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
