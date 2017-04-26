@@ -174,6 +174,7 @@ var _ = Describe("plugins command", func() {
 				var server1URL string
 
 				BeforeEach(func() {
+					// TODO:  How can we get this to work with a TLS server instead of clear?
 					server1, server1URL = helpers.NewPluginRepositoryServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-1", Version: "1.0.0"},
@@ -254,14 +255,14 @@ var _ = Describe("plugins command", func() {
 				)
 
 				BeforeEach(func() {
-					server1, server1URL = helpers.NewPluginRepositoryServer(helpers.PluginRepository{
+					server1, server1URL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-1", Version: "1.0.0"},
 							{Name: "plugin-3", Version: "3.5.0"},
 						},
 					})
 
-					server2, server2URL = helpers.NewPluginRepositoryServer(helpers.PluginRepository{
+					server2, server2URL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-2", Version: "2.0.0"},
 							{Name: "plugin-3", Version: "3.0.0"},

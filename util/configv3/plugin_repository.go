@@ -28,3 +28,9 @@ func (config *Config) PluginRepositories() []PluginRepository {
 	})
 	return repos
 }
+
+// does not add duplicates to the config
+func (config *Config) AddPluginRepository(name string, url string) {
+	config.ConfigFile.PluginRepositories = append(config.ConfigFile.PluginRepositories,
+		PluginRepository{Name: name, URL: url})
+}

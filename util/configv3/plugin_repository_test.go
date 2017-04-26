@@ -27,4 +27,21 @@ var _ = Describe("PluginRepository", func() {
 			}))
 		})
 	})
+
+	Describe("AddPluginRepository", func() {
+		It("adds the repo name and url to the list of repositories", func() {
+			config := Config{
+				ConfigFile: CFConfig{
+					PluginRepositories: []PluginRepository{
+						{Name: "S-repo", URL: "S-repo.com"},
+						{Name: "repo-2", URL: "repo2.com"},
+						{Name: "repo-1", URL: "repo1.com"},
+					},
+				},
+			}
+
+			config.AddPluginRepository("some-repo", "some-URL")
+			Expect(config.PluginRepositories()).To(ContainElement(PluginRepository{Name: "some-repo", URL: "some-URL"}))
+		})
+	})
 })

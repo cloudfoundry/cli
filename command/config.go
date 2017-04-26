@@ -11,6 +11,7 @@ import (
 // Config a way of getting basic CF configuration
 type Config interface {
 	AccessToken() string
+	AddPluginRepository(name string, url string)
 	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string

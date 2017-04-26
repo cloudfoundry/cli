@@ -97,7 +97,7 @@ var _ = Describe("PluginRepository", func() {
 
 			It("returns the error", func() {
 				_, err := client.GetPluginRepository(server.URL())
-				Expect(err).To(MatchError(pluginerror.NotFoundError{}))
+				Expect(err).To(MatchError(pluginerror.RawHTTPStatusError{StatusCode: http.StatusNotFound, RawResponse: []byte{}}))
 			})
 		})
 	})

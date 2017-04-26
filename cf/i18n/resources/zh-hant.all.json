@@ -572,7 +572,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
     "translation": ""
   },
   {
@@ -1818,6 +1818,10 @@
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分將來源從應用程式 {{.SourceApp}} 複製到組織 {{.OrgName}}/空間 {{.SpaceName}} 中的目標應用程式 {{.TargetApp}}..."
+  },
+  {
+    "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
+    "translation": ""
   },
   {
     "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
@@ -4350,6 +4354,10 @@
   {
     "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
     "translation": "名稱為 \"{{.repoName}}\" 的外掛程式儲存庫已存在，請使用另一個名稱。"
+  },
+  {
+    "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
+    "translation": ""
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
@@ -7082,6 +7090,14 @@
   {
     "id": "{{.PropertyName}} should not be null",
     "translation": "{{.PropertyName}} 不應該是空值"
+  },
+  {
+    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
+    "translation": ""
+  },
+  {
+    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
+    "translation": ""
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",

@@ -572,7 +572,7 @@
     "translation": "CF_NAME add-plugin-repo NOME_REPOSITORY URL"
   },
   {
-    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
+    "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
     "translation": ""
   },
   {
@@ -1818,6 +1818,10 @@
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Copia dell'origine dall'applicazione {{.SourceApp}} all'applicazione di destinazione {{.TargetApp}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
+  },
+  {
+    "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
+    "translation": ""
   },
   {
     "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
@@ -4350,6 +4354,10 @@
   {
     "id": "Plugin repo named \"{{.repoName}}\" already exists, please use another name.",
     "translation": "Il repository di plug-in denominato \"{{.repoName}}\" esiste già, utilizza un altro nome"
+  },
+  {
+    "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
+    "translation": ""
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
@@ -7082,6 +7090,14 @@
   {
     "id": "{{.PropertyName}} should not be null",
     "translation": "{{.PropertyName}} non deve essere null"
+  },
+  {
+    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
+    "translation": ""
+  },
+  {
+    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
+    "translation": ""
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
