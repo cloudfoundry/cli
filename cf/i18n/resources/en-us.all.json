@@ -148,8 +148,8 @@
     "translation": "\"Plugins\" object not found in the responded data."
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
-    "translation": "' is not a registered command. See 'cf help'"
+    "id": "' is not a registered command. See 'cf help -a'",
+    "translation": "' is not a registered command. See 'cf help -a'"
   },
   {
     "id": "'routes' should be a list",

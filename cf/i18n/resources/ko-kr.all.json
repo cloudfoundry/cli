@@ -148,7 +148,7 @@
     "translation": "\"플러그인\" 오브젝트를 응답 데이터에서 찾을 수 없습니다."
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "'은(는) 등록된 명령이 아닙니다. 'cf 도움말'을 참조하십시오."
   },
   {

@@ -129,7 +129,7 @@ var _ = Describe("Help", func() {
 			It("prints the usage help for the command", func() {
 				flagContext.Parse("bad-command")
 				err := cmd.Execute(flagContext)
-				Expect(err.Error()).To(Equal("'bad-command' is not a registered command. See 'cf help'"))
+				Expect(err.Error()).To(Equal("'bad-command' is not a registered command. See 'cf help -a'"))
 			})
 		})
 	})
