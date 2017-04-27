@@ -89,7 +89,7 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
 		URIParams:   internal.Params{"guid": spaceGUID},
-		Body:        bytes.NewBuffer(body),
+		Body:        bytes.NewReader(body),
 	})
 
 	var relationship Relationship
@@ -130,7 +130,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostIsolationSegmentRelationshipOrganizationsRequest,
 		URIParams:   internal.Params{"guid": isolationSegmentGUID},
-		Body:        bytes.NewBuffer(body),
+		Body:        bytes.NewReader(body),
 	})
 
 	var relationships RelationshipList

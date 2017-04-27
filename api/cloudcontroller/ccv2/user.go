@@ -43,7 +43,7 @@ func (client *Client) CreateUser(uaaUserID string) (User, Warnings, error) {
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetUsersRequest,
-		Body:        bytes.NewBuffer(bodyBytes),
+		Body:        bytes.NewReader(bodyBytes),
 	})
 	if err != nil {
 		return User{}, nil, err

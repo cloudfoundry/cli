@@ -56,7 +56,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationRequest,
-		Body:        bytes.NewBuffer(bodyBytes),
+		Body:        bytes.NewReader(bodyBytes),
 	})
 
 	var responseApp Application
