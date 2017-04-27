@@ -172,6 +172,14 @@
     "translation": "**Atención: Los plugins son binarios grabados por autores potencialmente no de confianza. Instale y utilice los plugins a su cuenta y riesgo.**\n\n¿Desea instalar el plugin {{.Plugin}}?"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
+    "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Una herramienta de línea de mandatos para interactuar con Cloud Foundry"
   },
@@ -234,10 +242,6 @@
   {
     "id": "API endpoint: {{.Endpoint}}",
     "translation": "Punto final de la API: {{.Endpoint}}"
-  },
-  {
-    "id": "API version:",
-    "translation": "Versión de API:"
   },
   {
     "id": "APPS",
@@ -328,6 +332,10 @@
     "translation": "Nombre de app es un campo obligatorio"
   },
   {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} does not exist.",
     "translation": "La app {{.AppName}} no existe."
   },
@@ -376,6 +384,14 @@
     "translation": "La aplicación {{.AppName}} no se puede configurar con 'routes' y 'no-hostname'"
   },
   {
+    "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
+    "translation": ""
+  },
+  {
+    "id": "Applications in this space will be placed in the platform default isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "Apps:",
     "translation": "Apps:"
   },
@@ -394,6 +410,10 @@
   {
     "id": "Assign an org role to a user",
     "translation": "Asignar un rol de organización a un usuario"
+  },
+  {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
   },
   {
     "id": "Assigned Value",
@@ -534,10 +554,6 @@
   {
     "id": "Buildpack {{.BuildpackName}} does not exist.",
     "translation": "El paquete de compilación {{.BuildpackName}} no existe."
-  },
-  {
-    "id": "Buildpack:",
-    "translation": ""
   },
   {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
@@ -940,6 +956,10 @@
     "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
   },
   {
+    "id": "CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]"
   },
@@ -1026,6 +1046,10 @@
   {
     "id": "CF_NAME install-plugin ~/Downloads/plugin-foobar",
     "translation": "CF_NAME install-plugin ~/Downloads/plugin-foobar"
+  },
+  {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -1208,6 +1232,10 @@
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nEJEMPLOS:\\n   CF_NAME repo-plugins -r PrivateRepo"
   },
   {
+    "id": "CF_NAME reset-space-isolation-segment SPACE_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME restage APP_NAME",
     "translation": "CF_NAME restage APP_NAME"
   },
@@ -1330,6 +1358,10 @@
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
     "translation": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'"
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
@@ -1616,8 +1648,12 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
-    "id": "CF_NAME v3apps",
-    "translation": "CF_NAME v3apps"
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-create-package --name [name]",
+    "translation": ""
   },
   {
     "id": "CF_NAME version",
@@ -1642,10 +1678,6 @@
   {
     "id": "COMMAND",
     "translation": "COMMAND"
-  },
-  {
-    "id": "CPU",
-    "translation": ""
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1942,6 +1974,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "Crear una clave para una instancia de servicio"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -2252,10 +2288,6 @@
     "translation": "Descripción: {{.ServiceDescription}}"
   },
   {
-    "id": "Details",
-    "translation": ""
-  },
-  {
     "id": "Did you mean?",
     "translation": "¿Qué ha querido decir?"
   },
@@ -2314,10 +2346,6 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "Inhabilitar el acceso SSH para el espacio"
-  },
-  {
-    "id": "Disk",
-    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -2444,7 +2472,7 @@
     "translation": "Habilitando el acceso al plan {{.PlanName}} del servicio {{.ServiceName}} para la organización {{.OrgName}} as {{.Username}}..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -2454,10 +2482,6 @@
   {
     "id": "Enabling ssh support for space '{{.SpaceName}}'...",
     "translation": "Habilitando el soporte de ssh para el espacio '{{.SpaceName}}'..."
-  },
-  {
-    "id": "Endpoint (for http type):",
-    "translation": "Punto final (para tipo de http):"
   },
   {
     "id": "Endpoint deprecated",
@@ -2516,8 +2540,8 @@
     "translation": "Error al suprimir el dominio {{.DomainName}}\n{{.Err}}"
   },
   {
-    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
-    "translation": "Error al suprimir el usuario {{.Username}} \nSe han devuelto varios usuarios con ese nombre de usuario. En su lugar, utilice el origen específico 'cf curl'."
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username found. Please use 'cf curl' to delete the user by guid instead.",
+    "translation": ""
   },
   {
     "id": "Error disabling ssh support for ",
@@ -2708,10 +2732,6 @@
     "translation": "Error al reiniciar la aplicación: {{.Error}}"
   },
   {
-    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "Error al recuperar la pila: "
   },
@@ -2726,6 +2746,14 @@
   {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Error al guardar el manifiesto: {{.Error}}"
+  },
+  {
+    "id": "Error staging application: {{.Message}}",
+    "translation": ""
+  },
+  {
+    "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
@@ -3004,6 +3032,10 @@
     "translation": "Obteniendo información para el espacio {{.TargetSpace}} en la organización {{.OrgName}} como {{.CurrentUser}}..."
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
     "translation": "Obteniendo la clave {{.ServiceKeyName}} para la instancia de servicio {{.ServiceInstanceName}} como {{.CurrentUser}}..."
   },
@@ -3176,10 +3208,6 @@
     "translation": "El tipo de comprobación de estado debería ser 'http' para establecer un punto final HTTP de comprobación de estado."
   },
   {
-    "id": "Health check type:",
-    "translation": "Tipo de comprobación de estado:"
-  },
-  {
     "id": "Hostname (e.g. my-subdomain)",
     "translation": "Nombre de host (p. ej. mi-subdominio)"
   },
@@ -3226,6 +3254,10 @@
   {
     "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
     "translation": "En Windows PowerShell, utilice JSON escapado con comillas dobles: \"{\\\"valid\\\":\\\"json\\\"}\""
+  },
+  {
+    "id": "In order to move running applications to this isolation segment, they must be restarted.",
+    "translation": ""
   },
   {
     "id": "Include response headers in the output",
@@ -3484,10 +3516,6 @@
     "translation": "La instancia debe ser un entero no negativo"
   },
   {
-    "id": "Instances:",
-    "translation": ""
-  },
-  {
     "id": "Invalid JSON response from server",
     "translation": "Respuesta JSON no válida del servidor"
   },
@@ -3624,10 +3652,6 @@
     "translation": "Última operación"
   },
   {
-    "id": "Last uploaded:",
-    "translation": ""
-  },
-  {
     "id": "List all apps in the target space",
     "translation": "Listar todas las apps del espacio de destino"
   },
@@ -3642,6 +3666,10 @@
   {
     "id": "List all buildpacks",
     "translation": "Listar todos los paquetes de compilación"
+  },
+  {
+    "id": "List all isolation segments",
+    "translation": ""
   },
   {
     "id": "List all orgs",
@@ -3832,10 +3860,6 @@
     "translation": "Número máximo de rutas que se pueden crear con puertos reservados (Valor predeterminado: 0)"
   },
   {
-    "id": "Memory",
-    "translation": ""
-  },
-  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "Límite de memoria (p. ej. 256M, 1024M, 1G)"
   },
@@ -3877,10 +3901,6 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
-    "translation": ""
-  },
-  {
-    "id": "Name:",
     "translation": ""
   },
   {
@@ -4508,7 +4528,7 @@
     "translation": ""
   },
   {
-    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": ""
   },
   {
@@ -4570,6 +4590,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "Eliminar un rol de organización de un usuario"
+  },
+  {
+    "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4664,10 +4688,6 @@
     "translation": "Solicitar asignación pseudo-tty"
   },
   {
-    "id": "Requested state:",
-    "translation": ""
-  },
-  {
     "id": "Requires SOURCE-APP TARGET-APP as arguments",
     "translation": "Requiere SOURCE-APP TARGET-APP como argumentos"
   },
@@ -4678,6 +4698,14 @@
   {
     "id": "Reserved Route Ports",
     "translation": "Puertos de ruta reservados"
+  },
+  {
+    "id": "Reset the isolation segment assignment of a space to the org's default",
+    "translation": ""
+  },
+  {
+    "id": "Resetting isolation segment assignment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Resource matching API timed out; pushing all app files.",
@@ -4748,6 +4776,10 @@
     "translation": "Recuperar las reglas para todos los grupos de seguridad asociados con este espacio"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -4766,6 +4798,10 @@
   {
     "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
     "translation": "Recuperando el contenido del grupo de variables de entorno intermedio como {{.Username}}..."
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Route and domain management:",
@@ -4804,10 +4840,6 @@
     "translation": "Las rutas para este dominio se configurarán solo en el grupo de direccionador especificado"
   },
   {
-    "id": "Routes:",
-    "translation": ""
-  },
-  {
     "id": "Rules",
     "translation": "Reglas"
   },
@@ -4818,6 +4850,10 @@
   {
     "id": "Running Environment Variable Groups:",
     "translation": "Ejecución de grupos de variables de entorno:"
+  },
+  {
+    "id": "Running applications need a restart to be moved there.",
+    "translation": ""
   },
   {
     "id": "SECURITY GROUP",
@@ -5156,10 +5192,6 @@
     "translation": "Mostrando el estado para app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
-    "id": "Since",
-    "translation": ""
-  },
-  {
     "id": "Skip assigning org role to user",
     "translation": "Omitir la asignación del rol de la organización al usuario"
   },
@@ -5212,10 +5244,6 @@
     "translation": "Pila a utilizar (una pila es un sistema de archivos preconfigurado, incluido un sistema operativo, que puede ejecutar apps)"
   },
   {
-    "id": "Stack:",
-    "translation": ""
-  },
-  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Grupos de variable de entorno de transferencia:"
   },
@@ -5229,10 +5257,6 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Start command:",
     "translation": ""
   },
   {
@@ -5356,8 +5380,12 @@
     "translation": "Espacio de destino {{.SpaceName}}\n"
   },
   {
-    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
-    "translation": "La tarea se ha enviado correctamente para su ejecución.\nNombre de tarea:   {{.TaskName}}\nID de tarea:     {{.TaskSequenceID}}"
+    "id": "Task has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
   },
   {
     "id": "Task workers are unavailable.",
@@ -5413,6 +5441,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {
@@ -5572,10 +5604,6 @@
     "translation": "La cuota"
   },
   {
-    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
-    "translation": ""
-  },
-  {
     "id": "The route {{.RouteName}} did not match any existing domains.",
     "translation": "La ruta {{.RouteName}} no coincide con ningún dominio existente."
   },
@@ -5700,6 +5728,10 @@
     "translation": "Estos son los mandatos utilizados con más frecuencia. Utilice 'cf help -a' para verlos todos, con descripciones."
   },
   {
+    "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+    "translation": ""
+  },
+  {
     "id": "This command",
     "translation": "Este mandato"
   },
@@ -5714,10 +5746,6 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "Este mandato requiere la API de direccionamiento. Los informes de puntos finales de destino no están habilitados."
-  },
-  {
-    "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-    "translation": "Este dominio se comparte a través de todas las organizaciones.\nLa supresión eliminará todas las rutas asociadas, y convertirá en inalcanzable cualquier app con este dominio.\n¿Está seguro de que desea suprimir el dominio {{.DomainName}}? "
   },
   {
     "id": "This is for backwards compatibility",
@@ -6004,6 +6032,10 @@
     "translation": "Actualizando el tipo de comprobación de estado para la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
     "translation": "Actualizando la cuota {{.QuotaName}} como {{.Username}}..."
   },
@@ -6248,6 +6280,14 @@
     "translation": "ya existe"
   },
   {
+    "id": "api endpoint:",
+    "translation": ""
+  },
+  {
+    "id": "api version:",
+    "translation": ""
+  },
+  {
     "id": "app",
     "translation": "app"
   },
@@ -6266,6 +6306,10 @@
   {
     "id": "apps",
     "translation": "apps"
+  },
+  {
+    "id": "apps:",
+    "translation": ""
   },
   {
     "id": "auth request failed",
@@ -6340,8 +6384,16 @@
     "translation": "descripción"
   },
   {
+    "id": "destination",
+    "translation": ""
+  },
+  {
     "id": "details",
     "translation": "detalles"
+  },
+  {
+    "id": "disable-org-isolation",
+    "translation": ""
   },
   {
     "id": "disallowed",
@@ -6400,6 +6452,10 @@
     "translation": "habilitado"
   },
   {
+    "id": "endpoint (for http type):",
+    "translation": ""
+  },
+  {
     "id": "env var '{{.PropertyName}}' should not be null",
     "translation": "la variable de entorno '{{.PropertyName}}' no debería ser nula"
   },
@@ -6418,6 +6474,10 @@
   {
     "id": "free or paid",
     "translation": "gratuito o de pago"
+  },
+  {
+    "id": "health check type:",
+    "translation": ""
   },
   {
     "id": "health_check_type is ",
@@ -6470,6 +6530,18 @@
   {
     "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
     "translation": "valor no válido para la variable de entorno CF_STARTUP_TIMEOUT\n{{.Err}}"
+  },
+  {
+    "id": "isolation segment:",
+    "translation": ""
+  },
+  {
+    "id": "isolation segments:",
+    "translation": ""
+  },
+  {
+    "id": "isolation-segments",
+    "translation": ""
   },
   {
     "id": "label",
@@ -6532,6 +6604,10 @@
     "translation": "org"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "organizaciones"
   },
@@ -6568,8 +6644,16 @@
     "translation": "puerto"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "posición"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6612,12 +6696,20 @@
     "translation": "puertos de ruta reservados"
   },
   {
+    "id": "reset-space-isolation-segment",
+    "translation": ""
+  },
+  {
     "id": "route ports",
     "translation": "puertos de ruta"
   },
   {
     "id": "routes",
     "translation": "rutas"
+  },
+  {
+    "id": "routes:",
+    "translation": ""
   },
   {
     "id": "run-task",
@@ -6630,6 +6722,10 @@
   {
     "id": "security group",
     "translation": "grupo de seguridad"
+  },
+  {
+    "id": "security groups:",
+    "translation": ""
   },
   {
     "id": "service",
@@ -6672,6 +6768,14 @@
     "translation": "servicios"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "compartido"
   },
@@ -6684,8 +6788,16 @@
     "translation": "espacio"
   },
   {
+    "id": "space quota:",
+    "translation": ""
+  },
+  {
     "id": "space quotas:",
     "translation": "cuotas de espacio:"
+  },
+  {
+    "id": "space:",
+    "translation": ""
   },
   {
     "id": "spaces:",
@@ -6740,6 +6852,10 @@
     "translation": "pila:"
   },
   {
+    "id": "start command:",
+    "translation": ""
+  },
+  {
     "id": "start time",
     "translation": ""
   },
@@ -6762,6 +6878,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "detenido después de una redirección"
+  },
+  {
+    "id": "task id:",
+    "translation": ""
+  },
+  {
+    "id": "task name:",
+    "translation": ""
   },
   {
     "id": "tasks",
@@ -6830,6 +6954,10 @@
   {
     "id": "user-provided",
     "translation": "proporcionada por el usuario"
+  },
+  {
+    "id": "user:",
+    "translation": ""
   },
   {
     "id": "username",

@@ -172,6 +172,14 @@
     "translation": "**注意: プラグインは必ずしも信頼できない作成者によって書かれたバイナリーです。 プラグインのインストールと使用は自らの責任で行ってください。**\n\nプラグイン {{.Plugin}} をインストールしますか?"
   },
   {
+    "id": "**EXPERIMENTAL** Create a V3 App",
+    "translation": ""
+  },
+  {
+    "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Cloud Foundry と対話するためのコマンド・ライン・ツール"
   },
@@ -234,10 +242,6 @@
   {
     "id": "API endpoint: {{.Endpoint}}",
     "translation": "API エンドポイント: {{.Endpoint}}"
-  },
-  {
-    "id": "API version:",
-    "translation": "API バージョン:"
   },
   {
     "id": "APPS",
@@ -328,6 +332,10 @@
     "translation": "アプリ名は必須フィールドです"
   },
   {
+    "id": "App {{.AppName}} already exists.",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} does not exist.",
     "translation": "アプリ {{.AppName}} は存在していません。"
   },
@@ -376,6 +384,14 @@
     "translation": "アプリケーション {{.AppName}} は、'routes' と 'no-hostname' の両方で構成されてはなりません"
   },
   {
+    "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
+    "translation": ""
+  },
+  {
+    "id": "Applications in this space will be placed in the platform default isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "Apps:",
     "translation": "アプリ:"
   },
@@ -394,6 +410,10 @@
   {
     "id": "Assign an org role to a user",
     "translation": "ユーザーに組織の役割を割り当てます"
+  },
+  {
+    "id": "Assign the isolation segment that apps in a space are started in",
+    "translation": ""
   },
   {
     "id": "Assigned Value",
@@ -534,10 +554,6 @@
   {
     "id": "Buildpack {{.BuildpackName}} does not exist.",
     "translation": "ビルドパック {{.BuildpackName}} は存在していません。"
-  },
-  {
-    "id": "Buildpack:",
-    "translation": ""
   },
   {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
@@ -940,6 +956,10 @@
     "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
   },
   {
+    "id": "CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]",
     "translation": "CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]"
   },
@@ -1026,6 +1046,10 @@
   {
     "id": "CF_NAME install-plugin ~/Downloads/plugin-foobar",
     "translation": "CF_NAME install-plugin ~/Downloads/plugin-foobar"
+  },
+  {
+    "id": "CF_NAME isolation-segments",
+    "translation": ""
   },
   {
     "id": "CF_NAME list-plugin-repos",
@@ -1208,6 +1232,10 @@
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\n例:\\n   CF_NAME repo-plugins -r PrivateRepo"
   },
   {
+    "id": "CF_NAME reset-space-isolation-segment SPACE_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME restage APP_NAME",
     "translation": "CF_NAME restage APP_NAME"
   },
@@ -1330,6 +1358,10 @@
   {
     "id": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'",
     "translation": "CF_NAME set-running-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'"
+  },
+  {
+    "id": "CF_NAME set-space-isolation-segment SPACE_NAME SEGMENT_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
@@ -1616,8 +1648,12 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
-    "id": "CF_NAME v3apps",
-    "translation": "CF_NAME v3apps"
+    "id": "CF_NAME v3-create-app --name [name]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-create-package --name [name]",
+    "translation": ""
   },
   {
     "id": "CF_NAME version",
@@ -1642,10 +1678,6 @@
   {
     "id": "COMMAND",
     "translation": "コマンド"
-  },
-  {
-    "id": "CPU",
-    "translation": ""
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1942,6 +1974,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "サービス・インスタンスのキーを作成します"
+  },
+  {
+    "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating an app manifest from current settings of app ",
@@ -2252,10 +2288,6 @@
     "translation": "説明: {{.ServiceDescription}}"
   },
   {
-    "id": "Details",
-    "translation": ""
-  },
-  {
     "id": "Did you mean?",
     "translation": "もしかして?"
   },
@@ -2314,10 +2346,6 @@
   {
     "id": "Disallow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを不許可にします"
-  },
-  {
-    "id": "Disk",
-    "translation": ""
   },
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
@@ -2444,7 +2472,7 @@
     "translation": "{{.Username}} として組織 {{.OrgName}} に対してサービス {{.ServiceName}} のプラン {{.PlanName}} へのアクセスを有効にしています..."
   },
   {
-    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}…",
+    "id": "Enabling isolation segment {{.SegmentName}} for org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -2454,10 +2482,6 @@
   {
     "id": "Enabling ssh support for space '{{.SpaceName}}'...",
     "translation": "スペース '{{.SpaceName}}' に対する SSH サポートを有効にしています..."
-  },
-  {
-    "id": "Endpoint (for http type):",
-    "translation": "エンドポイント (http タイプの場合):"
   },
   {
     "id": "Endpoint deprecated",
@@ -2516,8 +2540,8 @@
     "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.Err}}"
   },
   {
-    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
-    "translation": "ユーザー {{.Username}} の削除中にエラーが発生しました\nこのユーザー名のユーザーが複数戻されました。代わりに、特定のオリジンを指定した 'cf curl' を使用してください。"
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username found. Please use 'cf curl' to delete the user by guid instead.",
+    "translation": ""
   },
   {
     "id": "Error disabling ssh support for ",
@@ -2708,10 +2732,6 @@
     "translation": "アプリケーションの再始動時にエラーが発生しました: {{.Error}}"
   },
   {
-    "id": "Error restarting application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
-    "translation": ""
-  },
-  {
     "id": "Error retrieving stack: ",
     "translation": "スタックの取得時にエラーが発生しました: "
   },
@@ -2726,6 +2746,14 @@
   {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "マニフェストの保存時にエラーが発生しました: {{.Error}}"
+  },
+  {
+    "id": "Error staging application: {{.Message}}",
+    "translation": ""
+  },
+  {
+    "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
+    "translation": ""
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
@@ -3004,6 +3032,10 @@
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} 内のスペース {{.TargetSpace}} の情報を取得しています..."
   },
   {
+    "id": "Getting isolation segments as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} としてサービス・インスタンス {{.ServiceInstanceName}} のキー {{.ServiceKeyName}} を取得しています..."
   },
@@ -3176,10 +3208,6 @@
     "translation": "ヘルス・チェック HTTP エンドポイントを設定するには、ヘルス・チェック・タイプが 'http' でなければなりません。"
   },
   {
-    "id": "Health check type:",
-    "translation": "ヘルス・チェック・タイプ:"
-  },
-  {
     "id": "Hostname (e.g. my-subdomain)",
     "translation": "ホスト名 (例: my-subdomain)"
   },
@@ -3226,6 +3254,10 @@
   {
     "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
     "translation": "Windows PowerShell では、二重引用符で囲み、エスケープした JSON を使用してください: \"{\\\"valid\\\":\\\"json\\\"}\""
+  },
+  {
+    "id": "In order to move running applications to this isolation segment, they must be restarted.",
+    "translation": ""
   },
   {
     "id": "Include response headers in the output",
@@ -3484,10 +3516,6 @@
     "translation": "インスタンスは負でない整数でなければなりません"
   },
   {
-    "id": "Instances:",
-    "translation": ""
-  },
-  {
     "id": "Invalid JSON response from server",
     "translation": "サーバーからの無効な JSON 応答"
   },
@@ -3624,10 +3652,6 @@
     "translation": "最後の操作"
   },
   {
-    "id": "Last uploaded:",
-    "translation": ""
-  },
-  {
     "id": "List all apps in the target space",
     "translation": "ターゲット・スペース内のすべてのアプリをリストします"
   },
@@ -3642,6 +3666,10 @@
   {
     "id": "List all buildpacks",
     "translation": "すべてのビルドパックをリストします"
+  },
+  {
+    "id": "List all isolation segments",
+    "translation": ""
   },
   {
     "id": "List all orgs",
@@ -3832,10 +3860,6 @@
     "translation": "予約されたポートで作成される可能性のある経路の最大数 (デフォルト: 0)"
   },
   {
-    "id": "Memory",
-    "translation": ""
-  },
-  {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
     "translation": "メモリー制限 (例: 256M、1024M、1G)"
   },
@@ -3877,10 +3901,6 @@
   },
   {
     "id": "Name to give the task (generated if omitted)",
-    "translation": ""
-  },
-  {
-    "id": "Name:",
     "translation": ""
   },
   {
@@ -4508,7 +4528,7 @@
     "translation": ""
   },
   {
-    "id": "Really delete the org {{.OrgName}} and everything associated with it?",
+    "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": ""
   },
   {
@@ -4570,6 +4590,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "ユーザーから組織の役割を削除します"
+  },
+  {
+    "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4664,10 +4688,6 @@
     "translation": "pseudo-tty 割り振りを要求します"
   },
   {
-    "id": "Requested state:",
-    "translation": ""
-  },
-  {
     "id": "Requires SOURCE-APP TARGET-APP as arguments",
     "translation": "引数として SOURCE-APP TARGET-APP が必要です"
   },
@@ -4678,6 +4698,14 @@
   {
     "id": "Reserved Route Ports",
     "translation": "予約された経路ポート"
+  },
+  {
+    "id": "Reset the isolation segment assignment of a space to the org's default",
+    "translation": ""
+  },
+  {
+    "id": "Resetting isolation segment assignment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Resource matching API timed out; pushing all app files.",
@@ -4748,6 +4776,10 @@
     "translation": "このスペースに関連付けられているすべてのセキュリティー・グループのルールを取得します"
   },
   {
+    "id": "Retrieve the rules for all the security groups associated with the space.",
+    "translation": ""
+  },
+  {
     "id": "Retrieving logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -4766,6 +4798,10 @@
   {
     "id": "Retrieving the contents of the staging environment variable group as {{.Username}}...",
     "translation": "{{.Username}} としてステージング環境変数グループの内容を取得しています..."
+  },
+  {
+    "id": "Revoke an organization's entitlement to an isolation segment",
+    "translation": ""
   },
   {
     "id": "Route and domain management:",
@@ -4804,10 +4840,6 @@
     "translation": "このドメイン用の経路は指定されたルーター・グループ上でのみ構成されます"
   },
   {
-    "id": "Routes:",
-    "translation": ""
-  },
-  {
     "id": "Rules",
     "translation": "ルール"
   },
@@ -4818,6 +4850,10 @@
   {
     "id": "Running Environment Variable Groups:",
     "translation": "実行環境変数グループ:"
+  },
+  {
+    "id": "Running applications need a restart to be moved there.",
+    "translation": ""
   },
   {
     "id": "SECURITY GROUP",
@@ -5156,10 +5192,6 @@
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の正常性と状況を表示しています..."
   },
   {
-    "id": "Since",
-    "translation": ""
-  },
-  {
     "id": "Skip assigning org role to user",
     "translation": "ユーザーに組織の役割を割り当てるステップをスキップします"
   },
@@ -5212,10 +5244,6 @@
     "translation": "使用するスタック (スタックはオペレーティング・システムを含む事前ビルドされたファイル・システムであり、このファイル・システムはアプリを実行できます)"
   },
   {
-    "id": "Stack:",
-    "translation": ""
-  },
-  {
     "id": "Staging Environment Variable Groups:",
     "translation": "ステージング環境変数グループ:"
   },
@@ -5229,10 +5257,6 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Start command:",
     "translation": ""
   },
   {
@@ -5356,8 +5380,12 @@
     "translation": "スペース {{.SpaceName}} をターゲットにしました\n"
   },
   {
-    "id": "Task has been submitted successfully for execution.\nTask name:   {{.TaskName}}\nTask id:     {{.TaskSequenceID}}",
-    "translation": "タスクは、実行のために正常にサブミットされました。\nタスク名:   {{.TaskName}}\nタスク ID:     {{.TaskSequenceID}}"
+    "id": "Task has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
+    "id": "Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
   },
   {
     "id": "Task workers are unavailable.",
@@ -5413,6 +5441,10 @@
   },
   {
     "id": "The command to execute",
+    "translation": ""
+  },
+  {
+    "id": "The desired application name",
     "translation": ""
   },
   {
@@ -5572,10 +5604,6 @@
     "translation": "割り当て量"
   },
   {
-    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
-    "translation": ""
-  },
-  {
     "id": "The route {{.RouteName}} did not match any existing domains.",
     "translation": "経路 {{.RouteName}} は既存のどのドメインにも一致しませんでした。"
   },
@@ -5700,6 +5728,10 @@
     "translation": "これらは、一般的に使用されるコマンドです。説明付きですべて表示するには、'cf help -a' を使用します。"
   },
   {
+    "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
+    "translation": ""
+  },
+  {
     "id": "This command",
     "translation": "このコマンド"
   },
@@ -5714,10 +5746,6 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "このコマンドには Routing API が必要です。ターゲットのエンドポイントから有効になっていないことが報告されています。"
-  },
-  {
-    "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
-    "translation": "このドメインはすべての組織で共有されています。\nこれを削除すると、関連するすべての経路が除去されるので、このドメインを持つアプリには到達できなくなります。\nドメイン {{.DomainName}} を削除しますか? "
   },
   {
     "id": "This is for backwards compatibility",
@@ -6004,6 +6032,10 @@
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} のヘルス・チェック・タイプを更新しています..."
   },
   {
+    "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating quota {{.QuotaName}} as {{.Username}}...",
     "translation": "{{.Username}} として割り当て量 {{.QuotaName}} を更新しています..."
   },
@@ -6248,6 +6280,14 @@
     "translation": "既に存在しています"
   },
   {
+    "id": "api endpoint:",
+    "translation": ""
+  },
+  {
+    "id": "api version:",
+    "translation": ""
+  },
+  {
     "id": "app",
     "translation": "アプリ"
   },
@@ -6266,6 +6306,10 @@
   {
     "id": "apps",
     "translation": "アプリ"
+  },
+  {
+    "id": "apps:",
+    "translation": ""
   },
   {
     "id": "auth request failed",
@@ -6340,8 +6384,16 @@
     "translation": "説明"
   },
   {
+    "id": "destination",
+    "translation": ""
+  },
+  {
     "id": "details",
     "translation": "詳細"
+  },
+  {
+    "id": "disable-org-isolation",
+    "translation": ""
   },
   {
     "id": "disallowed",
@@ -6400,6 +6452,10 @@
     "translation": "有効"
   },
   {
+    "id": "endpoint (for http type):",
+    "translation": ""
+  },
+  {
     "id": "env var '{{.PropertyName}}' should not be null",
     "translation": "環境変数 '{{.PropertyName}}' をヌルにすることはできません"
   },
@@ -6418,6 +6474,10 @@
   {
     "id": "free or paid",
     "translation": "無料または有料"
+  },
+  {
+    "id": "health check type:",
+    "translation": ""
   },
   {
     "id": "health_check_type is ",
@@ -6470,6 +6530,18 @@
   {
     "id": "invalid value for env var CF_STARTUP_TIMEOUT\n{{.Err}}",
     "translation": "環境変数 CF_STARTUP_TIMEOUT の値が無効です\n{{.Err}}"
+  },
+  {
+    "id": "isolation segment:",
+    "translation": ""
+  },
+  {
+    "id": "isolation segments:",
+    "translation": ""
+  },
+  {
+    "id": "isolation-segments",
+    "translation": ""
   },
   {
     "id": "label",
@@ -6532,6 +6604,10 @@
     "translation": "組織"
   },
   {
+    "id": "org:",
+    "translation": ""
+  },
+  {
     "id": "orgs",
     "translation": "組織"
   },
@@ -6568,8 +6644,16 @@
     "translation": "ポート"
   },
   {
+    "id": "ports",
+    "translation": ""
+  },
+  {
     "id": "position",
     "translation": "位置"
+  },
+  {
+    "id": "protocol",
+    "translation": ""
   },
   {
     "id": "provider",
@@ -6612,12 +6696,20 @@
     "translation": "予約された経路ポート"
   },
   {
+    "id": "reset-space-isolation-segment",
+    "translation": ""
+  },
+  {
     "id": "route ports",
     "translation": "経路ポート"
   },
   {
     "id": "routes",
     "translation": "経路"
+  },
+  {
+    "id": "routes:",
+    "translation": ""
   },
   {
     "id": "run-task",
@@ -6630,6 +6722,10 @@
   {
     "id": "security group",
     "translation": "セキュリティー・グループ"
+  },
+  {
+    "id": "security groups:",
+    "translation": ""
   },
   {
     "id": "service",
@@ -6672,6 +6768,14 @@
     "translation": "サービス"
   },
   {
+    "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-space-isolation-segment",
+    "translation": ""
+  },
+  {
     "id": "shared",
     "translation": "共有"
   },
@@ -6684,8 +6788,16 @@
     "translation": "スペース"
   },
   {
+    "id": "space quota:",
+    "translation": ""
+  },
+  {
     "id": "space quotas:",
     "translation": "スペース割り当て量:"
+  },
+  {
+    "id": "space:",
+    "translation": ""
   },
   {
     "id": "spaces:",
@@ -6740,6 +6852,10 @@
     "translation": "スタック:"
   },
   {
+    "id": "start command:",
+    "translation": ""
+  },
+  {
     "id": "start time",
     "translation": ""
   },
@@ -6762,6 +6878,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "1 リダイレクト後に停止されます"
+  },
+  {
+    "id": "task id:",
+    "translation": ""
+  },
+  {
+    "id": "task name:",
+    "translation": ""
   },
   {
     "id": "tasks",
@@ -6830,6 +6954,10 @@
   {
     "id": "user-provided",
     "translation": "ユーザー提供"
+  },
+  {
+    "id": "user:",
+    "translation": ""
   },
   {
     "id": "username",
