@@ -99,7 +99,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			It("unbinds the security group from the targeted space", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Eventually(testUI.Out).Should(Say("Unbinding security group %s from %s/%s as %s", "some-security-group", "some-org", "some-space", "some-user"))
+				Eventually(testUI.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
 				Eventually(testUI.Out).Should(Say("OK\n\n"))
 				Eventually(testUI.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
 				Eventually(testUI.Err).Should(Say("unbind warning"))
@@ -162,7 +162,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("the security group is unbound from the targeted space", func() {
-				Eventually(testUI.Out).Should(Say("Unbinding security group %s from %s/%s as %s", "some-security-group", "some-org", "some-space", "some-user"))
+				Eventually(testUI.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
 				Eventually(testUI.Out).Should(Say("OK\n\n"))
 				Eventually(testUI.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
 				Eventually(testUI.Err).Should(Say("unbind warning"))
