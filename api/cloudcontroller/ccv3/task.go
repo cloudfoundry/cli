@@ -35,7 +35,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 		URIParams: internal.Params{
 			"guid": appGUID,
 		},
-		Body: bytes.NewBuffer(bodyBytes),
+		Body: bytes.NewReader(bodyBytes),
 	})
 	if err != nil {
 		return Task{}, nil, err

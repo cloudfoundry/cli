@@ -72,7 +72,7 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostPackageRequest,
-		Body:        bytes.NewBuffer(bodyBytes),
+		Body:        bytes.NewReader(bodyBytes),
 	})
 
 	var responsePackage Package
@@ -84,7 +84,8 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	return responsePackage, response.Warnings, err
 }
 
-// UploadPackage uploads a file to a given package's Upload resource.
+// UploadPackage uploads a file to a given package's Upload resource. Note:
+// fileToUpload is read entirely into memory prior to sending data to CC.
 func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, Warnings, error) {
 	link, ok := pkg.Links["upload"]
 	if !ok {
@@ -112,7 +113,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
-func (client *Client) createUploadStream(path string, paramName string) (io.Reader, string, error) {
+func (client *Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, "", err
@@ -132,5 +133,5 @@ func (client *Client) createUploadStream(path string, paramName string) (io.Read
 		return nil, "", err
 	}
 
-	return body, writer.FormDataContentType(), nil
+	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), nil
 }

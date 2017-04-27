@@ -82,7 +82,7 @@ func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnin
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostRouteRequest,
-		Body:        bytes.NewBuffer(body),
+		Body:        bytes.NewReader(body),
 	})
 	if err != nil {
 		return Route{}, nil, err

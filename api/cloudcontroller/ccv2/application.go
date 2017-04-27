@@ -141,7 +141,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostAppRequest,
-		Body:        bytes.NewBuffer(body),
+		Body:        bytes.NewReader(body),
 	})
 	if err != nil {
 		return Application{}, nil, err
@@ -215,7 +215,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutAppRequest,
 		URIParams:   Params{"app_guid": appGUID},
-		Body:        bytes.NewBuffer(body),
+		Body:        bytes.NewReader(body),
 	})
 	if err != nil {
 		return Application{}, nil, err

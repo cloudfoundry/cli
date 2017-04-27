@@ -26,7 +26,7 @@ type requestOptions struct {
 	// Method is the HTTP method.
 	Method string
 	// Body is the content of the request.
-	Body io.Reader
+	Body io.ReadSeeker
 }
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
