@@ -60,6 +60,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		It("defaults to 'https://'", func() {
 			session := helpers.CF("add-plugin-repo", "some-repo", "example.com/repo")
 			Eventually(session.Err).Should(Say("Could not add repository 'some-repo' from https://example\\.com/repo:"))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
