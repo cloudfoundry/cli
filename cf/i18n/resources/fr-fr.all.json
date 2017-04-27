@@ -148,7 +148,7 @@
     "translation": "Objet \"Plugins\" introuvable dans les données de réponse."
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "' n'est pas une commande enregistrée. Voir 'cf help'"
   },
   {

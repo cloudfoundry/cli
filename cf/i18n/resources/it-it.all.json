@@ -148,7 +148,7 @@
     "translation": "Oggetto \"Plugins\" non trovato nei dati restituiti."
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "' non è un comando registrato. Vedi 'cf help'"
   },
   {

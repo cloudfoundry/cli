@@ -16,7 +16,7 @@ var _ = Describe("Suggest Command", func() {
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session.Out).Should(Say("'logn' is not a registered command. See 'cf help'"))
+			Eventually(session.Out).Should(Say("'logn' is not a registered command. See 'cf help -a'"))
 			Eventually(session.Out).Should(Say("Did you mean?"))
 			Eventually(session.Out.Contents()).Should(ContainSubstring("login"))
 			Eventually(session.Out.Contents()).Should(ContainSubstring("logs"))
@@ -30,7 +30,7 @@ var _ = Describe("Suggest Command", func() {
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session.Out).Should(Say("'zzz' is not a registered command. See 'cf help'"))
+			Eventually(session.Out).Should(Say("'zzz' is not a registered command. See 'cf help -a'"))
 			Consistently(session.Out).ShouldNot(Say("Did you mean?"))
 			Eventually(session).Should(Exit(1))
 		})

@@ -148,7 +148,7 @@
     "translation": "\"Plugins\" オブジェクトが応答データに見つかりませんでした。"
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "' は登録済みコマンドではありません。 'cf help' を参照してください"
   },
   {

@@ -16,7 +16,7 @@ type ErrorInvalidCommand struct {
 }
 
 func (err ErrorInvalidCommand) Error() string {
-	return fmt.Sprintf("'%s' is not a registered command. See 'cf help'", err.CommandName)
+	return fmt.Sprintf("'%s' is not a registered command. See 'cf help -a'", err.CommandName)
 }
 
 // CommandInfo contains the help details of a command

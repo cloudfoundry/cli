@@ -152,7 +152,7 @@ func Main(traceEnv string, args []string) {
 
 	ran := rpc.RunMethodIfExists(rpcService, args[1:], pluginList)
 	if !ran {
-		deps.UI.Say("'" + args[1] + T("' is not a registered command. See 'cf help'"))
+		deps.UI.Say("'" + args[1] + T("' is not a registered command. See 'cf help -a'"))
 		suggestCommands(cmdName, deps.UI, append(cmdRegistry.ListCommands(), pluginConfig.ListCommands()...))
 		os.Exit(1)
 	}

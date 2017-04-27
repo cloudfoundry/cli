@@ -226,7 +226,7 @@ ENVIRONMENT:
 				session, err := Start(command(), GinkgoWriter, GinkgoWriter)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(session.Err).Should(Say("'rock' is not a registered command. See 'cf help'"))
+				Eventually(session.Err).Should(Say("'rock' is not a registered command. See 'cf help -a'"))
 				Eventually(session).Should(Exit(1))
 			},
 

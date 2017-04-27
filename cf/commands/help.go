@@ -93,7 +93,7 @@ func (cmd *Help) Execute(c flags.FlagContext) error {
 			}
 
 			if !found {
-				return errors.New("'" + cmdName + "' is not a registered command. See 'cf help'")
+				return errors.New("'" + cmdName + "' is not a registered command. See 'cf help -a'")
 			}
 		}
 	}

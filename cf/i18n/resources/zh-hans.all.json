@@ -148,7 +148,7 @@
     "translation": "在响应的数据中找不到 'Plugins' 对象。"
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "' 不是注册的命令。请参阅 'cf help'"
   },
   {

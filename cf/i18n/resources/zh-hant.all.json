@@ -148,7 +148,7 @@
     "translation": "在回應的資料中找不到 \"Plugins\" 物件。"
   },
   {
-    "id": "' is not a registered command. See 'cf help'",
+    "id": "' is not a registered command. See 'cf help -a'",
     "translation": "' 不是已登錄的指令。請參閱 'cf help'"
   },
   {
