@@ -1,10 +1,7 @@
 package plugin
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/actor/pluginaction"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
@@ -35,13 +32,6 @@ func (cmd *AddPluginRepoCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd AddPluginRepoCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	err := cmd.Actor.AddPluginRepository(cmd.RequiredArgs.PluginRepoName, cmd.RequiredArgs.PluginRepoURL)
 	if err != nil {
 		return shared.HandleError(err)
