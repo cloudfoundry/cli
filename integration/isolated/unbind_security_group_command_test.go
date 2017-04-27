@@ -186,7 +186,7 @@ var _ = Describe("unbind-security-group command", func() {
 		Context("when the space isn't bound to the security group", func() {
 			It("successfully runs the command", func() {
 				session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
-				Eventually(session.Out).Should(Say("Unbinding security group %s from %s/%s as %s", secGroupName, orgName, spaceName, username))
+				Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
 				Eventually(session.Out).Should(Say("OK\n\n"))
 				Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
 				Eventually(session).Should(Exit(0))
@@ -205,7 +205,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 				It("successfully unbinds the space from the security group", func() {
 					session := helpers.CF("unbind-security-group", secGroupName)
-					Eventually(session.Out).Should(Say("Unbinding security group %s from %s/%s as %s", secGroupName, orgName, spaceName, username))
+					Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
 					Eventually(session.Out).Should(Say("OK\n\n"))
 					Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
 					Eventually(session).Should(Exit(0))
@@ -219,7 +219,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 				It("successfully unbinds the space from the security group", func() {
 					session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
-					Eventually(session.Out).Should(Say("Unbinding security group %s from %s/%s as %s", secGroupName, orgName, spaceName, username))
+					Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
 					Eventually(session.Out).Should(Say("OK\n\n"))
 					Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
 					Eventually(session).Should(Exit(0))

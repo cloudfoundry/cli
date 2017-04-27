@@ -5916,7 +5916,7 @@
     "translation": "Desenlazando la ruta {{.URL}} de la instancia de servicio {{.ServiceInstanceName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.CurrentUser}}..."
   },
   {
-    "id": "Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}",
+    "id": "Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {

@@ -1628,8 +1628,8 @@
     "translation": "Unable to retrieve information for bound application GUID "
   },
   {
-    "id": "Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}",
-    "translation": ""
+    "id": "Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
     "id": "Uninstall CLI plugin",

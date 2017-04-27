@@ -68,7 +68,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 		}
 
 		space := cmd.Config.TargetedSpace()
-		cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"SecurityGroupName": cmd.RequiredArgs.SecurityGroupName,
 			"OrgName":           cmd.Config.TargetedOrganization().Name,
 			"SpaceName":         space.Name,
@@ -82,7 +82,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			return shared.HandleError(err)
 		}
 
-		cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from {{.OrgName}}/{{.SpaceName}} as {{.Username}}", map[string]interface{}{
+		cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"SecurityGroupName": cmd.RequiredArgs.SecurityGroupName,
 			"OrgName":           cmd.RequiredArgs.OrganizationName,
 			"SpaceName":         cmd.RequiredArgs.SpaceName,
