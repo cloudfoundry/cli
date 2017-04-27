@@ -15,10 +15,6 @@ import (
 )
 
 var _ = Describe("add-plugin-repo command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("skipping until approved")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
@@ -147,7 +143,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "cfpluginrepothatdoesnotexist.cf-app.com")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\\.cf-app\\.com: Get https://cfpluginrepothatdoesnotexist\\.cf-app\\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\\.cf-app\\.com on 127\\.0\\.1\\.1:\\d{1,5}: no such host"))
+				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://cfpluginrepothatdoesnotexist\\.cf-app\\.com: Get https://cfpluginrepothatdoesnotexist\\.cf-app\\.com/list: dial tcp: lookup cfpluginrepothatdoesnotexist\\.cf-app\\.com.*: no such host"))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
