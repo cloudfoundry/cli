@@ -28,7 +28,6 @@ var _ = Describe("add-plugin-repo command", func() {
 		cmd = AddPluginRepoCommand{UI: testUI, Config: fakeConfig, Actor: fakeActor}
 
 		fakeConfig.BinaryNameReturns("faceman")
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
