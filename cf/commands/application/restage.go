@@ -29,7 +29,7 @@ func (cmd *Restage) MetaData() commandregistry.CommandMetadata {
 	return commandregistry.CommandMetadata{
 		Name:        "restage",
 		ShortName:   "rg",
-		Description: T("Restage an app"),
+		Description: T("Run the app through the staging process again and restart it in a new container"),
 		Usage: []string{
 			T("CF_NAME restage APP_NAME"),
 		},
