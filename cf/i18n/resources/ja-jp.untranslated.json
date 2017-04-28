@@ -532,10 +532,6 @@
     "translation": ""
   },
   {
-    "id": "api endpoint:",
-    "translation": ""
-  },
-  {
     "id": "api version:",
     "translation": ""
   },
@@ -608,10 +604,6 @@
     "translation": ""
   },
   {
-    "id": "org:",
-    "translation": ""
-  },
-  {
     "id": "plugin",
     "translation": "plugin"
   },
@@ -652,10 +644,6 @@
     "translation": ""
   },
   {
-    "id": "space:",
-    "translation": ""
-  },
-  {
     "id": "sso-passcode",
     "translation": ""
   },
@@ -689,10 +677,6 @@
   },
   {
     "id": "user {{.User}} already exists",
-    "translation": ""
-  },
-  {
-    "id": "user:",
     "translation": ""
   },
   {

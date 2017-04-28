@@ -6281,7 +6281,7 @@
   },
   {
     "id": "api endpoint:",
-    "translation": ""
+    "translation": "API エンドポイント:"
   },
   {
     "id": "api version:",
@@ -6605,7 +6605,7 @@
   },
   {
     "id": "org:",
-    "translation": ""
+    "translation": "組織:"
   },
   {
     "id": "orgs",
@@ -6797,7 +6797,7 @@
   },
   {
     "id": "space:",
-    "translation": ""
+    "translation": "スペース:"
   },
   {
     "id": "spaces:",
@@ -6957,7 +6957,7 @@
   },
   {
     "id": "user:",
-    "translation": ""
+    "translation": "ユーザー:"
   },
   {
     "id": "username",
