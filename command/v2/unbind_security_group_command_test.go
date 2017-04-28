@@ -206,7 +206,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				ArgumentName2: "ORG",
 				ArgumentName3: "SPACE"}))
 
-			Consistently(testUI.Out).ShouldNot(Say("Unbinding security group"))
+			Expect(testUI.Out).NotTo(Say("Unbinding security group"))
 
 			Expect(fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameCallCount()).To(Equal(0))
 		})

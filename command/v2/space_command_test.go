@@ -238,7 +238,7 @@ var _ = Describe("space Command", func() {
 				It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
 					Expect(executeErr).To(BeNil())
 
-					Consistently(testUI.Out).ShouldNot(Say("isolation segment:"))
+					Expect(testUI.Out).NotTo(Say("isolation segment:"))
 
 					orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 					Expect(orgGUID).To(Equal("some-org-guid"))
@@ -257,7 +257,7 @@ var _ = Describe("space Command", func() {
 				It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
 					Expect(executeErr).To(BeNil())
 
-					Consistently(testUI.Out).ShouldNot(Say("isolation segment:"))
+					Expect(testUI.Out).NotTo(Say("isolation segment:"))
 
 					orgGUID, spaceName, includeStagingSecurityGroupRules := fakeActor.GetSpaceSummaryByOrganizationAndNameArgsForCall(0)
 					Expect(orgGUID).To(Equal("some-org-guid"))
