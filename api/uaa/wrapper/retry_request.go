@@ -50,6 +50,8 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *uaa.Respo
 			return nil
 		}
 
+		// do not retry if the request method is POST, or not one of the following
+		// http status codes: 500, 502, 503, 504
 		if request.Method == http.MethodPost ||
 			passedResponse.HTTPResponse != nil &&
 				passedResponse.HTTPResponse.StatusCode != http.StatusInternalServerError &&
