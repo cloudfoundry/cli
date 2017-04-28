@@ -229,7 +229,7 @@ var _ = Describe("bind-security-group Command", func() {
 				It("returns the error and displays all warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 
-					Consistently(testUI.Out).ShouldNot(Say("OK"))
+					Expect(testUI.Out).NotTo(Say("OK"))
 
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
@@ -271,8 +271,8 @@ var _ = Describe("bind-security-group Command", func() {
 			It("does not perform any bindings and displays all warnings", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Consistently(testUI.Out).ShouldNot(Say("Assigning security group"))
-				Consistently(testUI.Out).ShouldNot(Say("OK"))
+				Expect(testUI.Out).NotTo(Say("Assigning security group"))
+				Expect(testUI.Out).NotTo(Say("OK"))
 
 				Expect(testUI.Err).To(Say("get security group warning"))
 				Expect(testUI.Err).To(Say("get org warning"))
@@ -342,7 +342,7 @@ var _ = Describe("bind-security-group Command", func() {
 				It("returns the error and displays all warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 
-					Consistently(testUI.Out).ShouldNot(Say("OK"))
+					Expect(testUI.Out).NotTo(Say("OK"))
 
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
