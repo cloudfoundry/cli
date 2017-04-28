@@ -17,12 +17,12 @@ import (
 var _ = Describe("Retry Request", func() {
 	DescribeTable("number of retries",
 		func(requestMethod string, responseStatusCode int, expectedNumberOfRetries int) {
-			request, err := http.NewRequest(requestMethod, "https://foo.bar.com/banana", nil)
-			Expect(err).NotTo(HaveOccurred())
-
 			rawRequestBody := "banana pants"
-			originalBody := ioutil.NopCloser(strings.NewReader(rawRequestBody))
-			request.Body = originalBody
+			body := strings.NewReader(rawRequestBody)
+
+			req, err := http.NewRequest(requestMethod, "https://foo.bar.com/banana", body)
+			Expect(err).NotTo(HaveOccurred())
+			request := cloudcontroller.NewRequest(req, body)
 
 			response := &cloudcontroller.Response{
 				HTTPResponse: &http.Response{
@@ -34,10 +34,7 @@ var _ = Describe("Retry Request", func() {
 			expectedErr := ccerror.RawHTTPStatusError{
 				StatusCode: responseStatusCode,
 			}
-			fakeConnection.MakeStub = func(req *http.Request, passedResponse *cloudcontroller.Response) error {
-				if request.Method == http.MethodPost {
-					Expect(originalBody).To(Equal(request.Body))
-				}
+			fakeConnection.MakeStub = func(req *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 				defer req.Body.Close()
 				body, err := ioutil.ReadAll(request.Body)
 				Expect(err).ToNot(HaveOccurred())
@@ -65,8 +62,9 @@ var _ = Describe("Retry Request", func() {
 	)
 
 	It("does not retry on success", func() {
-		request, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
+		req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
 		Expect(err).NotTo(HaveOccurred())
+		request := &cloudcontroller.Request{Request: req}
 		response := &cloudcontroller.Response{
 			HTTPResponse: &http.Response{
 				StatusCode: http.StatusOK,

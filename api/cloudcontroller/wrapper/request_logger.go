@@ -47,8 +47,8 @@ func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cl
 }
 
 // Make records the request and the response to UI
-func (logger *RequestLogger) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
-	err := logger.displayRequest(request)
+func (logger *RequestLogger) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
+	err := logger.displayRequest(request.Request)
 	if err != nil {
 		logger.output.HandleInternalError(err)
 	}

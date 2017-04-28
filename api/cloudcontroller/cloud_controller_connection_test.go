@@ -28,7 +28,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 	Describe("Make", func() {
 		Describe("Data Unmarshalling", func() {
-			var request *http.Request
+			var request *Request
 
 			BeforeEach(func() {
 				response := `{
@@ -43,9 +43,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 					),
 				)
 
-				var err error
-				request, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+				req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
 				Expect(err).ToNot(HaveOccurred())
+				request = &Request{Request: req}
 			})
 
 			Context("when passed a response with a result set", func() {
@@ -85,7 +85,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 		})
 
 		Describe("HTTP Response", func() {
-			var request *http.Request
+			var request *Request
 
 			BeforeEach(func() {
 				response := `{}`
@@ -96,9 +96,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 					),
 				)
 
-				var err error
-				request, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+				req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
 				Expect(err).ToNot(HaveOccurred())
+				request = &Request{Request: req}
 			})
 
 			It("returns the status", func() {
@@ -123,8 +123,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns them in Response", func() {
-					request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+					req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
 					Expect(err).ToNot(HaveOccurred())
+					request := &Request{Request: req}
 
 					var response Response
 					err = connection.Make(request, &response)
@@ -149,8 +150,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns a RequestError", func() {
-					request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", "http://garbledyguk.com"), nil)
+					req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", "http://garbledyguk.com"), nil)
 					Expect(err).ToNot(HaveOccurred())
+					request := &Request{Request: req}
 
 					var response Response
 					err = connection.Make(request, &response)
@@ -175,8 +177,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 					})
 
 					It("returns a UnverifiedServerError", func() {
-						request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s", server.URL()), nil)
+						req, err := http.NewRequest(http.MethodGet, server.URL(), nil)
 						Expect(err).ToNot(HaveOccurred())
+						request := &Request{Request: req}
 
 						var response Response
 						err = connection.Make(request, &response)
@@ -203,8 +206,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 					// loopback.cli.ci.cf-app.com is a custom DNS record setup to point to 127.0.0.1
 					It("returns a SSLValidationHostnameError", func() {
 						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "loopback.cli.ci.cf-app.com", -1)
-						request, err := http.NewRequest(http.MethodGet, altHostURL, nil)
+						req, err := http.NewRequest(http.MethodGet, altHostURL, nil)
 						Expect(err).ToNot(HaveOccurred())
+						request := &Request{Request: req}
 
 						var response Response
 						err = connection.Make(request, &response)
@@ -233,8 +237,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns a CCRawResponse", func() {
-					request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+					req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
 					Expect(err).ToNot(HaveOccurred())
+					request := &Request{Request: req}
 
 					var response Response
 					err = connection.Make(request, &response)

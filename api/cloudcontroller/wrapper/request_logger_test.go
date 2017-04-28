@@ -25,7 +25,7 @@ var _ = Describe("Request Logger", func() {
 
 		wrapper cloudcontroller.Connection
 
-		request  *http.Request
+		request  *cloudcontroller.Request
 		response *cloudcontroller.Response
 		err      error
 	)
@@ -36,11 +36,10 @@ var _ = Describe("Request Logger", func() {
 
 		wrapper = NewRequestLogger(fakeOutput).Wrap(fakeConnection)
 
-		var err error
-		request, err = http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
+		req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
 		Expect(err).NotTo(HaveOccurred())
 
-		request.URL.RawQuery = url.Values{
+		req.URL.RawQuery = url.Values{
 			"query1": {"a"},
 			"query2": {"b"},
 		}.Encode()
@@ -49,12 +48,13 @@ var _ = Describe("Request Logger", func() {
 		headers.Add("Aghi", "bar")
 		headers.Add("Abc", "json")
 		headers.Add("Adef", "application/json")
-		request.Header = headers
+		req.Header = headers
 
 		response = &cloudcontroller.Response{
 			RawResponse:  []byte("some-response-body"),
 			HTTPResponse: &http.Response{},
 		}
+		request = &cloudcontroller.Request{Request: req}
 	})
 
 	JustBeforeEach(func() {
