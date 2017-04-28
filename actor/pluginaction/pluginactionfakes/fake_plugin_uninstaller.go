@@ -8,65 +8,67 @@ import (
 )
 
 type FakePluginUninstaller struct {
-	UninstallStub        func(pluginPath string) error
-	uninstallMutex       sync.RWMutex
-	uninstallArgsForCall []struct {
+	RunStub        func(pluginPath string, command string) error
+	runMutex       sync.RWMutex
+	runArgsForCall []struct {
 		pluginPath string
+		command    string
 	}
-	uninstallReturns struct {
+	runReturns struct {
 		result1 error
 	}
-	uninstallReturnsOnCall map[int]struct {
+	runReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePluginUninstaller) Uninstall(pluginPath string) error {
-	fake.uninstallMutex.Lock()
-	ret, specificReturn := fake.uninstallReturnsOnCall[len(fake.uninstallArgsForCall)]
-	fake.uninstallArgsForCall = append(fake.uninstallArgsForCall, struct {
+func (fake *FakePluginUninstaller) Run(pluginPath string, command string) error {
+	fake.runMutex.Lock()
+	ret, specificReturn := fake.runReturnsOnCall[len(fake.runArgsForCall)]
+	fake.runArgsForCall = append(fake.runArgsForCall, struct {
 		pluginPath string
-	}{pluginPath})
-	fake.recordInvocation("Uninstall", []interface{}{pluginPath})
-	fake.uninstallMutex.Unlock()
-	if fake.UninstallStub != nil {
-		return fake.UninstallStub(pluginPath)
+		command    string
+	}{pluginPath, command})
+	fake.recordInvocation("Run", []interface{}{pluginPath, command})
+	fake.runMutex.Unlock()
+	if fake.RunStub != nil {
+		return fake.RunStub(pluginPath, command)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.uninstallReturns.result1
+	return fake.runReturns.result1
 }
 
-func (fake *FakePluginUninstaller) UninstallCallCount() int {
-	fake.uninstallMutex.RLock()
-	defer fake.uninstallMutex.RUnlock()
-	return len(fake.uninstallArgsForCall)
+func (fake *FakePluginUninstaller) RunCallCount() int {
+	fake.runMutex.RLock()
+	defer fake.runMutex.RUnlock()
+	return len(fake.runArgsForCall)
 }
 
-func (fake *FakePluginUninstaller) UninstallArgsForCall(i int) string {
-	fake.uninstallMutex.RLock()
-	defer fake.uninstallMutex.RUnlock()
-	return fake.uninstallArgsForCall[i].pluginPath
+func (fake *FakePluginUninstaller) RunArgsForCall(i int) (string, string) {
+	fake.runMutex.RLock()
+	defer fake.runMutex.RUnlock()
+	return fake.runArgsForCall[i].pluginPath, fake.runArgsForCall[i].command
 }
 
-func (fake *FakePluginUninstaller) UninstallReturns(result1 error) {
-	fake.UninstallStub = nil
-	fake.uninstallReturns = struct {
+func (fake *FakePluginUninstaller) RunReturns(result1 error) {
+	fake.RunStub = nil
+	fake.runReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakePluginUninstaller) UninstallReturnsOnCall(i int, result1 error) {
-	fake.UninstallStub = nil
-	if fake.uninstallReturnsOnCall == nil {
-		fake.uninstallReturnsOnCall = make(map[int]struct {
+func (fake *FakePluginUninstaller) RunReturnsOnCall(i int, result1 error) {
+	fake.RunStub = nil
+	if fake.runReturnsOnCall == nil {
+		fake.runReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.uninstallReturnsOnCall[i] = struct {
+	fake.runReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -74,8 +76,8 @@ func (fake *FakePluginUninstaller) UninstallReturnsOnCall(i int, result1 error) 
 func (fake *FakePluginUninstaller) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.uninstallMutex.RLock()
-	defer fake.uninstallMutex.RUnlock()
+	fake.runMutex.RLock()
+	defer fake.runMutex.RUnlock()
 	return fake.invocations
 }
 

@@ -1,6 +1,8 @@
 package common
 
 import (
+	"reflect"
+
 	"code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v3"
@@ -83,7 +85,7 @@ type commandList struct {
 	Files                              v2.FilesCommand                              `command:"files" alias:"f" description:"Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"`
 	GetHealthCheck                     v2.GetHealthCheckCommand                     `command:"get-health-check" description:"Show the type of health check performed on an app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
-	InstallPlugin                      plugin.InstallPluginCommand                  `command:"install-plugin" description:"Install CLI plugin"`
+	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
 	IsolationSegments                  v3.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v2.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
@@ -179,4 +181,38 @@ type commandList struct {
 	UpdateSpaceQuota                   v2.UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
 	UpdateUserProvidedService          v2.UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
 	Version                            VersionCommand                               `command:"version" description:"Print the version"`
+}
+
+// HasCommand returns true if the command name is in the command list.
+func (c commandList) HasCommand(name string) bool {
+	if name == "" {
+		return false
+	}
+
+	cType := reflect.TypeOf(c)
+	_, found := cType.FieldByNameFunc(
+		func(fieldName string) bool {
+			field, _ := cType.FieldByName(fieldName)
+			return field.Tag.Get("command") == name
+		},
+	)
+
+	return found
+}
+
+// HasAlias returns true if the command alias is in the command list.
+func (c commandList) HasAlias(alias string) bool {
+	if alias == "" {
+		return false
+	}
+
+	cType := reflect.TypeOf(c)
+	_, found := cType.FieldByNameFunc(
+		func(fieldName string) bool {
+			field, _ := cType.FieldByName(fieldName)
+			return field.Tag.Get("alias") == alias
+		},
+	)
+
+	return found
 }

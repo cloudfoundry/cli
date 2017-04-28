@@ -35,6 +35,25 @@ var _ = Describe("HandleError", func() {
 			pluginaction.AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"},
 			AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"}),
 
+		Entry("pluginaction.PluginInvalidError -> PluginInvalidError",
+			pluginaction.PluginInvalidError{Path: "some-path"},
+			PluginInvalidError{
+				Path:              "some-path",
+				WrappedErrMessage: pluginaction.PluginInvalidError{}.Error(),
+			}),
+		Entry("pluginaction.PluginCommandConflictError -> PluginCommandConflictError",
+			pluginaction.PluginCommandsConflictError{
+				PluginName:     "some-plugin",
+				PluginVersion:  "1.1.1",
+				CommandNames:   []string{"some-command", "some-other-command"},
+				CommandAliases: []string{"sc", "soc"},
+			},
+			PluginCommandsConflictError{
+				PluginName:     "some-plugin",
+				PluginVersion:  "1.1.1",
+				CommandNames:   []string{"some-command", "some-other-command"},
+				CommandAliases: []string{"sc", "soc"},
+			}),
 		Entry("default case -> original error",
 			err,
 			err),

@@ -19,6 +19,11 @@ type FakeConfig struct {
 	accessTokenReturnsOnCall map[int]struct {
 		result1 string
 	}
+	AddPluginStub        func(configv3.Plugin)
+	addPluginMutex       sync.RWMutex
+	addPluginArgsForCall []struct {
+		arg1 configv3.Plugin
+	}
 	AddPluginRepositoryStub        func(name string, url string)
 	addPluginRepositoryMutex       sync.RWMutex
 	addPluginRepositoryArgsForCall []struct {
@@ -157,15 +162,6 @@ type FakeConfig struct {
 	pluginHomeReturnsOnCall map[int]struct {
 		result1 string
 	}
-	PluginsStub        func() []configv3.Plugin
-	pluginsMutex       sync.RWMutex
-	pluginsArgsForCall []struct{}
-	pluginsReturns     struct {
-		result1 []configv3.Plugin
-	}
-	pluginsReturnsOnCall map[int]struct {
-		result1 []configv3.Plugin
-	}
 	PluginRepositoriesStub        func() []configv3.PluginRepository
 	pluginRepositoriesMutex       sync.RWMutex
 	pluginRepositoriesArgsForCall []struct{}
@@ -174,6 +170,15 @@ type FakeConfig struct {
 	}
 	pluginRepositoriesReturnsOnCall map[int]struct {
 		result1 []configv3.PluginRepository
+	}
+	PluginsStub        func() []configv3.Plugin
+	pluginsMutex       sync.RWMutex
+	pluginsArgsForCall []struct{}
+	pluginsReturns     struct {
+		result1 []configv3.Plugin
+	}
+	pluginsReturnsOnCall map[int]struct {
+		result1 []configv3.Plugin
 	}
 	PollingIntervalStub        func() time.Duration
 	pollingIntervalMutex       sync.RWMutex
@@ -267,6 +272,15 @@ type FakeConfig struct {
 	startupTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
+	TargetStub        func() string
+	targetMutex       sync.RWMutex
+	targetArgsForCall []struct{}
+	targetReturns     struct {
+		result1 string
+	}
+	targetReturnsOnCall map[int]struct {
+		result1 string
+	}
 	TargetedOrganizationStub        func() configv3.Organization
 	targetedOrganizationMutex       sync.RWMutex
 	targetedOrganizationArgsForCall []struct{}
@@ -285,13 +299,13 @@ type FakeConfig struct {
 	targetedSpaceReturnsOnCall map[int]struct {
 		result1 configv3.Space
 	}
-	TargetStub        func() string
-	targetMutex       sync.RWMutex
-	targetArgsForCall []struct{}
-	targetReturns     struct {
+	UAAOAuthClientStub        func() string
+	uAAOAuthClientMutex       sync.RWMutex
+	uAAOAuthClientArgsForCall []struct{}
+	uAAOAuthClientReturns     struct {
 		result1 string
 	}
-	targetReturnsOnCall map[int]struct {
+	uAAOAuthClientReturnsOnCall map[int]struct {
 		result1 string
 	}
 	UAAOAuthClientSecretStub        func() string
@@ -301,15 +315,6 @@ type FakeConfig struct {
 		result1 string
 	}
 	uAAOAuthClientSecretReturnsOnCall map[int]struct {
-		result1 string
-	}
-	UAAOAuthClientStub        func() string
-	uAAOAuthClientMutex       sync.RWMutex
-	uAAOAuthClientArgsForCall []struct{}
-	uAAOAuthClientReturns     struct {
-		result1 string
-	}
-	uAAOAuthClientReturnsOnCall map[int]struct {
 		result1 string
 	}
 	UnsetOrganizationInformationStub        func()
@@ -380,6 +385,30 @@ func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
 	fake.accessTokenReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeConfig) AddPlugin(arg1 configv3.Plugin) {
+	fake.addPluginMutex.Lock()
+	fake.addPluginArgsForCall = append(fake.addPluginArgsForCall, struct {
+		arg1 configv3.Plugin
+	}{arg1})
+	fake.recordInvocation("AddPlugin", []interface{}{arg1})
+	fake.addPluginMutex.Unlock()
+	if fake.AddPluginStub != nil {
+		fake.AddPluginStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) AddPluginCallCount() int {
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
+	return len(fake.addPluginArgsForCall)
+}
+
+func (fake *FakeConfig) AddPluginArgsForCall(i int) configv3.Plugin {
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
+	return fake.addPluginArgsForCall[i].arg1
 }
 
 func (fake *FakeConfig) AddPluginRepository(name string, url string) {
@@ -981,46 +1010,6 @@ func (fake *FakeConfig) PluginHomeReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) Plugins() []configv3.Plugin {
-	fake.pluginsMutex.Lock()
-	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
-	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
-	fake.recordInvocation("Plugins", []interface{}{})
-	fake.pluginsMutex.Unlock()
-	if fake.PluginsStub != nil {
-		return fake.PluginsStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.pluginsReturns.result1
-}
-
-func (fake *FakeConfig) PluginsCallCount() int {
-	fake.pluginsMutex.RLock()
-	defer fake.pluginsMutex.RUnlock()
-	return len(fake.pluginsArgsForCall)
-}
-
-func (fake *FakeConfig) PluginsReturns(result1 []configv3.Plugin) {
-	fake.PluginsStub = nil
-	fake.pluginsReturns = struct {
-		result1 []configv3.Plugin
-	}{result1}
-}
-
-func (fake *FakeConfig) PluginsReturnsOnCall(i int, result1 []configv3.Plugin) {
-	fake.PluginsStub = nil
-	if fake.pluginsReturnsOnCall == nil {
-		fake.pluginsReturnsOnCall = make(map[int]struct {
-			result1 []configv3.Plugin
-		})
-	}
-	fake.pluginsReturnsOnCall[i] = struct {
-		result1 []configv3.Plugin
-	}{result1}
-}
-
 func (fake *FakeConfig) PluginRepositories() []configv3.PluginRepository {
 	fake.pluginRepositoriesMutex.Lock()
 	ret, specificReturn := fake.pluginRepositoriesReturnsOnCall[len(fake.pluginRepositoriesArgsForCall)]
@@ -1058,6 +1047,46 @@ func (fake *FakeConfig) PluginRepositoriesReturnsOnCall(i int, result1 []configv
 	}
 	fake.pluginRepositoriesReturnsOnCall[i] = struct {
 		result1 []configv3.PluginRepository
+	}{result1}
+}
+
+func (fake *FakeConfig) Plugins() []configv3.Plugin {
+	fake.pluginsMutex.Lock()
+	ret, specificReturn := fake.pluginsReturnsOnCall[len(fake.pluginsArgsForCall)]
+	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
+	fake.recordInvocation("Plugins", []interface{}{})
+	fake.pluginsMutex.Unlock()
+	if fake.PluginsStub != nil {
+		return fake.PluginsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.pluginsReturns.result1
+}
+
+func (fake *FakeConfig) PluginsCallCount() int {
+	fake.pluginsMutex.RLock()
+	defer fake.pluginsMutex.RUnlock()
+	return len(fake.pluginsArgsForCall)
+}
+
+func (fake *FakeConfig) PluginsReturns(result1 []configv3.Plugin) {
+	fake.PluginsStub = nil
+	fake.pluginsReturns = struct {
+		result1 []configv3.Plugin
+	}{result1}
+}
+
+func (fake *FakeConfig) PluginsReturnsOnCall(i int, result1 []configv3.Plugin) {
+	fake.PluginsStub = nil
+	if fake.pluginsReturnsOnCall == nil {
+		fake.pluginsReturnsOnCall = make(map[int]struct {
+			result1 []configv3.Plugin
+		})
+	}
+	fake.pluginsReturnsOnCall[i] = struct {
+		result1 []configv3.Plugin
 	}{result1}
 }
 
@@ -1441,6 +1470,46 @@ func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration
 	}{result1}
 }
 
+func (fake *FakeConfig) Target() string {
+	fake.targetMutex.Lock()
+	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
+	fake.targetArgsForCall = append(fake.targetArgsForCall, struct{}{})
+	fake.recordInvocation("Target", []interface{}{})
+	fake.targetMutex.Unlock()
+	if fake.TargetStub != nil {
+		return fake.TargetStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.targetReturns.result1
+}
+
+func (fake *FakeConfig) TargetCallCount() int {
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	return len(fake.targetArgsForCall)
+}
+
+func (fake *FakeConfig) TargetReturns(result1 string) {
+	fake.TargetStub = nil
+	fake.targetReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
+	fake.TargetStub = nil
+	if fake.targetReturnsOnCall == nil {
+		fake.targetReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.targetReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) TargetedOrganization() configv3.Organization {
 	fake.targetedOrganizationMutex.Lock()
 	ret, specificReturn := fake.targetedOrganizationReturnsOnCall[len(fake.targetedOrganizationArgsForCall)]
@@ -1521,42 +1590,42 @@ func (fake *FakeConfig) TargetedSpaceReturnsOnCall(i int, result1 configv3.Space
 	}{result1}
 }
 
-func (fake *FakeConfig) Target() string {
-	fake.targetMutex.Lock()
-	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
-	fake.targetArgsForCall = append(fake.targetArgsForCall, struct{}{})
-	fake.recordInvocation("Target", []interface{}{})
-	fake.targetMutex.Unlock()
-	if fake.TargetStub != nil {
-		return fake.TargetStub()
+func (fake *FakeConfig) UAAOAuthClient() string {
+	fake.uAAOAuthClientMutex.Lock()
+	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClient", []interface{}{})
+	fake.uAAOAuthClientMutex.Unlock()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.targetReturns.result1
+	return fake.uAAOAuthClientReturns.result1
 }
 
-func (fake *FakeConfig) TargetCallCount() int {
-	fake.targetMutex.RLock()
-	defer fake.targetMutex.RUnlock()
-	return len(fake.targetArgsForCall)
+func (fake *FakeConfig) UAAOAuthClientCallCount() int {
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	return len(fake.uAAOAuthClientArgsForCall)
 }
 
-func (fake *FakeConfig) TargetReturns(result1 string) {
-	fake.TargetStub = nil
-	fake.targetReturns = struct {
+func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
+	fake.UAAOAuthClientStub = nil
+	fake.uAAOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeConfig) TargetReturnsOnCall(i int, result1 string) {
-	fake.TargetStub = nil
-	if fake.targetReturnsOnCall == nil {
-		fake.targetReturnsOnCall = make(map[int]struct {
+func (fake *FakeConfig) UAAOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.UAAOAuthClientStub = nil
+	if fake.uAAOAuthClientReturnsOnCall == nil {
+		fake.uAAOAuthClientReturnsOnCall = make(map[int]struct {
 			result1 string
 		})
 	}
-	fake.targetReturnsOnCall[i] = struct {
+	fake.uAAOAuthClientReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -1597,46 +1666,6 @@ func (fake *FakeConfig) UAAOAuthClientSecretReturnsOnCall(i int, result1 string)
 		})
 	}
 	fake.uAAOAuthClientSecretReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) UAAOAuthClient() string {
-	fake.uAAOAuthClientMutex.Lock()
-	ret, specificReturn := fake.uAAOAuthClientReturnsOnCall[len(fake.uAAOAuthClientArgsForCall)]
-	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("UAAOAuthClient", []interface{}{})
-	fake.uAAOAuthClientMutex.Unlock()
-	if fake.UAAOAuthClientStub != nil {
-		return fake.UAAOAuthClientStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.uAAOAuthClientReturns.result1
-}
-
-func (fake *FakeConfig) UAAOAuthClientCallCount() int {
-	fake.uAAOAuthClientMutex.RLock()
-	defer fake.uAAOAuthClientMutex.RUnlock()
-	return len(fake.uAAOAuthClientArgsForCall)
-}
-
-func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
-	fake.UAAOAuthClientStub = nil
-	fake.uAAOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) UAAOAuthClientReturnsOnCall(i int, result1 string) {
-	fake.UAAOAuthClientStub = nil
-	if fake.uAAOAuthClientReturnsOnCall == nil {
-		fake.uAAOAuthClientReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.uAAOAuthClientReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -1761,6 +1790,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()
@@ -1791,10 +1822,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.overallPollingTimeoutMutex.RUnlock()
 	fake.pluginHomeMutex.RLock()
 	defer fake.pluginHomeMutex.RUnlock()
-	fake.pluginsMutex.RLock()
-	defer fake.pluginsMutex.RUnlock()
 	fake.pluginRepositoriesMutex.RLock()
 	defer fake.pluginRepositoriesMutex.RUnlock()
+	fake.pluginsMutex.RLock()
+	defer fake.pluginsMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()
 	defer fake.pollingIntervalMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
@@ -1819,16 +1850,16 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
 	fake.targetedOrganizationMutex.RLock()
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
-	fake.targetMutex.RLock()
-	defer fake.targetMutex.RUnlock()
-	fake.uAAOAuthClientSecretMutex.RLock()
-	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.uAAOAuthClientMutex.RLock()
 	defer fake.uAAOAuthClientMutex.RUnlock()
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.unsetOrganizationInformationMutex.RLock()
 	defer fake.unsetOrganizationInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()

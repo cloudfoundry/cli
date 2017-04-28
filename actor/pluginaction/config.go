@@ -6,6 +6,7 @@ import "code.cloudfoundry.org/cli/util/configv3"
 
 // Config is a way of getting basic CF configuration
 type Config interface {
+	AddPlugin(configv3.Plugin)
 	AddPluginRepository(repoName string, repoURL string)
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	PluginHome() string

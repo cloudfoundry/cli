@@ -10,7 +10,7 @@ import (
 //go:generate counterfeiter . UninstallPluginActor
 
 type UninstallPluginActor interface {
-	UninstallPlugin(pluginaction.PluginUninstaller, string) error
+	UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error
 }
 
 type UninstallPluginCommand struct {
@@ -42,7 +42,12 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 			"PluginName": pluginName,
 		})
 
-	err := cmd.Actor.UninstallPlugin(shared.NewPluginUninstaller(cmd.Config, cmd.UI), pluginName)
+	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.Actor.UninstallPlugin(rpcService, pluginName)
 	if err != nil {
 		return shared.HandleError(err)
 	}

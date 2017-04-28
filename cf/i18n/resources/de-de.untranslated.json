@@ -40,6 +40,10 @@
     "translation": ""
   },
   {
+    "id": "Attention: Plugins are binaries written by potentially untrusted authors.",
+    "translation": ""
+  },
+  {
     "id": "Binding routes...",
     "translation": ""
   },
@@ -61,6 +65,10 @@
   },
   {
     "id": "CF_NAME disable-org-isolation ORG_NAME SEGMENT_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
     "translation": ""
   },
   {
@@ -160,6 +168,10 @@
     "translation": ""
   },
   {
+    "id": "Do you want to install the plugin {{.Path}}?",
+    "translation": ""
+  },
+  {
     "id": "ENVIRONMENT:",
     "translation": ""
   },
@@ -190,6 +202,10 @@
   {
     "id": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks.",
     "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
+  },
+  {
+    "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
+    "translation": ""
   },
   {
     "id": "Getting app info...",
@@ -229,6 +245,14 @@
   },
   {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
+    "id": "Install and use plugins at your own risk.",
+    "translation": ""
+  },
+  {
+    "id": "Installing plugin {{.Name}}...",
     "translation": ""
   },
   {
@@ -305,6 +329,38 @@
   },
   {
     "id": "Plugin {{.Name}} does not exist.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} successfully uninstalled.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} is already installed. Uninstalling existing plugin...",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} successfully installed.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with aliases that are already used: {{.CommandAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names and aliases that are already used: {{.CommandNamesAndAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names or aliases that are already used.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names that are already used: {{.CommandNames}}.",
     "translation": ""
   },
   {
@@ -529,6 +585,10 @@
   },
   {
     "id": "[hidden]",
+    "translation": ""
+  },
+  {
+    "id": "alias",
     "translation": ""
   },
   {

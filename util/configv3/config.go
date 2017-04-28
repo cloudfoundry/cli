@@ -114,7 +114,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
 	if _, err := os.Stat(pluginFilePath); os.IsNotExist(err) {
-		config.pluginsConfig = PluginsConfig{}
+		config.pluginsConfig = PluginsConfig{
+			Plugins: make(map[string]Plugin),
+		}
 	} else {
 		file, err := ioutil.ReadFile(pluginFilePath)
 		if err != nil {

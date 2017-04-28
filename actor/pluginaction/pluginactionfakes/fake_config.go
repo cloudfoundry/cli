@@ -9,6 +9,11 @@ import (
 )
 
 type FakeConfig struct {
+	AddPluginStub        func(configv3.Plugin)
+	addPluginMutex       sync.RWMutex
+	addPluginArgsForCall []struct {
+		arg1 configv3.Plugin
+	}
 	AddPluginRepositoryStub        func(repoName string, repoURL string)
 	addPluginRepositoryMutex       sync.RWMutex
 	addPluginRepositoryArgsForCall []struct {
@@ -71,6 +76,30 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConfig) AddPlugin(arg1 configv3.Plugin) {
+	fake.addPluginMutex.Lock()
+	fake.addPluginArgsForCall = append(fake.addPluginArgsForCall, struct {
+		arg1 configv3.Plugin
+	}{arg1})
+	fake.recordInvocation("AddPlugin", []interface{}{arg1})
+	fake.addPluginMutex.Unlock()
+	if fake.AddPluginStub != nil {
+		fake.AddPluginStub(arg1)
+	}
+}
+
+func (fake *FakeConfig) AddPluginCallCount() int {
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
+	return len(fake.addPluginArgsForCall)
+}
+
+func (fake *FakeConfig) AddPluginArgsForCall(i int) configv3.Plugin {
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
+	return fake.addPluginArgsForCall[i].arg1
 }
 
 func (fake *FakeConfig) AddPluginRepository(repoName string, repoURL string) {
@@ -336,6 +365,8 @@ func (fake *FakeConfig) WritePluginConfigReturnsOnCall(i int, result1 error) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.addPluginMutex.RLock()
+	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	fake.getPluginMutex.RLock()
