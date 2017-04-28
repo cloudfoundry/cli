@@ -38,11 +38,11 @@ var _ = Describe("service-access command", func() {
 		It("sets visibility", func() {
 			// initial access is none
 			session := CF("service-access")
-			Eventually(session).Should(Exit(0))
-			Expect(session).To(Say("%s\\s+%s\\s+none",
+			Eventually(session).Should(Say("%s\\s+%s\\s+none",
 				serviceBroker.Service.Name,
 				serviceBroker.SyncPlans[0].Name,
 			))
+			Eventually(session).Should(Exit(0))
 
 			// enable access for org and plan
 			session = CF("enable-service-access",
@@ -52,22 +52,22 @@ var _ = Describe("service-access command", func() {
 			Eventually(session).Should(Exit(0))
 
 			session = CF("service-access")
-			Eventually(session).Should(Exit(0))
-			Expect(session).To(Say("%s\\s+%s\\s+limited\\s+%s",
+			Eventually(session).Should(Say("%s\\s+%s\\s+limited\\s+%s",
 				serviceBroker.Service.Name,
 				serviceBroker.SyncPlans[0].Name,
 				orgName))
+			Eventually(session).Should(Exit(0))
 
 			// enable access for all
 			session = CF("enable-service-access", serviceBroker.Service.Name)
 			Eventually(session).Should(Exit(0))
 
 			session = CF("service-access", "-e", serviceBroker.Service.Name)
-			Eventually(session).Should(Exit(0))
-			Expect(session).To(Say("%s\\s+%s\\s+all",
+			Eventually(session).Should(Say("%s\\s+%s\\s+all",
 				serviceBroker.Service.Name,
 				serviceBroker.SyncPlans[0].Name,
 			))
+			Eventually(session).Should(Exit(0))
 
 			// disable access
 			session = CF("disable-service-access",
@@ -77,11 +77,11 @@ var _ = Describe("service-access command", func() {
 			Eventually(session).Should(Exit(0))
 
 			session = CF("service-access", "-b", serviceBroker.Name)
-			Eventually(session).Should(Exit(0))
-			Expect(session).To(Say("%s\\s+%s\\s+none",
+			Eventually(session).Should(Say("%s\\s+%s\\s+none",
 				serviceBroker.Service.Name,
 				serviceBroker.SyncPlans[0].Name,
 			))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 })

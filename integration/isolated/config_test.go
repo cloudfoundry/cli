@@ -21,8 +21,8 @@ var _ = Describe("Config", func() {
 		Context("when color is disabled", func() {
 			It("does not print colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "false"}, "help")
+				Consistently(session).ShouldNot(Say("\x1b\\[1m"))
 				Eventually(session).Should(Exit(0))
-				Expect(session).NotTo(Say("\x1b\\[1m"))
 			})
 		})
 	})

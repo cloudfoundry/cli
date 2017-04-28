@@ -68,9 +68,9 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("reset-space-isolation-segment", spaceName)
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 	})

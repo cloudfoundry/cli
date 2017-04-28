@@ -31,9 +31,9 @@ var _ = Describe("create-buildpack command", func() {
 
 		It("outputs an error message to the user, provides help text, and exits 1", func() {
 			session := CF("create-buildpack", "some-buildpack", "some-file", "not-an-integer")
+			Eventually(session.Err).Should(Say("Incorrect usage: Value for POSITION must be integer"))
+			Eventually(session.Out).Should(Say("cf create-buildpack BUILDPACK PATH POSITION")) // help
 			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("Incorrect usage: Value for POSITION must be integer"))
-			Expect(session.Out).To(Say("cf create-buildpack BUILDPACK PATH POSITION")) // help
 		})
 	})
 

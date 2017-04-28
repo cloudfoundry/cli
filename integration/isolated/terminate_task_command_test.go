@@ -19,9 +19,9 @@ var _ = Describe("terminate-task command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("terminate-task", "app-name", "3")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -32,9 +32,9 @@ var _ = Describe("terminate-task command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("terminate-task", "app-name", "3")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
@@ -46,9 +46,9 @@ var _ = Describe("terminate-task command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("terminate-task", "app-name", "3")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 
@@ -61,9 +61,9 @@ var _ = Describe("terminate-task command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("terminate-task", "app-name", "3")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 			})
 		})
 	})
@@ -86,9 +86,9 @@ var _ = Describe("terminate-task command", func() {
 		Context("when the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := helpers.CF("terminate-task", appName, "1")
+				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
+				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say(fmt.Sprintf("App %s not found", appName)))
-				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
 
@@ -105,10 +105,10 @@ var _ = Describe("terminate-task command", func() {
 			Context("when the wrong data type is provided to terminate-task", func() {
 				It("outputs an error message to the user, provides help text, and exits 1", func() {
 					session := helpers.CF("terminate-task", appName, "not-an-integer")
+					Eventually(session.Err).Should(Say("Incorrect usage: Value for TASK_ID must be integer"))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Out).Should(Say("terminate-task APP_NAME TASK_ID")) // help
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Incorrect usage: Value for TASK_ID must be integer"))
-					Expect(session.Out).To(Say("FAILED"))
-					Expect(session.Out).To(Say("terminate-task APP_NAME TASK_ID")) // help
 				})
 			})
 
@@ -125,11 +125,11 @@ var _ = Describe("terminate-task command", func() {
 					Expect(tasksSession.Out).To(Say("1\\s+[a-zA-Z-0-9]+\\s+RUNNING"))
 
 					session := helpers.CF("terminate-task", appName, "1")
-					Eventually(session).Should(Exit(0))
 					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say(
+					Eventually(session.Out).Should(Say(
 						fmt.Sprintf("Terminating task 1 of app %s in org %s / space %s as %s..", appName, orgName, spaceName, userName)))
-					Expect(session.Out).To(Say("OK"))
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -148,9 +148,9 @@ var _ = Describe("terminate-task command", func() {
 					}).Should(Say("1\\s+[a-zA-Z-0-9]+\\s+SUCCEEDED"))
 
 					session := helpers.CF("terminate-task", appName, "1")
+					Eventually(session.Err).Should(Say("Task state is SUCCEEDED and therefore cannot be canceled"))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Task state is SUCCEEDED and therefore cannot be canceled"))
-					Expect(session.Out).To(Say("FAILED"))
 				})
 			})
 
@@ -169,18 +169,18 @@ var _ = Describe("terminate-task command", func() {
 					}).Should(Say("1\\s+[a-zA-Z-0-9]+\\s+FAILED"))
 
 					session := helpers.CF("terminate-task", appName, "1")
+					Eventually(session.Err).Should(Say("Task state is FAILED and therefore cannot be canceled"))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Task state is FAILED and therefore cannot be canceled"))
-					Expect(session.Out).To(Say("FAILED"))
 				})
 			})
 
 			Context("when the task ID does not exist", func() {
 				It("fails to terminate the task and prints an error", func() {
 					session := helpers.CF("terminate-task", appName, "1")
+					Eventually(session.Err).Should(Say("Task sequence ID 1 not found."))
+					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Task sequence ID 1 not found."))
-					Expect(session.Out).To(Say("FAILED"))
 				})
 			})
 		})

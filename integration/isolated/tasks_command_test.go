@@ -14,13 +14,13 @@ var _ = Describe("tasks command", func() {
 	Context("when --help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("tasks", "--help")
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session.Out).Should(Say("   tasks - List tasks of an app"))
+			Eventually(session.Out).Should(Say("USAGE:"))
+			Eventually(session.Out).Should(Say("   cf tasks APP_NAME"))
+			Eventually(session.Out).Should(Say("SEE ALSO:"))
+			Eventually(session.Out).Should(Say("   apps, logs, run-task, terminate-task"))
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say("NAME:"))
-			Expect(session.Out).To(Say("   tasks - List tasks of an app"))
-			Expect(session.Out).To(Say("USAGE:"))
-			Expect(session.Out).To(Say("   cf tasks APP_NAME"))
-			Expect(session.Out).To(Say("SEE ALSO:"))
-			Expect(session.Out).To(Say("   apps, logs, run-task, terminate-task"))
 		})
 	})
 	Context("when the environment is not setup correctly", func() {
@@ -31,9 +31,9 @@ var _ = Describe("tasks command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -44,9 +44,9 @@ var _ = Describe("tasks command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
@@ -58,9 +58,9 @@ var _ = Describe("tasks command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 
@@ -73,9 +73,9 @@ var _ = Describe("tasks command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("run-task", "app-name", "some command")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 			})
 		})
 	})
@@ -98,9 +98,9 @@ var _ = Describe("tasks command", func() {
 		Context("when the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
 				session := helpers.CF("run-task", appName, "echo hi")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say(fmt.Sprintf("App %s not found", appName)))
 			})
 		})
 
@@ -114,12 +114,12 @@ var _ = Describe("tasks command", func() {
 			Context("when the application does not have associated tasks", func() {
 				It("displays an empty table", func() {
 					session := helpers.CF("tasks", appName)
-					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say(`
+					Eventually(session.Out).Should(Say(`
 id   name   state   start time   command
 `,
 					))
-					Expect(session.Out).NotTo(Say("1"))
+					Consistently(session.Out).ShouldNot(Say("1"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -131,13 +131,13 @@ id   name   state   start time   command
 
 				It("displays all the tasks in descending order", func() {
 					session := helpers.CF("tasks", appName)
-					Eventually(session).Should(Exit(0))
 					userName, _ := helpers.GetCredentials()
-					Expect(session.Out).To(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-					Expect(session.Out).To(Say("OK\n"))
-					Expect(session.Out).To(Say(`id\s+name\s+state\s+start time\s+command
+					Eventually(session.Out).Should(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+					Eventually(session.Out).Should(Say("OK\n"))
+					Eventually(session.Out).Should(Say(`id\s+name\s+state\s+start time\s+command
 2\s+[a-zA-Z-0-9 ,:]+echo foo bar
 1\s+[a-zA-Z-0-9 ,:]+echo hello world`))
+					Eventually(session).Should(Exit(0))
 				})
 
 				Context("when the logged in user does not have authorization to see task commands", func() {
@@ -154,9 +154,9 @@ id   name   state   start time   command
 
 					It("does not display task commands", func() {
 						session := helpers.CF("tasks", appName)
+						Eventually(session.Out).Should(Say("2\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
+						Eventually(session.Out).Should(Say("1\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
 						Eventually(session).Should(Exit(0))
-						Expect(session.Out).To(Say("2\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
-						Expect(session.Out).To(Say("1\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
 					})
 				})
 			})
