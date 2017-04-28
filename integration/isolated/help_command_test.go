@@ -102,20 +102,20 @@ var _ = Describe("help command", func() {
 	Describe("commands that appear in cf help -a", func() {
 		It("includes run-task", func() {
 			session := helpers.CF("help", "-a")
+			Eventually(session.Out).Should(Say("run-task\\s+Run a one-off task on an app"))
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say("run-task\\s+Run a one-off task on an app"))
 		})
 
 		It("includes list-task", func() {
 			session := helpers.CF("help", "-a")
+			Eventually(session.Out).Should(Say("tasks\\s+List tasks of an app"))
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say("tasks\\s+List tasks of an app"))
 		})
 
 		It("includes terminate-task", func() {
 			session := helpers.CF("help", "-a")
+			Eventually(session.Out).Should(Say("terminate-task\\s+Terminate a running task of an app"))
 			Eventually(session).Should(Exit(0))
-			Expect(session.Out).To(Say("terminate-task\\s+Terminate a running task of an app"))
 		})
 	})
 

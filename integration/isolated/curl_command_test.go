@@ -33,10 +33,10 @@ var _ = Describe("error handling", func() {
 			It("does not display requirement errors twice", func() {
 				session := helpers.CF("space")
 
+				Eventually(session.Err).Should(Say("the required argument `SPACE` was not provided"))
+				Consistently(session.Err).ShouldNot(Say("the required argument `SPACE` was not provided"))
+				Consistently(session.Out).ShouldNot(Say("the required argument `SPACE` was not provided"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("the required argument `SPACE` was not provided"))
-				Expect(session.Err).NotTo(Say("the required argument `SPACE` was not provided"))
-				Expect(session.Out).NotTo(Say("the required argument `SPACE` was not provided"))
 			})
 		})
 	})

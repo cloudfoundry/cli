@@ -19,9 +19,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -32,9 +32,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
@@ -46,9 +46,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 
@@ -61,9 +61,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			It("fails with no space targeted error message", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 			})
 		})
 	})
@@ -157,11 +157,11 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 			It("deletes all the orphaned routes", func() {
 				session := helpers.CF("delete-orphaned-routes", "-f")
-				Eventually(session).Should(Exit(0))
 
 				for i := 0; i < 51; i++ {
-					Expect(session.Out).To(Say(fmt.Sprintf("Deleting route orphan-multi-page-%d.%s...", i, domainName)))
+					Eventually(session.Out).Should(Say(fmt.Sprintf("Deleting route orphan-multi-page-%d.%s...", i, domainName)))
 				}
+				Eventually(session).Should(Exit(0))
 			})
 		})
 

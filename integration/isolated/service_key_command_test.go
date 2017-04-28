@@ -49,9 +49,9 @@ var _ = Describe("service-key command", func() {
 
 		It("outputs an error message and exits 1", func() {
 			session := CF("service-key", serviceInstance, "some-service-key")
+			Eventually(session.Out).Should(Say("FAILED"))
+			Eventually(session.Out).Should(Say(fmt.Sprintf("No service key some-service-key found for service instance %s", serviceInstance)))
 			Eventually(session).Should(Exit(1))
-			Expect(session.Out).To(Say("FAILED"))
-			Expect(session.Out).To(Say(fmt.Sprintf("No service key some-service-key found for service instance %s", serviceInstance)))
 		})
 
 		Context("when the --guid option is given", func() {

@@ -18,14 +18,14 @@ var _ = Describe("unbind-security-group command", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("unbind-security-group", "--help")
+				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session.Out).Should(Say("\\s+unbind-security-group - Unbind a security group from a space"))
+				Eventually(session.Out).Should(Say("USAGE:"))
+				Eventually(session.Out).Should(Say("\\s+cf unbind-security-group SECURITY_GROUP ORG SPACE"))
+				Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
+				Eventually(session.Out).Should(Say("SEE ALSO:"))
+				Eventually(session.Out).Should(Say("\\s+apps, restart, security-groups"))
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("NAME:"))
-				Expect(session.Out).To(Say("\\s+unbind-security-group - Unbind a security group from a space"))
-				Expect(session.Out).To(Say("USAGE:"))
-				Expect(session.Out).To(Say("\\s+cf unbind-security-group SECURITY_GROUP ORG SPACE"))
-				Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
-				Expect(session.Out).To(Say("SEE ALSO:"))
-				Expect(session.Out).To(Say("\\s+apps, restart, security-groups"))
 			})
 		})
 	})
@@ -38,9 +38,9 @@ var _ = Describe("unbind-security-group command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("unbind-security-group", "some-security-group")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -51,9 +51,9 @@ var _ = Describe("unbind-security-group command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("unbind-security-group", "some-security-group")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
@@ -64,9 +64,9 @@ var _ = Describe("unbind-security-group command", func() {
 
 			It("fails with no org targeted error", func() {
 				session := helpers.CF("unbind-security-group", "some-security-group")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
 
@@ -80,9 +80,9 @@ var _ = Describe("unbind-security-group command", func() {
 
 			It("fails with no org targeted error", func() {
 				session := helpers.CF("unbind-security-group", "some-security-group")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 			})
 		})
 	})
@@ -91,18 +91,18 @@ var _ = Describe("unbind-security-group command", func() {
 		Context("when the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("unbind-security-group")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SECURITY_GROUP` was not provided"))
+				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required argument `SECURITY_GROUP` was not provided"))
-				Expect(session.Out).To(Say("USAGE:"))
 			})
 		})
 
 		Context("when the space is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("unbind-security-group", "some-security-group", "some-org")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SECURITY_GROUP`, `ORG`, and `SPACE` were not provided"))
+				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `SECURITY_GROUP`, `ORG`, and `SPACE` were not provided"))
-				Expect(session.Out).To(Say("USAGE:"))
 			})
 		})
 
@@ -131,27 +131,27 @@ var _ = Describe("unbind-security-group command", func() {
 			Context("when the provided org doesn't exist", func() {
 				It("fails with an 'org not found' message", func() {
 					session := helpers.CF("unbind-security-group", secGroupName, "some-other-org", "some-other-space")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Organization 'some-other-org' not found\\."))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Out).To(Say("FAILED"))
-					Expect(session.Err).To(Say("Organization 'some-other-org' not found\\."))
 				})
 			})
 
 			Context("when the provided space doesn't exist", func() {
 				It("fails with a 'space not found' message", func() {
 					session := helpers.CF("unbind-security-group", secGroupName, orgName, "some-other-space")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Space 'some-other-space' not found\\."))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Out).To(Say("FAILED"))
-					Expect(session.Err).To(Say("Space 'some-other-space' not found\\."))
 				})
 			})
 
 			Context("when the provided security group doesn't exist", func() {
 				It("fails with a 'security group not found' message", func() {
 					session := helpers.CF("unbind-security-group", "some-other-security-group", orgName, spaceName)
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Security group 'some-other-security-group' not found\\."))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Out).To(Say("FAILED"))
-					Expect(session.Err).To(Say("Security group 'some-other-security-group' not found\\."))
 				})
 			})
 		})

@@ -27,14 +27,14 @@ var _ = Describe("bind-security-group command", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("bind-security-group", "--help")
+				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session.Out).Should(Say("   bind-security-group - Bind a security group to a particular space, or all existing spaces of an org"))
+				Eventually(session.Out).Should(Say("USAGE:"))
+				Eventually(session.Out).Should(Say("   cf bind-security-group SECURITY_GROUP ORG \\[SPACE\\]"))
+				Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+				Eventually(session.Out).Should(Say("SEE ALSO:"))
+				Eventually(session.Out).Should(Say("   apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"))
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("NAME:"))
-				Expect(session.Out).To(Say("   bind-security-group - Bind a security group to a particular space, or all existing spaces of an org"))
-				Expect(session.Out).To(Say("USAGE:"))
-				Expect(session.Out).To(Say("   cf bind-security-group SECURITY_GROUP ORG \\[SPACE\\]"))
-				Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
-				Expect(session.Out).To(Say("SEE ALSO:"))
-				Expect(session.Out).To(Say("   apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"))
 			})
 		})
 	})
@@ -47,9 +47,9 @@ var _ = Describe("bind-security-group command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("bind-security-group", "some-security-group", "some-org")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -60,9 +60,9 @@ var _ = Describe("bind-security-group command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("bind-security-group", "some-security-group", "some-org")
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 	})
@@ -71,18 +71,18 @@ var _ = Describe("bind-security-group command", func() {
 		Context("when the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("bind-security-group")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SECURITY_GROUP` and `ORG` were not provided"))
+				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required arguments `SECURITY_GROUP` and `ORG` were not provided"))
-				Expect(session.Out).To(Say("USAGE:"))
 			})
 		})
 
 		Context("when the org is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
 				session := helpers.CF("bind-security-group", "some-security-group")
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ORG` was not provided"))
+				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Incorrect Usage: the required argument `ORG` was not provided"))
-				Expect(session.Out).To(Say("USAGE:"))
 			})
 		})
 	})
@@ -90,9 +90,9 @@ var _ = Describe("bind-security-group command", func() {
 	Context("when the security group doesn't exist", func() {
 		It("fails with a security group not found message", func() {
 			session := helpers.CF("bind-security-group", "some-security-group-that-doesn't-exist", "some-org")
+			Eventually(session.Err).Should(Say("Security group 'some-security-group-that-doesn't-exist' not found."))
+			Eventually(session.Out).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
-			Expect(session.Err).To(Say("Security group 'some-security-group-that-doesn't-exist' not found."))
-			Expect(session.Out).To(Say("FAILED"))
 		})
 	})
 
@@ -111,9 +111,9 @@ var _ = Describe("bind-security-group command", func() {
 		Context("when the org doesn't exist", func() {
 			It("fails with a org not found message", func() {
 				session := helpers.CF("bind-security-group", "some-security-group", "some-org")
+				Eventually(session.Err).Should(Say("Organization 'some-org' not found."))
+				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Err).To(Say("Organization 'some-org' not found."))
-				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
 
@@ -131,23 +131,23 @@ var _ = Describe("bind-security-group command", func() {
 					})
 					It("binds the security group to each space", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName)
-						Eventually(session).Should(Exit(0))
 						userName, _ := helpers.GetCredentials()
-						Expect(session.Out).To(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
-						Expect(session.Out).To(Say("OK"))
-						Expect(session.Out).To(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
-						Expect(session.Out).To(Say("OK"))
-						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session.Out).Should(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("Assigning security group some-security-group to space INTEGRATION-SPACE.* in org %s as %s...", orgName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 
 				Context("when there are no spaces in this org", func() {
 					It("does not bind the security group to any space", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName)
-						Eventually(session).Should(Exit(0))
 						Consistently(session.Out).ShouldNot(Say("Assigning security group"))
 						Consistently(session.Out).ShouldNot(Say("OK"))
-						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 			})
@@ -159,20 +159,19 @@ var _ = Describe("bind-security-group command", func() {
 					})
 					It("binds the security group to the space", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName, spaceName1)
-						Eventually(session).Should(Exit(0))
 						userName, _ := helpers.GetCredentials()
-						Expect(session.Out).To(Say("Assigning security group some-security-group to space %s in org %s as %s...", spaceName1, orgName, userName))
-						Expect(session.Out).To(Say("OK"))
-						Expect(session.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session.Out).Should(Say("Assigning security group some-security-group to space %s in org %s as %s...", spaceName1, orgName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted."))
+						Eventually(session).Should(Exit(0))
 					})
 				})
 				Context("when the space doesn't exist", func() {
 					It("fails with a space not found message", func() {
 						session := helpers.CF("bind-security-group", "some-security-group", orgName, "space-doesnt-exist")
+						Eventually(session.Err).Should(Say("Space 'space-doesnt-exist' not found."))
+						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
-						Expect(session.Err).To(Say("Space 'space-doesnt-exist' not found."))
-						Expect(session.Out).To(Say("FAILED"))
-
 					})
 				})
 			})

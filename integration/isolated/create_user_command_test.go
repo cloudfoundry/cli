@@ -14,20 +14,20 @@ var _ = Describe("create-user command", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("create-user", "--help")
+				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session.Out).Should(Say("create-user - Create a new user"))
+				Eventually(session.Out).Should(Say("USAGE:"))
+				Eventually(session.Out).Should(Say("cf create-user USERNAME PASSWORD"))
+				Eventually(session.Out).Should(Say("cf create-user USERNAME --origin ORIGIN"))
+				Eventually(session.Out).Should(Say("EXAMPLES:"))
+				Eventually(session.Out).Should(Say("   cf create-user j.smith@example.com S3cr3t                  # internal user"))
+				Eventually(session.Out).Should(Say("   cf create-user j.smith@example.com --origin ldap           # LDAP user"))
+				Eventually(session.Out).Should(Say("   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"))
+				Eventually(session.Out).Should(Say("OPTIONS:"))
+				Eventually(session.Out).Should(Say("--origin      Origin for mapping a user account to a user in an external identity provider"))
+				Eventually(session.Out).Should(Say("SEE ALSO:"))
+				Eventually(session.Out).Should(Say("passwd, set-org-role, set-space-role"))
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("NAME:"))
-				Expect(session.Out).To(Say("create-user - Create a new user"))
-				Expect(session.Out).To(Say("USAGE:"))
-				Expect(session.Out).To(Say("cf create-user USERNAME PASSWORD"))
-				Expect(session.Out).To(Say("cf create-user USERNAME --origin ORIGIN"))
-				Expect(session.Out).To(Say("EXAMPLES:"))
-				Expect(session.Out).To(Say("   cf create-user j.smith@example.com S3cr3t                  # internal user"))
-				Expect(session.Out).To(Say("   cf create-user j.smith@example.com --origin ldap           # LDAP user"))
-				Expect(session.Out).To(Say("   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user"))
-				Expect(session.Out).To(Say("OPTIONS:"))
-				Expect(session.Out).To(Say("--origin      Origin for mapping a user account to a user in an external identity provider"))
-				Expect(session.Out).To(Say("SEE ALSO:"))
-				Expect(session.Out).To(Say("passwd, set-org-role, set-space-role"))
 			})
 		})
 	})
@@ -40,9 +40,9 @@ var _ = Describe("create-user command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("create-user", helpers.RandomUsername(), helpers.RandomPassword())
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -53,9 +53,9 @@ var _ = Describe("create-user command", func() {
 
 			It("fails with not logged in message", func() {
 				session := helpers.CF("create-user", helpers.RandomUsername(), helpers.RandomPassword())
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 	})
@@ -81,10 +81,10 @@ var _ = Describe("create-user command", func() {
 
 			It("fails with insufficient scope error", func() {
 				session := helpers.CF("create-user", newUser, newPassword)
+				Eventually(session.Out).Should(Say("Error creating user %s.", newUser))
+				Eventually(session.Err).Should(Say("Insufficient scope for this resource"))
+				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("Error creating user %s.", newUser))
-				Expect(session.Err).To(Say("Insufficient scope for this resource"))
-				Expect(session.Out).To(Say("FAILED"))
 			})
 		})
 
@@ -97,10 +97,10 @@ var _ = Describe("create-user command", func() {
 				DescribeTable("when passed funkyUsername",
 					func(funkyUsername string) {
 						session := helpers.CF("create-user", funkyUsername, helpers.RandomPassword())
+						Eventually(session.Out).Should(Say("Error creating user %s.", funkyUsername))
+						Eventually(session.Err).Should(Say("Username must match pattern: \\[\\\\p\\{L\\}\\+0\\-9\\+\\\\\\-_\\.@'!\\]\\+"))
+						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
-						Expect(session.Out).To(Say("Error creating user %s.", funkyUsername))
-						Expect(session.Err).To(Say("Username must match pattern: \\[\\\\p\\{L\\}\\+0\\-9\\+\\\\\\-_\\.@'!\\]\\+"))
-						Expect(session.Out).To(Say("FAILED"))
 					},
 
 					Entry("fails when passed an emoji", "😀"),
@@ -110,10 +110,10 @@ var _ = Describe("create-user command", func() {
 				Context("when the username is empty", func() {
 					It("fails with a username must be provided error", func() {
 						session := helpers.CF("create-user", "", helpers.RandomPassword())
+						Eventually(session.Out).Should(Say("Error creating user ."))
+						Eventually(session.Err).Should(Say("A username must be provided."))
+						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session).Should(Exit(1))
-						Expect(session.Out).To(Say("Error creating user ."))
-						Expect(session.Err).To(Say("A username must be provided."))
-						Expect(session.Out).To(Say("FAILED"))
 					})
 				})
 			})
@@ -124,10 +124,10 @@ var _ = Describe("create-user command", func() {
 						It("errors and prints usage", func() {
 							newUser := helpers.RandomUsername()
 							session := helpers.CF("create-user", newUser, "--origin", "UAA")
+							Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session.Out).Should(Say("USAGE"))
 							Eventually(session).Should(Exit(1))
-							Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-							Expect(session.Out).To(Say("FAILED"))
-							Expect(session.Out).To(Say("USAGE"))
 						})
 					})
 				})
@@ -136,10 +136,10 @@ var _ = Describe("create-user command", func() {
 						It("errors and prints usage", func() {
 							newUser := helpers.RandomUsername()
 							session := helpers.CF("create-user", newUser, "--origin", "")
+							Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session.Out).Should(Say("USAGE"))
 							Eventually(session).Should(Exit(1))
-							Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-							Expect(session.Out).To(Say("FAILED"))
-							Expect(session.Out).To(Say("USAGE"))
 						})
 					})
 				})
@@ -148,18 +148,18 @@ var _ = Describe("create-user command", func() {
 					It("creates the new user in the specified origin", func() {
 						newUser := helpers.RandomUsername()
 						session := helpers.CF("create-user", newUser, "--origin", "ldap")
+						Eventually(session.Out).Should(Say("Creating user %s...", newUser))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 						Eventually(session).Should(Exit(0))
-						Expect(session.Out).To(Say("Creating user %s...", newUser))
-						Expect(session.Out).To(Say("OK"))
-						Expect(session.Out).To(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 					})
 				})
 
 				Context("when argument for flag is not present", func() {
 					It("fails with incorrect usage error", func() {
 						session := helpers.CF("create-user", helpers.RandomUsername(), "--origin")
+						Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--origin'"))
 						Eventually(session).Should(Exit(1))
-						Expect(session.Err).To(Say("Incorrect Usage: expected argument for flag `--origin'"))
 					})
 				})
 			})
@@ -167,10 +167,10 @@ var _ = Describe("create-user command", func() {
 			Context("when password is not present", func() {
 				It("fails with incorrect usage error", func() {
 					session := helpers.CF("create-user", helpers.RandomUsername())
+					Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Out).Should(Say("USAGE"))
 					Eventually(session).Should(Exit(1))
-					Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
-					Expect(session.Out).To(Say("FAILED"))
-					Expect(session.Out).To(Say("USAGE"))
 				})
 			})
 
@@ -189,9 +189,9 @@ var _ = Describe("create-user command", func() {
 
 				It("fails with the user already exists message", func() {
 					session := helpers.CF("create-user", newUser, newPassword)
+					Eventually(session.Err).Should(Say("user %s already exists", newUser))
+					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
-					Expect(session.Err).To(Say("user %s already exists", newUser))
-					Expect(session.Out).To(Say("OK"))
 				})
 			})
 
@@ -200,10 +200,10 @@ var _ = Describe("create-user command", func() {
 					newUser := helpers.RandomUsername()
 					newPassword := helpers.RandomPassword()
 					session := helpers.CF("create-user", newUser, newPassword)
+					Eventually(session.Out).Should(Say("Creating user %s...", newUser))
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say("Creating user %s...", newUser))
-					Expect(session.Out).To(Say("OK"))
-					Expect(session.Out).To(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
 				})
 			})
 		})
