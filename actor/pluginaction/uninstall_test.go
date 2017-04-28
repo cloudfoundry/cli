@@ -74,8 +74,10 @@ var _ = Describe("Plugin actor", func() {
 					Expect(fakeConfig.GetPluginCallCount()).To(Equal(1))
 					Expect(fakeConfig.GetPluginArgsForCall(0)).To(Equal("some-plugin"))
 
-					Expect(fakePluginUninstaller.UninstallCallCount()).To(Equal(1))
-					Expect(fakePluginUninstaller.UninstallArgsForCall(0)).To(Equal(binaryPath))
+					Expect(fakePluginUninstaller.RunCallCount()).To(Equal(1))
+					path, command := fakePluginUninstaller.RunArgsForCall(0)
+					Expect(path).To(Equal(binaryPath))
+					Expect(command).To(Equal("CLI-MESSAGE-UNINSTALL"))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -92,7 +94,7 @@ var _ = Describe("Plugin actor", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("some error")
-					fakePluginUninstaller.UninstallReturns(expectedErr)
+					fakePluginUninstaller.RunReturns(expectedErr)
 				})
 
 				It("returns the error and does not delete the binary or remove the plugin config", func() {

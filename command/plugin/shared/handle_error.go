@@ -14,6 +14,15 @@ func HandleError(err error) error {
 		return RepositoryURLTakenError{Name: e.Name, URL: e.URL}
 	case pluginaction.AddPluginRepositoryError:
 		return AddPluginRepositoryError{Name: e.Name, URL: e.URL, Message: e.Message}
+	case pluginaction.PluginInvalidError:
+		return PluginInvalidError{Path: e.Path, WrappedErrMessage: e.Error()}
+	case pluginaction.PluginCommandsConflictError:
+		return PluginCommandsConflictError{
+			PluginName:     e.PluginName,
+			PluginVersion:  e.PluginVersion,
+			CommandNames:   e.CommandNames,
+			CommandAliases: e.CommandAliases,
+		}
 	}
 	return err
 }

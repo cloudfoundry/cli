@@ -448,6 +448,10 @@
     "translation": "Versuch, {{.ServiceInstanceDescription}} zu migrieren..."
   },
   {
+    "id": "Attention: Plugins are binaries written by potentially untrusted authors.",
+    "translation": ""
+  },
+  {
     "id": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
     "translation": "Achtung: Der Plan `{{.PlanName}}` des Service `{{.ServiceName}}` ist nicht kostenlos.  Die Instanz `{{.ServiceInstanceName}}` wird Kosten verursachen.  Benachrichtigen Sie Ihren Administrator, wenn Sie meinen, dass dies ein Fehler ist."
   },
@@ -1032,8 +1036,8 @@
     "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Fordert zur Bestätigung auf, es sei denn, '-f' wird angegeben."
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\n   Prompts for confirmation unless '-f' is provided.\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\n   Fordert zur Bestätigung auf, es sei denn, '-f' wird angegeben.\\n\\nBEISPIELE:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo"
+    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME install-plugin -r My-Repo plugin-echo",
@@ -2372,6 +2376,10 @@
     "translation": "Keine App nach einer Push-Operation starten"
   },
   {
+    "id": "Do you want to install the plugin {{.Path}}?",
+    "translation": ""
+  },
+  {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
     "translation": "Zu verwendendes Docker-Image (z. B. user/docker-image-name)"
   },
@@ -2926,6 +2934,10 @@
   {
     "id": "Features",
     "translation": "Features"
+  },
+  {
+    "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
+    "translation": ""
   },
   {
     "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
@@ -3498,6 +3510,14 @@
   {
     "id": "Install CLI plugin",
     "translation": "Installieren von CLI-Plug-in"
+  },
+  {
+    "id": "Install and use plugins at your own risk.",
+    "translation": ""
+  },
+  {
+    "id": "Installing plugin {{.Name}}...",
+    "translation": ""
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -4368,8 +4388,40 @@
     "translation": ""
   },
   {
+    "id": "Plugin {{.Name}} successfully uninstalled.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} is already installed. Uninstalling existing plugin...",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} successfully installed.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "Plug-in {{.PluginName}} wurde erfolgreich deinstalliert."
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with aliases that are already used: {{.CommandAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names and aliases that are already used: {{.CommandNamesAndAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names or aliases that are already used.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names that are already used: {{.CommandNames}}.",
+    "translation": ""
   },
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
@@ -6266,6 +6318,10 @@
   {
     "id": "actor",
     "translation": "Akteur"
+  },
+  {
+    "id": "alias",
+    "translation": ""
   },
   {
     "id": "all",

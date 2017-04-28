@@ -81,6 +81,9 @@ var _ = Describe("Config", func() {
 			trace, location := config.Verbose()
 			Expect(trace).To(BeFalse())
 			Expect(location).To(BeEmpty())
+
+			// test the plugins map is initialized
+			config.AddPlugin(Plugin{})
 		})
 	})
 

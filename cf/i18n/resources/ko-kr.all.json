@@ -448,6 +448,10 @@
     "translation": "{{.ServiceInstanceDescription}} 마이그레이션 중..."
   },
   {
+    "id": "Attention: Plugins are binaries written by potentially untrusted authors.",
+    "translation": ""
+  },
+  {
     "id": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
     "translation": "주의: `{{.ServiceName}}` 서비스의 `{{.PlanName}}` 플랜은 무료가 아닙니다. `{{.ServiceInstanceName}}` 인스턴스를 사용하면 비용이 발생합니다. 오류가 있는 것으로 판단되면 관리자에게 문의하십시오."
   },
@@ -1032,8 +1036,8 @@
     "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   '-f'를 제공하지 않으면 확인을 위해 프롬프트가 표시됩니다."
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\n   Prompts for confirmation unless '-f' is provided.\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\n   '-f'가 제공되지 않으면 확인을 위해 프롬프트가 표시됩니다.\\n\\n예:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo"
+    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME install-plugin -r My-Repo plugin-echo",
@@ -2372,6 +2376,10 @@
     "translation": "푸시 후 앱을 시작하지 않음"
   },
   {
+    "id": "Do you want to install the plugin {{.Path}}?",
+    "translation": ""
+  },
+  {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
     "translation": "사용할 Docker 이미지(예: user/docker-image-name)"
   },
@@ -2926,6 +2934,10 @@
   {
     "id": "Features",
     "translation": "기능"
+  },
+  {
+    "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
+    "translation": ""
   },
   {
     "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
@@ -3498,6 +3510,14 @@
   {
     "id": "Install CLI plugin",
     "translation": "CLI 플러그인 설치"
+  },
+  {
+    "id": "Install and use plugins at your own risk.",
+    "translation": ""
+  },
+  {
+    "id": "Installing plugin {{.Name}}...",
+    "translation": ""
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -4368,8 +4388,40 @@
     "translation": ""
   },
   {
+    "id": "Plugin {{.Name}} successfully uninstalled.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} is already installed. Uninstalling existing plugin...",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.Name}} {{.Version}} successfully installed.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "{{.PluginName}} 플러그인이 설치 제거되었습니다."
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with aliases that are already used: {{.CommandAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names and aliases that are already used: {{.CommandNamesAndAliases}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names or aliases that are already used.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names that are already used: {{.CommandNames}}.",
+    "translation": ""
   },
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
@@ -6266,6 +6318,10 @@
   {
     "id": "actor",
     "translation": "액터"
+  },
+  {
+    "id": "alias",
+    "translation": ""
   },
   {
     "id": "all",

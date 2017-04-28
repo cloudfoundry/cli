@@ -385,6 +385,38 @@ var _ = Describe("PluginsConfig", func() {
 			})
 		})
 
+		Describe("AddPlugin", func() {
+			var (
+				config *Config
+				err    error
+			)
+
+			BeforeEach(func() {
+				rawConfig := `
+				{
+					"Plugins": {
+						"plugin-1": {}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("adds the plugin to the config", func() {
+				config.AddPlugin(Plugin{
+					Name:     "plugin-2",
+					Location: "/over-there",
+				})
+
+				plugin, exist := config.GetPlugin("plugin-2")
+				Expect(exist).To(BeTrue())
+				Expect(plugin).To(Equal(Plugin{Name: "plugin-2", Location: "/over-there"}))
+			})
+		})
+
 		Describe("GetPlugin", func() {
 			var (
 				config *Config

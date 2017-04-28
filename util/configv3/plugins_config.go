@@ -33,6 +33,14 @@ type PluginVersion struct {
 	Build int `json:"Build"`
 }
 
+// String returns the plugin's version in the format x.y.z.
+func (v PluginVersion) String() string {
+	if v.Major == 0 && v.Minor == 0 && v.Build == 0 {
+		return "N/A"
+	}
+	return fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Build)
+}
+
 // PluginCommand represents an individual command inside a plugin
 type PluginCommand struct {
 	Name         string             `json:"Name"`
@@ -79,14 +87,6 @@ func (p Plugin) PluginCommands() []PluginCommand {
 	return p.Commands
 }
 
-// String returns the plugin's version in the format x.y.z.
-func (v PluginVersion) String() string {
-	if v.Major == 0 && v.Minor == 0 && v.Build == 0 {
-		return "N/A"
-	}
-	return fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Build)
-}
-
 // CommandName returns the name of the plugin. The name is concatenated with
 // alias if alias is specified.
 func (c PluginCommand) CommandName() string {
@@ -105,6 +105,11 @@ func (config *Config) PluginHome() string {
 	}
 
 	return filepath.Join(homeDirectory(), ".cf", "plugins")
+}
+
+// AddPlugin adds the specified plugin to PluginsConfig
+func (config *Config) AddPlugin(plugin Plugin) {
+	config.pluginsConfig.Plugins[plugin.Name] = plugin
 }
 
 // RemovePlugin removes the specified plugin from PluginsConfig idempotently
