@@ -62,5 +62,6 @@ func (client Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontrol
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("User-Agent", client.userAgent)
 
+	// Make sure the body is the same as the one in the request
 	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }

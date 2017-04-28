@@ -1,7 +1,6 @@
 package wrapper
 
 import (
-	"bytes"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -48,7 +47,7 @@ func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cl
 
 // Make records the request and the response to UI
 func (logger *RequestLogger) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	err := logger.displayRequest(request.Request)
+	err := logger.displayRequest(request)
 	if err != nil {
 		logger.output.HandleInternalError(err)
 	}
@@ -65,7 +64,7 @@ func (logger *RequestLogger) Make(request *cloudcontroller.Request, passedRespon
 	return err
 }
 
-func (logger *RequestLogger) displayRequest(request *http.Request) error {
+func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) error {
 	err := logger.output.Start()
 	if err != nil {
 		return err
@@ -91,12 +90,12 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 
 	if request.Body != nil && strings.Contains(request.Header.Get("Content-Type"), "json") {
 		rawRequestBody, err := ioutil.ReadAll(request.Body)
-		defer request.Body.Close()
 		if err != nil {
 			return err
 		}
 
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+		defer request.ResetBody()
+
 		err = logger.output.DisplayJSONBody(rawRequestBody)
 		if err != nil {
 			return err
