@@ -4,9 +4,9 @@ set -e
 
 xargs_func () {
   if [[ $(uname) == "Darwin" ]]; then
-    xargs -n 1 -P 7 $@
+    xargs -n 1 -P 10 $@
   else
-    xargs -n 1 -P 7 -r $@
+    xargs -n 1 -P 10 -r $@
   fi
 }
 
@@ -41,7 +41,7 @@ cf domains | grep -i ^integration- | cut -d " " -f1 | xargs_func cf delete-share
 
 cf delete-org -f temp-org
 
-cf curl /v2/users?results-per-page=1000 | \
+cf curl /v2/users?results-per-page=100 | \
   jq -r .resources[].entity.username | \
   grep -i ^integration-user | \
   xargs_func cf delete-user -f || echo
