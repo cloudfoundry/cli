@@ -104,9 +104,9 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				Eventually(executeErr).Should(MatchError(sharedV2.SpaceNotFoundError{Name: space}))
-				Eventually(testUI.Err).Should(Say("warning-1"))
-				Eventually(testUI.Err).Should(Say("warning-2"))
+				Expect(executeErr).To(MatchError(sharedV2.SpaceNotFoundError{Name: space}))
+				Expect(testUI.Err).To(Say("warning-1"))
+				Expect(testUI.Err).To(Say("warning-2"))
 			})
 		})
 
@@ -126,17 +126,17 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				It("Displays the header and okay", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Eventually(testUI.Out).Should(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
+					Expect(testUI.Out).To(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
 
-					Eventually(testUI.Out).Should(Say("OK\n\n"))
+					Expect(testUI.Out).To(Say("OK\n\n"))
 
-					Eventually(testUI.Err).Should(Say("warning-1"))
-					Eventually(testUI.Err).Should(Say("warning-2"))
-					Eventually(testUI.Err).Should(Say("warning-3"))
-					Eventually(testUI.Err).Should(Say("warning-4"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("warning-3"))
+					Expect(testUI.Err).To(Say("warning-4"))
 
-					Eventually(testUI.Out).Should(Say("Applications in this space will be placed in the platform default isolation segment."))
-					Eventually(testUI.Out).Should(Say("Running applications need a restart to be moved there."))
+					Expect(testUI.Out).To(Say("Applications in this space will be placed in the platform default isolation segment."))
+					Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
 
 					Expect(fakeActor.ResetSpaceIsolationSegmentCallCount()).To(Equal(1))
 					orgGUID, spaceGUID := fakeActor.ResetSpaceIsolationSegmentArgsForCall(0)
@@ -153,17 +153,17 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				It("Displays the header and okay", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Eventually(testUI.Out).Should(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
+					Expect(testUI.Out).To(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
 
-					Eventually(testUI.Out).Should(Say("OK\n\n"))
+					Expect(testUI.Out).To(Say("OK\n\n"))
 
-					Eventually(testUI.Err).Should(Say("warning-1"))
-					Eventually(testUI.Err).Should(Say("warning-2"))
-					Eventually(testUI.Err).Should(Say("warning-3"))
-					Eventually(testUI.Err).Should(Say("warning-4"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("warning-3"))
+					Expect(testUI.Err).To(Say("warning-4"))
 
-					Eventually(testUI.Out).Should(Say("Applications in this space will be placed in isolation segment some-org-iso-seg-name."))
-					Eventually(testUI.Out).Should(Say("Running applications need a restart to be moved there."))
+					Expect(testUI.Out).To(Say("Applications in this space will be placed in isolation segment some-org-iso-seg-name."))
+					Expect(testUI.Out).To(Say("Running applications need a restart to be moved there."))
 
 					Expect(fakeActor.ResetSpaceIsolationSegmentCallCount()).To(Equal(1))
 					orgGUID, spaceGUID := fakeActor.ResetSpaceIsolationSegmentArgsForCall(0)
@@ -182,11 +182,11 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 				It("returns the warnings and error", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 
-					Eventually(testUI.Out).Should(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
-					Eventually(testUI.Err).Should(Say("warning-1"))
-					Eventually(testUI.Err).Should(Say("warning-2"))
-					Eventually(testUI.Err).Should(Say("warning-3"))
-					Eventually(testUI.Err).Should(Say("warning-4"))
+					Expect(testUI.Out).To(Say("Resetting isolation segment assignment of space %s in org %s as banana...", space, org))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("warning-3"))
+					Expect(testUI.Err).To(Say("warning-4"))
 				})
 			})
 		})

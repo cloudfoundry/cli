@@ -83,7 +83,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			repoName, repoURL := fakeActor.AddPluginRepositoryArgsForCall(0)
 			Expect(repoName).To(Equal("some-repo"))
 			Expect(repoURL).To(Equal("https://some-repo-URL"))
-			Eventually(testUI.Out).Should(Say("https://some-repo-URL added as 'some-repo'"))
+			Expect(testUI.Out).To(Say("https://some-repo-URL added as 'some-repo'"))
 		})
 	})
 })

@@ -199,7 +199,7 @@ var _ = Describe("org Command", func() {
 				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
 					Expect(executeErr).To(BeNil())
 
-					Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
+					Expect(testUI.Out).To(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 					Expect(testUI.Err).To(Say("warning-3"))
@@ -235,7 +235,7 @@ var _ = Describe("org Command", func() {
 				It("displays warnings and a table with org domains, org quota, spaces and isolation segments", func() {
 					Expect(executeErr).To(BeNil())
 
-					Eventually(testUI.Out).Should(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
+					Expect(testUI.Out).To(Say("Getting info for org %s as some-user\\.\\.\\.", cmd.RequiredArgs.Organization))
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 
