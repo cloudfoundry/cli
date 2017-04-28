@@ -3,7 +3,6 @@ package wrapper_test
 import (
 	"bytes"
 	"errors"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -36,7 +35,9 @@ var _ = Describe("Request Logger", func() {
 
 		wrapper = NewRequestLogger(fakeOutput).Wrap(fakeConnection)
 
-		req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
+		body := bytes.NewReader([]byte("foo"))
+
+		req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", body)
 		Expect(err).NotTo(HaveOccurred())
 
 		req.URL.RawQuery = url.Values{
@@ -54,7 +55,7 @@ var _ = Describe("Request Logger", func() {
 			RawResponse:  []byte("some-response-body"),
 			HTTPResponse: &http.Response{},
 		}
-		request = &cloudcontroller.Request{Request: req}
+		request = cloudcontroller.NewRequest(req, body)
 	})
 
 	JustBeforeEach(func() {
@@ -108,11 +109,8 @@ var _ = Describe("Request Logger", func() {
 
 		Context("when passed a body", func() {
 			Context("when the request's Content-Type is application/json", func() {
-				var originalBody io.ReadCloser
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "application/json")
-					originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
-					request.Body = originalBody
 				})
 
 				It("outputs the body", func() {
