@@ -1,7 +1,10 @@
 package common
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/pluginaction"
+	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
@@ -11,6 +14,7 @@ import (
 //go:generate counterfeiter . InstallPluginActor
 
 type InstallPluginActor interface {
+	CreateExecutableCopy(path string) (string, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
 	IsPluginInstalled(pluginName string) bool
@@ -38,6 +42,11 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd InstallPluginCommand) Execute(_ []string) error {
+	if !cmd.Config.Experimental() {
+		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
+		return nil
+	}
+
 	pluginPath := string(cmd.OptionalArgs.LocalPath)
 
 	if pluginPath != "" {
@@ -60,13 +69,24 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 			}
 		}
 
+		// copy plugin binary to a temporary location and make it executable
+		tempPluginPath, err := cmd.Actor.CreateExecutableCopy(pluginPath)
+		defer os.Remove(tempPluginPath)
+		if err != nil {
+			return err
+		}
+
 		rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
 		if err != nil {
 			return err
 		}
 
-		plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, pluginPath)
+		plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, tempPluginPath)
 		if err != nil {
+			// change plugin path in error to the original and not the temporary copy
+			if _, isInvalid := err.(pluginaction.PluginInvalidError); isInvalid {
+				err = pluginaction.PluginInvalidError{Path: pluginPath}
+			}
 			return shared.HandleError(err)
 		}
 
@@ -85,7 +105,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 			}
 		}
 
-		return cmd.installPlugin(plugin, pluginPath)
+		return cmd.installPlugin(plugin, tempPluginPath)
 	}
 
 	return nil

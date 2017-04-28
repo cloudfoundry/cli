@@ -39,6 +39,8 @@ var _ = Describe("install-plugin command", func() {
 		}
 
 		fakeActor.FileExistsReturns(true)
+		fakeActor.CreateExecutableCopyReturns("copy-path", nil)
+		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {
@@ -72,7 +74,7 @@ var _ = Describe("install-plugin command", func() {
 				var returnedErr error
 
 				BeforeEach(func() {
-					returnedErr = pluginaction.PluginInvalidError{Path: "some-path"}
+					returnedErr = pluginaction.PluginInvalidError{Path: "copy-path"}
 					fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, returnedErr)
 				})
 
@@ -132,7 +134,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 						_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
-						Expect(path).To(Equal("some-path"))
+						Expect(path).To(Equal("copy-path"))
 
 						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
 						Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
@@ -143,7 +145,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 						path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
-						Expect(path).To(Equal("some-path"))
+						Expect(path).To(Equal("copy-path"))
 						Expect(installedPlugin).To(Equal(plugin))
 					})
 
@@ -189,19 +191,33 @@ var _ = Describe("install-plugin command", func() {
 					Expect(fakeActor.FileExistsCallCount()).To(Equal(1))
 					Expect(fakeActor.FileExistsArgsForCall(0)).To(Equal("some-path"))
 
+					Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
+					Expect(fakeActor.CreateExecutableCopyArgsForCall(0)).To(Equal("some-path"))
+
 					Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 					_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
-					Expect(path).To(Equal("some-path"))
+					Expect(path).To(Equal("copy-path"))
 
 					Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
 					Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
 
 					Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 					path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
-					Expect(path).To(Equal("some-path"))
+					Expect(path).To(Equal("copy-path"))
 					Expect(installedPlugin).To(Equal(plugin))
 
 					Expect(fakeActor.UninstallPluginCallCount()).To(Equal(0))
+				})
+
+				Context("when there is an error making an executable copy of the plugin binary", func() {
+					BeforeEach(func() {
+						expectedErr = errors.New("create executable copy error")
+						fakeActor.CreateExecutableCopyReturns("", expectedErr)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+					})
 				})
 
 				Context("when an error is encountered installing the plugin", func() {
@@ -302,14 +318,14 @@ var _ = Describe("install-plugin command", func() {
 
 						Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 						_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
-						Expect(path).To(Equal("some-path"))
+						Expect(path).To(Equal("copy-path"))
 
 						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
 						Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
 
 						Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 						path, plugin := fakeActor.InstallPluginFromPathArgsForCall(0)
-						Expect(path).To(Equal("some-path"))
+						Expect(path).To(Equal("copy-path"))
 						Expect(plugin).To(Equal(plugin))
 
 						Expect(fakeActor.UninstallPluginCallCount()).To(Equal(0))
