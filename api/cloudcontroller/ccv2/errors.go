@@ -26,7 +26,7 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 
 // Make converts RawHTTPStatusError, which represents responses with 4xx and
 // 5xx status codes, to specific errors.
-func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
 	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {

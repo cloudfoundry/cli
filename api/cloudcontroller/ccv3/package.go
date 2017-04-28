@@ -127,11 +127,11 @@ func (client *Client) createUploadStream(path string, paramName string) (io.Read
 		return nil, "", err
 	}
 	_, err = io.Copy(part, file)
-
-	err = writer.Close()
 	if err != nil {
 		return nil, "", err
 	}
 
-	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), nil
+	err = writer.Close()
+
+	return bytes.NewReader(body.Bytes()), writer.FormDataContentType(), err
 }

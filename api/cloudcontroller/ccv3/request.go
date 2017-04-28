@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
@@ -31,7 +32,7 @@ type requestOptions struct {
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request options are not filled in.
-func (client *Client) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
+func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
 	var request *http.Request
 	var err error
 
@@ -61,5 +62,5 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*http.Reques
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("User-Agent", client.userAgent)
 
-	return request, nil
+	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }

@@ -26,7 +26,7 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 
 // Make creates a connection in the wrapped connection and handles errors
 // that it returns.
-func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
 	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {

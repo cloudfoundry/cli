@@ -25,7 +25,7 @@ var _ = Describe("UAA Authentication", func() {
 		inMemoryCache  *util.InMemoryCache
 
 		wrapper cloudcontroller.Connection
-		request *http.Request
+		request *cloudcontroller.Request
 		inner   *UAAAuthentication
 	)
 
@@ -38,8 +38,10 @@ var _ = Describe("UAA Authentication", func() {
 		inner = NewUAAAuthentication(fakeClient, inMemoryCache)
 		wrapper = inner.Wrap(fakeConnection)
 
-		request = &http.Request{
-			Header: http.Header{},
+		request = &cloudcontroller.Request{
+			Request: &http.Request{
+				Header: http.Header{},
+			},
 		}
 	})
 
@@ -106,10 +108,14 @@ var _ = Describe("UAA Authentication", func() {
 
 			BeforeEach(func() {
 				expectedBody = "this body content should be preserved"
-				request.Body = ioutil.NopCloser(strings.NewReader(expectedBody))
+				body := strings.NewReader(expectedBody)
+				request := cloudcontroller.NewRequest(&http.Request{
+					Header: http.Header{},
+					Body:   ioutil.NopCloser(body),
+				}, body)
 
 				makeCount := 0
-				fakeConnection.MakeStub = func(request *http.Request, response *cloudcontroller.Response) error {
+				fakeConnection.MakeStub = func(request *cloudcontroller.Request, response *cloudcontroller.Response) error {
 					body, err := ioutil.ReadAll(request.Body)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(string(body)).To(Equal(expectedBody))

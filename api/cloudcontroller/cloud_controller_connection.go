@@ -48,15 +48,15 @@ func NewConnection(config Config) *CloudControllerConnection {
 }
 
 // Make performs the request and parses the response.
-func (connection *CloudControllerConnection) Make(request *http.Request, passedResponse *Response) error {
+func (connection *CloudControllerConnection) Make(request *Request, passedResponse *Response) error {
 	// In case this function is called from a retry, passedResponse may already
 	// be populated with a previous response. We reset in case there's an HTTP
 	// error and we don't repopulate it in populateResponse.
 	passedResponse.reset()
 
-	response, err := connection.HTTPClient.Do(request)
+	response, err := connection.HTTPClient.Do(request.Request)
 	if err != nil {
-		return connection.processRequestErrors(request, err)
+		return connection.processRequestErrors(request.Request, err)
 	}
 
 	return connection.populateResponse(response, passedResponse)

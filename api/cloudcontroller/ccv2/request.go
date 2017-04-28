@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
 // Params represents URI parameters for a request.
@@ -32,7 +34,7 @@ type requestOptions struct {
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request fields are not filled in.
-func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
+func (client Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontroller.Request, error) {
 	var request *http.Request
 	var err error
 	if passedRequest.URI != "" {
@@ -60,5 +62,5 @@ func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("User-Agent", client.userAgent)
 
-	return request, nil
+	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }
