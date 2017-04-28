@@ -99,10 +99,10 @@ var _ = Describe("unbind-security-group Command", func() {
 			It("unbinds the security group from the targeted space", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Eventually(testUI.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
-				Eventually(testUI.Out).Should(Say("OK\n\n"))
-				Eventually(testUI.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
-				Eventually(testUI.Err).Should(Say("unbind warning"))
+				Expect(testUI.Out).To(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
+				Expect(testUI.Out).To(Say("OK\n\n"))
+				Expect(testUI.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
+				Expect(testUI.Err).To(Say("unbind warning"))
 
 				Expect(fakeConfig.TargetedOrganizationCallCount()).To(Equal(1))
 				Expect(fakeConfig.TargetedSpaceCallCount()).To(Equal(1))
@@ -125,7 +125,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("handles the error", func() {
-				Eventually(testUI.Err).Should(Say("unbind warning"))
+				Expect(testUI.Err).To(Say("unbind warning"))
 
 				Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
@@ -162,10 +162,10 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("the security group is unbound from the targeted space", func() {
-				Eventually(testUI.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
-				Eventually(testUI.Out).Should(Say("OK\n\n"))
-				Eventually(testUI.Out).Should(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
-				Eventually(testUI.Err).Should(Say("unbind warning"))
+				Expect(testUI.Out).To(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", "some-security-group", "some-org", "some-space", "some-user"))
+				Expect(testUI.Out).To(Say("OK\n\n"))
+				Expect(testUI.Out).To(Say("TIP: Changes will not apply to existing running applications until they are restarted\\."))
+				Expect(testUI.Err).To(Say("unbind warning"))
 
 				Expect(fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameCallCount()).To(Equal(1))
 				securityGroupName, orgName, spaceName := fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameArgsForCall(0)
@@ -187,7 +187,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("handles the error", func() {
-				Eventually(testUI.Err).Should(Say("unbind warning"))
+				Expect(testUI.Err).To(Say("unbind warning"))
 
 				Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
@@ -209,7 +209,6 @@ var _ = Describe("unbind-security-group Command", func() {
 			Consistently(testUI.Out).ShouldNot(Say("Unbinding security group"))
 
 			Expect(fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameCallCount()).To(Equal(0))
-
 		})
 	})
 })
