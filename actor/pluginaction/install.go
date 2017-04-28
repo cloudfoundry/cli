@@ -1,6 +1,7 @@
 package pluginaction
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -44,6 +45,36 @@ type PluginCommandsConflictError struct {
 
 func (e PluginCommandsConflictError) Error() string {
 	return ""
+}
+
+// CreateExecutableCopy makes a temporary copy of a plugin binary and makes it
+// executable.
+//
+// config.PluginHome() + /temp is used as the temp dir instead of the system
+// temp for security reasons.
+func (actor Actor) CreateExecutableCopy(path string) (string, error) {
+	pluginTemp := filepath.Join(actor.config.PluginHome(), "temp")
+	err := os.MkdirAll(pluginTemp, 0700)
+	if err != nil {
+		return "", err
+	}
+
+	tempFile, err := ioutil.TempFile(pluginTemp, "")
+	if err != nil {
+		return "", err
+	}
+
+	err = fileutils.CopyPathToPath(path, tempFile.Name())
+	if err != nil {
+		return "", err
+	}
+
+	err = os.Chmod(tempFile.Name(), 0700)
+	if err != nil {
+		return "", err
+	}
+
+	return tempFile.Name(), nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file
@@ -125,8 +156,13 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
-	installPath := filepath.Join(actor.config.PluginHome(), filepath.Base(path))
+	installPath := filepath.Join(actor.config.PluginHome(), plugin.Name)
 	err := fileutils.CopyPathToPath(path, installPath)
+	if err != nil {
+		return err
+	}
+	// rwxr-xr-x so that multiple users can share the same $CF_PLUGIN_HOME
+	err = os.Chmod(installPath, 0755)
 	if err != nil {
 		return err
 	}

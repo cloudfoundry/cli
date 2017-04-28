@@ -10,6 +10,19 @@ import (
 )
 
 type FakeInstallPluginActor struct {
+	CreateExecutableCopyStub        func(path string) (string, error)
+	createExecutableCopyMutex       sync.RWMutex
+	createExecutableCopyArgsForCall []struct {
+		path string
+	}
+	createExecutableCopyReturns struct {
+		result1 string
+		result2 error
+	}
+	createExecutableCopyReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	FileExistsStub        func(path string) bool
 	fileExistsMutex       sync.RWMutex
 	fileExistsArgsForCall []struct {
@@ -73,6 +86,57 @@ type FakeInstallPluginActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeInstallPluginActor) CreateExecutableCopy(path string) (string, error) {
+	fake.createExecutableCopyMutex.Lock()
+	ret, specificReturn := fake.createExecutableCopyReturnsOnCall[len(fake.createExecutableCopyArgsForCall)]
+	fake.createExecutableCopyArgsForCall = append(fake.createExecutableCopyArgsForCall, struct {
+		path string
+	}{path})
+	fake.recordInvocation("CreateExecutableCopy", []interface{}{path})
+	fake.createExecutableCopyMutex.Unlock()
+	if fake.CreateExecutableCopyStub != nil {
+		return fake.CreateExecutableCopyStub(path)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.createExecutableCopyReturns.result1, fake.createExecutableCopyReturns.result2
+}
+
+func (fake *FakeInstallPluginActor) CreateExecutableCopyCallCount() int {
+	fake.createExecutableCopyMutex.RLock()
+	defer fake.createExecutableCopyMutex.RUnlock()
+	return len(fake.createExecutableCopyArgsForCall)
+}
+
+func (fake *FakeInstallPluginActor) CreateExecutableCopyArgsForCall(i int) string {
+	fake.createExecutableCopyMutex.RLock()
+	defer fake.createExecutableCopyMutex.RUnlock()
+	return fake.createExecutableCopyArgsForCall[i].path
+}
+
+func (fake *FakeInstallPluginActor) CreateExecutableCopyReturns(result1 string, result2 error) {
+	fake.CreateExecutableCopyStub = nil
+	fake.createExecutableCopyReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, result1 string, result2 error) {
+	fake.CreateExecutableCopyStub = nil
+	if fake.createExecutableCopyReturnsOnCall == nil {
+		fake.createExecutableCopyReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.createExecutableCopyReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeInstallPluginActor) FileExists(path string) bool {
@@ -325,6 +389,8 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, re
 func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createExecutableCopyMutex.RLock()
+	defer fake.createExecutableCopyMutex.RUnlock()
 	fake.fileExistsMutex.RLock()
 	defer fake.fileExistsMutex.RUnlock()
 	fake.getAndValidatePluginMutex.RLock()
