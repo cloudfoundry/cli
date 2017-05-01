@@ -65,18 +65,6 @@ var _ = Describe("install actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(stat.Mode() & 0700).To(Equal(os.FileMode(0700)))
 			})
-
-			Context("when the plugin home does not exist", func() {
-				BeforeEach(func() {
-					fakeConfig.PluginHomeReturns("/a/file/that/does/not/exist")
-				})
-
-				It("returns an os.PathError", func() {
-					_, err := actor.CreateExecutableCopy(pluginPath)
-					_, isPathError := err.(*os.PathError)
-					Expect(isPathError).To(BeTrue())
-				})
-			})
 		})
 
 		Context("when the file does not exist", func() {
