@@ -27,7 +27,6 @@ var _ = Describe("security-groups command", func() {
 	Describe("Unrefactored command", func() {
 		var (
 			username string
-			session  *Session
 		)
 
 		BeforeEach(func() {
@@ -103,6 +102,7 @@ var _ = Describe("security-groups command", func() {
 			})
 
 			It("lists the security groups", func() {
+				session := helpers.CF("security-groups")
 				Eventually(session.Out).Should(Say("Getting security groups as admin"))
 				Eventually(session.Out).Should(Say("OK\\n\\n"))
 				Eventually(session.Out).Should(Say("\\s+Name\\s+Organization\\s+Space"))
