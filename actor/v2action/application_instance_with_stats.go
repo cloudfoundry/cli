@@ -72,12 +72,6 @@ func (instance *ApplicationInstanceWithStats) incomplete() {
 	instance.Details = strings.TrimSpace(fmt.Sprintf("%s (%s)", instance.Details, "Unable to retrieve information"))
 }
 
-type applicationInstances []ApplicationInstanceWithStats
-
-func (a applicationInstances) Len() int               { return len(a) }
-func (a applicationInstances) Swap(i int, j int)      { a[i], a[j] = a[j], a[i] }
-func (a applicationInstances) Less(i int, j int) bool { return a[i].ID < a[j].ID }
-
 // ApplicationInstancesNotFoundError is returned when the application does not
 // have running instances.
 type ApplicationInstancesNotFoundError struct {
@@ -111,13 +105,13 @@ func (actor Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([
 
 	returnedInstances := combineStatsAndInstances(appInstanceStats, appInstances)
 
-	sort.Sort(returnedInstances)
+	sort.Slice(returnedInstances, func(i int, j int) bool { return returnedInstances[i].ID < returnedInstances[j].ID })
 
 	return returnedInstances, allWarnings, err
 }
 
-func combineStatsAndInstances(appInstanceStats map[int]ccv2.ApplicationInstanceStatus, appInstances map[int]ApplicationInstance) applicationInstances {
-	returnedInstances := applicationInstances{}
+func combineStatsAndInstances(appInstanceStats map[int]ccv2.ApplicationInstanceStatus, appInstances map[int]ApplicationInstance) []ApplicationInstanceWithStats {
+	returnedInstances := []ApplicationInstanceWithStats{}
 	seenStatuses := make(map[int]bool, len(appInstanceStats))
 
 	for id, appInstanceStat := range appInstanceStats {

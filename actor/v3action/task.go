@@ -63,9 +63,9 @@ func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]T
 	}
 
 	if sortOrder == Descending {
-		sort.Sort(sortableTasksDescending(allTasks))
+		sort.Slice(allTasks, func(i int, j int) bool { return allTasks[i].SequenceID > allTasks[j].SequenceID })
 	} else {
-		sort.Sort(sortableTasksAscending(allTasks))
+		sort.Slice(allTasks, func(i int, j int) bool { return allTasks[i].SequenceID < allTasks[j].SequenceID })
 	}
 
 	return allTasks, actorWarnings, nil
@@ -91,32 +91,4 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 func (actor Actor) TerminateTask(taskGUID string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.UpdateTask(taskGUID)
 	return Task(task), Warnings(warnings), err
-}
-
-type sortableTasksAscending []Task
-
-func (t sortableTasksAscending) Len() int {
-	return len(t)
-}
-
-func (t sortableTasksAscending) Swap(i int, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t sortableTasksAscending) Less(i int, j int) bool {
-	return t[i].SequenceID < t[j].SequenceID
-}
-
-type sortableTasksDescending []Task
-
-func (t sortableTasksDescending) Len() int {
-	return len(t)
-}
-
-func (t sortableTasksDescending) Swap(i int, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t sortableTasksDescending) Less(i int, j int) bool {
-	return t[i].SequenceID > t[j].SequenceID
 }

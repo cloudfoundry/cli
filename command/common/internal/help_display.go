@@ -24,11 +24,11 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) sharedaction.Comm
 		Flags:       []sharedaction.CommandFlag{},
 	}
 
-	flagNames := sorting.Alphabetic{}
+	flagNames := make([]string, 0, len(plugin.UsageDetails.Options))
 	for flag := range plugin.UsageDetails.Options {
 		flagNames = append(flagNames, flag)
 	}
-	sort.Sort(flagNames)
+	sort.Slice(flagNames, sorting.SortAlphabeticFunc(flagNames))
 
 	for _, flag := range flagNames {
 		description := plugin.UsageDetails.Options[flag]
