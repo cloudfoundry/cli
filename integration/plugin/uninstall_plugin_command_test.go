@@ -92,7 +92,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 			BeforeEach(func() {
 				pluginsRootDir = filepath.Join(homeDir, ".cf", "plugins")
-				executablePath = filepath.Join(pluginsRootDir, "banana-plugin-name-1")
+				executablePath = filepath.Join(pluginsRootDir, "some-dir")
 				rawConfig := fmt.Sprintf(`
 				{
 					"Plugins": {
@@ -150,7 +150,7 @@ var _ = Describe("uninstall-plugin command", func() {
 				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
 				Eventually(session.Out).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("banana-plugin-name-1: permission denied"))
+				Eventually(session.Err).Should(Say("some-dir: permission denied"))
 				Eventually(session).Should(Exit(1))
 
 				session = helpers.CF("plugins")
