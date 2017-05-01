@@ -67,7 +67,12 @@ func (interaction Interaction) Resolve(dst interface{}) error {
 
 		defer terminal.Restore(int(file.Fd()), state)
 
-		user = newTTYUser(interaction.Input, interaction.Output)
+		term, err := newTTYUser(file, interaction.Output)
+		if err != nil {
+			return err
+		}
+
+		user = term
 	} else {
 		user = newNonTTYUser(interaction.Input, interaction.Output)
 	}
