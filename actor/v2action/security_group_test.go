@@ -22,14 +22,432 @@ var _ = Describe("Security Group Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
+	Describe("GetSecurityGroupsWithOrganizationAndSpace", func() {
+		var (
+			secGroupOrgSpaces []SecurityGroupWithOrganizationAndSpace
+			warnings          Warnings
+			err               error
+		)
+
+		JustBeforeEach(func() {
+			secGroupOrgSpaces, warnings, err = actor.GetSecurityGroupsWithOrganizationAndSpace()
+		})
+
+		Context("when an error occurs getting security groups", func() {
+			var returnedError error
+
+			BeforeEach(func() {
+				returnedError = errors.New("get-security-groups-error")
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					nil,
+					ccv2.Warnings{"warning-1", "warning-2"},
+					returnedError,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(returnedError))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when an error occurs getting spaces", func() {
+			var returnedError error
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]ccv2.SecurityGroup{
+						{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+				returnedError = errors.New("get-spaces-error")
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturns(
+					nil,
+					ccv2.Warnings{"warning-3", "warning-4"},
+					returnedError,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(returnedError))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+			})
+		})
+
+		Context("when an error occurs getting an organization", func() {
+			var returnedError error
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]ccv2.SecurityGroup{
+						{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturns(
+					[]ccv2.Space{
+						{
+							GUID:             "space-guid-11",
+							Name:             "space-11",
+							OrganizationGUID: "org-guid-11",
+						},
+					},
+					ccv2.Warnings{"warning-3", "warning-4"},
+					nil,
+				)
+				returnedError = errors.New("get-org-error")
+				fakeCloudControllerClient.GetOrganizationReturns(
+					ccv2.Organization{},
+					ccv2.Warnings{"warning-5", "warning-6"},
+					returnedError,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(returnedError))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6"))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+				Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-11"))
+			})
+		})
+
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSecurityGroupsReturns(
+					[]ccv2.SecurityGroup{
+						{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+						{
+							GUID: "security-group-guid-2",
+							Name: "security-group-2",
+						},
+						{
+							GUID: "security-group-guid-3",
+							Name: "security-group-3",
+						},
+						{
+							GUID: "security-group-guid-4",
+							Name: "security-group-4",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturnsOnCall(0,
+					[]ccv2.Space{
+						{
+							GUID:             "space-guid-13",
+							Name:             "space-13",
+							OrganizationGUID: "org-guid-13",
+						},
+						{
+							GUID:             "space-guid-12",
+							Name:             "space-12",
+							OrganizationGUID: "org-guid-12",
+						},
+						{
+							GUID:             "space-guid-11",
+							Name:             "space-11",
+							OrganizationGUID: "org-guid-11",
+						},
+					},
+					ccv2.Warnings{"warning-3", "warning-4"},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturnsOnCall(1,
+					[]ccv2.Space{
+						{
+							GUID:             "space-guid-21",
+							Name:             "space-21",
+							OrganizationGUID: "org-guid-21",
+						},
+						{
+							GUID:             "space-guid-23",
+							Name:             "space-23",
+							OrganizationGUID: "org-guid-23",
+						},
+						{
+							GUID:             "space-guid-22",
+							Name:             "space-22",
+							OrganizationGUID: "org-guid-11",
+						},
+					},
+					ccv2.Warnings{"warning-5", "warning-6"},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturnsOnCall(2,
+					[]ccv2.Space{},
+					ccv2.Warnings{"warning-7", "warning-8"},
+					nil,
+				)
+				fakeCloudControllerClient.GetSpacesBySecurityGroupReturnsOnCall(3,
+					[]ccv2.Space{
+						{
+							GUID:             "space-guid-31",
+							Name:             "space-31",
+							OrganizationGUID: "org-guid-23",
+						},
+						{
+							GUID:             "space-guid-32",
+							Name:             "space-32",
+							OrganizationGUID: "org-guid-11",
+						},
+						{
+							GUID:             "space-guid-33",
+							Name:             "space-33",
+							OrganizationGUID: "org-guid-33",
+						},
+					},
+					ccv2.Warnings{"warning-9", "warning-10"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(0,
+					ccv2.Organization{
+						GUID: "org-guid-13",
+						Name: "org-13",
+					},
+					ccv2.Warnings{"warning-11", "warning-12"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(1,
+					ccv2.Organization{
+						GUID: "org-guid-12",
+						Name: "org-12",
+					},
+					ccv2.Warnings{"warning-13", "warning-14"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(2,
+					ccv2.Organization{
+						GUID: "org-guid-11",
+						Name: "org-11",
+					},
+					ccv2.Warnings{"warning-15", "warning-16"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(3,
+					ccv2.Organization{
+						GUID: "org-guid-21",
+						Name: "org-21",
+					},
+					ccv2.Warnings{"warning-17", "warning-18"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(4,
+					ccv2.Organization{
+						GUID: "org-guid-23",
+						Name: "org-23",
+					},
+					ccv2.Warnings{"warning-19", "warning-20"},
+					nil,
+				)
+				fakeCloudControllerClient.GetOrganizationReturnsOnCall(5,
+					ccv2.Organization{
+						GUID: "org-guid-33",
+						Name: "org-33",
+					},
+					ccv2.Warnings{"warning-25", "warning-26"},
+					nil,
+				)
+			})
+
+			It("returns a slice of SecurityGroupWithOrganizationAndSpace and all warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf(
+					"warning-1", "warning-2",
+					"warning-3", "warning-4",
+					"warning-5", "warning-6",
+					"warning-7", "warning-8",
+					"warning-9", "warning-10",
+					"warning-11", "warning-12",
+					"warning-13", "warning-14",
+					"warning-15", "warning-16",
+					"warning-17", "warning-18",
+					"warning-19", "warning-20",
+					"warning-25", "warning-26",
+				))
+				expected := []SecurityGroupWithOrganizationAndSpace{
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-11",
+							Name: "org-11",
+						},
+						Space: &Space{
+							GUID: "space-guid-11",
+							Name: "space-11",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-12",
+							Name: "org-12",
+						},
+						Space: &Space{
+							GUID: "space-guid-12",
+							Name: "space-12",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-1",
+							Name: "security-group-1",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-13",
+							Name: "org-13",
+						},
+						Space: &Space{
+							GUID: "space-guid-13",
+							Name: "space-13",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-2",
+							Name: "security-group-2",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-11",
+							Name: "org-11",
+						},
+						Space: &Space{
+							GUID: "space-guid-22",
+							Name: "space-22",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-2",
+							Name: "security-group-2",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-21",
+							Name: "org-21",
+						},
+						Space: &Space{
+							GUID: "space-guid-21",
+							Name: "space-21",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-2",
+							Name: "security-group-2",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-23",
+							Name: "org-23",
+						},
+						Space: &Space{
+							GUID: "space-guid-23",
+							Name: "space-23",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-3",
+							Name: "security-group-3",
+						},
+						Organization: &Organization{},
+						Space:        &Space{},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-4",
+							Name: "security-group-4",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-11",
+							Name: "org-11",
+						},
+						Space: &Space{
+							GUID: "space-guid-32",
+							Name: "space-32",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-4",
+							Name: "security-group-4",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-23",
+							Name: "org-23",
+						},
+						Space: &Space{
+							GUID: "space-guid-31",
+							Name: "space-31",
+						},
+					},
+					{
+						SecurityGroup: &SecurityGroup{
+							GUID: "security-group-guid-4",
+							Name: "security-group-4",
+						},
+						Organization: &Organization{
+							GUID: "org-guid-33",
+							Name: "org-33",
+						},
+						Space: &Space{
+							GUID: "space-guid-33",
+							Name: "space-33",
+						},
+					},
+				}
+				Expect(secGroupOrgSpaces).To(Equal(expected))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupCallCount()).To(Equal(4))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
+				Expect(fakeCloudControllerClient.GetSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
+				Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(1)).To(Equal("org-guid-12"))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(2)).To(Equal("org-guid-11"))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(3)).To(Equal("org-guid-21"))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(4)).To(Equal("org-guid-23"))
+				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(5)).To(Equal("org-guid-33"))
+			})
+		})
+	})
+
 	Describe("GetSecurityGroupByName", func() {
 		var (
-			security_group SecurityGroup
-			warnings       Warnings
-			err            error
+			securityGroup SecurityGroup
+			warnings      Warnings
+			err           error
 		)
 		JustBeforeEach(func() {
-			security_group, warnings, err = actor.GetSecurityGroupByName("some-security-group")
+			securityGroup, warnings, err = actor.GetSecurityGroupByName("some-security-group")
 		})
 		Context("when the security group exists", func() {
 			BeforeEach(func() {
@@ -47,7 +465,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the security group and all warnings", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(security_group.GUID).To(Equal("some-security-group-guid"))
+				Expect(securityGroup.GUID).To(Equal("some-security-group-guid"))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
@@ -90,7 +508,6 @@ var _ = Describe("Security Group Actions", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
-
 	})
 
 	Describe("BindSecurityGroupToSpace", func() {

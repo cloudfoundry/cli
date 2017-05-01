@@ -3100,6 +3100,10 @@
     "translation": "보안 그룹: {{.SecurityGroupName}}의 규칙을 가져오는 중..."
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting security groups as {{.username}}",
     "translation": "{{.username}}(으)로 보안 그룹 가져오기"
   },
@@ -6661,6 +6665,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "organization",
     "translation": ""
   },
   {

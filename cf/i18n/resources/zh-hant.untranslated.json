@@ -220,6 +220,10 @@
     "translation": ""
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -669,6 +673,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "organization",
     "translation": ""
   },
   {

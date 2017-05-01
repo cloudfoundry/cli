@@ -3100,6 +3100,10 @@
     "translation": "Richiamo delle regole per il gruppo di sicurezza: {{.SecurityGroupName}} in corso..."
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting security groups as {{.username}}",
     "translation": "Richiamo dei gruppi di sicurezza come {{.username}}"
   },
@@ -6661,6 +6665,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "organization",
     "translation": ""
   },
   {
