@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("install-plugin command", func() {
+var _ = Describe("install-plugin command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
 	})
