@@ -67,9 +67,6 @@ var _ = Describe("install-plugin command", func() {
 				Eventually(session).Should(Exit(0))
 
 				installedPath := filepath.Join(homeDir, ".cf", "plugins", "some-plugin")
-				stat, err := os.Stat(installedPath)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(stat.Mode()).To(Equal(os.FileMode(0755)))
 
 				pluginsSession := helpers.CF("plugins", "--checksum")
 				expectedSha := helpers.Sha1Sum(installedPath)
