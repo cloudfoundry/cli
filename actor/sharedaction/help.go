@@ -102,8 +102,8 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 		}
 
 		if fieldTag.Get("related_commands") != "" {
-			relatedCommands := sorting.Alphabetic(strings.Split(fieldTag.Get("related_commands"), ", "))
-			sort.Sort(relatedCommands)
+			relatedCommands := strings.Split(fieldTag.Get("related_commands"), ", ")
+			sort.Slice(relatedCommands, sorting.SortAlphabeticFunc(relatedCommands))
 			cmd.RelatedCommands = relatedCommands
 			continue
 		}

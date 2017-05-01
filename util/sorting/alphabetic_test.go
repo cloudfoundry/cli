@@ -9,22 +9,22 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Alphabetic", func() {
+var _ = Describe("SortAlphabeticFunc", func() {
 	It("sorts an empty slice", func() {
 		sample := []string{}
-		sort.Sort(Alphabetic(sample))
+		sort.Slice(sample, SortAlphabeticFunc(sample))
 		Expect(sample).To(Equal([]string{}))
 	})
 
 	It("sorts a slice of size 1", func() {
 		sample := []string{"a"}
-		sort.Sort(Alphabetic(sample))
+		sort.Slice(sample, SortAlphabeticFunc(sample))
 		Expect(sample).To(Equal([]string{"a"}))
 	})
 
 	It("sorts a duplicates", func() {
 		sample := []string{"blurb", "blurb"}
-		sort.Sort(Alphabetic(sample))
+		sort.Slice(sample, SortAlphabeticFunc(sample))
 		Expect(sample).To(Equal([]string{"blurb", "blurb"}))
 	})
 
@@ -43,7 +43,7 @@ var _ = Describe("Alphabetic", func() {
 			"Mother",
 			"sister",
 		}
-		sort.Sort(Alphabetic(sample))
+		sort.Slice(sample, SortAlphabeticFunc(sample))
 		Expect(sample).To(Equal(expected))
 	})
 })

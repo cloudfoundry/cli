@@ -96,7 +96,21 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		}
 	}
 
-	sort.Sort(sortableSecurityGroupRules(securityGroupRules))
+	sort.Slice(securityGroupRules, func(i int, j int) bool {
+		if securityGroupRules[i].Name < securityGroupRules[j].Name {
+			return true
+		}
+		if securityGroupRules[i].Name > securityGroupRules[j].Name {
+			return false
+		}
+		if securityGroupRules[i].Destination < securityGroupRules[j].Destination {
+			return true
+		}
+		if securityGroupRules[i].Destination > securityGroupRules[j].Destination {
+			return false
+		}
+		return securityGroupRules[i].Lifecycle < securityGroupRules[j].Lifecycle
+	})
 
 	sort.Strings(securityGroupNames)
 
