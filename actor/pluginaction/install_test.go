@@ -44,6 +44,8 @@ var _ = Describe("install actions", func() {
 
 				_, err = tempFile.WriteString("cthulhu")
 				Expect(err).ToNot(HaveOccurred())
+				err = tempFile.Close()
+				Expect(err).ToNot(HaveOccurred())
 
 				pluginPath = tempFile.Name()
 			})
@@ -53,17 +55,13 @@ var _ = Describe("install actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("creates a copy of a file in plugin home and makes it executable", func() {
+			It("creates a copy of a file in plugin home", func() {
 				copyPath, err := actor.CreateExecutableCopy(pluginPath)
 				Expect(err).ToNot(HaveOccurred())
 
 				contents, err := ioutil.ReadFile(copyPath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(contents).To(BeEquivalentTo("cthulhu"))
-
-				stat, err := os.Stat(copyPath)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(stat.Mode() & 0700).To(Equal(os.FileMode(0700)))
 			})
 		})
 
@@ -539,7 +537,8 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns the error", func() {
-				Expect(installErr).To(MatchError(MatchRegexp("not a directory")))
+				_, isPathError := installErr.(*os.PathError)
+				Expect(isPathError).To(BeTrue())
 			})
 		})
 
@@ -569,9 +568,6 @@ var _ = Describe("install actions", func() {
 				Expect(installErr).ToNot(HaveOccurred())
 
 				installedPluginPath := filepath.Join(pluginHomeDir, "some-plugin")
-				stat, err := os.Stat(installedPluginPath)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(stat.Mode()).To(Equal(os.FileMode(0755)))
 
 				Expect(fakeConfig.PluginHomeCallCount()).To(Equal(1))
 
