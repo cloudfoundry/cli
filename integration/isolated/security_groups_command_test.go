@@ -35,10 +35,6 @@ var _ = Describe("security-groups command", func() {
 			username = helpers.LoginCF()
 		})
 
-		JustBeforeEach(func() {
-			session = helpers.CF("security-groups")
-		})
-
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
 				helpers.UnsetAPI()
@@ -47,7 +43,7 @@ var _ = Describe("security-groups command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("security-groups")
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
