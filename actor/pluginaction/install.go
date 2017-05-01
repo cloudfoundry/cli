@@ -63,6 +63,10 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	err = tempFile.Close()
+	if err != nil {
+		return "", err
+	}
 
 	err = fileutils.CopyPathToPath(path, tempFile.Name())
 	if err != nil {
