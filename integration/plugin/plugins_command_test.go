@@ -132,7 +132,7 @@ var _ = Describe("plugins command", func() {
 
 			It("displays the sha1 value for each installed plugin", func() {
 				calculatedSha := helpers.Sha1Sum(
-					filepath.Join(homeDir, ".cf/plugins/configurable_plugin.some-plugin"))
+					filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Eventually(session.Out).Should(Say(""))
@@ -143,7 +143,7 @@ var _ = Describe("plugins command", func() {
 
 			Context("when an error is encountered calculating the sha1 value", func() {
 				It("displays N/A for the plugin's sha1", func() {
-					err := os.Remove(filepath.Join(homeDir, ".cf/plugins/configurable_plugin.some-plugin"))
+					err := os.Remove(filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
