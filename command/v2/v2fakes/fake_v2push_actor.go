@@ -25,11 +25,11 @@ type FakeV2PushActor struct {
 		result2 <-chan pushaction.Warnings
 		result3 <-chan error
 	}
-	ConvertToApplicationConfigStub        func(spaceGUID string, orgGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
+	ConvertToApplicationConfigStub        func(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	convertToApplicationConfigMutex       sync.RWMutex
 	convertToApplicationConfigArgsForCall []struct {
-		spaceGUID string
 		orgGUID   string
+		spaceGUID string
 		apps      []manifest.Application
 	}
 	convertToApplicationConfigReturns struct {
@@ -114,7 +114,7 @@ func (fake *FakeV2PushActor) ApplyReturnsOnCall(i int, result1 <-chan pushaction
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2PushActor) ConvertToApplicationConfig(spaceGUID string, orgGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error) {
+func (fake *FakeV2PushActor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error) {
 	var appsCopy []manifest.Application
 	if apps != nil {
 		appsCopy = make([]manifest.Application, len(apps))
@@ -123,14 +123,14 @@ func (fake *FakeV2PushActor) ConvertToApplicationConfig(spaceGUID string, orgGUI
 	fake.convertToApplicationConfigMutex.Lock()
 	ret, specificReturn := fake.convertToApplicationConfigReturnsOnCall[len(fake.convertToApplicationConfigArgsForCall)]
 	fake.convertToApplicationConfigArgsForCall = append(fake.convertToApplicationConfigArgsForCall, struct {
-		spaceGUID string
 		orgGUID   string
+		spaceGUID string
 		apps      []manifest.Application
-	}{spaceGUID, orgGUID, appsCopy})
-	fake.recordInvocation("ConvertToApplicationConfig", []interface{}{spaceGUID, orgGUID, appsCopy})
+	}{orgGUID, spaceGUID, appsCopy})
+	fake.recordInvocation("ConvertToApplicationConfig", []interface{}{orgGUID, spaceGUID, appsCopy})
 	fake.convertToApplicationConfigMutex.Unlock()
 	if fake.ConvertToApplicationConfigStub != nil {
-		return fake.ConvertToApplicationConfigStub(spaceGUID, orgGUID, apps)
+		return fake.ConvertToApplicationConfigStub(orgGUID, spaceGUID, apps)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -147,7 +147,7 @@ func (fake *FakeV2PushActor) ConvertToApplicationConfigCallCount() int {
 func (fake *FakeV2PushActor) ConvertToApplicationConfigArgsForCall(i int) (string, string, []manifest.Application) {
 	fake.convertToApplicationConfigMutex.RLock()
 	defer fake.convertToApplicationConfigMutex.RUnlock()
-	return fake.convertToApplicationConfigArgsForCall[i].spaceGUID, fake.convertToApplicationConfigArgsForCall[i].orgGUID, fake.convertToApplicationConfigArgsForCall[i].apps
+	return fake.convertToApplicationConfigArgsForCall[i].orgGUID, fake.convertToApplicationConfigArgsForCall[i].spaceGUID, fake.convertToApplicationConfigArgsForCall[i].apps
 }
 
 func (fake *FakeV2PushActor) ConvertToApplicationConfigReturns(result1 []pushaction.ApplicationConfig, result2 pushaction.Warnings, result3 error) {

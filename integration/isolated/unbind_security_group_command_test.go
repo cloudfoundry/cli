@@ -176,7 +176,6 @@ var _ = Describe("unbind-security-group command", func() {
 			secGroupName = helpers.NewSecGroupName()
 			secGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "127.0.0.1", "8443", "some-description")
 			secGroup.Create()
-
 		})
 
 		AfterEach(func() {

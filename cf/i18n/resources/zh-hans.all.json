@@ -3100,6 +3100,10 @@
     "translation": "正在获取安全组 {{.SecurityGroupName}} 的规则..."
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting security groups as {{.username}}",
     "translation": "正在以 {{.username}} 身份获取安全组"
   },
@@ -6661,6 +6665,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "organization",
     "translation": ""
   },
   {

@@ -3100,6 +3100,10 @@
     "translation": "セキュリティー・グループ {{.SecurityGroupName}} のルールを取得しています..."
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting security groups as {{.username}}",
     "translation": "{{.username}} としてセキュリティー・グループを取得しています"
   },
@@ -6662,6 +6666,10 @@
   {
     "id": "org:",
     "translation": "組織:"
+  },
+  {
+    "id": "organization",
+    "translation": ""
   },
   {
     "id": "orgs",

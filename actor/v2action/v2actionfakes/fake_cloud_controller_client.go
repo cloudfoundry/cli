@@ -354,6 +354,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetSpacesBySecurityGroupStub        func(securityGroupGUID string) ([]ccv2.Space, ccv2.Warnings, error)
+	getSpacesBySecurityGroupMutex       sync.RWMutex
+	getSpacesBySecurityGroupArgsForCall []struct {
+		securityGroupGUID string
+	}
+	getSpacesBySecurityGroupReturns struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getSpacesBySecurityGroupReturnsOnCall map[int]struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetServiceBindingsStub        func(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	getServiceBindingsMutex       sync.RWMutex
 	getServiceBindingsArgsForCall []struct {
@@ -1916,6 +1931,60 @@ func (fake *FakeCloudControllerClient) GetSecurityGroupsReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetSpacesBySecurityGroup(securityGroupGUID string) ([]ccv2.Space, ccv2.Warnings, error) {
+	fake.getSpacesBySecurityGroupMutex.Lock()
+	ret, specificReturn := fake.getSpacesBySecurityGroupReturnsOnCall[len(fake.getSpacesBySecurityGroupArgsForCall)]
+	fake.getSpacesBySecurityGroupArgsForCall = append(fake.getSpacesBySecurityGroupArgsForCall, struct {
+		securityGroupGUID string
+	}{securityGroupGUID})
+	fake.recordInvocation("GetSpacesBySecurityGroup", []interface{}{securityGroupGUID})
+	fake.getSpacesBySecurityGroupMutex.Unlock()
+	if fake.GetSpacesBySecurityGroupStub != nil {
+		return fake.GetSpacesBySecurityGroupStub(securityGroupGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getSpacesBySecurityGroupReturns.result1, fake.getSpacesBySecurityGroupReturns.result2, fake.getSpacesBySecurityGroupReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesBySecurityGroupCallCount() int {
+	fake.getSpacesBySecurityGroupMutex.RLock()
+	defer fake.getSpacesBySecurityGroupMutex.RUnlock()
+	return len(fake.getSpacesBySecurityGroupArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesBySecurityGroupArgsForCall(i int) string {
+	fake.getSpacesBySecurityGroupMutex.RLock()
+	defer fake.getSpacesBySecurityGroupMutex.RUnlock()
+	return fake.getSpacesBySecurityGroupArgsForCall[i].securityGroupGUID
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesBySecurityGroupReturns(result1 []ccv2.Space, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpacesBySecurityGroupStub = nil
+	fake.getSpacesBySecurityGroupReturns = struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetSpacesBySecurityGroupReturnsOnCall(i int, result1 []ccv2.Space, result2 ccv2.Warnings, result3 error) {
+	fake.GetSpacesBySecurityGroupStub = nil
+	if fake.getSpacesBySecurityGroupReturnsOnCall == nil {
+		fake.getSpacesBySecurityGroupReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.Space
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getSpacesBySecurityGroupReturnsOnCall[i] = struct {
+		result1 []ccv2.Space
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceBindings(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error) {
 	var queriesCopy []ccv2.Query
 	if queries != nil {
@@ -3067,6 +3136,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getRoutesMutex.RUnlock()
 	fake.getSecurityGroupsMutex.RLock()
 	defer fake.getSecurityGroupsMutex.RUnlock()
+	fake.getSpacesBySecurityGroupMutex.RLock()
+	defer fake.getSpacesBySecurityGroupMutex.RUnlock()
 	fake.getServiceBindingsMutex.RLock()
 	defer fake.getServiceBindingsMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()

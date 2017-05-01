@@ -37,6 +37,7 @@ type CloudControllerClient interface {
 	GetSpaceRoutes(spaceGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	GetSpaceRunningSecurityGroupsBySpace(spaceGUID string) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetSpaces(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
+	GetSpacesBySecurityGroup(securityGroupGUID string) ([]ccv2.Space, ccv2.Warnings, error)
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error)

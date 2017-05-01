@@ -3100,6 +3100,10 @@
     "translation": "Abrufen von Regeln für die Sicherheitsgruppe: {{.SecurityGroupName}}..."
   },
   {
+    "id": "Getting security groups as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting security groups as {{.username}}",
     "translation": "Abrufen von Sicherheitsgruppen als {{.username}}"
   },
@@ -6661,6 +6665,10 @@
   },
   {
     "id": "org:",
+    "translation": ""
+  },
+  {
+    "id": "organization",
     "translation": ""
   },
   {

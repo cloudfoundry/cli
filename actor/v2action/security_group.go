@@ -2,6 +2,7 @@ package v2action
 
 import (
 	"fmt"
+	"sort"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -9,6 +10,14 @@ import (
 
 // SecurityGroup represents a CF SecurityGroup.
 type SecurityGroup ccv2.SecurityGroup
+
+// SecurityGroupWithOrganizationAndSpace represents a security group with
+// organization and space information.
+type SecurityGroupWithOrganizationAndSpace struct {
+	SecurityGroup *SecurityGroup
+	Organization  *Organization
+	Space         *Space
+}
 
 // SecurityGroupNotFoundError is returned when a requested security group is
 // not found.
@@ -47,6 +56,94 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 		GUID: securityGroups[0].GUID,
 	}
 	return securityGroup, Warnings(warnings), nil
+}
+
+// GetSecurityGroupsWithOrganizationAndSpace returns a list of security groups
+// with org and space information.
+func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupWithOrganizationAndSpace, Warnings, error) {
+	var err error
+
+	securityGroups, allWarnings, err := actor.CloudControllerClient.GetSecurityGroups(nil)
+	if err != nil {
+		return nil, Warnings(allWarnings), err
+	}
+
+	cachedOrgs := make(map[string]Organization)
+
+	var secGroupOrgSpaces []SecurityGroupWithOrganizationAndSpace
+
+	for _, s := range securityGroups {
+		securityGroup := SecurityGroup{
+			GUID: s.GUID,
+			Name: s.Name,
+		}
+
+		spaces, warnings, err := actor.CloudControllerClient.GetSpacesBySecurityGroup(s.GUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, Warnings(allWarnings), err
+		}
+
+		if len(spaces) == 0 {
+			secGroupOrgSpaces = append(secGroupOrgSpaces,
+				SecurityGroupWithOrganizationAndSpace{
+					SecurityGroup: &securityGroup,
+					Organization:  &Organization{},
+					Space:         &Space{},
+				})
+			continue
+		}
+
+		for _, sp := range spaces {
+			space := Space{
+				GUID: sp.GUID,
+				Name: sp.Name,
+			}
+
+			var org Organization
+
+			if cached, ok := cachedOrgs[sp.OrganizationGUID]; ok {
+				org = cached
+			} else {
+				o, warnings, err := actor.CloudControllerClient.GetOrganization(sp.OrganizationGUID)
+				allWarnings = append(allWarnings, warnings...)
+				if err != nil {
+					return nil, Warnings(allWarnings), err
+				}
+
+				org = Organization{
+					GUID: o.GUID,
+					Name: o.Name,
+				}
+				cachedOrgs[org.GUID] = org
+			}
+
+			secGroupOrgSpaces = append(secGroupOrgSpaces,
+				SecurityGroupWithOrganizationAndSpace{
+					SecurityGroup: &securityGroup,
+					Organization:  &org,
+					Space:         &space,
+				})
+		}
+	}
+
+	// Sort the results alphabetically by security group, then org, then space
+	sort.Slice(secGroupOrgSpaces,
+		func(i, j int) bool {
+			switch {
+			case secGroupOrgSpaces[i].SecurityGroup.Name < secGroupOrgSpaces[j].SecurityGroup.Name:
+				return true
+			case secGroupOrgSpaces[i].SecurityGroup.Name > secGroupOrgSpaces[j].SecurityGroup.Name:
+				return false
+			case secGroupOrgSpaces[i].Organization.Name < secGroupOrgSpaces[j].Organization.Name:
+				return true
+			case secGroupOrgSpaces[i].Organization.Name > secGroupOrgSpaces[j].Organization.Name:
+				return false
+			}
+
+			return secGroupOrgSpaces[i].Space.Name < secGroupOrgSpaces[j].Space.Name
+		})
+	return secGroupOrgSpaces, Warnings(allWarnings), err
 }
 
 // GetDomain returns the shared or private domain associated with the provided

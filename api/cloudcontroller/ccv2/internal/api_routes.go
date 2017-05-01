@@ -35,6 +35,7 @@ const (
 	GetRouteReservedRequest               = "GetRouteReserved"
 	GetRouteRouteMappingsRequest          = "GetRouteRouteMappings"
 	GetRoutesRequest                      = "GetRoutes"
+	GetSecurityGroupSpacesRequest         = "GetSecurityGroupSpaces"
 	GetSecurityGroupsRequest              = "GetSecurityGroups"
 	GetServiceBindingsRequest             = "GetServiceBindings"
 	GetServiceInstancesRequest            = "GetServiceInstances"
@@ -81,6 +82,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces", Method: http.MethodGet, Name: GetSecurityGroupSpacesRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
