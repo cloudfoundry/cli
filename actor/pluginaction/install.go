@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/generic"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
@@ -68,17 +69,18 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 		return "", err
 	}
 
-	err = fileutils.CopyPathToPath(path, tempFile.Name())
+	executablePath := generic.ExecutableFilename(tempFile.Name())
+	err = fileutils.CopyPathToPath(path, executablePath)
 	if err != nil {
 		return "", err
 	}
 
-	err = os.Chmod(tempFile.Name(), 0700)
+	err = os.Chmod(executablePath, 0700)
 	if err != nil {
 		return "", err
 	}
 
-	return tempFile.Name(), nil
+	return executablePath, nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file
@@ -160,7 +162,7 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
-	installPath := filepath.Join(actor.config.PluginHome(), plugin.Name)
+	installPath := generic.ExecutableFilename(filepath.Join(actor.config.PluginHome(), plugin.Name))
 	err := fileutils.CopyPathToPath(path, installPath)
 	if err != nil {
 		return err

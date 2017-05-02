@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -124,15 +125,17 @@ var _ = Describe("plugins command", func() {
 		})
 
 		Context("when the --checksum flag is provided", func() {
+			var installedPluginPath string
+
 			BeforeEach(func() {
 				helpers.InstallConfigurablePlugin("some-plugin", "1.0.0", []helpers.PluginCommand{
 					{Name: "banana-command", Help: "banana-command"},
 				})
+				installedPluginPath = generic.ExecutableFilename(filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
 			})
 
 			It("displays the sha1 value for each installed plugin", func() {
-				calculatedSha := helpers.Sha1Sum(
-					filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
+				calculatedSha := helpers.Sha1Sum(installedPluginPath)
 				session := helpers.CF("plugins", "--checksum")
 				Eventually(session.Out).Should(Say("Computing sha1 for installed plugins, this may take a while..."))
 				Eventually(session.Out).Should(Say(""))
@@ -143,7 +146,7 @@ var _ = Describe("plugins command", func() {
 
 			Context("when an error is encountered calculating the sha1 value", func() {
 				It("displays N/A for the plugin's sha1", func() {
-					err := os.Remove(filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
+					err := os.Remove(installedPluginPath)
 					Expect(err).NotTo(HaveOccurred())
 
 					session := helpers.CF("plugins", "--checksum")
