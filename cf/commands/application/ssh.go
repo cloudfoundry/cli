@@ -67,11 +67,6 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
-	if fc.IsSet("i") && fc.Int("i") < 0 {
-		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), commandregistry.Commands.CommandUsage("ssh")))
-		return nil, fmt.Errorf("Incorrect usage: app-instance-index cannot be negative")
-	}
-
 	var err error
 	cmd.opts, err = options.NewSSHOptions(fc)
 
@@ -81,6 +76,17 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(cmd.opts.AppName)
+
+	if fc.IsSet("i") {
+		if fc.Int("i") < 0 {
+			cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), commandregistry.Commands.CommandUsage("ssh")))
+			return nil, fmt.Errorf("Incorrect usage: app-instance-index cannot be negative")
+		}
+		if fc.Int("i") >= cmd.appReq.GetApplication().InstanceCount {
+			cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("The specified application instance does not exist"), commandregistry.Commands.CommandUsage("ssh")))
+			return nil, fmt.Errorf("Incorrect usage: The specified application instance does not exist")
+		}
+	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
