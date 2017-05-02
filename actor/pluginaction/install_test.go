@@ -9,6 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -66,8 +67,25 @@ var _ = Describe("install actions", func() {
 		})
 
 		Context("when the file does not exist", func() {
+			var (
+				myFile *os.File
+				err    error
+			)
+
+			BeforeEach(func() {
+				myFile, err = ioutil.TempFile("", "")
+				Expect(err).NotTo(HaveOccurred())
+				err = myFile.Close()
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				err = os.Remove(myFile.Name())
+				Expect(err).NotTo(HaveOccurred())
+			})
+
 			It("returns an os.PathError", func() {
-				_, err := actor.CreateExecutableCopy("/a/file/that/does/not/exist")
+				_, err = actor.CreateExecutableCopy(filepath.Join("foo", myFile.Name()))
 				_, isPathError := err.(*os.PathError)
 				Expect(isPathError).To(BeTrue())
 			})
@@ -567,7 +585,7 @@ var _ = Describe("install actions", func() {
 			It("makes an executable copy of the plugin file in the plugin directory, updates the plugin config, and writes the config to disk", func() {
 				Expect(installErr).ToNot(HaveOccurred())
 
-				installedPluginPath := filepath.Join(pluginHomeDir, "some-plugin")
+				installedPluginPath := generic.ExecutableFilename(filepath.Join(pluginHomeDir, "some-plugin"))
 
 				Expect(fakeConfig.PluginHomeCallCount()).To(Equal(1))
 
