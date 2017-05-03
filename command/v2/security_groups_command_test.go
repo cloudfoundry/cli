@@ -42,6 +42,7 @@ var _ = Describe("security-groups Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
+		fakeConfig.ExperimentalReturns(true)
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 	})
