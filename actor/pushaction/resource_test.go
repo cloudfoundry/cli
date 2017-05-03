@@ -174,7 +174,8 @@ var _ = Describe("Resources", func() {
 
 		Context("when the archive returns any access errors", func() {
 			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(ContainSubstring("no such file or directory")))
+				_, ok := executeErr.(*os.PathError)
+				Expect(ok).To(BeTrue())
 			})
 		})
 	})
