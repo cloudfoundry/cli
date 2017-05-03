@@ -5472,10 +5472,6 @@
     "translation": "プラグイン・リポジトリーの URL"
   },
   {
-    "id": "The URL to the plugin, if the plugin exists online",
-    "translation": "プラグインがオンラインで存在している場合は、プラグインの URL"
-  },
-  {
     "id": "The app is running on the DEA backend, which does not support this command.",
     "translation": "このコマンドをサポートしない DEA バックエンドでアプリが実行中です。"
   },
@@ -5544,7 +5540,7 @@
     "translation": ""
   },
   {
-    "id": "The local path to the plugin, if the plugin exists locally",
+    "id": "The local path to the plugin, if the plugin exists locally; the URL to the plugin, if the plugin exists online; or the plugin name, if a repo is specified",
     "translation": "プラグインがローカルに存在している場合は、プラグインのローカル・パス"
   },
   {

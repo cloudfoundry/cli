@@ -49,7 +49,7 @@ var _ = Describe("install-plugin command", func() {
 
 	Describe("installing from a local file", func() {
 		BeforeEach(func() {
-			cmd.OptionalArgs.LocalPath = "some-path"
+			cmd.OptionalArgs.PathURLOrPluginName = "some-path"
 		})
 
 		Context("when the local file does not exist", func() {

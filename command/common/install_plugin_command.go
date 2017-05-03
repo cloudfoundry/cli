@@ -47,7 +47,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 		return nil
 	}
 
-	pluginPath := string(cmd.OptionalArgs.LocalPath)
+	pluginPath := string(cmd.OptionalArgs.PathURLOrPluginName)
 
 	if pluginPath != "" {
 		if !cmd.Actor.FileExists(pluginPath) {
