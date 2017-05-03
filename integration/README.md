@@ -1,4 +1,4 @@
-# CLI Integraition Tests
+# CLI Integration Tests
 These are high-level tests for the CLI that make assertions about the behavior of the `cf` binary.
 
 These tests require that a `cf` binary built from the latest source is available in your `PATH`.
