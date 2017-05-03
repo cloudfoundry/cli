@@ -111,39 +111,18 @@ var _ = Describe("SSH command", func() {
 		})
 
 		Describe("Flag options", func() {
-			var args []string
-
 			BeforeEach(func() {
 				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 			})
 
 			Context("when an -i flag is provided", func() {
-				BeforeEach(func() {
-					args = append(args, "app-name")
-				})
-
-				Context("with a negative integer argument", func() {
-					BeforeEach(func() {
-						args = append(args, "-i", "-3")
-					})
-
-					It("returns an error", func() {
-						Expect(runCommand(args...)).To(BeFalse())
-						Expect(ui.Outputs()).To(ContainSubstrings(
-							[]string{"Incorrect Usage", "cannot be negative"},
-						))
-
-					})
-				})
-
 				Context("with a negative integer argument", func() {
 					It("returns an error", func() {
 						Expect(runCommand("my-app", "-i", "-3")).To(BeFalse())
 						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Incorrect Usage", "cannot be negative"},
 						))
-
 					})
 				})
 
