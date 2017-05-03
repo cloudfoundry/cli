@@ -43,7 +43,6 @@ var _ = Describe("unbind-security-group Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.ExperimentalReturns(true)
 
 		fakeConfig.CurrentUserReturns(
 			configv3.User{Name: "some-user"},

@@ -11,7 +11,6 @@ import (
 var _ = Describe("unbind-security-group command", func() {
 	BeforeEach(func() {
 		helpers.LoginCF()
-		helpers.RunIfExperimental("skipping until approved")
 	})
 
 	Describe("help", func() {
