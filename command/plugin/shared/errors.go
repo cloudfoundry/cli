@@ -58,24 +58,6 @@ func (e RepositoryNameTakenError) Translate(translate func(string, ...interface{
 	return translate(e.Error(), map[string]interface{}{"RepositoryName": e.Name})
 }
 
-// RepositoryURLTakenError is returned when adding a plugin repository
-// fails due to a repository already existing with the same URL
-type RepositoryURLTakenError struct {
-	Name string
-	URL  string
-}
-
-func (e RepositoryURLTakenError) Error() string {
-	return "{{.RepositoryURL}} ({{.RepositoryName}}) already exists."
-}
-
-func (e RepositoryURLTakenError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"RepositoryName": e.Name,
-		"RepositoryURL":  e.URL,
-	})
-}
-
 type AddPluginRepositoryError struct {
 	Name    string
 	URL     string

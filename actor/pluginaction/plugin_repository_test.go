@@ -40,7 +40,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when passed an IP address with a port is passed without a scheme", func() {
+		Context("when passed a schemeless IP address with a port", func() {
 			It("prepends https://", func() {
 				_ = actor.AddPluginRepository("some-repo2", "127.0.0.1:5000")
 				url := fakePluginClient.GetPluginRepositoryArgsForCall(1)
@@ -75,6 +75,42 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
+		Context("when the repository name and URL are already taken in the same repo", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+					{
+						Name: "some-repo",
+						URL:  "https://some-URL",
+					},
+				})
+			})
+
+			It("returns a RepositoryAlreadyExistsError", func() {
+				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
+
+				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
+				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
+			})
+
+			Context("when the repository name is the same except for case sensitivity", func() {
+				BeforeEach(func() {
+					fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+						{
+							Name: "sOmE-rEpO",
+							URL:  "https://some-URL",
+						},
+					})
+				})
+
+				It("returns a RepositoryAlreadyExistsError", func() {
+					Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "sOmE-rEpO", URL: "https://some-URL"}))
+
+					Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
+					Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
+				})
+			})
+		})
+
 		Context("when the repository URL is taken", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
@@ -89,8 +125,16 @@ var _ = Describe("Plugin Repository Actions", func() {
 				})
 			})
 
-			It("returns the RepositoryURLTakenError", func() {
-				Expect(err).To(MatchError(RepositoryURLTakenError{Name: "repo-2", URL: "https://some-URL"}))
+			It("adds the repo to the config and returns nil", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(1))
+				Expect(fakePluginClient.GetPluginRepositoryArgsForCall(0)).To(Equal("https://some-URL"))
+
+				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(1))
+				repoName, repoURL := fakeConfig.AddPluginRepositoryArgsForCall(0)
+				Expect(repoName).To(Equal("some-repo"))
+				Expect(repoURL).To(Equal("https://some-URL"))
 			})
 		})
 
@@ -99,7 +143,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 				fakePluginClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("generic-error"))
 			})
 
-			It("returns a 'AddPluginRepositoryError", func() {
+			It("returns an AddPluginRepositoryError", func() {
 				Expect(err).To(MatchError(AddPluginRepositoryError{
 					Name:    "some-repo",
 					URL:     "https://some-URL",

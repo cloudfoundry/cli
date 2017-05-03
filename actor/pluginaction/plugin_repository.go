@@ -3,11 +3,16 @@ package pluginaction
 import (
 	"fmt"
 	"strings"
-
-	"code.cloudfoundry.org/cli/api/plugin"
 )
 
-type PluginRepository plugin.PluginRepository
+type RepositoryAlreadyExistsError struct {
+	Name string
+	URL  string
+}
+
+func (e RepositoryAlreadyExistsError) Error() string {
+	return fmt.Sprintf("%s already registered as %s.", e.URL, e.Name)
+}
 
 type RepositoryNameTakenError struct {
 	Name string
@@ -15,15 +20,6 @@ type RepositoryNameTakenError struct {
 
 func (e RepositoryNameTakenError) Error() string {
 	return fmt.Sprintf("Plugin repo named '%s' already exists, please use another name.", e.Name)
-}
-
-type RepositoryURLTakenError struct {
-	Name string
-	URL  string
-}
-
-func (e RepositoryURLTakenError) Error() string {
-	return fmt.Sprintf("%s (%s) already exists.", e.URL, e.Name)
 }
 
 type AddPluginRepositoryError struct {
@@ -46,14 +42,16 @@ func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {
 		}
 	}
 
+	repoNameLowerCased := strings.ToLower(repoName)
 	for _, repository := range actor.config.PluginRepositories() {
-		if repoName == repository.Name {
+		existingRepoNameLowerCased := strings.ToLower(repository.Name)
+		switch {
+		case repoNameLowerCased == existingRepoNameLowerCased && normalizedURL == repository.URL:
+			return RepositoryAlreadyExistsError{Name: repository.Name, URL: repository.URL}
+		case repoNameLowerCased == existingRepoNameLowerCased && normalizedURL != repository.URL:
 			return RepositoryNameTakenError{Name: repository.Name}
-		} else if normalizedURL == repository.URL {
-			return RepositoryURLTakenError{
-				Name: repository.Name,
-				URL:  repository.URL,
-			}
+		case repoNameLowerCased != existingRepoNameLowerCased:
+			continue
 		}
 	}
 
@@ -67,7 +65,6 @@ func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {
 	}
 
 	actor.config.AddPluginRepository(repoName, normalizedURL)
-
 	return nil
 }
 

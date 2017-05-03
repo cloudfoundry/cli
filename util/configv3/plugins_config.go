@@ -19,7 +19,6 @@ type PluginsConfig struct {
 
 // Plugin represents the plugin as a whole, not be confused with PluginCommand
 type Plugin struct {
-	// repo, filepath, url
 	Name     string
 	Location string          `json:"Location"`
 	Version  PluginVersion   `json:"Version"`
