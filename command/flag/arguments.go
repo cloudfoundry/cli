@@ -275,8 +275,7 @@ type AddPluginRepoArgs struct {
 }
 
 type InstallPluginArgs struct {
-	LocalPath Path   `positional-arg-name:"LOCAL_PATH/TO/PLUGIN" description:"The local path to the plugin, if the plugin exists locally"`
-	URL       string `positional-arg-name:"URL" description:"The URL to the plugin, if the plugin exists online"`
+	PathURLOrPluginName Path `positional-arg-name:"PATH_URL_PLUGIN_NAME" required:"true" description:"The local path to the plugin, if the plugin exists locally; the URL to the plugin, if the plugin exists online; or the plugin name, if a repo is specified"`
 }
 
 type RunTaskArgs struct {

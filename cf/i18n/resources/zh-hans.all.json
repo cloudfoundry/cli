@@ -5472,10 +5472,6 @@
     "translation": "插件存储库的 URL"
   },
   {
-    "id": "The URL to the plugin, if the plugin exists online",
-    "translation": "插件的 URL（如果插件存在于网上）"
-  },
-  {
     "id": "The app is running on the DEA backend, which does not support this command.",
     "translation": "应用程序正在 DEA 后端上运行，此后端不支持此命令。"
   },
@@ -5544,7 +5540,7 @@
     "translation": ""
   },
   {
-    "id": "The local path to the plugin, if the plugin exists locally",
+    "id": "The local path to the plugin, if the plugin exists locally; the URL to the plugin, if the plugin exists online; or the plugin name, if a repo is specified",
     "translation": "插件的本地路径（如果插件存在于本地）"
   },
   {

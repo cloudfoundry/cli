@@ -5472,10 +5472,6 @@
     "translation": "L'URL del repository di plugin "
   },
   {
-    "id": "The URL to the plugin, if the plugin exists online",
-    "translation": "L'URL del plugin, se il plugin è online "
-  },
-  {
     "id": "The app is running on the DEA backend, which does not support this command.",
     "translation": "L'applicazione è in esecuzione sul backend DEA, che non supporta questo comando. "
   },
@@ -5544,7 +5540,7 @@
     "translation": ""
   },
   {
-    "id": "The local path to the plugin, if the plugin exists locally",
+    "id": "The local path to the plugin, if the plugin exists locally; the URL to the plugin, if the plugin exists online; or the plugin name, if a repo is specified",
     "translation": "Il percorso locale del plugin, se il plugin è locale "
   },
   {
