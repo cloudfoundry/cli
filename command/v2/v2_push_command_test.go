@@ -110,7 +110,7 @@ var _ = Describe("v2-push Command", func() {
 							Path:               pwd,
 						},
 					}
-					fakeActor.ConvertToApplicationConfigReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
+					fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
 				})
 
 				Context("when the push is successful", func() {
@@ -166,8 +166,8 @@ var _ = Describe("v2-push Command", func() {
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 
-						Expect(fakeActor.ConvertToApplicationConfigCallCount()).To(Equal(1))
-						orgGUID, spaceGUID, manifests := fakeActor.ConvertToApplicationConfigArgsForCall(0)
+						Expect(fakeActor.ConvertToApplicationConfigsCallCount()).To(Equal(1))
+						orgGUID, spaceGUID, manifests := fakeActor.ConvertToApplicationConfigsArgsForCall(0)
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
 						Expect(manifests).To(Equal(appManifests))
@@ -258,7 +258,7 @@ var _ = Describe("v2-push Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("no wayz dude")
-					fakeActor.ConvertToApplicationConfigReturns(nil, pushaction.Warnings{"some-config-warnings"}, expectedErr)
+					fakeActor.ConvertToApplicationConfigsReturns(nil, pushaction.Warnings{"some-config-warnings"}, expectedErr)
 				})
 
 				It("outputs the warnings and returns the error", func() {

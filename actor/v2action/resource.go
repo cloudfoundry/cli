@@ -13,6 +13,48 @@ import (
 
 type Resource ccv2.Resource
 
+// GatherResources returns a list of resources for a directory.
+func (actor Actor) GatherResources(sourceDir string) ([]Resource, error) {
+	var resources []Resource
+	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return nil
+		}
+
+		if relPath == "." {
+			return nil
+		}
+
+		resources = append(resources, Resource{
+			Filename: filepath.ToSlash(relPath),
+		})
+
+		return nil
+	})
+
+	return resources, walkErr
+}
+
+func (actor Actor) UploadApplicationPackage(appGUID string, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Warnings, error) {
+	var allWarnings Warnings
+
+	job, warnings, err := actor.CloudControllerClient.UploadApplicationPackage(appGUID, actor.actorToCCResources(existingResources), newResources, newResourcesLength)
+	allWarnings = Warnings(warnings)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.CloudControllerClient.PollJob(job)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+
+	return allWarnings, err
+}
+
 // ZipResources zips a directory and a sorted (based on full path/filename)
 // list of resources and returns the location. On Windows, the filemode for
 // user is forced to be readable and executable.
@@ -42,6 +84,16 @@ func (actor Actor) ZipResources(sourceDir string, filesToInclude []Resource) (st
 		"zipped_file_count": len(filesToInclude),
 	}).Info("zip file created")
 	return zipFile.Name(), nil
+}
+
+func (_ Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
+	apiResources := make([]ccv2.Resource, 0, len(resources)) // Explicitly done to prevent nils
+
+	for _, resource := range resources {
+		apiResources = append(apiResources, ccv2.Resource(resource))
+	}
+
+	return apiResources
 }
 
 func (_ Actor) addFileToZip(srcPath string, destPath string, zipFile *zip.Writer) error {

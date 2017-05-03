@@ -1,12 +1,19 @@
 package ccv2_test
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -402,6 +409,148 @@ var _ = Describe("Job", func() {
 					Message: "The organization could not be found: some-org-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+			})
+		})
+	})
+
+	Describe("UploadApplicationPackage", func() {
+		BeforeEach(func() {
+			client = NewTestClient()
+		})
+
+		Context("when the upload is successful", func() {
+			var (
+				resources  []Resource
+				reader     io.Reader
+				readerBody []byte
+			)
+
+			BeforeEach(func() {
+				resources = []Resource{
+					{Filename: "foo"},
+					{Filename: "bar"},
+				}
+
+				readerBody = []byte("hello world")
+				reader = bytes.NewReader(readerBody)
+
+				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
+					contentType := req.Header.Get("Content-Type")
+					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+					defer req.Body.Close()
+					reader := multipart.NewReader(req.Body, contentType[30:])
+
+					// Verify that matched resources are sent properly
+					resourcesPart, err := reader.NextPart()
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+					defer resourcesPart.Close()
+					expectedJSON, err := json.Marshal(resources)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+					// Verify that the application bits are sent properly
+					resourcesPart, err = reader.NextPart()
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(resourcesPart.FormName()).To(Equal("application"))
+					Expect(resourcesPart.FileName()).To(Equal("application.zip"))
+
+					defer resourcesPart.Close()
+					Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+				}
+
+				response := `{
+					"metadata": {
+						"guid": "job-guid",
+						"url": "/v2/jobs/job-guid"
+					},
+					"entity": {
+						"guid": "job-guid",
+						"status": "queued"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+						verifyHeaderAndBody,
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created job and warnings", func() {
+				job, warnings, err := client.UploadApplicationPackage("some-app-guid", resources, reader, int64(len(readerBody)))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(job).To(Equal(Job{
+					GUID:   "job-guid",
+					Status: JobStatusQueued,
+				}))
+			})
+		})
+
+		Context("when the CC returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 30003,
+					"description": "Banana",
+					"error_code": "CF-Banana"
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, bytes.NewReader(nil), 0)
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Banana"}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when passed a nil resources", func() {
+			It("returns a NilObjectError", func() {
+				_, _, err := client.UploadApplicationPackage("some-app-guid", nil, bytes.NewReader(nil), 0)
+				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "existingResources"}))
+			})
+		})
+
+		Context("when passed a nil reader", func() {
+			It("returns a NilObjectError", func() {
+				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, nil, 0)
+				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "newResources"}))
+			})
+		})
+
+		Context("when an error is returned from the new resources reader", func() {
+			var (
+				fakeReader  *ccv2fakes.FakeReader
+				expectedErr error
+			)
+
+			BeforeEach(func() {
+				fakeReader = new(ccv2fakes.FakeReader)
+				expectedErr = errors.New("some read error")
+				fakeReader.ReadReturns(0, expectedErr)
+
+				server.AppendHandlers(
+					VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+				)
+			})
+
+			It("returns the error", func() {
+				Skip("figure out how to write properly first")
+				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, fakeReader, 3)
+				Expect(err).To(MatchError(expectedErr))
 			})
 		})
 	})

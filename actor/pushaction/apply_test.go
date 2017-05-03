@@ -2,6 +2,8 @@ package pushaction_test
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
@@ -10,6 +12,30 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+func streamsDrainedAndClosed(eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) bool {
+	var eventStreamClosed, warningsStreamClosed, errorStreamClosed bool
+	for {
+		select {
+		case _, ok := <-eventStream:
+			if !ok {
+				eventStreamClosed = true
+			}
+		case _, ok := <-warningsStream:
+			if !ok {
+				warningsStreamClosed = true
+			}
+		case _, ok := <-errorStream:
+			if !ok {
+				errorStreamClosed = true
+			}
+		}
+		if eventStreamClosed && warningsStreamClosed && errorStreamClosed {
+			break
+		}
+	}
+	return true
+}
 
 var _ = Describe("Apply", func() {
 	var (
@@ -32,6 +58,8 @@ var _ = Describe("Apply", func() {
 				Name:      "some-app-name",
 				SpaceGUID: "some-space-guid",
 			},
+			DesiredRoutes: []v2action.Route{{Host: "banana"}},
+			Path:          "some-path",
 		}
 	})
 
@@ -40,265 +68,189 @@ var _ = Describe("Apply", func() {
 	})
 
 	AfterEach(func() {
-		Eventually(warningsStream).Should(BeClosed())
-		Eventually(eventStream).Should(BeClosed())
-		Eventually(errorStream).Should(BeClosed())
+		Eventually(streamsDrainedAndClosed(eventStream, warningsStream, errorStream)).Should(BeTrue())
 	})
 
-	Context("when the app exists", func() {
+	Context("when creating/updating the application is successful", func() {
+		var createdApp v2action.Application
+
 		BeforeEach(func() {
-			config.CurrentApplication = v2action.Application{
-				Name:      "some-app-name",
-				GUID:      "some-app-guid",
-				SpaceGUID: "some-space-guid",
-				Buildpack: "java",
-			}
-			config.DesiredApplication = v2action.Application{
-				Name:      "some-app-name",
-				GUID:      "some-app-guid",
-				SpaceGUID: "some-space-guid",
-				Buildpack: "ruby",
-			}
+			createdApp = config.DesiredApplication
+			createdApp.GUID = "some-app-guid"
+
+			fakeV2Actor.CreateApplicationReturns(createdApp, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, nil)
 		})
 
-		Context("when the update is successful", func() {
-			BeforeEach(func() {
-				fakeV2Actor.UpdateApplicationReturns(v2action.Application{}, v2action.Warnings{"update-warning"}, nil)
-			})
-
-			It("updates the application", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("update-warning")))
-				Eventually(eventStream).Should(Receive(Equal(ApplicationUpdated)))
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-				Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
-				Expect(fakeV2Actor.UpdateApplicationArgsForCall(0)).To(Equal(v2action.Application{
-					Name:      "some-app-name",
-					GUID:      "some-app-guid",
-					SpaceGUID: "some-space-guid",
-					Buildpack: "ruby",
-				}))
-			})
-		})
-
-		Context("when the update errors", func() {
-			var expectedErr error
-			BeforeEach(func() {
-				expectedErr = errors.New("oh my")
-				fakeV2Actor.UpdateApplicationReturns(v2action.Application{}, v2action.Warnings{"update-warning"}, expectedErr)
-			})
-
-			It("returns warnings and error and stops", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("update-warning")))
-				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-				Consistently(eventStream).ShouldNot(Receive(Equal(ApplicationUpdated)))
-			})
-		})
-	})
-
-	Context("when the app does not exist", func() {
-		Context("when the creation is successful", func() {
-			BeforeEach(func() {
-				fakeV2Actor.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"create-warning"}, nil)
-			})
-
-			It("creates the application", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-warning")))
-				Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-				Expect(fakeV2Actor.CreateApplicationCallCount()).To(Equal(1))
-				Expect(fakeV2Actor.CreateApplicationArgsForCall(0)).To(Equal(v2action.Application{
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
-				}))
-			})
-		})
-
-		Context("when the creation errors", func() {
-			var expectedErr error
-			BeforeEach(func() {
-				expectedErr = errors.New("oh my")
-				fakeV2Actor.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"create-warning"}, expectedErr)
-			})
-
-			It("returns warnings and error and stops", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-warning")))
-				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-				Consistently(eventStream).ShouldNot(Receive(Equal(ApplicationCreated)))
-			})
-		})
-	})
-
-	Describe("when routes need to be created", func() {
-		BeforeEach(func() {
-			// This will skip the binding step
-			config.CurrentRoutes = []v2action.Route{
-				{GUID: ""},
-				{GUID: "some-route-guid-2"},
-			}
-
-			config.DesiredRoutes = []v2action.Route{
-				{GUID: "", Host: "some-route-1"},
-				{GUID: "some-route-guid-2", Host: "some-route-2"},
-				{GUID: "", Host: "some-route-3"},
-			}
-
-			fakeV2Actor.CreateApplicationReturns(
-				v2action.Application{
-					GUID: "some-app-guid",
-				},
-				v2action.Warnings{"create-app-warning"},
-				nil)
-		})
-
-		Context("when the creation is successful", func() {
-			BeforeEach(func() {
-				fakeV2Actor.CreateRouteReturns(
-					v2action.Route{},
-					v2action.Warnings{"create-route-warning"},
-					nil)
-			})
-
-			It("only creates the routes that do not exist", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-app-warning")))
-				Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warning")))
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warning")))
-
-				Eventually(eventStream).Should(Receive(Equal(RouteCreated)))
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-				Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(2))
-				Expect(fakeV2Actor.CreateRouteArgsForCall(0)).To(Equal(v2action.Route{Host: "some-route-1"}))
-				Expect(fakeV2Actor.CreateRouteArgsForCall(1)).To(Equal(v2action.Route{Host: "some-route-3"}))
-			})
-		})
-
-		Context("when the creation errors", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("oh my")
-				fakeV2Actor.CreateRouteReturns(
-					v2action.Route{},
-					v2action.Warnings{"create-route-warning"},
-					expectedErr)
-			})
-
-			It("returns warnings and error and stops", func() {
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-app-warning")))
-				Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warning")))
-
-				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-				Consistently(eventStream).ShouldNot(Receive(Equal(RouteCreated)))
-			})
-		})
-	})
-
-	Context("when no routes are created", func() {
-		BeforeEach(func() {
-			fakeV2Actor.CreateRouteReturns(
-				v2action.Route{},
-				v2action.Warnings{"create-route-warning"},
-				nil)
-		})
-
-		It("returns warnings and error and stops", func() {
-			Eventually(warningsStream).Should(Receive())
+		JustBeforeEach(func() {
+			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
 			Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-			Consistently(eventStream).ShouldNot(Receive(Equal(RouteCreated)))
-		})
-	})
-
-	Context("when routes need to be bound to the application", func() {
-		BeforeEach(func() {
-			config.CurrentRoutes = []v2action.Route{
-				{GUID: "some-route-guid-2", Host: "some-route-2"},
-			}
-			config.DesiredRoutes = []v2action.Route{
-				{GUID: "some-route-guid-1", Host: "some-route-1", Domain: v2action.Domain{Name: "some-domain.com"}},
-				{GUID: "some-route-guid-2", Host: "some-route-2"},
-				{GUID: "some-route-guid-3", Host: "some-route-3"},
-			}
-
-			fakeV2Actor.CreateApplicationReturns(
-				v2action.Application{
-					GUID: "some-app-guid",
-				},
-				v2action.Warnings{"create-app-warning"},
-				nil)
 		})
 
-		Context("when the binding is successful", func() {
+		Context("when the route creation is successful", func() {
+			var createdRoutes []v2action.Route
+
 			BeforeEach(func() {
-				fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, nil)
+				createdRoutes = []v2action.Route{{Host: "banana", GUID: "some-route-guid"}}
+				fakeV2Actor.CreateRouteReturns(createdRoutes[0], v2action.Warnings{"create-route-warnings-1", "create-route-warnings-2"}, nil)
 			})
 
-			It("only creates the routes that do not exist", func() {
-				Eventually(warningsStream).Should(Receive())
-				Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-				Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
-				Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
-
-				Eventually(eventStream).Should(Receive(Equal(RouteBound)))
-				Eventually(eventStream).Should(Receive(Equal(Complete)))
-
-				Expect(fakeV2Actor.BindRouteToApplicationCallCount()).To(Equal(2))
-
-				routeGUID, appGUID := fakeV2Actor.BindRouteToApplicationArgsForCall(0)
-				Expect(routeGUID).To(Equal("some-route-guid-1"))
-				Expect(appGUID).To(Equal("some-app-guid"))
-
-				routeGUID, appGUID = fakeV2Actor.BindRouteToApplicationArgsForCall(1)
-				Expect(routeGUID).To(Equal("some-route-guid-3"))
-				Expect(appGUID).To(Equal("some-app-guid"))
+			JustBeforeEach(func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warnings-1", "create-route-warnings-2")))
+				Eventually(eventStream).Should(Receive(Equal(RouteCreated)))
 			})
-		})
 
-		Context("when the creation errors", func() {
-			Context("when the route is bound in another space", func() {
+			Context("when binding the routes is successful", func() {
 				BeforeEach(func() {
-					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, v2action.RouteInDifferentSpaceError{})
+					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warnings-1", "bind-route-warnings-2"}, nil)
 				})
 
-				It("stops and returns the RouteInDifferentSpaceError (with a guid set) and warnings", func() {
-					Eventually(warningsStream).Should(Receive())
-					Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
+				JustBeforeEach(func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warnings-1", "bind-route-warnings-2")))
+					Eventually(eventStream).Should(Receive(Equal(RouteBound)))
+				})
 
-					Eventually(errorStream).Should(Receive(MatchError(
-						v2action.RouteInDifferentSpaceError{Route: "some-route-1.some-domain.com"},
-					)))
-					Consistently(eventStream).ShouldNot(Receive(Equal(RouteBound)))
+				Context("when the archive creation is successful", func() {
+					var archivePath string
+
+					BeforeEach(func() {
+						tmpfile, err := ioutil.TempFile("", "fake-archive")
+						Expect(err).ToNot(HaveOccurred())
+						_, err = tmpfile.Write([]byte("123456"))
+						Expect(err).ToNot(HaveOccurred())
+						Expect(tmpfile.Close()).ToNot(HaveOccurred())
+
+						archivePath = tmpfile.Name()
+						fakeV2Actor.ZipResourcesReturns(archivePath, nil)
+					})
+
+					AfterEach(func() {
+						if archivePath != "" {
+							os.Remove(archivePath)
+						}
+					})
+
+					Context("when the upload is successful", func() {
+						BeforeEach(func() {
+							fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
+						})
+
+						JustBeforeEach(func() {
+							Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+							Eventually(eventStream).Should(Receive(Equal(UploadComplete)))
+							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+						})
+
+						It("returns the complete event", func() {
+							Eventually(eventStream).Should(Receive(Equal(Complete)))
+						})
+					})
+
+					Context("when the upload errors", func() {
+						Context("with a retryable error", func() {
+							It("retries the download", func() {
+								Skip("until error handling in api has been completed")
+							})
+						})
+
+						Context("with a generic error", func() {
+							var expectedErr error
+
+							BeforeEach(func() {
+								expectedErr = errors.New("dios mio")
+								fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+							})
+
+							It("sends warnings and errors, then stops", func() {
+								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+								Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+								Consistently(eventStream).ShouldNot(Receive())
+							})
+						})
+					})
+				})
+
+				Context("when the archive creation errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("dios mio")
+						fakeV2Actor.ZipResourcesReturns("", expectedErr)
+					})
+
+					It("sends warnings and errors, then stops", func() {
+						Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+						Consistently(eventStream).ShouldNot(Receive())
+					})
 				})
 			})
-			Context("generic error", func() {
+
+			Context("when there are no routes to bind", func() {
+				BeforeEach(func() {
+					config.CurrentRoutes = createdRoutes
+				})
+
+				It("should not send the RouteCreated event", func() {
+					Eventually(warningsStream).Should(Receive())
+					Consistently(eventStream).ShouldNot(Receive())
+				})
+			})
+
+			Context("when binding the routes errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = errors.New("oh my")
-					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, expectedErr)
+					expectedErr = errors.New("dios mio")
+					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warnings-1", "bind-route-warnings-2"}, expectedErr)
 				})
 
-				It("returns warnings and error and stops", func() {
-					Eventually(warningsStream).Should(Receive())
-					Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warning")))
-
+				It("sends warnings and errors, then stops", func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warnings-1", "bind-route-warnings-2")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-					Consistently(eventStream).ShouldNot(Receive(Equal(RouteBound)))
+					Consistently(eventStream).ShouldNot(Receive())
 				})
+			})
+		})
+
+		Context("when there are no routes to create", func() {
+			BeforeEach(func() {
+				config.DesiredRoutes[0].GUID = "some-route-guid"
+			})
+
+			It("should not send the RouteCreated event", func() {
+				Eventually(warningsStream).Should(Receive())
+				Consistently(eventStream).ShouldNot(Receive())
+			})
+		})
+
+		Context("when the route creation errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("dios mio")
+				fakeV2Actor.CreateRouteReturns(v2action.Route{}, v2action.Warnings{"create-route-warnings-1", "create-route-warnings-2"}, expectedErr)
+			})
+
+			It("sends warnings and errors, then stops", func() {
+				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warnings-1", "create-route-warnings-2")))
+				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+				Consistently(eventStream).ShouldNot(Receive())
 			})
 		})
 	})
 
-	Context("when no routes need to be bound", func() {
-		It("returns warnings and error and stops", func() {
-			Eventually(warningsStream).Should(Receive())
-			Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
-			Consistently(eventStream).ShouldNot(Receive(Equal(RouteBound)))
+	Context("when creating/updating errors", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = errors.New("dios mio")
+			fakeV2Actor.CreateApplicationReturns(v2action.Application{}, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, expectedErr)
+		})
+
+		It("sends warnings and errors, then stops", func() {
+			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
+			Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+			Consistently(eventStream).ShouldNot(Receive())
 		})
 	})
 })

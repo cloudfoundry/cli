@@ -23,7 +23,7 @@ var _ = Describe("Application Config", func() {
 		actor = NewActor(fakeV2Actor)
 	})
 
-	Describe("ConvertToApplicationConfig", func() {
+	Describe("ConvertToApplicationConfigs", func() {
 		var (
 			appName      string
 			orgGUID      string
@@ -60,7 +60,7 @@ var _ = Describe("Application Config", func() {
 		})
 
 		JustBeforeEach(func() {
-			configs, warnings, executeErr = actor.ConvertToApplicationConfig(orgGUID, spaceGUID, manifestApps)
+			configs, warnings, executeErr = actor.ConvertToApplicationConfigs(orgGUID, spaceGUID, manifestApps)
 			if len(configs) > 0 {
 				firstConfig = configs[0]
 			}
@@ -194,6 +194,43 @@ var _ = Describe("Application Config", func() {
 			It("returns the error and warnings", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+			})
+		})
+
+		Context("when given a directory", func() {
+			Context("when scanning is successful", func() {
+				var resources []v2action.Resource
+
+				BeforeEach(func() {
+					resources = []v2action.Resource{
+						{Filename: "I am a file!"},
+						{Filename: "I am not a file"},
+					}
+					fakeV2Actor.GatherResourcesReturns(resources, nil)
+				})
+
+				It("sets the full resource list on the config", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+					Expect(firstConfig.AllResources).To(Equal(resources))
+
+					Expect(fakeV2Actor.GatherResourcesCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GatherResourcesArgsForCall(0)).To(Equal("some-path"))
+				})
+			})
+
+			Context("when scanning errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("dios mio")
+					fakeV2Actor.GatherResourcesReturns(nil, expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+				})
 			})
 		})
 	})

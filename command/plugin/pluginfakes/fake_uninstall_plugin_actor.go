@@ -9,11 +9,11 @@ import (
 )
 
 type FakeUninstallPluginActor struct {
-	UninstallPluginStub        func(pluginaction.PluginUninstaller, string) error
+	UninstallPluginStub        func(uninstaller pluginaction.PluginUninstaller, name string) error
 	uninstallPluginMutex       sync.RWMutex
 	uninstallPluginArgsForCall []struct {
-		arg1 pluginaction.PluginUninstaller
-		arg2 string
+		uninstaller pluginaction.PluginUninstaller
+		name        string
 	}
 	uninstallPluginReturns struct {
 		result1 error
@@ -25,17 +25,17 @@ type FakeUninstallPluginActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUninstallPluginActor) UninstallPlugin(arg1 pluginaction.PluginUninstaller, arg2 string) error {
+func (fake *FakeUninstallPluginActor) UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error {
 	fake.uninstallPluginMutex.Lock()
 	ret, specificReturn := fake.uninstallPluginReturnsOnCall[len(fake.uninstallPluginArgsForCall)]
 	fake.uninstallPluginArgsForCall = append(fake.uninstallPluginArgsForCall, struct {
-		arg1 pluginaction.PluginUninstaller
-		arg2 string
-	}{arg1, arg2})
-	fake.recordInvocation("UninstallPlugin", []interface{}{arg1, arg2})
+		uninstaller pluginaction.PluginUninstaller
+		name        string
+	}{uninstaller, name})
+	fake.recordInvocation("UninstallPlugin", []interface{}{uninstaller, name})
 	fake.uninstallPluginMutex.Unlock()
 	if fake.UninstallPluginStub != nil {
-		return fake.UninstallPluginStub(arg1, arg2)
+		return fake.UninstallPluginStub(uninstaller, name)
 	}
 	if specificReturn {
 		return ret.result1
@@ -52,7 +52,7 @@ func (fake *FakeUninstallPluginActor) UninstallPluginCallCount() int {
 func (fake *FakeUninstallPluginActor) UninstallPluginArgsForCall(i int) (pluginaction.PluginUninstaller, string) {
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
-	return fake.uninstallPluginArgsForCall[i].arg1, fake.uninstallPluginArgsForCall[i].arg2
+	return fake.uninstallPluginArgsForCall[i].uninstaller, fake.uninstallPluginArgsForCall[i].name
 }
 
 func (fake *FakeUninstallPluginActor) UninstallPluginReturns(result1 error) {

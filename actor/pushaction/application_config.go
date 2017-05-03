@@ -13,11 +13,13 @@ type ApplicationConfig struct {
 	CurrentRoutes []v2action.Route
 	DesiredRoutes []v2action.Route
 
+	AllResources []v2action.Resource
+
 	TargetedSpaceGUID string
 	Path              string
 }
 
-func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
+func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings
 
@@ -63,7 +65,17 @@ func (actor Actor) ConvertToApplicationConfig(orgGUID string, spaceGUID string, 
 			log.Errorln("getting default route:", err)
 			return nil, warnings, err
 		}
+
+		// TODO: when working with all of routes, append to current route
 		config.DesiredRoutes = []v2action.Route{defaultRoute}
+
+		log.WithField("path_to_resources", app.Path).Info("determine resources to zip")
+		resources, err := actor.V2Actor.GatherResources(app.Path)
+		if err != nil {
+			return nil, warnings, err
+		}
+		config.AllResources = resources
+		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
 
 		configs = append(configs, config)
 	}
