@@ -2,12 +2,16 @@ package v2action_test
 
 import (
 	"archive/zip"
+	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/ykk"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,40 +21,133 @@ var _ = Describe("Resource Actions", func() {
 	var (
 		actor                     Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		srcDir                    string
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil)
+
+		var err error
+		srcDir, err = ioutil.TempDir("", "")
+		Expect(err).ToNot(HaveOccurred())
+
+		subDir := filepath.Join(srcDir, "level1", "level2")
+		err = os.MkdirAll(subDir, 0777)
+		Expect(err).ToNot(HaveOccurred())
+
+		err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
+		Expect(err).ToNot(HaveOccurred())
+
+		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
+		Expect(err).ToNot(HaveOccurred())
+
+		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	Describe("GatherResources", func() {
+		It("gathers a list of all directories files in a source directory", func() {
+			resources, err := actor.GatherResources(srcDir)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(resources).To(Equal(
+				[]Resource{
+					{Filename: "level1"},
+					{Filename: "level1/level2"},
+					{Filename: "level1/level2/tmpFile1"},
+					{Filename: "tmpFile2"},
+					{Filename: "tmpFile3"},
+				}))
+		})
+	})
+
+	Describe("UploadApplicationPackage", func() {
+		var (
+			appGUID           string
+			existingResources []Resource
+			reader            io.Reader
+			readerLength      int64
+			warnings          Warnings
+			executeErr        error
+		)
+
+		BeforeEach(func() {
+			appGUID = "some-app-guid"
+			existingResources = []Resource{{Filename: "some-resource"}, {Filename: "another-resource"}}
+			someString := "who reads these days"
+			reader = strings.NewReader(someString)
+			readerLength = int64(len([]byte(someString)))
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UploadApplicationPackage(appGUID, existingResources, reader, readerLength)
+		})
+
+		Context("when the upload returns an error", func() {
+			var err error
+
+			BeforeEach(func() {
+				err = errors.New("some-error")
+				fakeCloudControllerClient.UploadApplicationPackageReturns(ccv2.Job{}, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, err)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(err))
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+			})
+		})
+
+		Context("when polling errors", func() {
+			var err error
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.UploadApplicationPackageReturns(ccv2.Job{}, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+
+				err = errors.New("some-error")
+				fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"polling-warning"}, err)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(err))
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "polling-warning"))
+			})
+		})
+
+		Context("when the upload is successful", func() {
+			var returnedJob ccv2.Job
+
+			BeforeEach(func() {
+				returnedJob = ccv2.Job{GUID: "some-job-guid"}
+				fakeCloudControllerClient.UploadApplicationPackageReturns(returnedJob, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+				fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"polling-warning"}, nil)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "polling-warning"))
+
+				Expect(fakeCloudControllerClient.UploadApplicationPackageCallCount()).To(Equal(1))
+				passedAppGUID, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadApplicationPackageArgsForCall(0)
+				Expect(passedAppGUID).To(Equal(appGUID))
+				Expect(passedExistingResources).To(ConsistOf(ccv2.Resource{Filename: "some-resource"}, ccv2.Resource{Filename: "another-resource"}))
+				Expect(passedReader).To(Equal(reader))
+				Expect(passedReaderLength).To(Equal(readerLength))
+
+				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(returnedJob))
+			})
+		})
 	})
 
 	Describe("ZipResources", func() {
 		var (
-			srcDir string
-
 			resultZip  string
 			resources  []Resource
 			executeErr error
 		)
 
 		BeforeEach(func() {
-			var err error
-			srcDir, err = ioutil.TempDir("", "")
-			Expect(err).ToNot(HaveOccurred())
-
-			subDir := filepath.Join(srcDir, "level1", "level2")
-			err = os.MkdirAll(subDir, 0777)
-			Expect(err).ToNot(HaveOccurred())
-
-			err = ioutil.WriteFile(filepath.Join(subDir, "tmpFile1"), []byte("why hello"), 0600)
-			Expect(err).ToNot(HaveOccurred())
-
-			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile2"), []byte("Hello, Binky"), 0600)
-			Expect(err).ToNot(HaveOccurred())
-
-			err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
-			Expect(err).ToNot(HaveOccurred())
-
 			resources = []Resource{
 				{Filename: "level1"},
 				{Filename: "level1/level2"},

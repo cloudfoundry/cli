@@ -5,6 +5,62 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
+	log.Info("binding routes")
+
+	var boundRoutes bool
+	var allWarnings Warnings
+
+	for _, route := range config.DesiredRoutes {
+		if !actor.routeInList(route, config.CurrentRoutes) {
+			log.Debugf("binding route: %#v", route)
+			warnings, err := actor.bindRouteToApp(route, config.DesiredApplication.GUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				log.Errorln("binding route:", err)
+				return ApplicationConfig{}, false, allWarnings, err
+			}
+			boundRoutes = true
+		} else {
+			log.Debugf("route %s already bound to app", route)
+		}
+	}
+	log.Debug("binding routes complete")
+	config.CurrentRoutes = config.DesiredRoutes
+
+	return config, boundRoutes, allWarnings, nil
+}
+
+func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
+	log.Info("creating routes")
+
+	var routes []v2action.Route
+	var createdRoutes bool
+	var allWarnings Warnings
+
+	for _, route := range config.DesiredRoutes {
+		if route.GUID == "" {
+			log.Debugf("creating route: %#v", route)
+
+			createdRoute, warnings, err := actor.V2Actor.CreateRoute(route, false)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				log.Errorln("creating route:", err)
+				return ApplicationConfig{}, true, allWarnings, err
+			}
+			routes = append(routes, createdRoute)
+
+			createdRoutes = true
+		} else {
+			log.WithField("route", route).Debug("already exists, skipping")
+			routes = append(routes, route)
+		}
+	}
+	config.DesiredRoutes = routes
+
+	return config, createdRoutes, allWarnings, nil
+}
+
 // FindOrReturnPartialRoute finds the route with the given host and domain. If
 // it is unable to find the route, it will return back the partial route. When
 // the route exists in another space, RouteInDifferentSpaceError is returned.
@@ -64,6 +120,14 @@ func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceG
 		SpaceGUID: spaceGUID,
 	})
 	return route, append(Warnings(warnings), routeWarnings...), err
+}
+
+func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
+	warnings, err := actor.V2Actor.BindRouteToApplication(route.GUID, appGUID)
+	if _, ok := err.(v2action.RouteInDifferentSpaceError); ok {
+		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
+	}
+	return warnings, err
 }
 
 func (actor Actor) routeInList(route v2action.Route, routes []v2action.Route) bool {

@@ -2,6 +2,7 @@
 package pushactionfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
@@ -68,6 +69,19 @@ type FakeV2Actor struct {
 		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
+	}
+	GatherResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
+	gatherResourcesMutex       sync.RWMutex
+	gatherResourcesArgsForCall []struct {
+		sourceDir string
+	}
+	gatherResourcesReturns struct {
+		result1 []v2action.Resource
+		result2 error
+	}
+	gatherResourcesReturnsOnCall map[int]struct {
+		result1 []v2action.Resource
+		result2 error
 	}
 	GetApplicationByNameAndSpaceStub        func(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
@@ -145,6 +159,36 @@ type FakeV2Actor struct {
 		result1 v2action.Application
 		result2 v2action.Warnings
 		result3 error
+	}
+	UploadApplicationPackageStub        func(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Warnings, error)
+	uploadApplicationPackageMutex       sync.RWMutex
+	uploadApplicationPackageArgsForCall []struct {
+		appGUID            string
+		existingResources  []v2action.Resource
+		newResources       io.Reader
+		newResourcesLength int64
+	}
+	uploadApplicationPackageReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	uploadApplicationPackageReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	ZipResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
+	zipResourcesMutex       sync.RWMutex
+	zipResourcesArgsForCall []struct {
+		sourceDir      string
+		filesToInclude []v2action.Resource
+	}
+	zipResourcesReturns struct {
+		result1 string
+		result2 error
+	}
+	zipResourcesReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -363,6 +407,57 @@ func (fake *FakeV2Actor) CreateRouteReturnsOnCall(i int, result1 v2action.Route,
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GatherResources(sourceDir string) ([]v2action.Resource, error) {
+	fake.gatherResourcesMutex.Lock()
+	ret, specificReturn := fake.gatherResourcesReturnsOnCall[len(fake.gatherResourcesArgsForCall)]
+	fake.gatherResourcesArgsForCall = append(fake.gatherResourcesArgsForCall, struct {
+		sourceDir string
+	}{sourceDir})
+	fake.recordInvocation("GatherResources", []interface{}{sourceDir})
+	fake.gatherResourcesMutex.Unlock()
+	if fake.GatherResourcesStub != nil {
+		return fake.GatherResourcesStub(sourceDir)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.gatherResourcesReturns.result1, fake.gatherResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) GatherResourcesCallCount() int {
+	fake.gatherResourcesMutex.RLock()
+	defer fake.gatherResourcesMutex.RUnlock()
+	return len(fake.gatherResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) GatherResourcesArgsForCall(i int) string {
+	fake.gatherResourcesMutex.RLock()
+	defer fake.gatherResourcesMutex.RUnlock()
+	return fake.gatherResourcesArgsForCall[i].sourceDir
+}
+
+func (fake *FakeV2Actor) GatherResourcesReturns(result1 []v2action.Resource, result2 error) {
+	fake.GatherResourcesStub = nil
+	fake.gatherResourcesReturns = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) GatherResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
+	fake.GatherResourcesStub = nil
+	if fake.gatherResourcesReturnsOnCall == nil {
+		fake.gatherResourcesReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Resource
+			result2 error
+		})
+	}
+	fake.gatherResourcesReturnsOnCall[i] = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeV2Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error) {
@@ -637,6 +732,122 @@ func (fake *FakeV2Actor) UpdateApplicationReturnsOnCall(i int, result1 v2action.
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Warnings, error) {
+	var existingResourcesCopy []v2action.Resource
+	if existingResources != nil {
+		existingResourcesCopy = make([]v2action.Resource, len(existingResources))
+		copy(existingResourcesCopy, existingResources)
+	}
+	fake.uploadApplicationPackageMutex.Lock()
+	ret, specificReturn := fake.uploadApplicationPackageReturnsOnCall[len(fake.uploadApplicationPackageArgsForCall)]
+	fake.uploadApplicationPackageArgsForCall = append(fake.uploadApplicationPackageArgsForCall, struct {
+		appGUID            string
+		existingResources  []v2action.Resource
+		newResources       io.Reader
+		newResourcesLength int64
+	}{appGUID, existingResourcesCopy, newResources, newResourcesLength})
+	fake.recordInvocation("UploadApplicationPackage", []interface{}{appGUID, existingResourcesCopy, newResources, newResourcesLength})
+	fake.uploadApplicationPackageMutex.Unlock()
+	if fake.UploadApplicationPackageStub != nil {
+		return fake.UploadApplicationPackageStub(appGUID, existingResources, newResources, newResourcesLength)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.uploadApplicationPackageReturns.result1, fake.uploadApplicationPackageReturns.result2
+}
+
+func (fake *FakeV2Actor) UploadApplicationPackageCallCount() int {
+	fake.uploadApplicationPackageMutex.RLock()
+	defer fake.uploadApplicationPackageMutex.RUnlock()
+	return len(fake.uploadApplicationPackageArgsForCall)
+}
+
+func (fake *FakeV2Actor) UploadApplicationPackageArgsForCall(i int) (string, []v2action.Resource, io.Reader, int64) {
+	fake.uploadApplicationPackageMutex.RLock()
+	defer fake.uploadApplicationPackageMutex.RUnlock()
+	return fake.uploadApplicationPackageArgsForCall[i].appGUID, fake.uploadApplicationPackageArgsForCall[i].existingResources, fake.uploadApplicationPackageArgsForCall[i].newResources, fake.uploadApplicationPackageArgsForCall[i].newResourcesLength
+}
+
+func (fake *FakeV2Actor) UploadApplicationPackageReturns(result1 v2action.Warnings, result2 error) {
+	fake.UploadApplicationPackageStub = nil
+	fake.uploadApplicationPackageReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.UploadApplicationPackageStub = nil
+	if fake.uploadApplicationPackageReturnsOnCall == nil {
+		fake.uploadApplicationPackageReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.uploadApplicationPackageReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) ZipResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
+	var filesToIncludeCopy []v2action.Resource
+	if filesToInclude != nil {
+		filesToIncludeCopy = make([]v2action.Resource, len(filesToInclude))
+		copy(filesToIncludeCopy, filesToInclude)
+	}
+	fake.zipResourcesMutex.Lock()
+	ret, specificReturn := fake.zipResourcesReturnsOnCall[len(fake.zipResourcesArgsForCall)]
+	fake.zipResourcesArgsForCall = append(fake.zipResourcesArgsForCall, struct {
+		sourceDir      string
+		filesToInclude []v2action.Resource
+	}{sourceDir, filesToIncludeCopy})
+	fake.recordInvocation("ZipResources", []interface{}{sourceDir, filesToIncludeCopy})
+	fake.zipResourcesMutex.Unlock()
+	if fake.ZipResourcesStub != nil {
+		return fake.ZipResourcesStub(sourceDir, filesToInclude)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.zipResourcesReturns.result1, fake.zipResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) ZipResourcesCallCount() int {
+	fake.zipResourcesMutex.RLock()
+	defer fake.zipResourcesMutex.RUnlock()
+	return len(fake.zipResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) ZipResourcesArgsForCall(i int) (string, []v2action.Resource) {
+	fake.zipResourcesMutex.RLock()
+	defer fake.zipResourcesMutex.RUnlock()
+	return fake.zipResourcesArgsForCall[i].sourceDir, fake.zipResourcesArgsForCall[i].filesToInclude
+}
+
+func (fake *FakeV2Actor) ZipResourcesReturns(result1 string, result2 error) {
+	fake.ZipResourcesStub = nil
+	fake.zipResourcesReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) ZipResourcesReturnsOnCall(i int, result1 string, result2 error) {
+	fake.ZipResourcesStub = nil
+	if fake.zipResourcesReturnsOnCall == nil {
+		fake.zipResourcesReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.zipResourcesReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -648,6 +859,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.gatherResourcesMutex.RLock()
+	defer fake.gatherResourcesMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
@@ -658,6 +871,10 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getRouteByHostAndDomainMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
+	fake.uploadApplicationPackageMutex.RLock()
+	defer fake.uploadApplicationPackageMutex.RUnlock()
+	fake.zipResourcesMutex.RLock()
+	defer fake.zipResourcesMutex.RUnlock()
 	return fake.invocations
 }
 

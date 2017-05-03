@@ -45,6 +45,7 @@ type CloudControllerClient interface {
 	RemoveSpaceFromSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
+	UploadApplicationPackage(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error)
 
 	API() string
 	APIVersion() string
