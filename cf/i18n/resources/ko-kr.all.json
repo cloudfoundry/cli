@@ -6280,6 +6280,10 @@
     "translation": "구성에 기본값 쓰기"
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "Zip 아카이브에 빌드팩이 없음"
   },

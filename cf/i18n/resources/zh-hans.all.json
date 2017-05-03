@@ -6280,6 +6280,10 @@
     "translation": "将缺省值写入配置"
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "Zip 归档未包含 buildpack"
   },

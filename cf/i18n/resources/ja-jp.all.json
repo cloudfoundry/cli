@@ -6280,6 +6280,10 @@
     "translation": "デフォルト値を構成に書き込みます"
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "zip アーカイブにビルドパックが含まれていません"
   },

@@ -6280,6 +6280,10 @@
     "translation": "Ecrire les valeurs par défaut dans la configuration"
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "L'archive zip ne contient pas de pack de construction"
   },

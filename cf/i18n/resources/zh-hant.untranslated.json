@@ -588,6 +588,10 @@
     "translation": ""
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "[hidden]",
     "translation": ""
   },

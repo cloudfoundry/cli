@@ -12,6 +12,7 @@ import (
 //go:generate counterfeiter . SetHealthCheckActor
 type SetHealthCheckActor interface {
 	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type SetHealthCheckCommand struct {
@@ -39,7 +40,26 @@ func (cmd *SetHealthCheckCommand) Setup(config command.Config, ui command.UI) er
 }
 
 func (cmd *SetHealthCheckCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	var err error
+
+	switch cmd.RequiredArgs.HealthCheck.Type {
+	case "http":
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.47.0")
+		if err != nil {
+			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
+		}
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.68.0")
+		if err != nil {
+			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none", "process"}}
+		}
+	case "process":
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.47.0")
+		if err != nil {
+			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
+		}
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

@@ -6280,6 +6280,10 @@
     "translation": "Gravar valores padrão para a configuração"
   },
   {
+    "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
     "id": "Zip archive does not contain a buildpack",
     "translation": "O archive ZIP não contém um buildpack"
   },

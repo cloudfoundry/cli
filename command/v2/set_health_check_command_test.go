@@ -52,6 +52,8 @@ var _ = Describe("set-health-check Command", func() {
 		})
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
+
+		fakeActor.CloudControllerAPIVersionReturns("2.68.0")
 	})
 
 	JustBeforeEach(func() {
@@ -73,6 +75,74 @@ var _ = Describe("set-health-check Command", func() {
 
 			Expect(executeErr).To(MatchError(
 				command.NotLoggedInError{BinaryName: binaryName}))
+		})
+	})
+
+	Context("when the API version is below 2.47.0", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns("2.46.0")
+		})
+
+		Context("when the health-check-type 'process' is specified", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.HealthCheck.Type = "process"
+			})
+
+			It("returns the UnsupportedHealthCheckTypeError", func() {
+				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+					SupportedTypes: []string{"port", "none"},
+				}))
+			})
+		})
+
+		Context("when the health-check-type 'http' is specified", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.HealthCheck.Type = "http"
+			})
+
+			It("returns the UnsupportedHealthCheckTypeError", func() {
+				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+					SupportedTypes: []string{"port", "none"},
+				}))
+			})
+		})
+
+		Context("when a valid health-check-type is specified", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.HealthCheck.Type = "port"
+			})
+
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+		})
+	})
+
+	Context("when the API version is below 2.68.0", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns("2.67.0")
+		})
+
+		Context("when the health-check-type 'http' is specified", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.HealthCheck.Type = "http"
+			})
+
+			It("returns the UnsupportedHealthCheckTypeError", func() {
+				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+					SupportedTypes: []string{"port", "none", "process"},
+				}))
+			})
+		})
+
+		Context("when a valid health-check-type is specified", func() {
+			BeforeEach(func() {
+				cmd.RequiredArgs.HealthCheck.Type = "process"
+			})
+
+			It("does not error", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
 		})
 	})
 
