@@ -26,22 +26,28 @@ type AddPluginRepoCommand struct {
 func (cmd *AddPluginRepoCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	pluginClient := shared.NewClient(config, ui)
-	cmd.Actor = pluginaction.NewActor(config, pluginClient)
+	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui))
 	return nil
 }
 
 func (cmd AddPluginRepoCommand) Execute(args []string) error {
 	err := cmd.Actor.AddPluginRepository(cmd.RequiredArgs.PluginRepoName, cmd.RequiredArgs.PluginRepoURL)
-	if err != nil {
+	switch e := err.(type) {
+	case pluginaction.RepositoryAlreadyExistsError:
+		cmd.UI.DisplayTextWithFlavor("{{.RepositoryURL}} already registered as {{.RepositoryName}}",
+			map[string]interface{}{
+				"RepositoryName": e.Name,
+				"RepositoryURL":  e.URL,
+			})
+	case nil:
+		cmd.UI.DisplayTextWithFlavor("{{.RepositoryURL}} added as {{.RepositoryName}}",
+			map[string]interface{}{
+				"RepositoryName": cmd.RequiredArgs.PluginRepoName,
+				"RepositoryURL":  cmd.RequiredArgs.PluginRepoURL,
+			})
+	default:
 		return shared.HandleError(err)
 	}
-
-	cmd.UI.DisplayTextWithFlavor("{{.RepositoryURL}} added as '{{.RepositoryName}}'",
-		map[string]interface{}{
-			"RepositoryName": cmd.RequiredArgs.PluginRepoName,
-			"RepositoryURL":  cmd.RequiredArgs.PluginRepoURL,
-		})
 
 	return nil
 }

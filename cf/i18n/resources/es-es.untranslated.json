@@ -780,11 +780,11 @@
     "translation": ""
   },
   {
-    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
-    "translation": ""
+    "id": "{{.RepositoryURL}} added as {{.RepositoryName}}",
+    "translation": "{{.RepositoryURL}} added as {{.RepositoryName}}"
   },
   {
-    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
+    "id": "{{.RepositoryURL}} already registered as {{.RepositoryName}}",
     "translation": ""
   }
 ]

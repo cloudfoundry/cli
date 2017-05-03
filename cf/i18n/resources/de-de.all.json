@@ -7156,11 +7156,11 @@
     "translation": "{{.PropertyName}} sollte nicht null sein"
   },
   {
-    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
+    "id": "{{.RepositoryURL}} added as {{.RepositoryName}}",
     "translation": ""
   },
   {
-    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
+    "id": "{{.RepositoryURL}} already registered as {{.RepositoryName}}",
     "translation": ""
   },
   {

@@ -7156,11 +7156,11 @@
     "translation": "{{.PropertyName}}은(는) 널이 아니어야 합니다."
   },
   {
-    "id": "{{.RepositoryURL}} ({{.RepositoryName}}) already exists.",
+    "id": "{{.RepositoryURL}} added as {{.RepositoryName}}",
     "translation": ""
   },
   {
-    "id": "{{.RepositoryURL}} added as '{{.RepositoryName}}'",
+    "id": "{{.RepositoryURL}} already registered as {{.RepositoryName}}",
     "translation": ""
   },
   {
