@@ -30,9 +30,16 @@ func (actor Actor) GatherResources(sourceDir string) ([]Resource, error) {
 			return nil
 		}
 
-		resources = append(resources, Resource{
-			Filename: filepath.ToSlash(relPath),
-		})
+		if info.IsDir() {
+			resources = append(resources, Resource{
+				// An extra '/' indicates that this file is a directory
+				Filename: filepath.ToSlash(relPath) + "/",
+			})
+		} else {
+			resources = append(resources, Resource{
+				Filename: filepath.ToSlash(relPath),
+			})
+		}
 
 		return nil
 	})

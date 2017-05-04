@@ -53,8 +53,8 @@ var _ = Describe("Resource Actions", func() {
 
 			Expect(resources).To(Equal(
 				[]Resource{
-					{Filename: "level1"},
-					{Filename: "level1/level2"},
+					{Filename: "level1/"},
+					{Filename: "level1/level2/"},
 					{Filename: "level1/level2/tmpFile1"},
 					{Filename: "tmpFile2"},
 					{Filename: "tmpFile3"},
@@ -149,8 +149,8 @@ var _ = Describe("Resource Actions", func() {
 
 		BeforeEach(func() {
 			resources = []Resource{
-				{Filename: "level1"},
-				{Filename: "level1/level2"},
+				{Filename: "level1/"},
+				{Filename: "level1/level2/"},
 				{Filename: "level1/level2/tmpFile1"},
 				{Filename: "tmpFile2"},
 				{Filename: "tmpFile3"},
@@ -181,8 +181,8 @@ var _ = Describe("Resource Actions", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(reader.File).To(HaveLen(5))
-			Expect(reader.File[0].Name).To(Equal("level1"))
-			Expect(reader.File[1].Name).To(Equal("level1/level2"))
+			Expect(reader.File[0].Name).To(Equal("level1/"))
+			Expect(reader.File[1].Name).To(Equal("level1/level2/"))
 			Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
 			Expect(reader.File[3].Name).To(Equal("tmpFile2"))
 			Expect(reader.File[4].Name).To(Equal("tmpFile3"))
