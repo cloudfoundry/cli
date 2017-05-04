@@ -23,6 +23,19 @@ type FakeInstallPluginActor struct {
 		result1 string
 		result2 error
 	}
+	FetchPluginFromURLStub        func(url string) (string, error)
+	fetchPluginFromURLMutex       sync.RWMutex
+	fetchPluginFromURLArgsForCall []struct {
+		url string
+	}
+	fetchPluginFromURLReturns struct {
+		result1 string
+		result2 error
+	}
+	fetchPluginFromURLReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	FileExistsStub        func(path string) bool
 	fileExistsMutex       sync.RWMutex
 	fileExistsArgsForCall []struct {
@@ -49,6 +62,18 @@ type FakeInstallPluginActor struct {
 		result1 configv3.Plugin
 		result2 error
 	}
+	InstallPluginFromPathStub        func(path string, plugin configv3.Plugin) error
+	installPluginFromPathMutex       sync.RWMutex
+	installPluginFromPathArgsForCall []struct {
+		path   string
+		plugin configv3.Plugin
+	}
+	installPluginFromPathReturns struct {
+		result1 error
+	}
+	installPluginFromPathReturnsOnCall map[int]struct {
+		result1 error
+	}
 	IsPluginInstalledStub        func(pluginName string) bool
 	isPluginInstalledMutex       sync.RWMutex
 	isPluginInstalledArgsForCall []struct {
@@ -70,18 +95,6 @@ type FakeInstallPluginActor struct {
 		result1 error
 	}
 	uninstallPluginReturnsOnCall map[int]struct {
-		result1 error
-	}
-	InstallPluginFromPathStub        func(path string, plugin configv3.Plugin) error
-	installPluginFromPathMutex       sync.RWMutex
-	installPluginFromPathArgsForCall []struct {
-		path   string
-		plugin configv3.Plugin
-	}
-	installPluginFromPathReturns struct {
-		result1 error
-	}
-	installPluginFromPathReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -134,6 +147,57 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, res
 		})
 	}
 	fake.createExecutableCopyReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeInstallPluginActor) FetchPluginFromURL(url string) (string, error) {
+	fake.fetchPluginFromURLMutex.Lock()
+	ret, specificReturn := fake.fetchPluginFromURLReturnsOnCall[len(fake.fetchPluginFromURLArgsForCall)]
+	fake.fetchPluginFromURLArgsForCall = append(fake.fetchPluginFromURLArgsForCall, struct {
+		url string
+	}{url})
+	fake.recordInvocation("FetchPluginFromURL", []interface{}{url})
+	fake.fetchPluginFromURLMutex.Unlock()
+	if fake.FetchPluginFromURLStub != nil {
+		return fake.FetchPluginFromURLStub(url)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.fetchPluginFromURLReturns.result1, fake.fetchPluginFromURLReturns.result2
+}
+
+func (fake *FakeInstallPluginActor) FetchPluginFromURLCallCount() int {
+	fake.fetchPluginFromURLMutex.RLock()
+	defer fake.fetchPluginFromURLMutex.RUnlock()
+	return len(fake.fetchPluginFromURLArgsForCall)
+}
+
+func (fake *FakeInstallPluginActor) FetchPluginFromURLArgsForCall(i int) string {
+	fake.fetchPluginFromURLMutex.RLock()
+	defer fake.fetchPluginFromURLMutex.RUnlock()
+	return fake.fetchPluginFromURLArgsForCall[i].url
+}
+
+func (fake *FakeInstallPluginActor) FetchPluginFromURLReturns(result1 string, result2 error) {
+	fake.FetchPluginFromURLStub = nil
+	fake.fetchPluginFromURLReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeInstallPluginActor) FetchPluginFromURLReturnsOnCall(i int, result1 string, result2 error) {
+	fake.FetchPluginFromURLStub = nil
+	if fake.fetchPluginFromURLReturnsOnCall == nil {
+		fake.fetchPluginFromURLReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.fetchPluginFromURLReturnsOnCall[i] = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
@@ -240,6 +304,55 @@ func (fake *FakeInstallPluginActor) GetAndValidatePluginReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
+func (fake *FakeInstallPluginActor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
+	fake.installPluginFromPathMutex.Lock()
+	ret, specificReturn := fake.installPluginFromPathReturnsOnCall[len(fake.installPluginFromPathArgsForCall)]
+	fake.installPluginFromPathArgsForCall = append(fake.installPluginFromPathArgsForCall, struct {
+		path   string
+		plugin configv3.Plugin
+	}{path, plugin})
+	fake.recordInvocation("InstallPluginFromPath", []interface{}{path, plugin})
+	fake.installPluginFromPathMutex.Unlock()
+	if fake.InstallPluginFromPathStub != nil {
+		return fake.InstallPluginFromPathStub(path, plugin)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.installPluginFromPathReturns.result1
+}
+
+func (fake *FakeInstallPluginActor) InstallPluginFromPathCallCount() int {
+	fake.installPluginFromPathMutex.RLock()
+	defer fake.installPluginFromPathMutex.RUnlock()
+	return len(fake.installPluginFromPathArgsForCall)
+}
+
+func (fake *FakeInstallPluginActor) InstallPluginFromPathArgsForCall(i int) (string, configv3.Plugin) {
+	fake.installPluginFromPathMutex.RLock()
+	defer fake.installPluginFromPathMutex.RUnlock()
+	return fake.installPluginFromPathArgsForCall[i].path, fake.installPluginFromPathArgsForCall[i].plugin
+}
+
+func (fake *FakeInstallPluginActor) InstallPluginFromPathReturns(result1 error) {
+	fake.InstallPluginFromPathStub = nil
+	fake.installPluginFromPathReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, result1 error) {
+	fake.InstallPluginFromPathStub = nil
+	if fake.installPluginFromPathReturnsOnCall == nil {
+		fake.installPluginFromPathReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.installPluginFromPathReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeInstallPluginActor) IsPluginInstalled(pluginName string) bool {
 	fake.isPluginInstalledMutex.Lock()
 	ret, specificReturn := fake.isPluginInstalledReturnsOnCall[len(fake.isPluginInstalledArgsForCall)]
@@ -337,70 +450,23 @@ func (fake *FakeInstallPluginActor) UninstallPluginReturnsOnCall(i int, result1 
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
-	fake.installPluginFromPathMutex.Lock()
-	ret, specificReturn := fake.installPluginFromPathReturnsOnCall[len(fake.installPluginFromPathArgsForCall)]
-	fake.installPluginFromPathArgsForCall = append(fake.installPluginFromPathArgsForCall, struct {
-		path   string
-		plugin configv3.Plugin
-	}{path, plugin})
-	fake.recordInvocation("InstallPluginFromPath", []interface{}{path, plugin})
-	fake.installPluginFromPathMutex.Unlock()
-	if fake.InstallPluginFromPathStub != nil {
-		return fake.InstallPluginFromPathStub(path, plugin)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.installPluginFromPathReturns.result1
-}
-
-func (fake *FakeInstallPluginActor) InstallPluginFromPathCallCount() int {
-	fake.installPluginFromPathMutex.RLock()
-	defer fake.installPluginFromPathMutex.RUnlock()
-	return len(fake.installPluginFromPathArgsForCall)
-}
-
-func (fake *FakeInstallPluginActor) InstallPluginFromPathArgsForCall(i int) (string, configv3.Plugin) {
-	fake.installPluginFromPathMutex.RLock()
-	defer fake.installPluginFromPathMutex.RUnlock()
-	return fake.installPluginFromPathArgsForCall[i].path, fake.installPluginFromPathArgsForCall[i].plugin
-}
-
-func (fake *FakeInstallPluginActor) InstallPluginFromPathReturns(result1 error) {
-	fake.InstallPluginFromPathStub = nil
-	fake.installPluginFromPathReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, result1 error) {
-	fake.InstallPluginFromPathStub = nil
-	if fake.installPluginFromPathReturnsOnCall == nil {
-		fake.installPluginFromPathReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.installPluginFromPathReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.createExecutableCopyMutex.RLock()
 	defer fake.createExecutableCopyMutex.RUnlock()
+	fake.fetchPluginFromURLMutex.RLock()
+	defer fake.fetchPluginFromURLMutex.RUnlock()
 	fake.fileExistsMutex.RLock()
 	defer fake.fileExistsMutex.RUnlock()
 	fake.getAndValidatePluginMutex.RLock()
 	defer fake.getAndValidatePluginMutex.RUnlock()
+	fake.installPluginFromPathMutex.RLock()
+	defer fake.installPluginFromPathMutex.RUnlock()
 	fake.isPluginInstalledMutex.RLock()
 	defer fake.isPluginInstalledMutex.RUnlock()
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
-	fake.installPluginFromPathMutex.RLock()
-	defer fake.installPluginFromPathMutex.RUnlock()
 	return fake.invocations
 }
 

@@ -58,5 +58,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("HealthCheckTypeUnsupportedError", HealthCheckTypeUnsupportedError{
 			SupportedTypes: []string{"some-type", "another-type"},
 		}),
+
+		// URL scheme errors.
+		Entry("UnsupportedURLSchemeError", UnsupportedURLSchemeError{}),
 	)
 })

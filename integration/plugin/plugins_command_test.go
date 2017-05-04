@@ -173,8 +173,10 @@ var _ = Describe("plugins command", func() {
 			})
 
 			Context("when there is 1 repository", func() {
-				var server1 *Server
-				var server1URL string
+				var (
+					server1    *Server
+					server1URL string
+				)
 
 				BeforeEach(func() {
 					// TODO:  How can we get this to work with a TLS server instead of clear?
