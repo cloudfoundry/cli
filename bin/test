@@ -12,6 +12,8 @@ function printStatus {
 
 trap printStatus EXIT
 
+go version
+
 bin/i18n-checkup
 
 echo -e "\n Cleaning build artifacts..."
@@ -39,6 +41,8 @@ for file in $(find {actor,command,cf,plugin,util} \( -name "*.go" -not -iname "*
 do
   go tool vet -all -shadow=true $file
 done
+
+ginkgo version
 
 CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration $@
 
