@@ -368,6 +368,10 @@
     "translation": "Anwendungsinstanzindex"
   },
   {
+    "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Application lifecycle:",
     "translation": "Anwendungslebenszyklus:"
   },

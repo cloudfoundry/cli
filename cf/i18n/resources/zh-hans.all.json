@@ -368,6 +368,10 @@
     "translation": "应用程序实例索引"
   },
   {
+    "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Application lifecycle:",
     "translation": "应用程序生命周期:"
   },

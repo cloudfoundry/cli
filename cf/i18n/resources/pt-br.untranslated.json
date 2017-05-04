@@ -28,6 +28,10 @@
     "translation": ""
   },
   {
+    "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
     "translation": ""
   },

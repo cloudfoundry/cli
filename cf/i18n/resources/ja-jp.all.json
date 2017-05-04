@@ -368,6 +368,10 @@
     "translation": "アプリケーション・インスタンスの索引"
   },
   {
+    "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Application lifecycle:",
     "translation": "アプリケーション・ライフサイクル:"
   },
