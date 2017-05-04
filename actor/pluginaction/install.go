@@ -90,18 +90,17 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 	return executablePath, nil
 }
 
-// FileExists returns true if the file exists. It returns false if the file
-// doesn't exist or there is an error checking.
-func (_ Actor) FileExists(path string) bool {
-	if _, err := os.Stat(path); err == nil {
-		return true
-	}
-	return false
+// FetchPluginFromURL fetches a plugin binary from the specified URL, if
+// it exists.
+func (actor Actor) FetchPluginFromURL(path string) (string, error) {
+	return "", nil
 }
 
-func (actor Actor) IsPluginInstalled(pluginName string) bool {
-	_, isInstalled := actor.config.GetPlugin(pluginName)
-	return isInstalled
+// FileExists returns true if the file exists. It returns false if the file
+// doesn't exist or there is an error checking.
+func (actor Actor) FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
@@ -186,4 +185,9 @@ func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) er
 	}
 
 	return nil
+}
+
+func (actor Actor) IsPluginInstalled(pluginName string) bool {
+	_, isInstalled := actor.config.GetPlugin(pluginName)
+	return isInstalled
 }
