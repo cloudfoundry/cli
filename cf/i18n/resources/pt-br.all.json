@@ -368,6 +368,10 @@
     "translation": "Índice da instância do aplicativo"
   },
   {
+    "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Application lifecycle:",
     "translation": "Ciclo de vida do aplicativo:"
   },

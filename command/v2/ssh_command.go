@@ -10,7 +10,7 @@ import (
 
 type SSHCommand struct {
 	RequiredArgs        flag.AppName `positional-args:"yes"`
-	AppInstanceIndex    int          `long:"app-instance-index" short:"i" description:"Application instance index"`
+	AppInstanceIndex    int          `long:"app-instance-index" short:"i" description:"Application instance index (Default: 0)"`
 	Command             string       `long:"command" short:"c" description:"Command to run. This flag can be defined more than once."`
 	DisablePseudoTTY    bool         `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
 	ForcePseudoTTY      bool         `long:"force-pseudo-tty" description:"Force pseudo-tty allocation"`
