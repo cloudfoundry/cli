@@ -265,7 +265,7 @@
 			"importpath": "github.com/onsi/ginkgo",
 			"repository": "https://github.com/onsi/ginkgo",
 			"vcs": "git",
-			"revision": "5ca121185e255e5041d7727d77992618545a93d2",
+			"revision": "83438ca4278f2f56757b9ab2cb15dd4f596d84e8",
 			"branch": "master",
 			"notests": true
 		},
@@ -273,7 +273,7 @@
 			"importpath": "github.com/onsi/gomega",
 			"repository": "https://github.com/onsi/gomega",
 			"vcs": "git",
-			"revision": "1de7ab2df9105aa5c15c4d7e14a8a514e3cb8d4b",
+			"revision": "da367351331c75190afec7ed3a0c61e0016942ed",
 			"branch": "master",
 			"notests": true
 		},
