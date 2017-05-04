@@ -124,7 +124,7 @@ func findFirstMismatch(a, b string) int {
 	bSlice := strings.Split(b, "")
 
 	for index, str := range aSlice {
-		if index > len(b)-1 {
+		if index > len(b) - 1 {
 			return index
 		}
 		if str != bSlice[index] {
@@ -255,7 +255,7 @@ func formatValue(value reflect.Value, indentation uint) string {
 	case reflect.Map:
 		return formatMap(value, indentation)
 	case reflect.Struct:
-		if value.Type() == timeType {
+		if value.Type() == timeType && value.CanInterface() {
 			t, _ := value.Interface().(time.Time)
 			return t.Format(time.RFC3339Nano)
 		}
