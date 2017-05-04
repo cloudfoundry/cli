@@ -216,52 +216,6 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("UpdateApplication", func() {
-		Context("when the update is successful", func() {
-			var expectedApp ccv2.Application
-			BeforeEach(func() {
-				expectedApp = ccv2.Application{
-					GUID:      "some-app-guid",
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
-				}
-				fakeCloudControllerClient.UpdateApplicationReturns(expectedApp, ccv2.Warnings{"some-app-warning-1"}, nil)
-			})
-
-			It("updates and returns the application", func() {
-				newApp := Application{
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
-				}
-				app, warnings, err := actor.UpdateApplication(newApp)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("some-app-warning-1"))
-				Expect(app).To(Equal(Application(expectedApp)))
-
-				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(ccv2.Application(newApp)))
-			})
-		})
-
-		Context("when the client returns back an error", func() {
-			var expectedErr error
-			BeforeEach(func() {
-				expectedErr = errors.New("some update app error")
-				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"some-app-warning-1"}, expectedErr)
-			})
-
-			It("returns warnings and an error", func() {
-				newApp := Application{
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
-				}
-				_, warnings, err := actor.UpdateApplication(newApp)
-				Expect(warnings).To(ConsistOf("some-app-warning-1"))
-				Expect(err).To(MatchError(expectedErr))
-			})
-		})
-	})
-
 	Describe("GetApplication", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
@@ -297,70 +251,6 @@ var _ = Describe("Application Actions", func() {
 			It("returns an ApplicationNotFoundError", func() {
 				_, _, err := actor.GetApplication("some-app-guid")
 				Expect(err).To(MatchError(ApplicationNotFoundError{GUID: "some-app-guid"}))
-			})
-		})
-	})
-
-	Describe("GetApplicationsBySpace", func() {
-		Context("when the there are applications in the space", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv2.Application{
-						{
-							GUID: "some-app-guid-1",
-							Name: "some-app-1",
-						},
-						{
-							GUID: "some-app-guid-2",
-							Name: "some-app-2",
-						},
-					},
-					ccv2.Warnings{"warning-1", "warning-2"},
-					nil,
-				)
-			})
-
-			It("returns the application and warnings", func() {
-				apps, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(apps).To(ConsistOf(
-					Application{
-						GUID: "some-app-guid-1",
-						Name: "some-app-1",
-					},
-					Application{
-						GUID: "some-app-guid-2",
-						Name: "some-app-2",
-					},
-				))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-
-				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Query{
-					ccv2.Query{
-						Filter:   ccv2.SpaceGUIDFilter,
-						Operator: ccv2.EqualOperator,
-						Value:    "some-space-guid",
-					},
-				}))
-			})
-		})
-
-		Context("when the cloud controller client returns an error", func() {
-			var expectedError error
-
-			BeforeEach(func() {
-				expectedError = errors.New("some cc error")
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv2.Application{},
-					ccv2.Warnings{"warning-1", "warning-2"},
-					expectedError)
-			})
-
-			It("returns the error and warnings", func() {
-				_, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(err).To(MatchError(expectedError))
 			})
 		})
 	})
@@ -431,6 +321,70 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("GetApplicationsBySpace", func() {
+		Context("when the there are applications in the space", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{
+						{
+							GUID: "some-app-guid-1",
+							Name: "some-app-1",
+						},
+						{
+							GUID: "some-app-guid-2",
+							Name: "some-app-2",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns the application and warnings", func() {
+				apps, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(apps).To(ConsistOf(
+					Application{
+						GUID: "some-app-guid-1",
+						Name: "some-app-1",
+					},
+					Application{
+						GUID: "some-app-guid-2",
+						Name: "some-app-2",
+					},
+				))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Query{
+					ccv2.Query{
+						Filter:   ccv2.SpaceGUIDFilter,
+						Operator: ccv2.EqualOperator,
+						Value:    "some-space-guid",
+					},
+				}))
+			})
+		})
+
+		Context("when the cloud controller client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("some cc error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedError)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.GetApplicationsBySpace("some-space-guid")
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(err).To(MatchError(expectedError))
+			})
+		})
+	})
+
 	Describe("GetRouteApplications", func() {
 		Context("when the CC client returns no errors", func() {
 			BeforeEach(func() {
@@ -488,6 +442,183 @@ var _ = Describe("Application Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 				_, query := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
 				Expect(query).To(Equal(expectedQuery))
+			})
+		})
+	})
+
+	Describe("SetApplicationHealthCheckTypeByNameAndSpace", func() {
+		Context("when setting an http endpoint with a health check that is not http", func() {
+			It("returns an http health check invalid error", func() {
+				_, _, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+					"some-app", "some-space-guid", "some-health-check-type", "/foo")
+				Expect(err).To(MatchError(HTTPHealthCheckInvalidError{}))
+			})
+		})
+
+		Context("when the app exists", func() {
+			Context("when the desired health check type is different", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturns(
+						[]ccv2.Application{
+							{GUID: "some-app-guid"},
+						},
+						ccv2.Warnings{"get application warning"},
+						nil,
+					)
+					fakeCloudControllerClient.UpdateApplicationReturns(
+						ccv2.Application{
+							GUID:            "some-app-guid",
+							HealthCheckType: "process",
+						},
+						ccv2.Warnings{"update warnings"},
+						nil,
+					)
+				})
+
+				It("sets the desired health check type and returns the warnings", func() {
+					returnedApp, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+						"some-app", "some-space-guid", "process", "/")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
+
+					Expect(returnedApp).To(Equal(Application{
+						GUID:            "some-app-guid",
+						HealthCheckType: "process",
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(app).To(Equal(ccv2.Application{
+						GUID:            "some-app-guid",
+						HealthCheckType: "process",
+					}))
+				})
+			})
+
+			Context("when the desired health check type is 'http'", func() {
+				Context("when the desired http endpoint is already set", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationsReturns(
+							[]ccv2.Application{
+								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
+							},
+							ccv2.Warnings{"get application warning"},
+							nil,
+						)
+					})
+
+					It("does not send the update", func() {
+						_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+							"some-app", "some-space-guid", "http", "/")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("get application warning"))
+
+						Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the desired http endpoint is not set", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationsReturns(
+							[]ccv2.Application{
+								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
+							},
+							ccv2.Warnings{"get application warning"},
+							nil,
+						)
+						fakeCloudControllerClient.UpdateApplicationReturns(
+							ccv2.Application{},
+							ccv2.Warnings{"update warnings"},
+							nil,
+						)
+					})
+
+					It("sets the desired health check type and returns the warnings", func() {
+						_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+							"some-app", "some-space-guid", "http", "/v2/anything")
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+						app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+						Expect(app).To(Equal(ccv2.Application{
+							GUID:                    "some-app-guid",
+							HealthCheckType:         "http",
+							HealthCheckHTTPEndpoint: "/v2/anything",
+						}))
+
+						Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
+					})
+				})
+			})
+
+			Context("when the application health check type is already set to the desired type", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationsReturns(
+						[]ccv2.Application{
+							{
+								GUID:            "some-app-guid",
+								HealthCheckType: "process",
+							},
+						},
+						ccv2.Warnings{"get application warning"},
+						nil,
+					)
+				})
+
+				It("does not update the health check type", func() {
+					returnedApp, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+						"some-app", "some-space-guid", "process", "/")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get application warning"))
+					Expect(returnedApp).To(Equal(Application{
+						GUID:            "some-app-guid",
+						HealthCheckType: "process",
+					}))
+
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Context("when getting the application returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{}, ccv2.Warnings{"get application warning"}, errors.New("get application error"))
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+					"some-app", "some-space-guid", "process", "/")
+
+				Expect(warnings).To(ConsistOf("get application warning"))
+				Expect(err).To(MatchError("get application error"))
+			})
+		})
+
+		Context("when updating the application returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("foo bar")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv2.Warnings{"get application warning"},
+					nil,
+				)
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv2.Application{},
+					ccv2.Warnings{"update warnings"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
+					"some-app", "some-space-guid", "process", "/")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
 			})
 		})
 	})
@@ -855,179 +986,48 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("SetApplicationHealthCheckTypeByNameAndSpace", func() {
-		Context("when setting an http endpoint with a health check that is not http", func() {
-			It("returns an http health check invalid error", func() {
-				_, _, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-					"some-app", "some-space-guid", "some-health-check-type", "/foo")
-				Expect(err).To(MatchError(HTTPHealthCheckInvalidError{}))
-			})
-		})
-
-		Context("when the app exists", func() {
-			Context("when the desired health check type is different", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv2.Application{
-							{GUID: "some-app-guid"},
-						},
-						ccv2.Warnings{"get application warning"},
-						nil,
-					)
-					fakeCloudControllerClient.UpdateApplicationReturns(
-						ccv2.Application{
-							GUID:            "some-app-guid",
-							HealthCheckType: "process",
-						},
-						ccv2.Warnings{"update warnings"},
-						nil,
-					)
-				})
-
-				It("sets the desired health check type and returns the warnings", func() {
-					returnedApp, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-						"some-app", "some-space-guid", "process", "/")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
-
-					Expect(returnedApp).To(Equal(Application{
-						GUID:            "some-app-guid",
-						HealthCheckType: "process",
-					}))
-
-					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
-						GUID:            "some-app-guid",
-						HealthCheckType: "process",
-					}))
-				})
-			})
-
-			Context("when the desired health check type is 'http'", func() {
-				Context("when the desired http endpoint is already set", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv2.Application{
-								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
-							},
-							ccv2.Warnings{"get application warning"},
-							nil,
-						)
-					})
-
-					It("does not send the update", func() {
-						_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-							"some-app", "some-space-guid", "http", "/")
-						Expect(err).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("get application warning"))
-
-						Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))
-					})
-				})
-
-				Context("when the desired http endpoint is not set", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationsReturns(
-							[]ccv2.Application{
-								{GUID: "some-app-guid", HealthCheckType: "http", HealthCheckHTTPEndpoint: "/"},
-							},
-							ccv2.Warnings{"get application warning"},
-							nil,
-						)
-						fakeCloudControllerClient.UpdateApplicationReturns(
-							ccv2.Application{},
-							ccv2.Warnings{"update warnings"},
-							nil,
-						)
-					})
-
-					It("sets the desired health check type and returns the warnings", func() {
-						_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-							"some-app", "some-space-guid", "http", "/v2/anything")
-						Expect(err).ToNot(HaveOccurred())
-
-						Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-						app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-						Expect(app).To(Equal(ccv2.Application{
-							GUID:                    "some-app-guid",
-							HealthCheckType:         "http",
-							HealthCheckHTTPEndpoint: "/v2/anything",
-						}))
-
-						Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
-					})
-				})
-			})
-
-			Context("when the application health check type is already set to the desired type", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationsReturns(
-						[]ccv2.Application{
-							{
-								GUID:            "some-app-guid",
-								HealthCheckType: "process",
-							},
-						},
-						ccv2.Warnings{"get application warning"},
-						nil,
-					)
-				})
-
-				It("does not update the health check type", func() {
-					returnedApp, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-						"some-app", "some-space-guid", "process", "/")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("get application warning"))
-					Expect(returnedApp).To(Equal(Application{
-						GUID:            "some-app-guid",
-						HealthCheckType: "process",
-					}))
-
-					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(0))
-				})
-			})
-		})
-
-		Context("when getting the application returns an error", func() {
+	Describe("UpdateApplication", func() {
+		Context("when the update is successful", func() {
+			var expectedApp ccv2.Application
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv2.Application{}, ccv2.Warnings{"get application warning"}, errors.New("get application error"))
+				expectedApp = ccv2.Application{
+					GUID:      "some-app-guid",
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				fakeCloudControllerClient.UpdateApplicationReturns(expectedApp, ccv2.Warnings{"some-app-warning-1"}, nil)
 			})
 
-			It("returns the error and warnings", func() {
-				_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-					"some-app", "some-space-guid", "process", "/")
+			It("updates and returns the application", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				app, warnings, err := actor.UpdateApplication(newApp)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
+				Expect(app).To(Equal(Application(expectedApp)))
 
-				Expect(warnings).To(ConsistOf("get application warning"))
-				Expect(err).To(MatchError("get application error"))
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(ccv2.Application(newApp)))
 			})
 		})
 
-		Context("when updating the application returns an error", func() {
+		Context("when the client returns back an error", func() {
 			var expectedErr error
-
 			BeforeEach(func() {
-				expectedErr = errors.New("foo bar")
-				fakeCloudControllerClient.GetApplicationsReturns(
-					[]ccv2.Application{
-						{GUID: "some-app-guid"},
-					},
-					ccv2.Warnings{"get application warning"},
-					nil,
-				)
-				fakeCloudControllerClient.UpdateApplicationReturns(
-					ccv2.Application{},
-					ccv2.Warnings{"update warnings"},
-					expectedErr,
-				)
+				expectedErr = errors.New("some update app error")
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"some-app-warning-1"}, expectedErr)
 			})
 
-			It("returns the error and warnings", func() {
-				_, warnings, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
-					"some-app", "some-space-guid", "process", "/")
+			It("returns warnings and an error", func() {
+				newApp := Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}
+				_, warnings, err := actor.UpdateApplication(newApp)
+				Expect(warnings).To(ConsistOf("some-app-warning-1"))
 				Expect(err).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("get application warning", "update warnings"))
 			})
 		})
 	})

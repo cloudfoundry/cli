@@ -8,59 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-// Application represents an application.
-type Application ccv2.Application
-
-// CalculatedBuildpack returns the buildpack that will be used.
-func (application Application) CalculatedBuildpack() string {
-	if application.Buildpack != "" {
-		return application.Buildpack
-	}
-
-	return application.DetectedBuildpack
-}
-
-// CalculatedHealthCheckEndpoint returns the health check endpoint.
-// If the health check type is not http it will return the empty string.
-func (application Application) CalculatedHealthCheckEndpoint() string {
-	if application.HealthCheckType == "http" {
-		return application.HealthCheckHTTPEndpoint
-	}
-
-	return ""
-}
-
-// StagingCompleted returns true if the application has been staged.
-func (application Application) StagingCompleted() bool {
-	return application.PackageState == ccv2.ApplicationPackageStaged
-}
-
-// StagingFailed returns true if staging the application failed.
-func (application Application) StagingFailed() bool {
-	return application.PackageState == ccv2.ApplicationPackageFailed
-}
-
-// StagingFailedNoAppDetected returns true when the staging failed due to a
-// NoAppDetectedError.
-func (application Application) StagingFailedNoAppDetected() bool {
-	return application.StagingFailedReason == "NoAppDetectedError"
-}
-
-// Started returns true when the application is started.
-func (application Application) Started() bool {
-	return application.State == ccv2.ApplicationStarted
-}
-
-// StagingFailedMessage returns the verbose description of the failure or
-// the reason if the verbose description is empty.
-func (application Application) StagingFailedMessage() string {
-	if application.StagingFailedDescription != "" {
-		return application.StagingFailedDescription
-	}
-
-	return application.StagingFailedReason
-}
-
 // ApplicationInstanceCrashedError is returned when an instance crashes.
 type ApplicationInstanceCrashedError struct {
 	Name string
@@ -142,13 +89,66 @@ func (e StartupTimeoutError) Error() string {
 	return fmt.Sprintf("Timed out waiting for application '%s' to start", e.Name)
 }
 
+// Application represents an application.
+type Application ccv2.Application
+
+// CalculatedBuildpack returns the buildpack that will be used.
+func (application Application) CalculatedBuildpack() string {
+	if application.Buildpack != "" {
+		return application.Buildpack
+	}
+
+	return application.DetectedBuildpack
+}
+
+// CalculatedHealthCheckEndpoint returns the health check endpoint.
+// If the health check type is not http it will return the empty string.
+func (application Application) CalculatedHealthCheckEndpoint() string {
+	if application.HealthCheckType == "http" {
+		return application.HealthCheckHTTPEndpoint
+	}
+
+	return ""
+}
+
+// StagingCompleted returns true if the application has been staged.
+func (application Application) StagingCompleted() bool {
+	return application.PackageState == ccv2.ApplicationPackageStaged
+}
+
+// StagingFailed returns true if staging the application failed.
+func (application Application) StagingFailed() bool {
+	return application.PackageState == ccv2.ApplicationPackageFailed
+}
+
+// StagingFailedMessage returns the verbose description of the failure or
+// the reason if the verbose description is empty.
+func (application Application) StagingFailedMessage() string {
+	if application.StagingFailedDescription != "" {
+		return application.StagingFailedDescription
+	}
+
+	return application.StagingFailedReason
+}
+
+// StagingFailedNoAppDetected returns true when the staging failed due to a
+// NoAppDetectedError.
+func (application Application) StagingFailedNoAppDetected() bool {
+	return application.StagingFailedReason == "NoAppDetectedError"
+}
+
+// Started returns true when the application is started.
+func (application Application) Started() bool {
+	return application.State == ccv2.ApplicationStarted
+}
+
 // CreateApplication creates an application.
 func (actor Actor) CreateApplication(application Application) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.CreateApplication(ccv2.Application(application))
 	return Application(app), Warnings(warnings), err
 }
 
-// GetApplication returns the application
+// GetApplication returns the application.
 func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplication(guid)
 
@@ -157,28 +157,6 @@ func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	}
 
 	return Application(app), Warnings(warnings), err
-}
-
-// GetApplicationsBySpace returns all applications in a space.
-func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
-	ccv2Apps, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
-		ccv2.Query{
-			Filter:   ccv2.SpaceGUIDFilter,
-			Operator: ccv2.EqualOperator,
-			Value:    spaceGUID,
-		},
-	})
-
-	if err != nil {
-		return []Application{}, Warnings(warnings), err
-	}
-
-	apps := make([]Application, len(ccv2Apps))
-	for i, ccv2App := range ccv2Apps {
-		apps[i] = Application(ccv2App)
-	}
-
-	return apps, Warnings(warnings), nil
 }
 
 // GetApplicationByNameAndSpace returns an application with matching name in
@@ -210,6 +188,28 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 	return Application(app[0]), Warnings(warnings), nil
 }
 
+// GetApplicationsBySpace returns all applications in a space.
+func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
+	ccv2Apps, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
+		ccv2.Query{
+			Filter:   ccv2.SpaceGUIDFilter,
+			Operator: ccv2.EqualOperator,
+			Value:    spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return []Application{}, Warnings(warnings), err
+	}
+
+	apps := make([]Application, len(ccv2Apps))
+	for i, ccv2App := range ccv2Apps {
+		apps[i] = Application(ccv2App)
+	}
+
+	return apps, Warnings(warnings), nil
+}
+
 // GetRouteApplications returns a list of apps associated with the provided
 // Route GUID.
 func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([]Application, Warnings, error) {
@@ -222,6 +222,42 @@ func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([
 		allApplications = append(allApplications, Application(app))
 	}
 	return allApplications, Warnings(warnings), nil
+}
+
+// SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
+// check type if it is not already the desired type.
+func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
+	if httpEndpoint != "/" && healthCheckType != "http" {
+		return Application{}, nil, HTTPHealthCheckInvalidError{}
+	}
+
+	var allWarnings Warnings
+
+	app, warnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+
+	if app.HealthCheckType != healthCheckType ||
+		healthCheckType == "http" && app.HealthCheckHTTPEndpoint != httpEndpoint {
+		var healthCheckHttpEndpoint string
+		if healthCheckType == "http" {
+			healthCheckHttpEndpoint = httpEndpoint
+		}
+
+		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			GUID:                    app.GUID,
+			HealthCheckType:         healthCheckType,
+			HealthCheckHTTPEndpoint: healthCheckHttpEndpoint,
+		})
+
+		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
+		return Application(updatedApp), allWarnings, err
+	}
+
+	return app, allWarnings, nil
 }
 
 // StartApplication starts a given application.
@@ -270,6 +306,12 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 	}()
 
 	return messages, logErrs, appStarting, allWarnings, errs
+}
+
+// UpdateApplication updates an application.
+func (actor Actor) UpdateApplication(application Application) (Application, Warnings, error) {
+	app, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application(application))
+	return Application(app), Warnings(warnings), err
 }
 
 func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<- string) error {
@@ -321,46 +363,4 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 	}
 
 	return StartupTimeoutError{Name: app.Name}
-}
-
-// SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
-// check type if it is not already the desired type.
-func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
-	if httpEndpoint != "/" && healthCheckType != "http" {
-		return Application{}, nil, HTTPHealthCheckInvalidError{}
-	}
-
-	var allWarnings Warnings
-
-	app, warnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-
-	if err != nil {
-		return Application{}, allWarnings, err
-	}
-
-	if app.HealthCheckType != healthCheckType ||
-		healthCheckType == "http" && app.HealthCheckHTTPEndpoint != httpEndpoint {
-		var healthCheckHttpEndpoint string
-		if healthCheckType == "http" {
-			healthCheckHttpEndpoint = httpEndpoint
-		}
-
-		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
-			GUID:                    app.GUID,
-			HealthCheckType:         healthCheckType,
-			HealthCheckHTTPEndpoint: healthCheckHttpEndpoint,
-		})
-
-		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
-		return Application(updatedApp), allWarnings, err
-	}
-
-	return app, allWarnings, nil
-}
-
-// UpdateApplication updates an application.
-func (actor Actor) UpdateApplication(application Application) (Application, Warnings, error) {
-	app, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application(application))
-	return Application(app), Warnings(warnings), err
 }
