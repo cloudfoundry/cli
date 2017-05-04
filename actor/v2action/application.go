@@ -260,8 +260,9 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 	return app, allWarnings, nil
 }
 
-// StartApplication starts a given application.
-func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+// RestartApplication restarts a given application. If already stopped, no stop
+// call will be sent.
+func (actor Actor) RestartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
 	appStarting := make(chan bool)
@@ -272,6 +273,21 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 		defer close(allWarnings)
 		defer close(errs)
 		defer client.Close()
+
+		if app.Started() {
+			_, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+				GUID:  app.GUID,
+				State: ccv2.ApplicationStopped,
+			})
+
+			for _, warning := range warnings {
+				allWarnings <- warning
+			}
+			if err != nil {
+				errs <- err
+				return
+			}
+		}
 
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,

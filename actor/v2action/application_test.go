@@ -623,7 +623,7 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("StartApplication", func() {
+	Describe("RestartApplication", func() {
 		var (
 			app            Application
 			fakeNOAAClient *v2actionfakes.FakeNOAAClient
@@ -648,6 +648,7 @@ var _ = Describe("Application Actions", func() {
 				GUID:      "some-app-guid",
 				Name:      "some-app",
 				Instances: 2,
+				State:     ccv2.ApplicationStopped,
 			}
 
 			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
@@ -709,6 +710,10 @@ var _ = Describe("Application Actions", func() {
 			}
 		})
 
+		JustBeforeEach(func() {
+			messages, logErrs, appStarting, warnings, errs = actor.RestartApplication(app, fakeNOAAClient, fakeConfig)
+		})
+
 		AfterEach(func() {
 			Eventually(messages).Should(BeClosed())
 			Eventually(logErrs).Should(BeClosed())
@@ -717,28 +722,63 @@ var _ = Describe("Application Actions", func() {
 			Eventually(errs).Should(BeClosed())
 		})
 
-		It("starts and polls for an app instance", func() {
-			messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+		Context("when the app is already running", func() {
+			BeforeEach(func() {
+				app.State = ccv2.ApplicationStarted
+			})
 
-			Eventually(warnings).Should(Receive(Equal("update-warning")))
-			Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-			Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
-			Eventually(appStarting).Should(Receive(BeTrue()))
-			Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-			Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+			It("stops, starts and polls for an app instance", func() {
+				Eventually(warnings).Should(Receive(Equal("update-warning")))
+				Eventually(warnings).Should(Receive(Equal("update-warning")))
+				Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+				Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+				Eventually(appStarting).Should(Receive(BeTrue()))
+				Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+				Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
 
-			Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
 
-			Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-			app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-			Expect(app).To(Equal(ccv2.Application{
-				GUID:  "some-app-guid",
-				State: ccv2.ApplicationStarted,
-			}))
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(2))
+				app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+				Expect(app).To(Equal(ccv2.Application{
+					GUID:  "some-app-guid",
+					State: ccv2.ApplicationStopped,
+				}))
 
-			Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
-			Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
-			Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
+				app = fakeCloudControllerClient.UpdateApplicationArgsForCall(1)
+				Expect(app).To(Equal(ccv2.Application{
+					GUID:  "some-app-guid",
+					State: ccv2.ApplicationStarted,
+				}))
+
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+				Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
+			})
+		})
+
+		Context("when the app is not running", func() {
+			It("starts and polls for an app instance", func() {
+				Eventually(warnings).Should(Receive(Equal("update-warning")))
+				Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+				Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+				Eventually(appStarting).Should(Receive(BeTrue()))
+				Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+				Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+				app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+				Expect(app).To(Equal(ccv2.Application{
+					GUID:  "some-app-guid",
+					State: ccv2.ApplicationStarted,
+				}))
+
+				Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
+				Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+				Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
+			})
 		})
 
 		Context("when the app has zero instances", func() {
@@ -750,8 +790,6 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("starts and only polls for staging to finish", func() {
-				messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 				Eventually(warnings).Should(Receive(Equal("update-warning")))
 				Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 				Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
@@ -779,8 +817,6 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("sends the update error and never polls", func() {
-				messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 				Eventually(warnings).Should(Receive(Equal("update-warning")))
 				Eventually(errs).Should(Receive(MatchError(expectedErr)))
 
@@ -801,8 +837,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("sends the error and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(errs).Should(Receive(MatchError(expectedErr)))
@@ -828,8 +862,6 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends a StagingFailedNoAppDetectedError and stops polling", func() {
-						messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
@@ -855,8 +887,6 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends a StagingFailedError and stops polling", func() {
-						messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
@@ -876,8 +906,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("sends a timeout error and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: 0})))
 
@@ -900,8 +928,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("sends the error and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
@@ -920,8 +946,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("sends a timeout error and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
@@ -944,8 +968,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("returns an ApplicationInstanceCrashedError and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
@@ -969,8 +991,6 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("returns an ApplicationInstanceFlappingError and stops polling", func() {
-					messages, logErrs, appStarting, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
-
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
