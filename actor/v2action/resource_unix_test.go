@@ -86,12 +86,6 @@ var _ = Describe("Resource Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(reader.File).To(HaveLen(5))
-				Expect(reader.File[0].Name).To(Equal("level1"))
-				Expect(reader.File[1].Name).To(Equal("level1/level2"))
-				Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
-				Expect(reader.File[3].Name).To(Equal("tmpFile2"))
-				Expect(reader.File[4].Name).To(Equal("tmpFile3"))
-
 				Expect(reader.File[2].Mode()).To(Equal(os.FileMode(0644)))
 				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0751)))
 				Expect(reader.File[4].Mode()).To(Equal(os.FileMode(0655)))

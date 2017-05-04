@@ -30,16 +30,9 @@ func (actor Actor) GatherResources(sourceDir string) ([]Resource, error) {
 			return nil
 		}
 
-		if info.IsDir() {
-			resources = append(resources, Resource{
-				// An extra '/' indicates that this file is a directory
-				Filename: filepath.ToSlash(relPath) + "/",
-			})
-		} else {
-			resources = append(resources, Resource{
-				Filename: filepath.ToSlash(relPath),
-			})
-		}
+		resources = append(resources, Resource{
+			Filename: filepath.ToSlash(relPath),
+		})
 
 		return nil
 	})
@@ -116,20 +109,27 @@ func (_ Actor) addFileToZip(srcPath string, destPath string, zipFile *zip.Writer
 		log.WithField("srcPath", srcPath).Errorln("stat error in dir:", err)
 		return err
 	}
-	// check error here
+
 	header, err := zip.FileInfoHeader(fileInfo)
 	if err != nil {
 		log.WithField("srcPath", srcPath).Errorln("getting file info in dir:", err)
 		return err
 	}
+
+	// An extra '/' indicates that this file is a directory
+	if fileInfo.IsDir() {
+		destPath += "/"
+	}
+
 	header.Name = destPath
 	header.Method = zip.Deflate
 
 	mode := fixMode(fileInfo.Mode())
 	header.SetMode(mode)
 	log.WithFields(log.Fields{
-		"srcPath": srcPath,
-		"mode":    mode,
+		"srcPath":  srcPath,
+		"destPath": destPath,
+		"mode":     mode,
 	}).Debug("setting mode for file")
 
 	destFileWriter, err := zipFile.CreateHeader(header)

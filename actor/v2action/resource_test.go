@@ -53,8 +53,8 @@ var _ = Describe("Resource Actions", func() {
 
 			Expect(resources).To(Equal(
 				[]Resource{
-					{Filename: "level1/"},
-					{Filename: "level1/level2/"},
+					{Filename: "level1"},
+					{Filename: "level1/level2"},
 					{Filename: "level1/level2/tmpFile1"},
 					{Filename: "tmpFile2"},
 					{Filename: "tmpFile3"},
@@ -149,8 +149,8 @@ var _ = Describe("Resource Actions", func() {
 
 		BeforeEach(func() {
 			resources = []Resource{
-				{Filename: "level1/"},
-				{Filename: "level1/level2/"},
+				{Filename: "level1"},
+				{Filename: "level1/level2"},
 				{Filename: "level1/level2/tmpFile1"},
 				{Filename: "tmpFile2"},
 				{Filename: "tmpFile3"},
