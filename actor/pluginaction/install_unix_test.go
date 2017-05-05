@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("install actions", func() {
 	var (
-		actor      Actor
+		actor      *Actor
 		fakeConfig *pluginactionfakes.FakeConfig
 		tempDir    string
 	)

@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Isolation Segment Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
 	)
 

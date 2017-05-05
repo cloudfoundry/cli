@@ -5,7 +5,7 @@ type NotLoggedInError struct {
 	BinaryName string
 }
 
-func (e NotLoggedInError) Error() string {
+func (_ NotLoggedInError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -16,7 +16,7 @@ type NoTargetedOrganizationError struct {
 	BinaryName string
 }
 
-func (e NoTargetedOrganizationError) Error() string {
+func (_ NoTargetedOrganizationError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -27,7 +27,7 @@ type NoTargetedSpaceError struct {
 	BinaryName string
 }
 
-func (e NoTargetedSpaceError) Error() string {
+func (_ NoTargetedSpaceError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""

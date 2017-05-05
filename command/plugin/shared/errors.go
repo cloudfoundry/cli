@@ -9,7 +9,7 @@ type PluginNotFoundError struct {
 	Name string
 }
 
-func (e PluginNotFoundError) Error() string {
+func (_ PluginNotFoundError) Error() string {
 	return "Plugin {{.Name}} does not exist."
 }
 
@@ -21,7 +21,7 @@ func (e PluginNotFoundError) Translate(translate func(string, ...interface{}) st
 
 type NoPluginRepositoriesError struct{}
 
-func (e NoPluginRepositoriesError) Error() string {
+func (_ NoPluginRepositoriesError) Error() string {
 	return "No plugin repositories registered to search for plugin updates."
 }
 
@@ -36,7 +36,7 @@ type GettingPluginRepositoryError struct {
 	Message string
 }
 
-func (e GettingPluginRepositoryError) Error() string {
+func (_ GettingPluginRepositoryError) Error() string {
 	return "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}"
 }
 
@@ -50,7 +50,7 @@ type RepositoryNameTakenError struct {
 	Name string
 }
 
-func (e RepositoryNameTakenError) Error() string {
+func (_ RepositoryNameTakenError) Error() string {
 	return "Plugin repo named '{{.RepositoryName}}' already exists, please use another name."
 }
 
@@ -64,7 +64,7 @@ type AddPluginRepositoryError struct {
 	Message string
 }
 
-func (e AddPluginRepositoryError) Error() string {
+func (_ AddPluginRepositoryError) Error() string {
 	return "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}"
 }
 
@@ -82,7 +82,7 @@ type FileNotFoundError struct {
 	Path string
 }
 
-func (e FileNotFoundError) Error() string {
+func (_ FileNotFoundError) Error() string {
 	return "File not found locally, make sure the file exists at given path {{.FilePath}}"
 }
 
@@ -97,7 +97,7 @@ func (e FileNotFoundError) Translate(translate func(string, ...interface{}) stri
 type PluginInstallationCancelled struct {
 }
 
-func (e PluginInstallationCancelled) Error() string {
+func (_ PluginInstallationCancelled) Error() string {
 	return "Plugin installation cancelled"
 }
 
@@ -162,7 +162,7 @@ type PluginAlreadyInstalledError struct {
 	Path    string
 }
 
-func (e PluginAlreadyInstalledError) Error() string {
+func (_ PluginAlreadyInstalledError) Error() string {
 	return "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall."
 }
 

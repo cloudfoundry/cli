@@ -7,8 +7,8 @@ import (
 
 // NewPaginatedResources returns a new PaginatedResources struct with the
 // given resource type.
-func NewPaginatedResources(exampleResource interface{}) PaginatedResources {
-	return PaginatedResources{
+func NewPaginatedResources(exampleResource interface{}) *PaginatedResources {
+	return &PaginatedResources{
 		resourceType: reflect.TypeOf(exampleResource),
 	}
 }

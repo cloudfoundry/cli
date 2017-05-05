@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Plugin actions", func() {
 	var (
-		actor            Actor
+		actor            *Actor
 		fakeConfig       *pluginactionfakes.FakeConfig
 		fakePluginClient *pluginactionfakes.FakePluginClient
 	)

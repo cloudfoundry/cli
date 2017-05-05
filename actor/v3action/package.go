@@ -16,13 +16,13 @@ import (
 
 type PackageProcessingFailedError struct{}
 
-func (e PackageProcessingFailedError) Error() string {
+func (_ PackageProcessingFailedError) Error() string {
 	return "Package failed to process correctly after upload"
 }
 
 type PackageProcessingExpiredError struct{}
 
-func (e PackageProcessingExpiredError) Error() string {
+func (_ PackageProcessingExpiredError) Error() string {
 	return "Package expired after upload"
 }
 

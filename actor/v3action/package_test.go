@@ -29,7 +29,7 @@ func createFile(root, path, contents string) int64 {
 
 var _ = Describe("Package Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
 		fakeConfig                *v3actionfakes.FakeConfig
 	)

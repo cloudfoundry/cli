@@ -8,6 +8,6 @@ type Actor struct {
 }
 
 // NewActor returns a pluginaction Actor
-func NewActor(config Config, client PluginClient) Actor {
-	return Actor{config: config, client: client}
+func NewActor(config Config, client PluginClient) *Actor {
+	return &Actor{config: config, client: client}
 }

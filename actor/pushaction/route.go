@@ -130,7 +130,7 @@ func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2actio
 	return warnings, err
 }
 
-func (actor Actor) routeInList(route v2action.Route, routes []v2action.Route) bool {
+func (_ Actor) routeInList(route v2action.Route, routes []v2action.Route) bool {
 	for _, r := range routes {
 		if r.GUID == route.GUID {
 			return true

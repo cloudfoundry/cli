@@ -7,7 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func (actor Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
+func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
 	if len(apps) != 0 {
 		return nil, errors.New("functionality still pending")
 	}

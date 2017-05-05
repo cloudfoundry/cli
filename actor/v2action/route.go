@@ -42,8 +42,8 @@ func (r Route) String() string {
 type OrphanedRoutesNotFoundError struct{}
 
 // Error method to display the error message.
-func (e OrphanedRoutesNotFoundError) Error() string {
-	return fmt.Sprintf("No orphaned routes were found.")
+func (_ OrphanedRoutesNotFoundError) Error() string {
+	return "No orphaned routes were found."
 }
 
 // RouteNotFoundError is returned when a route cannot be found
@@ -62,8 +62,8 @@ type RouteInDifferentSpaceError struct {
 	Route string
 }
 
-func (e RouteInDifferentSpaceError) Error() string {
-	return fmt.Sprintf("route registered to another space")
+func (_ RouteInDifferentSpaceError) Error() string {
+	return "route registered to another space"
 }
 
 func (actor Actor) BindRouteToApplication(routeGUID string, appGUID string) (Warnings, error) {

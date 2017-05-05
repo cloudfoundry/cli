@@ -12,7 +12,7 @@ const StagingLog = "STG"
 
 type NOAATimeoutError struct{}
 
-func (e NOAATimeoutError) Error() string {
+func (_ NOAATimeoutError) Error() string {
 	return "Timeout trying to connect to NOAA"
 }
 
@@ -61,7 +61,7 @@ func NewLogMessage(message string, messageType int, timestamp time.Time, sourceT
 	}
 }
 
-func (actor Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error) {
+func (_ Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error) {
 	// Do not pass in token because client should have a TokenRefresher set
 	eventStream, errStream := client.TailingLogs(appGUID, "")
 

@@ -10,7 +10,7 @@ type Pipebomb struct {
 	io.ReadCloser
 }
 
-func (p *Pipebomb) Seek(offset int64, whence int) (int64, error) {
+func (_ *Pipebomb) Seek(offset int64, whence int) (int64, error) {
 	return 0, ccerror.PipeSeekError{}
 }
 

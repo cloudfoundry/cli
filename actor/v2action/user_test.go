@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("User Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeUAAClient             *v2actionfakes.FakeUAAClient
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 	)

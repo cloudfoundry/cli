@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Organization Summary Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 		orgSummary                OrganizationSummary
 		warnings                  Warnings
