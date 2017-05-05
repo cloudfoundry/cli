@@ -10,10 +10,11 @@ import (
 )
 
 type FakeV2PushActor struct {
-	ApplyStub        func(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	ApplyStub        func(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	applyMutex       sync.RWMutex
 	applyArgsForCall []struct {
-		config pushaction.ApplicationConfig
+		config      pushaction.ApplicationConfig
+		progressBar pushaction.ProgressBar
 	}
 	applyReturns struct {
 		result1 <-chan pushaction.ApplicationConfig
@@ -62,16 +63,17 @@ type FakeV2PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV2PushActor) Apply(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+func (fake *FakeV2PushActor) Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 	fake.applyMutex.Lock()
 	ret, specificReturn := fake.applyReturnsOnCall[len(fake.applyArgsForCall)]
 	fake.applyArgsForCall = append(fake.applyArgsForCall, struct {
-		config pushaction.ApplicationConfig
-	}{config})
-	fake.recordInvocation("Apply", []interface{}{config})
+		config      pushaction.ApplicationConfig
+		progressBar pushaction.ProgressBar
+	}{config, progressBar})
+	fake.recordInvocation("Apply", []interface{}{config, progressBar})
 	fake.applyMutex.Unlock()
 	if fake.ApplyStub != nil {
-		return fake.ApplyStub(config)
+		return fake.ApplyStub(config, progressBar)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
@@ -85,10 +87,10 @@ func (fake *FakeV2PushActor) ApplyCallCount() int {
 	return len(fake.applyArgsForCall)
 }
 
-func (fake *FakeV2PushActor) ApplyArgsForCall(i int) pushaction.ApplicationConfig {
+func (fake *FakeV2PushActor) ApplyArgsForCall(i int) (pushaction.ApplicationConfig, pushaction.ProgressBar) {
 	fake.applyMutex.RLock()
 	defer fake.applyMutex.RUnlock()
-	return fake.applyArgsForCall[i].config
+	return fake.applyArgsForCall[i].config, fake.applyArgsForCall[i].progressBar
 }
 
 func (fake *FakeV2PushActor) ApplyReturns(result1 <-chan pushaction.ApplicationConfig, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {

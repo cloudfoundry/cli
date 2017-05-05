@@ -19,7 +19,7 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	return archivePath, nil
 }
 
-func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, eventStream chan<- Event) (Warnings, error) {
+func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, progressbar ProgressBar, eventStream chan<- Event) (Warnings, error) {
 	log.Info("uploading archive")
 	archive, err := os.Open(archivePath)
 	if err != nil {
@@ -42,7 +42,8 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, e
 	}).Debug("uploading app bits")
 
 	eventStream <- UploadingApplication
-	warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, []v2action.Resource{}, archive, archiveInfo.Size())
+	reader := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
+	warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, []v2action.Resource{}, reader, archiveInfo.Size())
 	if err != nil {
 		log.WithField("archivePath", archivePath).Errorln("streaming archive:", err)
 		return Warnings(warnings), err
