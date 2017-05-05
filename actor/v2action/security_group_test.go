@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Security Group Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 	)
 

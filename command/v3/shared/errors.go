@@ -4,7 +4,7 @@ type RunTaskError struct {
 	Message string
 }
 
-func (e RunTaskError) Error() string {
+func (_ RunTaskError) Error() string {
 	return "Error running task: {{.CloudControllerMessage}}"
 }
 
@@ -18,7 +18,7 @@ type V3APIDoesNotExistError struct {
 	Message string
 }
 
-func (e V3APIDoesNotExistError) Error() string {
+func (_ V3APIDoesNotExistError) Error() string {
 	return "{{.Message}}\nNote that this command requires CF API version 3.0.0+."
 }
 
@@ -32,7 +32,7 @@ type IsolationSegmentNotFoundError struct {
 	Name string
 }
 
-func (e IsolationSegmentNotFoundError) Error() string {
+func (_ IsolationSegmentNotFoundError) Error() string {
 	return "Isolation segment '{{.Name}}' not found."
 }
 
@@ -46,7 +46,7 @@ type OrganizationNotFoundError struct {
 	Name string
 }
 
-func (e OrganizationNotFoundError) Error() string {
+func (_ OrganizationNotFoundError) Error() string {
 	return "Organization '{{.Name}}' not found."
 }
 

@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Application Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
 	)
 

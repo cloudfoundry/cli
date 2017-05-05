@@ -9,7 +9,7 @@ type APIRequestError struct {
 	Err error
 }
 
-func (e APIRequestError) Error() string {
+func (_ APIRequestError) Error() string {
 	return "Request error: {{.Error}}\nTIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
 }
 
@@ -23,7 +23,7 @@ type InvalidSSLCertError struct {
 	API string
 }
 
-func (e InvalidSSLCertError) Error() string {
+func (_ InvalidSSLCertError) Error() string {
 	return "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
 }
 
@@ -37,7 +37,7 @@ type SSLCertErrorError struct {
 	Message string
 }
 
-func (e SSLCertErrorError) Error() string {
+func (_ SSLCertErrorError) Error() string {
 	return "SSL Certificate Error {{.Message}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
 }
 
@@ -51,7 +51,7 @@ type NoAPISetError struct {
 	BinaryName string
 }
 
-func (e NoAPISetError) Error() string {
+func (_ NoAPISetError) Error() string {
 	return "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
 }
 
@@ -66,7 +66,7 @@ type NotLoggedInError struct {
 	BinaryName string
 }
 
-func (e NotLoggedInError) Error() string {
+func (_ NotLoggedInError) Error() string {
 	return "Not logged in. Use '{{.CFLoginCommand}}' to log in."
 }
 
@@ -80,7 +80,7 @@ type NoTargetedOrganizationError struct {
 	BinaryName string
 }
 
-func (e NoTargetedOrganizationError) Error() string {
+func (_ NoTargetedOrganizationError) Error() string {
 	return "No org targeted, use '{{.Command}}' to target an org."
 }
 
@@ -94,7 +94,7 @@ type NoTargetedSpaceError struct {
 	BinaryName string
 }
 
-func (e NoTargetedSpaceError) Error() string {
+func (_ NoTargetedSpaceError) Error() string {
 	return "No space targeted, use '{{.Command}}' to target a space."
 }
 
@@ -108,7 +108,7 @@ type ApplicationNotFoundError struct {
 	Name string
 }
 
-func (e ApplicationNotFoundError) Error() string {
+func (_ ApplicationNotFoundError) Error() string {
 	return "App {{.AppName}} not found"
 }
 
@@ -122,7 +122,7 @@ type ServiceInstanceNotFoundError struct {
 	Name string
 }
 
-func (e ServiceInstanceNotFoundError) Error() string {
+func (_ ServiceInstanceNotFoundError) Error() string {
 	return "Service instance {{.ServiceInstance}} not found"
 }
 
@@ -136,7 +136,7 @@ type APINotFoundError struct {
 	URL string
 }
 
-func (e APINotFoundError) Error() string {
+func (_ APINotFoundError) Error() string {
 	return "API endpoint not found at '{{.URL}}'"
 }
 
@@ -151,7 +151,7 @@ type ParseArgumentError struct {
 	ExpectedType string
 }
 
-func (e ParseArgumentError) Error() string {
+func (_ ParseArgumentError) Error() string {
 	return "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}"
 }
 
@@ -166,7 +166,7 @@ type RequiredArgumentError struct {
 	ArgumentName string
 }
 
-func (e RequiredArgumentError) Error() string {
+func (_ RequiredArgumentError) Error() string {
 	return "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided"
 }
 
@@ -182,7 +182,7 @@ type ThreeRequiredArgumentsError struct {
 	ArgumentName3 string
 }
 
-func (e ThreeRequiredArgumentsError) Error() string {
+func (_ ThreeRequiredArgumentsError) Error() string {
 	return "Incorrect Usage: the required arguments `{{.ArgumentName1}}`, `{{.ArgumentName2}}`, and `{{.ArgumentName3}}` were not provided"
 }
 
@@ -199,7 +199,7 @@ type MinimumAPIVersionNotMetError struct {
 	MinimumVersion string
 }
 
-func (e MinimumAPIVersionNotMetError) Error() string {
+func (_ MinimumAPIVersionNotMetError) Error() string {
 	return "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}."
 }
 
@@ -214,7 +214,7 @@ type HealthCheckTypeUnsupportedError struct {
 	SupportedTypes []string
 }
 
-func (e HealthCheckTypeUnsupportedError) Error() string {
+func (_ HealthCheckTypeUnsupportedError) Error() string {
 	return "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}."
 }
 

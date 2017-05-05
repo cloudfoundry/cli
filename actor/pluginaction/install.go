@@ -31,7 +31,7 @@ type PluginInvalidError struct {
 	Path string
 }
 
-func (e PluginInvalidError) Error() string {
+func (_ PluginInvalidError) Error() string {
 	return "File {{.Path}} is not a valid cf CLI plugin binary."
 }
 
@@ -44,7 +44,7 @@ type PluginCommandsConflictError struct {
 	CommandNames   []string
 }
 
-func (e PluginCommandsConflictError) Error() string {
+func (_ PluginCommandsConflictError) Error() string {
 	return ""
 }
 
@@ -92,7 +92,7 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 
 // FileExists returns true if the file exists. It returns false if the file
 // doesn't exist or there is an error checking.
-func (actor Actor) FileExists(path string) bool {
+func (_ Actor) FileExists(path string) bool {
 	if _, err := os.Stat(path); err == nil {
 		return true
 	}

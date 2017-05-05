@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Space", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
 	)
 

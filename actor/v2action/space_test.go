@@ -40,7 +40,7 @@ var _ = Describe("Space", func() {
 
 	Describe("Actions", func() {
 		var (
-			actor                     Actor
+			actor                     *Actor
 			fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 		)
 

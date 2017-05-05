@@ -4,6 +4,6 @@ package ccerror
 type PipeSeekError struct {
 }
 
-func (e PipeSeekError) Error() string {
+func (_ PipeSeekError) Error() string {
 	return "error seeking a stream on retry"
 }

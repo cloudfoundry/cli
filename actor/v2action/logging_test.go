@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Logging Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeNOAAClient            *v2actionfakes.FakeNOAAClient
 		fakeConfig                *v2actionfakes.FakeConfig
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient

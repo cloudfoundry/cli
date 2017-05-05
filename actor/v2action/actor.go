@@ -11,8 +11,8 @@ type Actor struct {
 }
 
 // NewActor returns a new actor.
-func NewActor(ccClient CloudControllerClient, uaaClient UAAClient) Actor {
-	return Actor{
+func NewActor(ccClient CloudControllerClient, uaaClient UAAClient) *Actor {
+	return &Actor{
 		CloudControllerClient: ccClient,
 		UAAClient:             uaaClient,
 	}

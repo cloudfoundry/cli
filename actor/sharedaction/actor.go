@@ -6,6 +6,6 @@ package sharedaction
 type Actor struct{}
 
 // NewActor returns an Actor with default settings
-func NewActor() Actor {
-	return Actor{}
+func NewActor() *Actor {
+	return &Actor{}
 }

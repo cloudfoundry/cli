@@ -13,7 +13,7 @@ import (
 var _ = Describe("Space Summary Actions", func() {
 	Describe("GetSpaceSummaryByOrganizationAndName", func() {
 		var (
-			actor                     Actor
+			actor                     *Actor
 			fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 			spaceSummary              SpaceSummary
 			warnings                  Warnings

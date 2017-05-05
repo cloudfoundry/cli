@@ -14,7 +14,7 @@ import (
 type Resource ccv2.Resource
 
 // GatherResources returns a list of resources for a directory.
-func (actor Actor) GatherResources(sourceDir string) ([]Resource, error) {
+func (_ Actor) GatherResources(sourceDir string) ([]Resource, error) {
 	var resources []Resource
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

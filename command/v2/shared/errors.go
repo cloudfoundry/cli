@@ -10,7 +10,7 @@ type JobFailedError struct {
 	Message string
 }
 
-func (e JobFailedError) Error() string {
+func (_ JobFailedError) Error() string {
 	return "Job ({{.JobGUID}}) failed: {{.Message}}"
 }
 
@@ -26,7 +26,7 @@ type JobTimeoutError struct {
 	Timeout time.Duration
 }
 
-func (e JobTimeoutError) Error() string {
+func (_ JobTimeoutError) Error() string {
 	return "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
 }
 
@@ -38,7 +38,7 @@ func (e JobTimeoutError) Translate(translate func(string, ...interface{}) string
 
 type NoOrganizationTargetedError struct{}
 
-func (e NoOrganizationTargetedError) Error() string {
+func (_ NoOrganizationTargetedError) Error() string {
 	return "An org must be targeted before targeting a space"
 }
 
@@ -50,7 +50,7 @@ type OrganizationNotFoundError struct {
 	Name string
 }
 
-func (e OrganizationNotFoundError) Error() string {
+func (_ OrganizationNotFoundError) Error() string {
 	return "Organization '{{.Name}}' not found."
 }
 
@@ -64,7 +64,7 @@ type SecurityGroupNotFoundError struct {
 	Name string
 }
 
-func (e SecurityGroupNotFoundError) Error() string {
+func (_ SecurityGroupNotFoundError) Error() string {
 	return "Security group '{{.Name}}' not found."
 }
 
@@ -78,7 +78,7 @@ type SpaceNotFoundError struct {
 	Name string
 }
 
-func (e SpaceNotFoundError) Error() string {
+func (_ SpaceNotFoundError) Error() string {
 	return "Space '{{.Name}}' not found."
 }
 
@@ -91,7 +91,7 @@ func (e SpaceNotFoundError) Translate(translate func(string, ...interface{}) str
 type HTTPHealthCheckInvalidError struct {
 }
 
-func (e HTTPHealthCheckInvalidError) Error() string {
+func (_ HTTPHealthCheckInvalidError) Error() string {
 	return "Health check type must be 'http' to set a health check HTTP endpoint."
 }
 
@@ -102,7 +102,7 @@ func (e HTTPHealthCheckInvalidError) Translate(translate func(string, ...interfa
 type InvalidRefreshTokenError struct {
 }
 
-func (e InvalidRefreshTokenError) Error() string {
+func (_ InvalidRefreshTokenError) Error() string {
 	return "The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate."
 }
 
@@ -115,7 +115,7 @@ type StagingFailedNoAppDetectedError struct {
 	BinaryName string
 }
 
-func (e StagingFailedNoAppDetectedError) Error() string {
+func (_ StagingFailedNoAppDetectedError) Error() string {
 	return "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
 }
 
@@ -130,7 +130,7 @@ type StagingFailedError struct {
 	Message string
 }
 
-func (e StagingFailedError) Error() string {
+func (_ StagingFailedError) Error() string {
 	return "Error staging application: {{.Message}}"
 }
 
@@ -145,7 +145,7 @@ type StagingTimeoutError struct {
 	Timeout time.Duration
 }
 
-func (e StagingTimeoutError) Error() string {
+func (_ StagingTimeoutError) Error() string {
 	return "{{.AppName}} failed to stage within {{.Timeout}} minutes"
 }
 
@@ -161,7 +161,7 @@ type UnsuccessfulStartError struct {
 	BinaryName string
 }
 
-func (e UnsuccessfulStartError) Error() string {
+func (_ UnsuccessfulStartError) Error() string {
 	return "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
 }
 
@@ -177,7 +177,7 @@ type StartupTimeoutError struct {
 	BinaryName string
 }
 
-func (e StartupTimeoutError) Error() string {
+func (_ StartupTimeoutError) Error() string {
 	return "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
 }
 

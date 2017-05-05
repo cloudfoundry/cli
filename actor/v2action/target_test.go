@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("Targeting", func() {
 	var (
-		actor             Actor
+		actor             *Actor
 		skipSSLValidation bool
 
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient

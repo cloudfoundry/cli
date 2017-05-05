@@ -30,7 +30,8 @@ type helpCommand struct {
 }
 
 var _ = Describe("Help Actions", func() {
-	var actor Actor
+	var actor *Actor
+
 	BeforeEach(func() {
 		actor = NewActor()
 	})

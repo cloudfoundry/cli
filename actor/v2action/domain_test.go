@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Domain Actions", func() {
 	var (
-		actor                     Actor
+		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 	)
 

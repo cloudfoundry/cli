@@ -32,7 +32,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 	Describe("GetApplicationSummaryByNameSpace", func() {
 		var (
-			actor                     Actor
+			actor                     *Actor
 			fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 			app                       ccv2.Application
 		)

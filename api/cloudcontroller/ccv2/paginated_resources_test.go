@@ -32,7 +32,7 @@ func (t *testItem) UnmarshalJSON(data []byte) error {
 }
 
 var _ = Describe("Paginated Resources", func() {
-	var page PaginatedResources
+	var page *PaginatedResources
 
 	BeforeEach(func() {
 		page = NewPaginatedResources(testItem{})

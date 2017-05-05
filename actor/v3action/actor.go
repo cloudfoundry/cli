@@ -19,8 +19,8 @@ type Actor struct {
 }
 
 // NewActor returns a new V3 actor.
-func NewActor(client CloudControllerClient, config Config) Actor {
-	return Actor{
+func NewActor(client CloudControllerClient, config Config) *Actor {
+	return &Actor{
 		CloudControllerClient: client,
 		Config:                config,
 	}

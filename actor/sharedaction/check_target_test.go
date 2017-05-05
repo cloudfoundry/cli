@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("CheckTarget", func() {
 	var (
-		actor      Actor
+		actor      *Actor
 		binaryName string
 		fakeConfig *sharedactionfakes.FakeConfig
 	)
