@@ -121,9 +121,7 @@ var _ = Describe("Resources", func() {
 			})
 
 			AfterEach(func() {
-				if archivePath != "" {
-					os.Remove(archivePath)
-				}
+				Expect(os.Remove(archivePath)).ToNot(HaveOccurred())
 			})
 
 			Context("when the upload is successful", func() {
@@ -151,21 +149,32 @@ var _ = Describe("Resources", func() {
 			})
 
 			Context("when the upload errors", func() {
-				var expectedErr error
+				var (
+					expectedErr error
+					done        chan bool
+				)
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I can't let you do that starfox")
 					fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
+
+					done = make(chan bool)
 
 					go func() {
 						defer GinkgoRecover()
 
 						Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
 						Consistently(eventStream).ShouldNot(Receive())
+						done <- true
 					}()
 				})
 
+				AfterEach(func() {
+					close(done)
+				})
+
 				It("returns the error and warnings", func() {
+					Eventually(done).Should(Receive())
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
 				})
