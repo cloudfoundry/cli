@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util/configv3"
 	log "github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry/noaa/consumer"
 )
@@ -17,7 +18,7 @@ import (
 //go:generate counterfeiter . V2PushActor
 
 type V2PushActor interface {
-	Apply(config pushaction.ApplicationConfig) (<-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	Apply(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
 }
@@ -53,8 +54,9 @@ type V2PushCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       V2PushActor
-	StartActor  StartActor
-	NOAAClient  *consumer.Consumer
+
+	StartActor StartActor
+	NOAAClient *consumer.Consumer
 }
 
 func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -69,6 +71,8 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	v2Actor := v2action.NewActor(ccClient, uaaClient)
 	cmd.StartActor = v2Actor
 	cmd.Actor = pushaction.NewActor(v2Actor)
+
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 	return nil
 }
 
@@ -76,6 +80,11 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -111,12 +120,27 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	for _, appConfig := range appConfigs {
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
-		eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig)
-		err := cmd.processApplyStreams(appConfig, eventStream, warningsStream, errorStream)
+		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig)
+		updatedConfig, err := cmd.processApplyStreams(user, appConfig, configStream, eventStream, warningsStream, errorStream)
 		if err != nil {
 			return shared.HandleError(err)
 		}
-		//TODO call start / display App
+
+		messages, logErrs, appStarting, apiWarnings, errs := cmd.StartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
+		cmd.UI.DisplayNewline()
+		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
+		if err != nil {
+			return err
+		}
+
+		cmd.UI.DisplayNewline()
+		appSummary, warnings, err := cmd.StartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
+		cmd.UI.DisplayWarnings(warnings)
+		if err != nil {
+			return shared.HandleError(err)
+		}
+
+		shared.DisplayAppSummary(cmd.UI, appSummary, true)
 	}
 
 	return nil
@@ -137,55 +161,64 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	return config, nil
 }
 
-func (cmd V2PushCommand) processApplyStreams(appConfig pushaction.ApplicationConfig, eventStream <-chan pushaction.Event, warningsStream <-chan pushaction.Warnings, errorStream <-chan error) error {
-	var eventClosed, warningsClosed, complete bool
+func (cmd V2PushCommand) processApplyStreams(
+	user configv3.User,
+	appConfig pushaction.ApplicationConfig,
+	configStream <-chan pushaction.ApplicationConfig,
+	eventStream <-chan pushaction.Event,
+	warningsStream <-chan pushaction.Warnings,
+	errorStream <-chan error,
+) (pushaction.ApplicationConfig, error) {
+	var configClosed, eventClosed, warningsClosed, complete bool
+	var updatedConfig pushaction.ApplicationConfig
 
 	for {
 		select {
+		case config, ok := <-configStream:
+			if !ok {
+				log.Debug("processing config stream closed")
+				configClosed = true
+				break
+			}
+			updatedConfig = config
+			log.Debugf("updated config received: %#v", updatedConfig)
 		case event, ok := <-eventStream:
 			if !ok {
-				log.Debug("received event stream closed")
+				log.Debug("processing event stream closed")
 				eventClosed = true
 				break
 			}
-			var err error
-			complete, err = cmd.processEvent(appConfig, event)
-			if err != nil {
-				return err
-			}
+			complete = cmd.processEvent(user, appConfig, event)
 		case warnings, ok := <-warningsStream:
 			if !ok {
-				log.Debug("received warnings stream closed")
+				log.Debug("processing warnings stream closed")
 				warningsClosed = true
+				break
 			}
 			cmd.UI.DisplayWarnings(warnings)
 		case err, ok := <-errorStream:
 			if !ok {
-				log.Debug("received error stream closed")
+				log.Debug("processing error stream closed")
 				warningsClosed = true
+				break
 			}
-			return err
+			return pushaction.ApplicationConfig{}, err
 		}
 
-		if eventClosed && warningsClosed && complete {
+		if configClosed && eventClosed && warningsClosed && complete {
 			log.Debug("breaking apply display loop")
 			break
 		}
 	}
 
-	return nil
+	return updatedConfig, nil
 }
 
-func (cmd V2PushCommand) processEvent(appConfig pushaction.ApplicationConfig, event pushaction.Event) (bool, error) {
+func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.ApplicationConfig, event pushaction.Event) bool {
 	log.Infoln("received apply event:", event)
 
 	switch event {
 	case pushaction.ApplicationCreated:
-		user, err := cmd.Config.CurrentUser()
-		if err != nil {
-			return false, err
-		}
-
 		cmd.UI.DisplayTextWithFlavor(
 			"Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 			map[string]interface{}{
@@ -197,11 +230,6 @@ func (cmd V2PushCommand) processEvent(appConfig pushaction.ApplicationConfig, ev
 		)
 
 	case pushaction.ApplicationUpdated:
-		user, err := cmd.Config.CurrentUser()
-		if err != nil {
-			return false, err
-		}
-
 		cmd.UI.DisplayTextWithFlavor(
 			"Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 			map[string]interface{}{
@@ -220,7 +248,7 @@ func (cmd V2PushCommand) processEvent(appConfig pushaction.ApplicationConfig, ev
 	case pushaction.UploadComplete:
 		cmd.UI.DisplayText("Upload complete")
 	case pushaction.Complete:
-		return true, nil
+		return true
 	}
-	return false, nil
+	return false
 }
