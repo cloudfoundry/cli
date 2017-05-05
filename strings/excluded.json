@@ -573,6 +573,7 @@
     "processing error stream closed",
     "processing event stream closed",
     "processing warnings stream closed",
+    "starting progress bar",
     "starting create/update:",
     "merging manifest:",
     "converting manifest:",

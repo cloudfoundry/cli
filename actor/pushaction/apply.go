@@ -2,7 +2,7 @@ package pushaction
 
 import log "github.com/Sirupsen/logrus"
 
-func (actor Actor) Apply(config ApplicationConfig) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
+func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
 	configStream := make(chan ApplicationConfig)
 	eventStream := make(chan Event)
 	warningsStream := make(chan Warnings)
@@ -57,7 +57,7 @@ func (actor Actor) Apply(config ApplicationConfig) (<-chan ApplicationConfig, <-
 			return
 		}
 
-		warnings, err = actor.UploadPackage(config, archivePath, eventStream)
+		warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
 		warningsStream <- warnings
 		if err != nil {
 			errorStream <- err

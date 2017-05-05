@@ -14,6 +14,10 @@ Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved
 Copyright (c) 2014-2015 Pivotal Software, Inc.
 and is licensed under the Apache License, Version 2.0.
 
+This product includes software from https://github.com/code.cloudfoundry.org/cli/tree/master/vendor/code.cloudfoundry.org/ykk that is:
+Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
+and is licensed under the Apache License, Version 2.0.
+
 This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/github.com/cloudfoundry-incubator/cli-plugin-repo/web that is:
 Copyright (c) 2015-Present CloudFoundry.org Foundation, Inc. All Rights Reserved.
 Copyright (c) 2015 Pivotal Software, Inc.
@@ -25,4 +29,4 @@ and is licensed under the Apache License, Version 2.0.
 
 This product includes software from https://github.com/cloudfoundry/cli/tree/master/vendor/github.com/docker/docker/pkg/term that is:
 Copyright 2012-2016 Docker, Inc.
-and is licensed under the Apache License, Version 2.0.
+mitations Liability Warrantyand is licensed under the Apache License, Version 2.0.

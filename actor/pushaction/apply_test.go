@@ -46,12 +46,13 @@ var _ = Describe("Apply", func() {
 		actor       *Actor
 		fakeV2Actor *pushactionfakes.FakeV2Actor
 
+		config          ApplicationConfig
+		fakeProgressBar *pushactionfakes.FakeProgressBar
+
 		eventStream    <-chan Event
 		warningsStream <-chan Warnings
 		errorStream    <-chan error
 		configStream   <-chan ApplicationConfig
-
-		config ApplicationConfig
 	)
 
 	BeforeEach(func() {
@@ -66,10 +67,11 @@ var _ = Describe("Apply", func() {
 			DesiredRoutes: []v2action.Route{{Host: "banana"}},
 			Path:          "some-path",
 		}
+		fakeProgressBar = new(pushactionfakes.FakeProgressBar)
 	})
 
 	JustBeforeEach(func() {
-		configStream, eventStream, warningsStream, errorStream = actor.Apply(config)
+		configStream, eventStream, warningsStream, errorStream = actor.Apply(config, fakeProgressBar)
 	})
 
 	AfterEach(func() {

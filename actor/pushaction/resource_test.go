@@ -2,8 +2,10 @@ package pushaction_test
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
@@ -84,9 +86,10 @@ var _ = Describe("Resources", func() {
 
 	Describe("UploadPackage", func() {
 		var (
-			config      ApplicationConfig
-			archivePath string
-			eventStream chan Event
+			config          ApplicationConfig
+			archivePath     string
+			fakeProgressBar *pushactionfakes.FakeProgressBar
+			eventStream     chan Event
 
 			warnings   Warnings
 			executeErr error
@@ -98,6 +101,7 @@ var _ = Describe("Resources", func() {
 					GUID: "some-app-guid",
 				},
 			}
+			fakeProgressBar = new(pushactionfakes.FakeProgressBar)
 			eventStream = make(chan Event)
 		})
 
@@ -106,7 +110,7 @@ var _ = Describe("Resources", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.UploadPackage(config, archivePath, eventStream)
+			warnings, executeErr = actor.UploadPackage(config, archivePath, fakeProgressBar, eventStream)
 		})
 
 		Context("when the archive can be accessed properly", func() {
@@ -125,8 +129,13 @@ var _ = Describe("Resources", func() {
 			})
 
 			Context("when the upload is successful", func() {
+				var progresBarReader io.Reader
+
 				BeforeEach(func() {
 					fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+
+					progresBarReader = strings.NewReader("123456")
+					fakeProgressBar.NewProgressBarWrapperReturns(progresBarReader)
 
 					go func() {
 						defer GinkgoRecover()
@@ -145,6 +154,14 @@ var _ = Describe("Resources", func() {
 					Expect(appGUID).To(Equal("some-app-guid"))
 					Expect(existingResources).To(BeEmpty())
 					Expect(newResourcesLength).To(BeNumerically("==", 6))
+				})
+
+				It("passes the file reader to the progress bar", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeProgressBar.NewProgressBarWrapperCallCount()).To(Equal(1))
+					_, size := fakeProgressBar.NewProgressBarWrapperArgsForCall(0)
+					Expect(size).To(BeNumerically("==", 6))
 				})
 			})
 

@@ -11,14 +11,23 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/progressbar"
 	log "github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
+//go:generate counterfeiter . ProgressBar
+
+type ProgressBar interface {
+	pushaction.ProgressBar
+	Complete()
+	Ready()
+}
+
 //go:generate counterfeiter . V2PushActor
 
 type V2PushActor interface {
-	Apply(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
 }
@@ -54,6 +63,7 @@ type V2PushCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       V2PushActor
+	ProgressBar ProgressBar
 
 	StartActor StartActor
 	NOAAClient *consumer.Consumer
@@ -73,6 +83,8 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Actor = pushaction.NewActor(v2Actor)
 
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
+
+	cmd.ProgressBar = progressbar.NewProgressBar()
 	return nil
 }
 
@@ -120,7 +132,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	for _, appConfig := range appConfigs {
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
-		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig)
+		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig, cmd.ProgressBar)
 		updatedConfig, err := cmd.processApplyStreams(user, appConfig, configStream, eventStream, warningsStream, errorStream)
 		if err != nil {
 			return shared.HandleError(err)
@@ -245,8 +257,11 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		cmd.UI.DisplayText("Binding routes...")
 	case pushaction.UploadingApplication:
 		cmd.UI.DisplayText("Uploading application...")
+		log.Debug("starting progress bar")
+		cmd.ProgressBar.Ready()
 	case pushaction.UploadComplete:
 		cmd.UI.DisplayText("Upload complete")
+		cmd.ProgressBar.Complete()
 	case pushaction.Complete:
 		return true
 	}

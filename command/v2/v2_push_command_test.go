@@ -28,6 +28,7 @@ var _ = Describe("v2-push Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeV2PushActor
 		fakeStartActor  *v2fakes.FakeStartActor
+		fakeProgressBar *v2fakes.FakeProgressBar
 		input           *Buffer
 		binaryName      string
 
@@ -43,6 +44,7 @@ var _ = Describe("v2-push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeV2PushActor)
 		fakeStartActor = new(v2fakes.FakeStartActor)
+		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
 		cmd = V2PushCommand{
 			UI:          testUI,
@@ -50,6 +52,7 @@ var _ = Describe("v2-push Command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 			StartActor:  fakeStartActor,
+			ProgressBar: fakeProgressBar,
 		}
 
 		appName = "some-app"
@@ -121,7 +124,7 @@ var _ = Describe("v2-push Command", func() {
 					var updatedConfig pushaction.ApplicationConfig
 
 					BeforeEach(func() {
-						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig, _ pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 							configStream := make(chan pushaction.ApplicationConfig, 1)
 							eventStream := make(chan pushaction.Event)
 							warningsStream := make(chan pushaction.Warnings)
@@ -142,7 +145,9 @@ var _ = Describe("v2-push Command", func() {
 								Eventually(eventStream).Should(BeSent(pushaction.RouteCreated))
 								Eventually(eventStream).Should(BeSent(pushaction.RouteBound))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
+								Eventually(fakeProgressBar.ReadyCallCount).Should(Equal(1))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadComplete))
+								Eventually(fakeProgressBar.CompleteCallCount).Should(Equal(1))
 								Eventually(configStream).Should(BeSent(updatedConfig))
 								Eventually(eventStream).Should(BeSent(pushaction.Complete))
 								Eventually(warningsStream).Should(BeSent(pushaction.Warnings{"apply-1", "apply-2"}))
@@ -244,7 +249,9 @@ var _ = Describe("v2-push Command", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeActor.ApplyCallCount()).To(Equal(1))
-						Expect(fakeActor.ApplyArgsForCall(0)).To(Equal(appConfigs[0]))
+						config, progressBar := fakeActor.ApplyArgsForCall(0)
+						Expect(config).To(Equal(appConfigs[0]))
+						Expect(progressBar).To(Equal(fakeProgressBar))
 					})
 
 					It("displays app events and warnings", func() {
@@ -294,7 +301,7 @@ var _ = Describe("v2-push Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("no wayz dude")
-						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig, _ pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 							configStream := make(chan pushaction.ApplicationConfig)
 							eventStream := make(chan pushaction.Event)
 							warningsStream := make(chan pushaction.Warnings)
