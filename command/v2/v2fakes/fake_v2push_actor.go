@@ -10,20 +10,22 @@ import (
 )
 
 type FakeV2PushActor struct {
-	ApplyStub        func(config pushaction.ApplicationConfig) (<-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
+	ApplyStub        func(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	applyMutex       sync.RWMutex
 	applyArgsForCall []struct {
 		config pushaction.ApplicationConfig
 	}
 	applyReturns struct {
-		result1 <-chan pushaction.Event
-		result2 <-chan pushaction.Warnings
-		result3 <-chan error
+		result1 <-chan pushaction.ApplicationConfig
+		result2 <-chan pushaction.Event
+		result3 <-chan pushaction.Warnings
+		result4 <-chan error
 	}
 	applyReturnsOnCall map[int]struct {
-		result1 <-chan pushaction.Event
-		result2 <-chan pushaction.Warnings
-		result3 <-chan error
+		result1 <-chan pushaction.ApplicationConfig
+		result2 <-chan pushaction.Event
+		result3 <-chan pushaction.Warnings
+		result4 <-chan error
 	}
 	ConvertToApplicationConfigsStub        func(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	convertToApplicationConfigsMutex       sync.RWMutex
@@ -60,7 +62,7 @@ type FakeV2PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV2PushActor) Apply(config pushaction.ApplicationConfig) (<-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+func (fake *FakeV2PushActor) Apply(config pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
 	fake.applyMutex.Lock()
 	ret, specificReturn := fake.applyReturnsOnCall[len(fake.applyArgsForCall)]
 	fake.applyArgsForCall = append(fake.applyArgsForCall, struct {
@@ -72,9 +74,9 @@ func (fake *FakeV2PushActor) Apply(config pushaction.ApplicationConfig) (<-chan 
 		return fake.ApplyStub(config)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2, ret.result3, ret.result4
 	}
-	return fake.applyReturns.result1, fake.applyReturns.result2, fake.applyReturns.result3
+	return fake.applyReturns.result1, fake.applyReturns.result2, fake.applyReturns.result3, fake.applyReturns.result4
 }
 
 func (fake *FakeV2PushActor) ApplyCallCount() int {
@@ -89,29 +91,32 @@ func (fake *FakeV2PushActor) ApplyArgsForCall(i int) pushaction.ApplicationConfi
 	return fake.applyArgsForCall[i].config
 }
 
-func (fake *FakeV2PushActor) ApplyReturns(result1 <-chan pushaction.Event, result2 <-chan pushaction.Warnings, result3 <-chan error) {
+func (fake *FakeV2PushActor) ApplyReturns(result1 <-chan pushaction.ApplicationConfig, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
 	fake.ApplyStub = nil
 	fake.applyReturns = struct {
-		result1 <-chan pushaction.Event
-		result2 <-chan pushaction.Warnings
-		result3 <-chan error
-	}{result1, result2, result3}
+		result1 <-chan pushaction.ApplicationConfig
+		result2 <-chan pushaction.Event
+		result3 <-chan pushaction.Warnings
+		result4 <-chan error
+	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV2PushActor) ApplyReturnsOnCall(i int, result1 <-chan pushaction.Event, result2 <-chan pushaction.Warnings, result3 <-chan error) {
+func (fake *FakeV2PushActor) ApplyReturnsOnCall(i int, result1 <-chan pushaction.ApplicationConfig, result2 <-chan pushaction.Event, result3 <-chan pushaction.Warnings, result4 <-chan error) {
 	fake.ApplyStub = nil
 	if fake.applyReturnsOnCall == nil {
 		fake.applyReturnsOnCall = make(map[int]struct {
-			result1 <-chan pushaction.Event
-			result2 <-chan pushaction.Warnings
-			result3 <-chan error
+			result1 <-chan pushaction.ApplicationConfig
+			result2 <-chan pushaction.Event
+			result3 <-chan pushaction.Warnings
+			result4 <-chan error
 		})
 	}
 	fake.applyReturnsOnCall[i] = struct {
-		result1 <-chan pushaction.Event
-		result2 <-chan pushaction.Warnings
-		result3 <-chan error
-	}{result1, result2, result3}
+		result1 <-chan pushaction.ApplicationConfig
+		result2 <-chan pushaction.Event
+		result3 <-chan pushaction.Warnings
+		result4 <-chan error
+	}{result1, result2, result3, result4}
 }
 
 func (fake *FakeV2PushActor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error) {

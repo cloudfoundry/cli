@@ -3,6 +3,7 @@ package v2_test
 import (
 	"errors"
 	"os"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
@@ -26,6 +27,7 @@ var _ = Describe("v2-push Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeV2PushActor
+		fakeStartActor  *v2fakes.FakeStartActor
 		input           *Buffer
 		binaryName      string
 
@@ -40,12 +42,14 @@ var _ = Describe("v2-push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeV2PushActor)
+		fakeStartActor = new(v2fakes.FakeStartActor)
 
 		cmd = V2PushCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
+			StartActor:  fakeStartActor,
 		}
 
 		appName = "some-app"
@@ -113,41 +117,99 @@ var _ = Describe("v2-push Command", func() {
 					fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
 				})
 
-				Context("when the push is successful", func() {
-					var (
-						eventStream    chan pushaction.Event
-						warningsStream chan pushaction.Warnings
-						errorStream    chan error
-					)
+				Context("when the apply is successful", func() {
+					var updatedConfig pushaction.ApplicationConfig
 
 					BeforeEach(func() {
-						eventStream = make(chan pushaction.Event)
-						warningsStream = make(chan pushaction.Warnings)
-						errorStream = make(chan error)
+						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+							configStream := make(chan pushaction.ApplicationConfig, 1)
+							eventStream := make(chan pushaction.Event)
+							warningsStream := make(chan pushaction.Warnings)
+							errorStream := make(chan error)
 
-						fakeActor.ApplyReturns(eventStream, warningsStream, errorStream)
+							updatedConfig = pushaction.ApplicationConfig{
+								CurrentApplication: v2action.Application{Name: appName, GUID: "some-app-guid"},
+								DesiredApplication: v2action.Application{Name: appName, GUID: "some-app-guid"},
+								TargetedSpaceGUID:  "some-space-guid",
+								Path:               pwd,
+							}
 
-						go func() {
-							defer GinkgoRecover()
+							go func() {
+								defer GinkgoRecover()
 
-							Eventually(eventStream).Should(BeSent(pushaction.ApplicationCreated))
-							Eventually(eventStream).Should(BeSent(pushaction.ApplicationUpdated))
-							Eventually(eventStream).Should(BeSent(pushaction.RouteCreated))
-							Eventually(eventStream).Should(BeSent(pushaction.RouteBound))
-							Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
-							Eventually(eventStream).Should(BeSent(pushaction.UploadComplete))
-							Eventually(eventStream).Should(BeSent(pushaction.Complete))
-							Eventually(warningsStream).Should(BeSent(pushaction.Warnings{"apply-1", "apply-2"}))
-							close(eventStream)
-							close(warningsStream)
-							close(errorStream)
-						}()
-					})
+								Eventually(eventStream).Should(BeSent(pushaction.ApplicationCreated))
+								Eventually(eventStream).Should(BeSent(pushaction.ApplicationUpdated))
+								Eventually(eventStream).Should(BeSent(pushaction.RouteCreated))
+								Eventually(eventStream).Should(BeSent(pushaction.RouteBound))
+								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
+								Eventually(eventStream).Should(BeSent(pushaction.UploadComplete))
+								Eventually(configStream).Should(BeSent(updatedConfig))
+								Eventually(eventStream).Should(BeSent(pushaction.Complete))
+								Eventually(warningsStream).Should(BeSent(pushaction.Warnings{"apply-1", "apply-2"}))
+								close(configStream)
+								close(eventStream)
+								close(warningsStream)
+								close(errorStream)
+							}()
 
-					AfterEach(func() {
-						Eventually(eventStream).Should(BeClosed())
-						Eventually(warningsStream).Should(BeClosed())
-						Eventually(errorStream).Should(BeClosed())
+							return configStream, eventStream, warningsStream, errorStream
+						}
+
+						fakeStartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+							messages := make(chan *v2action.LogMessage)
+							logErrs := make(chan error)
+							appStart := make(chan bool)
+							warnings := make(chan string)
+							errs := make(chan error)
+
+							go func() {
+								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
+								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+								appStart <- true
+								close(messages)
+								close(logErrs)
+								close(appStart)
+								close(warnings)
+								close(errs)
+							}()
+
+							return messages, logErrs, appStart, warnings, errs
+						}
+						applicationSummary := v2action.ApplicationSummary{
+							Application: v2action.Application{
+								Name:                 appName,
+								GUID:                 "some-app-guid",
+								Instances:            3,
+								Memory:               128,
+								PackageUpdatedAt:     time.Unix(0, 0),
+								DetectedBuildpack:    "some-buildpack",
+								State:                "STARTED",
+								DetectedStartCommand: "some start command",
+							},
+							Stack: v2action.Stack{
+								Name: "potatos",
+							},
+							Routes: []v2action.Route{
+								{
+									Host: "banana",
+									Domain: v2action.Domain{
+										Name: "fruit.com",
+									},
+									Path: "/hi",
+								},
+								{
+									Domain: v2action.Domain{
+										Name: "foobar.com",
+									},
+									Port: 13,
+								},
+							},
+						}
+						warnings := []string{"app-summary-warning"}
+
+						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
+
+						fakeStartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
 					It("merges app manifest and flags", func() {
@@ -201,46 +263,56 @@ var _ = Describe("v2-push Command", func() {
 					})
 
 					It("displays app staging logs", func() {
-						Skip("will fill in later")
+						Expect(executeErr).ToNot(HaveOccurred())
 
+						Expect(testUI.Out).To(Say("log message 1"))
+						Expect(testUI.Out).To(Say("log message 2"))
+
+						Expect(fakeStartActor.RestartApplicationCallCount()).To(Equal(1))
+						appConfig, _, _ := fakeStartActor.RestartApplicationArgsForCall(0)
+						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication))
 					})
 
-					It("displays the app info", func() {
-						Skip("will fill in later")
+					It("displays the app summary with isolation segments as well as warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+						Expect(testUI.Out).To(Say("requested state:\\s+started"))
+						Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})
 				})
 
-				Context("when the push errors", func() {
-					var (
-						expectedErr    error
-						eventStream    chan pushaction.Event
-						warningsStream chan pushaction.Warnings
-						errorStream    chan error
-					)
+				Context("when the apply errors", func() {
+					var expectedErr error
 
 					BeforeEach(func() {
 						expectedErr = errors.New("no wayz dude")
-						eventStream = make(chan pushaction.Event)
-						warningsStream = make(chan pushaction.Warnings)
-						errorStream = make(chan error)
+						fakeActor.ApplyStub = func(_ pushaction.ApplicationConfig) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error) {
+							configStream := make(chan pushaction.ApplicationConfig)
+							eventStream := make(chan pushaction.Event)
+							warningsStream := make(chan pushaction.Warnings)
+							errorStream := make(chan error)
 
-						fakeActor.ApplyReturns(eventStream, warningsStream, errorStream)
+							go func() {
+								defer GinkgoRecover()
 
-						go func() {
-							defer GinkgoRecover()
+								Eventually(warningsStream).Should(BeSent(pushaction.Warnings{"apply-1", "apply-2"}))
+								Eventually(errorStream).Should(BeSent(expectedErr))
+								close(configStream)
+								close(eventStream)
+								close(warningsStream)
+								close(errorStream)
+							}()
 
-							Eventually(warningsStream).Should(BeSent(pushaction.Warnings{"apply-1", "apply-2"}))
-							Eventually(errorStream).Should(BeSent(expectedErr))
-							close(eventStream)
-							close(warningsStream)
-							close(errorStream)
-						}()
-					})
-
-					AfterEach(func() {
-						Eventually(eventStream).Should(BeClosed())
-						Eventually(warningsStream).Should(BeClosed())
-						Eventually(errorStream).Should(BeClosed())
+							return configStream, eventStream, warningsStream, errorStream
+						}
 					})
 
 					It("outputs the warnings and returns the error", func() {

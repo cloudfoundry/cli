@@ -13,10 +13,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func streamsDrainedAndClosed(eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) bool {
-	var eventStreamClosed, warningsStreamClosed, errorStreamClosed bool
+func streamsDrainedAndClosed(configStream <-chan ApplicationConfig, eventStream <-chan Event, warningsStream <-chan Warnings, errorStream <-chan error) bool {
+	var configStreamClosed, eventStreamClosed, warningsStreamClosed, errorStreamClosed bool
 	for {
 		select {
+		case _, ok := <-configStream:
+			if !ok {
+				configStreamClosed = true
+			}
 		case _, ok := <-eventStream:
 			if !ok {
 				eventStreamClosed = true
@@ -30,7 +34,7 @@ func streamsDrainedAndClosed(eventStream <-chan Event, warningsStream <-chan War
 				errorStreamClosed = true
 			}
 		}
-		if eventStreamClosed && warningsStreamClosed && errorStreamClosed {
+		if configStreamClosed && eventStreamClosed && warningsStreamClosed && errorStreamClosed {
 			break
 		}
 	}
@@ -45,6 +49,7 @@ var _ = Describe("Apply", func() {
 		eventStream    <-chan Event
 		warningsStream <-chan Warnings
 		errorStream    <-chan error
+		configStream   <-chan ApplicationConfig
 
 		config ApplicationConfig
 	)
@@ -64,11 +69,11 @@ var _ = Describe("Apply", func() {
 	})
 
 	JustBeforeEach(func() {
-		eventStream, warningsStream, errorStream = actor.Apply(config)
+		configStream, eventStream, warningsStream, errorStream = actor.Apply(config)
 	})
 
 	AfterEach(func() {
-		Eventually(streamsDrainedAndClosed(eventStream, warningsStream, errorStream)).Should(BeTrue())
+		Eventually(streamsDrainedAndClosed(configStream, eventStream, warningsStream, errorStream)).Should(BeTrue())
 	})
 
 	Context("when creating/updating the application is successful", func() {
@@ -140,7 +145,14 @@ var _ = Describe("Apply", func() {
 							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 						})
 
-						It("returns the complete event", func() {
+						It("sends the updated config and a complete event", func() {
+							Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+								CurrentApplication: createdApp,
+								DesiredApplication: createdApp,
+								CurrentRoutes:      createdRoutes,
+								DesiredRoutes:      createdRoutes,
+								Path:               "some-path",
+							})))
 							Eventually(eventStream).Should(Receive(Equal(Complete)))
 						})
 					})

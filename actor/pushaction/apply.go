@@ -2,13 +2,15 @@ package pushaction
 
 import log "github.com/Sirupsen/logrus"
 
-func (actor Actor) Apply(config ApplicationConfig) (<-chan Event, <-chan Warnings, <-chan error) {
+func (actor Actor) Apply(config ApplicationConfig) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
+	configStream := make(chan ApplicationConfig)
 	eventStream := make(chan Event)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)
 
 	go func() {
 		log.Debug("starting apply go routine")
+		defer close(configStream)
 		defer close(eventStream)
 		defer close(warningsStream)
 		defer close(errorStream)
@@ -62,9 +64,11 @@ func (actor Actor) Apply(config ApplicationConfig) (<-chan Event, <-chan Warning
 			return
 		}
 
+		configStream <- config
+
 		log.Debug("completed apply")
 		eventStream <- Complete
 	}()
 
-	return eventStream, warningsStream, errorStream
+	return configStream, eventStream, warningsStream, errorStream
 }
