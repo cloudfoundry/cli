@@ -64,12 +64,19 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	err = tempFile.Close()
 	if err != nil {
 		return "", err
 	}
 
+	// add '.exe' to the temp file if on Windows
 	executablePath := generic.ExecutableFilename(tempFile.Name())
+	err = os.Rename(tempFile.Name(), executablePath)
+	if err != nil {
+		return "", err
+	}
+
 	err = fileutils.CopyPathToPath(path, executablePath)
 	if err != nil {
 		return "", err
@@ -99,11 +106,7 @@ func (actor Actor) IsPluginInstalled(pluginName string) bool {
 
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
 	plugin, err := pluginMetadata.GetMetadata(path)
-	if err != nil {
-		return configv3.Plugin{}, err
-	}
-
-	if plugin.Name == "" || len(plugin.Commands) == 0 {
+	if err != nil || plugin.Name == "" || len(plugin.Commands) == 0 {
 		return configv3.Plugin{}, PluginInvalidError{Path: path}
 	}
 

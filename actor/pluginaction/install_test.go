@@ -165,8 +165,8 @@ var _ = Describe("install actions", func() {
 				fakePluginMetadata.GetMetadataReturns(configv3.Plugin{}, expectedErr)
 			})
 
-			It("returns the error", func() {
-				Expect(validateErr).To(MatchError(expectedErr))
+			It("returns a PluginInvalidError", func() {
+				Expect(validateErr).To(MatchError(PluginInvalidError{Path: "some-plugin-path"}))
 			})
 		})
 
