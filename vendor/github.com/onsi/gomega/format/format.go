@@ -124,7 +124,7 @@ func findFirstMismatch(a, b string) int {
 	bSlice := strings.Split(b, "")
 
 	for index, str := range aSlice {
-		if index > len(b) - 1 {
+		if index > len(b)-1 {
 			return index
 		}
 		if str != bSlice[index] {
