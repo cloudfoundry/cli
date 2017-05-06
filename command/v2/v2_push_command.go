@@ -255,6 +255,8 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		cmd.UI.DisplayText("Creating routes...")
 	case pushaction.RouteBound:
 		cmd.UI.DisplayText("Binding routes...")
+	case pushaction.CreatingArchive:
+		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
 		cmd.UI.DisplayText("Uploading application...")
 		log.Debug("starting progress bar")

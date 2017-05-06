@@ -56,6 +56,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			errorStream <- err
 			return
 		}
+		eventStream <- CreatingArchive
 
 		warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
 		warningsStream <- warnings
