@@ -144,6 +144,7 @@ var _ = Describe("v2-push Command", func() {
 								Eventually(eventStream).Should(BeSent(pushaction.ApplicationUpdated))
 								Eventually(eventStream).Should(BeSent(pushaction.RouteCreated))
 								Eventually(eventStream).Should(BeSent(pushaction.RouteBound))
+								Eventually(eventStream).Should(BeSent(pushaction.CreatingArchive))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
 								Eventually(fakeProgressBar.ReadyCallCount).Should(Equal(1))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadComplete))
@@ -261,6 +262,7 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("Updating app %s in org %s / space %s as %s...", appName, "some-org", "some-space", "some-user"))
 						Expect(testUI.Out).To(Say("Creating routes..."))
 						Expect(testUI.Out).To(Say("Binding routes..."))
+						Expect(testUI.Out).To(Say("Packaging files to upload..."))
 						Expect(testUI.Out).To(Say("Uploading application..."))
 						Expect(testUI.Out).To(Say("Upload complete"))
 

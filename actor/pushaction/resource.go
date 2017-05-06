@@ -34,8 +34,6 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, p
 		return nil, err
 	}
 
-	//TODO Add progressbar wrapper
-
 	log.WithFields(log.Fields{
 		"appGUID":     config.DesiredApplication.GUID,
 		"archiveSize": archiveInfo.Size(),

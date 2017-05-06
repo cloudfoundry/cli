@@ -130,6 +130,10 @@ var _ = Describe("Apply", func() {
 						fakeV2Actor.ZipResourcesReturns(archivePath, nil)
 					})
 
+					JustBeforeEach(func() {
+						Eventually(eventStream).Should(Receive(Equal(CreatingArchive)))
+					})
+
 					AfterEach(func() {
 						if archivePath != "" {
 							os.Remove(archivePath)
@@ -206,7 +210,7 @@ var _ = Describe("Apply", func() {
 
 				It("should not send the RouteCreated event", func() {
 					Eventually(warningsStream).Should(Receive())
-					Consistently(eventStream).ShouldNot(Receive())
+					Consistently(eventStream).ShouldNot(Receive(Equal(RouteCreated)))
 				})
 			})
 
