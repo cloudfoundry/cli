@@ -166,7 +166,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{Path: "some-plugin-path"}))
+				Expect(validateErr).To(MatchError(PluginInvalidError{}))
 			})
 		})
 
@@ -176,7 +176,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{Path: "some-plugin-path"}))
+				Expect(validateErr).To(MatchError(PluginInvalidError{}))
 			})
 		})
 
@@ -186,7 +186,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{Path: "some-plugin-path"}))
+				Expect(validateErr).To(MatchError(PluginInvalidError{}))
 			})
 		})
 

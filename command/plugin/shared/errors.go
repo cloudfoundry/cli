@@ -1,9 +1,6 @@
 package shared
 
-import (
-	"fmt"
-	"strings"
-)
+import "strings"
 
 type PluginNotFoundError struct {
 	Name string
@@ -108,18 +105,14 @@ func (e PluginInstallationCancelled) Translate(translate func(string, ...interfa
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
-	Path              string
-	WrappedErrMessage string
 }
 
 func (e PluginInvalidError) Error() string {
-	return e.WrappedErrMessage
+	return "File not a valid cf CLI plugin binary."
 }
 
 func (e PluginInvalidError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error(), map[string]interface{}{
-		"Path": e.Path,
-	})
+	return translate(e.Error())
 }
 
 // PluginCommandConflictError is returned when a plugin command name conflicts
@@ -156,20 +149,21 @@ func (e PluginCommandsConflictError) Translate(translate func(string, ...interfa
 
 // PluginAlreadyInstalledError is returned when the plugin has the same name as
 // an installed plugin.
+// TODO: ADD Binary Name
 type PluginAlreadyInstalledError struct {
-	Name    string
-	Version string
-	Path    string
+	BinaryName string
+	Name       string
+	Version    string
 }
 
 func (_ PluginAlreadyInstalledError) Error() string {
-	return "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall."
+	return "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall."
 }
 
 func (e PluginAlreadyInstalledError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Name":    e.Name,
-		"Version": e.Version,
-		"Command": fmt.Sprintf("cf install-plugin %s -f", e.Path),
+		"BinaryName": e.BinaryName,
+		"Name":       e.Name,
+		"Version":    e.Version,
 	})
 }
