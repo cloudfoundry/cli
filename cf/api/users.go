@@ -365,8 +365,9 @@ func (repo CloudControllerUserRepository) UnsetSpaceRoleByGUID(userGUID, spaceGU
 	if !found {
 		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
 	}
+	apiURL := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGUID, rolePath, userGUID)
 
-	return repo.ccGateway.DeleteResource(repo.config.APIEndpoint(), rolePath)
+	return repo.ccGateway.DeleteResource(repo.config.APIEndpoint(), apiURL)
 }
 
 func (repo CloudControllerUserRepository) checkSpaceRole(spaceGUID string, role models.Role) (string, error) {
