@@ -208,6 +208,10 @@
     "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
   },
   {
+    "id": "File not a valid cf CLI plugin binary.",
+    "translation": ""
+  },
+  {
     "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
     "translation": ""
   },
@@ -344,8 +348,8 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
-    "translation": ""
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall.",
+    "translation": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall."
   },
   {
     "id": "Plugin {{.Name}} {{.Version}} is already installed. Uninstalling existing plugin...",
@@ -492,6 +496,10 @@
     "translation": ""
   },
   {
+    "id": "Starting download of plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
     "translation": ""
   },
@@ -546,6 +554,10 @@
   {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
     "translation": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
+  },
+  {
+    "id": "This command does not support the URL scheme in {{.UnsupportedURL}}.",
+    "translation": ""
   },
   {
     "id": "This command is in EXPERIMENTAL stage and may change without notice",
@@ -765,6 +777,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.Bytes}} bytes downloaded...",
     "translation": ""
   },
   {

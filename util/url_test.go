@@ -4,49 +4,37 @@ import (
 	. "code.cloudfoundry.org/cli/util"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DeterminePathType", func() {
-	Context("when the string passed is not a proper HTTP URL", func() {
-		It("returns that it is a PluginFilePath", func() {
-			Expect(DeterminePathType("http//example.com")).To(Equal(PluginFilePath))
-		})
-	})
+var _ = Describe("util", func() {
 
-	Context("when the string passed is a proper HTTP URL", func() {
-		It("returns that it is an HTTP path", func() {
-			Expect(DeterminePathType("http://example.com")).To(Equal(PluginHTTPPath))
-		})
-	})
+	DescribeTable("URL's",
+		func(path string, isHTTPScheme bool) {
+			Expect(IsHTTPScheme(path)).To(Equal(isHTTPScheme))
+		},
 
-	Context("when the string passed is a proper HTTPS URL", func() {
-		It("returns that it is an HTTP path", func() {
-			Expect(DeterminePathType("https://example.com")).To(Equal(PluginHTTPPath))
-		})
-	})
+		Entry("proper HTTP URL", "http://example.com", true),
+		Entry("proper HTTPS URL", "https://example.com", true),
+		Entry("not proper HTTP URL", "http//example.com", false),
+		Entry("proper FTP URL", "ftp://example.com", false),
+		Entry("local file name", "some-path", false),
+		Entry("UNIX path", "/some/path", false),
+		Entry("Windows path", "C:\\some\\path", false),
+	)
 
-	Context("when the string passed is a proper FTP URL", func() {
-		It("returns that it is of an unsupported path type", func() {
-			Expect(DeterminePathType("ftp://example.com")).To(Equal(PluginUnsupportedPathType))
-		})
-	})
+	DescribeTable("IsUnsupportedScheme",
+		func(path string, isUnsupportedScheme bool) {
+			Expect(IsUnsupportedURLScheme(path)).To(Equal(isUnsupportedScheme))
+		},
 
-	Context("when the string passed is a local file name", func() {
-		It("returns that it is a PluginFilePath", func() {
-			Expect(DeterminePathType("some-path")).To(Equal(PluginFilePath))
-		})
-	})
-
-	Context("when the string passed is a UNIX path", func() {
-		It("returns that it is a PluginFilePath", func() {
-			Expect(DeterminePathType("/some/path")).To(Equal(PluginFilePath))
-		})
-	})
-
-	Context("when the string passed is a Windows path", func() {
-		It("returns that it is a PluginFilePath", func() {
-			Expect(DeterminePathType("C:\\some\\path")).To(Equal(PluginFilePath))
-		})
-	})
+		Entry("proper HTTP URL", "http://example.com", false),
+		Entry("proper HTTPS URL", "https://example.com", false),
+		Entry("not proper HTTP URL", "http//example.com", false),
+		Entry("proper FTP URL", "ftp://example.com", true),
+		Entry("local file name", "some-path", false),
+		Entry("UNIX path", "/some/path", false),
+		Entry("Windows path", "C:\\some\\path", false),
+	)
 })

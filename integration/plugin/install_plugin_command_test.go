@@ -49,6 +49,16 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
+	FContext("when the user does not provide a plugin name or location", func() {
+		It("errors and displays usage", func() {
+			session := helpers.CF("install-plugin")
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PLUGIN_NAME_OR_LOCATION` was not provided"))
+			Eventually(session.Out).Should(Say("USAGE:"))
+
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
 	Context("installing a plugin from a local file", func() {
 		var pluginPath string
 
@@ -476,7 +486,7 @@ var _ = Describe("install-plugin command", func() {
 
 							Eventually(session.Out).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
-							Eventually(session.Err).Should(Say("TIP: Use 'cf install-plugin %s -f' to force a reinstall\\.", convertPathToRegularExpression(pluginPath)))
+							Eventually(session.Err).Should(Say("TIP: Use 'cf install-plugin -f' to force a reinstall\\."))
 
 							Eventually(session).Should(Exit(1))
 						})
@@ -570,7 +580,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 
 		Context("when a URL and the -f flag are provided", func() {
-			Context("and an executable is available for download at the URL", func() {
+			Context("when an executable is available for download at the URL", func() {
 				var (
 					pluginData []byte
 				)

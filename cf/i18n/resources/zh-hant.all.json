@@ -2940,6 +2940,10 @@
     "translation": "特性"
   },
   {
+    "id": "File not a valid cf CLI plugin binary.",
+    "translation": ""
+  },
+  {
     "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
     "translation": ""
   },
@@ -4400,7 +4404,7 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall.",
     "translation": ""
   },
   {
@@ -5340,6 +5344,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分啟動組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
   },
   {
+    "id": "Starting download of plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Startup command, set to null to reset to default start command",
     "translation": "Startup 指令，設定為空值，以重設為預設 start 指令"
   },
@@ -5794,6 +5802,10 @@
   {
     "id": "This command",
     "translation": "這個指令"
+  },
+  {
+    "id": "This command does not support the URL scheme in {{.UnsupportedURL}}.",
+    "translation": ""
   },
   {
     "id": "This command is in EXPERIMENTAL stage and may change without notice",
@@ -7061,6 +7073,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.Bytes}} bytes downloaded...",
     "translation": ""
   },
   {

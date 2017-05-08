@@ -28,11 +28,10 @@ type CommandList interface {
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
-	Path string
 }
 
 func (_ PluginInvalidError) Error() string {
-	return "File {{.Path}} is not a valid cf CLI plugin binary."
+	return "File not a valid cf CLI plugin binary."
 }
 
 // PluginCommandConflictError is returned when a plugin command name conflicts
@@ -90,10 +89,10 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 	return executablePath, nil
 }
 
-// FetchPluginFromURL fetches a plugin binary from the specified URL, if
+// DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
 // it exists.
-func (actor Actor) FetchPluginFromURL(path string) (string, error) {
-	return "", nil
+func (actor Actor) DownloadExecutableBinaryFromURL(path string) (string, int64, error) {
+	return "", 0, nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file
@@ -106,7 +105,7 @@ func (actor Actor) FileExists(path string) bool {
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
 	plugin, err := pluginMetadata.GetMetadata(path)
 	if err != nil || plugin.Name == "" || len(plugin.Commands) == 0 {
-		return configv3.Plugin{}, PluginInvalidError{Path: path}
+		return configv3.Plugin{}, PluginInvalidError{}
 	}
 
 	installedPlugins := actor.config.Plugins()

@@ -2940,6 +2940,10 @@
     "translation": "Features"
   },
   {
+    "id": "File not a valid cf CLI plugin binary.",
+    "translation": ""
+  },
+  {
     "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
     "translation": ""
   },
@@ -4400,7 +4404,7 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.Command}}' to force a reinstall.",
+    "id": "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall.",
     "translation": ""
   },
   {
@@ -5340,6 +5344,10 @@
     "translation": "Starten der App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Starting download of plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Startup command, set to null to reset to default start command",
     "translation": "Startbefehl, auf Null festlegen, um die Einstellung auf den Standardstartbefehl zurückzusetzen"
   },
@@ -5794,6 +5802,10 @@
   {
     "id": "This command",
     "translation": "Dieser Befehl"
+  },
+  {
+    "id": "This command does not support the URL scheme in {{.UnsupportedURL}}.",
+    "translation": ""
   },
   {
     "id": "This command is in EXPERIMENTAL stage and may change without notice",
@@ -7061,6 +7073,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.Bytes}} bytes downloaded...",
     "translation": ""
   },
   {

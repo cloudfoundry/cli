@@ -23,18 +23,20 @@ type FakeInstallPluginActor struct {
 		result1 string
 		result2 error
 	}
-	FetchPluginFromURLStub        func(url string) (string, error)
-	fetchPluginFromURLMutex       sync.RWMutex
-	fetchPluginFromURLArgsForCall []struct {
+	DownloadExecutableBinaryFromURLStub        func(url string) (string, int64, error)
+	downloadExecutableBinaryFromURLMutex       sync.RWMutex
+	downloadExecutableBinaryFromURLArgsForCall []struct {
 		url string
 	}
-	fetchPluginFromURLReturns struct {
+	downloadExecutableBinaryFromURLReturns struct {
 		result1 string
-		result2 error
+		result2 int64
+		result3 error
 	}
-	fetchPluginFromURLReturnsOnCall map[int]struct {
+	downloadExecutableBinaryFromURLReturnsOnCall map[int]struct {
 		result1 string
-		result2 error
+		result2 int64
+		result3 error
 	}
 	FileExistsStub        func(path string) bool
 	fileExistsMutex       sync.RWMutex
@@ -152,55 +154,58 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) FetchPluginFromURL(url string) (string, error) {
-	fake.fetchPluginFromURLMutex.Lock()
-	ret, specificReturn := fake.fetchPluginFromURLReturnsOnCall[len(fake.fetchPluginFromURLArgsForCall)]
-	fake.fetchPluginFromURLArgsForCall = append(fake.fetchPluginFromURLArgsForCall, struct {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(url string) (string, int64, error) {
+	fake.downloadExecutableBinaryFromURLMutex.Lock()
+	ret, specificReturn := fake.downloadExecutableBinaryFromURLReturnsOnCall[len(fake.downloadExecutableBinaryFromURLArgsForCall)]
+	fake.downloadExecutableBinaryFromURLArgsForCall = append(fake.downloadExecutableBinaryFromURLArgsForCall, struct {
 		url string
 	}{url})
-	fake.recordInvocation("FetchPluginFromURL", []interface{}{url})
-	fake.fetchPluginFromURLMutex.Unlock()
-	if fake.FetchPluginFromURLStub != nil {
-		return fake.FetchPluginFromURLStub(url)
+	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{url})
+	fake.downloadExecutableBinaryFromURLMutex.Unlock()
+	if fake.DownloadExecutableBinaryFromURLStub != nil {
+		return fake.DownloadExecutableBinaryFromURLStub(url)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.fetchPluginFromURLReturns.result1, fake.fetchPluginFromURLReturns.result2
+	return fake.downloadExecutableBinaryFromURLReturns.result1, fake.downloadExecutableBinaryFromURLReturns.result2, fake.downloadExecutableBinaryFromURLReturns.result3
 }
 
-func (fake *FakeInstallPluginActor) FetchPluginFromURLCallCount() int {
-	fake.fetchPluginFromURLMutex.RLock()
-	defer fake.fetchPluginFromURLMutex.RUnlock()
-	return len(fake.fetchPluginFromURLArgsForCall)
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLCallCount() int {
+	fake.downloadExecutableBinaryFromURLMutex.RLock()
+	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
+	return len(fake.downloadExecutableBinaryFromURLArgsForCall)
 }
 
-func (fake *FakeInstallPluginActor) FetchPluginFromURLArgsForCall(i int) string {
-	fake.fetchPluginFromURLMutex.RLock()
-	defer fake.fetchPluginFromURLMutex.RUnlock()
-	return fake.fetchPluginFromURLArgsForCall[i].url
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLArgsForCall(i int) string {
+	fake.downloadExecutableBinaryFromURLMutex.RLock()
+	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
+	return fake.downloadExecutableBinaryFromURLArgsForCall[i].url
 }
 
-func (fake *FakeInstallPluginActor) FetchPluginFromURLReturns(result1 string, result2 error) {
-	fake.FetchPluginFromURLStub = nil
-	fake.fetchPluginFromURLReturns = struct {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturns(result1 string, result2 int64, result3 error) {
+	fake.DownloadExecutableBinaryFromURLStub = nil
+	fake.downloadExecutableBinaryFromURLReturns = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeInstallPluginActor) FetchPluginFromURLReturnsOnCall(i int, result1 string, result2 error) {
-	fake.FetchPluginFromURLStub = nil
-	if fake.fetchPluginFromURLReturnsOnCall == nil {
-		fake.fetchPluginFromURLReturnsOnCall = make(map[int]struct {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturnsOnCall(i int, result1 string, result2 int64, result3 error) {
+	fake.DownloadExecutableBinaryFromURLStub = nil
+	if fake.downloadExecutableBinaryFromURLReturnsOnCall == nil {
+		fake.downloadExecutableBinaryFromURLReturnsOnCall = make(map[int]struct {
 			result1 string
-			result2 error
+			result2 int64
+			result3 error
 		})
 	}
-	fake.fetchPluginFromURLReturnsOnCall[i] = struct {
+	fake.downloadExecutableBinaryFromURLReturnsOnCall[i] = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeInstallPluginActor) FileExists(path string) bool {
@@ -455,8 +460,8 @@ func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.createExecutableCopyMutex.RLock()
 	defer fake.createExecutableCopyMutex.RUnlock()
-	fake.fetchPluginFromURLMutex.RLock()
-	defer fake.fetchPluginFromURLMutex.RUnlock()
+	fake.downloadExecutableBinaryFromURLMutex.RLock()
+	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
 	fake.fileExistsMutex.RLock()
 	defer fake.fileExistsMutex.RUnlock()
 	fake.getAndValidatePluginMutex.RLock()

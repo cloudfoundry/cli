@@ -11,6 +11,10 @@ import (
 
 type Path string
 
+func (p Path) String() string {
+	return string(p)
+}
+
 func (_ Path) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
