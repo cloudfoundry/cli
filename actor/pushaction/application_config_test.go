@@ -169,7 +169,7 @@ var _ = Describe("Application Config", func() {
 		Context("when retrieving the default route is successful", func() {
 			BeforeEach(func() {
 				// Assumes new route
-				fakeV2Actor.CheckRouteReturns(false, v2action.Warnings{"get-route-warnings"}, nil)
+				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
 			})
 
 			It("adds the route to desired routes", func() {
@@ -188,7 +188,7 @@ var _ = Describe("Application Config", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("dios mio")
-				fakeV2Actor.CheckRouteReturns(false, v2action.Warnings{"get-route-warnings"}, expectedErr)
+				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, expectedErr)
 			})
 
 			It("returns the error and warnings", func() {

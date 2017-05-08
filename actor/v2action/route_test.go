@@ -23,6 +23,28 @@ var _ = Describe("Route Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
+	Describe("Route", func() {
+		DescribeTable("String", func(host string, domain string, path string, port int, expectedValue string) {
+			route := Route{
+				Host: host,
+				Domain: Domain{
+					Name: domain,
+				},
+				Path: path,
+				Port: port,
+			}
+			Expect(route.String()).To(Equal(expectedValue))
+		},
+
+			Entry("has domain", "", "domain.com", "", 0, "domain.com"),
+			Entry("has host, domain", "host", "domain.com", "", 0, "host.domain.com"),
+			Entry("has domain, path", "", "domain.com", "/path", 0, "domain.com/path"),
+			Entry("has host, domain, path", "host", "domain.com", "/path", 0, "host.domain.com/path"),
+			Entry("has domain, port", "", "domain.com", "", 3333, "domain.com:3333"),
+			Entry("has host, domain, path, port", "host", "domain.com", "/path", 3333, "domain.com:3333"),
+		)
+	})
+
 	Describe("BindRouteToApplication", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
@@ -772,25 +794,109 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
-	Describe("Route", func() {
-		DescribeTable("String", func(host string, domain string, path string, port int, expectedValue string) {
-			route := Route{
-				Host: host,
-				Domain: Domain{
-					Name: domain,
-				},
-				Path: path,
-				Port: port,
-			}
-			Expect(route.String()).To(Equal(expectedValue))
-		},
+	Describe("FindRouteBoundToSpaceWithSettings", func() {
+		var (
+			route Route
 
-			Entry("has domain", "", "domain.com", "", 0, "domain.com"),
-			Entry("has host, domain", "host", "domain.com", "", 0, "host.domain.com"),
-			Entry("has domain, path", "", "domain.com", "/path", 0, "domain.com/path"),
-			Entry("has host, domain, path", "host", "domain.com", "/path", 0, "host.domain.com/path"),
-			Entry("has domain, port", "", "domain.com", "", 3333, "domain.com:3333"),
-			Entry("has host, domain, path, port", "host", "domain.com", "/path", 3333, "domain.com:3333"),
+			returnedRoute Route
+			warnings      Warnings
+			executeErr    error
 		)
+
+		BeforeEach(func() {
+			route = Route{
+				Domain: Domain{
+					Name: "some-domain.com",
+					GUID: "some-domain-guid",
+				},
+				Host:      "some-host",
+				SpaceGUID: "some-space-guid",
+			}
+
+			fakeCloudControllerClient.GetSharedDomainReturns(
+				ccv2.Domain{
+					GUID: "some-domain-guid",
+					Name: "some-domain.com",
+				},
+				ccv2.Warnings{"get domain warning"},
+				nil)
+		})
+
+		JustBeforeEach(func() {
+			returnedRoute, warnings, executeErr = actor.FindRouteBoundToSpaceWithSettings(route)
+		})
+
+		Context("when the route exists in the current space", func() {
+			var existingRoute Route
+
+			BeforeEach(func() {
+				existingRoute = route
+				existingRoute.GUID = "some-route-guid"
+				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{ActorToCCRoute(existingRoute)}, ccv2.Warnings{"get route warning"}, nil)
+			})
+
+			It("returns the route", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(returnedRoute).To(Equal(existingRoute))
+				Expect(warnings).To(ConsistOf("get route warning", "get domain warning"))
+			})
+		})
+
+		Context("when the route exists in a different space", func() {
+			Context("when the user has access to the route", func() {
+				BeforeEach(func() {
+					existingRoute := route
+					existingRoute.GUID = "some-route-guid"
+					existingRoute.SpaceGUID = "some-other-space-guid"
+					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{ActorToCCRoute(existingRoute)}, ccv2.Warnings{"get route warning"}, nil)
+				})
+
+				It("returns a RouteInDifferentSpaceError", func() {
+					Expect(executeErr).To(MatchError(RouteInDifferentSpaceError{Route: route.String()}))
+					Expect(warnings).To(ConsistOf("get route warning", "get domain warning"))
+				})
+			})
+
+			Context("when the user does not have access to the route", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
+					fakeCloudControllerClient.CheckRouteReturns(true, ccv2.Warnings{"check route warning"}, nil)
+				})
+
+				It("returns a RouteInDifferentSpaceError", func() {
+					Expect(executeErr).To(MatchError(RouteInDifferentSpaceError{Route: route.String()}))
+					Expect(warnings).To(ConsistOf("get route warning", "check route warning"))
+				})
+			})
+		})
+
+		Context("when the route does not exist", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = RouteNotFoundError{Host: route.Host, DomainGUID: route.Domain.GUID}
+				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
+				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"check route warning"}, nil)
+			})
+
+			It("returns the route", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("get route warning", "check route warning"))
+			})
+		})
+
+		Context("when finding the route errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("booo")
+				fakeCloudControllerClient.GetRoutesReturns(nil, ccv2.Warnings{"get route warning"}, expectedErr)
+			})
+
+			It("the error and warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("get route warning"))
+			})
+		})
 	})
 })
