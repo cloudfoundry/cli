@@ -24,21 +24,6 @@ type FakeV2Actor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	CheckRouteStub        func(route v2action.Route) (bool, v2action.Warnings, error)
-	checkRouteMutex       sync.RWMutex
-	checkRouteArgsForCall []struct {
-		route v2action.Route
-	}
-	checkRouteReturns struct {
-		result1 bool
-		result2 v2action.Warnings
-		result3 error
-	}
-	checkRouteReturnsOnCall map[int]struct {
-		result1 bool
-		result2 v2action.Warnings
-		result3 error
-	}
 	CreateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	createApplicationMutex       sync.RWMutex
 	createApplicationArgsForCall []struct {
@@ -66,6 +51,21 @@ type FakeV2Actor struct {
 		result3 error
 	}
 	createRouteReturnsOnCall map[int]struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}
+	FindRouteBoundToSpaceWithSettingsStub        func(route v2action.Route) (v2action.Route, v2action.Warnings, error)
+	findRouteBoundToSpaceWithSettingsMutex       sync.RWMutex
+	findRouteBoundToSpaceWithSettingsArgsForCall []struct {
+		route v2action.Route
+	}
+	findRouteBoundToSpaceWithSettingsReturns struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}
+	findRouteBoundToSpaceWithSettingsReturnsOnCall map[int]struct {
 		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
@@ -126,22 +126,6 @@ type FakeV2Actor struct {
 	}
 	getOrganizationDomainsReturnsOnCall map[int]struct {
 		result1 []v2action.Domain
-		result2 v2action.Warnings
-		result3 error
-	}
-	GetRouteByHostAndDomainStub        func(host string, domainGUID string) (v2action.Route, v2action.Warnings, error)
-	getRouteByHostAndDomainMutex       sync.RWMutex
-	getRouteByHostAndDomainArgsForCall []struct {
-		host       string
-		domainGUID string
-	}
-	getRouteByHostAndDomainReturns struct {
-		result1 v2action.Route
-		result2 v2action.Warnings
-		result3 error
-	}
-	getRouteByHostAndDomainReturnsOnCall map[int]struct {
-		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -244,60 +228,6 @@ func (fake *FakeV2Actor) BindRouteToApplicationReturnsOnCall(i int, result1 v2ac
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
-}
-
-func (fake *FakeV2Actor) CheckRoute(route v2action.Route) (bool, v2action.Warnings, error) {
-	fake.checkRouteMutex.Lock()
-	ret, specificReturn := fake.checkRouteReturnsOnCall[len(fake.checkRouteArgsForCall)]
-	fake.checkRouteArgsForCall = append(fake.checkRouteArgsForCall, struct {
-		route v2action.Route
-	}{route})
-	fake.recordInvocation("CheckRoute", []interface{}{route})
-	fake.checkRouteMutex.Unlock()
-	if fake.CheckRouteStub != nil {
-		return fake.CheckRouteStub(route)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.checkRouteReturns.result1, fake.checkRouteReturns.result2, fake.checkRouteReturns.result3
-}
-
-func (fake *FakeV2Actor) CheckRouteCallCount() int {
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
-	return len(fake.checkRouteArgsForCall)
-}
-
-func (fake *FakeV2Actor) CheckRouteArgsForCall(i int) v2action.Route {
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
-	return fake.checkRouteArgsForCall[i].route
-}
-
-func (fake *FakeV2Actor) CheckRouteReturns(result1 bool, result2 v2action.Warnings, result3 error) {
-	fake.CheckRouteStub = nil
-	fake.checkRouteReturns = struct {
-		result1 bool
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV2Actor) CheckRouteReturnsOnCall(i int, result1 bool, result2 v2action.Warnings, result3 error) {
-	fake.CheckRouteStub = nil
-	if fake.checkRouteReturnsOnCall == nil {
-		fake.checkRouteReturnsOnCall = make(map[int]struct {
-			result1 bool
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.checkRouteReturnsOnCall[i] = struct {
-		result1 bool
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
 }
 
 func (fake *FakeV2Actor) CreateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
@@ -403,6 +333,60 @@ func (fake *FakeV2Actor) CreateRouteReturnsOnCall(i int, result1 v2action.Route,
 		})
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettings(route v2action.Route) (v2action.Route, v2action.Warnings, error) {
+	fake.findRouteBoundToSpaceWithSettingsMutex.Lock()
+	ret, specificReturn := fake.findRouteBoundToSpaceWithSettingsReturnsOnCall[len(fake.findRouteBoundToSpaceWithSettingsArgsForCall)]
+	fake.findRouteBoundToSpaceWithSettingsArgsForCall = append(fake.findRouteBoundToSpaceWithSettingsArgsForCall, struct {
+		route v2action.Route
+	}{route})
+	fake.recordInvocation("FindRouteBoundToSpaceWithSettings", []interface{}{route})
+	fake.findRouteBoundToSpaceWithSettingsMutex.Unlock()
+	if fake.FindRouteBoundToSpaceWithSettingsStub != nil {
+		return fake.FindRouteBoundToSpaceWithSettingsStub(route)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.findRouteBoundToSpaceWithSettingsReturns.result1, fake.findRouteBoundToSpaceWithSettingsReturns.result2, fake.findRouteBoundToSpaceWithSettingsReturns.result3
+}
+
+func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsCallCount() int {
+	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
+	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
+	return len(fake.findRouteBoundToSpaceWithSettingsArgsForCall)
+}
+
+func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsArgsForCall(i int) v2action.Route {
+	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
+	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
+	return fake.findRouteBoundToSpaceWithSettingsArgsForCall[i].route
+}
+
+func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsReturns(result1 v2action.Route, result2 v2action.Warnings, result3 error) {
+	fake.FindRouteBoundToSpaceWithSettingsStub = nil
+	fake.findRouteBoundToSpaceWithSettingsReturns = struct {
+		result1 v2action.Route
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsReturnsOnCall(i int, result1 v2action.Route, result2 v2action.Warnings, result3 error) {
+	fake.FindRouteBoundToSpaceWithSettingsStub = nil
+	if fake.findRouteBoundToSpaceWithSettingsReturnsOnCall == nil {
+		fake.findRouteBoundToSpaceWithSettingsReturnsOnCall = make(map[int]struct {
+			result1 v2action.Route
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.findRouteBoundToSpaceWithSettingsReturnsOnCall[i] = struct {
 		result1 v2action.Route
 		result2 v2action.Warnings
 		result3 error
@@ -623,61 +607,6 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GetRouteByHostAndDomain(host string, domainGUID string) (v2action.Route, v2action.Warnings, error) {
-	fake.getRouteByHostAndDomainMutex.Lock()
-	ret, specificReturn := fake.getRouteByHostAndDomainReturnsOnCall[len(fake.getRouteByHostAndDomainArgsForCall)]
-	fake.getRouteByHostAndDomainArgsForCall = append(fake.getRouteByHostAndDomainArgsForCall, struct {
-		host       string
-		domainGUID string
-	}{host, domainGUID})
-	fake.recordInvocation("GetRouteByHostAndDomain", []interface{}{host, domainGUID})
-	fake.getRouteByHostAndDomainMutex.Unlock()
-	if fake.GetRouteByHostAndDomainStub != nil {
-		return fake.GetRouteByHostAndDomainStub(host, domainGUID)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
-	}
-	return fake.getRouteByHostAndDomainReturns.result1, fake.getRouteByHostAndDomainReturns.result2, fake.getRouteByHostAndDomainReturns.result3
-}
-
-func (fake *FakeV2Actor) GetRouteByHostAndDomainCallCount() int {
-	fake.getRouteByHostAndDomainMutex.RLock()
-	defer fake.getRouteByHostAndDomainMutex.RUnlock()
-	return len(fake.getRouteByHostAndDomainArgsForCall)
-}
-
-func (fake *FakeV2Actor) GetRouteByHostAndDomainArgsForCall(i int) (string, string) {
-	fake.getRouteByHostAndDomainMutex.RLock()
-	defer fake.getRouteByHostAndDomainMutex.RUnlock()
-	return fake.getRouteByHostAndDomainArgsForCall[i].host, fake.getRouteByHostAndDomainArgsForCall[i].domainGUID
-}
-
-func (fake *FakeV2Actor) GetRouteByHostAndDomainReturns(result1 v2action.Route, result2 v2action.Warnings, result3 error) {
-	fake.GetRouteByHostAndDomainStub = nil
-	fake.getRouteByHostAndDomainReturns = struct {
-		result1 v2action.Route
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV2Actor) GetRouteByHostAndDomainReturnsOnCall(i int, result1 v2action.Route, result2 v2action.Warnings, result3 error) {
-	fake.GetRouteByHostAndDomainStub = nil
-	if fake.getRouteByHostAndDomainReturnsOnCall == nil {
-		fake.getRouteByHostAndDomainReturnsOnCall = make(map[int]struct {
-			result1 v2action.Route
-			result2 v2action.Warnings
-			result3 error
-		})
-	}
-	fake.getRouteByHostAndDomainReturnsOnCall[i] = struct {
-		result1 v2action.Route
-		result2 v2action.Warnings
-		result3 error
-	}{result1, result2, result3}
-}
-
 func (fake *FakeV2Actor) UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -853,12 +782,12 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.bindRouteToApplicationMutex.RLock()
 	defer fake.bindRouteToApplicationMutex.RUnlock()
-	fake.checkRouteMutex.RLock()
-	defer fake.checkRouteMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
+	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
 	fake.gatherResourcesMutex.RLock()
 	defer fake.gatherResourcesMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
@@ -867,8 +796,6 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
-	fake.getRouteByHostAndDomainMutex.RLock()
-	defer fake.getRouteByHostAndDomainMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
