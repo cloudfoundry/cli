@@ -40,21 +40,6 @@ func (_ Actor) GatherResources(sourceDir string) ([]Resource, error) {
 	return resources, walkErr
 }
 
-func (actor Actor) UploadApplicationPackage(appGUID string, existingResources []Resource, newResources io.Reader, newResourcesLength int64) (Warnings, error) {
-	var allWarnings Warnings
-
-	job, warnings, err := actor.CloudControllerClient.UploadApplicationPackage(appGUID, actor.actorToCCResources(existingResources), newResources, newResourcesLength)
-	allWarnings = Warnings(warnings)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	warnings, err = actor.CloudControllerClient.PollJob(job)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-
-	return allWarnings, err
-}
-
 // ZipResources zips a directory and a sorted (based on full path/filename)
 // list of resources and returns the location. On Windows, the filemode for
 // user is forced to be readable and executable.

@@ -2,16 +2,12 @@ package v2action_test
 
 import (
 	"archive/zip"
-	"errors"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/ykk"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -46,6 +42,10 @@ var _ = Describe("Resource Actions", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	AfterEach(func() {
+		Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
+	})
+
 	Describe("GatherResources", func() {
 		It("gathers a list of all directories files in a source directory", func() {
 			resources, err := actor.GatherResources(srcDir)
@@ -59,84 +59,6 @@ var _ = Describe("Resource Actions", func() {
 					{Filename: "tmpFile2"},
 					{Filename: "tmpFile3"},
 				}))
-		})
-	})
-
-	Describe("UploadApplicationPackage", func() {
-		var (
-			appGUID           string
-			existingResources []Resource
-			reader            io.Reader
-			readerLength      int64
-			warnings          Warnings
-			executeErr        error
-		)
-
-		BeforeEach(func() {
-			appGUID = "some-app-guid"
-			existingResources = []Resource{{Filename: "some-resource"}, {Filename: "another-resource"}}
-			someString := "who reads these days"
-			reader = strings.NewReader(someString)
-			readerLength = int64(len([]byte(someString)))
-		})
-
-		JustBeforeEach(func() {
-			warnings, executeErr = actor.UploadApplicationPackage(appGUID, existingResources, reader, readerLength)
-		})
-
-		Context("when the upload returns an error", func() {
-			var err error
-
-			BeforeEach(func() {
-				err = errors.New("some-error")
-				fakeCloudControllerClient.UploadApplicationPackageReturns(ccv2.Job{}, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, err)
-			})
-
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(err))
-				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
-			})
-		})
-
-		Context("when polling errors", func() {
-			var err error
-
-			BeforeEach(func() {
-				fakeCloudControllerClient.UploadApplicationPackageReturns(ccv2.Job{}, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
-
-				err = errors.New("some-error")
-				fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"polling-warning"}, err)
-			})
-
-			It("returns the error", func() {
-				Expect(executeErr).To(MatchError(err))
-				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "polling-warning"))
-			})
-		})
-
-		Context("when the upload is successful", func() {
-			var returnedJob ccv2.Job
-
-			BeforeEach(func() {
-				returnedJob = ccv2.Job{GUID: "some-job-guid"}
-				fakeCloudControllerClient.UploadApplicationPackageReturns(returnedJob, ccv2.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
-				fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"polling-warning"}, nil)
-			})
-
-			It("returns all warnings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "polling-warning"))
-
-				Expect(fakeCloudControllerClient.UploadApplicationPackageCallCount()).To(Equal(1))
-				passedAppGUID, passedExistingResources, passedReader, passedReaderLength := fakeCloudControllerClient.UploadApplicationPackageArgsForCall(0)
-				Expect(passedAppGUID).To(Equal(appGUID))
-				Expect(passedExistingResources).To(ConsistOf(ccv2.Resource{Filename: "some-resource"}, ccv2.Resource{Filename: "another-resource"}))
-				Expect(passedReader).To(Equal(reader))
-				Expect(passedReaderLength).To(Equal(readerLength))
-
-				Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(returnedJob))
-			})
 		})
 	})
 
@@ -162,11 +84,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		AfterEach(func() {
-			err := os.RemoveAll(srcDir)
-			Expect(err).ToNot(HaveOccurred())
-
-			err = os.RemoveAll(resultZip)
-			Expect(err).ToNot(HaveOccurred())
+			Expect(os.RemoveAll(resultZip)).ToNot(HaveOccurred())
 		})
 
 		It("zips the file and returns a populated resources list", func() {

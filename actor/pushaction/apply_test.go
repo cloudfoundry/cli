@@ -3,7 +3,6 @@ package pushaction_test
 import (
 	"errors"
 	"io/ioutil"
-	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
@@ -134,15 +133,9 @@ var _ = Describe("Apply", func() {
 						Eventually(eventStream).Should(Receive(Equal(CreatingArchive)))
 					})
 
-					AfterEach(func() {
-						if archivePath != "" {
-							os.Remove(archivePath)
-						}
-					})
-
 					Context("when the upload is successful", func() {
 						BeforeEach(func() {
-							fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
+							fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
 						})
 
 						JustBeforeEach(func() {
@@ -175,7 +168,7 @@ var _ = Describe("Apply", func() {
 
 							BeforeEach(func() {
 								expectedErr = errors.New("dios mio")
-								fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+								fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
 							})
 
 							It("sends warnings and errors, then stops", func() {

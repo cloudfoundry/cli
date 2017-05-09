@@ -139,7 +139,6 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		}
 
 		messages, logErrs, appStarting, apiWarnings, errs := cmd.StartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
-		cmd.UI.DisplayNewline()
 		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
 		if err != nil {
 			return err
@@ -258,13 +257,14 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	case pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
-		cmd.UI.DisplayText("Uploading application...")
+		cmd.UI.DisplayText("Uploading files...")
 		log.Debug("starting progress bar")
 		cmd.ProgressBar.Ready()
 	case pushaction.UploadComplete:
-		cmd.UI.DisplayText("Upload complete")
 		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayText("Processing files...")
 	case pushaction.Complete:
+		cmd.UI.DisplayText("Tracing staging logs...")
 		return true
 	}
 	return false

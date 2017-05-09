@@ -272,7 +272,7 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 		defer close(appStarting)
 		defer close(allWarnings)
 		defer close(errs)
-		defer client.Close()
+		defer client.Close() // automatic close to prevent stale clients
 
 		if app.Started() {
 			_, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
@@ -312,7 +312,7 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 			return
 		}
 
-		client.Close()
+		client.Close() // Explicit close to stop logs from displaying on the screen
 		appStarting <- true
 
 		err = actor.pollStartup(app, config, allWarnings)
