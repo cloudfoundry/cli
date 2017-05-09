@@ -175,8 +175,7 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 		return Job{}, nil, err
 	}
 
-	// TODO: Error handling of Copying bits!!!
-	contentType, body, _ := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutAppBitsRequest,
@@ -198,9 +197,42 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 		Result: &job,
 	}
 
-	err = client.connection.Make(request, &response)
+	httpErrors := client.uploadBits(request, &response)
 
-	return job, response.Warnings, err
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break
+		}
+	}
+
+	return job, response.Warnings, firstError
 }
 
 func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
@@ -210,19 +242,39 @@ func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Reso
 	writeErrors := make(chan error)
 
 	go func() {
+		defer close(writeErrors)
 		defer writerInput.Close()
 
 		jsonResources, err := json.Marshal(existingResources)
 		if err != nil {
+			writeErrors <- err
 			return
 		}
-		form.WriteField("resources", string(jsonResources))
 
-		writer, _ := form.CreateFormFile("application", "application.zip")
-		if newResourcesLength != 0 {
-			io.Copy(writer, newResources)
+		err = form.WriteField("resources", string(jsonResources))
+		if err != nil {
+			writeErrors <- err
+			return
 		}
-		form.Close()
+
+		writer, err := form.CreateFormFile("application", "application.zip")
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		if newResourcesLength != 0 {
+			_, err = io.Copy(writer, newResources)
+			if err != nil {
+				writeErrors <- err
+				return
+			}
+		}
+
+		err = form.Close()
+		if err != nil {
+			writeErrors <- err
+		}
 	}()
 
 	return form.FormDataContentType(), writerOutput, writeErrors
@@ -250,4 +302,19 @@ func (_ *Client) overallRequestSize(existingResources []Resource, newResourcesLe
 	}
 
 	return int64(body.Len()) + newResourcesLength, nil
+}
+
+func (client *Client) uploadBits(request *cloudcontroller.Request, response *cloudcontroller.Response) <-chan error {
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
+
+	return httpErrors
 }

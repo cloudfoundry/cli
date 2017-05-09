@@ -9,11 +9,14 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -538,8 +541,8 @@ var _ = Describe("Job", func() {
 			)
 
 			BeforeEach(func() {
-				fakeReader = new(ccv2fakes.FakeReader)
 				expectedErr = errors.New("some read error")
+				fakeReader = new(ccv2fakes.FakeReader)
 				fakeReader.ReadReturns(0, expectedErr)
 
 				server.AppendHandlers(
@@ -548,8 +551,58 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns the error", func() {
-				Skip("figure out how to write properly first")
 				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, fakeReader, 3)
+				Expect(err).To(MatchError(expectedErr))
+			})
+		})
+
+		Context("when a retryable error occurs", func() {
+			BeforeEach(func() {
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
+							defer request.Body.Close()
+							return request.ResetBody()
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the PipeSeekError", func() {
+				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, strings.NewReader("hello world"), 3)
+				Expect(err).To(MatchError(ccerror.PipeSeekError{}))
+			})
+		})
+
+		Context("when an http error occurs mid-transfer", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some read error")
+
+				wrapper := &wrapper.CustomWrapper{
+					CustomMake: func(connection cloudcontroller.Connection, request *cloudcontroller.Request, response *cloudcontroller.Response) error {
+						defer GinkgoRecover() // Since this will be running in a thread
+
+						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
+							defer request.Body.Close()
+							request.Body.Read(make([]byte, 32*1024))
+							return expectedErr
+						}
+						return connection.Make(request, response)
+					},
+				}
+
+				client = NewTestClient(Config{Wrappers: []ConnectionWrapper{wrapper}})
+			})
+
+			It("returns the http error", func() {
+				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, strings.NewReader(strings.Repeat("a", 33*1024)), 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
