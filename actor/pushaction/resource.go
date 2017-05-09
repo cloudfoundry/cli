@@ -41,12 +41,18 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, p
 
 	eventStream <- UploadingApplication
 	reader := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
-	warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, []v2action.Resource{}, reader, archiveInfo.Size())
+
+	var allWarnings Warnings
+	job, warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, []v2action.Resource{}, reader, archiveInfo.Size())
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+
 	if err != nil {
 		log.WithField("archivePath", archivePath).Errorln("streaming archive:", err)
-		return Warnings(warnings), err
+		return allWarnings, err
 	}
 	eventStream <- UploadComplete
+	warnings, err = actor.V2Actor.PollJob(job)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
 
-	return Warnings(warnings), nil
+	return allWarnings, err
 }

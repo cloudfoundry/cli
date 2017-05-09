@@ -263,8 +263,9 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("Creating routes..."))
 						Expect(testUI.Out).To(Say("Binding routes..."))
 						Expect(testUI.Out).To(Say("Packaging files to upload..."))
-						Expect(testUI.Out).To(Say("Uploading application..."))
-						Expect(testUI.Out).To(Say("Upload complete"))
+						Expect(testUI.Out).To(Say("Uploading files..."))
+						Expect(testUI.Out).To(Say("Processing files..."))
+						Expect(testUI.Out).To(Say("Tracing staging logs..."))
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 						Expect(testUI.Err).To(Say("apply-1"))

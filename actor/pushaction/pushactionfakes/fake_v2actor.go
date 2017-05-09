@@ -129,6 +129,19 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	PollJobStub        func(job v2action.Job) (v2action.Warnings, error)
+	pollJobMutex       sync.RWMutex
+	pollJobArgsForCall []struct {
+		job v2action.Job
+	}
+	pollJobReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	pollJobReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	UpdateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
 	updateApplicationArgsForCall []struct {
@@ -144,7 +157,7 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	UploadApplicationPackageStub        func(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Warnings, error)
+	UploadApplicationPackageStub        func(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Job, v2action.Warnings, error)
 	uploadApplicationPackageMutex       sync.RWMutex
 	uploadApplicationPackageArgsForCall []struct {
 		appGUID            string
@@ -153,12 +166,14 @@ type FakeV2Actor struct {
 		newResourcesLength int64
 	}
 	uploadApplicationPackageReturns struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 v2action.Job
+		result2 v2action.Warnings
+		result3 error
 	}
 	uploadApplicationPackageReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
+		result1 v2action.Job
+		result2 v2action.Warnings
+		result3 error
 	}
 	ZipResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
 	zipResourcesMutex       sync.RWMutex
@@ -607,6 +622,57 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) PollJob(job v2action.Job) (v2action.Warnings, error) {
+	fake.pollJobMutex.Lock()
+	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
+	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
+		job v2action.Job
+	}{job})
+	fake.recordInvocation("PollJob", []interface{}{job})
+	fake.pollJobMutex.Unlock()
+	if fake.PollJobStub != nil {
+		return fake.PollJobStub(job)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.pollJobReturns.result1, fake.pollJobReturns.result2
+}
+
+func (fake *FakeV2Actor) PollJobCallCount() int {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return len(fake.pollJobArgsForCall)
+}
+
+func (fake *FakeV2Actor) PollJobArgsForCall(i int) v2action.Job {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return fake.pollJobArgsForCall[i].job
+}
+
+func (fake *FakeV2Actor) PollJobReturns(result1 v2action.Warnings, result2 error) {
+	fake.PollJobStub = nil
+	fake.pollJobReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) PollJobReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.PollJobStub = nil
+	if fake.pollJobReturnsOnCall == nil {
+		fake.pollJobReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.pollJobReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV2Actor) UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
 	fake.updateApplicationMutex.Lock()
 	ret, specificReturn := fake.updateApplicationReturnsOnCall[len(fake.updateApplicationArgsForCall)]
@@ -661,7 +727,7 @@ func (fake *FakeV2Actor) UpdateApplicationReturnsOnCall(i int, result1 v2action.
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Warnings, error) {
+func (fake *FakeV2Actor) UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Job, v2action.Warnings, error) {
 	var existingResourcesCopy []v2action.Resource
 	if existingResources != nil {
 		existingResourcesCopy = make([]v2action.Resource, len(existingResources))
@@ -681,9 +747,9 @@ func (fake *FakeV2Actor) UploadApplicationPackage(appGUID string, existingResour
 		return fake.UploadApplicationPackageStub(appGUID, existingResources, newResources, newResourcesLength)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.uploadApplicationPackageReturns.result1, fake.uploadApplicationPackageReturns.result2
+	return fake.uploadApplicationPackageReturns.result1, fake.uploadApplicationPackageReturns.result2, fake.uploadApplicationPackageReturns.result3
 }
 
 func (fake *FakeV2Actor) UploadApplicationPackageCallCount() int {
@@ -698,26 +764,29 @@ func (fake *FakeV2Actor) UploadApplicationPackageArgsForCall(i int) (string, []v
 	return fake.uploadApplicationPackageArgsForCall[i].appGUID, fake.uploadApplicationPackageArgsForCall[i].existingResources, fake.uploadApplicationPackageArgsForCall[i].newResources, fake.uploadApplicationPackageArgsForCall[i].newResourcesLength
 }
 
-func (fake *FakeV2Actor) UploadApplicationPackageReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeV2Actor) UploadApplicationPackageReturns(result1 v2action.Job, result2 v2action.Warnings, result3 error) {
 	fake.UploadApplicationPackageStub = nil
 	fake.uploadApplicationPackageReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v2action.Job
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2action.Job, result2 v2action.Warnings, result3 error) {
 	fake.UploadApplicationPackageStub = nil
 	if fake.uploadApplicationPackageReturnsOnCall == nil {
 		fake.uploadApplicationPackageReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
+			result1 v2action.Job
+			result2 v2action.Warnings
+			result3 error
 		})
 	}
 	fake.uploadApplicationPackageReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
+		result1 v2action.Job
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeV2Actor) ZipResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
@@ -796,6 +865,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()

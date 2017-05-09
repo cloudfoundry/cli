@@ -129,13 +129,17 @@ var _ = Describe("Resources", func() {
 			})
 
 			Context("when the upload is successful", func() {
-				var progresBarReader io.Reader
+				var (
+					progressBarReader io.Reader
+					uploadJob         v2action.Job
+				)
 
 				BeforeEach(func() {
-					fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+					uploadJob.GUID = "some-job-guid"
+					fakeV2Actor.UploadApplicationPackageReturns(uploadJob, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
 
-					progresBarReader = strings.NewReader("123456")
-					fakeProgressBar.NewProgressBarWrapperReturns(progresBarReader)
+					progressBarReader = strings.NewReader("123456")
+					fakeProgressBar.NewProgressBarWrapperReturns(progressBarReader)
 
 					go func() {
 						defer GinkgoRecover()
@@ -145,23 +149,46 @@ var _ = Describe("Resources", func() {
 					}()
 				})
 
-				It("returns the warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+				Context("when the polling is successful", func() {
+					BeforeEach(func() {
+						fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
+					})
 
-					Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
-					appGUID, existingResources, _, newResourcesLength := fakeV2Actor.UploadApplicationPackageArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(existingResources).To(BeEmpty())
-					Expect(newResourcesLength).To(BeNumerically("==", 6))
+					It("returns the warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+
+						Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
+						appGUID, existingResources, _, newResourcesLength := fakeV2Actor.UploadApplicationPackageArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(existingResources).To(BeEmpty())
+						Expect(newResourcesLength).To(BeNumerically("==", 6))
+
+						Expect(fakeV2Actor.PollJobCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.PollJobArgsForCall(0)).To(Equal(uploadJob))
+					})
+
+					It("passes the file reader to the progress bar", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeProgressBar.NewProgressBarWrapperCallCount()).To(Equal(1))
+						_, size := fakeProgressBar.NewProgressBarWrapperArgsForCall(0)
+						Expect(size).To(BeNumerically("==", 6))
+					})
 				})
 
-				It("passes the file reader to the progress bar", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				Context("when the polling fails", func() {
+					var expectedErr error
 
-					Expect(fakeProgressBar.NewProgressBarWrapperCallCount()).To(Equal(1))
-					_, size := fakeProgressBar.NewProgressBarWrapperArgsForCall(0)
-					Expect(size).To(BeNumerically("==", 6))
+					BeforeEach(func() {
+						expectedErr = errors.New("I can't let you do that starfox")
+						fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, expectedErr)
+					})
+
+					It("returns the warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+					})
 				})
 			})
 
@@ -173,7 +200,7 @@ var _ = Describe("Resources", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I can't let you do that starfox")
-					fakeV2Actor.UploadApplicationPackageReturns(v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
+					fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
 
 					done = make(chan bool)
 
