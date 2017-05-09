@@ -4472,6 +4472,10 @@
     "translation": "El proceso ha finalizado por la señal: {{.Signal}}. Se ha salido con {{.ExitCode}}"
   },
   {
+    "id": "Processing files...",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "Solicitudes HTTP de rastreo"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "Falta el punto final de UAA del archivo de configuración"
   },
@@ -6124,10 +6132,6 @@
     "translation": "Actualizando {{.AppName}} health_check_type a '{{.HealthCheckType}}'"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "Subiendo archivos de app desde: {{.Path}}"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "Subiendo el paquete de compilación {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": ""
   },
   {
     "id": "Uploading {{.AppName}}...",

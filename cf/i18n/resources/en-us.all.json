@@ -4472,6 +4472,10 @@
     "translation": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}"
   },
   {
+    "id": "Processing files...",
+    "translation": "Processing files..."
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "Trace HTTP requests"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "UAA endpoint missing from config file"
   },
@@ -6124,10 +6132,6 @@
     "translation": "Updating {{.AppName}} health_check_type to '{{.HealthCheckType}}'"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "Uploading app files from: {{.Path}}"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "Uploading buildpack {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": "Uploading files..."
   },
   {
     "id": "Uploading {{.AppName}}...",

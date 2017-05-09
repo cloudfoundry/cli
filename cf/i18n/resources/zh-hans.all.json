@@ -4472,6 +4472,10 @@
     "translation": "进程被以下信号终止: {{.Signal}}。已退出，并带有 {{.ExitCode}}"
   },
   {
+    "id": "Processing files...",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "跟踪 HTTP 请求"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "配置文件中缺少 UAA 端点"
   },
@@ -6124,10 +6132,6 @@
     "translation": "正在将 {{.AppName}} health_check_type 更新为“{{.HealthCheckType}}”"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "正在从以下位置上传应用程序文件: {{.Path}}"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "正在上传 buildpack {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": ""
   },
   {
     "id": "Uploading {{.AppName}}...",

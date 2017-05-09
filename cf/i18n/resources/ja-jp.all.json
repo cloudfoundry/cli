@@ -4472,6 +4472,10 @@
     "translation": "このプロセスは次のシグナルによって終了しました: {{.Signal}}。次のもので終了しました: {{.ExitCode}}"
   },
   {
+    "id": "Processing files...",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "HTTP 要求をトレースします"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "UAA エンドポイントが構成ファイルにありません"
   },
@@ -6124,10 +6132,6 @@
     "translation": "{{.AppName}} health_check_type を '{{.HealthCheckType}}' に更新しています"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "次のパスからアプリ・ファイルをアップロードしています: {{.Path}}"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "ビルドパック {{.BuildpackName}} をアップロードしています..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": ""
   },
   {
     "id": "Uploading {{.AppName}}...",

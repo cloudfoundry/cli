@@ -4472,6 +4472,10 @@
     "translation": "因信號 {{.Signal}} 而終止處理程序。結束碼 {{.ExitCode}}"
   },
   {
+    "id": "Processing files...",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "追蹤 HTTP 要求"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "配置檔中遺漏 UAA 端點"
   },
@@ -6124,10 +6132,6 @@
     "translation": "正在將 {{.AppName}} health_check_type 更新為 '{{.HealthCheckType}}'"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "正在從 {{.Path}} 上傳應用程式檔案"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "正在上傳建置套件 {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": ""
   },
   {
     "id": "Uploading {{.AppName}}...",
