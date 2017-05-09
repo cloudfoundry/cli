@@ -68,6 +68,9 @@ var _ = Describe("Resource Actions", func() {
 		AfterEach(func() {
 			err := os.RemoveAll(srcDir)
 			Expect(err).ToNot(HaveOccurred())
+
+			err = os.RemoveAll(resultZip)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		Context("when zipping on UNIX", func() {

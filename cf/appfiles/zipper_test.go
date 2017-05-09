@@ -313,14 +313,11 @@ var _ = Describe("Zipper", func() {
 			BeforeEach(func() {
 				f, err := ioutil.TempFile("", "zipper-test")
 				Expect(err).NotTo(HaveOccurred())
-
-				fi, err := f.Stat()
-				Expect(err).NotTo(HaveOccurred())
-				fileName = fi.Name()
+				fileName = f.Name()
 			})
 
 			AfterEach(func() {
-				defer os.RemoveAll(fileName)
+				os.RemoveAll(fileName)
 			})
 
 			It("returns false", func() {

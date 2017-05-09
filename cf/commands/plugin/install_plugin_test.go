@@ -103,8 +103,8 @@ var _ = Describe("Install", func() {
 	})
 
 	AfterEach(func() {
-		os.Remove(filepath.Join(curDir, pluginFile.Name()))
-		os.Remove(homeDir)
+		os.RemoveAll(filepath.Join(curDir, pluginFile.Name()))
+		os.RemoveAll(homeDir)
 	})
 
 	runCommand := func(args ...string) bool {

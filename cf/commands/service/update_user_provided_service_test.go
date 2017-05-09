@@ -196,12 +196,21 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			})
 
 			Context("when the -p flag is passed with a file containing JSON", func() {
+				var filename string
+
 				BeforeEach(func() {
 					tempfile, err := ioutil.TempFile("", "update-user-provided-service-test")
 					Expect(err).NotTo(HaveOccurred())
+					Expect(tempfile.Close()).NotTo(HaveOccurred())
+					filename = tempfile.Name()
+
 					jsonData := `{"some":"json"}`
-					ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
-					flagContext.Parse("service-instance", "-p", tempfile.Name())
+					ioutil.WriteFile(filename, []byte(jsonData), os.ModePerm)
+					flagContext.Parse("service-instance", "-p", filename)
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(filename)).NotTo(HaveOccurred())
 				})
 
 				It("tries to update the user provided service instance with the credentials", func() {

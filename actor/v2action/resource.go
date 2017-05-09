@@ -147,13 +147,3 @@ func (_ Actor) addFileToZip(srcPath string, destPath string, zipFile *zip.Writer
 
 	return nil
 }
-
-func (_ Actor) containedInFiles(path string, fileList []Resource) bool {
-	for _, resource := range fileList {
-		if resource.Filename == path {
-			return true
-		}
-	}
-
-	return false
-}
