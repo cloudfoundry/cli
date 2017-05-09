@@ -4472,6 +4472,10 @@
     "translation": "다음 신호로 프로세스가 종료됨: {{.Signal}}. {{.ExitCode}}(으)로 종료됨"
   },
   {
+    "id": "Processing files...",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -5864,6 +5868,10 @@
     "translation": "HTTP 추적 요청"
   },
   {
+    "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
     "id": "UAA endpoint missing from config file",
     "translation": "구성 파일에서 UAA 엔드포인트 누락"
   },
@@ -6124,10 +6132,6 @@
     "translation": "{{.AppName}} health_check_type을 '{{.HealthCheckType}}'(으)로 업데이트"
   },
   {
-    "id": "Upload complete",
-    "translation": ""
-  },
-  {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6136,12 +6140,12 @@
     "translation": "업로드 중인 앱 파일 원본 위치: {{.Path}}"
   },
   {
-    "id": "Uploading application...",
-    "translation": ""
-  },
-  {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "{{.BuildpackName}} 빌드팩 업로드 중..."
+  },
+  {
+    "id": "Uploading files...",
+    "translation": ""
   },
   {
     "id": "Uploading {{.AppName}}...",
