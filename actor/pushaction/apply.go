@@ -1,6 +1,10 @@
 package pushaction
 
-import log "github.com/Sirupsen/logrus"
+import (
+	"os"
+
+	log "github.com/Sirupsen/logrus"
+)
 
 func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
 	configStream := make(chan ApplicationConfig)
@@ -57,6 +61,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			return
 		}
 		eventStream <- CreatingArchive
+		defer os.Remove(archivePath)
 
 		warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
 		warningsStream <- warnings

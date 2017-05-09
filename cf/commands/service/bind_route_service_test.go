@@ -422,14 +422,22 @@ var _ = Describe("BindRouteService", func() {
 				})
 
 				Context("when given parameters as a file containing JSON", func() {
+					var filename string
 					BeforeEach(func() {
 						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 						tempfile, err := ioutil.TempFile("", "get-data-test")
 						Expect(err).NotTo(HaveOccurred())
+						Expect(tempfile.Close()).NotTo(HaveOccurred())
+						filename = tempfile.Name()
+
 						jsonData := `{"some":"json"}`
-						ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
-						err = flagContext.Parse("domain-name", "service-instance", "-c", tempfile.Name())
+						ioutil.WriteFile(filename, []byte(jsonData), os.ModePerm)
+						err = flagContext.Parse("domain-name", "service-instance", "-c", filename)
 						Expect(err).NotTo(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						os.RemoveAll(filename)
 					})
 
 					It("tries to find the route with the given parameters", func() {

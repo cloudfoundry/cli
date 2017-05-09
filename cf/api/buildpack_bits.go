@@ -56,6 +56,13 @@ func (repo CloudControllerBuildpackBitsRepository) CreateBuildpackZipFile(buildp
 		return nil, "", fmt.Errorf("%s: %s", T("Couldn't create temp file for upload"), err.Error())
 	}
 
+	var success bool
+	defer func() {
+		if !success {
+			os.RemoveAll(zipFileToUpload.Name())
+		}
+	}()
+
 	var buildpackFileName string
 	if isWebURL(buildpackPath) {
 		buildpackFileName = path.Base(buildpackPath)
@@ -105,6 +112,7 @@ func (repo CloudControllerBuildpackBitsRepository) CreateBuildpackZipFile(buildp
 		}
 	}
 
+	success = true
 	return zipFileToUpload, buildpackFileName, nil
 }
 

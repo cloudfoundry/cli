@@ -84,9 +84,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("not a valid zip file"))
-
 			})
-
 		})
 
 		Context("when buildpack path is a URL", func() {
@@ -176,7 +174,6 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		)
 
 		JustBeforeEach(func() {
-
 			buildpackPath := filepath.Join(buildpacksDir, zipFileName)
 			zipFile, _, err = repo.CreateBuildpackZipFile(buildpackPath)
 
@@ -188,6 +185,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			BeforeEach(func() {
 				zipFileName = "example-buildpack.zip"
 			})
+
 			It("uploads the buildpack", func() {
 
 				apiErr := repo.UploadBuildpack(buildpack, zipFile, zipFileName)
@@ -201,15 +199,14 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			BeforeEach(func() {
 				zipFileName = "example-buildpack-in-dir.zip"
 			})
-			It("uploads a zip file containing only the actual buildpack", func() {
 
+			It("uploads a zip file containing only the actual buildpack", func() {
 				apiErr := repo.UploadBuildpack(buildpack, zipFile, zipFileName)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(testServerHandler).To(HaveAllRequestsCalled())
 			})
 		})
-
 	})
 })
 

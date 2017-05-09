@@ -190,6 +190,7 @@ var _ = Describe("curl command", func() {
 		It("sets the request body with an @-prefixed file", func() {
 			tempfile, err := ioutil.TempFile("", "get-data-test")
 			Expect(err).NotTo(HaveOccurred())
+			defer os.RemoveAll(tempfile.Name())
 			jsonData := `{"some":"json"}`
 			ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
 
