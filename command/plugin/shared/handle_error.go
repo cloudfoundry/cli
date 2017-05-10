@@ -7,16 +7,17 @@ import (
 
 func HandleError(err error) error {
 	switch e := err.(type) {
-	case pluginaction.PluginNotFoundError:
-		return PluginNotFoundError{Name: e.Name}
-	case pluginaction.GettingPluginRepositoryError:
-		return GettingPluginRepositoryError{Name: e.Name, Message: e.Message}
-	case pluginaction.RepositoryNameTakenError:
-		return RepositoryNameTakenError{Name: e.Name}
+	case pluginerror.RawHTTPStatusError:
+		return DownloadPluginHTTPError{Message: e.Status}
+	case pluginerror.SSLValidationHostnameError:
+		return DownloadPluginHTTPError{Message: e.Error()}
+	case pluginerror.UnverifiedServerError:
+		return DownloadPluginHTTPError{Message: e.Error()}
+
 	case pluginaction.AddPluginRepositoryError:
 		return AddPluginRepositoryError{Name: e.Name, URL: e.URL, Message: e.Message}
-	case pluginaction.PluginInvalidError:
-		return PluginInvalidError{}
+	case pluginaction.GettingPluginRepositoryError:
+		return GettingPluginRepositoryError{Name: e.Name, Message: e.Message}
 	case pluginaction.PluginCommandsConflictError:
 		return PluginCommandsConflictError{
 			PluginName:     e.PluginName,
@@ -24,8 +25,12 @@ func HandleError(err error) error {
 			CommandNames:   e.CommandNames,
 			CommandAliases: e.CommandAliases,
 		}
-	case pluginerror.RawHTTPStatusError:
-		return DownloadPluginRawHTTPStatusError{Status: e.Status}
+	case pluginaction.PluginInvalidError:
+		return PluginInvalidError{}
+	case pluginaction.PluginNotFoundError:
+		return PluginNotFoundError{Name: e.Name}
+	case pluginaction.RepositoryNameTakenError:
+		return RepositoryNameTakenError{Name: e.Name}
 	}
 	return err
 }

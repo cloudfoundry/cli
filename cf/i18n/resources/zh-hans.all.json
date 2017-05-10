@@ -2404,7 +2404,7 @@
     "translation": "下载尝试失败: {{.Error}}\n\n无法安装，插件无法从给定 URL 获取。"
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
     "translation": ""
   },
   {
