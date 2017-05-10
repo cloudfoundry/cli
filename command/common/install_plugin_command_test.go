@@ -391,7 +391,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("begins downloading the plugin", func() {
-				Expect(testUI.Out).To(Say("Attempting to download plugin binary from URL\\.\\.\\."))
+				Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
 
 				Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 				url := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
@@ -601,7 +601,7 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", cmd.OptionalArgs.PluginNameOrLocation))
-						Expect(testUI.Out).To(Say("Attempting to download plugin binary from URL\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
 
 						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
