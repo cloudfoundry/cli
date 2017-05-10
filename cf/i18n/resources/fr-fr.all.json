@@ -4872,6 +4872,10 @@
     "translation": "Extraction du contenu du groupe de variables d'environnement de constitution en tant que {{.Username}}..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },
