@@ -18,16 +18,19 @@ var _ = Describe("install actions", func() {
 	var (
 		actor      *Actor
 		fakeConfig *pluginactionfakes.FakeConfig
+		fakeClient *pluginactionfakes.FakePluginClient
 		tempDir    string
 	)
 
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
+		fakeClient = new(pluginactionfakes.FakePluginClient)
+		actor = NewActor(fakeConfig, fakeClient)
+
 		var err error
 		tempDir, err = ioutil.TempDir("", "")
 		Expect(err).ToNot(HaveOccurred())
 		fakeConfig.PluginHomeReturns(tempDir)
-		actor = NewActor(fakeConfig, nil)
 	})
 
 	AfterEach(func() {
@@ -87,6 +90,73 @@ var _ = Describe("install actions", func() {
 			It("returns an os.PathError", func() {
 				_, err = actor.CreateExecutableCopy(filepath.Join("foo", myFile.Name()))
 				_, isPathError := err.(*os.PathError)
+				Expect(isPathError).To(BeTrue())
+			})
+		})
+	})
+
+	Describe("DownloadExecutableBinaryFromURL", func() {
+		var (
+			path        string
+			size        int64
+			downloadErr error
+		)
+
+		JustBeforeEach(func() {
+			path, size, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com")
+		})
+
+		Context("when the downloaded is successful", func() {
+			var (
+				data []byte
+			)
+
+			BeforeEach(func() {
+				data = []byte("some test data")
+				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
+					err := ioutil.WriteFile(path, data, 0700)
+					Expect(err).ToNot(HaveOccurred())
+					return nil
+				}
+			})
+			It("returns the path to the file and the size", func() {
+				Expect(downloadErr).ToNot(HaveOccurred())
+				fileData, err := ioutil.ReadFile(path)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fileData).To(Equal(data))
+				Expect(size).To(BeEquivalentTo(len(data)))
+
+				Expect(fakeClient.DownloadPluginCallCount()).To(Equal(1))
+				pluginURL, downloadPath := fakeClient.DownloadPluginArgsForCall(0)
+				Expect(pluginURL).To(Equal("some-plugin-url.com"))
+				Expect(downloadPath).To(Equal(path))
+			})
+		})
+
+		Context("when there is an error downloading file", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some error")
+				fakeClient.DownloadPluginReturns(expectedErr)
+			})
+
+			It("returns the error", func() {
+				Expect(downloadErr).To(MatchError(expectedErr))
+			})
+		})
+
+		Context("when there is an error getting the file size", func() {
+			BeforeEach(func() {
+				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
+					err := os.Remove(path)
+					Expect(err).ToNot(HaveOccurred())
+					return nil
+				}
+			})
+
+			It("returns the error", func() {
+				_, isPathError := downloadErr.(*os.PathError)
 				Expect(isPathError).To(BeTrue())
 			})
 		})

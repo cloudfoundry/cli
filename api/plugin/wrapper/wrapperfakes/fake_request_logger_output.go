@@ -9,15 +9,15 @@ import (
 )
 
 type FakeRequestLoggerOutput struct {
-	DisplayJSONBodyStub        func(body []byte) error
-	displayJSONBodyMutex       sync.RWMutex
-	displayJSONBodyArgsForCall []struct {
-		body []byte
+	DisplayDumpStub        func(dump string) error
+	displayDumpMutex       sync.RWMutex
+	displayDumpArgsForCall []struct {
+		dump string
 	}
-	displayJSONBodyReturns struct {
+	displayDumpReturns struct {
 		result1 error
 	}
-	displayJSONBodyReturnsOnCall map[int]struct {
+	displayDumpReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DisplayHeaderStub        func(name string, value string) error
@@ -41,6 +41,17 @@ type FakeRequestLoggerOutput struct {
 		result1 error
 	}
 	displayHostReturnsOnCall map[int]struct {
+		result1 error
+	}
+	DisplayJSONBodyStub        func(body []byte) error
+	displayJSONBodyMutex       sync.RWMutex
+	displayJSONBodyArgsForCall []struct {
+		body []byte
+	}
+	displayJSONBodyReturns struct {
+		result1 error
+	}
+	displayJSONBodyReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string) error
@@ -107,55 +118,50 @@ type FakeRequestLoggerOutput struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
-	var bodyCopy []byte
-	if body != nil {
-		bodyCopy = make([]byte, len(body))
-		copy(bodyCopy, body)
-	}
-	fake.displayJSONBodyMutex.Lock()
-	ret, specificReturn := fake.displayJSONBodyReturnsOnCall[len(fake.displayJSONBodyArgsForCall)]
-	fake.displayJSONBodyArgsForCall = append(fake.displayJSONBodyArgsForCall, struct {
-		body []byte
-	}{bodyCopy})
-	fake.recordInvocation("DisplayJSONBody", []interface{}{bodyCopy})
-	fake.displayJSONBodyMutex.Unlock()
-	if fake.DisplayJSONBodyStub != nil {
-		return fake.DisplayJSONBodyStub(body)
+func (fake *FakeRequestLoggerOutput) DisplayDump(dump string) error {
+	fake.displayDumpMutex.Lock()
+	ret, specificReturn := fake.displayDumpReturnsOnCall[len(fake.displayDumpArgsForCall)]
+	fake.displayDumpArgsForCall = append(fake.displayDumpArgsForCall, struct {
+		dump string
+	}{dump})
+	fake.recordInvocation("DisplayDump", []interface{}{dump})
+	fake.displayDumpMutex.Unlock()
+	if fake.DisplayDumpStub != nil {
+		return fake.DisplayDumpStub(dump)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.displayJSONBodyReturns.result1
+	return fake.displayDumpReturns.result1
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayJSONBodyCallCount() int {
-	fake.displayJSONBodyMutex.RLock()
-	defer fake.displayJSONBodyMutex.RUnlock()
-	return len(fake.displayJSONBodyArgsForCall)
+func (fake *FakeRequestLoggerOutput) DisplayDumpCallCount() int {
+	fake.displayDumpMutex.RLock()
+	defer fake.displayDumpMutex.RUnlock()
+	return len(fake.displayDumpArgsForCall)
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayJSONBodyArgsForCall(i int) []byte {
-	fake.displayJSONBodyMutex.RLock()
-	defer fake.displayJSONBodyMutex.RUnlock()
-	return fake.displayJSONBodyArgsForCall[i].body
+func (fake *FakeRequestLoggerOutput) DisplayDumpArgsForCall(i int) string {
+	fake.displayDumpMutex.RLock()
+	defer fake.displayDumpMutex.RUnlock()
+	return fake.displayDumpArgsForCall[i].dump
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturns(result1 error) {
-	fake.DisplayJSONBodyStub = nil
-	fake.displayJSONBodyReturns = struct {
+func (fake *FakeRequestLoggerOutput) DisplayDumpReturns(result1 error) {
+	fake.DisplayDumpStub = nil
+	fake.displayDumpReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturnsOnCall(i int, result1 error) {
-	fake.DisplayJSONBodyStub = nil
-	if fake.displayJSONBodyReturnsOnCall == nil {
-		fake.displayJSONBodyReturnsOnCall = make(map[int]struct {
+func (fake *FakeRequestLoggerOutput) DisplayDumpReturnsOnCall(i int, result1 error) {
+	fake.DisplayDumpStub = nil
+	if fake.displayDumpReturnsOnCall == nil {
+		fake.displayDumpReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.displayJSONBodyReturnsOnCall[i] = struct {
+	fake.displayDumpReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -253,6 +259,59 @@ func (fake *FakeRequestLoggerOutput) DisplayHostReturnsOnCall(i int, result1 err
 		})
 	}
 	fake.displayHostReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
+	var bodyCopy []byte
+	if body != nil {
+		bodyCopy = make([]byte, len(body))
+		copy(bodyCopy, body)
+	}
+	fake.displayJSONBodyMutex.Lock()
+	ret, specificReturn := fake.displayJSONBodyReturnsOnCall[len(fake.displayJSONBodyArgsForCall)]
+	fake.displayJSONBodyArgsForCall = append(fake.displayJSONBodyArgsForCall, struct {
+		body []byte
+	}{bodyCopy})
+	fake.recordInvocation("DisplayJSONBody", []interface{}{bodyCopy})
+	fake.displayJSONBodyMutex.Unlock()
+	if fake.DisplayJSONBodyStub != nil {
+		return fake.DisplayJSONBodyStub(body)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayJSONBodyReturns.result1
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayJSONBodyCallCount() int {
+	fake.displayJSONBodyMutex.RLock()
+	defer fake.displayJSONBodyMutex.RUnlock()
+	return len(fake.displayJSONBodyArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayJSONBodyArgsForCall(i int) []byte {
+	fake.displayJSONBodyMutex.RLock()
+	defer fake.displayJSONBodyMutex.RUnlock()
+	return fake.displayJSONBodyArgsForCall[i].body
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturns(result1 error) {
+	fake.DisplayJSONBodyStub = nil
+	fake.displayJSONBodyReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturnsOnCall(i int, result1 error) {
+	fake.DisplayJSONBodyStub = nil
+	if fake.displayJSONBodyReturnsOnCall == nil {
+		fake.displayJSONBodyReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayJSONBodyReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -512,12 +571,14 @@ func (fake *FakeRequestLoggerOutput) StopReturnsOnCall(i int, result1 error) {
 func (fake *FakeRequestLoggerOutput) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.displayJSONBodyMutex.RLock()
-	defer fake.displayJSONBodyMutex.RUnlock()
+	fake.displayDumpMutex.RLock()
+	defer fake.displayDumpMutex.RUnlock()
 	fake.displayHeaderMutex.RLock()
 	defer fake.displayHeaderMutex.RUnlock()
 	fake.displayHostMutex.RLock()
 	defer fake.displayHostMutex.RUnlock()
+	fake.displayJSONBodyMutex.RLock()
+	defer fake.displayJSONBodyMutex.RUnlock()
 	fake.displayRequestHeaderMutex.RLock()
 	defer fake.displayRequestHeaderMutex.RUnlock()
 	fake.displayResponseHeaderMutex.RLock()

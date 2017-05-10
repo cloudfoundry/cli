@@ -45,5 +45,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("PluginInvalidError", PluginInvalidError{}),
 		Entry("PluginCommandsConflictError", PluginCommandsConflictError{}),
 		Entry("PluginAlreadyInstalledError", PluginAlreadyInstalledError{}),
+		Entry("DownloadPluginRawHTTPStatusError", DownloadPluginRawHTTPStatusError{}),
 	)
 })

@@ -44,6 +44,10 @@
     "translation": ""
   },
   {
+    "id": "Attempting to download plugin binary from URL...",
+    "translation": "Attempting to download plugin binary from URL..."
+  },
+  {
     "id": "Attention: Plugins are binaries written by potentially untrusted authors.",
     "translation": ""
   },
@@ -176,6 +180,10 @@
     "translation": ""
   },
   {
+    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": ""
+  },
+  {
     "id": "ENVIRONMENT:",
     "translation": ""
   },
@@ -208,8 +216,8 @@
     "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
   },
   {
-    "id": "File not a valid cf CLI plugin binary.",
-    "translation": ""
+    "id": "File is not a valid cf CLI plugin binary.",
+    "translation": "File is not a valid cf CLI plugin binary."
   },
   {
     "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
@@ -493,10 +501,6 @@
   },
   {
     "id": "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
-    "translation": ""
-  },
-  {
-    "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
   {

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
@@ -369,12 +370,14 @@ var _ = Describe("install-plugin command", func() {
 			plugin               configv3.Plugin
 			pluginName           string
 			downloadedPluginPath string
+			executablePluginPath string
 		)
 
 		BeforeEach(func() {
 			cmd.OptionalArgs.PluginNameOrLocation = "http://some-url"
 			pluginName = "some-plugin"
 			downloadedPluginPath = "some-path"
+			executablePluginPath = "executable-path"
 		})
 
 		It("displays the plugin warning", func() {
@@ -388,7 +391,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("begins downloading the plugin", func() {
-				Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
+				Expect(testUI.Out).To(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 
 				Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 				url := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
@@ -407,11 +410,22 @@ var _ = Describe("install-plugin command", func() {
 					Expect(testUI.Out).ToNot(Say("downloaded"))
 					Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(0))
 				})
+
+				Context("when a 4xx or 5xx status is encountered while downloading the plugin", func() {
+					BeforeEach(func() {
+						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, pluginerror.RawHTTPStatusError{Status: "some-status"})
+					})
+
+					It("returns a DownloadPluginRawHTTPError", func() {
+						Expect(executeErr).To(MatchError(shared.DownloadPluginRawHTTPStatusError{Status: "some-status"}))
+					})
+				})
 			})
 
 			Context("when getting the binary succeeds", func() {
 				BeforeEach(func() {
 					fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+					fakeActor.CreateExecutableCopyReturns(executablePluginPath, nil)
 				})
 
 				It("displays the bytes downloaded", func() {
@@ -419,7 +433,7 @@ var _ = Describe("install-plugin command", func() {
 
 					Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 					_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
-					Expect(path).To(Equal(downloadedPluginPath))
+					Expect(path).To(Equal(executablePluginPath))
 				})
 
 				Context("when the plugin is invalid", func() {
@@ -521,8 +535,18 @@ var _ = Describe("install-plugin command", func() {
 
 		Context("when the -f argument is not given (user is prompted for confirmation)", func() {
 			BeforeEach(func() {
+				plugin = configv3.Plugin{
+					Name: pluginName,
+					Version: configv3.PluginVersion{
+						Major: 1,
+						Minor: 2,
+						Build: 3,
+					},
+				}
+
 				cmd.Force = false
 				fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+				fakeActor.CreateExecutableCopyReturns("executable-path", nil)
 			})
 
 			Context("when the user chooses no", func() {
@@ -569,7 +593,6 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the plugin is not already installed", func() {
 					BeforeEach(func() {
 						fakeActor.GetAndValidatePluginReturns(plugin, nil)
-
 					})
 
 					It("installs the plugin", func() {
@@ -578,7 +601,7 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", cmd.OptionalArgs.PluginNameOrLocation))
-						Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 
 						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
@@ -589,16 +612,20 @@ var _ = Describe("install-plugin command", func() {
 						url := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 						Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
 
+						Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
+						path := fakeActor.CreateExecutableCopyArgsForCall(0)
+						Expect(path).To(Equal("some-path"))
+
 						Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
-						_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
-						Expect(path).To(Equal(downloadedPluginPath))
+						_, _, path = fakeActor.GetAndValidatePluginArgsForCall(0)
+						Expect(path).To(Equal(executablePluginPath))
 
 						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
 						Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal(pluginName))
 
 						Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 						path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
-						Expect(path).To(Equal(downloadedPluginPath))
+						Expect(path).To(Equal(executablePluginPath))
 						Expect(installedPlugin).To(Equal(plugin))
 
 						Expect(fakeActor.UninstallPluginCallCount()).To(Equal(0))
@@ -607,14 +634,6 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when the plugin is already installed", func() {
 					BeforeEach(func() {
-						plugin := configv3.Plugin{
-							Name: pluginName,
-							Version: configv3.PluginVersion{
-								Major: 1,
-								Minor: 2,
-								Build: 3,
-							},
-						}
 						fakeActor.GetAndValidatePluginReturns(plugin, nil)
 						fakeActor.IsPluginInstalledReturns(true)
 					})

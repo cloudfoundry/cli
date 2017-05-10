@@ -39,7 +39,7 @@ type InstallPluginCommand struct {
 func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.Actor = pluginaction.NewActor(config, nil)
+	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui))
 	return nil
 }
 
@@ -124,6 +124,8 @@ func (cmd InstallPluginCommand) uninstallPlugin(plugin configv3.Plugin, rpcServi
 }
 
 func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string) (string, error) {
+	var tempPath string
+
 	switch {
 	case cmd.Actor.FileExists(pluginNameOrLocation):
 		err := cmd.promptForInstallPlugin(pluginNameOrLocation)
@@ -131,30 +133,34 @@ func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string)
 			return "", err
 		}
 
-		return cmd.Actor.CreateExecutableCopy(pluginNameOrLocation)
+		tempPath = pluginNameOrLocation
 	case util.IsHTTPScheme(pluginNameOrLocation):
 		err := cmd.promptForInstallPlugin(pluginNameOrLocation)
 		if err != nil {
 			return "", err
 		}
 
-		cmd.UI.DisplayText("Starting download of plugin binary from URL...")
+		cmd.UI.DisplayText("Attempting to download plugin binary from URL...")
 
-		downloadedPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation)
+		var size int64
+		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation)
+		defer os.Remove(tempPath)
 		if err != nil {
-			return "", err
+			return "", shared.HandleError(err)
 		}
 
 		cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
 			"Bytes": size,
 		})
-
-		return downloadedPath, nil
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
 		return "", command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 	default:
 		return "", shared.FileNotFoundError{Path: pluginNameOrLocation}
 	}
+
+	// copy twice when downloading from a URL to keep Windows specific code
+	// isolated to CreateExecutableCopy
+	return cmd.Actor.CreateExecutableCopy(tempPath)
 }
 
 func (cmd InstallPluginCommand) promptForInstallPlugin(path string) error {

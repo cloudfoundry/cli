@@ -132,8 +132,8 @@ var _ = Describe("Request Logger", func() {
 					request.Header.Set("Content-Type", "banana")
 				})
 
-				It("does not display the body", func() {
-					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(1)) // Once for response body only
+				It("does not display the request body", func() {
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(0))
 				})
 			})
 		})
@@ -163,47 +163,105 @@ var _ = Describe("Request Logger", func() {
 		})
 
 		Context("when the request is successful", func() {
-			BeforeEach(func() {
-				response = &plugin.Response{
-					RawResponse: []byte("some-response-body"),
-					HTTPResponse: &http.Response{
-						Proto:  "HTTP/1.1",
-						Status: "200 OK",
-						Header: http.Header{
-							"BBBBB": {"second"},
-							"AAAAA": {"first"},
-							"CCCCC": {"third"},
+			Context("when the response is JSON", func() {
+				BeforeEach(func() {
+					response = &plugin.Response{
+						RawResponse: []byte(`{"some-key":"some-value"}`),
+						HTTPResponse: &http.Response{
+							Proto:  "HTTP/1.1",
+							Status: "200 OK",
+							Header: http.Header{
+								"Content-Type": {"application/json"},
+								"BBBBB":        {"second"},
+								"AAAAA":        {"first"},
+								"CCCCC":        {"third"},
+							},
+							Body: ioutil.NopCloser(bytes.NewReader([]byte(`{"some-key":"some-value"}`))),
 						},
-					},
-				}
+					}
+				})
+
+				It("outputs the response", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+					name, date := fakeOutput.DisplayTypeArgsForCall(1)
+					Expect(name).To(Equal("RESPONSE"))
+					Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+					protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+					Expect(protocol).To(Equal("HTTP/1.1"))
+					Expect(status).To(Equal("200 OK"))
+
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 7))
+					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+					Expect(name).To(Equal("AAAAA"))
+					Expect(value).To(Equal("first"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(4)
+					Expect(name).To(Equal("BBBBB"))
+					Expect(value).To(Equal("second"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(5)
+					Expect(name).To(Equal("CCCCC"))
+					Expect(value).To(Equal("third"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(6)
+					Expect(name).To(Equal("Content-Type"))
+					Expect(value).To(Equal("application/json"))
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal(response.RawResponse))
+
+					Expect(fakeOutput.DisplayDumpCallCount()).To(Equal(0))
+				})
 			})
 
-			It("outputs the response", func() {
-				Expect(err).NotTo(HaveOccurred())
+			Context("when the response is not JSON", func() {
+				BeforeEach(func() {
+					response = &plugin.Response{
+						RawResponse: []byte(`not JSON`),
+						HTTPResponse: &http.Response{
+							Proto:  "HTTP/1.1",
+							Status: "200 OK",
+							Header: http.Header{
+								"BBBBB": {"second"},
+								"AAAAA": {"first"},
+								"CCCCC": {"third"},
+							},
+							Body: ioutil.NopCloser(bytes.NewReader([]byte(`not JSON`))),
+						},
+					}
+				})
 
-				Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
-				name, date := fakeOutput.DisplayTypeArgsForCall(1)
-				Expect(name).To(Equal("RESPONSE"))
-				Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+				It("outputs the response", func() {
+					Expect(err).NotTo(HaveOccurred())
 
-				Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
-				protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
-				Expect(protocol).To(Equal("HTTP/1.1"))
-				Expect(status).To(Equal("200 OK"))
+					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+					name, date := fakeOutput.DisplayTypeArgsForCall(1)
+					Expect(name).To(Equal("RESPONSE"))
+					Expect(date).To(BeTemporally("~", time.Now(), time.Second))
 
-				Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
-				name, value := fakeOutput.DisplayHeaderArgsForCall(3)
-				Expect(name).To(Equal("AAAAA"))
-				Expect(value).To(Equal("first"))
-				name, value = fakeOutput.DisplayHeaderArgsForCall(4)
-				Expect(name).To(Equal("BBBBB"))
-				Expect(value).To(Equal("second"))
-				name, value = fakeOutput.DisplayHeaderArgsForCall(5)
-				Expect(name).To(Equal("CCCCC"))
-				Expect(value).To(Equal("third"))
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+					protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+					Expect(protocol).To(Equal("HTTP/1.1"))
+					Expect(status).To(Equal("200 OK"))
 
-				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
+					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+					Expect(name).To(Equal("AAAAA"))
+					Expect(value).To(Equal("first"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(4)
+					Expect(name).To(Equal("BBBBB"))
+					Expect(value).To(Equal("second"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(5)
+					Expect(name).To(Equal("CCCCC"))
+					Expect(value).To(Equal("third"))
+
+					Expect(fakeOutput.DisplayDumpCallCount()).To(Equal(1))
+					text := fakeOutput.DisplayDumpArgsForCall(0)
+					Expect(text).To(Equal("[NON-JSON BODY CONTENT HIDDEN]"))
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(0))
+				})
 			})
 		})
 
@@ -226,6 +284,22 @@ var _ = Describe("Request Logger", func() {
 				})
 			})
 
+			Context("when the http response body is nil", func() {
+				BeforeEach(func() {
+					response = &plugin.Response{
+						HTTPResponse: &http.Response{Body: nil},
+					}
+				})
+
+				It("does not output the response body", func() {
+					Expect(err).To(MatchError(expectedErr))
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(0))
+					Expect(fakeOutput.DisplayDumpCallCount()).To(Equal(0))
+				})
+			})
+
 			Context("when the http response is set", func() {
 				BeforeEach(func() {
 					response = &plugin.Response{
@@ -234,10 +308,12 @@ var _ = Describe("Request Logger", func() {
 							Proto:  "HTTP/1.1",
 							Status: "200 OK",
 							Header: http.Header{
-								"BBBBB": {"second"},
-								"AAAAA": {"first"},
-								"CCCCC": {"third"},
+								"Content-Type": {"application/json"},
+								"BBBBB":        {"second"},
+								"AAAAA":        {"first"},
+								"CCCCC":        {"third"},
 							},
+							Body: ioutil.NopCloser(bytes.NewReader([]byte(`some-error-body`))),
 						},
 					}
 				})
@@ -255,7 +331,7 @@ var _ = Describe("Request Logger", func() {
 					Expect(protocol).To(Equal("HTTP/1.1"))
 					Expect(status).To(Equal("200 OK"))
 
-					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 7))
 					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
 					Expect(name).To(Equal("AAAAA"))
 					Expect(value).To(Equal("first"))
@@ -265,6 +341,9 @@ var _ = Describe("Request Logger", func() {
 					name, value = fakeOutput.DisplayHeaderArgsForCall(5)
 					Expect(name).To(Equal("CCCCC"))
 					Expect(value).To(Equal("third"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(6)
+					Expect(name).To(Equal("Content-Type"))
+					Expect(value).To(Equal("application/json"))
 
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))

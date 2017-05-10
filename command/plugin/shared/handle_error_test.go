@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	. "code.cloudfoundry.org/cli/command/plugin/shared"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -51,6 +52,10 @@ var _ = Describe("HandleError", func() {
 		Entry("default case -> original error",
 			err,
 			err),
+		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginRawHTTPStatusError",
+			pluginerror.RawHTTPStatusError{Status: "some status"},
+			DownloadPluginRawHTTPStatusError{Status: "some status"},
+		),
 	)
 
 	It("returns nil for a nil error", func() {

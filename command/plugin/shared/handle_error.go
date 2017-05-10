@@ -1,6 +1,9 @@
 package shared
 
-import "code.cloudfoundry.org/cli/actor/pluginaction"
+import (
+	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+)
 
 func HandleError(err error) error {
 	switch e := err.(type) {
@@ -21,6 +24,8 @@ func HandleError(err error) error {
 			CommandNames:   e.CommandNames,
 			CommandAliases: e.CommandAliases,
 		}
+	case pluginerror.RawHTTPStatusError:
+		return DownloadPluginRawHTTPStatusError{Status: e.Status}
 	}
 	return err
 }

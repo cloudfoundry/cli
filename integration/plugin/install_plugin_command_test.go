@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -49,7 +50,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
-	FContext("when the user does not provide a plugin name or location", func() {
+	Context("when the user does not provide a plugin name or location", func() {
 		It("errors and displays usage", func() {
 			session := helpers.CF("install-plugin")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `PLUGIN_NAME_OR_LOCATION` was not provided"))
@@ -86,7 +87,7 @@ var _ = Describe("install-plugin command", func() {
 				Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 				Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("File %s is not a valid cf CLI plugin binary.", convertPathToRegularExpression(pluginPath)))
+				Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 				Eventually(session).Should(Exit(1))
 			})
@@ -189,7 +190,7 @@ var _ = Describe("install-plugin command", func() {
 
 					It("tells the user that the file is not a plugin and fails", func() {
 						session := helpers.CF("install-plugin", pluginPath, "-f")
-						Eventually(session.Err).Should(Say("File %s is not a valid cf CLI plugin binary\\.", convertPathToRegularExpression(pluginPath)))
+						Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 						Eventually(session).Should(Exit(1))
 					})
@@ -204,7 +205,7 @@ var _ = Describe("install-plugin command", func() {
 
 					It("tells the user that the file is not a plugin and fails", func() {
 						session := helpers.CF("install-plugin", pluginPath, "-f")
-						Eventually(session.Err).Should(Say("File %s is not a valid cf CLI plugin binary\\.", convertPathToRegularExpression(pluginPath)))
+						Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 						Eventually(session).Should(Exit(1))
 					})
@@ -613,7 +614,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session.Out).Should(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
@@ -623,18 +624,43 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
+				Context("when the URL redirects", func() {
+					BeforeEach(func() {
+						server.Reset()
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/redirect"),
+								RespondWith(http.StatusMovedPermanently, nil, http.Header{"Location": []string{server.URL()}}),
+							),
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/"),
+								RespondWith(http.StatusOK, pluginData),
+							))
+					})
+
+					It("installs the plugin", func() {
+						session := helpers.CF("install-plugin", "-f", fmt.Sprintf("%s/redirect", server.URL()))
+
+						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when the plugin has already been installed", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("install-plugin", pluginPath, "-f")).Should(Exit(0))
 					})
 
-					It("installs the plugin", func() {
+					It("uninstalls and reinstalls the plugin", func() {
 						session := helpers.CF("install-plugin", "-f", server.URL())
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
-						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+						Eventually(session.Out).Should(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
 
 						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
@@ -648,7 +674,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
-			Context("when a 404 is encountered", func() {
+			Context("when a 4xx or 5xx HTTP response status is encountered", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
@@ -695,9 +721,8 @@ var _ = Describe("install-plugin command", func() {
 					session := helpers.CF("install-plugin", "-f", server.URL())
 
 					Eventually(session.Out).Should(Say("Attempting to download plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Downloaded file not a valid cf CLI plugin binary\\."))
+					Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
 
 					Eventually(session).Should(Exit(1))
 				})
@@ -742,9 +767,9 @@ var _ = Describe("install-plugin command", func() {
 
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin from %s\\? \\[yN\\]: y", server.URL()))
+					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
-					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+					Eventually(session.Out).Should(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
@@ -764,15 +789,14 @@ var _ = Describe("install-plugin command", func() {
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin from %s\\? \\[yN\\]: y", server.URL()))
+						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
-						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
+						Eventually(session.Out).Should(Say("Attempting to download plugin binary from URL\\.\\.\\."))
 						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
 
-						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
-						Eventually(session.Out).Should(Say("TIP: Use 'cf install-plugin -f' to force a reinstall\\."))
+						Eventually(session.Err).Should(Say("TIP: Use 'cf install-plugin -f' to force a reinstall\\."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -789,7 +813,7 @@ var _ = Describe("install-plugin command", func() {
 
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin from %s\\? \\[yN\\]: y", server.URL()))
+					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", server.URL()))
 					Eventually(session.Err).Should(Say("Plugin installation cancelled"))
 					Eventually(session.Out).Should(Say("FAILED"))
 
