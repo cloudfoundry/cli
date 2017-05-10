@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -153,13 +154,34 @@ var _ = Describe("Apply", func() {
 								Path:               "some-path",
 							})))
 							Eventually(eventStream).Should(Receive(Equal(Complete)))
+
+							Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
 						})
 					})
 
 					Context("when the upload errors", func() {
 						Context("with a retryable error", func() {
-							It("retries the download", func() {
-								Skip("until error handling in api has been completed")
+							BeforeEach(func() {
+								fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
+							})
+
+							It("retries the download up to three times", func() {
+								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(1))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(2))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(3))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+								Eventually(errorStream).Should(Receive(Equal(UploadFailedError{})))
 							})
 						})
 

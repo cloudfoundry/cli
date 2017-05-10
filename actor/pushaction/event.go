@@ -10,5 +10,6 @@ const (
 	CreatingArchive      Event = "creating archive"
 	UploadingApplication Event = "uploading application"
 	UploadComplete       Event = "upload complete"
+	RetryUpload          Event = "retry upload"
 	Complete             Event = "complete"
 )
