@@ -4872,6 +4872,10 @@
     "translation": "{{.Username}}(으)로 스테이징 환경 변수 그룹의 컨텐츠 검색 중..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },

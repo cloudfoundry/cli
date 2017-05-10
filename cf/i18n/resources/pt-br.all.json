@@ -4872,6 +4872,10 @@
     "translation": "Recuperando os conteúdos do grupo de variáveis de ambiente temporárias como {{.Username}}..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },

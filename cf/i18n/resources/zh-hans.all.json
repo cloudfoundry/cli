@@ -4872,6 +4872,10 @@
     "translation": "正在以 {{.Username}} 身份检索编译打包环境变量组的内容..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },

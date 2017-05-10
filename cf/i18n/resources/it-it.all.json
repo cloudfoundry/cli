@@ -4872,6 +4872,10 @@
     "translation": "Richiamo del contenuto del gruppo di variabili di ambiente in fase di preparazione come {{.Username}} in corso..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },

@@ -4872,6 +4872,10 @@
     "translation": "{{.Username}} としてステージング環境変数グループの内容を取得しています..."
   },
   {
+    "id": "Retrying upload due to an error...",
+    "translation": ""
+  },
+  {
     "id": "Revoke an organization's entitlement to an isolation segment",
     "translation": ""
   },
