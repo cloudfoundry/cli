@@ -140,7 +140,7 @@ func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string)
 			return "", err
 		}
 
-		cmd.UI.DisplayText("Attempting to download plugin binary from URL...")
+		cmd.UI.DisplayText("Starting download of plugin binary from URL...")
 
 		var size int64
 		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation)

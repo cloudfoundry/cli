@@ -448,10 +448,6 @@
     "translation": "正在嘗試從網際網路位址下載二進位檔..."
   },
   {
-    "id": "Attempting to download plugin binary from URL...",
-    "translation": ""
-  },
-  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "正在嘗試移轉 {{.ServiceInstanceDescription}}..."
   },
@@ -5350,6 +5346,10 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分啟動組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
+  },
+  {
+    "id": "Starting download of plugin binary from URL...",
+    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",

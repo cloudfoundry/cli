@@ -448,10 +448,6 @@
     "translation": "Tentando fazer download do arquivo binário a partir do endereço de Internet..."
   },
   {
-    "id": "Attempting to download plugin binary from URL...",
-    "translation": ""
-  },
-  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "Tentando migrar {{.ServiceInstanceDescription}}..."
   },
@@ -5350,6 +5346,10 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Iniciando o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
+  },
+  {
+    "id": "Starting download of plugin binary from URL...",
+    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",
