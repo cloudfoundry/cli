@@ -2404,7 +2404,7 @@
     "translation": "下載嘗試失敗: {{.Error}}\n\n無法安裝，無法從給定的 URL 取得外掛程式。"
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
     "translation": ""
   },
   {

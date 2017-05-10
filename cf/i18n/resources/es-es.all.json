@@ -2404,7 +2404,7 @@
     "translation": "Ha fallado un intento de descarga: {{.Error}}\n\nNo se ha podido instalar, el plugin no está disponible desde el URL proporcionado."
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
     "translation": ""
   },
   {

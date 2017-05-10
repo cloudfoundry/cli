@@ -2404,7 +2404,7 @@
     "translation": "다운로드 실패: {{.Error}}\n\n설치할 수 없습니다. 주어진 URL에서 플러그인을 사용할 수 없습니다."
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
     "translation": ""
   },
   {

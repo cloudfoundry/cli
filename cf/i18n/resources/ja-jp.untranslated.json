@@ -176,8 +176,8 @@
     "translation": ""
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
-    "translation": ""
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
   },
   {
     "id": "ENVIRONMENT:",

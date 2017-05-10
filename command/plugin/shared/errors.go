@@ -167,16 +167,16 @@ func (e PluginAlreadyInstalledError) Translate(translate func(string, ...interfa
 	})
 }
 
-type DownloadPluginRawHTTPStatusError struct {
-	Status string
+type DownloadPluginHTTPError struct {
+	Message string
 }
 
-func (_ DownloadPluginRawHTTPStatusError) Error() string {
-	return "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL."
+func (_ DownloadPluginHTTPError) Error() string {
+	return "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
 }
 
-func (e DownloadPluginRawHTTPStatusError) Translate(translate func(string, ...interface{}) string) string {
+func (e DownloadPluginHTTPError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"HTTPStatus": e.Status,
+		"ErrorMessage": e.Message,
 	})
 }

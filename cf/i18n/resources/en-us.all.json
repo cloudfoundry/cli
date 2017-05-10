@@ -2404,8 +2404,8 @@
     "translation": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url."
   },
   {
-    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
-    "translation": ""
+    "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
   },
   {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",

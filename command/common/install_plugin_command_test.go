@@ -416,8 +416,18 @@ var _ = Describe("install-plugin command", func() {
 						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, pluginerror.RawHTTPStatusError{Status: "some-status"})
 					})
 
-					It("returns a DownloadPluginRawHTTPError", func() {
-						Expect(executeErr).To(MatchError(shared.DownloadPluginRawHTTPStatusError{Status: "some-status"}))
+					It("returns a DownloadPluginHTTPError", func() {
+						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: "some-status"}))
+					})
+				})
+
+				Context("when a SSL error is encountered while downloading the plugin", func() {
+					BeforeEach(func() {
+						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, pluginerror.UnverifiedServerError{})
+					})
+
+					It("returns a DownloadPluginHTTPError", func() {
+						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: "x509: certificate signed by unknown authority"}))
 					})
 				})
 			})
