@@ -3,8 +3,20 @@ package pushaction
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+
 	log "github.com/Sirupsen/logrus"
 )
+
+const PushRetries = 3
+
+type UploadFailedError struct {
+	Err error
+}
+
+func (_ UploadFailedError) Error() string {
+	return "upload failed"
+}
 
 func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-chan ApplicationConfig, <-chan Event, <-chan Warnings, <-chan error) {
 	configStream := make(chan ApplicationConfig)
@@ -63,9 +75,20 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		eventStream <- CreatingArchive
 		defer os.Remove(archivePath)
 
-		warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
-		warningsStream <- warnings
+		for count := 0; count < PushRetries; count++ {
+			warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
+			warningsStream <- warnings
+			if _, ok := err.(ccerror.PipeSeekError); !ok {
+				break
+			}
+			eventStream <- RetryUpload
+		}
+
 		if err != nil {
+			if _, ok := err.(ccerror.PipeSeekError); ok {
+				errorStream <- UploadFailedError{}
+				return
+			}
 			errorStream <- err
 			return
 		}

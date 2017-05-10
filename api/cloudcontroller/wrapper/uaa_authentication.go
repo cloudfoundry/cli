@@ -61,10 +61,9 @@ func (t *UAAAuthentication) Make(request *cloudcontroller.Request, passedRespons
 
 	request.Header.Set("Authorization", t.cache.AccessToken())
 
-	err := t.connection.Make(request, passedResponse)
-	if _, ok := err.(ccerror.InvalidAuthTokenError); ok {
-		var token uaa.RefreshToken
-		token, err = t.client.RefreshAccessToken(t.cache.RefreshToken())
+	requestErr := t.connection.Make(request, passedResponse)
+	if _, ok := requestErr.(ccerror.InvalidAuthTokenError); ok {
+		token, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
 		}
@@ -75,12 +74,15 @@ func (t *UAAAuthentication) Make(request *cloudcontroller.Request, passedRespons
 		if request.Body != nil {
 			err = request.ResetBody()
 			if err != nil {
+				if _, ok := err.(ccerror.PipeSeekError); ok {
+					return ccerror.PipeSeekError{Err: requestErr}
+				}
 				return err
 			}
 		}
 		request.Header.Set("Authorization", t.cache.AccessToken())
-		err = t.connection.Make(request, passedResponse)
+		requestErr = t.connection.Make(request, passedResponse)
 	}
 
-	return err
+	return requestErr
 }

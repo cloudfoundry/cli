@@ -147,6 +147,7 @@ var _ = Describe("v2-push Command", func() {
 								Eventually(eventStream).Should(BeSent(pushaction.CreatingArchive))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
 								Eventually(fakeProgressBar.ReadyCallCount).Should(Equal(1))
+								Eventually(eventStream).Should(BeSent(pushaction.RetryUpload))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadComplete))
 								Eventually(fakeProgressBar.CompleteCallCount).Should(Equal(1))
 								Eventually(configStream).Should(BeSent(updatedConfig))
@@ -264,6 +265,7 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("Binding routes..."))
 						Expect(testUI.Out).To(Say("Packaging files to upload..."))
 						Expect(testUI.Out).To(Say("Uploading files..."))
+						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
 						Expect(testUI.Out).To(Say("Processing files..."))
 						Expect(testUI.Out).To(Say("Tracing staging logs..."))
 

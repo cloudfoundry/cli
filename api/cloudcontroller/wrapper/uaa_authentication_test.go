@@ -54,7 +54,8 @@ var _ = Describe("UAA Authentication", func() {
 			})
 
 			It("calls the connection without any side effects", func() {
-				wrapper.Make(request, nil)
+				err := wrapper.Make(request, nil)
+				Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{}))
 
 				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
@@ -63,7 +64,8 @@ var _ = Describe("UAA Authentication", func() {
 
 		Context("when the token is valid", func() {
 			It("adds authentication headers", func() {
-				wrapper.Make(request, nil)
+				err := wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
@@ -74,7 +76,8 @@ var _ = Describe("UAA Authentication", func() {
 			Context("when the request already has headers", func() {
 				It("preserves existing headers", func() {
 					request.Header.Add("Existing", "header")
-					wrapper.Make(request, nil)
+					err := wrapper.Make(request, nil)
+					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 					authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
@@ -104,12 +107,18 @@ var _ = Describe("UAA Authentication", func() {
 		})
 
 		Context("when the token is invalid", func() {
-			var expectedBody string
+			var (
+				expectedBody string
+
+				request *cloudcontroller.Request
+
+				executeErr error
+			)
 
 			BeforeEach(func() {
 				expectedBody = "this body content should be preserved"
 				body := strings.NewReader(expectedBody)
-				request := cloudcontroller.NewRequest(&http.Request{
+				request = cloudcontroller.NewRequest(&http.Request{
 					Header: http.Header{},
 					Body:   ioutil.NopCloser(body),
 				}, body)
@@ -138,16 +147,19 @@ var _ = Describe("UAA Authentication", func() {
 					},
 					nil,
 				)
+			})
 
-				err := wrapper.Make(request, nil)
-				Expect(err).ToNot(HaveOccurred())
+			JustBeforeEach(func() {
+				executeErr = wrapper.Make(request, nil)
 			})
 
 			It("should refresh the token", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(1))
 			})
 
 			It("should resend the request", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeConnection.MakeCallCount()).To(Equal(2))
 
 				request, _ := fakeConnection.MakeArgsForCall(1)
@@ -155,7 +167,30 @@ var _ = Describe("UAA Authentication", func() {
 			})
 
 			It("should save the refresh token", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(inMemoryCache.RefreshToken()).To(Equal("bananananananana"))
+			})
+
+			Context("when a PipeSeekError is returned from ResetBody", func() {
+				BeforeEach(func() {
+					body, writer := cloudcontroller.NewPipeBomb()
+					req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", body)
+					Expect(err).NotTo(HaveOccurred())
+					request = cloudcontroller.NewRequest(req, body)
+
+					go func() {
+						defer GinkgoRecover()
+
+						_, err := writer.Write([]byte(expectedBody))
+						Expect(err).NotTo(HaveOccurred())
+						err = writer.Close()
+						Expect(err).NotTo(HaveOccurred())
+					}()
+				})
+
+				It("set the err on PipeSeekError", func() {
+					Expect(executeErr).To(MatchError(ccerror.PipeSeekError{Err: ccerror.InvalidAuthTokenError{}}))
+				})
 			})
 		})
 	})

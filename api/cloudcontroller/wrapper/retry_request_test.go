@@ -1,6 +1,7 @@
 package wrapper_test
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -64,7 +65,7 @@ var _ = Describe("Retry Request", func() {
 	It("does not retry on success", func() {
 		req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
 		Expect(err).NotTo(HaveOccurred())
-		request := &cloudcontroller.Request{Request: req}
+		request := cloudcontroller.NewRequest(req, nil)
 		response := &cloudcontroller.Response{
 			HTTPResponse: &http.Response{
 				StatusCode: http.StatusOK,
@@ -77,5 +78,40 @@ var _ = Describe("Retry Request", func() {
 		err = wrapper.Make(request, response)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+	})
+
+	Context("when a PipeSeekError is returned from ResetBody", func() {
+		var (
+			expectedErr error
+			request     *cloudcontroller.Request
+			response    *cloudcontroller.Response
+
+			fakeConnection *cloudcontrollerfakes.FakeConnection
+			wrapper        cloudcontroller.Connection
+		)
+
+		BeforeEach(func() {
+			body, _ := cloudcontroller.NewPipeBomb()
+			req, err := http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", body)
+			Expect(err).NotTo(HaveOccurred())
+			request = cloudcontroller.NewRequest(req, body)
+			response = &cloudcontroller.Response{
+				HTTPResponse: &http.Response{
+					StatusCode: http.StatusInternalServerError,
+				},
+			}
+
+			fakeConnection = new(cloudcontrollerfakes.FakeConnection)
+			expectedErr = errors.New("oh noes")
+			fakeConnection.MakeReturns(expectedErr)
+
+			wrapper = NewRetryRequest(2).Wrap(fakeConnection)
+		})
+
+		It("sets the err on PipeSeekError", func() {
+			err := wrapper.Make(request, response)
+			Expect(err).To(MatchError(ccerror.PipeSeekError{Err: expectedErr}))
+			Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+		})
 	})
 })

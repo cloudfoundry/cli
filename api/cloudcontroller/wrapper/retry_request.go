@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 )
 
 // RetryRequest is a wrapper that retries failed requests if they contain a 5XX
@@ -50,6 +51,9 @@ func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse
 		// Reset the request body prior to the next retry
 		resetErr := request.ResetBody()
 		if resetErr != nil {
+			if _, ok := resetErr.(ccerror.PipeSeekError); ok {
+				return ccerror.PipeSeekError{Err: err}
+			}
 			return resetErr
 		}
 	}
