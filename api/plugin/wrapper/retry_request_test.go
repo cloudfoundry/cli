@@ -1,6 +1,7 @@
 package wrapper_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -31,7 +32,7 @@ var _ = Describe("Retry Request", func() {
 
 			fakeConnection := new(pluginfakes.FakeConnection)
 			expectedErr := pluginerror.RawHTTPStatusError{
-				StatusCode: responseStatusCode,
+				Status: fmt.Sprintf("%d", responseStatusCode),
 			}
 			fakeConnection.MakeStub = func(req *http.Request, passedResponse *plugin.Response) error {
 				defer req.Body.Close()

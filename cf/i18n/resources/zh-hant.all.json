@@ -448,6 +448,10 @@
     "translation": "正在嘗試從網際網路位址下載二進位檔..."
   },
   {
+    "id": "Attempting to download plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "正在嘗試移轉 {{.ServiceInstanceDescription}}..."
   },
@@ -2404,6 +2408,10 @@
     "translation": "下載嘗試失敗: {{.Error}}\n\n無法安裝，無法從給定的 URL 取得外掛程式。"
   },
   {
+    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": ""
+  },
+  {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
     "translation": "所下載外掛程式二進位檔的總和檢查不符合儲存庫 meta 資料"
   },
@@ -2940,7 +2948,7 @@
     "translation": "特性"
   },
   {
-    "id": "File not a valid cf CLI plugin binary.",
+    "id": "File is not a valid cf CLI plugin binary.",
     "translation": ""
   },
   {
@@ -5342,10 +5350,6 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分啟動組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
-  },
-  {
-    "id": "Starting download of plugin binary from URL...",
-    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",

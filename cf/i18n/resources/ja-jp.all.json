@@ -448,6 +448,10 @@
     "translation": "IP アドレスからバイナリー・ファイルのダウンロードを試みています..."
   },
   {
+    "id": "Attempting to download plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "{{.ServiceInstanceDescription}} のマイグレーションを試みています..."
   },
@@ -2404,6 +2408,10 @@
     "translation": "ダウンロードを試みたが失敗しました: {{.Error}}\n\nインストールできません、指定された URL からプラグインを取得することができません。"
   },
   {
+    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": ""
+  },
+  {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
     "translation": "ダウンロードされたプラグイン・バイナリーのチェックサムはリポジトリー・メタデータと一致しません"
   },
@@ -2940,7 +2948,7 @@
     "translation": "フィーチャー"
   },
   {
-    "id": "File not a valid cf CLI plugin binary.",
+    "id": "File is not a valid cf CLI plugin binary.",
     "translation": ""
   },
   {
@@ -5342,10 +5350,6 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} を開始しています..."
-  },
-  {
-    "id": "Starting download of plugin binary from URL...",
-    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",

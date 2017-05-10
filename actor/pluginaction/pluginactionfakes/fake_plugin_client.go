@@ -22,6 +22,18 @@ type FakePluginClient struct {
 		result1 plugin.PluginRepository
 		result2 error
 	}
+	DownloadPluginStub        func(pluginURL string, path string) error
+	downloadPluginMutex       sync.RWMutex
+	downloadPluginArgsForCall []struct {
+		pluginURL string
+		path      string
+	}
+	downloadPluginReturns struct {
+		result1 error
+	}
+	downloadPluginReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -77,11 +89,62 @@ func (fake *FakePluginClient) GetPluginRepositoryReturnsOnCall(i int, result1 pl
 	}{result1, result2}
 }
 
+func (fake *FakePluginClient) DownloadPlugin(pluginURL string, path string) error {
+	fake.downloadPluginMutex.Lock()
+	ret, specificReturn := fake.downloadPluginReturnsOnCall[len(fake.downloadPluginArgsForCall)]
+	fake.downloadPluginArgsForCall = append(fake.downloadPluginArgsForCall, struct {
+		pluginURL string
+		path      string
+	}{pluginURL, path})
+	fake.recordInvocation("DownloadPlugin", []interface{}{pluginURL, path})
+	fake.downloadPluginMutex.Unlock()
+	if fake.DownloadPluginStub != nil {
+		return fake.DownloadPluginStub(pluginURL, path)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.downloadPluginReturns.result1
+}
+
+func (fake *FakePluginClient) DownloadPluginCallCount() int {
+	fake.downloadPluginMutex.RLock()
+	defer fake.downloadPluginMutex.RUnlock()
+	return len(fake.downloadPluginArgsForCall)
+}
+
+func (fake *FakePluginClient) DownloadPluginArgsForCall(i int) (string, string) {
+	fake.downloadPluginMutex.RLock()
+	defer fake.downloadPluginMutex.RUnlock()
+	return fake.downloadPluginArgsForCall[i].pluginURL, fake.downloadPluginArgsForCall[i].path
+}
+
+func (fake *FakePluginClient) DownloadPluginReturns(result1 error) {
+	fake.DownloadPluginStub = nil
+	fake.downloadPluginReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePluginClient) DownloadPluginReturnsOnCall(i int, result1 error) {
+	fake.DownloadPluginStub = nil
+	if fake.downloadPluginReturnsOnCall == nil {
+		fake.downloadPluginReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.downloadPluginReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakePluginClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getPluginRepositoryMutex.RLock()
 	defer fake.getPluginRepositoryMutex.RUnlock()
+	fake.downloadPluginMutex.RLock()
+	defer fake.downloadPluginMutex.RUnlock()
 	return fake.invocations
 }
 

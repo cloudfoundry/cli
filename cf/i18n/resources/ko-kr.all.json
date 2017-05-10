@@ -448,6 +448,10 @@
     "translation": "인터넷 주소에서 바이너리 파일 다운로드 중..."
   },
   {
+    "id": "Attempting to download plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "{{.ServiceInstanceDescription}} 마이그레이션 중..."
   },
@@ -2404,6 +2408,10 @@
     "translation": "다운로드 실패: {{.Error}}\n\n설치할 수 없습니다. 주어진 URL에서 플러그인을 사용할 수 없습니다."
   },
   {
+    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": ""
+  },
+  {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
     "translation": "다운로드된 플러그인 바이너리의 체크섬이 저장소 메타데이터와 일치하지 않음"
   },
@@ -2940,7 +2948,7 @@
     "translation": "기능"
   },
   {
-    "id": "File not a valid cf CLI plugin binary.",
+    "id": "File is not a valid cf CLI plugin binary.",
     "translation": ""
   },
   {
@@ -5342,10 +5350,6 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 시작 중..."
-  },
-  {
-    "id": "Starting download of plugin binary from URL...",
-    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",

@@ -6,4 +6,5 @@ import "code.cloudfoundry.org/cli/api/plugin"
 
 type PluginClient interface {
 	GetPluginRepository(repositoryURL string) (plugin.PluginRepository, error)
+	DownloadPlugin(pluginURL string, path string) error
 }

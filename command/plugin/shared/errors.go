@@ -108,7 +108,7 @@ type PluginInvalidError struct {
 }
 
 func (e PluginInvalidError) Error() string {
-	return "File not a valid cf CLI plugin binary."
+	return "File is not a valid cf CLI plugin binary."
 }
 
 func (e PluginInvalidError) Translate(translate func(string, ...interface{}) string) string {
@@ -149,7 +149,6 @@ func (e PluginCommandsConflictError) Translate(translate func(string, ...interfa
 
 // PluginAlreadyInstalledError is returned when the plugin has the same name as
 // an installed plugin.
-// TODO: ADD Binary Name
 type PluginAlreadyInstalledError struct {
 	BinaryName string
 	Name       string
@@ -165,5 +164,19 @@ func (e PluginAlreadyInstalledError) Translate(translate func(string, ...interfa
 		"BinaryName": e.BinaryName,
 		"Name":       e.Name,
 		"Version":    e.Version,
+	})
+}
+
+type DownloadPluginRawHTTPStatusError struct {
+	Status string
+}
+
+func (_ DownloadPluginRawHTTPStatusError) Error() string {
+	return "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL."
+}
+
+func (e DownloadPluginRawHTTPStatusError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"HTTPStatus": e.Status,
 	})
 }

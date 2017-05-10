@@ -209,7 +209,7 @@ var _ = Describe("Plugin Connection", func() {
 					var response Response
 					err = connection.Make(request, &response)
 					Expect(err).To(MatchError(pluginerror.RawHTTPStatusError{
-						StatusCode:  http.StatusTeapot,
+						Status:      "418 I'm a teapot",
 						RawResponse: []byte(rawResponse),
 					}))
 

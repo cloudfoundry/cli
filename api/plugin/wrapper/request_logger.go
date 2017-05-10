@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sort"
-	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -15,9 +14,10 @@ import (
 
 // RequestLoggerOutput is the interface for displaying logs
 type RequestLoggerOutput interface {
-	DisplayJSONBody(body []byte) error
+	DisplayDump(dump string) error
 	DisplayHeader(name string, value string) error
 	DisplayHost(name string) error
+	DisplayJSONBody(body []byte) error
 	DisplayRequestHeader(method string, uri string, httpProtocol string) error
 	DisplayResponseHeader(httpProtocol string, status string) error
 	DisplayType(name string, requestDate time.Time) error
@@ -89,7 +89,7 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 		return err
 	}
 
-	if request.Body != nil && strings.Contains(request.Header.Get("Content-Type"), "json") {
+	if request.Body != nil && request.Header.Get("Content-Type") == "application/json" {
 		rawRequestBody, err := ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
 		if err != nil {
@@ -125,6 +125,14 @@ func (logger *RequestLogger) displayResponse(passedResponse *plugin.Response) er
 	if err != nil {
 		return err
 	}
+
+	if passedResponse.HTTPResponse.Body == nil {
+		return nil
+	}
+	if passedResponse.HTTPResponse.Header.Get("Content-Type") != "application/json" {
+		return logger.output.DisplayDump("[NON-JSON BODY CONTENT HIDDEN]")
+	}
+
 	return logger.output.DisplayJSONBody(passedResponse.RawResponse)
 }
 

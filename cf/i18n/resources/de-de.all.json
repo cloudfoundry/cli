@@ -448,6 +448,10 @@
     "translation": "Versuch, eine Binärdatei von folgender Internetadresse herunterzuladen: ..."
   },
   {
+    "id": "Attempting to download plugin binary from URL...",
+    "translation": ""
+  },
+  {
     "id": "Attempting to migrate {{.ServiceInstanceDescription}}...",
     "translation": "Versuch, {{.ServiceInstanceDescription}} zu migrieren..."
   },
@@ -2404,6 +2408,10 @@
     "translation": "Versuchtes Herunterladen ist fehlgeschlagen: {{.Error}}\n\nInstallieren nicht möglich; Plug-in ist von der angegebenen URL nicht verfügbar."
   },
   {
+    "id": "Download attempt failed; server returned {{.HTTPStatus}}\nUnable to install; plugin is not available from the given URL.",
+    "translation": ""
+  },
+  {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
     "translation": "Die Kontrollsumme der heruntergeladen Binärdateien des Plug-ins stimmt nicht mit den Repositorymetadaten überein"
   },
@@ -2940,7 +2948,7 @@
     "translation": "Features"
   },
   {
-    "id": "File not a valid cf CLI plugin binary.",
+    "id": "File is not a valid cf CLI plugin binary.",
     "translation": ""
   },
   {
@@ -5342,10 +5350,6 @@
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Starten der App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
-  },
-  {
-    "id": "Starting download of plugin binary from URL...",
-    "translation": ""
   },
   {
     "id": "Startup command, set to null to reset to default start command",

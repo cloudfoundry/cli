@@ -31,7 +31,7 @@ type PluginInvalidError struct {
 }
 
 func (_ PluginInvalidError) Error() string {
-	return "File not a valid cf CLI plugin binary."
+	return "File is not a valid cf CLI plugin binary."
 }
 
 // PluginCommandConflictError is returned when a plugin command name conflicts
@@ -53,8 +53,7 @@ func (_ PluginCommandsConflictError) Error() string {
 // config.PluginHome() + /temp is used as the temp dir instead of the system
 // temp for security reasons.
 func (actor Actor) CreateExecutableCopy(path string) (string, error) {
-	pluginTemp := filepath.Join(actor.config.PluginHome(), "temp")
-	err := os.MkdirAll(pluginTemp, 0700)
+	pluginTemp, err := actor.pluginTemp()
 	if err != nil {
 		return "", err
 	}
@@ -91,8 +90,33 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 
 // DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
 // it exists.
-func (actor Actor) DownloadExecutableBinaryFromURL(path string) (string, int64, error) {
-	return "", 0, nil
+func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string) (string, int64, error) {
+	pluginTemp, err := actor.pluginTemp()
+	if err != nil {
+		return "", 0, err
+	}
+
+	tempFile, err := ioutil.TempFile(pluginTemp, "")
+	if err != nil {
+		return "", 0, err
+	}
+
+	err = tempFile.Close()
+	if err != nil {
+		return "", 0, err
+	}
+
+	err = actor.client.DownloadPlugin(pluginURL, tempFile.Name())
+	if err != nil {
+		return "", 0, err
+	}
+
+	stat, err := os.Stat(tempFile.Name())
+	if err != nil {
+		return "", 0, err
+	}
+
+	return tempFile.Name(), stat.Size(), nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file
@@ -189,4 +213,14 @@ func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) er
 func (actor Actor) IsPluginInstalled(pluginName string) bool {
 	_, isInstalled := actor.config.GetPlugin(pluginName)
 	return isInstalled
+}
+
+func (actor Actor) pluginTemp() (string, error) {
+	tempDir := filepath.Join(actor.config.PluginHome(), "temp")
+	err := os.MkdirAll(tempDir, 0700)
+	if err != nil {
+		return "", err
+	}
+
+	return tempDir, nil
 }
