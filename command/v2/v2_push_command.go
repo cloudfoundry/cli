@@ -264,6 +264,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		cmd.UI.DisplayText("Retrying upload due to an error...")
 	case pushaction.UploadComplete:
 		cmd.ProgressBar.Complete()
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("Processing files...")
 	case pushaction.Complete:
 		cmd.UI.DisplayText("Tracing staging logs...")
