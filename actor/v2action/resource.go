@@ -2,6 +2,8 @@ package v2action
 
 import (
 	"archive/zip"
+	"crypto/sha1"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -18,22 +20,39 @@ func (_ Actor) GatherResources(sourceDir string) ([]Resource, error) {
 	var resources []Resource
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return err
 		}
 
 		relPath, err := filepath.Rel(sourceDir, path)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		if relPath == "." {
 			return nil
 		}
 
-		resources = append(resources, Resource{
+		resource := Resource{
 			Filename: filepath.ToSlash(relPath),
-		})
+		}
 
+		if !info.IsDir() {
+			resource.Size = info.Size()
+			resource.Mode = fixMode(info.Mode())
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			sum := sha1.New()
+			_, err = io.Copy(sum, file)
+			if err != nil {
+				return err
+			}
+			resource.SHA1 = fmt.Sprintf("%x", sum.Sum(nil))
+		}
+		resources = append(resources, resource)
 		return nil
 	})
 
