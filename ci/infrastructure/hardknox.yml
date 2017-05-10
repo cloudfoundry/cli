@@ -109,6 +109,7 @@ jobs:
     input_mapping:
       bbl-state: state
       vars-store: cf-state
+      vars-files: cf-state
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
