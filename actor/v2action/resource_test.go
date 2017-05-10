@@ -47,19 +47,7 @@ var _ = Describe("Resource Actions", func() {
 	})
 
 	Describe("GatherResources", func() {
-		It("gathers a list of all directories files in a source directory", func() {
-			resources, err := actor.GatherResources(srcDir)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(resources).To(Equal(
-				[]Resource{
-					{Filename: "level1"},
-					{Filename: "level1/level2"},
-					{Filename: "level1/level2/tmpFile1"},
-					{Filename: "tmpFile2"},
-					{Filename: "tmpFile3"},
-				}))
-		})
+		// tests are under resource_unix_test.go and resource_windows_test.go
 	})
 
 	Describe("ZipResources", func() {
