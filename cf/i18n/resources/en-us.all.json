@@ -528,10 +528,6 @@
     "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
-    "id": "Binding routes...",
-    "translation": ""
-  },
-  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "Binding security group {{.security_group}} to defaults for running as {{.username}}"
   },
@@ -554,6 +550,10 @@
   {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "Bound apps: {{.BoundApplications}}"
+  },
+  {
+    "id": "Bound routes.",
+    "translation": ""
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1812,6 +1812,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n"
   },
@@ -1984,6 +1992,14 @@
     "translation": "Create key for a service instance"
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -2026,10 +2042,6 @@
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
-  },
-  {
-    "id": "Creating routes...",
-    "translation": ""
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -6094,6 +6106,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
+  },
+  {
+    "id": "Updated app.",
+    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

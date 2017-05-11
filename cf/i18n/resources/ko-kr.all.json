@@ -528,10 +528,6 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.ServiceInstanceName}} 서비스 인스턴스에 {{.URL}} 라우트 바인드 중..."
   },
   {
-    "id": "Binding routes...",
-    "translation": ""
-  },
-  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "{{.username}}(으)로 실행하기 위해 보안 그룹 {{.security_group}}을(를) 기본값에 바인딩"
   },
@@ -554,6 +550,10 @@
   {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "바인딩된 앱: {{.BoundApplications}}"
+  },
+  {
+    "id": "Bound routes.",
+    "translation": ""
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1812,6 +1812,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "연결됨, {{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 있는 {{.AppName}} 앱의 최근 로그 덤프 중...\n"
   },
@@ -1984,6 +1992,14 @@
     "translation": "서비스 인스턴스의 키 작성"
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -2026,10 +2042,6 @@
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.URL}} 라우트 작성 중..."
-  },
-  {
-    "id": "Creating routes...",
-    "translation": ""
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -6094,6 +6106,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "사용자 제공 서비스 인스턴스 업데이트"
+  },
+  {
+    "id": "Updated app.",
+    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",
