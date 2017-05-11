@@ -97,7 +97,7 @@ func (cmd InstallPluginCommand) installPlugin(plugin configv3.Plugin, pluginPath
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayTextWithFlavor("Plugin {{.Name}} {{.Version}} successfully installed.", map[string]interface{}{
+	cmd.UI.DisplayText("Plugin {{.Name}} {{.Version}} successfully installed.", map[string]interface{}{
 		"Name":    plugin.Name,
 		"Version": plugin.Version.String(),
 	})
