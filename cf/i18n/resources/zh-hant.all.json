@@ -528,10 +528,6 @@
     "translation": "正在以 {{.CurrentUser}} 身分將路徑 {{.URL}} 新增至組織 {{.OrgName}}/空間 {{.SpaceName}} 中的服務實例 {{.ServiceInstanceName}}..."
   },
   {
-    "id": "Binding routes...",
-    "translation": ""
-  },
-  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "正在將安全群組 {{.security_group}} 連結至以 {{.username}} 身分執行的預設值"
   },
@@ -554,6 +550,10 @@
   {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "連結的應用程式: {{.BoundApplications}}"
+  },
+  {
+    "id": "Bound routes.",
+    "translation": ""
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1812,6 +1812,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "已連接，正在以 {{.Username}} 身分傾出組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的最近日誌...\n"
   },
@@ -1984,6 +1992,14 @@
     "translation": "建立服務實例的金鑰"
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -2026,10 +2042,6 @@
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分建立組織 {{.OrgName}}/空間 {{.SpaceName}} 的路徑 {{.URL}}..."
-  },
-  {
-    "id": "Creating routes...",
-    "translation": ""
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -6094,6 +6106,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "更新使用者提供的服務實例"
+  },
+  {
+    "id": "Updated app.",
+    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

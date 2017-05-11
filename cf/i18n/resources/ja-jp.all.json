@@ -528,10 +528,6 @@
     "translation": "{{.CurrentUser}} として経路 {{.URL}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内のサービス・インスタンス {{.ServiceInstanceName}} にバインドしています..."
   },
   {
-    "id": "Binding routes...",
-    "translation": ""
-  },
-  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "{{.username}} としてセキュリティー・グループ {{.security_group}} を実行用のデフォルトにバインドしています"
   },
@@ -554,6 +550,10 @@
   {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "バインド済みアプリ: {{.BoundApplications}}"
+  },
+  {
+    "id": "Bound routes.",
+    "translation": ""
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1812,6 +1812,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "接続されました、{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の最近のログをダンプしています...\n"
   },
@@ -1984,6 +1992,14 @@
     "translation": "サービス・インスタンスのキーを作成します"
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -2026,10 +2042,6 @@
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} の経路 {{.URL}} を作成しています..."
-  },
-  {
-    "id": "Creating routes...",
-    "translation": ""
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -6094,6 +6106,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "ユーザー提供サービス・インスタンスを更新します"
+  },
+  {
+    "id": "Updated app.",
+    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

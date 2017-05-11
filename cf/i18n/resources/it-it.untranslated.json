@@ -48,7 +48,7 @@
     "translation": ""
   },
   {
-    "id": "Binding routes...",
+    "id": "Bound routes.",
     "translation": ""
   },
   {
@@ -128,6 +128,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
     "translation": ""
   },
@@ -140,15 +148,19 @@
     "translation": ""
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Creating isolation segment {{.SegmentName}} as {{.CurrentUser}}...",
-    "translation": ""
-  },
-  {
-    "id": "Creating routes...",
     "translation": ""
   },
   {
@@ -589,6 +601,10 @@
   },
   {
     "id": "Uninstall CLI plugin",
+    "translation": ""
+  },
+  {
+    "id": "Updated app.",
     "translation": ""
   },
   {

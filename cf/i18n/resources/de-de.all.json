@@ -528,10 +528,6 @@
     "translation": "Binden von Route {{.URL}} an Serviceinstanz {{.ServiceInstanceName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
   {
-    "id": "Binding routes...",
-    "translation": ""
-  },
-  {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
     "translation": "Binden von Sicherheitsgruppe {{.security_group}} an die Standards für die Ausführung als {{.username}}"
   },
@@ -554,6 +550,10 @@
   {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "Gebundene Apps: {{.BoundApplications}}"
+  },
+  {
+    "id": "Bound routes.",
+    "translation": ""
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1812,6 +1812,14 @@
     "translation": ""
   },
   {
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "translation": ""
+  },
+  {
+    "id": "Configuring routes...",
+    "translation": ""
+  },
+  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Verbundene, kürzlich erstellte Speicherauszugsprotokolle für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}...\n"
   },
@@ -1984,6 +1992,14 @@
     "translation": "Schlüssel für eine Serviceinstanz erstellen"
   },
   {
+    "id": "Created app.",
+    "translation": ""
+  },
+  {
+    "id": "Created routes.",
+    "translation": ""
+  },
+  {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -2026,10 +2042,6 @@
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Erstellen von Route {{.URL}} für Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
-  },
-  {
-    "id": "Creating routes...",
-    "translation": ""
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -6094,6 +6106,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Vom Benutzer zur Verfügung gestellte Serviceinstanz aktualisieren"
+  },
+  {
+    "id": "Updated app.",
+    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",
