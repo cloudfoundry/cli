@@ -14,7 +14,7 @@ func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfi
 
 		config.DesiredApplication = app
 		config.CurrentApplication = config.DesiredApplication
-		return config, ApplicationUpdated, Warnings(warnings), err
+		return config, UpdatedApplication, Warnings(warnings), err
 	} else {
 		log.Debugf("creating application: %#v", config.DesiredApplication)
 		app, warnings, err := actor.V2Actor.CreateApplication(config.DesiredApplication)
@@ -25,6 +25,6 @@ func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfi
 
 		config.DesiredApplication = app
 		config.CurrentApplication = config.DesiredApplication
-		return config, ApplicationCreated, Warnings(warnings), err
+		return config, CreatedApplication, Warnings(warnings), err
 	}
 }

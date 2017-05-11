@@ -75,7 +75,7 @@ var _ = Describe("Applications", func() {
 				It("updates the application", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("update-warning"))
-					Expect(event).To(Equal(ApplicationUpdated))
+					Expect(event).To(Equal(UpdatedApplication))
 
 					Expect(returnedConfig.DesiredApplication).To(Equal(v2action.Application{
 						Name:      "some-app-name",
@@ -124,7 +124,7 @@ var _ = Describe("Applications", func() {
 				It("creates the application", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("create-warning"))
-					Expect(event).To(Equal(ApplicationCreated))
+					Expect(event).To(Equal(CreatedApplication))
 
 					Expect(returnedConfig.DesiredApplication).To(Equal(v2action.Application{
 						Name:      "some-app-name",
