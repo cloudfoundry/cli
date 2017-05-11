@@ -229,9 +229,9 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	log.Infoln("received apply event:", event)
 
 	switch event {
-	case pushaction.ApplicationCreated:
+	case pushaction.SettingUpApplication:
 		cmd.UI.DisplayTextWithFlavor(
-			"Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+			"Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
 			map[string]interface{}{
 				"AppName":   appConfig.DesiredApplication.Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -239,21 +239,16 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 				"Username":  user.Name,
 			},
 		)
-
-	case pushaction.ApplicationUpdated:
-		cmd.UI.DisplayTextWithFlavor(
-			"Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-			map[string]interface{}{
-				"AppName":   appConfig.DesiredApplication.Name,
-				"OrgName":   cmd.Config.TargetedOrganization().Name,
-				"SpaceName": cmd.Config.TargetedSpace().Name,
-				"Username":  user.Name,
-			},
-		)
-	case pushaction.RouteCreated:
-		cmd.UI.DisplayText("Creating routes...")
-	case pushaction.RouteBound:
-		cmd.UI.DisplayText("Binding routes...")
+	case pushaction.CreatedApplication:
+		cmd.UI.DisplayText("Created app.")
+	case pushaction.UpdatedApplication:
+		cmd.UI.DisplayText("Updated app.")
+	case pushaction.ConfiguringRoutes:
+		cmd.UI.DisplayText("Configuring routes...")
+	case pushaction.CreatedRoutes:
+		cmd.UI.DisplayText("Created routes.")
+	case pushaction.BoundRoutes:
+		cmd.UI.DisplayText("Bound routes.")
 	case pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:

@@ -34,6 +34,8 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		var event Event
 		var warnings Warnings
 		var err error
+
+		eventStream <- SettingUpApplication
 		config, event, warnings, err = actor.CreateOrUpdateApp(config)
 		warningsStream <- warnings
 		if err != nil {
@@ -42,6 +44,8 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 		eventStream <- event
 		log.Debugf("desired application: %#v", config.DesiredApplication)
+
+		eventStream <- ConfiguringRoutes
 
 		var createdRoutes bool
 		config, createdRoutes, warnings, err = actor.CreateRoutes(config)
@@ -52,7 +56,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 		if createdRoutes {
 			log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
-			eventStream <- RouteCreated
+			eventStream <- CreatedRoutes
 		}
 
 		var boundRoutes bool
@@ -64,7 +68,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 		if boundRoutes {
 			log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
-			eventStream <- RouteBound
+			eventStream <- BoundRoutes
 		}
 
 		archivePath, err := actor.CreateArchive(config)

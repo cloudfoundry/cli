@@ -89,8 +89,9 @@ var _ = Describe("Apply", func() {
 		})
 
 		JustBeforeEach(func() {
+			Eventually(eventStream).Should(Receive(Equal(SettingUpApplication)))
 			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
-			Eventually(eventStream).Should(Receive(Equal(ApplicationCreated)))
+			Eventually(eventStream).Should(Receive(Equal(CreatedApplication)))
 		})
 
 		Context("when the route creation is successful", func() {
@@ -102,8 +103,9 @@ var _ = Describe("Apply", func() {
 			})
 
 			JustBeforeEach(func() {
+				Eventually(eventStream).Should(Receive(Equal(ConfiguringRoutes)))
 				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warnings-1", "create-route-warnings-2")))
-				Eventually(eventStream).Should(Receive(Equal(RouteCreated)))
+				Eventually(eventStream).Should(Receive(Equal(CreatedRoutes)))
 			})
 
 			Context("when binding the routes is successful", func() {
@@ -113,7 +115,7 @@ var _ = Describe("Apply", func() {
 
 				JustBeforeEach(func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warnings-1", "bind-route-warnings-2")))
-					Eventually(eventStream).Should(Receive(Equal(RouteBound)))
+					Eventually(eventStream).Should(Receive(Equal(BoundRoutes)))
 				})
 
 				Context("when the archive creation is successful", func() {
@@ -225,7 +227,7 @@ var _ = Describe("Apply", func() {
 
 				It("should not send the RouteCreated event", func() {
 					Eventually(warningsStream).Should(Receive())
-					Consistently(eventStream).ShouldNot(Receive(Equal(RouteCreated)))
+					Consistently(eventStream).ShouldNot(Receive(Equal(CreatedRoutes)))
 				})
 			})
 
@@ -251,6 +253,7 @@ var _ = Describe("Apply", func() {
 			})
 
 			It("should not send the RouteCreated event", func() {
+				Eventually(eventStream).Should(Receive(Equal(ConfiguringRoutes)))
 				Eventually(warningsStream).Should(Receive())
 				Consistently(eventStream).ShouldNot(Receive())
 			})
@@ -265,6 +268,7 @@ var _ = Describe("Apply", func() {
 			})
 
 			It("sends warnings and errors, then stops", func() {
+				Eventually(eventStream).Should(Receive(Equal(ConfiguringRoutes)))
 				Eventually(warningsStream).Should(Receive(ConsistOf("create-route-warnings-1", "create-route-warnings-2")))
 				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 				Consistently(eventStream).ShouldNot(Receive())
@@ -281,6 +285,7 @@ var _ = Describe("Apply", func() {
 		})
 
 		It("sends warnings and errors, then stops", func() {
+			Eventually(eventStream).Should(Receive(Equal(SettingUpApplication)))
 			Eventually(warningsStream).Should(Receive(ConsistOf("create-application-warnings-1", "create-application-warnings-2")))
 			Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 			Consistently(eventStream).ShouldNot(Receive())

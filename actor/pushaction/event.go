@@ -3,10 +3,12 @@ package pushaction
 type Event string
 
 const (
-	ApplicationCreated   Event = "application created"
-	ApplicationUpdated   Event = "application updated"
-	RouteCreated         Event = "route created"
-	RouteBound           Event = "route bound"
+	SettingUpApplication Event = "setting up application"
+	CreatedApplication   Event = "created application"
+	UpdatedApplication   Event = "updated application"
+	ConfiguringRoutes    Event = "configuring routes"
+	CreatedRoutes        Event = "created routes"
+	BoundRoutes          Event = "bound routes"
 	CreatingArchive      Event = "creating archive"
 	UploadingApplication Event = "uploading application"
 	UploadComplete       Event = "upload complete"
