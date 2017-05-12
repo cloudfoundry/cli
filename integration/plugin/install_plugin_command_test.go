@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/generic"
@@ -457,7 +456,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", convertPathToRegularExpression(pluginPath)))
+						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", helpers.ConvertPathToRegularExpression(pluginPath)))
 						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 						Eventually(session.Out).Should(Say("OK"))
 						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
@@ -505,7 +504,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", convertPathToRegularExpression(pluginPath)))
+						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", helpers.ConvertPathToRegularExpression(pluginPath)))
 						Eventually(session.Err).Should(Say("Plugin installation cancelled"))
 						Eventually(session.Out).Should(Say("FAILED"))
 
@@ -542,7 +541,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", convertPathToRegularExpression(pluginPath)))
+						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
 
 						session.Interrupt()
 
@@ -834,7 +833,7 @@ var _ = Describe("install-plugin command", func() {
 
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
-					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", pluginPath))
+					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]:", helpers.ConvertPathToRegularExpression(pluginPath)))
 
 					session.Interrupt()
 
@@ -855,7 +854,3 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 })
-
-func convertPathToRegularExpression(path string) string {
-	return strings.Replace(path, "\\", "\\\\", -1)
-}
