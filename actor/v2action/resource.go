@@ -13,6 +13,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+type FileChangedError struct {
+	Filename string
+}
+
+func (e FileChangedError) Error() string {
+	return fmt.Sprint("SHA1 mismatch for:", e.Filename)
+}
+
 type Resource ccv2.Resource
 
 // GatherResources returns a list of resources for a directory.
@@ -76,7 +84,7 @@ func (actor Actor) ZipResources(sourceDir string, filesToInclude []Resource) (st
 	for _, resource := range filesToInclude {
 		fullPath := filepath.Join(sourceDir, resource.Filename)
 		log.WithField("fullPath", fullPath).Debug("zipping file")
-		err := actor.addFileToZip(fullPath, resource.Filename, writer)
+		err := actor.addFileToZip(fullPath, resource.Filename, resource.SHA1, writer)
 		if err != nil {
 			log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
 			return "", err
@@ -100,7 +108,7 @@ func (_ Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
 	return apiResources
 }
 
-func (_ Actor) addFileToZip(srcPath string, destPath string, zipFile *zip.Writer) error {
+func (_ Actor) addFileToZip(srcPath string, destPath string, sha1Sum string, zipFile *zip.Writer) error {
 	srcFile, err := os.Open(srcPath)
 	if err != nil {
 		log.WithField("srcPath", srcPath).Errorln("opening path in dir:", err)
@@ -143,9 +151,16 @@ func (_ Actor) addFileToZip(srcPath string, destPath string, zipFile *zip.Writer
 	}
 
 	if !fileInfo.IsDir() {
-		if _, err := io.Copy(destFileWriter, srcFile); err != nil {
+		sum := sha1.New()
+
+		multi := io.MultiWriter(sum, destFileWriter)
+		if _, err := io.Copy(multi, srcFile); err != nil {
 			log.WithField("srcPath", srcPath).Errorln("copying data in dir:", err)
 			return err
+		}
+
+		if sha1Sum != fmt.Sprintf("%x", sum.Sum(nil)) {
+			return FileChangedError{Filename: srcPath}
 		}
 	}
 
