@@ -95,10 +95,7 @@ var _ = Describe("terminate-task command", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					// TODO revert to using the buildpack name after bug is resolved
-					// (affecting staticfile buildpack 1.4.0) :
-					// https://www.pivotaltracker.com/n/projects/1042066/stories/142863193
-					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "https://github.com/cloudfoundry/staticfile-buildpack/releases/download/v1.3.18/staticfile_buildpack-cached-v1.3.18.zip")).Should(Exit(0))
+					Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
