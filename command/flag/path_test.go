@@ -233,6 +233,71 @@ var _ = Describe("path types", func() {
 		})
 	})
 
+	Describe("JSONOrFileWithValidation", func() {
+		var jsonOrFile JSONOrFileWithValidation
+
+		BeforeEach(func() {
+			jsonOrFile = JSONOrFileWithValidation(nil)
+		})
+
+		// The Complete method is not tested because it shares the same code as
+		// Path.Complete().
+
+		Describe("UnmarshalFlag", func() {
+			Context("when the file exists", func() {
+				var tempPath string
+
+				Context("when the file has valid JSON", func() {
+					BeforeEach(func() {
+						tempPath = tempFile(`{"this is":"valid JSON"}`)
+					})
+
+					It("sets the path", func() {
+						err := jsonOrFile.UnmarshalFlag(tempPath)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(jsonOrFile).To(BeEquivalentTo(map[string]interface{}{
+							"this is": "valid JSON",
+						}))
+					})
+				})
+
+				Context("when the file has invalid JSON", func() {
+					BeforeEach(func() {
+						tempPath = tempFile(`{"this is":"invalid JSON"`)
+					})
+
+					It("errors with the invalid configuration error", func() {
+						err := jsonOrFile.UnmarshalFlag(tempPath)
+						Expect(err).To(Equal(&flags.Error{
+							Type:    flags.ErrRequired,
+							Message: "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
+						}))
+					})
+				})
+			})
+
+			Context("when the JSON is invalid", func() {
+				It("errors with the invalid configuration error", func() {
+					err := jsonOrFile.UnmarshalFlag(`{"this is":"invalid JSON"`)
+					Expect(err).To(Equal(&flags.Error{
+						Type:    flags.ErrRequired,
+						Message: "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
+					}))
+				})
+			})
+
+			Context("when the JSON is valid", func() {
+				It("sets the path", func() {
+					err := jsonOrFile.UnmarshalFlag(`{"this is":"valid JSON"}`)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(jsonOrFile).To(BeEquivalentTo(map[string]interface{}{
+						"this is": "valid JSON",
+					}))
+				})
+			})
+		})
+	})
+
 	Describe("PathWithExistenceCheckOrURL", func() {
 		var pathWithExistenceCheckOrURL PathWithExistenceCheckOrURL
 

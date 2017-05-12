@@ -22,6 +22,106 @@ var _ = Describe("Service Binding Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
+	Describe("BindServiceBySpace", func() {
+		var (
+			executeErr error
+			warnings   Warnings
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", map[string]interface{}{"some-parameter": "some-value"})
+		})
+
+		Context("when getting the application errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					nil,
+					ccv2.Warnings{"foo-1"},
+					errors.New("some-error"),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(errors.New("some-error")))
+				Expect(warnings).To(ConsistOf("foo-1"))
+			})
+		})
+
+		Context("when getting the application succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv2.Application{{GUID: "some-app-guid"}},
+					ccv2.Warnings{"foo-1"},
+					nil,
+				)
+			})
+
+			Context("when getting the service instance errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+						[]ccv2.ServiceInstance{},
+						ccv2.Warnings{"foo-2"},
+						errors.New("some-error"),
+					)
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(MatchError(errors.New("some-error")))
+					Expect(warnings).To(ConsistOf("foo-1", "foo-2"))
+				})
+			})
+
+			Context("when getting the service instance succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+						[]ccv2.ServiceInstance{{GUID: "some-service-instance-guid"}},
+						ccv2.Warnings{"foo-2"},
+						nil,
+					)
+				})
+
+				Context("when getting binding the service instance to the application errors", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.CreateServiceBindingReturns(
+							ccv2.ServiceBinding{},
+							ccv2.Warnings{"foo-3"},
+							errors.New("some-error"),
+						)
+					})
+
+					It("returns the error", func() {
+						Expect(executeErr).To(MatchError(errors.New("some-error")))
+						Expect(warnings).To(ConsistOf("foo-1", "foo-2", "foo-3"))
+					})
+				})
+				Context("when getting binding the service instance to the application succeeds", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.CreateServiceBindingReturns(
+							ccv2.ServiceBinding{GUID: "some-service-binding-guid"},
+							ccv2.Warnings{"foo-3"},
+							nil,
+						)
+					})
+
+					It("returns all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("foo-1", "foo-2", "foo-3"))
+
+						Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+
+						Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
+
+						Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
+						appGUID, serviceInstanceGUID, parameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(serviceInstanceGUID).To(Equal("some-service-instance-guid"))
+						Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
+					})
+				})
+			})
+		})
+	})
+
 	Describe("GetServiceBindingByApplicationAndServiceInstance", func() {
 		Context("when the service binding exists", func() {
 			BeforeEach(func() {

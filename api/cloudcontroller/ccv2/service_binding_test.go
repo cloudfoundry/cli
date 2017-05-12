@@ -17,6 +17,71 @@ var _ = Describe("Service Binding", func() {
 		client = NewTestClient()
 	})
 
+	Describe("CreateServiceBinding", func() {
+		Context("when the create is successful", func() {
+			BeforeEach(func() {
+				response := `
+						{
+							"metadata": {
+								"guid": "some-service-binding-guid"
+							}
+						}`
+				requestBody := map[string]interface{}{
+					"service_instance_guid": "some-service-instance-guid",
+					"app_guid":              "some-app-guid",
+					"parameters": map[string]interface{}{
+						"the-service-broker": "wants this object",
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/service_bindings"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created object and warnings", func() {
+				parameters := map[string]interface{}{
+					"the-service-broker": "wants this object",
+				}
+				serviceBinding, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", parameters)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(serviceBinding).To(Equal(ServiceBinding{GUID: "some-service-binding-guid"}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		Context("when the create returns an error", func() {
+			BeforeEach(func() {
+				response := `
+				{
+					  "description": "The app space binding to service is taken: some-app-guid some-service-instance-guid",
+						  "error_code": "CF-ServiceBindingAppServiceTaken",
+							  "code": 90003
+							}
+			`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/service_bindings"),
+						RespondWith(http.StatusBadRequest, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				parameters := map[string]interface{}{
+					"the-service-broker": "wants this object",
+				}
+				_, warnings, err := client.CreateServiceBinding("some-app-guid", "some-service-instance-guid", parameters)
+				Expect(err).To(MatchError(ccerror.ServiceBindingTakenError{Message: "The app space binding to service is taken: some-app-guid some-service-instance-guid"}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetServiceBindings", func() {
 		BeforeEach(func() {
 			response1 := `{

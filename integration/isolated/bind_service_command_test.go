@@ -1,6 +1,10 @@
 package isolated
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -8,10 +12,6 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-// TODO: Change error outputs to session.Err after refactor
-// as well as any other suggested changes in tracker stories:
-// https://www.pivotaltracker.com/story/show/144626837
-// https://www.pivotaltracker.com/story/show/126256765
 var _ = Describe("bind-service command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("command is currently experimental")
@@ -72,7 +72,7 @@ var _ = Describe("bind-service command", func() {
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("bind-service", appName, serviceInstance)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -85,13 +85,12 @@ var _ = Describe("bind-service command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("bind-service", appName, serviceInstance)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
 
-		// TODO: Figure out this wack shi
-		XContext("when there no org set", func() {
+		Context("when there no org set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -100,13 +99,12 @@ var _ = Describe("bind-service command", func() {
 			It("fails with no targeted org error message", func() {
 				session := helpers.CF("bind-service", appName, serviceInstance)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
 
-		// TODO: Figure out this wack shi
-		XContext("when there no space set", func() {
+		Context("when there no space set", func() {
 			BeforeEach(func() {
 				helpers.LogoutCF()
 				helpers.LoginCF()
@@ -116,7 +114,7 @@ var _ = Describe("bind-service command", func() {
 			It("fails with no targeted space error message", func() {
 				session := helpers.CF("bind-service", appName, serviceInstance)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -147,7 +145,7 @@ var _ = Describe("bind-service command", func() {
 			It("displays FAILED and app not found", func() {
 				session := helpers.CF("bind-service", "does-not-exist", serviceInstance)
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("App %s not found", "does-not-exist"))
+				Eventually(session.Err).Should(Say("App %s not found", "does-not-exist"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -163,7 +161,7 @@ var _ = Describe("bind-service command", func() {
 				It("displays FAILED and service not found", func() {
 					session := helpers.CF("bind-service", appName, "does-not-exist")
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Out).Should(Say("Service instance %s not found", "does-not-exist"))
+					Eventually(session.Err).Should(Say("Service instance %s not found", "does-not-exist"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -190,7 +188,7 @@ var _ = Describe("bind-service command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-				FContext("when the service is already bound to an app", func() {
+				Context("when the service is already bound to an app", func() {
 					BeforeEach(func() {
 						Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
 					})
@@ -199,45 +197,158 @@ var _ = Describe("bind-service command", func() {
 						session := helpers.CF("bind-service", appName, serviceInstance)
 
 						Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
-						Eventually(session.Out).Should(Say("OK"))
 						Eventually(session.Out).Should(Say("App %s is already bound to %s.", appName, serviceInstance))
+						Eventually(session.Out).Should(Say("OK"))
 
 						Eventually(session).Should(Exit(0))
 					})
 				})
 
 				Context("when configuration parameters are provided in a file", func() {
+					var configurationFile *os.File
+
 					Context("when the file-path does not exist", func() {
 						It("displays FAILED and the invalid configuration error", func() {
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-do-not-exist")
+							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+
+							Eventually(session).Should(Exit(1))
+						})
+					})
+
+					Context("when the file contians invalid json", func() {
+						BeforeEach(func() {
+							var err error
+							content := []byte("{i-am-very-bad-json")
+							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							Expect(err).ToNot(HaveOccurred())
+
+							_, err = configurationFile.Write(content)
+							Expect(err).ToNot(HaveOccurred())
+
+							err = configurationFile.Close()
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						AfterEach(func() {
+							os.Remove(configurationFile.Name())
+						})
+
+						It("displays FAILED and the invalid configuration error", func() {
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", configurationFile.Name())
+							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+
+							Eventually(session).Should(Exit(1))
 						})
 					})
 
 					Context("when the file-path is relative", func() {
+						BeforeEach(func() {
+							var err error
+							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
+							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							Expect(err).ToNot(HaveOccurred())
+
+							_, err = configurationFile.Write(content)
+							Expect(err).ToNot(HaveOccurred())
+
+							err = configurationFile.Close()
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						AfterEach(func() {
+							os.Remove(configurationFile.Name())
+						})
+
 						It("binds the service to the app, displays OK and TIP", func() {
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", configurationFile.Name())
+							Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
 					Context("when the file-path is absolute", func() {
+						BeforeEach(func() {
+							var err error
+							content := []byte("{\"i-am-good-json\":\"good-boy\"}")
+							configurationFile, err = ioutil.TempFile("", "CF_CLI")
+							Expect(err).ToNot(HaveOccurred())
+
+							_, err = configurationFile.Write(content)
+							Expect(err).ToNot(HaveOccurred())
+
+							err = configurationFile.Close()
+							Expect(err).ToNot(HaveOccurred())
+						})
+
 						It("binds the service to the app, displays OK and TIP", func() {
+							absolutePath, err := filepath.Abs(configurationFile.Name())
+							Expect(err).ToNot(HaveOccurred())
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", absolutePath)
+							Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
 
 				Context("when configuration paramters are provided as in-line JSON", func() {
 					Context("when the JSON is invalid", func() {
-						It("displays FAILED and the  invalid configuration error", func() {
+						It("displays FAILED and the invalid configuration error", func() {
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "i-am-invalid-json")
+							Eventually(session.Err).Should(Say("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+
+							Eventually(session).Should(Exit(1))
 						})
 					})
 
 					Context("when the JSON is valid", func() {
 						It("binds the service to the app, displays OK and TIP", func() {
+							session := helpers.CF("bind-service", appName, serviceInstance, "-c", "{\"i-am-valid-json\":\"dope dude\"}")
+							Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
 			})
 
-			Context("when the service doesn't allow apps to bind", func() {
-				It("displays FAILED and service server error", func() {
+			Context("when the service is provided by a broker", func() {
+				var broker helpers.ServiceBroker
+
+				BeforeEach(func() {
+					broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+					broker.Push()
+					broker.Configure()
+					broker.Create()
+
+					Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+
+					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					broker.Destroy()
+				})
+
+				It("binds the service to the app, displays OK and TIP", func() {
+					session := helpers.CF("bind-service", appName, serviceInstance, "-c", `{"wheres":"waldo"}`)
+					Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+					Eventually(session).Should(Exit(0))
+
+					logsSession := helpers.CF("logs", broker.Name, "--recent")
+					Eventually(logsSession).Should(Say("{\"wheres\":\"waldo\"}"))
+					Eventually(logsSession).Should(Exit(0))
 				})
 			})
 		})

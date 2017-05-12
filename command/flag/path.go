@@ -1,7 +1,9 @@
 package flag
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,6 +40,40 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 	}
 
 	*p = PathWithExistenceCheck(path)
+	return nil
+}
+
+type JSONOrFileWithValidation map[string]interface{}
+
+func (_ JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
+	return completeWithTilde(prefix)
+}
+
+func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
+	var jsonBytes []byte
+
+	errorToReturn := &flags.Error{
+		Type:    flags.ErrRequired,
+		Message: "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
+	}
+
+	_, err := os.Stat(pathOrJSON)
+	if err == nil {
+		jsonBytes, err = ioutil.ReadFile(pathOrJSON)
+		if err != nil {
+			return errorToReturn
+		}
+	} else {
+		jsonBytes = []byte(pathOrJSON)
+	}
+
+	var jsonMap map[string]interface{}
+
+	if jsonIsInvalid := json.Unmarshal(jsonBytes, &jsonMap); jsonIsInvalid != nil {
+		return errorToReturn
+	}
+
+	*p = JSONOrFileWithValidation(jsonMap)
 	return nil
 }
 
