@@ -9,5 +9,5 @@ type RawHTTPStatusError struct {
 }
 
 func (r RawHTTPStatusError) Error() string {
-	return fmt.Sprintf("Error Code: %s\nRaw Response: %s", r.Status, r.RawResponse)
+	return fmt.Sprintf("HTTP Response: %s\nHTTP Response Body: %s", r.Status, r.RawResponse)
 }

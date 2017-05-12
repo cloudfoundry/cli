@@ -140,8 +140,8 @@
     "translation": ""
   },
   {
-    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
-    "translation": ""
+    "id": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}",
+    "translation": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}"
   },
   {
     "id": "Create an isolation segment",

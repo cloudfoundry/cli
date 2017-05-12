@@ -20,7 +20,7 @@ type GettingPluginRepositoryError struct {
 }
 
 func (e GettingPluginRepositoryError) Error() string {
-	return fmt.Sprintf("Could not get plugin repository '%s': %s", e.Name, e.Message)
+	return fmt.Sprintf("Could not get plugin repository '%s'\n%s", e.Name, e.Message)
 }
 
 func (actor Actor) GetOutdatedPlugins() ([]OutdatedPlugin, error) {

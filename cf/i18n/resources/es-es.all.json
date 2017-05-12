@@ -1880,7 +1880,7 @@
     "translation": "No se ha podido encontrar el espacio {{.Space}} de la organización {{.Org}}"
   },
   {
-    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
+    "id": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}",
     "translation": ""
   },
   {

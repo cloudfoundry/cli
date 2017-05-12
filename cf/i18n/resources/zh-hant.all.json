@@ -1880,7 +1880,7 @@
     "translation": "在組織 {{.Org}} 中找不到空間 {{.Space}}"
   },
   {
-    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
+    "id": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}",
     "translation": ""
   },
   {

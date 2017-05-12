@@ -34,7 +34,7 @@ type GettingPluginRepositoryError struct {
 }
 
 func (_ GettingPluginRepositoryError) Error() string {
-	return "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}"
+	return "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}"
 }
 
 func (e GettingPluginRepositoryError) Translate(translate func(string, ...interface{}) string) string {
