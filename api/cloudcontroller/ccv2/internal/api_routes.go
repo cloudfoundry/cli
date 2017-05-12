@@ -51,6 +51,7 @@ const (
 	GetUsersRequest                       = "GetUsers"
 	PostAppRequest                        = "PostApp"
 	PostRouteRequest                      = "PostRoute"
+	PostServiceBindingRequest             = "PostServiceBinding"
 	PutAppRequest                         = "PutApp"
 	PutAppBitsRequest                     = "PutAppBits"
 	PutBindRouteAppRequest                = "PutBindRouteApp"
@@ -88,6 +89,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
+	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},

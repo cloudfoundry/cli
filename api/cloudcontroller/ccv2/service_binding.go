@@ -1,6 +1,7 @@
 package ccv2
 
 import (
+	"bytes"
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -25,6 +26,48 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 
 	serviceBinding.GUID = ccServiceBinding.Metadata.GUID
 	return nil
+}
+
+// serviceBindingRequestBody represents the body of the service binding create
+// request.
+type serviceBindingRequestBody struct {
+	ServiceInstanceGUID string                 `json:"service_instance_guid"`
+	AppGUID             string                 `json:"app_guid"`
+	Parameters          map[string]interface{} `json:"parameters"`
+}
+
+// CreateServiceBinding creates a service binding
+func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
+	requestBody := serviceBindingRequestBody{
+		ServiceInstanceGUID: serviceInstanceGUID,
+		AppGUID:             appGUID,
+		Parameters:          parameters,
+	}
+
+	bodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return ServiceBinding{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostServiceBindingRequest,
+		Body:        bytes.NewReader(bodyBytes),
+	})
+	if err != nil {
+		return ServiceBinding{}, nil, err
+	}
+
+	var serviceBinding ServiceBinding
+	response := cloudcontroller.Response{
+		Result: &serviceBinding,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return ServiceBinding{}, response.Warnings, err
+	}
+
+	return serviceBinding, response.Warnings, nil
 }
 
 // GetServiceBindings returns back a list of Service Bindings based off of the

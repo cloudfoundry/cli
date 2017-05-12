@@ -540,6 +540,10 @@
     "translation": "{{.CurrentUser}} としてサービス {{.ServiceInstanceName}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} にバインドしています..."
   },
   {
+    "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}} としてサービス {{.ServiceName}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} にバインドしています..."
   },

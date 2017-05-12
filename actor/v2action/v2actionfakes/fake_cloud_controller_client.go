@@ -85,6 +85,23 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	CreateServiceBindingStub        func(appGUID string, serviceBindingGUID string, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error)
+	createServiceBindingMutex       sync.RWMutex
+	createServiceBindingArgsForCall []struct {
+		appGUID            string
+		serviceBindingGUID string
+		parameters         map[string]interface{}
+	}
+	createServiceBindingReturns struct {
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}
+	createServiceBindingReturnsOnCall map[int]struct {
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}
 	CreateUserStub        func(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	createUserMutex       sync.RWMutex
 	createUserArgsForCall []struct {
@@ -940,6 +957,62 @@ func (fake *FakeCloudControllerClient) CreateRouteReturnsOnCall(i int, result1 c
 	}
 	fake.createRouteReturnsOnCall[i] = struct {
 		result1 ccv2.Route
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBinding(appGUID string, serviceBindingGUID string, parameters map[string]interface{}) (ccv2.ServiceBinding, ccv2.Warnings, error) {
+	fake.createServiceBindingMutex.Lock()
+	ret, specificReturn := fake.createServiceBindingReturnsOnCall[len(fake.createServiceBindingArgsForCall)]
+	fake.createServiceBindingArgsForCall = append(fake.createServiceBindingArgsForCall, struct {
+		appGUID            string
+		serviceBindingGUID string
+		parameters         map[string]interface{}
+	}{appGUID, serviceBindingGUID, parameters})
+	fake.recordInvocation("CreateServiceBinding", []interface{}{appGUID, serviceBindingGUID, parameters})
+	fake.createServiceBindingMutex.Unlock()
+	if fake.CreateServiceBindingStub != nil {
+		return fake.CreateServiceBindingStub(appGUID, serviceBindingGUID, parameters)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createServiceBindingReturns.result1, fake.createServiceBindingReturns.result2, fake.createServiceBindingReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBindingCallCount() int {
+	fake.createServiceBindingMutex.RLock()
+	defer fake.createServiceBindingMutex.RUnlock()
+	return len(fake.createServiceBindingArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBindingArgsForCall(i int) (string, string, map[string]interface{}) {
+	fake.createServiceBindingMutex.RLock()
+	defer fake.createServiceBindingMutex.RUnlock()
+	return fake.createServiceBindingArgsForCall[i].appGUID, fake.createServiceBindingArgsForCall[i].serviceBindingGUID, fake.createServiceBindingArgsForCall[i].parameters
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBindingReturns(result1 ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
+	fake.CreateServiceBindingStub = nil
+	fake.createServiceBindingReturns = struct {
+		result1 ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateServiceBindingReturnsOnCall(i int, result1 ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
+	fake.CreateServiceBindingStub = nil
+	if fake.createServiceBindingReturnsOnCall == nil {
+		fake.createServiceBindingReturnsOnCall = make(map[int]struct {
+			result1 ccv2.ServiceBinding
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.createServiceBindingReturnsOnCall[i] = struct {
+		result1 ccv2.ServiceBinding
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -3180,6 +3253,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
+	fake.createServiceBindingMutex.RLock()
+	defer fake.createServiceBindingMutex.RUnlock()
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
 	fake.deleteOrganizationMutex.RLock()
