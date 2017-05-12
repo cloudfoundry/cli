@@ -35,8 +35,8 @@ var _ = Describe("Request Logger File Writer", func() {
 			tmpdir, err = ioutil.TempDir("", "request_logger")
 			Expect(err).ToNot(HaveOccurred())
 
-			logFile1 = filepath.Join(tmpdir, "tmp_sub_dir/tmpfile1")
-			logFile2 = filepath.Join(tmpdir, "tmp/sub/dir/../tmpfile2")
+			logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile1")
+			logFile2 = filepath.Join(tmpdir, "tmp", "sub", "dir", ".", "tmpfile2")
 			display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
 			err = display.Start()
 			Expect(err).ToNot(HaveOccurred())
@@ -225,6 +225,7 @@ var _ = Describe("Request Logger File Writer", func() {
 				err := errors.New("foobar")
 				display.HandleInternalError(err)
 				Expect(testUI.Err).To(Say("foobar"))
+				Expect(display.Stop()).NotTo(HaveOccurred())
 			})
 		})
 
