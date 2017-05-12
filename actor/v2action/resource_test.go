@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
@@ -57,16 +58,6 @@ var _ = Describe("Resource Actions", func() {
 			executeErr error
 		)
 
-		BeforeEach(func() {
-			resources = []Resource{
-				{Filename: "level1"},
-				{Filename: "level1/level2"},
-				{Filename: "level1/level2/tmpFile1"},
-				{Filename: "tmpFile2"},
-				{Filename: "tmpFile3"},
-			}
-		})
-
 		JustBeforeEach(func() {
 			resultZip, executeErr = actor.ZipResources(srcDir, resources)
 		})
@@ -75,34 +66,62 @@ var _ = Describe("Resource Actions", func() {
 			Expect(os.RemoveAll(resultZip)).ToNot(HaveOccurred())
 		})
 
-		It("zips the file and returns a populated resources list", func() {
-			Expect(executeErr).ToNot(HaveOccurred())
+		Context("when the files have not been changed since scanning them", func() {
+			BeforeEach(func() {
+				resources = []Resource{
+					{Filename: "level1"},
+					{Filename: "level1/level2"},
+					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
+					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879"},
+				}
+			})
 
-			Expect(resultZip).ToNot(BeEmpty())
-			zipFile, err := os.Open(resultZip)
-			Expect(err).ToNot(HaveOccurred())
-			defer zipFile.Close()
+			It("zips the file and returns a populated resources list", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
 
-			zipInfo, err := zipFile.Stat()
-			Expect(err).ToNot(HaveOccurred())
+				Expect(resultZip).ToNot(BeEmpty())
+				zipFile, err := os.Open(resultZip)
+				Expect(err).ToNot(HaveOccurred())
+				defer zipFile.Close()
 
-			reader, err := ykk.NewReader(zipFile, zipInfo.Size())
-			Expect(err).ToNot(HaveOccurred())
+				zipInfo, err := zipFile.Stat()
+				Expect(err).ToNot(HaveOccurred())
 
-			Expect(reader.File).To(HaveLen(5))
-			Expect(reader.File[0].Name).To(Equal("level1/"))
-			Expect(reader.File[1].Name).To(Equal("level1/level2/"))
-			Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
-			Expect(reader.File[3].Name).To(Equal("tmpFile2"))
-			Expect(reader.File[4].Name).To(Equal("tmpFile3"))
+				reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+				Expect(err).ToNot(HaveOccurred())
 
-			expectFileContentsToEqual(reader.File[2], "why hello")
-			expectFileContentsToEqual(reader.File[3], "Hello, Binky")
-			expectFileContentsToEqual(reader.File[4], "Bananarama")
+				Expect(reader.File).To(HaveLen(5))
+				Expect(reader.File[0].Name).To(Equal("level1/"))
+				Expect(reader.File[1].Name).To(Equal("level1/level2/"))
+				Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
+				Expect(reader.File[3].Name).To(Equal("tmpFile2"))
+				Expect(reader.File[4].Name).To(Equal("tmpFile3"))
 
-			for _, file := range reader.File {
-				Expect(file.Method).To(Equal(zip.Deflate))
-			}
+				expectFileContentsToEqual(reader.File[2], "why hello")
+				expectFileContentsToEqual(reader.File[3], "Hello, Binky")
+				expectFileContentsToEqual(reader.File[4], "Bananarama")
+
+				for _, file := range reader.File {
+					Expect(file.Method).To(Equal(zip.Deflate))
+				}
+			})
+		})
+
+		Context("when the files have changed since the scanning", func() {
+			BeforeEach(func() {
+				resources = []Resource{
+					{Filename: "level1"},
+					{Filename: "level1/level2"},
+					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
+					{Filename: "tmpFile3", SHA1: "i dunno, 7?"},
+				}
+			})
+
+			It("returns an FileChangedError", func() {
+				Expect(executeErr).To(Equal(FileChangedError{Filename: path.Join(srcDir, "tmpFile3")}))
+			})
 		})
 	})
 })
