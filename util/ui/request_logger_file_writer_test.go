@@ -233,12 +233,12 @@ var _ = Describe("Request Logger File Writer", func() {
 			It("locks and then unlocks the mutex properly", func() { // and creates the intermediate dirs
 				c := make(chan bool)
 				go func() {
-					err := display.Start()
-					Expect(err).ToNot(HaveOccurred())
+					Expect(display.Start()).ToNot(HaveOccurred())
 					c <- true
 				}()
-				Eventually(c).Should(Receive())
+				Consistently(c).ShouldNot(Receive())
 				Expect(display.Stop()).NotTo(HaveOccurred())
+				Eventually(c).Should(Receive())
 			})
 		})
 	})
