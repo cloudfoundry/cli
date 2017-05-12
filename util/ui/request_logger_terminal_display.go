@@ -22,13 +22,23 @@ func newRequestLoggerTerminalDisplay(ui *UI, lock *sync.Mutex) *RequestLoggerTer
 	}
 }
 
-func (display RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
+func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
+	fmt.Fprintf(display.ui.Out, "%s\n", RedactedValue)
+	return nil
+}
+
+func (display *RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
 	fmt.Fprintf(display.ui.Out, "%s\n", dump)
 	return nil
 }
 
-func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
-	fmt.Fprintf(display.ui.Out, "%s\n", RedactedValue)
+func (display *RequestLoggerTerminalDisplay) DisplayHeader(name string, value string) error {
+	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText(name), value)
+	return nil
+}
+
+func (display *RequestLoggerTerminalDisplay) DisplayHost(name string) error {
+	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText("Host"), name)
 	return nil
 }
 
@@ -52,16 +62,6 @@ func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error 
 	}
 
 	fmt.Fprintf(display.ui.Out, "%s\n", buff.String())
-	return nil
-}
-
-func (display *RequestLoggerTerminalDisplay) DisplayHeader(name string, value string) error {
-	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText(name), value)
-	return nil
-}
-
-func (display *RequestLoggerTerminalDisplay) DisplayHost(name string) error {
-	fmt.Fprintf(display.ui.Out, "%s: %s\n", display.ui.TranslateText("Host"), name)
 	return nil
 }
 

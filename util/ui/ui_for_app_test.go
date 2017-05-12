@@ -29,6 +29,50 @@ var _ = Describe("UI", func() {
 		ui.Err = NewBuffer()
 	})
 
+	Describe("DisplayInstancesTableForApp", func() {
+		Context("in english", func() {
+			It("displays a table with red coloring for down and crashed", func() {
+				ui.DisplayInstancesTableForApp([][]string{
+					{"", "header1", "header2", "header3"},
+					{"#0", "starting", "val1", "val2"},
+					{"#1", "down", "val1", "val2"},
+					{"#2", "crashed", "val1", "val2"},
+				})
+
+				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
+				Expect(ui.Out).To(Say("#0\\s+starting\\s+val1\\s+val2"))
+				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1mdown\x1b\\[0m\\s+val1\\s+val2"))
+				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1mcrashed\x1b\\[0m\\s+val1\\s+val2"))
+			})
+		})
+
+		Context("in a non-english language", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+				ui.Out = NewBuffer()
+				ui.Err = NewBuffer()
+			})
+
+			It("displays a table with red coloring for down and crashed", func() {
+				ui.DisplayInstancesTableForApp([][]string{
+					{"", "header1", "header2", "header3"},
+					{"#0", ui.TranslateText("starting"), "val1", "val2"},
+					{"#1", ui.TranslateText("down"), "val1", "val2"},
+					{"#2", ui.TranslateText("crashed"), "val1", "val2"},
+				})
+
+				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
+				Expect(ui.Out).To(Say("#0\\s+%s\\s+val1\\s+val2", ui.TranslateText("starting")))
+				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("down")))
+				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("crashed")))
+			})
+		})
+	})
+
 	Describe("DisplayKeyValueTableForApp", func() {
 		Context("when the app is running properly", func() {
 			BeforeEach(func() {
@@ -127,50 +171,6 @@ var _ = Describe("UI", func() {
 					Expect(ui.Out).To(Say("requested state:   \x1b\\[31;1m%s\x1b\\[0m\n", ui.TranslateText("running")))
 					Expect(ui.Out).To(Say("instances:         \x1b\\[31;1m0/1\x1b\\[0m\n"))
 				})
-			})
-		})
-	})
-
-	Describe("DisplayInstancesTableForApp", func() {
-		Context("in english", func() {
-			It("displays a table with red coloring for down and crashed", func() {
-				ui.DisplayInstancesTableForApp([][]string{
-					{"", "header1", "header2", "header3"},
-					{"#0", "starting", "val1", "val2"},
-					{"#1", "down", "val1", "val2"},
-					{"#2", "crashed", "val1", "val2"},
-				})
-
-				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
-				Expect(ui.Out).To(Say("#0\\s+starting\\s+val1\\s+val2"))
-				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1mdown\x1b\\[0m\\s+val1\\s+val2"))
-				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1mcrashed\x1b\\[0m\\s+val1\\s+val2"))
-			})
-		})
-
-		Context("in a non-english language", func() {
-			BeforeEach(func() {
-				fakeConfig.LocaleReturns("fr-FR")
-
-				var err error
-				ui, err = NewUI(fakeConfig)
-				Expect(err).NotTo(HaveOccurred())
-				ui.Out = NewBuffer()
-				ui.Err = NewBuffer()
-			})
-
-			It("displays a table with red coloring for down and crashed", func() {
-				ui.DisplayInstancesTableForApp([][]string{
-					{"", "header1", "header2", "header3"},
-					{"#0", ui.TranslateText("starting"), "val1", "val2"},
-					{"#1", ui.TranslateText("down"), "val1", "val2"},
-					{"#2", ui.TranslateText("crashed"), "val1", "val2"},
-				})
-
-				Expect(ui.Out).To(Say("\x1b\\[1mheader1\x1b\\[0m\\s+\x1b\\[1mheader2\x1b\\[0m\\s+\x1b\\[1mheader3\x1b\\[0m")) // Makes sure empty values are not bolded
-				Expect(ui.Out).To(Say("#0\\s+%s\\s+val1\\s+val2", ui.TranslateText("starting")))
-				Expect(ui.Out).To(Say("#1\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("down")))
-				Expect(ui.Out).To(Say("#2\\s+\x1b\\[31;1m%s\x1b\\[0m\\s+val1\\s+val2", ui.TranslateText("crashed")))
 			})
 		})
 	})

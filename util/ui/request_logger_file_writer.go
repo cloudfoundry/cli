@@ -26,7 +26,17 @@ func newRequestLoggerFileWriter(ui *UI, lock *sync.Mutex, filePaths []string) *R
 	}
 }
 
-func (display RequestLoggerFileWriter) DisplayDump(dump string) error {
+func (display *RequestLoggerFileWriter) DisplayBody(_ []byte) error {
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(RedactedValue)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (display *RequestLoggerFileWriter) DisplayDump(dump string) error {
 	for _, logFile := range display.logFiles {
 		_, err := logFile.WriteString(dump)
 		if err != nil {
@@ -36,9 +46,19 @@ func (display RequestLoggerFileWriter) DisplayDump(dump string) error {
 	return nil
 }
 
-func (display *RequestLoggerFileWriter) DisplayBody(_ []byte) error {
+func (display *RequestLoggerFileWriter) DisplayHeader(name string, value string) error {
 	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(RedactedValue)
+		_, err := logFile.WriteString(fmt.Sprintf("%s: %s\n", name, value))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (display *RequestLoggerFileWriter) DisplayHost(name string) error {
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("Host: %s\n", name))
 		if err != nil {
 			return err
 		}
@@ -67,26 +87,6 @@ func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
 
 	for _, logFile := range display.logFiles {
 		_, err = logFile.Write(buff.Bytes())
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (display *RequestLoggerFileWriter) DisplayHeader(name string, value string) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("%s: %s\n", name, value))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (display *RequestLoggerFileWriter) DisplayHost(name string) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("Host: %s\n", name))
 		if err != nil {
 			return err
 		}
@@ -148,8 +148,11 @@ func (display *RequestLoggerFileWriter) Start() error {
 
 func (display *RequestLoggerFileWriter) Stop() error {
 	for _, logFile := range display.logFiles {
-		logFile.WriteString("\n")
-		err := logFile.Close()
+		_, err := logFile.WriteString("\n")
+		if err != nil {
+			return err
+		}
+		err = logFile.Close()
 		if err != nil {
 			return err
 		}
