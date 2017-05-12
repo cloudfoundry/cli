@@ -184,8 +184,9 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("returns an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", server.URL())
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}: Error Code: 404"))
-				Eventually(session.Err).Should(Say("Raw Response: foobar"))
+				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from https://127\\.0\\.0\\.1:\\d{1,5}"))
+				Eventually(session.Err).Should(Say("HTTP Response: 404"))
+				Eventually(session.Err).Should(Say("HTTP Response Body: foobar"))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

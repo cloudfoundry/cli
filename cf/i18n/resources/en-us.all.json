@@ -1880,8 +1880,8 @@
     "translation": "Could not find space {{.Space}} in organization {{.Org}}"
   },
   {
-    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
-    "translation": ""
+    "id": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}",
+    "translation": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}"
   },
   {
     "id": "Could not serialize information",

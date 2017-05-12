@@ -1880,7 +1880,7 @@
     "translation": "{{.Org}} 조직에서 {{.Space}} 영역을 찾을 수 없음"
   },
   {
-    "id": "Could not get plugin repository '{{.RepositoryName}}': {{.ErrorMessage}}",
+    "id": "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}",
     "translation": ""
   },
   {
