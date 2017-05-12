@@ -237,9 +237,8 @@ var _ = Describe("Request Logger File Writer", func() {
 					Expect(err).ToNot(HaveOccurred())
 					c <- true
 				}()
-				Consistently(c).ShouldNot(Receive())
-				Expect(display.Stop()).NotTo(HaveOccurred())
 				Eventually(c).Should(Receive())
+				Expect(display.Stop()).NotTo(HaveOccurred())
 			})
 		})
 	})
@@ -251,7 +250,7 @@ var _ = Describe("Request Logger File Writer", func() {
 			tmpdir, err := ioutil.TempDir("", "request_logger")
 			Expect(err).ToNot(HaveOccurred())
 
-			pathName = filepath.Join(tmpdir, "/foo")
+			pathName = filepath.Join(tmpdir, "foo")
 		})
 
 		AfterEach(func() {
