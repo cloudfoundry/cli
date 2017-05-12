@@ -52,6 +52,7 @@ const (
 	PostAppRequest                        = "PostApp"
 	PostRouteRequest                      = "PostRoute"
 	PostServiceBindingRequest             = "PostServiceBinding"
+	PostUserRequest                       = "PostUser"
 	PutAppRequest                         = "PutApp"
 	PutAppBitsRequest                     = "PutAppBits"
 	PutBindRouteAppRequest                = "PutBindRouteApp"
@@ -101,5 +102,5 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces/:space_guid/security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
 	{Path: "/v2/spaces/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
 	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
-	{Path: "/v2/users", Method: http.MethodPost, Name: GetUsersRequest},
+	{Path: "/v2/users", Method: http.MethodPost, Name: PostUserRequest},
 }
