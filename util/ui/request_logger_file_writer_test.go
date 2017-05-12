@@ -43,7 +43,25 @@ var _ = Describe("Request Logger File Writer", func() {
 		})
 
 		AfterEach(func() {
-			os.RemoveAll(tmpdir)
+			Expect(os.RemoveAll(tmpdir)).NotTo(HaveOccurred())
+		})
+
+		Describe("DisplayBody", func() {
+			It("writes the redacted value", func() {
+				err := display.DisplayBody([]byte("this is a body"))
+				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				contents, err := ioutil.ReadFile(logFile1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+
+				contents, err = ioutil.ReadFile(logFile2)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+			})
 		})
 
 		Describe("DisplayDump", func() {
@@ -64,9 +82,9 @@ var _ = Describe("Request Logger File Writer", func() {
 			})
 		})
 
-		Describe("DisplayBody", func() {
-			It("writes the redacted value", func() {
-				err := display.DisplayBody([]byte("this is a body"))
+		Describe("DisplayHeader", func() {
+			It("writes the header key and value", func() {
+				err := display.DisplayHeader("Header", "Value")
 				Expect(err).ToNot(HaveOccurred())
 
 				err = display.Stop()
@@ -74,11 +92,29 @@ var _ = Describe("Request Logger File Writer", func() {
 
 				contents, err := ioutil.ReadFile(logFile1)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+				Expect(string(contents)).To(Equal("Header: Value\n\n"))
 
 				contents, err = ioutil.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+				Expect(string(contents)).To(Equal("Header: Value\n\n"))
+			})
+		})
+
+		Describe("DisplayHost", func() {
+			It("writes the host", func() {
+				err := display.DisplayHost("banana")
+				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				contents, err := ioutil.ReadFile(logFile1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal("Host: banana\n\n"))
+
+				contents, err = ioutil.ReadFile(logFile2)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal("Host: banana\n\n"))
 			})
 		})
 
@@ -126,42 +162,6 @@ var _ = Describe("Request Logger File Writer", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal("\n"))
 				})
-			})
-		})
-
-		Describe("DisplayHeader", func() {
-			It("writes the header key and value", func() {
-				err := display.DisplayHeader("Header", "Value")
-				Expect(err).ToNot(HaveOccurred())
-
-				err = display.Stop()
-				Expect(err).ToNot(HaveOccurred())
-
-				contents, err := ioutil.ReadFile(logFile1)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal("Header: Value\n\n"))
-
-				contents, err = ioutil.ReadFile(logFile2)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal("Header: Value\n\n"))
-			})
-		})
-
-		Describe("DisplayHost", func() {
-			It("writes the host", func() {
-				err := display.DisplayHost("banana")
-				Expect(err).ToNot(HaveOccurred())
-
-				err = display.Stop()
-				Expect(err).ToNot(HaveOccurred())
-
-				contents, err := ioutil.ReadFile(logFile1)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal("Host: banana\n\n"))
-
-				contents, err = ioutil.ReadFile(logFile2)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(contents)).To(Equal("Host: banana\n\n"))
 			})
 		})
 
@@ -237,7 +237,7 @@ var _ = Describe("Request Logger File Writer", func() {
 					c <- true
 				}()
 				Consistently(c).ShouldNot(Receive())
-				display.Stop()
+				Expect(display.Stop()).NotTo(HaveOccurred())
 				Eventually(c).Should(Receive())
 			})
 		})
@@ -254,12 +254,12 @@ var _ = Describe("Request Logger File Writer", func() {
 		})
 
 		AfterEach(func() {
-			display.Stop()
-			os.RemoveAll(tmpdir)
+			Expect(display.Stop()).NotTo(HaveOccurred())
+			Expect(os.RemoveAll(tmpdir)).NotTo(HaveOccurred())
 		})
 
 		It("returns the os error when we unsuccessfully try to write to a file", func() {
-			os.Mkdir(pathName, os.ModeDir|os.ModePerm)
+			Expect(os.Mkdir(pathName, os.ModeDir|os.ModePerm)).NotTo(HaveOccurred())
 			display = testUI.RequestLoggerFileWriter([]string{pathName})
 			err := display.Start()
 
@@ -269,7 +269,8 @@ var _ = Describe("Request Logger File Writer", func() {
 		It("returns the os error when the parent directory for the log file is in the root directory", func() {
 			file, err := os.OpenFile(pathName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 			Expect(err).ToNot(HaveOccurred())
-			file.WriteString("hello world")
+			_, err = file.WriteString("hello world")
+			Expect(err).ToNot(HaveOccurred())
 			err = file.Close()
 			Expect(err).ToNot(HaveOccurred())
 

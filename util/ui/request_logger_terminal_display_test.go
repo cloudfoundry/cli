@@ -24,6 +24,14 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		display = testUI.RequestLoggerTerminalDisplay()
 	})
 
+	Describe("DisplayBody", func() {
+		It("displays the redacted value", func() {
+			err := display.DisplayBody([]byte("some-string body"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("\\[PRIVATE DATA HIDDEN\\]"))
+		})
+	})
+
 	Describe("DisplayDump", func() {
 		It("displays the passed in string", func() {
 			err := display.DisplayDump("some-dump-of-string")
@@ -32,11 +40,19 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		})
 	})
 
-	Describe("DisplayBody", func() {
-		It("displays the redacted value", func() {
-			err := display.DisplayBody([]byte("some-string body"))
+	Describe("DisplayHeader", func() {
+		It("displays the header key and value", func() {
+			err := display.DisplayHeader("Header", "Value")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("\\[PRIVATE DATA HIDDEN\\]"))
+			Expect(testUI.Out).To(Say("Header: Value"))
+		})
+	})
+
+	Describe("DisplayHost", func() {
+		It("displays the host", func() {
+			err := display.DisplayHost("banana")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("Host: banana"))
 		})
 	})
 
@@ -62,22 +78,6 @@ var _ = Describe("Request Logger Terminal Display", func() {
 
 				Expect(out.Contents()).To(BeEmpty())
 			})
-		})
-	})
-
-	Describe("DisplayHeader", func() {
-		It("displays the header key and value", func() {
-			err := display.DisplayHeader("Header", "Value")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("Header: Value"))
-		})
-	})
-
-	Describe("DisplayHost", func() {
-		It("displays the host", func() {
-			err := display.DisplayHost("banana")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(testUI.Out).To(Say("Host: banana"))
 		})
 	})
 
@@ -120,11 +120,11 @@ var _ = Describe("Request Logger Terminal Display", func() {
 			err := display.Start()
 			Expect(err).ToNot(HaveOccurred())
 			go func() {
-				display.Start()
+				Expect(display.Start()).NotTo(HaveOccurred())
 				c <- true
 			}()
 			Consistently(c).ShouldNot(Receive())
-			display.Stop()
+			Expect(display.Stop()).NotTo(HaveOccurred())
 			Eventually(c).Should(Receive())
 		})
 	})
