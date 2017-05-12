@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
@@ -70,8 +69,8 @@ var _ = Describe("Resource Actions", func() {
 			BeforeEach(func() {
 				resources = []Resource{
 					{Filename: "level1"},
-					{Filename: "level1/level2"},
-					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+					{Filename: filepath.Join("level1", "level2")},
+					{Filename: filepath.Join("level1", "level2", "tmpFile1"), SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
 					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
 					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879"},
 				}
@@ -112,15 +111,15 @@ var _ = Describe("Resource Actions", func() {
 			BeforeEach(func() {
 				resources = []Resource{
 					{Filename: "level1"},
-					{Filename: "level1/level2"},
-					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+					{Filename: filepath.Join("level1", "level2")},
+					{Filename: filepath.Join("level1", "level2", "tmpFile1"), SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
 					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
 					{Filename: "tmpFile3", SHA1: "i dunno, 7?"},
 				}
 			})
 
 			It("returns an FileChangedError", func() {
-				Expect(executeErr).To(Equal(FileChangedError{Filename: path.Join(srcDir, "tmpFile3")}))
+				Expect(executeErr).To(Equal(FileChangedError{Filename: filepath.Join(srcDir, "tmpFile3")}))
 			})
 		})
 	})
