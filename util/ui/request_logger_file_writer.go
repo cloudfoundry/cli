@@ -147,17 +147,19 @@ func (display *RequestLoggerFileWriter) Start() error {
 }
 
 func (display *RequestLoggerFileWriter) Stop() error {
+	var err error
+
 	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString("\n")
-		if err != nil {
-			return err
-		}
-		err = logFile.Close()
-		if err != nil {
-			return err
+		_, lastLineErr := logFile.WriteString("\n")
+		closeErr := logFile.Close()
+		switch {
+		case closeErr != nil:
+			err = closeErr
+		case lastLineErr != nil:
+			err = lastLineErr
 		}
 	}
 	display.logFiles = []*os.File{}
 	display.lock.Unlock()
-	return nil
+	return err
 }
