@@ -230,6 +230,11 @@ var _ = Describe("Request Logger File Writer", func() {
 		})
 
 		Describe("Start and Stop", func() {
+			BeforeEach(func() {
+				// Cleanup old display output directory
+				Expect(display.Stop()).NotTo(HaveOccurred())
+			})
+
 			It("locks and then unlocks the mutex properly", func() { // and creates the intermediate dirs
 				c := make(chan bool)
 				go func() {
