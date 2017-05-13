@@ -38,8 +38,7 @@ var _ = Describe("Request Logger File Writer", func() {
 			logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile1")
 			logFile2 = filepath.Join(tmpdir, "tmp", "sub", "dir", ".", "tmpfile2")
 			display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
-			err = display.Start()
-			Expect(err).ToNot(HaveOccurred())
+			Expect(display.Start()).ToNot(HaveOccurred())
 		})
 
 		AfterEach(func() {
@@ -233,6 +232,9 @@ var _ = Describe("Request Logger File Writer", func() {
 			BeforeEach(func() {
 				// Cleanup old display output directory
 				Expect(display.Stop()).NotTo(HaveOccurred())
+				logFile1 = filepath.Join(tmpdir, "tmp_sub_dir", "tmpfile3")
+				logFile2 = filepath.Join(tmpdir, "tmp", "sub", "dir", ".", "tmpfile4")
+				display = testUI.RequestLoggerFileWriter([]string{logFile1, logFile2})
 			})
 
 			It("locks and then unlocks the mutex properly", func() { // and creates the intermediate dirs
@@ -241,9 +243,8 @@ var _ = Describe("Request Logger File Writer", func() {
 					Expect(display.Start()).ToNot(HaveOccurred())
 					c <- true
 				}()
-				Consistently(c).ShouldNot(Receive())
-				Expect(display.Stop()).NotTo(HaveOccurred())
 				Eventually(c).Should(Receive())
+				Expect(display.Stop()).NotTo(HaveOccurred())
 			})
 		})
 	})
