@@ -4540,6 +4540,10 @@
     "translation": "Distribuisci più applicazione con un manifest"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "QUOTA"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "percorso"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",

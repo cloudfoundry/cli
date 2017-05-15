@@ -4540,6 +4540,10 @@
     "translation": "Enviar por push varias apps con un manifiesto"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "CUOTA"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "vía de acceso"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",

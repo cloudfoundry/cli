@@ -4540,6 +4540,10 @@
     "translation": "Manifest를 사용하여 여러 개의 앱 푸시"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "할당량"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "경로"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",

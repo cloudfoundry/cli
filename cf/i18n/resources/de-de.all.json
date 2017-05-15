@@ -4540,6 +4540,10 @@
     "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "GRÖßENBESCHRÄNKUNG"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "Pfad"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",

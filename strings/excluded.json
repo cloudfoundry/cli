@@ -580,6 +580,7 @@
     "reading flags:",
     "received apply event:",
     "Packaging files to upload...",
+    "display changes:",
 
     "(?i).*(?:token|password).*",
     "Host",

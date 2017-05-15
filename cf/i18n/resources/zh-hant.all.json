@@ -4540,6 +4540,10 @@
     "translation": "使用資訊清單推送多個應用程式"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "配額"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "路徑"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",
