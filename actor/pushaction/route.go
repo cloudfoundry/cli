@@ -12,7 +12,7 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 	var allWarnings Warnings
 
 	for _, route := range config.DesiredRoutes {
-		if !actor.routeInList(route, config.CurrentRoutes) {
+		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
 			log.Debugf("binding route: %#v", route)
 			warnings, err := actor.bindRouteToApp(route, config.DesiredApplication.GUID)
 			allWarnings = append(allWarnings, warnings...)
@@ -64,7 +64,7 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 // GetRouteWithDefaultDomain returns a route with the host and the default org
 // domain. This may be a partial route (ie no GUID) if the route does not
 // exist.
-func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceGUID string) (v2action.Route, Warnings, error) {
+func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceGUID string, knownRoutes []v2action.Route) (v2action.Route, Warnings, error) {
 	defaultDomain, warnings, err := actor.DefaultDomain(orgGUID)
 	if err != nil {
 		log.Errorln("could not find default domains:", err.Error())
@@ -76,11 +76,16 @@ func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceG
 		Host:      host,
 		SpaceGUID: spaceGUID,
 	}
-	route, routeWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
-	if _, ok := err.(v2action.RouteNotFoundError); ok {
-		return defaultRoute, append(Warnings(warnings), routeWarnings...), nil
+
+	if cachedRoute, found := actor.routeInListBySettings(defaultRoute, knownRoutes); !found {
+		route, routeWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
+		if _, ok := err.(v2action.RouteNotFoundError); ok {
+			return defaultRoute, append(Warnings(warnings), routeWarnings...), nil
+		}
+		return route, append(Warnings(warnings), routeWarnings...), err
+	} else {
+		return cachedRoute, Warnings(warnings), nil
 	}
-	return route, append(Warnings(warnings), routeWarnings...), err
 }
 
 func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
@@ -91,7 +96,7 @@ func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2actio
 	return warnings, err
 }
 
-func (_ Actor) routeInList(route v2action.Route, routes []v2action.Route) bool {
+func (_ Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
 	for _, r := range routes {
 		if r.GUID == route.GUID {
 			return true
@@ -99,4 +104,15 @@ func (_ Actor) routeInList(route v2action.Route, routes []v2action.Route) bool {
 	}
 
 	return false
+}
+
+func (_ Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
+	for _, r := range routes {
+		if r.Host == route.Host && r.Path == route.Path && r.Port == route.Port &&
+			r.SpaceGUID == route.SpaceGUID && r.Domain.GUID == route.Domain.GUID {
+			return r, true
+		}
+	}
+
+	return v2action.Route{}, false
 }

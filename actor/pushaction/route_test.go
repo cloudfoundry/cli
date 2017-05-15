@@ -198,9 +198,10 @@ var _ = Describe("Routes", func() {
 
 	Describe("GetRouteWithDefaultDomain", func() {
 		var (
-			host      string
-			orgGUID   string
-			spaceGUID string
+			host        string
+			orgGUID     string
+			spaceGUID   string
+			knownRoutes []v2action.Route
 
 			defaultRoute v2action.Route
 			warnings     Warnings
@@ -213,6 +214,7 @@ var _ = Describe("Routes", func() {
 			host = "some-app"
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
+			knownRoutes = nil
 
 			domain = v2action.Domain{
 				Name: "private-domain.com",
@@ -221,7 +223,7 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			defaultRoute, warnings, executeErr = actor.GetRouteWithDefaultDomain(host, orgGUID, spaceGUID)
+			defaultRoute, warnings, executeErr = actor.GetRouteWithDefaultDomain(host, orgGUID, spaceGUID, knownRoutes)
 		})
 
 		Context("when retrieving the domains is successful", func() {
@@ -260,6 +262,31 @@ var _ = Describe("Routes", func() {
 
 					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
 					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: host, SpaceGUID: spaceGUID}))
+				})
+
+				Context("when the route has been found", func() {
+					BeforeEach(func() {
+						knownRoutes = []v2action.Route{{
+							Domain:    domain,
+							GUID:      "some-route-guid",
+							Host:      host,
+							SpaceGUID: spaceGUID,
+						}}
+					})
+
+					It("should return the known route and warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+
+						Expect(defaultRoute).To(Equal(v2action.Route{
+							Domain:    domain,
+							GUID:      "some-route-guid",
+							Host:      host,
+							SpaceGUID: spaceGUID,
+						}))
+
+						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+					})
 				})
 			})
 
