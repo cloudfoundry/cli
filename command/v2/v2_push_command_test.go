@@ -3,6 +3,7 @@ package v2_test
 import (
 	"errors"
 	"os"
+	"regexp"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
@@ -113,8 +114,36 @@ var _ = Describe("v2-push Command", func() {
 					appConfigs = []pushaction.ApplicationConfig{
 						{
 							DesiredApplication: v2action.Application{Name: appName},
-							TargetedSpaceGUID:  "some-space-guid",
-							Path:               pwd,
+							CurrentRoutes: []v2action.Route{
+								{
+									Host: "route1",
+									Domain: v2action.Domain{
+										Name: "example.com",
+									},
+								},
+								{
+									Host: "route2",
+									Domain: v2action.Domain{
+										Name: "example.com",
+									},
+								},
+							},
+							DesiredRoutes: []v2action.Route{
+								{
+									Host: "route3",
+									Domain: v2action.Domain{
+										Name: "example.com",
+									},
+								},
+								{
+									Host: "route4",
+									Domain: v2action.Domain{
+										Name: "example.com",
+									},
+								},
+							},
+							TargetedSpaceGUID: "some-space-guid",
+							Path:              pwd,
 						},
 					}
 					fakeActor.ConvertToApplicationConfigsReturns(appConfigs, pushaction.Warnings{"some-config-warnings"}, nil)
@@ -258,10 +287,23 @@ var _ = Describe("v2-push Command", func() {
 						Expect(progressBar).To(Equal(fakeProgressBar))
 					})
 
+					It("display diff of changes", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("\\+\\s+name:\\s+%s", appName))
+						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
+						Expect(testUI.Out).To(Say("\\s+routes:"))
+						for _, route := range appConfigs[0].CurrentRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
+						for _, route := range appConfigs[0].DesiredRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
+					})
+
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Getting app info..."))
 						Expect(testUI.Out).To(Say("Configuring app %s in org %s / space %s as %s.", appName, "some-org", "some-space", "some-user"))
 						Expect(testUI.Out).To(Say("Created app."))
 						Expect(testUI.Out).To(Say("Updated app."))
