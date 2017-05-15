@@ -4540,6 +4540,10 @@
     "translation": "マニフェストを使用して複数のアプリをプッシュします"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "割り当て量"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "パス"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",

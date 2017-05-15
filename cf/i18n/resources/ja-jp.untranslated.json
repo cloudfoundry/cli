@@ -412,6 +412,10 @@
     "translation": ""
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
     "translation": ""
   },
@@ -721,6 +725,10 @@
   },
   {
     "id": "organization",
+    "translation": ""
+  },
+  {
+    "id": "path:",
     "translation": ""
   },
   {

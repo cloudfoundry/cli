@@ -4540,6 +4540,10 @@
     "translation": "通过清单推送多个应用程序"
   },
   {
+    "id": "Pushing apps with these attributes...",
+    "translation": ""
+  },
+  {
     "id": "QUOTA",
     "translation": "QUOTA"
   },
@@ -6738,6 +6742,10 @@
   {
     "id": "path",
     "translation": "路径"
+  },
+  {
+    "id": "path:",
+    "translation": ""
   },
   {
     "id": "plan",
