@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/progressbar"
+	"code.cloudfoundry.org/cli/util/ui"
 	log "github.com/Sirupsen/logrus"
 	"github.com/cloudfoundry/noaa/consumer"
 )
@@ -128,6 +129,44 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	if err != nil {
 		log.Errorln("converting manifest:", err)
 		return shared.HandleError(err)
+	}
+
+	cmd.UI.DisplayText("Pushing apps with these attributes...")
+	for _, appConfig := range appConfigs {
+		var currentRoutes []string
+		for _, route := range appConfig.CurrentRoutes {
+			currentRoutes = append(currentRoutes, route.String())
+		}
+
+		var desiredRotues []string
+		for _, route := range appConfig.DesiredRoutes {
+			desiredRotues = append(desiredRotues, route.String())
+		}
+
+		err = cmd.UI.DisplayChangesForPush([]ui.Change{
+			{
+				Header:       "name:",
+				CurrentValue: appConfig.CurrentApplication.Name,
+				NewValue:     appConfig.DesiredApplication.Name,
+			},
+			{
+				Header:       "path:",
+				CurrentValue: appConfig.Path,
+				NewValue:     appConfig.Path,
+			},
+			{
+				Header:       "routes:",
+				CurrentValue: currentRoutes,
+				NewValue:     desiredRotues,
+			},
+		})
+
+		if err != nil {
+			log.Errorln("display changes:", err)
+			return shared.HandleError(err)
+		}
+
+		cmd.UI.DisplayNewline()
 	}
 
 	for _, appConfig := range appConfigs {
