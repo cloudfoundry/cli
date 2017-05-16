@@ -33,8 +33,8 @@ pipelines_path=$(cd $(dirname $0)/.. && pwd)
 configure_pipeline cli \
   $pipelines_path/cli/pipeline.yml
 
-configure_pipeline infrastructure \
+configure_pipeline infrastructure-bosh-lites \
   $pipelines_path/infrastructure/pipeline.yml
 
-configure_pipeline hardknox \
+configure_pipeline infrastructure-hardknox \
   $pipelines_path/infrastructure/hardknox.yml

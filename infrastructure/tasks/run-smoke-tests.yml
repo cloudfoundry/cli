@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-image: docker:///cloudfoundry/cli-vagrant-ci
+rootfs_uri: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
   LITE_IP_ADDRESS:
