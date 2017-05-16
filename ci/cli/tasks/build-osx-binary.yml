@@ -1,6 +1,6 @@
 ---
 platform: darwin
-image: docker:///cloudfoundry/cli-ci
+rootfs_uri: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli
