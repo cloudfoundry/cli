@@ -3,6 +3,8 @@ package v2action
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Domain represents a CLI Domain.
@@ -51,31 +53,41 @@ func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 // GetSharedDomain returns the shared domain associated with the provided
 // Domain GUID.
 func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
-	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
-	if err == nil {
-		return Domain(domain), Warnings(warnings), nil
+	if domain, found := actor.loadDomain(domainGUID); found {
+		log.WithFields(log.Fields{
+			"domain": domain.Name,
+			"GUID":   domain.GUID,
+		}).Debug("using domain from cache")
+		return domain, nil, nil
 	}
 
+	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
 	if isResourceNotFoundError(err) {
 		return Domain{}, Warnings(warnings), DomainNotFoundError{}
 	}
 
-	return Domain{}, Warnings(warnings), err
+	actor.saveDomain(domain)
+	return Domain(domain), Warnings(warnings), err
 }
 
 // GetPrivateDomain returns the private domain associated with the provided
 // Domain GUID.
 func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
-	domain, warnings, err := actor.CloudControllerClient.GetPrivateDomain(domainGUID)
-	if err == nil {
-		return Domain(domain), Warnings(warnings), nil
+	if domain, found := actor.loadDomain(domainGUID); found {
+		log.WithFields(log.Fields{
+			"domain": domain.Name,
+			"GUID":   domain.GUID,
+		}).Debug("using domain from cache")
+		return domain, nil, nil
 	}
 
+	domain, warnings, err := actor.CloudControllerClient.GetPrivateDomain(domainGUID)
 	if isResourceNotFoundError(err) {
 		return Domain{}, Warnings(warnings), DomainNotFoundError{}
 	}
 
-	return Domain{}, Warnings(warnings), err
+	actor.saveDomain(domain)
+	return Domain(domain), Warnings(warnings), err
 }
 
 // GetOrganizationDomains returns the private and shared domains associated
@@ -107,4 +119,15 @@ func (actor Actor) GetOrganizationDomains(orgGUID string) ([]Domain, Warnings, e
 	}
 
 	return allDomains, allWarnings, nil
+}
+
+func (actor Actor) saveDomain(domain ccv2.Domain) {
+	if domain.GUID != "" {
+		actor.domainCache[domain.GUID] = Domain(domain)
+	}
+}
+
+func (actor Actor) loadDomain(domainGUID string) (Domain, bool) {
+	domain, found := actor.domainCache[domainGUID]
+	return domain, found
 }

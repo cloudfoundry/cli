@@ -149,6 +149,25 @@ var _ = Describe("Domain Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 				Expect(warnings).To(ConsistOf("shared domain warning"))
+
+				Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSharedDomainArgsForCall(0)).To(Equal("shared-domain-guid"))
+			})
+
+			Context("when the domain has been looked up multiple times", func() {
+				It("caches the domain", func() {
+					domain, warnings, err := actor.GetSharedDomain("shared-domain-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(domain).To(Equal(Domain(expectedDomain)))
+					Expect(warnings).To(ConsistOf("shared domain warning"))
+
+					domain, warnings, err = actor.GetSharedDomain("shared-domain-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(domain).To(Equal(Domain(expectedDomain)))
+					Expect(warnings).To(BeEmpty())
+
+					Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))
+				})
 			})
 		})
 
@@ -201,6 +220,25 @@ var _ = Describe("Domain Actions", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 				Expect(warnings).To(ConsistOf("private domain warning"))
+
+				Expect(fakeCloudControllerClient.GetPrivateDomainCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetPrivateDomainArgsForCall(0)).To(Equal("private-domain-guid"))
+			})
+
+			Context("when the domain has been looked up multiple times", func() {
+				It("caches the domain", func() {
+					domain, warnings, err := actor.GetPrivateDomain("private-domain-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(domain).To(Equal(Domain(expectedDomain)))
+					Expect(warnings).To(ConsistOf("private domain warning"))
+
+					domain, warnings, err = actor.GetPrivateDomain("private-domain-guid")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(domain).To(Equal(Domain(expectedDomain)))
+					Expect(warnings).To(BeEmpty())
+
+					Expect(fakeCloudControllerClient.GetPrivateDomainCallCount()).To(Equal(1))
+				})
 			})
 		})
 

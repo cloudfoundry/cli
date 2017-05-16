@@ -8,6 +8,7 @@ type Warnings []string
 type Actor struct {
 	CloudControllerClient CloudControllerClient
 	UAAClient             UAAClient
+	domainCache           map[string]Domain
 }
 
 // NewActor returns a new actor.
@@ -15,5 +16,6 @@ func NewActor(ccClient CloudControllerClient, uaaClient UAAClient) *Actor {
 	return &Actor{
 		CloudControllerClient: ccClient,
 		UAAClient:             uaaClient,
+		domainCache:           map[string]Domain{},
 	}
 }
