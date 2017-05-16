@@ -175,7 +175,7 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 			log.Errorf("unable to find route %s in current space", route.String())
 			return Route{}, append(Warnings(warnings), checkRouteWarnings...), RouteInDifferentSpaceError{Route: route.String()}
 		} else {
-			log.Warnf("negitive existence check for route %s - returning partial route", route.String())
+			log.Warnf("negative existence check for route %s - returning partial route", route.String())
 			log.Debugf("partialRoute: %#v", route)
 			return Route{}, append(Warnings(warnings), checkRouteWarnings...), routeNotFoundErr
 		}
