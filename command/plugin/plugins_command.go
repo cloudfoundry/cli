@@ -16,20 +16,20 @@ type PluginsActor interface {
 }
 
 type PluginsCommand struct {
-	Checksum        bool        `long:"checksum" description:"Compute and show the sha1 value of the plugin binary file"`
-	Outdated        bool        `long:"outdated" description:"Search the plugin repositories for new versions of installed plugins"`
-	usage           interface{} `usage:"CF_NAME plugins [--checksum | --outdated]"`
-	relatedCommands interface{} `related_commands:"install-plugin, repo-plugins, uninstall-plugin"`
-
-	UI     command.UI
-	Config command.Config
-	Actor  PluginsActor
+	Checksum          bool        `long:"checksum" description:"Compute and show the sha1 value of the plugin binary file"`
+	Outdated          bool        `long:"outdated" description:"Search the plugin repositories for new versions of installed plugins"`
+	usage             interface{} `usage:"CF_NAME plugins [--checksum | --outdated]"`
+	relatedCommands   interface{} `related_commands:"install-plugin, repo-plugins, uninstall-plugin"`
+	SkipSSLValidation bool        `short:"k" hidden:"true"`
+	UI                command.UI
+	Config            command.Config
+	Actor             PluginsActor
 }
 
 func (cmd *PluginsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	pluginClient := shared.NewClient(config, ui)
+	pluginClient := shared.NewClient(config, ui, cmd.SkipSSLValidation)
 	cmd.Actor = pluginaction.NewActor(config, pluginClient)
 	return nil
 }

@@ -27,19 +27,19 @@ type InstallPluginActor interface {
 type InstallPluginCommand struct {
 	OptionalArgs         flag.InstallPluginArgs `positional-args:"yes"`
 	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
+	SkipSSLValidation    bool                   `short:"k" hidden:"true"`
 	RegisteredRepository string                 `short:"r" description:"Name of a registered repository where the specified plugin is located"`
 	usage                interface{}            `usage:"CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
 	relatedCommands      interface{}            `related_commands:"add-plugin-repo, list-plugin-repos, plugins"`
-
-	UI     command.UI
-	Config command.Config
-	Actor  InstallPluginActor
+	UI                   command.UI
+	Config               command.Config
+	Actor                InstallPluginActor
 }
 
 func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui))
+	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui, cmd.SkipSSLValidation))
 	return nil
 }
 

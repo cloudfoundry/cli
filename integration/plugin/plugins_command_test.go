@@ -274,8 +274,8 @@ var _ = Describe("plugins command", func() {
 						},
 					})
 
-					Eventually(helpers.CF("add-plugin-repo", "repo1", server1URL)).Should(Exit(0))
-					Eventually(helpers.CF("add-plugin-repo", "repo2", server2URL)).Should(Exit(0))
+					Eventually(helpers.CF("add-plugin-repo", "repo1", server1URL, "-k")).Should(Exit(0))
+					Eventually(helpers.CF("add-plugin-repo", "repo2", server2URL, "-k")).Should(Exit(0))
 				})
 
 				AfterEach(func() {
@@ -294,7 +294,7 @@ var _ = Describe("plugins command", func() {
 					})
 
 					It("displays the table with outdated plugin and new version", func() {
-						session := helpers.CF("plugins", "--outdated")
+						session := helpers.CF("plugins", "--outdated", "-k")
 						Eventually(session).Should(Say("Searching repo1, repo2 for newer versions of installed plugins..."))
 						Eventually(session).Should(Say("plugin\\s+version\\s+latest version"))
 						Eventually(session).Should(Say("plugin-1\\s+0\\.9\\.0\\s+1\\.0\\.0"))
@@ -319,7 +319,7 @@ var _ = Describe("plugins command", func() {
 					})
 
 					It("only displays the newest version of the plugin found in the repositories", func() {
-						session := helpers.CF("plugins", "--outdated")
+						session := helpers.CF("plugins", "--outdated", "-k")
 						Eventually(session).Should(Say("Searching repo1, repo2 for newer versions of installed plugins..."))
 						Eventually(session).Should(Say(""))
 						Eventually(session).Should(Say("plugin\\s+version\\s+latest version"))

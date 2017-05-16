@@ -8,7 +8,7 @@ import (
 
 // NewClients creates a new V2 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClient(config command.Config, ui command.UI) *plugin.Client {
+func NewClient(config command.Config, ui command.UI, skipSSLValidation bool) *plugin.Client {
 
 	verbose, location := config.Verbose()
 
@@ -16,7 +16,7 @@ func NewClient(config command.Config, ui command.UI) *plugin.Client {
 		AppName:           config.BinaryName(),
 		AppVersion:        config.BinaryVersion(),
 		DialTimeout:       config.DialTimeout(),
-		SkipSSLValidation: config.SkipSSLValidation(),
+		SkipSSLValidation: skipSSLValidation,
 	})
 
 	if verbose {

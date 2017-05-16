@@ -14,19 +14,19 @@ type AddPluginRepoActor interface {
 }
 
 type AddPluginRepoCommand struct {
-	RequiredArgs    flag.AddPluginRepoArgs `positional-args:"yes"`
-	usage           interface{}            `usage:"CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLES:\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo"`
-	relatedCommands interface{}            `related_commands:"install-plugin, list-plugin-repos"`
-
-	UI     command.UI
-	Config command.Config
-	Actor  AddPluginRepoActor
+	RequiredArgs      flag.AddPluginRepoArgs `positional-args:"yes"`
+	usage             interface{}            `usage:"CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLES:\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo"`
+	relatedCommands   interface{}            `related_commands:"install-plugin, list-plugin-repos"`
+	SkipSSLValidation bool                   `short:"k" hidden:"true"`
+	UI                command.UI
+	Config            command.Config
+	Actor             AddPluginRepoActor
 }
 
 func (cmd *AddPluginRepoCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui))
+	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui, cmd.SkipSSLValidation))
 	return nil
 }
 
