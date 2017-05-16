@@ -13,7 +13,7 @@ func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSetting
 	}
 	manifests := []manifest.Application{{
 		Name: cmdConfig.Name,
-		Path: cmdConfig.Path,
+		Path: cmdConfig.CurrentDirectory,
 	}}
 
 	//TODO Add validations

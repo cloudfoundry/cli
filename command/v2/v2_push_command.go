@@ -203,8 +203,8 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	}
 
 	config := pushaction.CommandLineSettings{
-		Name: cmd.OptionalArgs.AppName,
-		Path: pwd,
+		Name:             cmd.OptionalArgs.AppName,
+		CurrentDirectory: pwd,
 	}
 
 	log.Debugf("%#v", config)

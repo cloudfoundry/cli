@@ -29,8 +29,8 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			cmdSettings = CommandLineSettings{
-				Name: "some-app",
-				Path: pwd,
+				Name:             "some-app",
+				CurrentDirectory: pwd,
 			}
 		})
 

@@ -256,8 +256,8 @@ var _ = Describe("v2-push Command", func() {
 						Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
 						cmdSettings, _ := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
 						Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
-							Name: appName,
-							Path: pwd,
+							Name:             appName,
+							CurrentDirectory: pwd,
 						}))
 					})
 

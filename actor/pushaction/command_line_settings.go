@@ -1,6 +1,6 @@
 package pushaction
 
 type CommandLineSettings struct {
-	Name string
-	Path string
+	Name             string
+	CurrentDirectory string
 }
