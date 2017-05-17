@@ -97,7 +97,7 @@
   },
   {
     "id": " (Default: {{.DefaultValue}})",
-    "translation": " (기본값: {{.DefaultValue}})"
+    "translation": ""
   },
   {
     "id": " added as '",
@@ -193,11 +193,11 @@
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
-    "translation": "플러그인 저장소 추가/제거:"
+    "translation": ""
   },
   {
     "id": "ADD/REMOVE PLUGIN:",
-    "translation": "플러그인 추가/제거:"
+    "translation": ""
   },
   {
     "id": "ADVANCED",
@@ -205,7 +205,7 @@
   },
   {
     "id": "ADVANCED:",
-    "translation": "고급:"
+    "translation": ""
   },
   {
     "id": "ALIAS:",
@@ -249,7 +249,7 @@
   },
   {
     "id": "APPS:",
-    "translation": "앱:"
+    "translation": ""
   },
   {
     "id": "APP_INSTANCES",
@@ -297,7 +297,7 @@
   },
   {
     "id": "All available CLI commands",
-    "translation": "사용 가능한 모든 CLI 명령"
+    "translation": ""
   },
   {
     "id": "Allow SSH access for the space",
@@ -357,7 +357,7 @@
   },
   {
     "id": "Append API request diagnostics to a log file",
-    "translation": "로그 파일에 API 요청 진단 추가"
+    "translation": ""
   },
   {
     "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
@@ -373,7 +373,7 @@
   },
   {
     "id": "Application lifecycle:",
-    "translation": "애플리케이션 라이프사이클:"
+    "translation": ""
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
@@ -485,7 +485,7 @@
   },
   {
     "id": "BUILDPACKS:",
-    "translation": "빌드팩:"
+    "translation": ""
   },
   {
     "id": "BUILDPACK_NAME",
@@ -497,7 +497,7 @@
   },
   {
     "id": "Before getting started:",
-    "translation": "시작하기 전에:"
+    "translation": ""
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
@@ -1673,7 +1673,7 @@
   },
   {
     "id": "CF_NAME version\\n\\n   'cf -v' and 'cf --version' are also accepted.",
-    "translation": "CF_NAME version\\n\\n   'cf -v' 및 'cf --version'도 허용됩니다. "
+    "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
@@ -1681,7 +1681,7 @@
   },
   {
     "id": "CLI plugin management:",
-    "translation": "CLI 플러그인 관리:"
+    "translation": ""
   },
   {
     "id": "COLOR must be \"true\" or \"false\"",
@@ -1749,7 +1749,7 @@
   },
   {
     "id": "Change type of health check performed on an app",
-    "translation": "앱에 수행되는 상태 검사의 유형 변경"
+    "translation": ""
   },
   {
     "id": "Change user password",
@@ -1773,7 +1773,7 @@
   },
   {
     "id": "Cloud Foundry command line tool",
-    "translation": "Cloud Foundry 명령행 도구"
+    "translation": ""
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1801,7 +1801,7 @@
   },
   {
     "id": "Commands offered by installed plugins:",
-    "translation": "설치된 플러그인에서 제공하는 명령:"
+    "translation": ""
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
@@ -2137,7 +2137,7 @@
   },
   {
     "id": "DOMAINS:",
-    "translation": "도메인:"
+    "translation": ""
   },
   {
     "id": "Dashboard: {{.URL}}",
@@ -2381,7 +2381,7 @@
   },
   {
     "id": "Do not colorize output",
-    "translation": "출력에 색상을 입히지 않음"
+    "translation": ""
   },
   {
     "id": "Do not execute a remote command",
@@ -2437,11 +2437,11 @@
   },
   {
     "id": "ENVIRONMENT VARIABLE GROUPS:",
-    "translation": "환경 변수 그룹:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
-    "translation": "환경 변수:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT:",
@@ -2457,7 +2457,7 @@
   },
   {
     "id": "Enable HTTP proxying for API requests",
-    "translation": "API 요청에 HTTP 프록시 사용"
+    "translation": ""
   },
   {
     "id": "Enable access for a specified organization",
@@ -2873,7 +2873,7 @@
   },
   {
     "id": "FEATURE FLAGS:",
-    "translation": "기능 플래그: "
+    "translation": ""
   },
   {
     "id": "Failed assigning org role to user: ",
@@ -3005,11 +3005,11 @@
   },
   {
     "id": "GETTING STARTED:",
-    "translation": "시작하기:"
+    "translation": ""
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "글로벌 옵션:"
+    "translation": ""
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -3225,7 +3225,7 @@
   },
   {
     "id": "Global options:",
-    "translation": "글로벌 옵션:"
+    "translation": ""
   },
   {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
@@ -3277,7 +3277,7 @@
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS:",
-    "translation": "설치된 플러그인 명령:"
+    "translation": ""
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3889,7 +3889,7 @@
   },
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": "이름 분석을 포함한 연결을 설정하기 위한 최대 대기 시간(초)"
+    "translation": ""
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
@@ -4149,7 +4149,7 @@
   },
   {
     "id": "ORG ADMIN:",
-    "translation": "조직 관리자:"
+    "translation": ""
   },
   {
     "id": "ORG AUDITOR",
@@ -4165,7 +4165,7 @@
   },
   {
     "id": "ORGS:",
-    "translation": "조직: "
+    "translation": ""
   },
   {
     "id": "One-time passcode",
@@ -4221,7 +4221,7 @@
   },
   {
     "id": "Org management:",
-    "translation": "조직 관리:"
+    "translation": ""
   },
   {
     "id": "Org that contains the target application",
@@ -4257,11 +4257,11 @@
   },
   {
     "id": "Override path to default config directory",
-    "translation": "경로를 기본 구성 디렉토리로 대체"
+    "translation": ""
   },
   {
     "id": "Override path to default plugin config directory",
-    "translation": "경로를 기본 플러그인 구성 디렉토리로 대체"
+    "translation": ""
   },
   {
     "id": "Override restart of the application in target environment after copy-source completes",
@@ -4489,7 +4489,7 @@
   },
   {
     "id": "Print API request diagnostics to stdout",
-    "translation": "API 요청 진단을 stdout에 인쇄"
+    "translation": ""
   },
   {
     "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
@@ -4605,7 +4605,7 @@
   },
   {
     "id": "ROUTES:",
-    "translation": "라우트:"
+    "translation": ""
   },
   {
     "id": "ROUTE_PATH",
@@ -4661,7 +4661,7 @@
   },
   {
     "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
-    "translation": "푸시된 최신 앱 파일과 최신 환경(변수, 서비스 바인딩, 빌드팩, 스택 등)을 사용하여 앱의 실행 가능한 아티팩트 재작성"
+    "translation": ""
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
@@ -4913,7 +4913,7 @@
   },
   {
     "id": "Route and domain management:",
-    "translation": "라우트 및 도메인 관리:"
+    "translation": ""
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
@@ -4973,7 +4973,7 @@
   },
   {
     "id": "SECURITY GROUP:",
-    "translation": "보안 그룹:"
+    "translation": ""
   },
   {
     "id": "SECURITY_GROUP",
@@ -4981,7 +4981,7 @@
   },
   {
     "id": "SEE ALSO:",
-    "translation": "추가 참조: "
+    "translation": ""
   },
   {
     "id": "SERVICE",
@@ -4993,7 +4993,7 @@
   },
   {
     "id": "SERVICE ADMIN:",
-    "translation": "서비스 관리자:"
+    "translation": ""
   },
   {
     "id": "SERVICES",
@@ -5001,7 +5001,7 @@
   },
   {
     "id": "SERVICES:",
-    "translation": "서비스:"
+    "translation": ""
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -5017,7 +5017,7 @@
   },
   {
     "id": "SPACE ADMIN:",
-    "translation": "영역 관리자:"
+    "translation": ""
   },
   {
     "id": "SPACE AUDITOR",
@@ -5037,7 +5037,7 @@
   },
   {
     "id": "SPACES:",
-    "translation": "영역:"
+    "translation": ""
   },
   {
     "id": "SSH to an application container instance",
@@ -5173,7 +5173,7 @@
   },
   {
     "id": "Services integration:",
-    "translation": "서비스 통합:"
+    "translation": ""
   },
   {
     "id": "Services:",
@@ -5293,7 +5293,7 @@
   },
   {
     "id": "Show the type of health check performed on an app",
-    "translation": "앱에 수행되는 상태 검사의 유형 표시"
+    "translation": ""
   },
   {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5337,7 +5337,7 @@
   },
   {
     "id": "Space management:",
-    "translation": "영역 관리:"
+    "translation": ""
   },
   {
     "id": "Space that contains the target application",
@@ -5853,7 +5853,7 @@
   },
   {
     "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
-    "translation": "이는 자주 사용하는 명령들입니다. 설명과 함께 모두 표시하려면 'cf help -a'를 사용하십시오. "
+    "translation": ""
   },
   {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -5969,7 +5969,7 @@
   },
   {
     "id": "USER ADMIN:",
-    "translation": "사용자 관리:"
+    "translation": ""
   },
   {
     "id": "USERS",
@@ -6237,7 +6237,7 @@
   },
   {
     "id": "Usage:",
-    "translation": "사용법:"
+    "translation": ""
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
@@ -6289,7 +6289,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "버전:"
+    "translation": ""
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -6397,7 +6397,7 @@
   },
   {
     "id": "[global options] command [arguments...] [command options]",
-    "translation": "[글로벌 옵션] 명령 [인수...] [명령 옵션]"
+    "translation": ""
   },
   {
     "id": "[hidden]",
@@ -7121,7 +7121,7 @@
   },
   {
     "id": "verbose and version flag",
-    "translation": "상세 및 버전 플래그"
+    "translation": ""
   },
   {
     "id": "version",
