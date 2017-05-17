@@ -122,6 +122,18 @@ func (config *Config) GetPlugin(pluginName string) (Plugin, bool) {
 	return plugin, exists
 }
 
+// GetPluginCaseInsensitive finds the first matching plugin name case
+// insensitive and returns true if it exists.
+func (config *Config) GetPluginCaseInsensitive(pluginName string) (Plugin, bool) {
+	for name, plugin := range config.pluginsConfig.Plugins {
+		if strings.ToLower(name) == strings.ToLower(pluginName) {
+			return plugin, true
+		}
+	}
+
+	return Plugin{}, false
+}
+
 // WritePluginConfig writes the plugin config to config.json in the plugin home
 // directory.
 func (config *Config) WritePluginConfig() error {

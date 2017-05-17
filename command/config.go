@@ -21,6 +21,7 @@ type Config interface {
 	DialTimeout() time.Duration
 	Experimental() bool
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
+	GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool)
 	HasTargetedOrganization() bool
 	HasTargetedSpace() bool
 	Locale() string

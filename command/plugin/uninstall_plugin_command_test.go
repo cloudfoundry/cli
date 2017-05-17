@@ -35,7 +35,7 @@ var _ = Describe("uninstall-plugin command", func() {
 				Build: 3,
 			},
 		}
-		fakeConfig.GetPluginReturns(somePlugin, true)
+		fakeConfig.GetPluginCaseInsensitiveReturns(somePlugin, true)
 		fakeActor = new(pluginfakes.FakeUninstallPluginActor)
 
 		cmd = UninstallPluginCommand{
