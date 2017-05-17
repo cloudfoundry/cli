@@ -66,10 +66,9 @@ var _ = Describe("add-plugin-repo command", func() {
 
 	Context("when the provided URL is a valid plugin repository", func() {
 		var server *Server
-		var serverURL string
 
 		BeforeEach(func() {
-			server, serverURL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
+			server = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 				Plugins: []helpers.Plugin{},
 			})
 		})
@@ -79,35 +78,35 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 
 		It("succeeds and exits 0", func() {
-			session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
+			session := helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")
 
-			Eventually(session.Out).Should(Say("%s added as repo1", serverURL))
+			Eventually(session.Out).Should(Say("%s added as repo1", server.URL()))
 			Eventually(session).Should(Exit(0))
 		})
 
 		Context("when the repo URL is already in use", func() {
 			BeforeEach(func() {
-				Eventually(helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")).Should(Exit(0))
+				Eventually(helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")).Should(Exit(0))
 			})
 
 			It("allows the duplicate repo URL", func() {
-				session := helpers.CF("add-plugin-repo", "some-repo", serverURL, "-k")
+				session := helpers.CF("add-plugin-repo", "some-repo", server.URL(), "-k")
 
-				Eventually(session.Out).Should(Say("%s added as some-repo", serverURL))
+				Eventually(session.Out).Should(Say("%s added as some-repo", server.URL()))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
 		Context("when the repo name is already in use", func() {
 			BeforeEach(func() {
-				Eventually(helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")).Should(Exit(0))
+				Eventually(helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")).Should(Exit(0))
 			})
 
 			Context("when the repo name is different only in case sensitivity", func() {
 				It("succeeds and exists 0", func() {
-					session := helpers.CF("add-plugin-repo", "rEPo1", serverURL, "-k")
+					session := helpers.CF("add-plugin-repo", "rEPo1", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session.Out).Should(Say("%s already registered as repo1", server.URL()))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -123,18 +122,18 @@ var _ = Describe("add-plugin-repo command", func() {
 
 			Context("when the URL is the same", func() {
 				It("succeeds and exists 0", func() {
-					session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
+					session := helpers.CF("add-plugin-repo", "repo1", server.URL(), "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session.Out).Should(Say("%s already registered as repo1", server.URL()))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when the URL is the same except for a trainling '/'", func() {
 				It("succeeds and exists 0", func() {
-					session := helpers.CF("add-plugin-repo", "repo1", fmt.Sprintf("%s/", serverURL), "-k")
+					session := helpers.CF("add-plugin-repo", "repo1", fmt.Sprintf("%s/", server.URL()), "-k")
 
-					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session.Out).Should(Say("%s already registered as repo1", server.URL()))
 					Eventually(session).Should(Exit(0))
 				})
 			})

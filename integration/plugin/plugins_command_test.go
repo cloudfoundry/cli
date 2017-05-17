@@ -174,19 +174,18 @@ var _ = Describe("plugins command", func() {
 
 			Context("when there is 1 repository", func() {
 				var (
-					server1    *Server
-					server1URL string
+					server1 *Server
 				)
 
 				BeforeEach(func() {
-					server1, server1URL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
+					server1 = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-1", Version: "1.0.0"},
 							{Name: "plugin-2", Version: "2.0.0"},
 						},
 					})
 
-					Eventually(helpers.CF("add-plugin-repo", "repo1", server1URL, "-k")).Should(Exit(0))
+					Eventually(helpers.CF("add-plugin-repo", "repo1", server1.URL(), "-k")).Should(Exit(0))
 					// TODO: re-add when refactor repo-plugins
 					// session := helpers.CF("repo-plugins")
 					// Eventually(session).Should(Say("plugin-1\\s+1\\.0\\.0"))
@@ -253,29 +252,27 @@ var _ = Describe("plugins command", func() {
 
 			Context("when multiple repositories are registered", func() {
 				var (
-					server1    *Server
-					server1URL string
-					server2    *Server
-					server2URL string
+					server1 *Server
+					server2 *Server
 				)
 
 				BeforeEach(func() {
-					server1, server1URL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
+					server1 = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-1", Version: "1.0.0"},
 							{Name: "plugin-3", Version: "3.5.0"},
 						},
 					})
 
-					server2, server2URL = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
+					server2 = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
 						Plugins: []helpers.Plugin{
 							{Name: "plugin-2", Version: "2.0.0"},
 							{Name: "plugin-3", Version: "3.0.0"},
 						},
 					})
 
-					Eventually(helpers.CF("add-plugin-repo", "repo1", server1URL, "-k")).Should(Exit(0))
-					Eventually(helpers.CF("add-plugin-repo", "repo2", server2URL, "-k")).Should(Exit(0))
+					Eventually(helpers.CF("add-plugin-repo", "repo1", server1.URL(), "-k")).Should(Exit(0))
+					Eventually(helpers.CF("add-plugin-repo", "repo2", server2.URL(), "-k")).Should(Exit(0))
 				})
 
 				AfterEach(func() {
