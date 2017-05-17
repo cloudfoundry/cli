@@ -4420,6 +4420,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "translation": ""
+  },
+  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "O plug-in solicitado não possui binários disponíveis para seu SO: "
   },

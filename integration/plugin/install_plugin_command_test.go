@@ -72,7 +72,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
-	Context("installing a plugin from a local file", func() {
+	Describe("installing a plugin from a local file", func() {
 		var pluginPath string
 
 		Context("when the file is compiled for a different os and architecture", func() {
@@ -131,7 +131,7 @@ var _ = Describe("install-plugin command", func() {
 					pluginsSession := helpers.CF("plugins", "--checksum")
 					expectedSha := helpers.Sha1Sum(installedPath)
 
-					Eventually(pluginsSession.Out).Should(Say("some-plugin\\s+1.0.0\\s+%s", expectedSha))
+					Eventually(pluginsSession.Out).Should(Say("some-plugin\\s+1\\.0\\.0\\s+%s", expectedSha))
 					Eventually(pluginsSession).Should(Exit(0))
 
 					Eventually(helpers.CF("some-command")).Should(Exit(0))
@@ -570,7 +570,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 	})
 
-	Context("installing a plugin from a URL", func() {
+	Describe("installing a plugin from a URL", func() {
 		var (
 			server     *Server
 			pluginPath string
