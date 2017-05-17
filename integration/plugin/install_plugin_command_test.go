@@ -570,7 +570,7 @@ var _ = Describe("install-plugin command", func() {
 		)
 
 		BeforeEach(func() {
-			server = NewServer()
+			server = NewTLSServer()
 			// Suppresses ginkgo server logs
 			server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 		})
@@ -608,7 +608,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("installs the plugin", func() {
-					session := helpers.CF("install-plugin", "-f", server.URL())
+					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
@@ -638,7 +638,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("installs the plugin", func() {
-						session := helpers.CF("install-plugin", "-f", fmt.Sprintf("%s/redirect", server.URL()))
+						session := helpers.CF("install-plugin", "-f", fmt.Sprintf("%s/redirect", server.URL()), "-k")
 
 						Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 						Eventually(session.Out).Should(Say("OK"))
@@ -654,7 +654,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("uninstalls and reinstalls the plugin", func() {
-						session := helpers.CF("install-plugin", "-f", server.URL())
+						session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
@@ -684,7 +684,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("displays an appropriate error", func() {
-					session := helpers.CF("install-plugin", "-f", server.URL())
+					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
@@ -717,7 +717,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("tells the user that the file is not a plugin and fails", func() {
-					session := helpers.CF("install-plugin", "-f", server.URL())
+					session := helpers.CF("install-plugin", "-f", server.URL(), "-k")
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
@@ -762,7 +762,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("installs the plugin", func() {
-					session := helpers.CFWithStdin(buffer, "install-plugin", server.URL())
+					session := helpers.CFWithStdin(buffer, "install-plugin", server.URL(), "-k")
 
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
@@ -784,7 +784,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("fails and tells the user how to force a reinstall", func() {
-						session := helpers.CFWithStdin(buffer, "install-plugin", server.URL())
+						session := helpers.CFWithStdin(buffer, "install-plugin", server.URL(), "-k")
 
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
