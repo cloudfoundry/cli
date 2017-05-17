@@ -19,15 +19,15 @@ type PluginRepository struct {
 	Plugins []Plugin `json:"plugins"`
 }
 
-func NewPluginRepositoryServer(pluginRepo PluginRepository) (*Server, string) {
+func NewPluginRepositoryServer(pluginRepo PluginRepository) *Server {
 	return configurePluginRepositoryServer(NewServer(), pluginRepo)
 }
 
-func NewPluginRepositoryTLSServer(pluginRepo PluginRepository) (*Server, string) {
+func NewPluginRepositoryTLSServer(pluginRepo PluginRepository) *Server {
 	return configurePluginRepositoryServer(NewTLSServer(), pluginRepo)
 }
 
-func configurePluginRepositoryServer(server *Server, pluginRepo PluginRepository) (*Server, string) {
+func configurePluginRepositoryServer(server *Server, pluginRepo PluginRepository) *Server {
 	// Suppresses ginkgo server logs
 	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
 
@@ -40,5 +40,5 @@ func configurePluginRepositoryServer(server *Server, pluginRepo PluginRepository
 		RespondWith(http.StatusOK, string(jsonBytes)),
 	)
 
-	return server, server.URL()
+	return server
 }
