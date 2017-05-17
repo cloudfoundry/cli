@@ -354,8 +354,13 @@ var _ = Describe("Push Actor", func() {
 			err := actor.ProcessPath(appDir, f)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalled).To(BeTrue())
+
 			path, err := filepath.Abs(appDir)
 			Expect(err).NotTo(HaveOccurred())
+
+			path, err = filepath.EvalSymlinks(appDir)
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(wasCalledWith).To(Equal(path))
 		})
 
@@ -391,6 +396,10 @@ var _ = Describe("Push Actor", func() {
 			}
 			err = actor.ProcessPath(absolutePath, f)
 			Expect(err).NotTo(HaveOccurred())
+
+			absolutePath, err = filepath.EvalSymlinks(appDir)
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(wasCalled).To(BeTrue())
 			Expect(wasCalledWith).To(Equal(absolutePath))
 		})
