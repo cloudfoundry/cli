@@ -372,6 +372,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} does not exist.",
     "translation": ""
   },

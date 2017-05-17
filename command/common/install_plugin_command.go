@@ -93,11 +93,14 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
 		if !cmd.Force {
+			// if installing from repo -> prompt {
+			// } else {
 			return shared.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
 				Name:       plugin.Name,
 				Version:    plugin.Version.String(),
 			}
+			// }
 		}
 
 		err = cmd.uninstallPlugin(plugin, rpcService)

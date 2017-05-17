@@ -692,4 +692,21 @@ var _ = Describe("install-plugin command", func() {
 			})
 		})
 	})
+
+	PDescribe("installing from a specific repo", func() {
+		BeforeEach(func() {
+			cmd.OptionalArgs.PluginNameOrLocation = "some-plugin"
+			cmd.RegisteredRepository = "some-repo"
+		})
+
+		Context("when the repo is not registered", func() {
+			BeforeEach(func() {
+				cmd.RegisteredRepository = "repo-that-does-not-exist"
+			})
+
+			It("returns a RepositoryNotRegisteredError", func() {
+				Expect(executeErr).To(MatchError(shared.RepositoryNotRegisteredError{Name: "repo-that-does-not-exist"}))
+			})
+		})
+	})
 })

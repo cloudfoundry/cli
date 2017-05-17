@@ -4420,6 +4420,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "translation": ""
+  },
+  {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "所要求的外掛程式沒有可供您 OS 使用的二進位檔: "
   },
