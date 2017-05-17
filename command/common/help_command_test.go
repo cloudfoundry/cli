@@ -579,7 +579,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   repo-plugins\\s+List all available plugins in specified repository or in all added repositories"))
 
 				Expect(testUI.Out).To(Say("ADD/REMOVE PLUGIN:"))
-				Expect(testUI.Out).To(Say("   plugins\\s+List all available plugin commands"))
+				Expect(testUI.Out).To(Say("   plugins\\s+List commands of installed plugins"))
 				Expect(testUI.Out).To(Say("   uninstall-plugin\\s+Uninstall CLI plugin"))
 
 				Expect(testUI.Out).To(Say("INSTALLED PLUGIN COMMANDS:"))

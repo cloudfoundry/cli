@@ -46,6 +46,8 @@ var _ = Describe("plugins Command", func() {
 			Expect(testUI.Out).To(Say("Listing installed plugins..."))
 			Expect(testUI.Out).To(Say(""))
 			Expect(testUI.Out).To(Say("plugin\\s+version\\s+command name\\s+command help"))
+			Expect(testUI.Out).To(Say(""))
+			Expect(testUI.Out).To(Say("Use 'faceman repo-plugins' to list plugins in registered repos available to install\\."))
 			Expect(testUI.Out).ToNot(Say("[A-Za-z0-9]+"))
 		})
 
@@ -122,6 +124,8 @@ var _ = Describe("plugins Command", func() {
 			Expect(testUI.Out).To(Say("Sorted-first\\s+1\\.1\\.0\\s+command-2\\s+help-command-2"))
 			Expect(testUI.Out).To(Say("sorted-second\\s+N/A\\s+bar\\s+help-bar"))
 			Expect(testUI.Out).To(Say("sorted-second\\s+N/A\\s+foo\\s+help-foo"))
+			Expect(testUI.Out).To(Say(""))
+			Expect(testUI.Out).To(Say("Use 'faceman repo-plugins' to list plugins in registered repos available to install\\."))
 		})
 
 		Context("when the --checksum flag is provided", func() {

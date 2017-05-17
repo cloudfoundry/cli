@@ -20,7 +20,7 @@ type PluginsCommand struct {
 	Outdated          bool        `long:"outdated" description:"Search the plugin repositories for new versions of installed plugins"`
 	usage             interface{} `usage:"CF_NAME plugins [--checksum | --outdated]"`
 	relatedCommands   interface{} `related_commands:"install-plugin, repo-plugins, uninstall-plugin"`
-	SkipSSLValidation bool        `short:"k" hidden:"true"`
+	SkipSSLValidation bool        `short:"k" hidden:"true" description:"Skip SSL certificate validation"`
 	UI                command.UI
 	Config            command.Config
 	Actor             PluginsActor
@@ -103,6 +103,12 @@ func (cmd PluginsCommand) displayPluginCommands(plugins []configv3.Plugin) error
 	}
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
+		map[string]interface{}{
+			"BinaryName": cmd.Config.BinaryName(),
+		})
 
 	return nil
 }

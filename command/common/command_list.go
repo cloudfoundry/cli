@@ -99,7 +99,7 @@ type commandList struct {
 	OrgUsers                           v2.OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
 	Org                                v2.OrgCommand                                `command:"org" description:"Show org info"`
 	Passwd                             v2.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
-	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List all available plugin commands"`
+	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
 	PurgeServiceInstance               v2.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v2.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
 	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
