@@ -3772,6 +3772,10 @@
     "translation": "Répertorier les quotas d'utilisation disponibles"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "Répertorier les domaines dans l'organisation cible"
   },
@@ -5292,6 +5296,10 @@
     "translation": "Affichage de la santé et du statut de l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.Username}}..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Ignorer l'affectation du rôle de l'organisation à l'utilisateur"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

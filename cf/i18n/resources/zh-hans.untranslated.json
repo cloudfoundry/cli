@@ -308,6 +308,10 @@
     "translation": ""
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List tasks of an app",
     "translation": ""
   },
@@ -516,6 +520,10 @@
     "translation": ""
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Space '{{.Name}}' not found.",
     "translation": ""
   },
@@ -633,6 +641,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

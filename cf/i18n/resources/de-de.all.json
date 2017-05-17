@@ -3772,6 +3772,10 @@
     "translation": "Verfügbare Größenbeschränkungen für Verwendung auflisten"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "Domänen in der Zielorganisation auflisten"
   },
@@ -5292,6 +5296,10 @@
     "translation": "Anzeigen von Zustand und Status für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Zuordnen einer Organisationsrolle zu Benutzer überspringen"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

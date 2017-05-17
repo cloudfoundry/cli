@@ -3772,6 +3772,10 @@
     "translation": "List available usage quotas"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "List domains in the target org"
   },
@@ -5292,6 +5296,10 @@
     "translation": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Skip assigning org role to user"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

@@ -3772,6 +3772,10 @@
     "translation": "列出可用的使用配額"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "列出目標組織中的網域"
   },
@@ -5292,6 +5296,10 @@
     "translation": "正在以 {{.Username}} 身分顯示組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的性能和狀態..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "跳過將組織角色指派給使用者"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

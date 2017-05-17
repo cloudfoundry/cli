@@ -3772,6 +3772,10 @@
     "translation": "使用可能な使用量の割り当て量をリストします"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "ターゲット組織内のドメインをリストします"
   },
@@ -5292,6 +5296,10 @@
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の正常性と状況を表示しています..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "ユーザーに組織の役割を割り当てるステップをスキップします"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

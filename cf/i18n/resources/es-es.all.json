@@ -3772,6 +3772,10 @@
     "translation": "Listar las cuotas de uso disponibles"
   },
   {
+    "id": "List commands of installed plugins",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "Listar dominios en la organización de destino"
   },
@@ -5292,6 +5296,10 @@
     "translation": "Mostrando el estado para app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Skip SSL certificate validation",
+    "translation": ""
+  },
+  {
     "id": "Skip assigning org role to user",
     "translation": "Omitir la asignación del rol de la organización al usuario"
   },
@@ -6209,6 +6217,10 @@
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
+    "translation": ""
+  },
+  {
+    "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
     "translation": ""
   },
   {

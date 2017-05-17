@@ -17,7 +17,7 @@ type AddPluginRepoCommand struct {
 	RequiredArgs      flag.AddPluginRepoArgs `positional-args:"yes"`
 	usage             interface{}            `usage:"CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLES:\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo"`
 	relatedCommands   interface{}            `related_commands:"install-plugin, list-plugin-repos"`
-	SkipSSLValidation bool                   `short:"k" hidden:"true"`
+	SkipSSLValidation bool                   `short:"k" hidden:"true" description:"Skip SSL certificate validation"`
 	UI                command.UI
 	Config            command.Config
 	Actor             AddPluginRepoActor
