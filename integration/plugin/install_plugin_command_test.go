@@ -505,10 +505,9 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", helpers.ConvertPathToRegularExpression(pluginPath)))
-						Eventually(session.Err).Should(Say("Plugin installation cancelled"))
-						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
 
-						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Exit(0))
 					})
 
 					Context("when the plugin is already installed", func() {
@@ -519,13 +518,13 @@ var _ = Describe("install-plugin command", func() {
 						It("does not uninstall the existing plugin", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", pluginPath)
 
-							Eventually(session.Err).Should(Say("Plugin installation cancelled"))
+							Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
 
 							Consistently(session.Out).ShouldNot(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
 							Consistently(session.Out).ShouldNot(Say("CLI-MESSAGE-UNINSTALL"))
 							Consistently(session.Out).ShouldNot(Say("Plugin some-plugin successfully uninstalled\\."))
 
-							Eventually(session).Should(Exit(1))
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
@@ -813,10 +812,9 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: n", server.URL()))
-					Eventually(session.Err).Should(Say("Plugin installation cancelled"))
-					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Out).Should(Say("Plugin installation cancelled\\."))
 
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Exit(0))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(0))
 				})

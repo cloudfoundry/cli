@@ -89,19 +89,6 @@ func (e FileNotFoundError) Translate(translate func(string, ...interface{}) stri
 	})
 }
 
-// PluginInstallationCancelled is returned when the user chooses no during
-// plugin installation confirmation.
-type PluginInstallationCancelled struct {
-}
-
-func (_ PluginInstallationCancelled) Error() string {
-	return "Plugin installation cancelled"
-}
-
-func (e PluginInstallationCancelled) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error())
-}
-
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {

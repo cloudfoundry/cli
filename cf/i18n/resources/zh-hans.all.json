@@ -4396,6 +4396,10 @@
     "translation": "插件安装已取消"
   },
   {
+    "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "插件名称 {{.PluginName}} 不存在"
   },
@@ -6898,6 +6902,10 @@
   {
     "id": "shared",
     "translation": "共享"
+  },
+  {
+    "id": "short:\"k\" hidden:\"true\"",
+    "translation": ""
   },
   {
     "id": "since",
