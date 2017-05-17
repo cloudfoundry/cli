@@ -1,5 +1,9 @@
 [
   {
+    "id": " (Default: {{.DefaultValue}})",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },
@@ -8,7 +12,27 @@
     "translation": ""
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": ""
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": ""
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": ""
+  },
+  {
     "id": "API endpoint not found at '{{.URL}}'",
+    "translation": ""
+  },
+  {
+    "id": "APPS:",
+    "translation": ""
+  },
+  {
+    "id": "All available CLI commands",
     "translation": ""
   },
   {
@@ -28,7 +52,15 @@
     "translation": ""
   },
   {
+    "id": "Append API request diagnostics to a log file",
+    "translation": ""
+  },
+  {
     "id": "Application instance index (Default: 0)",
+    "translation": ""
+  },
+  {
+    "id": "Application lifecycle:",
     "translation": ""
   },
   {
@@ -45,6 +77,14 @@
   },
   {
     "id": "Attention: Plugins are binaries written by potentially untrusted authors.",
+    "translation": ""
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": ""
+  },
+  {
+    "id": "Before getting started:",
     "translation": ""
   },
   {
@@ -120,11 +160,31 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME version\\n\\n   'cf -v' and 'cf --version' are also accepted.",
+    "translation": ""
+  },
+  {
+    "id": "CLI plugin management:",
+    "translation": ""
+  },
+  {
     "id": "COLOR must be \"true\" or \"false\"",
     "translation": ""
   },
   {
+    "id": "Change type of health check performed on an app",
+    "translation": ""
+  },
+  {
     "id": "Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": ""
+  },
+  {
+    "id": "Cloud Foundry command line tool",
+    "translation": ""
+  },
+  {
+    "id": "Commands offered by installed plugins:",
     "translation": ""
   },
   {
@@ -172,6 +232,10 @@
     "translation": ""
   },
   {
+    "id": "DOMAINS:",
+    "translation": ""
+  },
+  {
     "id": "Delete an isolation segment",
     "translation": ""
   },
@@ -188,6 +252,10 @@
     "translation": ""
   },
   {
+    "id": "Do not colorize output",
+    "translation": ""
+  },
+  {
     "id": "Do you want to install the plugin {{.Path}}?",
     "translation": ""
   },
@@ -196,7 +264,19 @@
     "translation": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
   },
   {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": ""
+  },
+  {
+    "id": "ENVIRONMENT VARIABLES:",
+    "translation": ""
+  },
+  {
     "id": "ENVIRONMENT:",
+    "translation": ""
+  },
+  {
+    "id": "Enable HTTP proxying for API requests",
     "translation": ""
   },
   {
@@ -228,11 +308,23 @@
     "translation": "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": ""
+  },
+  {
     "id": "File is not a valid cf CLI plugin binary.",
     "translation": "File is not a valid cf CLI plugin binary."
   },
   {
     "id": "File not found locally, make sure the file exists at given path {{.FilePath}}",
+    "translation": ""
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": ""
+  },
+  {
+    "id": "GLOBAL OPTIONS:",
     "translation": ""
   },
   {
@@ -253,6 +345,14 @@
   },
   {
     "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
+    "id": "Global options:",
+    "translation": ""
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
     "translation": ""
   },
   {
@@ -320,6 +420,10 @@
     "translation": ""
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Name to give the task (generated if omitted)",
     "translation": ""
   },
@@ -336,7 +440,19 @@
     "translation": ""
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": ""
+  },
+  {
+    "id": "ORGS:",
+    "translation": ""
+  },
+  {
     "id": "One-time passcode",
+    "translation": ""
+  },
+  {
+    "id": "Org management:",
     "translation": ""
   },
   {
@@ -345,6 +461,14 @@
   },
   {
     "id": "Origin for mapping a user account to a user in an external identity provider",
+    "translation": ""
+  },
+  {
+    "id": "Override path to default config directory",
+    "translation": ""
+  },
+  {
+    "id": "Override path to default plugin config directory",
     "translation": ""
   },
   {
@@ -416,6 +540,10 @@
     "translation": ""
   },
   {
+    "id": "Print API request diagnostics to stdout",
+    "translation": ""
+  },
+  {
     "id": "Processing files...",
     "translation": "Processing files..."
   },
@@ -436,6 +564,10 @@
     "translation": ""
   },
   {
+    "id": "ROUTES:",
+    "translation": ""
+  },
+  {
     "id": "RUNNING",
     "translation": ""
   },
@@ -450,6 +582,10 @@
   {
     "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
     "translation": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?"
+  },
+  {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": ""
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -484,6 +620,10 @@
     "translation": ""
   },
   {
+    "id": "Route and domain management:",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} has been registered to another space.",
     "translation": "Route {{.Route}} has been registered to another space."
   },
@@ -496,7 +636,31 @@
     "translation": ""
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": ""
+  },
+  {
     "id": "SECURITY_GROUP",
+    "translation": ""
+  },
+  {
+    "id": "SEE ALSO:",
+    "translation": ""
+  },
+  {
+    "id": "SERVICE ADMIN:",
+    "translation": ""
+  },
+  {
+    "id": "SERVICES:",
+    "translation": ""
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": ""
+  },
+  {
+    "id": "SPACES:",
     "translation": ""
   },
   {
@@ -528,7 +692,15 @@
     "translation": ""
   },
   {
+    "id": "Services integration:",
+    "translation": ""
+  },
+  {
     "id": "Set to 'port' or 'none'",
+    "translation": ""
+  },
+  {
+    "id": "Show the type of health check performed on an app",
     "translation": ""
   },
   {
@@ -537,6 +709,10 @@
   },
   {
     "id": "Space '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
+    "id": "Space management:",
     "translation": ""
   },
   {
@@ -549,7 +725,7 @@
   },
   {
     "id": "Starting download of plugin binary from URL...",
-    "translation": "Starting download of plugin binary from URL..."
+    "translation": ""
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
@@ -616,6 +792,10 @@
     "translation": ""
   },
   {
+    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
+    "translation": ""
+  },
+  {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
     "translation": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
   },
@@ -637,6 +817,10 @@
   },
   {
     "id": "Tracing staging logs...",
+    "translation": ""
+  },
+  {
+    "id": "USER ADMIN:",
     "translation": ""
   },
   {
@@ -668,11 +852,19 @@
     "translation": "Uploading files..."
   },
   {
+    "id": "Usage:",
+    "translation": ""
+  },
+  {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
     "translation": ""
   },
   {
     "id": "Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",
+    "translation": ""
+  },
+  {
+    "id": "VERSION:",
     "translation": ""
   },
   {
@@ -685,6 +877,10 @@
   },
   {
     "id": "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}.",
+    "translation": ""
+  },
+  {
+    "id": "[global options] command [arguments...] [command options]",
     "translation": ""
   },
   {
@@ -849,6 +1045,10 @@
   },
   {
     "id": "user {{.User}} already exists",
+    "translation": ""
+  },
+  {
+    "id": "verbose and version flag",
     "translation": ""
   },
   {

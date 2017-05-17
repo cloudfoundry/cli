@@ -97,7 +97,7 @@
   },
   {
     "id": " (Default: {{.DefaultValue}})",
-    "translation": " (Padrão: {{.DefaultValue}})"
+    "translation": ""
   },
   {
     "id": " added as '",
@@ -193,11 +193,11 @@
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
-    "translation": "INCLUIR/REMOVER REPOSITÓRIO DE PLUG-IN:"
+    "translation": ""
   },
   {
     "id": "ADD/REMOVE PLUGIN:",
-    "translation": "INCLUIR/REMOVER PLUG-IN:"
+    "translation": ""
   },
   {
     "id": "ADVANCED",
@@ -205,7 +205,7 @@
   },
   {
     "id": "ADVANCED:",
-    "translation": "AVANÇADO:"
+    "translation": ""
   },
   {
     "id": "ALIAS:",
@@ -249,7 +249,7 @@
   },
   {
     "id": "APPS:",
-    "translation": "APPS:"
+    "translation": ""
   },
   {
     "id": "APP_INSTANCES",
@@ -297,7 +297,7 @@
   },
   {
     "id": "All available CLI commands",
-    "translation": "Todos os comandos da CLI disponíveis"
+    "translation": ""
   },
   {
     "id": "Allow SSH access for the space",
@@ -357,7 +357,7 @@
   },
   {
     "id": "Append API request diagnostics to a log file",
-    "translation": "Anexar diagnósticos de solicitação de API a um arquivo de log"
+    "translation": ""
   },
   {
     "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
@@ -373,7 +373,7 @@
   },
   {
     "id": "Application lifecycle:",
-    "translation": "Ciclo de vida do aplicativo:"
+    "translation": ""
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
@@ -485,7 +485,7 @@
   },
   {
     "id": "BUILDPACKS:",
-    "translation": "BUILDPACKS:"
+    "translation": ""
   },
   {
     "id": "BUILDPACK_NAME",
@@ -497,7 +497,7 @@
   },
   {
     "id": "Before getting started:",
-    "translation": "Antes de iniciar:"
+    "translation": ""
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
@@ -1673,7 +1673,7 @@
   },
   {
     "id": "CF_NAME version\\n\\n   'cf -v' and 'cf --version' are also accepted.",
-    "translation": "CF_NAME version\\n\\n   'cf -v' e 'cf --version' também são aceitos."
+    "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
@@ -1681,7 +1681,7 @@
   },
   {
     "id": "CLI plugin management:",
-    "translation": "Gerenciamento de plug-in da CLI:"
+    "translation": ""
   },
   {
     "id": "COLOR must be \"true\" or \"false\"",
@@ -1749,7 +1749,7 @@
   },
   {
     "id": "Change type of health check performed on an app",
-    "translation": "Mudar o tipo de verificação de funcionamento executado em um app"
+    "translation": ""
   },
   {
     "id": "Change user password",
@@ -1773,7 +1773,7 @@
   },
   {
     "id": "Cloud Foundry command line tool",
-    "translation": "Ferramenta de linha de comandos Cloud Foundry"
+    "translation": ""
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1801,7 +1801,7 @@
   },
   {
     "id": "Commands offered by installed plugins:",
-    "translation": "Comandos oferecidos pelos plug-ins instalados:"
+    "translation": ""
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
@@ -2137,7 +2137,7 @@
   },
   {
     "id": "DOMAINS:",
-    "translation": "DOMÍNIOS:"
+    "translation": ""
   },
   {
     "id": "Dashboard: {{.URL}}",
@@ -2381,7 +2381,7 @@
   },
   {
     "id": "Do not colorize output",
-    "translation": "Não colorir a saída"
+    "translation": ""
   },
   {
     "id": "Do not execute a remote command",
@@ -2437,11 +2437,11 @@
   },
   {
     "id": "ENVIRONMENT VARIABLE GROUPS:",
-    "translation": "GRUPOS DE VARIÁVEIS DE AMBIENTE:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
-    "translation": "VARIÁVEIS DE AMBIENTE:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT:",
@@ -2457,7 +2457,7 @@
   },
   {
     "id": "Enable HTTP proxying for API requests",
-    "translation": "Ativar proxy de HTTP para solicitações de API"
+    "translation": ""
   },
   {
     "id": "Enable access for a specified organization",
@@ -2873,7 +2873,7 @@
   },
   {
     "id": "FEATURE FLAGS:",
-    "translation": "SINALIZAÇÕES DE RECURSOS:"
+    "translation": ""
   },
   {
     "id": "Failed assigning org role to user: ",
@@ -3005,11 +3005,11 @@
   },
   {
     "id": "GETTING STARTED:",
-    "translation": "INICIANDO:"
+    "translation": ""
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "OPÇÕES GLOBAIS:"
+    "translation": ""
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -3225,7 +3225,7 @@
   },
   {
     "id": "Global options:",
-    "translation": "Opções globais:"
+    "translation": ""
   },
   {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
@@ -3277,7 +3277,7 @@
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS:",
-    "translation": "COMANDOS DE PLUG-IN INSTALADOS:"
+    "translation": ""
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3889,7 +3889,7 @@
   },
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": "Máximo de tempo de espera para estabelecer uma conexão, incluindo resolução do nome, em segundos"
+    "translation": ""
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
@@ -4149,7 +4149,7 @@
   },
   {
     "id": "ORG ADMIN:",
-    "translation": "ADMINISTRADOR DA ORGANIZAÇÃO:"
+    "translation": ""
   },
   {
     "id": "ORG AUDITOR",
@@ -4165,7 +4165,7 @@
   },
   {
     "id": "ORGS:",
-    "translation": "ORGANIZAÇÕES:"
+    "translation": ""
   },
   {
     "id": "One-time passcode",
@@ -4221,7 +4221,7 @@
   },
   {
     "id": "Org management:",
-    "translation": "Gerenciamento da organização:"
+    "translation": ""
   },
   {
     "id": "Org that contains the target application",
@@ -4257,11 +4257,11 @@
   },
   {
     "id": "Override path to default config directory",
-    "translation": "Substituir caminho para o diretório de configuração padrão"
+    "translation": ""
   },
   {
     "id": "Override path to default plugin config directory",
-    "translation": "Substituir caminho para o diretório de configuração de plug-in padrão"
+    "translation": ""
   },
   {
     "id": "Override restart of the application in target environment after copy-source completes",
@@ -4489,7 +4489,7 @@
   },
   {
     "id": "Print API request diagnostics to stdout",
-    "translation": "Imprimir diagnósticos da solicitação de API na saída padrão"
+    "translation": ""
   },
   {
     "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
@@ -4605,7 +4605,7 @@
   },
   {
     "id": "ROUTES:",
-    "translation": "ROTAS:"
+    "translation": ""
   },
   {
     "id": "ROUTE_PATH",
@@ -4661,7 +4661,7 @@
   },
   {
     "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
-    "translation": "Recriar o artefato executável do app usando os arquivos de app enviados por push mais recentes e o ambiente mais recente (variáveis, ligações de serviço, buildpack, pilha, etc.)"
+    "translation": ""
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
@@ -4913,7 +4913,7 @@
   },
   {
     "id": "Route and domain management:",
-    "translation": "Gerenciamento de rota e de domínio:"
+    "translation": ""
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
@@ -4973,7 +4973,7 @@
   },
   {
     "id": "SECURITY GROUP:",
-    "translation": "GRUPO DE SEGURANÇA:"
+    "translation": ""
   },
   {
     "id": "SECURITY_GROUP",
@@ -4981,7 +4981,7 @@
   },
   {
     "id": "SEE ALSO:",
-    "translation": "VEJA TAMBÉM:"
+    "translation": ""
   },
   {
     "id": "SERVICE",
@@ -4993,7 +4993,7 @@
   },
   {
     "id": "SERVICE ADMIN:",
-    "translation": "ADMINISTRADOR DO SERVIÇO:"
+    "translation": ""
   },
   {
     "id": "SERVICES",
@@ -5001,7 +5001,7 @@
   },
   {
     "id": "SERVICES:",
-    "translation": "SERVIÇOS:"
+    "translation": ""
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -5017,7 +5017,7 @@
   },
   {
     "id": "SPACE ADMIN:",
-    "translation": "ADMINISTRADOR DO ESPAÇO:"
+    "translation": ""
   },
   {
     "id": "SPACE AUDITOR",
@@ -5037,7 +5037,7 @@
   },
   {
     "id": "SPACES:",
-    "translation": "ESPAÇOS:"
+    "translation": ""
   },
   {
     "id": "SSH to an application container instance",
@@ -5173,7 +5173,7 @@
   },
   {
     "id": "Services integration:",
-    "translation": "Integração de serviços:"
+    "translation": ""
   },
   {
     "id": "Services:",
@@ -5293,7 +5293,7 @@
   },
   {
     "id": "Show the type of health check performed on an app",
-    "translation": "Mostrar o tipo de verificação de funcionamento executado em um app"
+    "translation": ""
   },
   {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5337,7 +5337,7 @@
   },
   {
     "id": "Space management:",
-    "translation": "Gerenciamento de espaço:"
+    "translation": ""
   },
   {
     "id": "Space that contains the target application",
@@ -5853,7 +5853,7 @@
   },
   {
     "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
-    "translation": "Esses são comandos usados em geral. Use 'cf help -a' para ver todos, com descrições."
+    "translation": ""
   },
   {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -5969,7 +5969,7 @@
   },
   {
     "id": "USER ADMIN:",
-    "translation": "ADMINISTRADOR DO USUÁRIO:"
+    "translation": ""
   },
   {
     "id": "USERS",
@@ -6237,7 +6237,7 @@
   },
   {
     "id": "Usage:",
-    "translation": "Usage:"
+    "translation": ""
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
@@ -6289,7 +6289,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "VERSÃO:"
+    "translation": ""
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -6397,7 +6397,7 @@
   },
   {
     "id": "[global options] command [arguments...] [command options]",
-    "translation": "[global options] command [arguments...] [command options]"
+    "translation": ""
   },
   {
     "id": "[hidden]",
@@ -7121,7 +7121,7 @@
   },
   {
     "id": "verbose and version flag",
-    "translation": "sinalização detalhada e de versão"
+    "translation": ""
   },
   {
     "id": "version",

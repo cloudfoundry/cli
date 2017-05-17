@@ -97,7 +97,7 @@
   },
   {
     "id": " (Default: {{.DefaultValue}})",
-    "translation": " （缺省值: {{.DefaultValue}}）"
+    "translation": ""
   },
   {
     "id": " added as '",
@@ -193,11 +193,11 @@
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
-    "translation": "添加/除去插件存储库:"
+    "translation": ""
   },
   {
     "id": "ADD/REMOVE PLUGIN:",
-    "translation": "添加/除去插件:"
+    "translation": ""
   },
   {
     "id": "ADVANCED",
@@ -205,7 +205,7 @@
   },
   {
     "id": "ADVANCED:",
-    "translation": "高级:"
+    "translation": ""
   },
   {
     "id": "ALIAS:",
@@ -249,7 +249,7 @@
   },
   {
     "id": "APPS:",
-    "translation": "应用程序:"
+    "translation": ""
   },
   {
     "id": "APP_INSTANCES",
@@ -297,7 +297,7 @@
   },
   {
     "id": "All available CLI commands",
-    "translation": "所有可用的 CLI 命令"
+    "translation": ""
   },
   {
     "id": "Allow SSH access for the space",
@@ -357,7 +357,7 @@
   },
   {
     "id": "Append API request diagnostics to a log file",
-    "translation": "将 API 请求诊断附加到日志文件"
+    "translation": ""
   },
   {
     "id": "Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')",
@@ -373,7 +373,7 @@
   },
   {
     "id": "Application lifecycle:",
-    "translation": "应用程序生命周期:"
+    "translation": ""
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
@@ -485,7 +485,7 @@
   },
   {
     "id": "BUILDPACKS:",
-    "translation": "BUILDPACK:"
+    "translation": ""
   },
   {
     "id": "BUILDPACK_NAME",
@@ -497,7 +497,7 @@
   },
   {
     "id": "Before getting started:",
-    "translation": "开始之前:"
+    "translation": ""
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
@@ -1673,7 +1673,7 @@
   },
   {
     "id": "CF_NAME version\\n\\n   'cf -v' and 'cf --version' are also accepted.",
-    "translation": "CF_NAME version\\n\\n   还接受“cf -v”和“cf --version”。"
+    "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
@@ -1681,7 +1681,7 @@
   },
   {
     "id": "CLI plugin management:",
-    "translation": "CLI 插件管理:"
+    "translation": ""
   },
   {
     "id": "COLOR must be \"true\" or \"false\"",
@@ -1749,7 +1749,7 @@
   },
   {
     "id": "Change type of health check performed on an app",
-    "translation": "更改对应用程序执行的运行状况检查的类型"
+    "translation": ""
   },
   {
     "id": "Change user password",
@@ -1773,7 +1773,7 @@
   },
   {
     "id": "Cloud Foundry command line tool",
-    "translation": "Cloud Foundry 命令行工具"
+    "translation": ""
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1801,7 +1801,7 @@
   },
   {
     "id": "Commands offered by installed plugins:",
-    "translation": "安装的插件提供的命令:"
+    "translation": ""
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
@@ -2137,7 +2137,7 @@
   },
   {
     "id": "DOMAINS:",
-    "translation": "域:"
+    "translation": ""
   },
   {
     "id": "Dashboard: {{.URL}}",
@@ -2381,7 +2381,7 @@
   },
   {
     "id": "Do not colorize output",
-    "translation": "不设置输出的颜色"
+    "translation": ""
   },
   {
     "id": "Do not execute a remote command",
@@ -2437,11 +2437,11 @@
   },
   {
     "id": "ENVIRONMENT VARIABLE GROUPS:",
-    "translation": "环境变量组:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
-    "translation": "环境变量:"
+    "translation": ""
   },
   {
     "id": "ENVIRONMENT:",
@@ -2457,7 +2457,7 @@
   },
   {
     "id": "Enable HTTP proxying for API requests",
-    "translation": "对 API 请求启用 HTTP 代理"
+    "translation": ""
   },
   {
     "id": "Enable access for a specified organization",
@@ -2873,7 +2873,7 @@
   },
   {
     "id": "FEATURE FLAGS:",
-    "translation": "功能标志:"
+    "translation": ""
   },
   {
     "id": "Failed assigning org role to user: ",
@@ -3005,11 +3005,11 @@
   },
   {
     "id": "GETTING STARTED:",
-    "translation": "开始使用:"
+    "translation": ""
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "全局选项:"
+    "translation": ""
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -3225,7 +3225,7 @@
   },
   {
     "id": "Global options:",
-    "translation": "全局选项:"
+    "translation": ""
   },
   {
     "id": "HEALTH_CHECK_TYPE must be \"port\", \"process\", or \"http\"",
@@ -3277,7 +3277,7 @@
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS:",
-    "translation": "已安装插件命令:"
+    "translation": ""
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3889,7 +3889,7 @@
   },
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": "建立连接（包括名称解析）的最长等待时间（秒）"
+    "translation": ""
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
@@ -4149,7 +4149,7 @@
   },
   {
     "id": "ORG ADMIN:",
-    "translation": "组织管理员:"
+    "translation": ""
   },
   {
     "id": "ORG AUDITOR",
@@ -4165,7 +4165,7 @@
   },
   {
     "id": "ORGS:",
-    "translation": "组织:"
+    "translation": ""
   },
   {
     "id": "One-time passcode",
@@ -4221,7 +4221,7 @@
   },
   {
     "id": "Org management:",
-    "translation": "组织管理:"
+    "translation": ""
   },
   {
     "id": "Org that contains the target application",
@@ -4257,11 +4257,11 @@
   },
   {
     "id": "Override path to default config directory",
-    "translation": "覆盖缺省配置目录的路径"
+    "translation": ""
   },
   {
     "id": "Override path to default plugin config directory",
-    "translation": "覆盖缺省插件配置目录的路径"
+    "translation": ""
   },
   {
     "id": "Override restart of the application in target environment after copy-source completes",
@@ -4489,7 +4489,7 @@
   },
   {
     "id": "Print API request diagnostics to stdout",
-    "translation": "将 API 请求诊断打印到 stdout"
+    "translation": ""
   },
   {
     "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
@@ -4605,7 +4605,7 @@
   },
   {
     "id": "ROUTES:",
-    "translation": "路径:"
+    "translation": ""
   },
   {
     "id": "ROUTE_PATH",
@@ -4661,7 +4661,7 @@
   },
   {
     "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
-    "translation": "使用最新推送的应用程序文件和最新的环境（变量、服务绑定、buildpack 和堆栈等）重新创建应用程序的可执行工件"
+    "translation": ""
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
@@ -4913,7 +4913,7 @@
   },
   {
     "id": "Route and domain management:",
-    "translation": "路径和域管理:"
+    "translation": ""
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
@@ -4973,7 +4973,7 @@
   },
   {
     "id": "SECURITY GROUP:",
-    "translation": "安全组:"
+    "translation": ""
   },
   {
     "id": "SECURITY_GROUP",
@@ -4981,7 +4981,7 @@
   },
   {
     "id": "SEE ALSO:",
-    "translation": "另请参阅:"
+    "translation": ""
   },
   {
     "id": "SERVICE",
@@ -4993,7 +4993,7 @@
   },
   {
     "id": "SERVICE ADMIN:",
-    "translation": "服务管理员:"
+    "translation": ""
   },
   {
     "id": "SERVICES",
@@ -5001,7 +5001,7 @@
   },
   {
     "id": "SERVICES:",
-    "translation": "服务:"
+    "translation": ""
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -5017,7 +5017,7 @@
   },
   {
     "id": "SPACE ADMIN:",
-    "translation": "空间管理员:"
+    "translation": ""
   },
   {
     "id": "SPACE AUDITOR",
@@ -5037,7 +5037,7 @@
   },
   {
     "id": "SPACES:",
-    "translation": "空间:"
+    "translation": ""
   },
   {
     "id": "SSH to an application container instance",
@@ -5173,7 +5173,7 @@
   },
   {
     "id": "Services integration:",
-    "translation": "服务集成:"
+    "translation": ""
   },
   {
     "id": "Services:",
@@ -5293,7 +5293,7 @@
   },
   {
     "id": "Show the type of health check performed on an app",
-    "translation": "显示对应用程序执行的运行状况检查的类型"
+    "translation": ""
   },
   {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5337,7 +5337,7 @@
   },
   {
     "id": "Space management:",
-    "translation": "空间管理:"
+    "translation": ""
   },
   {
     "id": "Space that contains the target application",
@@ -5853,7 +5853,7 @@
   },
   {
     "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
-    "translation": "这些是常用命令。使用“cf help -a”可查看所有命令及描述。"
+    "translation": ""
   },
   {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -5969,7 +5969,7 @@
   },
   {
     "id": "USER ADMIN:",
-    "translation": "用户管理员:"
+    "translation": ""
   },
   {
     "id": "USERS",
@@ -6237,7 +6237,7 @@
   },
   {
     "id": "Usage:",
-    "translation": "用法:"
+    "translation": ""
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
@@ -6289,7 +6289,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "版本:"
+    "translation": ""
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -6397,7 +6397,7 @@
   },
   {
     "id": "[global options] command [arguments...] [command options]",
-    "translation": "[global options] command [arguments...] [command options]"
+    "translation": ""
   },
   {
     "id": "[hidden]",
@@ -7121,7 +7121,7 @@
   },
   {
     "id": "verbose and version flag",
-    "translation": "详细信息和版本标志"
+    "translation": ""
   },
   {
     "id": "version",
