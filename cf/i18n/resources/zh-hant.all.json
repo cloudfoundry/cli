@@ -4396,6 +4396,10 @@
     "translation": "已取消外掛程式安裝"
   },
   {
+    "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "外掛程式名稱 {{.PluginName}} 不存在"
   },
@@ -6898,6 +6902,10 @@
   {
     "id": "shared",
     "translation": "共用"
+  },
+  {
+    "id": "short:\"k\" hidden:\"true\"",
+    "translation": ""
   },
   {
     "id": "since",

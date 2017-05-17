@@ -24,6 +24,15 @@ type InstallPluginActor interface {
 	UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error
 }
 
+// PluginInstallationCancelled is used to ignore the scenario when the user
+// responds with 'no' when prompted to install plugin and exit 0.
+type PluginInstallationCancelled struct {
+}
+
+func (_ PluginInstallationCancelled) Error() string {
+	return "Plugin installation cancelled"
+}
+
 type InstallPluginCommand struct {
 	OptionalArgs         flag.InstallPluginArgs `positional-args:"yes"`
 	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
@@ -52,6 +61,9 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 	pluginNameOrLocation := cmd.OptionalArgs.PluginNameOrLocation.String()
 
 	tempPluginPath, err := cmd.getExecutableBinary(pluginNameOrLocation)
+	if _, ok := err.(PluginInstallationCancelled); ok {
+		return nil
+	}
 
 	defer os.Remove(tempPluginPath)
 	if err != nil {
@@ -175,7 +187,8 @@ func (cmd InstallPluginCommand) promptForInstallPlugin(path string) error {
 			return promptErr
 		}
 		if !really {
-			return shared.PluginInstallationCancelled{}
+			cmd.UI.DisplayText("Plugin installation cancelled.")
+			return PluginInstallationCancelled{}
 		}
 	}
 

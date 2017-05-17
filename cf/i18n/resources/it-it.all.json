@@ -4396,6 +4396,10 @@
     "translation": "Installazione del plug-in annullata"
   },
   {
+    "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "Il nome del plug-in {{.PluginName}} non esiste"
   },
@@ -6898,6 +6902,10 @@
   {
     "id": "shared",
     "translation": "condiviso"
+  },
+  {
+    "id": "short:\"k\" hidden:\"true\"",
+    "translation": ""
   },
   {
     "id": "since",

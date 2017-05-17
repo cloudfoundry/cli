@@ -4396,6 +4396,10 @@
     "translation": "プラグインのインストールは取り消されました"
   },
   {
+    "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "プラグイン名 {{.PluginName}} が存在していません"
   },
@@ -6898,6 +6902,10 @@
   {
     "id": "shared",
     "translation": "共有"
+  },
+  {
+    "id": "short:\"k\" hidden:\"true\"",
+    "translation": ""
   },
   {
     "id": "since",

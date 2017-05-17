@@ -356,6 +356,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
     "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
     "translation": ""
   },
@@ -773,6 +777,10 @@
   },
   {
     "id": "set-space-isolation-segment",
+    "translation": ""
+  },
+  {
+    "id": "short:\"k\" hidden:\"true\"",
     "translation": ""
   },
   {

@@ -248,9 +248,9 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("cancels plugin installation", func() {
-					Expect(executeErr).To(MatchError(shared.PluginInstallationCancelled{}))
+					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).ToNot(Say("Installing plugin"))
+					Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
 				})
 			})
 
@@ -260,9 +260,9 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("cancels plugin installation", func() {
-					Expect(executeErr).To(MatchError(shared.PluginInstallationCancelled{}))
+					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).ToNot(Say("Installing plugin"))
+					Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
 				})
 			})
 
@@ -565,9 +565,9 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("cancels plugin installation", func() {
-					Expect(executeErr).To(MatchError(shared.PluginInstallationCancelled{}))
+					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).ToNot(Say("Installing plugin"))
+					Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
 				})
 			})
 
@@ -577,9 +577,9 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("cancels plugin installation", func() {
-					Expect(executeErr).To(MatchError(shared.PluginInstallationCancelled{}))
+					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).ToNot(Say("Installing plugin"))
+					Expect(testUI.Out).To(Say("Plugin installation cancelled\\."))
 				})
 			})
 
