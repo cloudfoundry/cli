@@ -453,5 +453,54 @@ var _ = Describe("PluginsConfig", func() {
 				Expect(plugin).To(Equal(Plugin{}))
 			})
 		})
+
+		Describe("GetPluginCaseInsensitive", func() {
+			var (
+				config *Config
+				err    error
+			)
+
+			BeforeEach(func() {
+				rawConfig := `
+				{
+					"Plugins": {
+						"plugin-1": {},
+						"plugin-2": {},
+						"PLUGIN-2": {}
+					}
+				}`
+
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
+				setPluginConfig(pluginsPath, rawConfig)
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Context("when there is a matching plugin", func() {
+				It("returns the plugin and true", func() {
+					plugin, exist := config.GetPluginCaseInsensitive("PlUgIn-1")
+					Expect(plugin).To(Equal(Plugin{Name: "plugin-1"}))
+					Expect(exist).To(BeTrue())
+				})
+			})
+
+			Context("when there is no matching plugin", func() {
+				It("returns an empty plugin and false", func() {
+					plugin, exist := config.GetPluginCaseInsensitive("plugin-3")
+					Expect(plugin).To(Equal(Plugin{}))
+					Expect(exist).To(BeFalse())
+				})
+			})
+
+			Context("when there are multiple matching plugins", func() {
+				// this should never happen
+				It("returns one of them", func() {
+					_, exist := config.GetPluginCaseInsensitive("pLuGiN-2")
+					// do not test the plugin because the plugins are in a map and the
+					// order is undefined
+					Expect(exist).To(BeTrue())
+				})
+			})
+		})
 	})
 })

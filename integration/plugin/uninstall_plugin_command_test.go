@@ -57,6 +57,14 @@ var _ = Describe("uninstall-plugin command", func() {
 				Eventually(session.Out).Should(Say("banana-plugin-name-2"))
 				Eventually(session).Should(Exit(0))
 			})
+
+			It("matches the plugin name case insensitive", func() {
+				session := helpers.CF("uninstall-plugin", "BaNaNa-PlUgIn-NaMe-1")
+				Eventually(session.Out).Should(Say("Uninstalling plugin banana-plugin-name-1\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Plugin banana-plugin-name-1 2\\.0\\.1 successfully uninstalled\\."))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 
 		Context("when the plugin encounters an error during cleanup", func() {

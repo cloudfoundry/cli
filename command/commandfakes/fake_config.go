@@ -108,6 +108,19 @@ type FakeConfig struct {
 		result1 configv3.Plugin
 		result2 bool
 	}
+	GetPluginCaseInsensitiveStub        func(pluginName string) (configv3.Plugin, bool)
+	getPluginCaseInsensitiveMutex       sync.RWMutex
+	getPluginCaseInsensitiveArgsForCall []struct {
+		pluginName string
+	}
+	getPluginCaseInsensitiveReturns struct {
+		result1 configv3.Plugin
+		result2 bool
+	}
+	getPluginCaseInsensitiveReturnsOnCall map[int]struct {
+		result1 configv3.Plugin
+		result2 bool
+	}
 	HasTargetedOrganizationStub        func() bool
 	hasTargetedOrganizationMutex       sync.RWMutex
 	hasTargetedOrganizationArgsForCall []struct{}
@@ -765,6 +778,57 @@ func (fake *FakeConfig) GetPluginReturnsOnCall(i int, result1 configv3.Plugin, r
 		})
 	}
 	fake.getPluginReturnsOnCall[i] = struct {
+		result1 configv3.Plugin
+		result2 bool
+	}{result1, result2}
+}
+
+func (fake *FakeConfig) GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool) {
+	fake.getPluginCaseInsensitiveMutex.Lock()
+	ret, specificReturn := fake.getPluginCaseInsensitiveReturnsOnCall[len(fake.getPluginCaseInsensitiveArgsForCall)]
+	fake.getPluginCaseInsensitiveArgsForCall = append(fake.getPluginCaseInsensitiveArgsForCall, struct {
+		pluginName string
+	}{pluginName})
+	fake.recordInvocation("GetPluginCaseInsensitive", []interface{}{pluginName})
+	fake.getPluginCaseInsensitiveMutex.Unlock()
+	if fake.GetPluginCaseInsensitiveStub != nil {
+		return fake.GetPluginCaseInsensitiveStub(pluginName)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.getPluginCaseInsensitiveReturns.result1, fake.getPluginCaseInsensitiveReturns.result2
+}
+
+func (fake *FakeConfig) GetPluginCaseInsensitiveCallCount() int {
+	fake.getPluginCaseInsensitiveMutex.RLock()
+	defer fake.getPluginCaseInsensitiveMutex.RUnlock()
+	return len(fake.getPluginCaseInsensitiveArgsForCall)
+}
+
+func (fake *FakeConfig) GetPluginCaseInsensitiveArgsForCall(i int) string {
+	fake.getPluginCaseInsensitiveMutex.RLock()
+	defer fake.getPluginCaseInsensitiveMutex.RUnlock()
+	return fake.getPluginCaseInsensitiveArgsForCall[i].pluginName
+}
+
+func (fake *FakeConfig) GetPluginCaseInsensitiveReturns(result1 configv3.Plugin, result2 bool) {
+	fake.GetPluginCaseInsensitiveStub = nil
+	fake.getPluginCaseInsensitiveReturns = struct {
+		result1 configv3.Plugin
+		result2 bool
+	}{result1, result2}
+}
+
+func (fake *FakeConfig) GetPluginCaseInsensitiveReturnsOnCall(i int, result1 configv3.Plugin, result2 bool) {
+	fake.GetPluginCaseInsensitiveStub = nil
+	if fake.getPluginCaseInsensitiveReturnsOnCall == nil {
+		fake.getPluginCaseInsensitiveReturnsOnCall = make(map[int]struct {
+			result1 configv3.Plugin
+			result2 bool
+		})
+	}
+	fake.getPluginCaseInsensitiveReturnsOnCall[i] = struct {
 		result1 configv3.Plugin
 		result2 bool
 	}{result1, result2}
@@ -1810,6 +1874,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.experimentalMutex.RUnlock()
 	fake.getPluginMutex.RLock()
 	defer fake.getPluginMutex.RUnlock()
+	fake.getPluginCaseInsensitiveMutex.RLock()
+	defer fake.getPluginCaseInsensitiveMutex.RUnlock()
 	fake.hasTargetedOrganizationMutex.RLock()
 	defer fake.hasTargetedOrganizationMutex.RUnlock()
 	fake.hasTargetedSpaceMutex.RLock()

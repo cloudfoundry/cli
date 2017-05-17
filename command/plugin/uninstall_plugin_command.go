@@ -32,14 +32,14 @@ func (cmd *UninstallPluginCommand) Setup(config command.Config, ui command.UI) e
 
 func (cmd UninstallPluginCommand) Execute(args []string) error {
 	pluginName := cmd.RequiredArgs.PluginName
-	plugin, exist := cmd.Config.GetPlugin(pluginName)
+	plugin, exist := cmd.Config.GetPluginCaseInsensitive(pluginName)
 	if !exist {
 		return shared.PluginNotFoundError{Name: pluginName}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uninstalling plugin {{.PluginName}}...",
 		map[string]interface{}{
-			"PluginName": pluginName,
+			"PluginName": plugin.Name,
 		})
 
 	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
@@ -47,7 +47,7 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.Actor.UninstallPlugin(rpcService, pluginName)
+	err = cmd.Actor.UninstallPlugin(rpcService, plugin.Name)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -55,7 +55,7 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
 		map[string]interface{}{
-			"PluginName":    pluginName,
+			"PluginName":    plugin.Name,
 			"PluginVersion": plugin.Version,
 		})
 
