@@ -1,11 +1,5 @@
 ---
 resource_types:
-# TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
-- name: tracker-resource-fixed
-  type: docker-image
-  source:
-    repository: concourse/tracker-resource
-
 - name: slack-notification
   type: docker-image
   source:
@@ -177,9 +171,8 @@ resources:
     branch: master
     pool: bosh-lites-diego
 
-# TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
 - name: cf-cli-tracker
-  type: tracker-resource-fixed
+  type: tracker
   source:
     token: {{cf-cli-public-tracker-token}}
     project_id: {{cf-cli-public-tracker-project-id}}
@@ -604,7 +597,6 @@ jobs:
     - put: edge-windows-installer-64
       params:
         file: winstallers/cf-cli-installer_winx64.zip
-    # TODO: remove temp tracker resource when https://github.com/concourse/tracker-resource/issues/17 is fixed
     - put: cf-cli-tracker
       params:
         repos:
