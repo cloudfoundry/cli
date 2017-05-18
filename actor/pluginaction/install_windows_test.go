@@ -22,14 +22,13 @@ var _ = Describe("install actions", func() {
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
 		var err error
-		tempDir, err = ioutil.TempDir("", "")
+		tempPluginDir, err = ioutil.TempDir("", "")
 		Expect(err).ToNot(HaveOccurred())
-		fakeConfig.PluginHomeReturns(tempDir)
 		actor = NewActor(fakeConfig, nil)
 	})
 
 	AfterEach(func() {
-		err := os.RemoveAll(tempDir)
+		err := os.RemoveAll(tempPluginDir)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -55,7 +54,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("adds .exe to the end of the filename", func() {
-				copyPath, err := actor.CreateExecutableCopy(pluginPath)
+				copyPath, err := actor.CreateExecutableCopy(pluginPath, tempPluginDir)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(copyPath).To(HaveSuffix(".exe"))
