@@ -16,10 +16,10 @@ import (
 
 var _ = Describe("install actions", func() {
 	var (
-		actor      *Actor
-		fakeConfig *pluginactionfakes.FakeConfig
-		fakeClient *pluginactionfakes.FakePluginClient
-		tempDir    string
+		actor         *Actor
+		fakeConfig    *pluginactionfakes.FakeConfig
+		fakeClient    *pluginactionfakes.FakePluginClient
+		tempPluginDir string
 	)
 
 	BeforeEach(func() {
@@ -28,13 +28,12 @@ var _ = Describe("install actions", func() {
 		actor = NewActor(fakeConfig, fakeClient)
 
 		var err error
-		tempDir, err = ioutil.TempDir("", "")
+		tempPluginDir, err = ioutil.TempDir("", "")
 		Expect(err).ToNot(HaveOccurred())
-		fakeConfig.PluginHomeReturns(tempDir)
 	})
 
 	AfterEach(func() {
-		err := os.RemoveAll(tempDir)
+		err := os.RemoveAll(tempPluginDir)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -60,7 +59,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("creates a copy of a file in plugin home", func() {
-				copyPath, err := actor.CreateExecutableCopy(pluginPath)
+				copyPath, err := actor.CreateExecutableCopy(pluginPath, tempPluginDir)
 				Expect(err).ToNot(HaveOccurred())
 
 				contents, err := ioutil.ReadFile(copyPath)
@@ -70,25 +69,8 @@ var _ = Describe("install actions", func() {
 		})
 
 		Context("when the file does not exist", func() {
-			var (
-				myFile *os.File
-				err    error
-			)
-
-			BeforeEach(func() {
-				myFile, err = ioutil.TempFile("", "")
-				Expect(err).NotTo(HaveOccurred())
-				err = myFile.Close()
-				Expect(err).NotTo(HaveOccurred())
-			})
-
-			AfterEach(func() {
-				err = os.Remove(myFile.Name())
-				Expect(err).NotTo(HaveOccurred())
-			})
-
 			It("returns an os.PathError", func() {
-				_, err = actor.CreateExecutableCopy(filepath.Join("foo", myFile.Name()))
+				_, err := actor.CreateExecutableCopy("i-don't-exist", tempPluginDir)
 				_, isPathError := err.(*os.PathError)
 				Expect(isPathError).To(BeTrue())
 			})
@@ -103,7 +85,7 @@ var _ = Describe("install actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			path, size, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com")
+			path, size, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir)
 		})
 
 		Context("when the downloaded is successful", func() {

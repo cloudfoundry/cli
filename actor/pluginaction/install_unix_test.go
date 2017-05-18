@@ -14,24 +14,24 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// Checks file permissions for UNIX platforms
 var _ = Describe("install actions", func() {
 	var (
-		actor      *Actor
-		fakeConfig *pluginactionfakes.FakeConfig
-		tempDir    string
+		actor         *Actor
+		fakeConfig    *pluginactionfakes.FakeConfig
+		tempPluginDir string
 	)
 
 	BeforeEach(func() {
 		fakeConfig = new(pluginactionfakes.FakeConfig)
 		var err error
-		tempDir, err = ioutil.TempDir("", "")
+		tempPluginDir, err = ioutil.TempDir("", "")
 		Expect(err).ToNot(HaveOccurred())
-		fakeConfig.PluginHomeReturns(tempDir)
 		actor = NewActor(fakeConfig, nil)
 	})
 
 	AfterEach(func() {
-		err := os.RemoveAll(tempDir)
+		err := os.RemoveAll(tempPluginDir)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -57,7 +57,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("gives the copy 0700 permission", func() {
-				copyPath, err := actor.CreateExecutableCopy(pluginPath)
+				copyPath, err := actor.CreateExecutableCopy(pluginPath, tempPluginDir)
 				Expect(err).ToNot(HaveOccurred())
 
 				stat, err := os.Stat(copyPath)

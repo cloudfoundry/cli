@@ -1,6 +1,7 @@
 package common
 
 import (
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -15,8 +16,8 @@ import (
 //go:generate counterfeiter . InstallPluginActor
 
 type InstallPluginActor interface {
-	CreateExecutableCopy(path string) (string, error)
-	DownloadExecutableBinaryFromURL(url string) (string, int64, error)
+	CreateExecutableCopy(path string, tempPluginDir string) (string, error)
+	DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
@@ -58,14 +59,24 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 		return nil
 	}
 
+	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
+	if err != nil {
+		return err
+	}
+
+	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
+	defer os.RemoveAll(tempPluginDir)
+
+	if err != nil {
+		return err
+	}
+
 	pluginNameOrLocation := cmd.OptionalArgs.PluginNameOrLocation.String()
 
-	tempPluginPath, err := cmd.getExecutableBinary(pluginNameOrLocation)
+	tempPluginPath, err := cmd.getExecutableBinary(pluginNameOrLocation, tempPluginDir)
 	if _, ok := err.(PluginInstallationCancelled); ok {
 		return nil
 	}
-
-	defer os.Remove(tempPluginPath)
 	if err != nil {
 		return err
 	}
@@ -135,7 +146,7 @@ func (cmd InstallPluginCommand) uninstallPlugin(plugin configv3.Plugin, rpcServi
 	return nil
 }
 
-func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string) (string, error) {
+func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string, tempPluginDir string) (string, error) {
 	var tempPath string
 
 	switch {
@@ -155,8 +166,7 @@ func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string)
 		cmd.UI.DisplayText("Starting download of plugin binary from URL...")
 
 		var size int64
-		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation)
-		defer os.Remove(tempPath)
+		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation, tempPluginDir)
 		if err != nil {
 			return "", shared.HandleError(err)
 		}
@@ -172,7 +182,7 @@ func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string)
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
-	return cmd.Actor.CreateExecutableCopy(tempPath)
+	return cmd.Actor.CreateExecutableCopy(tempPath, tempPluginDir)
 }
 
 func (cmd InstallPluginCommand) promptForInstallPlugin(path string) error {
