@@ -572,6 +572,10 @@
     "translation": ""
   },
   {
+    "id": "The application instance index cannot be negative",
+    "translation": ""
+  },
+  {
     "id": "The command to execute",
     "translation": ""
   },
@@ -585,6 +589,10 @@
   },
   {
     "id": "The organization name",
+    "translation": ""
+  },
+  {
+    "id": "The specified application instance does not exist",
     "translation": ""
   },
   {

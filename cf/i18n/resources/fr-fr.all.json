@@ -3532,10 +3532,6 @@
     "translation": ""
   },
   {
-    "id": "Incorrect usage: app-instance-index cannot be negative",
-    "translation": "Syntaxe incorrecte : app-instance-index ne peut pas être négatif"
-  },
-  {
     "id": "Incorrect usage: invalid healthcheck type",
     "translation": "Syntaxe incorrecte : type de diagnostic d'intégrité non valide"
   },
@@ -5536,6 +5532,10 @@
     "translation": "L'application s'exécute sur le système de back end Diego,  qui ne prend pas en charge cette commande."
   },
   {
+    "id": "The application instance index cannot be negative",
+    "translation": ""
+  },
+  {
     "id": "The application name",
     "translation": "Nom de l'application"
   },
@@ -5778,6 +5778,10 @@
   {
     "id": "The space role",
     "translation": "Rôle de l'espace"
+  },
+  {
+    "id": "The specified application instance does not exist",
+    "translation": ""
   },
   {
     "id": "The stack name",
@@ -6274,10 +6278,6 @@
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
     "translation": "Objet JSON valide contenant des paramètres de configuration propres au service, fournis en ligne ou dans un fichier. Pour la liste des paramètres de configuration pris en charge, voir la documentation de l'offre de services particulière."
-  },
-  {
-    "id": "Value for flag 'app-instance-index' cannot be negative",
-    "translation": "La valeur de l'indicateur 'app-instance-index' ne peut pas être négative"
   },
   {
     "id": "Variable Name",
