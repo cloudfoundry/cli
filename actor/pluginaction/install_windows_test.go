@@ -14,9 +14,9 @@ import (
 
 var _ = Describe("install actions", func() {
 	var (
-		actor      *Actor
-		fakeConfig *pluginactionfakes.FakeConfig
-		tempDir    string
+		actor         *Actor
+		fakeConfig    *pluginactionfakes.FakeConfig
+		tempPluginDir string
 	)
 
 	BeforeEach(func() {
