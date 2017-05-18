@@ -209,7 +209,8 @@ var _ = Describe("install-plugin command", func() {
 						Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
 						pathArg, pluginDirArg := fakeActor.CreateExecutableCopyArgsForCall(0)
 						Expect(pathArg).To(Equal("some-path"))
-						Expect(pluginDirArg).To(ContainSubstring("some-pluginhome/temp"))
+						Expect(pluginDirArg).To(ContainSubstring("some-pluginhome"))
+						Expect(pluginDirArg).To(ContainSubstring("temp"))
 
 						Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 						_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
@@ -412,7 +413,8 @@ var _ = Describe("install-plugin command", func() {
 				Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 				url, tempPluginDir := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 				Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
-				Expect(tempPluginDir).To(ContainSubstring("some-pluginhome/temp"))
+				Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
+				Expect(tempPluginDir).To(ContainSubstring("temp"))
 			})
 
 			Context("When getting the binary fails", func() {
@@ -465,12 +467,14 @@ var _ = Describe("install-plugin command", func() {
 					Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 					urlArg, pluginDirArg := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 					Expect(urlArg).To(Equal("http://some-url"))
-					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome/temp"))
+					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome"))
+					Expect(pluginDirArg).To(ContainSubstring("temp"))
 
 					Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
 					pathArg, pluginDirArg := fakeActor.CreateExecutableCopyArgsForCall(0)
 					Expect(pathArg).To(Equal("some-path"))
-					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome/temp"))
+					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome"))
+					Expect(pluginDirArg).To(ContainSubstring("temp"))
 				})
 
 				Context("when the plugin is invalid", func() {
@@ -646,12 +650,14 @@ var _ = Describe("install-plugin command", func() {
 						Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 						url, tempPluginDir := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 						Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
-						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome/temp"))
+						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
+						Expect(tempPluginDir).To(ContainSubstring("temp"))
 
 						Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
 						path, tempPluginDir := fakeActor.CreateExecutableCopyArgsForCall(0)
 						Expect(path).To(Equal("some-path"))
-						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome/temp"))
+						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
+						Expect(tempPluginDir).To(ContainSubstring("temp"))
 
 						Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 						_, _, path = fakeActor.GetAndValidatePluginArgsForCall(0)
