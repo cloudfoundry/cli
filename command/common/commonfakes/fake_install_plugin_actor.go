@@ -10,10 +10,11 @@ import (
 )
 
 type FakeInstallPluginActor struct {
-	CreateExecutableCopyStub        func(path string) (string, error)
+	CreateExecutableCopyStub        func(path string, tempPluginDir string) (string, error)
 	createExecutableCopyMutex       sync.RWMutex
 	createExecutableCopyArgsForCall []struct {
-		path string
+		path          string
+		tempPluginDir string
 	}
 	createExecutableCopyReturns struct {
 		result1 string
@@ -23,10 +24,11 @@ type FakeInstallPluginActor struct {
 		result1 string
 		result2 error
 	}
-	DownloadExecutableBinaryFromURLStub        func(url string) (string, int64, error)
+	DownloadExecutableBinaryFromURLStub        func(url string, tempPluginDir string) (string, int64, error)
 	downloadExecutableBinaryFromURLMutex       sync.RWMutex
 	downloadExecutableBinaryFromURLArgsForCall []struct {
-		url string
+		url           string
+		tempPluginDir string
 	}
 	downloadExecutableBinaryFromURLReturns struct {
 		result1 string
@@ -103,16 +105,17 @@ type FakeInstallPluginActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeInstallPluginActor) CreateExecutableCopy(path string) (string, error) {
+func (fake *FakeInstallPluginActor) CreateExecutableCopy(path string, tempPluginDir string) (string, error) {
 	fake.createExecutableCopyMutex.Lock()
 	ret, specificReturn := fake.createExecutableCopyReturnsOnCall[len(fake.createExecutableCopyArgsForCall)]
 	fake.createExecutableCopyArgsForCall = append(fake.createExecutableCopyArgsForCall, struct {
-		path string
-	}{path})
-	fake.recordInvocation("CreateExecutableCopy", []interface{}{path})
+		path          string
+		tempPluginDir string
+	}{path, tempPluginDir})
+	fake.recordInvocation("CreateExecutableCopy", []interface{}{path, tempPluginDir})
 	fake.createExecutableCopyMutex.Unlock()
 	if fake.CreateExecutableCopyStub != nil {
-		return fake.CreateExecutableCopyStub(path)
+		return fake.CreateExecutableCopyStub(path, tempPluginDir)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -126,10 +129,10 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyCallCount() int {
 	return len(fake.createExecutableCopyArgsForCall)
 }
 
-func (fake *FakeInstallPluginActor) CreateExecutableCopyArgsForCall(i int) string {
+func (fake *FakeInstallPluginActor) CreateExecutableCopyArgsForCall(i int) (string, string) {
 	fake.createExecutableCopyMutex.RLock()
 	defer fake.createExecutableCopyMutex.RUnlock()
-	return fake.createExecutableCopyArgsForCall[i].path
+	return fake.createExecutableCopyArgsForCall[i].path, fake.createExecutableCopyArgsForCall[i].tempPluginDir
 }
 
 func (fake *FakeInstallPluginActor) CreateExecutableCopyReturns(result1 string, result2 error) {
@@ -154,16 +157,17 @@ func (fake *FakeInstallPluginActor) CreateExecutableCopyReturnsOnCall(i int, res
 	}{result1, result2}
 }
 
-func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(url string) (string, int64, error) {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error) {
 	fake.downloadExecutableBinaryFromURLMutex.Lock()
 	ret, specificReturn := fake.downloadExecutableBinaryFromURLReturnsOnCall[len(fake.downloadExecutableBinaryFromURLArgsForCall)]
 	fake.downloadExecutableBinaryFromURLArgsForCall = append(fake.downloadExecutableBinaryFromURLArgsForCall, struct {
-		url string
-	}{url})
-	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{url})
+		url           string
+		tempPluginDir string
+	}{url, tempPluginDir})
+	fake.recordInvocation("DownloadExecutableBinaryFromURL", []interface{}{url, tempPluginDir})
 	fake.downloadExecutableBinaryFromURLMutex.Unlock()
 	if fake.DownloadExecutableBinaryFromURLStub != nil {
-		return fake.DownloadExecutableBinaryFromURLStub(url)
+		return fake.DownloadExecutableBinaryFromURLStub(url, tempPluginDir)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -177,10 +181,10 @@ func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLCallCount() i
 	return len(fake.downloadExecutableBinaryFromURLArgsForCall)
 }
 
-func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLArgsForCall(i int) string {
+func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLArgsForCall(i int) (string, string) {
 	fake.downloadExecutableBinaryFromURLMutex.RLock()
 	defer fake.downloadExecutableBinaryFromURLMutex.RUnlock()
-	return fake.downloadExecutableBinaryFromURLArgsForCall[i].url
+	return fake.downloadExecutableBinaryFromURLArgsForCall[i].url, fake.downloadExecutableBinaryFromURLArgsForCall[i].tempPluginDir
 }
 
 func (fake *FakeInstallPluginActor) DownloadExecutableBinaryFromURLReturns(result1 string, result2 int64, result3 error) {

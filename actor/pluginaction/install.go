@@ -52,18 +52,8 @@ func (_ PluginCommandsConflictError) Error() string {
 //
 // config.PluginHome() + /temp is used as the temp dir instead of the system
 // temp for security reasons.
-func (actor Actor) CreateExecutableCopy(path string) (string, error) {
-	pluginTemp, err := actor.pluginTemp()
-	if err != nil {
-		return "", err
-	}
-
-	tempFile, err := ioutil.TempFile(pluginTemp, "")
-	if err != nil {
-		return "", err
-	}
-
-	err = tempFile.Close()
+func (actor Actor) CreateExecutableCopy(path string, tempPluginDir string) (string, error) {
+	tempFile, err := makeTempFile(tempPluginDir)
 	if err != nil {
 		return "", err
 	}
@@ -90,18 +80,8 @@ func (actor Actor) CreateExecutableCopy(path string) (string, error) {
 
 // DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
 // it exists.
-func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string) (string, int64, error) {
-	pluginTemp, err := actor.pluginTemp()
-	if err != nil {
-		return "", 0, err
-	}
-
-	tempFile, err := ioutil.TempFile(pluginTemp, "")
-	if err != nil {
-		return "", 0, err
-	}
-
-	err = tempFile.Close()
+func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string) (string, int64, error) {
+	tempFile, err := makeTempFile(tempPluginDir)
 	if err != nil {
 		return "", 0, err
 	}
@@ -215,12 +195,16 @@ func (actor Actor) IsPluginInstalled(pluginName string) bool {
 	return isInstalled
 }
 
-func (actor Actor) pluginTemp() (string, error) {
-	tempDir := filepath.Join(actor.config.PluginHome(), "temp")
-	err := os.MkdirAll(tempDir, 0700)
+func makeTempFile(tempDir string) (*os.File, error) {
+	tempFile, err := ioutil.TempFile(tempDir, "")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return tempDir, nil
+	err = tempFile.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return tempFile, nil
 }

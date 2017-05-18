@@ -25,6 +25,19 @@ var _ = Describe("install-plugin command", func() {
 		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
 	})
 
+	AfterEach(func() {
+		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
+		if os.IsNotExist(err) {
+			return
+		}
+
+		Expect(err).ToNot(HaveOccurred())
+
+		for _, entry := range pluginsHomeDirContents {
+			Expect(entry.Name()).NotTo(ContainSubstring("temp"))
+		}
+	})
+
 	Describe("help", func() {
 		Context("when the --help flag is given", func() {
 			It("displays command usage to stdout", func() {
@@ -112,10 +125,6 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 successfully installed\\."))
 
 					Eventually(session).Should(Exit(0))
-
-					tempPluginBinaries, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins", "temp"))
-					Expect(err).ToNot(HaveOccurred())
-					Expect(len(tempPluginBinaries)).To(Equal(0))
 
 					installedPath := generic.ExecutableFilename(filepath.Join(homeDir, ".cf", "plugins", "some-plugin"))
 

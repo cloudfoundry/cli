@@ -584,7 +584,8 @@
 
     "(?i).*(?:token|password).*",
     "Host",
-    "{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}"
+    "{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}",
+    "temp"
   ],
   "excludedRegexps": [
     "^(?:\\s*{{.\\w+}}[^\\w{]*)+$",
