@@ -3,7 +3,6 @@ platform: windows
 
 inputs:
 - name: cf-acceptance-tests
-  path: gopath/src/github.com/cloudfoundry/cf-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cli
