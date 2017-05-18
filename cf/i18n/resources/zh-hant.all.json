@@ -3532,10 +3532,6 @@
     "translation": ""
   },
   {
-    "id": "Incorrect usage: app-instance-index cannot be negative",
-    "translation": "用法不正確: app-instance-index 不能是負數"
-  },
-  {
     "id": "Incorrect usage: invalid healthcheck type",
     "translation": "用法不正確: 性能檢查類型無效"
   },
@@ -5536,6 +5532,10 @@
     "translation": "應用程式正在 Diego 後端上執行，後端不支援這個指令。"
   },
   {
+    "id": "The application instance index cannot be negative",
+    "translation": ""
+  },
+  {
     "id": "The application name",
     "translation": "應用程式名稱"
   },
@@ -5778,6 +5778,10 @@
   {
     "id": "The space role",
     "translation": "空間角色"
+  },
+  {
+    "id": "The specified application instance does not exist",
+    "translation": ""
   },
   {
     "id": "The stack name",
@@ -6274,10 +6278,6 @@
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
     "translation": "包含服務特定配置參數的有效 JSON 物件（透過行內或檔案所提供）。如需所支援配置參數的清單，請參閱文件以取得特定服務供應項目。"
-  },
-  {
-    "id": "Value for flag 'app-instance-index' cannot be negative",
-    "translation": "旗標 'app-instance-index' 的值不能是負數"
   },
   {
     "id": "Variable Name",

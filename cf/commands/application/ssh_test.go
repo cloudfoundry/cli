@@ -110,49 +110,6 @@ var _ = Describe("SSH command", func() {
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
-		Describe("Flag options", func() {
-			BeforeEach(func() {
-				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
-				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
-			})
-
-			Context("when an -i flag is provided", func() {
-				Context("with a negative integer argument", func() {
-					It("returns an error", func() {
-						Expect(runCommand("my-app", "-i", "-3")).To(BeFalse())
-						Expect(ui.Outputs()).To(ContainSubstrings(
-							[]string{"Incorrect Usage", "cannot be negative"},
-						))
-					})
-				})
-
-				Context("with a value greater than the application's highest instance index", func() {
-					BeforeEach(func() {
-						var app models.Application
-
-						app = models.Application{}
-						app.Name = "my-app"
-						app.State = "started"
-						app.GUID = "my-app-guid"
-						app.EnableSSH = true
-						app.Diego = true
-						app.InstanceCount = 3
-
-						applicationReq := new(requirementsfakes.FakeApplicationRequirement)
-						applicationReq.GetApplicationReturns(app)
-						requirementsFactory.NewApplicationRequirementReturns(applicationReq)
-					})
-
-					It("returns an error", func() {
-						Expect(runCommand("my-app", "-i", "3")).To(BeFalse())
-						Expect(ui.Outputs()).To(ContainSubstrings(
-							[]string{"Incorrect Usage", "specified application instance does not exist"},
-						))
-					})
-				})
-			})
-		})
-
 		Describe("SSHOptions", func() {
 			Context("when an error is returned during initialization", func() {
 				It("shows error and prints command usage", func() {
@@ -161,11 +118,49 @@ var _ = Describe("SSH command", func() {
 						[]string{"Incorrect Usage"},
 						[]string{"USAGE:"},
 					))
-
 				})
 			})
 		})
+	})
 
+	Describe("Specifying application index", func() {
+		BeforeEach(func() {
+			var app models.Application
+
+			app = models.Application{}
+			app.Name = "my-app"
+			app.State = "started"
+			app.GUID = "my-app-guid"
+			app.EnableSSH = true
+			app.Diego = true
+			app.InstanceCount = 3
+
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+		})
+
+		Context("when an app instance is provided", func() {
+			Context("when it is negative", func() {
+				It("returns an error", func() {
+					Expect(runCommand("my-app", "-i", "-3")).To(BeFalse())
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"The application instance index cannot be negative"},
+					))
+				})
+			})
+
+			Context("when the app index exceeds the last valid index", func() {
+				It("returns an error", func() {
+					Expect(runCommand("my-app", "-i", "3")).To(BeFalse())
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"The specified application instance does not exist"},
+					))
+				})
+			})
+		})
 	})
 
 	Describe("ssh", func() {
