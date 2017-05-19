@@ -4032,6 +4032,10 @@
     "translation": ""
   },
   {
+    "id": "No private or shared domains found in this organization",
+    "translation": ""
+  },
+  {
     "id": "No router groups found",
     "translation": "找不到路由器组"
   },
@@ -4916,6 +4920,10 @@
     "translation": "路径 {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Route {{.Route}} has been registered to another space.",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
     "translation": "路径 {{.Route}} 未绑定到服务实例 {{.ServiceInstance}}。"
   },
@@ -5406,6 +5414,10 @@
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份停止组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
+  },
+  {
+    "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
+    "translation": ""
   },
   {
     "id": "System-Provided:",
@@ -6202,6 +6214,10 @@
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "正在上传 buildpack {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files have failed after a number of retriest due to: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Uploading files...",

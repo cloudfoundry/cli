@@ -328,6 +328,10 @@
     "translation": ""
   },
   {
+    "id": "No private or shared domains found in this organization",
+    "translation": ""
+  },
+  {
     "id": "ORG",
     "translation": ""
   },
@@ -476,6 +480,10 @@
     "translation": ""
   },
   {
+    "id": "Route {{.Route}} has been registered to another space.",
+    "translation": "Route {{.Route}} has been registered to another space."
+  },
+  {
     "id": "Run a one-off task on an app",
     "translation": ""
   },
@@ -541,6 +549,10 @@
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
+  },
+  {
+    "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
     "translation": ""
   },
   {
@@ -641,6 +653,10 @@
   },
   {
     "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
+    "id": "Uploading files have failed after a number of retriest due to: {{.Error}}",
     "translation": ""
   },
   {

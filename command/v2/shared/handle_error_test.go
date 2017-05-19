@@ -3,6 +3,7 @@ package shared_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -84,9 +85,29 @@ var _ = Describe("HandleError", func() {
 			HTTPHealthCheckInvalidError{},
 		),
 
+		Entry("v2action.RouteInDifferentSpaceError -> RouteInDifferentSpaceError",
+			v2action.RouteInDifferentSpaceError{Route: "some-route"},
+			RouteInDifferentSpaceError{Route: "some-route"},
+		),
+
+		Entry("v2action.FileChangedError -> FileChangedError",
+			v2action.FileChangedError{Filename: "some-filename"},
+			FileChangedError{Filename: "some-filename"},
+		),
+
 		Entry("uaa.InvalidAuthTokenError -> InvalidRefreshTokenError",
 			uaa.InvalidAuthTokenError{},
 			InvalidRefreshTokenError{},
+		),
+
+		Entry("pushaction.NoDomainsFoundError -> NoDomainsFoundError",
+			pushaction.NoDomainsFoundError{OrganizationGUID: "some-guid"},
+			NoDomainsFoundError{},
+		),
+
+		Entry("pushaction.UploadFailedError -> UploadFailedError",
+			pushaction.UploadFailedError{Err: pushaction.NoDomainsFoundError{}},
+			UploadFailedError{Err: NoDomainsFoundError{}},
 		),
 
 		Entry("default case -> original error",

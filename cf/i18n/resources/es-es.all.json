@@ -4032,6 +4032,10 @@
     "translation": ""
   },
   {
+    "id": "No private or shared domains found in this organization",
+    "translation": ""
+  },
+  {
     "id": "No router groups found",
     "translation": "No se han encontrado grupos de direccionador"
   },
@@ -4916,6 +4920,10 @@
     "translation": "Ruta {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Route {{.Route}} has been registered to another space.",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
     "translation": "La ruta {{.Route}} no estaba enlazada a la instancia de servicio {{.ServiceInstance}}."
   },
@@ -5406,6 +5414,10 @@
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Deteniendo app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.CurrentUser}}..."
+  },
+  {
+    "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
+    "translation": ""
   },
   {
     "id": "System-Provided:",
@@ -6202,6 +6214,10 @@
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "Subiendo el paquete de compilación {{.BuildpackName}}..."
+  },
+  {
+    "id": "Uploading files have failed after a number of retriest due to: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Uploading files...",
