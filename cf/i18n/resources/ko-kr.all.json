@@ -4032,6 +4032,10 @@
     "translation": ""
   },
   {
+    "id": "No private or shared domains found in this organization",
+    "translation": ""
+  },
+  {
     "id": "No router groups found",
     "translation": "라우터 그룹을 찾을 수 없음"
   },
@@ -4916,6 +4920,10 @@
     "translation": "라우트 {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Route {{.Route}} has been registered to another space.",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
     "translation": "{{.Route}} 라우트가 서비스 인스턴스 {{.ServiceInstance}}에 바인딩되지 않았습니다."
   },
@@ -5406,6 +5414,10 @@
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 중지 중..."
+  },
+  {
+    "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
+    "translation": ""
   },
   {
     "id": "System-Provided:",
@@ -6202,6 +6214,10 @@
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
     "translation": "{{.BuildpackName}} 빌드팩 업로드 중..."
+  },
+  {
+    "id": "Uploading files have failed after a number of retriest due to: {{.Error}}",
+    "translation": ""
   },
   {
     "id": "Uploading files...",

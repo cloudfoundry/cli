@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -46,6 +47,15 @@ func HandleError(err error) error {
 		return SpaceNotFoundError{Name: e.Name}
 	case v2action.HTTPHealthCheckInvalidError:
 		return HTTPHealthCheckInvalidError{}
+	case v2action.RouteInDifferentSpaceError:
+		return RouteInDifferentSpaceError{Route: e.Route}
+	case v2action.FileChangedError:
+		return FileChangedError{Filename: e.Filename}
+
+	case pushaction.NoDomainsFoundError:
+		return NoDomainsFoundError{}
+	case pushaction.UploadFailedError:
+		return UploadFailedError{Err: HandleError(e.Err)}
 	}
 
 	return err
