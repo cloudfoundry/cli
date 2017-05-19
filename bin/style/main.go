@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -14,8 +15,30 @@ import (
 )
 
 type warning struct {
-	message string
+	format string
+	vars   []interface{}
 	token.Position
+}
+
+type warningPrinter struct {
+	warnings []warning
+}
+
+func (w warningPrinter) print(writer io.Writer) {
+	for _, warning := range w.warnings {
+		coloredVars := make([]interface{}, len(warning.vars))
+		for i, v := range warning.vars {
+			coloredVars[i] = color.CyanString(v.(string))
+		}
+
+		message := fmt.Sprintf(warning.format, coloredVars...)
+
+		fmt.Printf(
+			"%s %s %s\n",
+			color.MagentaString(warning.Position.Filename),
+			color.MagentaString(fmt.Sprintf("+%d", warning.Position.Line)),
+			message)
+	}
 }
 
 type visitor struct {
@@ -51,14 +74,10 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
-func (v *visitor) addWarning(pos token.Pos, message string, subs ...interface{}) {
-	coloredSubs := make([]interface{}, len(subs))
-	for i, sub := range subs {
-		coloredSubs[i] = color.CyanString(sub.(string))
-	}
-
+func (v *visitor) addWarning(pos token.Pos, format string, vars ...interface{}) {
 	v.warnings = append(v.warnings, warning{
-		message:  fmt.Sprintf(message, coloredSubs...),
+		format:   format,
+		vars:     vars,
 		Position: v.fileSet.Position(pos),
 	})
 }
@@ -197,9 +216,10 @@ func main() {
 		panic(err)
 	}
 
-	for _, warning := range allWarnings {
-		fmt.Printf("%s +%d %s\n", color.CyanString(warning.Position.Filename), warning.Position.Line, warning.message)
+	warningPrinter := warningPrinter{
+		warnings: allWarnings,
 	}
+	warningPrinter.print(os.Stdout)
 
 	if len(allWarnings) > 0 {
 		os.Exit(1)
