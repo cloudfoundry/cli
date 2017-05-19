@@ -21,14 +21,14 @@ type warning struct {
 type visitor struct {
 	fileSet *token.FileSet
 
-	lastConstSpec string
-	lastFuncDecl  string
-	lastTypeSpec  string
-	lastVarSpec   string
-	warnings      []warning
-
-	lastReceiver     string
+	lastConstSpec    string
+	lastFuncDecl     string
 	lastReceiverFunc string
+	lastReceiver     string
+	lastTypeSpec     string
+	lastVarSpec      string
+
+	warnings []warning
 }
 
 func (v *visitor) Visit(node ast.Node) ast.Visitor {
