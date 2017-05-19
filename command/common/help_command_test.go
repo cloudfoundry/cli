@@ -405,7 +405,7 @@ var _ = Describe("help Command", func() {
 			Expect(testUI.Out).To(Say("  spaces\\s+create-space\\s+set-space-role"))
 
 			Expect(testUI.Out).To(Say("Org management:"))
-			Expect(testUI.Out).To(Say("  orgs,o\\s+set-org-role"))
+			Expect(testUI.Out).To(Say("  orgs,o\\s+create-org,co\\s+set-org-role"))
 
 			Expect(testUI.Out).To(Say("CLI plugin management:"))
 			Expect(testUI.Out).To(Say("  install-plugin    list-plugin-repos"))

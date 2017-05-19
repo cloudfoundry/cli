@@ -40,7 +40,7 @@ var _ = Describe("help command", func() {
 			Eventually(session.Out).Should(Say("  spaces\\s+create-space\\s+set-space-role"))
 
 			Eventually(session.Out).Should(Say("Org management:"))
-			Eventually(session.Out).Should(Say("  orgs,o\\s+set-org-role"))
+			Eventually(session.Out).Should(Say("  orgs,o\\s+create-org,co\\s+set-org-role"))
 
 			Eventually(session.Out).Should(Say("CLI plugin management:"))
 			Eventually(session.Out).Should(Say("  install-plugin    list-plugin-repos"))
