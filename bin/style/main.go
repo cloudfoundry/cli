@@ -21,11 +21,11 @@ type warning struct {
 type visitor struct {
 	fileSet *token.FileSet
 
-	constSpecs []string
-	funcDecls  []string
-	typeSpecs  []string
-	varSpecs   []string
-	warnings   []warning
+	lastConstSpec string
+	lastFuncDecl  string
+	lastTypeSpec  string
+	lastVarSpec   string
+	warnings      []warning
 
 	lastReceiver     string
 	lastReceiverFunc string
@@ -66,21 +66,21 @@ func (v *visitor) addWarning(pos token.Pos, message string, subs ...interface{})
 func (v *visitor) checkConst(node *ast.GenDecl) {
 	constName := node.Specs[0].(*ast.ValueSpec).Names[0].Name
 
-	if len(v.funcDecls) != 0 {
+	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "constant %s defined after a function declaration", constName)
 	}
-	if len(v.typeSpecs) != 0 {
+	if v.lastTypeSpec != "" {
 		v.addWarning(node.Pos(), "constant %s defined after a type declaration", constName)
 	}
-	if len(v.varSpecs) != 0 {
+	if v.lastVarSpec != "" {
 		v.addWarning(node.Pos(), "constant %s defined after a variable declaration", constName)
 	}
 
-	if strings.Compare(constName, v.lastConstSpec()) == -1 {
-		v.addWarning(node.Pos(), "constant %s defined after constant %s", constName, v.lastConstSpec())
+	if strings.Compare(constName, v.lastConstSpec) == -1 {
+		v.addWarning(node.Pos(), "constant %s defined after constant %s", constName, v.lastConstSpec)
 	}
 
-	v.constSpecs = append(v.constSpecs, constName)
+	v.lastConstSpec = constName
 }
 
 func (v *visitor) checkFunc(node *ast.FuncDecl) {
@@ -89,11 +89,11 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 	} else {
 		funcName := node.Name.Name
 
-		if strings.Compare(funcName, v.lastFuncDecl()) == -1 {
-			v.addWarning(node.Pos(), "function %s defined after function %s", funcName, v.lastFuncDecl())
+		if strings.Compare(funcName, v.lastFuncDecl) == -1 {
+			v.addWarning(node.Pos(), "function %s defined after function %s", funcName, v.lastFuncDecl)
 		}
 
-		v.funcDecls = append(v.funcDecls, funcName)
+		v.lastFuncDecl = funcName
 	}
 }
 
@@ -107,14 +107,11 @@ func (v *visitor) checkFuncWithReceiver(node *ast.FuncDecl) {
 	case *ast.StarExpr:
 		receiver = typedType.X.(*ast.Ident).Name
 	}
-	if len(v.funcDecls) > 0 {
-		v.addWarning(node.Pos(), "method %s.%s defined after function %s", receiver, funcName, v.lastFuncDecl())
+	if v.lastFuncDecl != "" {
+		v.addWarning(node.Pos(), "method %s.%s defined after function %s", receiver, funcName, v.lastFuncDecl)
 	}
-	if len(v.typeSpecs) > 0 {
-		lastTypeSpec := v.typeSpecs[len(v.typeSpecs)-1]
-		if receiver != lastTypeSpec {
-			v.addWarning(node.Pos(), "method %s.%s should be defined immediately after type %s", receiver, funcName, receiver)
-		}
+	if v.lastTypeSpec != "" && receiver != v.lastTypeSpec {
+		v.addWarning(node.Pos(), "method %s.%s should be defined immediately after type %s", receiver, funcName, receiver)
 	}
 	if receiver == v.lastReceiver {
 		if strings.Compare(funcName, v.lastReceiverFunc) == -1 {
@@ -128,51 +125,27 @@ func (v *visitor) checkFuncWithReceiver(node *ast.FuncDecl) {
 
 func (v *visitor) checkType(node *ast.TypeSpec) {
 	typeName := node.Name.Name
-	v.typeSpecs = append(v.typeSpecs, typeName)
-	if len(v.funcDecls) != 0 {
+	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "type declaration %s defined after a function declaration", typeName)
 	}
+	v.lastTypeSpec = typeName
 }
 
 func (v *visitor) checkVar(node *ast.GenDecl) {
 	varName := node.Specs[0].(*ast.ValueSpec).Names[0].Name
 
-	if len(v.funcDecls) != 0 {
+	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "variable %s defined after a function declaration", varName)
 	}
-	if len(v.typeSpecs) != 0 {
+	if v.lastTypeSpec != "" {
 		v.addWarning(node.Pos(), "variable %s defined after a type declaration", varName)
 	}
 
-	if strings.Compare(varName, v.lastVarSpec()) == -1 {
-		v.addWarning(node.Pos(), "variable %s defined after variable %s", varName, v.lastVarSpec())
+	if strings.Compare(varName, v.lastVarSpec) == -1 {
+		v.addWarning(node.Pos(), "variable %s defined after variable %s", varName, v.lastVarSpec)
 	}
 
-	v.varSpecs = append(v.varSpecs, varName)
-}
-
-func (v *visitor) lastConstSpec() string {
-	if len(v.constSpecs) > 0 {
-		return v.constSpecs[len(v.constSpecs)-1]
-	}
-
-	return ""
-}
-
-func (v *visitor) lastFuncDecl() string {
-	if len(v.funcDecls) > 0 {
-		return v.funcDecls[len(v.funcDecls)-1]
-	}
-
-	return ""
-}
-
-func (v *visitor) lastVarSpec() string {
-	if len(v.varSpecs) > 0 {
-		return v.varSpecs[len(v.varSpecs)-1]
-	}
-
-	return ""
+	v.lastVarSpec = varName
 }
 
 func main() {
