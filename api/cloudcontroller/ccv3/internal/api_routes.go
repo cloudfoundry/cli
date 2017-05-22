@@ -15,6 +15,7 @@ const (
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
 	GetAppsRequest                                        = "GetApps"
 	GetAppTasksRequest                                    = "GetAppTasks"
+	GetBuildRequest                                       = "GetBuild"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
@@ -25,6 +26,7 @@ const (
 	PatchSpaceRelationshipIsolationSegmentRequest         = "PatchSpaceRelationshipIsolationSegmentRequest"
 	PostApplicationRequest                                = "PostApplicationRequest"
 	PostAppTasksRequest                                   = "PostAppTasks"
+	PostBuildRequest                                      = "PostBuild"
 	PostIsolationSegmentRelationshipOrganizationsRequest  = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                          = "PostIsolationSegments"
 	PostPackageRequest                                    = "PostPackageRequest"
@@ -33,6 +35,7 @@ const (
 
 const (
 	AppsResource              = "apps"
+	BuildsResource            = "builds"
 	IsolationSegmentsResource = "isolation_segments"
 	OrgsResource              = "organizations"
 	PackagesResource          = "packages"
@@ -46,9 +49,11 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostApplicationRequest, Resource: AppsResource},
+	{Path: "/", Method: http.MethodPost, Name: PostBuildRequest, Resource: BuildsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid", Method: http.MethodGet, Name: GetBuildRequest, Resource: BuildsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},

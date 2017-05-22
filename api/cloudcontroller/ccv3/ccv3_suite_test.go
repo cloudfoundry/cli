@@ -97,6 +97,9 @@ func SetupV3Response() {
 			"isolation_segments": {
 				"href": "SERVER_URL/v3/isolation_segments"
 			},
+			"builds": {
+				"href": "SERVER_URL/v3/builds"
+			},
 			"organizations": {
 				"href": "SERVER_URL/v3/organizations"
 			},
