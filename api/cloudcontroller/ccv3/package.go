@@ -32,15 +32,11 @@ const (
 )
 
 type Package struct {
-	GUID          string               `json:"guid,omitempty"`
-	Links         APILinks             `json:"links,omitempty"`
-	Relationships PackageRelationships `json:"relationships"`
-	State         PackageState         `json:"state,omitempty"`
-	Type          PackageType          `json:"type"`
-}
-
-type PackageRelationships struct {
-	Application Relationship `json:"app"`
+	GUID          string        `json:"guid,omitempty"`
+	Links         APILinks      `json:"links,omitempty"`
+	Relationships Relationships `json:"relationships"`
+	State         PackageState  `json:"state,omitempty"`
+	Type          PackageType   `json:"type"`
 }
 
 // GetPackage returns the package with the given GUID.
@@ -62,8 +58,8 @@ func (client *Client) GetPackage(guid string) (Package, Warnings, error) {
 	return responsePackage, response.Warnings, err
 }
 
-// CreatePackage creates a package with the given settings, Type and the Space
-// must be set.
+// CreatePackage creates a package with the given settings, Type and the
+// ApplicationRelationship must be set.
 func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 	bodyBytes, err := json.Marshal(pkg)
 	if err != nil {

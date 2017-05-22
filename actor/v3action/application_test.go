@@ -134,8 +134,8 @@ var _ = Describe("Application Actions", func() {
 				Expect(fakeCloudControllerClient.CreateApplicationCallCount()).To(Equal(1))
 				expectedApp := ccv3.Application{
 					Name: "some-app-name",
-					Relationships: ccv3.ApplicationRelationships{
-						Space: ccv3.Relationship{GUID: "some-space-guid"},
+					Relationships: ccv3.Relationships{
+						ccv3.SpaceRelationship: ccv3.Relationship{GUID: "some-space-guid"},
 					},
 				}
 				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(expectedApp))

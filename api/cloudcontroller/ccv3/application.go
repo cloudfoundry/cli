@@ -12,13 +12,9 @@ import (
 
 // Application represents a Cloud Controller V3 Application.
 type Application struct {
-	Name          string                   `json:"name"`
-	GUID          string                   `json:"guid,omitempty"`
-	Relationships ApplicationRelationships `json:"relationships"`
-}
-
-type ApplicationRelationships struct {
-	Space Relationship `json:"space"`
+	Name          string        `json:"name"`
+	GUID          string        `json:"guid,omitempty"`
+	Relationships Relationships `json:"relationships"`
 }
 
 // GetApplications lists applications with optional filters.

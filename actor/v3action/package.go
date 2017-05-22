@@ -36,8 +36,8 @@ func (actor Actor) CreateAndUploadPackageByApplicationNameAndSpace(appName strin
 
 	inputPackage := ccv3.Package{
 		Type: ccv3.PackageTypeBits,
-		Relationships: ccv3.PackageRelationships{
-			Application: ccv3.Relationship{GUID: app.GUID},
+		Relationships: ccv3.Relationships{
+			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
 	}
 
