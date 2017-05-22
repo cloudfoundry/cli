@@ -144,8 +144,8 @@ var _ = Describe("Package", func() {
 			It("returns the created package and warnings", func() {
 				pkg, warnings, err := client.CreatePackage(Package{
 					Type: PackageTypeBits,
-					Relationships: PackageRelationships{
-						Application: Relationship{GUID: "some-app-guid"},
+					Relationships: Relationships{
+						ApplicationRelationship: Relationship{GUID: "some-app-guid"},
 					},
 				})
 
@@ -265,7 +265,7 @@ var _ = Describe("Package", func() {
 
 			AfterEach(func() {
 				if tempFile != nil {
-					os.Remove(tempFile.Name())
+					Expect(os.Remove(tempFile.Name())).ToNot(HaveOccurred())
 				}
 			})
 

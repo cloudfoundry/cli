@@ -55,8 +55,8 @@ func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID str
 	app, warnings, err := actor.CloudControllerClient.CreateApplication(
 		ccv3.Application{
 			Name: appName,
-			Relationships: ccv3.ApplicationRelationships{
-				Space: ccv3.Relationship{GUID: spaceGUID},
+			Relationships: ccv3.Relationships{
+				ccv3.SpaceRelationship: ccv3.Relationship{GUID: spaceGUID},
 			},
 		})
 

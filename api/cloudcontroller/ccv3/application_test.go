@@ -158,8 +158,8 @@ var _ = Describe("Application", func() {
 			It("returns the created app and warnings", func() {
 				app, warnings, err := client.CreateApplication(Application{
 					Name: "some-app-name",
-					Relationships: ApplicationRelationships{
-						Space: Relationship{GUID: "some-space-guid"},
+					Relationships: Relationships{
+						SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
 				})
 

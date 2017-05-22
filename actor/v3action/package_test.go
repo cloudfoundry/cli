@@ -95,8 +95,8 @@ var _ = Describe("Package Actions", func() {
 						createdPackage = ccv3.Package{
 							GUID:  "some-pkg-guid",
 							State: ccv3.PackageStateAwaitingUpload,
-							Relationships: ccv3.PackageRelationships{
-								Application: ccv3.Relationship{
+							Relationships: ccv3.Relationships{
+								ccv3.ApplicationRelationship: ccv3.Relationship{
 									GUID: "some-app-guid",
 								},
 							},
@@ -169,8 +169,8 @@ var _ = Describe("Package Actions", func() {
 								inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 								Expect(inputPackage).To(Equal(ccv3.Package{
 									Type: ccv3.PackageTypeBits,
-									Relationships: ccv3.PackageRelationships{
-										Application: ccv3.Relationship{GUID: "some-app-guid"},
+									Relationships: ccv3.Relationships{
+										ccv3.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
 									},
 								}))
 							})
