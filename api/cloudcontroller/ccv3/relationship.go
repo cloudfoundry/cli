@@ -43,43 +43,8 @@ func (r *Relationship) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// RelationshipList represents a one to many relationship.
-type RelationshipList struct {
-	GUIDs []string
-}
-
-func (r RelationshipList) MarshalJSON() ([]byte, error) {
-	var ccRelationship struct {
-		Data []map[string]string `json:"data"`
-	}
-
-	for _, guid := range r.GUIDs {
-		ccRelationship.Data = append(
-			ccRelationship.Data,
-			map[string]string{
-				"guid": guid,
-			})
-	}
-
-	return json.Marshal(ccRelationship)
-}
-
-func (r *RelationshipList) UnmarshalJSON(data []byte) error {
-	var ccRelationships struct {
-		Data []map[string]string `json:"data"`
-	}
-
-	err := json.Unmarshal(data, &ccRelationships)
-	if err != nil {
-		return err
-	}
-
-	for _, partner := range ccRelationships.Data {
-		r.GUIDs = append(r.GUIDs, partner["guid"])
-	}
-	return nil
-}
-
+// AssignSpaceToIsolationSegment assigns an isolation segment to a space and
+// returns the relationship.
 func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (Relationship, Warnings, error) {
 	body, err := json.Marshal(Relationship{GUID: isolationSegmentGUID})
 	if err != nil {
@@ -101,6 +66,8 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 	return relationship, response.Warnings, err
 }
 
+// GetSpaceIsolationSegment returns the relationship between a space and it's
+// isolation segment.
 func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceRelationshipIsolationSegmentRequest,
@@ -117,29 +84,6 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 
 	err = client.connection.Make(request, &response)
 	return relationship, response.Warnings, err
-}
-
-// EntitleIsolationSegmentToOrganizations will create a link between the
-// isolation segment and the list of organizations provided.
-func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUID string, organizationGUIDs []string) (RelationshipList, Warnings, error) {
-	body, err := json.Marshal(RelationshipList{GUIDs: organizationGUIDs})
-	if err != nil {
-		return RelationshipList{}, nil, err
-	}
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostIsolationSegmentRelationshipOrganizationsRequest,
-		URIParams:   internal.Params{"guid": isolationSegmentGUID},
-		Body:        bytes.NewReader(body),
-	})
-
-	var relationships RelationshipList
-	response := cloudcontroller.Response{
-		Result: &relationships,
-	}
-
-	err = client.connection.Make(request, &response)
-	return relationships, response.Warnings, err
 }
 
 // RevokeIsolationSegmentFromOrganization will delete the relationship between
@@ -159,6 +103,8 @@ func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUI
 	return response.Warnings, err
 }
 
+// GetOrganizationDefaultIsolationSegment returns the relationship between an
+// organization and it's default isolation segment.
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationDefaultIsolationSegmentRequest,
