@@ -349,7 +349,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							buffer.Write([]byte("y\n"))
 						})
 
-						FContext("when the plugin checksum is valid", func() {
+						Context("when the plugin checksum is valid", func() {
 							BeforeEach(func() {
 								repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", helpers.PluginPlatform(), true)
 								Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
