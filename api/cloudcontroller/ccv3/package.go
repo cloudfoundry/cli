@@ -34,9 +34,9 @@ const (
 type Package struct {
 	GUID          string        `json:"guid,omitempty"`
 	Links         APILinks      `json:"links,omitempty"`
-	Relationships Relationships `json:"relationships"`
+	Relationships Relationships `json:"relationships,omitempty"`
 	State         PackageState  `json:"state,omitempty"`
-	Type          PackageType   `json:"type"`
+	Type          PackageType   `json:"type,omitempty"`
 }
 
 // GetPackage returns the package with the given GUID.
