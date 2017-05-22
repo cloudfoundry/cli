@@ -13,6 +13,7 @@ import (
 
 var _ = Describe("install-plugin (from repo) command", func() {
 	BeforeEach(func() {
+		helpers.SkipIfExperimental("command not working yet")
 		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
 	})
 
