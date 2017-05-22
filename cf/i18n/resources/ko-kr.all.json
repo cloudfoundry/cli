@@ -2400,6 +2400,10 @@
     "translation": ""
   },
   {
+    "id": "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?",
+    "translation": ""
+  },
+  {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
     "translation": "사용할 Docker 이미지(예: user/docker-image-name)"
   },
@@ -4428,10 +4432,6 @@
     "translation": "요청된 플러그인에 사용자의 OS에서 사용 가능한 바이너리가 없습니다. "
   },
   {
-    "id": "Plugin {{.Name}} does not exist.",
-    "translation": ""
-  },
-  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },
@@ -4445,6 +4445,14 @@
   },
   {
     "id": "Plugin {{.Name}} {{.Version}} successfully installed.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} does not exist.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}",
     "translation": ""
   },
   {
@@ -4470,6 +4478,14 @@
   {
     "id": "Plugin {{.PluginName}} v{{.Version}} successfully installed.",
     "translation": "{{.PluginName}} 플러그인 v{{.Version}}이(가) 설치되었습니다."
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} is already installed.",
+    "translation": ""
   },
   {
     "id": "Plugin {{.PluginName}} {{.PluginVersion}} successfully uninstalled.",
@@ -5068,6 +5084,10 @@
     "translation": ""
   },
   {
+    "id": "Searching {{.RepositoryName}} for plugin {{.PluginName}}...",
+    "translation": ""
+  },
+  {
     "id": "Security Groups:",
     "translation": "보안 그룹:"
   },
@@ -5393,6 +5413,10 @@
   },
   {
     "id": "Starting download of plugin binary from URL...",
+    "translation": ""
+  },
+  {
+    "id": "Starting download of plugin binary from repository {{.RepositoryName}}...",
     "translation": ""
   },
   {

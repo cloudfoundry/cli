@@ -20,8 +20,10 @@ type InstallPluginActor interface {
 	DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
+	GetPluginInfoFromRepository(pluginName string, repositoryName string) (pluginaction.PluginInfo, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
 	IsPluginInstalled(pluginName string) bool
+	IsPluginRepositoryRegistered(repositoryName string) bool
 	UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error
 }
 
@@ -33,6 +35,14 @@ type PluginInstallationCancelled struct {
 func (_ PluginInstallationCancelled) Error() string {
 	return "Plugin installation cancelled"
 }
+
+type PluginSource int
+
+const (
+	PluginFromRepository PluginSource = iota
+	PluginFromLocalFile
+	PluginFromURL
+)
 
 type InstallPluginCommand struct {
 	OptionalArgs         flag.InstallPluginArgs `positional-args:"yes"`
@@ -71,9 +81,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 		return err
 	}
 
-	pluginNameOrLocation := cmd.OptionalArgs.PluginNameOrLocation.String()
-
-	tempPluginPath, err := cmd.getExecutableBinary(pluginNameOrLocation, tempPluginDir)
+	tempPluginPath, err, pluginSource := cmd.getExecutableBinary(tempPluginDir)
 	if _, ok := err.(PluginInstallationCancelled); ok {
 		return nil
 	}
@@ -92,15 +100,12 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 	}
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
-		if !cmd.Force {
-			// if installing from repo -> prompt {
-			// } else {
+		if !cmd.Force && pluginSource != PluginFromRepository {
 			return shared.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
 				Name:       plugin.Name,
 				Version:    plugin.Version.String(),
 			}
-			// }
 		}
 
 		err = cmd.uninstallPlugin(plugin, rpcService)
@@ -149,21 +154,81 @@ func (cmd InstallPluginCommand) uninstallPlugin(plugin configv3.Plugin, rpcServi
 	return nil
 }
 
-func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string, tempPluginDir string) (string, error) {
-	var tempPath string
+func (cmd InstallPluginCommand) getExecutableBinary(tempPluginDir string) (string, error, PluginSource) {
+	var (
+		pluginNameOrLocation string
+		tempPath             string
+		executablePath       string
+		err                  error
+		pluginSource         PluginSource
+	)
+
+	pluginNameOrLocation = cmd.OptionalArgs.PluginNameOrLocation.String()
 
 	switch {
-	case cmd.Actor.FileExists(pluginNameOrLocation):
-		err := cmd.promptForInstallPlugin(pluginNameOrLocation)
+	case cmd.RegisteredRepository != "":
+		pluginSource = PluginFromRepository
+		if !cmd.Actor.IsPluginRepositoryRegistered(cmd.RegisteredRepository) {
+			return "", shared.RepositoryNotRegisteredError{Name: cmd.RegisteredRepository}, pluginSource
+		}
+
+		cmd.UI.DisplayText("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
+			"RepositoryName": cmd.RegisteredRepository,
+			"PluginName":     pluginNameOrLocation,
+		})
+		var pluginInfo pluginaction.PluginInfo
+		pluginInfo, err = cmd.Actor.GetPluginInfoFromRepository(pluginNameOrLocation, cmd.RegisteredRepository)
 		if err != nil {
-			return "", err
+			return "", shared.HandleError(err), pluginSource
+		}
+		cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.", map[string]interface{}{
+			"PluginName":     pluginNameOrLocation,
+			"PluginVersion":  pluginInfo.Version,
+			"RepositoryName": cmd.RegisteredRepository,
+		})
+
+		installedPlugin, exist := cmd.Config.GetPlugin(pluginNameOrLocation)
+		if exist {
+			cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} is already installed.", map[string]interface{}{
+				"PluginName":    installedPlugin.Name,
+				"PluginVersion": installedPlugin.Version.String(),
+			})
+
+			err = cmd.promptForInstallPlugin(pluginNameOrLocation, true, pluginInfo.Version)
+		} else {
+			err = cmd.promptForInstallPlugin(pluginNameOrLocation, false, "")
+		}
+
+		if err != nil {
+			return "", err, pluginSource
+		}
+
+		cmd.UI.DisplayText("Starting download of plugin binary from repository {{.RepositoryName}}...", map[string]interface{}{
+			"RepositoryName": cmd.RegisteredRepository,
+		})
+
+		var size int64
+		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
+		if err != nil {
+			return "", shared.HandleError(err), pluginSource
+		}
+
+		cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
+			"Bytes": size,
+		})
+	case cmd.Actor.FileExists(pluginNameOrLocation):
+		pluginSource = PluginFromLocalFile
+		err = cmd.promptForInstallPlugin(pluginNameOrLocation, false, "")
+		if err != nil {
+			return "", err, pluginSource
 		}
 
 		tempPath = pluginNameOrLocation
 	case util.IsHTTPScheme(pluginNameOrLocation):
-		err := cmd.promptForInstallPlugin(pluginNameOrLocation)
+		pluginSource = PluginFromURL
+		err = cmd.promptForInstallPlugin(pluginNameOrLocation, false, "")
 		if err != nil {
-			return "", err
+			return "", err, pluginSource
 		}
 
 		cmd.UI.DisplayText("Starting download of plugin binary from URL...")
@@ -171,38 +236,55 @@ func (cmd InstallPluginCommand) getExecutableBinary(pluginNameOrLocation string,
 		var size int64
 		tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginNameOrLocation, tempPluginDir)
 		if err != nil {
-			return "", shared.HandleError(err)
+			return "", shared.HandleError(err), pluginSource
 		}
 
 		cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
 			"Bytes": size,
 		})
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
-		return "", command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
+		return "", command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}, pluginSource
 	default:
-		return "", shared.FileNotFoundError{Path: pluginNameOrLocation}
+		return "", shared.FileNotFoundError{Path: pluginNameOrLocation}, pluginSource
 	}
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
-	return cmd.Actor.CreateExecutableCopy(tempPath, tempPluginDir)
+	executablePath, err = cmd.Actor.CreateExecutableCopy(tempPath, tempPluginDir)
+	return executablePath, err, pluginSource
 }
 
-func (cmd InstallPluginCommand) promptForInstallPlugin(path string) error {
+func (cmd InstallPluginCommand) promptForInstallPlugin(path string, promptForUninstall bool, newPluginVersion string) error {
 	cmd.UI.DisplayHeader("Attention: Plugins are binaries written by potentially untrusted authors.")
 	cmd.UI.DisplayHeader("Install and use plugins at your own risk.")
 
-	if !cmd.Force {
-		really, promptErr := cmd.UI.DisplayBoolPrompt(false, "Do you want to install the plugin {{.Path}}?", map[string]interface{}{
+	if cmd.Force {
+		return nil
+	}
+
+	var (
+		really    bool
+		promptErr error
+	)
+
+	if promptForUninstall {
+		really, promptErr = cmd.UI.DisplayBoolPrompt(false, "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?", map[string]interface{}{
+			"Path":          path,
+			"PluginVersion": newPluginVersion,
+		})
+	} else {
+		really, promptErr = cmd.UI.DisplayBoolPrompt(false, "Do you want to install the plugin {{.Path}}?", map[string]interface{}{
 			"Path": path,
 		})
-		if promptErr != nil {
-			return promptErr
-		}
-		if !really {
-			cmd.UI.DisplayText("Plugin installation cancelled.")
-			return PluginInstallationCancelled{}
-		}
+	}
+
+	if promptErr != nil {
+		return promptErr
+	}
+
+	if !really {
+		cmd.UI.DisplayText("Plugin installation cancelled.")
+		return PluginInstallationCancelled{}
 	}
 
 	return nil

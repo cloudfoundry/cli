@@ -16,7 +16,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
 	})
 
-	FDescribe("installing a plugin from a specific repo", func() {
+	Describe("installing a plugin from a specific repo", func() {
 		Context("when the repo and the plugin name are swapped", func() {
 			var repoServer *Server
 
@@ -333,7 +333,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					})
 				})
 
-				FContext("when the plugin is already installed", func() {
+				Context("when the plugin is already installed", func() {
 					BeforeEach(func() {
 						pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.2.2",
 							[]helpers.PluginCommand{

@@ -47,3 +47,27 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),
 	)
 })
+
+var _ = Describe("PluginNotFoundError", func() {
+	var err PluginNotFoundError
+
+	Context("when the repository is specified", func() {
+		BeforeEach(func() {
+			err = PluginNotFoundError{PluginName: "some-plugin", RepositoryName: "some-repo"}
+		})
+
+		It("errors with the plugin name and with the repository", func() {
+			Expect(err.Error()).To(Equal("Plugin {{.PluginName}} not found in repository {{.RepositoryName}}"))
+		})
+	})
+
+	Context("when the repository is not specified", func() {
+		BeforeEach(func() {
+			err = PluginNotFoundError{PluginName: "some-plugin"}
+		})
+
+		It("errors with the plugin name and without the repository", func() {
+			Expect(err.Error()).To(Equal("Plugin {{.PluginName}} does not exist."))
+		})
+	})
+})

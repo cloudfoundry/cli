@@ -54,7 +54,7 @@ var _ = Describe("Plugin actor", func() {
 
 			It("returns a PluginNotFoundError", func() {
 				err := actor.UninstallPlugin(fakePluginUninstaller, "some-non-existent-plugin")
-				Expect(err).To(MatchError(PluginNotFoundError{Name: "some-non-existent-plugin"}))
+				Expect(err).To(MatchError(PluginNotFoundError{PluginName: "some-non-existent-plugin"}))
 			})
 		})
 

@@ -25,6 +25,12 @@ type CommandList interface {
 	HasAlias(string) bool
 }
 
+type PluginInfo struct {
+	Name    string
+	Version string
+	URL     string
+}
+
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
@@ -164,6 +170,14 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	}
 
 	return plugin, nil
+}
+
+func (actor Actor) GetPluginInfoFromRepository(pluginName string, repositoryName string) (PluginInfo, error) {
+	return PluginInfo{}, nil
+}
+
+func (actor Actor) GetPluginInfoFromConfig(pluginName string) (PluginInfo, error) {
+	return PluginInfo{}, nil
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {
