@@ -6792,6 +6792,10 @@
     "translation": "自有"
   },
   {
+    "id": "package guid: {{.PackageGuid}}",
+    "translation": ""
+  },
+  {
     "id": "paid plans",
     "translation": "付费套餐"
   },

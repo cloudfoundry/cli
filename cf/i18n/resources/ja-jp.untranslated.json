@@ -992,6 +992,10 @@
     "translation": ""
   },
   {
+    "id": "package guid: {{.PackageGuid}}",
+    "translation": ""
+  },
+  {
     "id": "path:",
     "translation": ""
   },
