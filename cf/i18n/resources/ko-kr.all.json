@@ -6792,6 +6792,10 @@
     "translation": "소유"
   },
   {
+    "id": "package guid: {{.PackageGuid}}",
+    "translation": ""
+  },
+  {
     "id": "paid plans",
     "translation": "유료 사용제"
   },

@@ -6792,6 +6792,10 @@
     "translation": "eigen"
   },
   {
+    "id": "package guid: {{.PackageGuid}}",
+    "translation": ""
+  },
+  {
     "id": "paid plans",
     "translation": "Bezahlte Pläne"
   },

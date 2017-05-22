@@ -6792,6 +6792,10 @@
     "translation": "所有"
   },
   {
+    "id": "package guid: {{.PackageGuid}}",
+    "translation": ""
+  },
+  {
     "id": "paid plans",
     "translation": "有料プラン"
   },
