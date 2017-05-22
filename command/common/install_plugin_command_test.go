@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"os"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -29,6 +30,7 @@ var _ = Describe("install-plugin command", func() {
 		fakeActor   *commonfakes.FakeInstallPluginActor
 		executeErr  error
 		expectedErr error
+		pluginHome  string
 	)
 
 	BeforeEach(func() {
@@ -44,9 +46,14 @@ var _ = Describe("install-plugin command", func() {
 		}
 
 		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
-		fakeConfig.PluginHomeReturns(fmt.Sprintf("some-pluginhome-%s", tmpDirectorySeed))
+		pluginHome = fmt.Sprintf("some-pluginhome-%s", tmpDirectorySeed)
+		fakeConfig.PluginHomeReturns(pluginHome)
 		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
+	})
+
+	AfterEach(func() {
+		os.RemoveAll(pluginHome)
 	})
 
 	JustBeforeEach(func() {
