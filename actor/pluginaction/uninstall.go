@@ -8,12 +8,13 @@ import (
 
 // PluginNotFoundError is an error returned when a plugin is not found.
 type PluginNotFoundError struct {
-	Name string
+	PluginName     string
+	RepositoryName string
 }
 
 // Error outputs a plugin not found error message.
 func (e PluginNotFoundError) Error() string {
-	return fmt.Sprintf("Plugin name %s does not exist.", e.Name)
+	return fmt.Sprintf("Plugin name %s does not exist.", e.PluginName)
 }
 
 //go:generate counterfeiter . PluginUninstaller
@@ -25,7 +26,7 @@ type PluginUninstaller interface {
 func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) error {
 	plugin, exist := actor.config.GetPlugin(name)
 	if !exist {
-		return PluginNotFoundError{Name: name}
+		return PluginNotFoundError{PluginName: name}
 	}
 
 	err := uninstaller.Run(plugin.Location, "CLI-MESSAGE-UNINSTALL")

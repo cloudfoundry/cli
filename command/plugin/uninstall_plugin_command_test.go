@@ -88,7 +88,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		BeforeEach(func() {
 			fakeActor.UninstallPluginReturns(
 				pluginaction.PluginNotFoundError{
-					Name: "some-plugin",
+					PluginName: "some-plugin",
 				},
 			)
 		})
@@ -96,7 +96,7 @@ var _ = Describe("uninstall-plugin command", func() {
 		It("returns a PluginNotFoundError", func() {
 			Expect(testUI.Out).To(Say("Uninstalling plugin some-plugin..."))
 			Expect(executeErr).To(MatchError(shared.PluginNotFoundError{
-				Name: "some-plugin",
+				PluginName: "some-plugin",
 			}))
 		})
 	})

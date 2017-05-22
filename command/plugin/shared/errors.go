@@ -3,16 +3,21 @@ package shared
 import "strings"
 
 type PluginNotFoundError struct {
-	Name string
+	PluginName     string
+	RepositoryName string
 }
 
-func (_ PluginNotFoundError) Error() string {
-	return "Plugin {{.Name}} does not exist."
+func (e PluginNotFoundError) Error() string {
+	if e.RepositoryName != "" {
+		return "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}"
+	}
+	return "Plugin {{.PluginName}} does not exist."
 }
 
 func (e PluginNotFoundError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Name": e.Name,
+		"PluginName":     e.PluginName,
+		"RepositoryName": e.RepositoryName,
 	})
 }
 

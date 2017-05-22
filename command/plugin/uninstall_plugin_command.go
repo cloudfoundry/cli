@@ -34,7 +34,7 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 	pluginName := cmd.RequiredArgs.PluginName
 	plugin, exist := cmd.Config.GetPluginCaseInsensitive(pluginName)
 	if !exist {
-		return shared.PluginNotFoundError{Name: pluginName}
+		return shared.PluginNotFoundError{PluginName: pluginName}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uninstalling plugin {{.PluginName}}...",

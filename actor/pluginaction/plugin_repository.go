@@ -68,6 +68,10 @@ func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {
 	return nil
 }
 
+func (actor Actor) IsPluginRepositoryRegistered(repositoryName string) bool {
+	return false
+}
+
 func normalizeURLPath(rawURL string) (string, error) {
 	prefix := ""
 	if !strings.Contains(rawURL, "://") {

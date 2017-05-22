@@ -260,6 +260,10 @@
     "translation": ""
   },
   {
+    "id": "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?",
+    "translation": ""
+  },
+  {
     "id": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL.",
     "translation": "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
   },
@@ -500,10 +504,6 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.Name}} does not exist.",
-    "translation": ""
-  },
-  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },
@@ -520,6 +520,14 @@
     "translation": ""
   },
   {
+    "id": "Plugin {{.PluginName}} does not exist.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with aliases that are already used: {{.CommandAliases}}.",
     "translation": ""
   },
@@ -533,6 +541,14 @@
   },
   {
     "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with names that are already used: {{.CommandNames}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} is already installed.",
     "translation": ""
   },
   {
@@ -680,6 +696,10 @@
     "translation": ""
   },
   {
+    "id": "Searching {{.RepositoryName}} for plugin {{.PluginName}}...",
+    "translation": ""
+  },
+  {
     "id": "Security group '{{.Name}}' not found.",
     "translation": ""
   },
@@ -725,6 +745,10 @@
   },
   {
     "id": "Starting download of plugin binary from URL...",
+    "translation": ""
+  },
+  {
+    "id": "Starting download of plugin binary from repository {{.RepositoryName}}...",
     "translation": ""
   },
   {
