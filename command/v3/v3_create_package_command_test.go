@@ -82,13 +82,15 @@ var _ = Describe("v3-create-package Command", func() {
 
 		Context("when the create is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				myPackage := v3action.Package{GUID: "1234"}
+				fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("displays the header and ok", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Out).To(Say("Uploading V3 app some-app in org some-org / space some-space as banana..."))
+				Expect(testUI.Out).To(Say("package guid: 1234"))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(testUI.Err).To(Say("I am a warning"))

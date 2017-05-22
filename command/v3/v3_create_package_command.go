@@ -65,12 +65,15 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	_, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, pwd)
+	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, pwd)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
+	cmd.UI.DisplayText("package guid: {{.PackageGuid}}", map[string]interface{}{
+		"PackageGuid": pkg.GUID,
+	})
 	cmd.UI.DisplayOK()
 
 	return nil
