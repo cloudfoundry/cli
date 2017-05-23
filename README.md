@@ -39,19 +39,8 @@ on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 Download and install the cf CLI from the [Downloads Section](#downloads).
 
 Once installed, you can log in and push an app.
-```sh
-$ cf login -a api.[my-cloudfoundry].com
-API endpoint: https://api.[my-cloudfoundry].com
 
-Email> [my-email]
-
-Password> [my-password]
-Authenticating...
-OK
-
-$ cd [my-app-directory]
-$ cf push
-```
+![Example](.github/cf_example.gif)
 
 Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.org) to further enhance your CLI experience.
 
