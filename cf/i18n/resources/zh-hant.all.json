@@ -556,7 +556,7 @@
     "translation": "連結的應用程式: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes.",
+    "id": "Bound routes",
     "translation": ""
   },
   {
@@ -1816,7 +1816,7 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
     "translation": ""
   },
   {
@@ -1996,11 +1996,11 @@
     "translation": "建立服務實例的金鑰"
   },
   {
-    "id": "Created app.",
+    "id": "Created app",
     "translation": ""
   },
   {
-    "id": "Created routes.",
+    "id": "Created routes",
     "translation": ""
   },
   {
@@ -4568,7 +4568,7 @@
     "translation": "使用資訊清單推送多個應用程式"
   },
   {
-    "id": "Pushing apps with these attributes...",
+    "id": "Pushing app with these attributes...",
     "translation": ""
   },
   {
@@ -5384,6 +5384,10 @@
     "translation": "編譯打包環境變數群組: "
   },
   {
+    "id": "Staging app and tracing logs...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "啟動應用程式"
   },
@@ -5964,10 +5968,6 @@
     "translation": "追蹤 HTTP 要求"
   },
   {
-    "id": "Tracing staging logs...",
-    "translation": ""
-  },
-  {
     "id": "UAA endpoint missing from config file",
     "translation": "配置檔中遺漏 UAA 端點"
   },
@@ -6172,7 +6172,7 @@
     "translation": "更新使用者提供的服務實例"
   },
   {
-    "id": "Updated app.",
+    "id": "Updated app",
     "translation": ""
   },
   {

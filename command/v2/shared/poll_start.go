@@ -6,6 +6,7 @@ import (
 )
 
 func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appStarting <-chan bool, apiWarnings <-chan string, apiErrs <-chan error) error {
+	ui.DisplayText("Staging app and tracing logs...")
 	var breakAppStart, breakWarnings, breakAPIErrs bool
 	for {
 		select {

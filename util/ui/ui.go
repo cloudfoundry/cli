@@ -205,7 +205,7 @@ func (ui *UI) DisplayLogMessage(message LogMessage, displayHeader bool) {
 		if message.Type() == "ERR" {
 			logLine = ui.modifyColor(logLine, color.New(color.FgRed))
 		}
-		fmt.Fprintf(ui.Out, "%s\n", logLine)
+		fmt.Fprintf(ui.Out, "   %s\n", logLine)
 	}
 }
 

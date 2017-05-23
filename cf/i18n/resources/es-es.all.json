@@ -556,7 +556,7 @@
     "translation": "Apps enlazadas: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes.",
+    "id": "Bound routes",
     "translation": ""
   },
   {
@@ -1816,7 +1816,7 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
     "translation": ""
   },
   {
@@ -1996,11 +1996,11 @@
     "translation": "Crear una clave para una instancia de servicio"
   },
   {
-    "id": "Created app.",
+    "id": "Created app",
     "translation": ""
   },
   {
-    "id": "Created routes.",
+    "id": "Created routes",
     "translation": ""
   },
   {
@@ -4568,7 +4568,7 @@
     "translation": "Enviar por push varias apps con un manifiesto"
   },
   {
-    "id": "Pushing apps with these attributes...",
+    "id": "Pushing app with these attributes...",
     "translation": ""
   },
   {
@@ -5384,6 +5384,10 @@
     "translation": "Grupos de variable de entorno de transferencia:"
   },
   {
+    "id": "Staging app and tracing logs...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "Iniciar una app"
   },
@@ -5964,10 +5968,6 @@
     "translation": "Solicitudes HTTP de rastreo"
   },
   {
-    "id": "Tracing staging logs...",
-    "translation": ""
-  },
-  {
     "id": "UAA endpoint missing from config file",
     "translation": "Falta el punto final de UAA del archivo de configuración"
   },
@@ -6172,7 +6172,7 @@
     "translation": "Actualizar la instancia de servicio proporcionada por el usuario"
   },
   {
-    "id": "Updated app.",
+    "id": "Updated app",
     "translation": ""
   },
   {

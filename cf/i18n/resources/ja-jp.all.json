@@ -556,7 +556,7 @@
     "translation": "バインド済みアプリ: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes.",
+    "id": "Bound routes",
     "translation": ""
   },
   {
@@ -1816,7 +1816,7 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
     "translation": ""
   },
   {
@@ -1996,11 +1996,11 @@
     "translation": "サービス・インスタンスのキーを作成します"
   },
   {
-    "id": "Created app.",
+    "id": "Created app",
     "translation": ""
   },
   {
-    "id": "Created routes.",
+    "id": "Created routes",
     "translation": ""
   },
   {
@@ -4568,7 +4568,7 @@
     "translation": "マニフェストを使用して複数のアプリをプッシュします"
   },
   {
-    "id": "Pushing apps with these attributes...",
+    "id": "Pushing app with these attributes...",
     "translation": ""
   },
   {
@@ -5384,6 +5384,10 @@
     "translation": "ステージング環境変数グループ:"
   },
   {
+    "id": "Staging app and tracing logs...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "アプリを開始します"
   },
@@ -5964,10 +5968,6 @@
     "translation": "HTTP 要求をトレースします"
   },
   {
-    "id": "Tracing staging logs...",
-    "translation": ""
-  },
-  {
     "id": "UAA endpoint missing from config file",
     "translation": "UAA エンドポイントが構成ファイルにありません"
   },
@@ -6172,7 +6172,7 @@
     "translation": "ユーザー提供サービス・インスタンスを更新します"
   },
   {
-    "id": "Updated app.",
+    "id": "Updated app",
     "translation": ""
   },
   {
