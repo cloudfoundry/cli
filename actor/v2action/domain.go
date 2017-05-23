@@ -90,15 +90,13 @@ func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error)
 	return Domain(domain), Warnings(warnings), err
 }
 
-// GetOrganizationDomains returns the private and shared domains associated
-// with an organization. Private domains will be listed before shared.
+// GetOrganizationDomains returns the shared and private domains associated
+// with an organization.
 func (actor Actor) GetOrganizationDomains(orgGUID string) ([]Domain, Warnings, error) {
 	var allWarnings Warnings
 	var allDomains []Domain
 
-	// push requires that private domains are listed first to deterime the
-	// default domain.
-	domains, warnings, err := actor.CloudControllerClient.GetOrganizationPrivateDomains(orgGUID, nil)
+	domains, warnings, err := actor.CloudControllerClient.GetSharedDomains()
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
@@ -108,7 +106,7 @@ func (actor Actor) GetOrganizationDomains(orgGUID string) ([]Domain, Warnings, e
 		allDomains = append(allDomains, Domain(domain))
 	}
 
-	domains, warnings, err = actor.CloudControllerClient.GetSharedDomains()
+	domains, warnings, err = actor.CloudControllerClient.GetOrganizationPrivateDomains(orgGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
