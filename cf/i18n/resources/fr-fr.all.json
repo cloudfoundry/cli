@@ -556,7 +556,7 @@
     "translation": "Applis liées : {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes.",
+    "id": "Bound routes",
     "translation": ""
   },
   {
@@ -1816,7 +1816,7 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
     "translation": ""
   },
   {
@@ -1996,11 +1996,11 @@
     "translation": "Créer une clé pour une instance de service"
   },
   {
-    "id": "Created app.",
+    "id": "Created app",
     "translation": ""
   },
   {
-    "id": "Created routes.",
+    "id": "Created routes",
     "translation": ""
   },
   {
@@ -4568,7 +4568,7 @@
     "translation": "Envoyez par commande push plusieurs applications avec un manifeste"
   },
   {
-    "id": "Pushing apps with these attributes...",
+    "id": "Pushing app with these attributes...",
     "translation": ""
   },
   {
@@ -5384,6 +5384,10 @@
     "translation": "Groupes de variables d'environnement de constitution :"
   },
   {
+    "id": "Staging app and tracing logs...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "Démarrer une application"
   },
@@ -5964,10 +5968,6 @@
     "translation": "Tracer les demandes HTTP"
   },
   {
-    "id": "Tracing staging logs...",
-    "translation": ""
-  },
-  {
     "id": "UAA endpoint missing from config file",
     "translation": "Noeud final UUA manquant dans le fichier de configuration"
   },
@@ -6172,7 +6172,7 @@
     "translation": "Mettre à jour une instance de service fournie par l'utilisateur"
   },
   {
-    "id": "Updated app.",
+    "id": "Updated app",
     "translation": ""
   },
   {

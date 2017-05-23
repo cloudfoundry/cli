@@ -556,7 +556,7 @@
     "translation": "Applicazioni associate: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes.",
+    "id": "Bound routes",
     "translation": ""
   },
   {
@@ -1816,7 +1816,7 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}.",
+    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
     "translation": ""
   },
   {
@@ -1996,11 +1996,11 @@
     "translation": "Crea chiave per un'istanza del servizio"
   },
   {
-    "id": "Created app.",
+    "id": "Created app",
     "translation": ""
   },
   {
-    "id": "Created routes.",
+    "id": "Created routes",
     "translation": ""
   },
   {
@@ -4568,7 +4568,7 @@
     "translation": "Distribuisci più applicazione con un manifest"
   },
   {
-    "id": "Pushing apps with these attributes...",
+    "id": "Pushing app with these attributes...",
     "translation": ""
   },
   {
@@ -5384,6 +5384,10 @@
     "translation": "Gruppi di variabili di ambiente in fase di preparazione:"
   },
   {
+    "id": "Staging app and tracing logs...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "Avvia un'applicazione"
   },
@@ -5964,10 +5968,6 @@
     "translation": "Traccia richieste HTTP"
   },
   {
-    "id": "Tracing staging logs...",
-    "translation": ""
-  },
-  {
     "id": "UAA endpoint missing from config file",
     "translation": "Endpoint UAA mancante nel file di configurazione"
   },
@@ -6172,7 +6172,7 @@
     "translation": "Aggiorna l'istanza del servizio fornita dall'utente"
   },
   {
-    "id": "Updated app.",
+    "id": "Updated app",
     "translation": ""
   },
   {

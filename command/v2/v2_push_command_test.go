@@ -304,17 +304,16 @@ var _ = Describe("v2-push Command", func() {
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Configuring app %s in org %s / space %s as %s.", appName, "some-org", "some-space", "some-user"))
-						Expect(testUI.Out).To(Say("Created app."))
-						Expect(testUI.Out).To(Say("Updated app."))
+						Expect(testUI.Out).To(Say("Configuring app %s in org %s / space %s as %s", appName, "some-org", "some-space", "some-user"))
+						Expect(testUI.Out).To(Say("Created app"))
+						Expect(testUI.Out).To(Say("Updated app"))
 						Expect(testUI.Out).To(Say("Configuring routes..."))
-						Expect(testUI.Out).To(Say("Created routes."))
-						Expect(testUI.Out).To(Say("Bound routes."))
+						Expect(testUI.Out).To(Say("Created routes"))
+						Expect(testUI.Out).To(Say("Bound routes"))
 						Expect(testUI.Out).To(Say("Packaging files to upload..."))
 						Expect(testUI.Out).To(Say("Uploading files..."))
 						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
 						Expect(testUI.Out).To(Say("Processing files..."))
-						Expect(testUI.Out).To(Say("Tracing staging logs..."))
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 						Expect(testUI.Err).To(Say("apply-1"))
