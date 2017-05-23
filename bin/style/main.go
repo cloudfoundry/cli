@@ -48,10 +48,12 @@ type visitor struct {
 	lastFuncDecl     string
 	lastReceiverFunc string
 	lastReceiver     string
-	lastTypeSpec     string
 	lastVarSpec      string
+	typeSpecs        []string
 
 	warnings []warning
+
+	previousPass *visitor
 }
 
 func (v *visitor) Visit(node ast.Node) ast.Visitor {
@@ -88,7 +90,7 @@ func (v *visitor) checkConst(node *ast.GenDecl) {
 	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "constant %s defined after a function declaration", constName)
 	}
-	if v.lastTypeSpec != "" {
+	if len(v.typeSpecs) != 0 {
 		v.addWarning(node.Pos(), "constant %s defined after a type declaration", constName)
 	}
 	if v.lastVarSpec != "" {
@@ -129,8 +131,11 @@ func (v *visitor) checkFuncWithReceiver(node *ast.FuncDecl) {
 	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "method %s.%s defined after function %s", receiver, funcName, v.lastFuncDecl)
 	}
-	if v.lastTypeSpec != "" && receiver != v.lastTypeSpec {
-		v.addWarning(node.Pos(), "method %s.%s should be defined immediately after type %s", receiver, funcName, receiver)
+	if len(v.typeSpecs) > 0 {
+		lastTypeSpec := v.typeSpecs[len(v.typeSpecs)-1]
+		if v.typeDefinedInFile(receiver) && receiver != lastTypeSpec {
+			v.addWarning(node.Pos(), "method %s.%s should be defined immediately after type %s", receiver, funcName, receiver)
+		}
 	}
 	if receiver == v.lastReceiver {
 		if strings.Compare(funcName, v.lastReceiverFunc) == -1 {
@@ -147,7 +152,7 @@ func (v *visitor) checkType(node *ast.TypeSpec) {
 	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "type declaration %s defined after a function declaration", typeName)
 	}
-	v.lastTypeSpec = typeName
+	v.typeSpecs = append(v.typeSpecs, typeName)
 }
 
 func (v *visitor) checkVar(node *ast.GenDecl) {
@@ -156,7 +161,7 @@ func (v *visitor) checkVar(node *ast.GenDecl) {
 	if v.lastFuncDecl != "" {
 		v.addWarning(node.Pos(), "variable %s defined after a function declaration", varName)
 	}
-	if v.lastTypeSpec != "" {
+	if len(v.typeSpecs) != 0 {
 		v.addWarning(node.Pos(), "variable %s defined after a type declaration", varName)
 	}
 
@@ -165,6 +170,20 @@ func (v *visitor) checkVar(node *ast.GenDecl) {
 	}
 
 	v.lastVarSpec = varName
+}
+
+func (v *visitor) typeDefinedInFile(typeName string) bool {
+	if v.previousPass == nil {
+		return true
+	}
+
+	for _, definedTypeName := range v.previousPass.typeSpecs {
+		if definedTypeName == typeName {
+			return true
+		}
+	}
+
+	return false
 }
 
 func main() {
@@ -201,8 +220,14 @@ func main() {
 			sort.Strings(fileNames)
 
 			for _, fileName := range fileNames {
-				v := visitor{
+				firstPass := visitor{
 					fileSet: fileSet,
+				}
+				ast.Walk(&firstPass, packages[packageName].Files[fileName])
+
+				v := visitor{
+					fileSet:      fileSet,
+					previousPass: &firstPass,
 				}
 				ast.Walk(&v, packages[packageName].Files[fileName])
 				allWarnings = append(allWarnings, v.warnings...)
