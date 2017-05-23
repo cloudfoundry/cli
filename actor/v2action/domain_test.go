@@ -295,9 +295,9 @@ var _ = Describe("Domain Actions", func() {
 				domains, warnings, err := actor.GetOrganizationDomains("some-org-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domains).To(Equal([]Domain{
+					{Name: "some-shared-domain"},
 					{Name: "some-private-domain"},
 					{Name: "some-other-private-domain"},
-					{Name: "some-shared-domain"},
 				}))
 				Expect(warnings).To(ConsistOf("shared domains warning", "private domains warning"))
 
@@ -309,6 +309,7 @@ var _ = Describe("Domain Actions", func() {
 				Expect(query).To(BeEmpty())
 			})
 		})
+
 		Context("when get shared domains returns an error", func() {
 			var expectedErr error
 

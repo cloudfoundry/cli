@@ -17,7 +17,7 @@ func (e NoDomainsFoundError) Error() string {
 	return fmt.Sprintf("No private or shared domains found for organization (GUID: %s)", e.OrganizationGUID)
 }
 
-// DefaultDomain looks up the private and then shared domains and returns back
+// DefaultDomain looks up the shared and then private domains and returns back
 // the first one in the list as the default.
 func (actor Actor) DefaultDomain(orgGUID string) (v2action.Domain, Warnings, error) {
 	log.Infoln("getting org domains for org GUID:", orgGUID)
