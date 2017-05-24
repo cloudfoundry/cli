@@ -22,7 +22,9 @@ var _ = Describe("Build", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-build-guid",
-					"state": "STAGING"
+					"state": "STAGING",
+					"droplet": {
+						"guid": "some-droplet-guid"
 					}
 				}`
 
@@ -48,6 +50,9 @@ var _ = Describe("Build", func() {
 				Expect(build).To(Equal(Build{
 					GUID:  "some-build-guid",
 					State: BuildStateStaging,
+					Droplet: Droplet{
+						GUID: "some-droplet-guid",
+					},
 				}))
 			})
 		})
@@ -105,7 +110,10 @@ var _ = Describe("Build", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-build-guid",
-					"state": "STAGING"
+					"state": "STAGING",
+					"droplet": {
+						"guid": "some-droplet-guid"
+					}
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -122,6 +130,9 @@ var _ = Describe("Build", func() {
 				expectedBuild := Build{
 					GUID:  "some-build-guid",
 					State: BuildStateStaging,
+					Droplet: Droplet{
+						GUID: "some-droplet-guid",
+					},
 				}
 				Expect(build).To(Equal(expectedBuild))
 				Expect(warnings).To(ConsistOf("this is a warning"))

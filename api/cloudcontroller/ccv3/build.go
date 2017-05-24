@@ -20,8 +20,23 @@ type Build struct {
 	GUID    string     `json:"guid,omitempty"`
 	Package Package    `json:"package"`
 	State   BuildState `json:"state,omitempty"`
+	Droplet Droplet    `json:"droplet"`
 }
 
+func (b Build) MarshalJSON() ([]byte, error) {
+	var ccBuild struct {
+		Package struct {
+			GUID string `json:"guid"`
+		} `json:"package"`
+	}
+
+	ccBuild.Package.GUID = b.Package.GUID
+
+	return json.Marshal(ccBuild)
+}
+
+// CreateBuild creates the given build, requires Package GUID to be set on the
+// build.
 func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 	bodyBytes, err := json.Marshal(build)
 	if err != nil {
@@ -42,6 +57,7 @@ func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 	return responseBuild, response.Warnings, err
 }
 
+// GetBuild gets the build with the given GUID.
 func (client *Client) GetBuild(guid string) (Build, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetBuildRequest,
