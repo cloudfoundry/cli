@@ -9,6 +9,12 @@ import (
 )
 
 var _ = Describe("push targetting", func() {
+	AfterEach(func() {
+		helpers.SetAPI()
+		helpers.LoginCF()
+		helpers.TargetOrg(organization)
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
