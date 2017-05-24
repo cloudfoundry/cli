@@ -6264,6 +6264,10 @@
     "translation": "자세한 정보는 '{{.Command}}'을(를) 사용하십시오."
   },
   {
+    "id": "Use '{{.Command}}' to view or set your target org and space.",
+    "translation": "대상 조직과 영역을 보거나 설정하려면 '{{.Command}}'을(를) 사용하십시오."
+  },
+  {
     "id": "Use '{{.Name}}' to view or set your target org and space",
     "translation": "대상 조직과 영역을 보거나 설정하려면 '{{.Name}}'을(를) 사용하십시오."
   },

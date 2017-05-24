@@ -38,6 +38,9 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("NoTargetedSpaceError", NoTargetedSpaceError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
 
+		// UAA errors.
+		Entry("BadCredentialsError", BadCredentialsError{}),
+
 		// Cloud Controller errors.
 		Entry("APIRequestError", APIRequestError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),

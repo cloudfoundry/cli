@@ -118,6 +118,22 @@ var _ = Describe("Error Wrapper", func() {
 						Expect(makeErr).To(MatchError(InvalidAuthTokenError{Message: "your token is invalid!"}))
 					})
 				})
+
+				Context("unauthorized", func() {
+					BeforeEach(func() {
+						fakeConnectionErr.RawResponse = []byte(`{
+  "error": "unauthorized",
+  "error_description": "Bad credentials"
+}`)
+						fakeConnection.MakeReturns(fakeConnectionErr)
+					})
+
+					It("returns a BadCredentialsError", func() {
+						Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+
+						Expect(makeErr).To(MatchError(BadCredentialsError{Message: "Bad credentials"}))
+					})
+				})
 			})
 
 			Context("(403) Forbidden", func() {

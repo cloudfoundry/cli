@@ -52,6 +52,15 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
+// BadCredentialsError is returned when the credentials are rejected.
+type BadCredentialsError struct {
+	Message string
+}
+
+func (e BadCredentialsError) Error() string {
+	return e.Message
+}
+
 // InvalidAuthTokenError is returned when the client has an invalid
 // authorization header.
 type InvalidAuthTokenError struct {

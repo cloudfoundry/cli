@@ -46,7 +46,8 @@ var _ = Describe("UAA Authentication", func() {
 			})
 
 			It("adds authentication headers", func() {
-				wrapper.Make(request, nil)
+				err := wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 				authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
@@ -57,7 +58,8 @@ var _ = Describe("UAA Authentication", func() {
 			Context("when the request already has headers", func() {
 				It("preserves existing headers", func() {
 					request.Header.Add("Existing", "header")
-					wrapper.Make(request, nil)
+					err := wrapper.Make(request, nil)
+					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 					authenticatedRequest, _ := fakeConnection.MakeArgsForCall(0)
@@ -144,6 +146,7 @@ var _ = Describe("UAA Authentication", func() {
 		})
 
 		Context("when refreshing the token", func() {
+			var originalAuthHeader string
 			BeforeEach(func() {
 				body := strings.NewReader(url.Values{
 					"grant_type": {"refresh_token"},
@@ -151,15 +154,46 @@ var _ = Describe("UAA Authentication", func() {
 
 				request, err := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", server.URL()), body)
 				Expect(err).NotTo(HaveOccurred())
+				request.SetBasicAuth("some-user", "some-password")
+				originalAuthHeader = request.Header.Get("Authorization")
 
-				wrapper.Make(request, nil)
+				inMemoryCache.SetAccessToken("some-access-token")
+
+				err = wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("should not set the 'Authorization' header", func() {
+			It("does not change the 'Authorization' header", func() {
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 
 				request, _ := fakeConnection.MakeArgsForCall(0)
-				Expect(request.Header.Get("Authorization")).To(BeEmpty())
+				Expect(request.Header.Get("Authorization")).To(Equal(originalAuthHeader))
+			})
+		})
+
+		Context("when logging in", func() {
+			var originalAuthHeader string
+			BeforeEach(func() {
+				body := strings.NewReader(url.Values{
+					"grant_type": {"password"},
+				}.Encode())
+
+				request, err := http.NewRequest("POST", fmt.Sprintf("%s/oauth/token", server.URL()), body)
+				Expect(err).NotTo(HaveOccurred())
+				request.SetBasicAuth("some-user", "some-password")
+				originalAuthHeader = request.Header.Get("Authorization")
+
+				inMemoryCache.SetAccessToken("some-access-token")
+
+				err = wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("does not change the 'Authorization' header", func() {
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+
+				request, _ := fakeConnection.MakeArgsForCall(0)
+				Expect(request.Header.Get("Authorization")).To(Equal(originalAuthHeader))
 			})
 		})
 	})

@@ -25,6 +25,8 @@ func HandleError(err error) error {
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
 
+	case uaa.BadCredentialsError:
+		return command.BadCredentialsError{}
 	case uaa.InvalidAuthTokenError:
 		return InvalidRefreshTokenError{}
 

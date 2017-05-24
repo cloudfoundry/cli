@@ -44,9 +44,12 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *TargetCommand) Execute(args []string) error {
-	cmd.notifyCLIUpdateIfNeeded()
+	err := command.WarnAPIVersionCheck(cmd.Config, cmd.UI)
+	if err != nil {
+		return err
+	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -101,19 +104,6 @@ func (cmd *TargetCommand) Execute(args []string) error {
 	}
 
 	return nil
-}
-
-func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
-	err := command.MinimumAPIVersionCheck(cmd.Config.BinaryVersion(), cmd.Config.MinCLIVersion())
-
-	if _, ok := err.(command.MinimumAPIVersionNotMetError); ok {
-		cmd.UI.DisplayWarning("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-			map[string]interface{}{
-				"APIVersion":    cmd.Config.APIVersion(),
-				"MinCLIVersion": cmd.Config.MinCLIVersion(),
-				"BinaryVersion": cmd.Config.BinaryVersion(),
-			})
-	}
 }
 
 func (cmd TargetCommand) clearTargets() {

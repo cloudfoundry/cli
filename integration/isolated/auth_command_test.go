@@ -74,7 +74,7 @@ var _ = Describe("auth command", func() {
 			session := helpers.CF("auth", "some-username", "some-password")
 
 			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Out).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
+			Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 
 			Eventually(session).Should(Exit(1))
 		})
@@ -92,7 +92,7 @@ var _ = Describe("auth command", func() {
 			Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
 			Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
 			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Out).Should(Say("Credentials were rejected, please try again\\."))
+			Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
 			Eventually(session).Should(Exit(1))
 
 			// Verify that the user is not logged-in
