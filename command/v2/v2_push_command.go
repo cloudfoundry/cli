@@ -278,16 +278,8 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 				"Username":  user.Name,
 			},
 		)
-	case pushaction.CreatedApplication:
-		cmd.UI.DisplayText("Created app")
-	case pushaction.UpdatedApplication:
-		cmd.UI.DisplayText("Updated app")
 	case pushaction.ConfiguringRoutes:
-		cmd.UI.DisplayText("Configuring routes...")
-	case pushaction.CreatedRoutes:
-		cmd.UI.DisplayText("Created routes")
-	case pushaction.BoundRoutes:
-		cmd.UI.DisplayText("Bound routes")
+		cmd.UI.DisplayText("Mapping routes...")
 	case pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
@@ -302,6 +294,8 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		cmd.UI.DisplayText("Processing files...")
 	case pushaction.Complete:
 		return true
+	default:
+		log.WithField("event", event).Debug("ignoring event")
 	}
 	return false
 }

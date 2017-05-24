@@ -556,10 +556,6 @@
     "translation": "绑定的应用程序: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "Buildpack {{.BuildpackName}} 已存在"
   },
@@ -1820,10 +1816,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "已连接，正在以 {{.Username}} 身份转储组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 最近的日志...\n"
   },
@@ -1994,14 +1986,6 @@
   {
     "id": "Create key for a service instance",
     "translation": "为服务实例创建密钥"
-  },
-  {
-    "id": "Created app",
-    "translation": ""
-  },
-  {
-    "id": "Created routes",
-    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -3882,6 +3866,10 @@
   {
     "id": "Map the root domain to this app",
     "translation": "将根域映射到此应用程序"
+  },
+  {
+    "id": "Mapping routes...",
+    "translation": ""
   },
   {
     "id": "Max wait time for app instance startup, in minutes",
@@ -6170,10 +6158,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "更新用户提供的服务实例"
-  },
-  {
-    "id": "Updated app",
-    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

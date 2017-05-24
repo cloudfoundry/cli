@@ -581,6 +581,7 @@
     "received apply event:",
     "Packaging files to upload...",
     "display changes:",
+    "ignoring event",
 
     "(?i).*(?:token|password).*",
     "Host",

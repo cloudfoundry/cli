@@ -556,10 +556,6 @@
     "translation": "Apps enlazadas: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "El paquete de compilación {{.BuildpackName}} ya existe"
   },
@@ -1820,10 +1816,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Conectado, descartando registros recientes para la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}...\n"
   },
@@ -1994,14 +1986,6 @@
   {
     "id": "Create key for a service instance",
     "translation": "Crear una clave para una instancia de servicio"
-  },
-  {
-    "id": "Created app",
-    "translation": ""
-  },
-  {
-    "id": "Created routes",
-    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -3882,6 +3866,10 @@
   {
     "id": "Map the root domain to this app",
     "translation": "Correlacionar el dominio raíz a esta app"
+  },
+  {
+    "id": "Mapping routes...",
+    "translation": ""
   },
   {
     "id": "Max wait time for app instance startup, in minutes",
@@ -6170,10 +6158,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Actualizar la instancia de servicio proporcionada por el usuario"
-  },
-  {
-    "id": "Updated app",
-    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",
