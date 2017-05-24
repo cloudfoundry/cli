@@ -1,9 +1,11 @@
 package pluginaction
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -26,9 +28,10 @@ type CommandList interface {
 }
 
 type PluginInfo struct {
-	Name    string
-	Version string
-	URL     string
+	Name     string
+	Version  string
+	URL      string
+	Checksum string
 }
 
 // PluginInvalidError is returned with a plugin is invalid because it is
@@ -51,6 +54,17 @@ type PluginCommandsConflictError struct {
 
 func (_ PluginCommandsConflictError) Error() string {
 	return ""
+}
+
+// PluginNotFoundError is an error returned when a plugin is not found.
+type PluginNotFoundInRepositoryError struct {
+	PluginName     string
+	RepositoryName string
+}
+
+// Error outputs a plugin not found error message.
+func (e PluginNotFoundInRepositoryError) Error() string {
+	return fmt.Sprintf("Plugin %s not found in repository %s", e.PluginName, e.RepositoryName)
 }
 
 // CreateExecutableCopy makes a temporary copy of a plugin binary and makes it
@@ -172,12 +186,24 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	return plugin, nil
 }
 
-func (actor Actor) GetPluginInfoFromRepository(pluginName string, repositoryName string) (PluginInfo, error) {
-	return PluginInfo{}, nil
-}
+func (actor Actor) GetPluginInfoFromRepository(pluginName string, pluginRepo configv3.PluginRepository) (PluginInfo, error) {
+	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
+	if err != nil {
+		return PluginInfo{}, err
+	}
 
-func (actor Actor) GetPluginInfoFromConfig(pluginName string) (PluginInfo, error) {
-	return PluginInfo{}, nil
+	currentPlatform := generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH)
+	for _, plugin := range pluginRepository.Plugins {
+		if plugin.Name == pluginName {
+			for _, pluginBinary := range plugin.Binaries {
+				if pluginBinary.Platform == currentPlatform {
+					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
+				}
+			}
+		}
+	}
+
+	return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {

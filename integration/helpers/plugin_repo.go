@@ -39,7 +39,7 @@ type PluginRepositoryServerWithPlugin struct {
 }
 
 func NewPluginRepositoryServer(pluginRepo PluginRepository) *Server {
-	return configurePluginRepositoryServer(NewServer(), pluginRepo)
+	return configurePluginRepositoryServer(NewTLSServer(), pluginRepo)
 }
 
 func NewPluginRepositoryServerWithPlugin(pluginName string, version string, platform string, shouldCalculateChecksum bool) *PluginRepositoryServerWithPlugin {
@@ -81,7 +81,7 @@ func (pluginRepoServer *PluginRepositoryServerWithPlugin) Init(pluginName string
 				Version: version,
 				Binaries: []Binary{
 					{
-						Checksum: string(checksum),
+						Checksum: fmt.Sprintf("%x", checksum),
 						Platform: platform,
 						URL:      downloadURL,
 					},
@@ -99,6 +99,10 @@ func (pluginRepoServer *PluginRepositoryServerWithPlugin) Init(pluginName string
 	Expect(err).ToNot(HaveOccurred())
 
 	repoServer.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest(http.MethodGet, "/list"),
+			RespondWith(http.StatusOK, jsonBytes),
+		),
 		CombineHandlers(
 			VerifyRequest(http.MethodGet, "/list"),
 			RespondWith(http.StatusOK, jsonBytes),
@@ -137,6 +141,7 @@ func configurePluginRepositoryServer(server *Server, pluginRepo PluginRepository
 	Expect(err).ToNot(HaveOccurred())
 
 	server.AppendHandlers(
+		RespondWith(http.StatusOK, string(jsonBytes)),
 		RespondWith(http.StatusOK, string(jsonBytes)),
 		RespondWith(http.StatusOK, string(jsonBytes)),
 		RespondWith(http.StatusOK, string(jsonBytes)),

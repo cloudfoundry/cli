@@ -2416,6 +2416,10 @@
     "translation": "Downloaded plugin binary's checksum does not match repo metadata"
   },
   {
+    "id": "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author.",
+    "translation": ""
+  },
+  {
     "id": "Dump recent logs instead of tailing",
     "translation": "Dump recent logs instead of tailing"
   },
@@ -4440,8 +4444,8 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}",
-    "translation": ""
+    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}.\nUse '{{.BinaryName}} repo-plugins -r {{.RepositoryName}}' to list plugins available in the repo.",
+    "translation": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}.\nUse '{{.BinaryName}} repo-plugins -r {{.RepositoryName}}' to list plugins available in the repo."
   },
   {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
