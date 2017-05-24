@@ -14,7 +14,7 @@ import (
 const (
 	CFEventuallyTimeout  = 300 * time.Second
 	RealIsolationSegment = "persistent_isolation_segment"
-	PushCommandName      = "push"
+	PushCommandName      = "v2-push"
 )
 
 var (
@@ -41,8 +41,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	helpers.TurnOffColors()
 
+	homeDir = helpers.SetHomeDir()
+	helpers.SetAPI()
+	helpers.LoginCF()
 	organization = helpers.NewOrgName()
 	helpers.CreateOrg(organization)
+	helpers.DestroyHomeDir(homeDir)
 })
 
 var _ = BeforeEach(func() {

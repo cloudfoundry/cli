@@ -270,7 +270,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	switch event {
 	case pushaction.SettingUpApplication:
 		cmd.UI.DisplayTextWithFlavor(
-			"Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}",
+			"Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 			map[string]interface{}{
 				"AppName":   appConfig.DesiredApplication.Name,
 				"OrgName":   cmd.Config.TargetedOrganization().Name,
