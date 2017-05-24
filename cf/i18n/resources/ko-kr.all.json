@@ -556,10 +556,6 @@
     "translation": "바인딩된 앱: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "{{.BuildpackName}} 빌드팩이 이미 있음"
   },
@@ -1820,10 +1816,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "연결됨, {{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 있는 {{.AppName}} 앱의 최근 로그 덤프 중...\n"
   },
@@ -1994,14 +1986,6 @@
   {
     "id": "Create key for a service instance",
     "translation": "서비스 인스턴스의 키 작성"
-  },
-  {
-    "id": "Created app",
-    "translation": ""
-  },
-  {
-    "id": "Created routes",
-    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -3882,6 +3866,10 @@
   {
     "id": "Map the root domain to this app",
     "translation": "이 앱에 루트 도메인 맵핑"
+  },
+  {
+    "id": "Mapping routes...",
+    "translation": ""
   },
   {
     "id": "Max wait time for app instance startup, in minutes",
@@ -6170,10 +6158,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "사용자 제공 서비스 인스턴스 업데이트"
-  },
-  {
-    "id": "Updated app",
-    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

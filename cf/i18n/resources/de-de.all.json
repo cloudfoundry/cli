@@ -556,10 +556,6 @@
     "translation": "Gebundene Apps: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "Buildpack {{.BuildpackName}} ist bereits vorhanden"
   },
@@ -1820,10 +1816,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Verbundene, kürzlich erstellte Speicherauszugsprotokolle für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}...\n"
   },
@@ -1994,14 +1986,6 @@
   {
     "id": "Create key for a service instance",
     "translation": "Schlüssel für eine Serviceinstanz erstellen"
-  },
-  {
-    "id": "Created app",
-    "translation": ""
-  },
-  {
-    "id": "Created routes",
-    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -3882,6 +3866,10 @@
   {
     "id": "Map the root domain to this app",
     "translation": "Rootdomäne dieser App zuordnen"
+  },
+  {
+    "id": "Mapping routes...",
+    "translation": ""
   },
   {
     "id": "Max wait time for app instance startup, in minutes",
@@ -6170,10 +6158,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Vom Benutzer zur Verfügung gestellte Serviceinstanz aktualisieren"
-  },
-  {
-    "id": "Updated app",
-    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

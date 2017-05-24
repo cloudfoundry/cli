@@ -556,10 +556,6 @@
     "translation": "バインド済みアプリ: {{.BoundApplications}}"
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "ビルドパック {{.BuildpackName}} は既に存在しています"
   },
@@ -1820,10 +1816,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "接続されました、{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の最近のログをダンプしています...\n"
   },
@@ -1994,14 +1986,6 @@
   {
     "id": "Create key for a service instance",
     "translation": "サービス・インスタンスのキーを作成します"
-  },
-  {
-    "id": "Created app",
-    "translation": ""
-  },
-  {
-    "id": "Created routes",
-    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -3882,6 +3866,10 @@
   {
     "id": "Map the root domain to this app",
     "translation": "ルート・ドメインをこのアプリにマップします"
+  },
+  {
+    "id": "Mapping routes...",
+    "translation": ""
   },
   {
     "id": "Max wait time for app instance startup, in minutes",
@@ -6170,10 +6158,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "ユーザー提供サービス・インスタンスを更新します"
-  },
-  {
-    "id": "Updated app",
-    "translation": ""
   },
   {
     "id": "Updated: {{.Updated}}",

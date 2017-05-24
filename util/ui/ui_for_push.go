@@ -58,15 +58,15 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 		offset := strings.Repeat(" ", stringTypePadding)
 
 		if oVal != nVal {
-			formattedOld := fmt.Sprintf("-  %s%s%s", ui.TranslateText(header), offset, oVal)
-			formattedNew := fmt.Sprintf("+  %s%s%s", ui.TranslateText(header), offset, nVal)
+			formattedOld := fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
+			formattedNew := fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, nVal)
 
 			if oVal != "" {
 				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
 			}
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 		} else {
-			fmt.Fprintf(ui.Out, "   %s%s%s\n", ui.TranslateText(header), offset, oVal)
+			fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, oVal)
 		}
 	case []string:
 		nVal, ok := newValue.([]string)
@@ -74,7 +74,7 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 			return ErrValueMissmatch
 		}
 
-		fmt.Fprintf(ui.Out, "   %s\n", ui.TranslateText(header))
+		fmt.Fprintf(ui.Out, "  %s\n", ui.TranslateText(header))
 
 		fullList := sortedUniqueArray(oVal, nVal)
 		for _, item := range fullList {
@@ -82,12 +82,12 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 			inNew := existsIn(item, nVal)
 
 			if inOld && inNew {
-				fmt.Fprintf(ui.Out, "      %s\n", item)
+				fmt.Fprintf(ui.Out, "    %s\n", item)
 			} else if inOld {
-				formattedOld := fmt.Sprintf("-     %s", item)
+				formattedOld := fmt.Sprintf("-   %s", item)
 				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
 			} else {
-				formattedNew := fmt.Sprintf("+     %s", item)
+				formattedNew := fmt.Sprintf("+   %s", item)
 				fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 			}
 		}

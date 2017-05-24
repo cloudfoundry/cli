@@ -92,10 +92,6 @@
     "translation": ""
   },
   {
-    "id": "Bound routes",
-    "translation": ""
-  },
-  {
     "id": "CANCELING",
     "translation": ""
   },
@@ -196,10 +192,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring routes...",
-    "translation": ""
-  },
-  {
     "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
     "translation": ""
   },
@@ -209,14 +201,6 @@
   },
   {
     "id": "Create an isolation segment",
-    "translation": ""
-  },
-  {
-    "id": "Created app",
-    "translation": "Created app"
-  },
-  {
-    "id": "Created routes",
     "translation": ""
   },
   {
@@ -421,6 +405,10 @@
   },
   {
     "id": "Listing installed plugins...",
+    "translation": ""
+  },
+  {
+    "id": "Mapping routes...",
     "translation": ""
   },
   {
@@ -853,10 +841,6 @@
   },
   {
     "id": "Uninstall CLI plugin",
-    "translation": ""
-  },
-  {
-    "id": "Updated app",
     "translation": ""
   },
   {
