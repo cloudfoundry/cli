@@ -64,10 +64,7 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 
-		// The authentication header is not added to the token refresh request.
-		if strings.Contains(request.URL.String(), "/oauth/token") &&
-			request.Method == http.MethodPost &&
-			strings.Contains(string(rawRequestBody), "grant_type=refresh_token") {
+		if skipAuthenticationHeader(request, rawRequestBody) {
 			return t.connection.Make(request, passedResponse)
 		}
 	}
@@ -93,4 +90,15 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 	}
 
 	return err
+}
+
+// The authentication header is not added to token refresh requests or login
+// requests.
+func skipAuthenticationHeader(request *http.Request, body []byte) bool {
+	stringBody := string(body)
+
+	return strings.Contains(request.URL.String(), "/oauth/token") &&
+		request.Method == http.MethodPost &&
+		(strings.Contains(stringBody, "grant_type=refresh_token") ||
+			strings.Contains(stringBody, "grant_type=password"))
 }

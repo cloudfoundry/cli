@@ -31,7 +31,7 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshToken, err
 	}.Encode())
 
 	request, err := client.newRequest(requestOptions{
-		RequestName: internal.RefreshTokenRequest,
+		RequestName: internal.PostOAuthTokenRequest,
 		Header: http.Header{
 			"Content-Type": {"application/x-www-form-urlencoded"},
 		},

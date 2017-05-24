@@ -53,6 +53,9 @@ func convert(rawHTTPStatusErr RawHTTPStatusError) error {
 		if uaaErrorResponse.Type == "invalid_token" {
 			return InvalidAuthTokenError{Message: uaaErrorResponse.Description}
 		}
+		if uaaErrorResponse.Type == "unauthorized" {
+			return BadCredentialsError{Message: uaaErrorResponse.Description}
+		}
 		return rawHTTPStatusErr
 	case http.StatusForbidden: // 403
 		if uaaErrorResponse.Type == "insufficient_scope" {

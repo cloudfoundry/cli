@@ -49,6 +49,7 @@ var _ = Describe("target Command", func() {
 		fakeConfig.APIVersionReturns(apiVersion)
 		minCLIVersion = "1.0.0"
 		fakeConfig.MinCLIVersionReturns(minCLIVersion)
+		fakeConfig.BinaryVersionReturns("1.0.0")
 	})
 
 	JustBeforeEach(func() {
@@ -92,6 +93,16 @@ var _ = Describe("target Command", func() {
 
 				It("does not recommend to update the CLI version", func() {
 					Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s.", apiVersion, minCLIVersion))
+				})
+			})
+
+			Context("when the CLI version is invalid", func() {
+				BeforeEach(func() {
+					fakeConfig.BinaryVersionReturns("&#%")
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr.Error()).To(Equal("No Major.Minor.Patch elements found"))
 				})
 			})
 		})

@@ -95,6 +95,11 @@ var _ = Describe("HandleError", func() {
 			FileChangedError{Filename: "some-filename"},
 		),
 
+		Entry("uaa.BadCredentialsError -> command.BadCredentialsError",
+			uaa.BadCredentialsError{},
+			command.BadCredentialsError{},
+		),
+
 		Entry("uaa.InvalidAuthTokenError -> InvalidRefreshTokenError",
 			uaa.InvalidAuthTokenError{},
 			InvalidRefreshTokenError{},

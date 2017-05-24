@@ -6264,6 +6264,10 @@
     "translation": "詳しくは '{{.Command}}' を使用してください"
   },
   {
+    "id": "Use '{{.Command}}' to view or set your target org and space.",
+    "translation": "ターゲットの組織とスペースを表示または設定するには '{{.Command}}' を使用してください。"
+  },
+  {
     "id": "Use '{{.Name}}' to view or set your target org and space",
     "translation": "ターゲットの組織とスペースを表示または設定するには '{{.Name}}' を使用してください"
   },

@@ -9,6 +9,22 @@ import (
 )
 
 type FakeUAAClient struct {
+	AuthenticateStub        func(username string, password string) (string, string, error)
+	authenticateMutex       sync.RWMutex
+	authenticateArgsForCall []struct {
+		username string
+		password string
+	}
+	authenticateReturns struct {
+		result1 string
+		result2 string
+		result3 error
+	}
+	authenticateReturnsOnCall map[int]struct {
+		result1 string
+		result2 string
+		result3 error
+	}
 	CreateUserStub        func(username string, password string, origin string) (uaa.User, error)
 	createUserMutex       sync.RWMutex
 	createUserArgsForCall []struct {
@@ -26,6 +42,61 @@ type FakeUAAClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeUAAClient) Authenticate(username string, password string) (string, string, error) {
+	fake.authenticateMutex.Lock()
+	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
+	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
+		username string
+		password string
+	}{username, password})
+	fake.recordInvocation("Authenticate", []interface{}{username, password})
+	fake.authenticateMutex.Unlock()
+	if fake.AuthenticateStub != nil {
+		return fake.AuthenticateStub(username, password)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.authenticateReturns.result1, fake.authenticateReturns.result2, fake.authenticateReturns.result3
+}
+
+func (fake *FakeUAAClient) AuthenticateCallCount() int {
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	return len(fake.authenticateArgsForCall)
+}
+
+func (fake *FakeUAAClient) AuthenticateArgsForCall(i int) (string, string) {
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	return fake.authenticateArgsForCall[i].username, fake.authenticateArgsForCall[i].password
+}
+
+func (fake *FakeUAAClient) AuthenticateReturns(result1 string, result2 string, result3 error) {
+	fake.AuthenticateStub = nil
+	fake.authenticateReturns = struct {
+		result1 string
+		result2 string
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeUAAClient) AuthenticateReturnsOnCall(i int, result1 string, result2 string, result3 error) {
+	fake.AuthenticateStub = nil
+	if fake.authenticateReturnsOnCall == nil {
+		fake.authenticateReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 string
+			result3 error
+		})
+	}
+	fake.authenticateReturnsOnCall[i] = struct {
+		result1 string
+		result2 string
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeUAAClient) CreateUser(username string, password string, origin string) (uaa.User, error) {
@@ -84,6 +155,8 @@ func (fake *FakeUAAClient) CreateUserReturnsOnCall(i int, result1 uaa.User, resu
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
 	fake.createUserMutex.RLock()
 	defer fake.createUserMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
