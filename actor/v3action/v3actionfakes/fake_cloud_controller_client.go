@@ -66,6 +66,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateBuildStub        func(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error)
+	createBuildMutex       sync.RWMutex
+	createBuildArgsForCall []struct {
+		build ccv3.Build
+	}
+	createBuildReturns struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createBuildReturnsOnCall map[int]struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateIsolationSegmentStub        func(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error)
 	createIsolationSegmentMutex       sync.RWMutex
 	createIsolationSegmentArgsForCall []struct {
@@ -153,6 +168,21 @@ type FakeCloudControllerClient struct {
 	}
 	getApplicationTasksReturnsOnCall map[int]struct {
 		result1 []ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
+	GetBuildStub        func(guid string) (ccv3.Build, ccv3.Warnings, error)
+	getBuildMutex       sync.RWMutex
+	getBuildArgsForCall []struct {
+		guid string
+	}
+	getBuildReturns struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getBuildReturnsOnCall map[int]struct {
+		result1 ccv3.Build
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -514,6 +544,60 @@ func (fake *FakeCloudControllerClient) CreateApplicationTaskReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) CreateBuild(build ccv3.Build) (ccv3.Build, ccv3.Warnings, error) {
+	fake.createBuildMutex.Lock()
+	ret, specificReturn := fake.createBuildReturnsOnCall[len(fake.createBuildArgsForCall)]
+	fake.createBuildArgsForCall = append(fake.createBuildArgsForCall, struct {
+		build ccv3.Build
+	}{build})
+	fake.recordInvocation("CreateBuild", []interface{}{build})
+	fake.createBuildMutex.Unlock()
+	if fake.CreateBuildStub != nil {
+		return fake.CreateBuildStub(build)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createBuildReturns.result1, fake.createBuildReturns.result2, fake.createBuildReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildCallCount() int {
+	fake.createBuildMutex.RLock()
+	defer fake.createBuildMutex.RUnlock()
+	return len(fake.createBuildArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildArgsForCall(i int) ccv3.Build {
+	fake.createBuildMutex.RLock()
+	defer fake.createBuildMutex.RUnlock()
+	return fake.createBuildArgsForCall[i].build
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildReturns(result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+	fake.CreateBuildStub = nil
+	fake.createBuildReturns = struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateBuildReturnsOnCall(i int, result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+	fake.CreateBuildStub = nil
+	if fake.createBuildReturnsOnCall == nil {
+		fake.createBuildReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Build
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createBuildReturnsOnCall[i] = struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) CreateIsolationSegment(isolationSegment ccv3.IsolationSegment) (ccv3.IsolationSegment, ccv3.Warnings, error) {
 	fake.createIsolationSegmentMutex.Lock()
 	ret, specificReturn := fake.createIsolationSegmentReturnsOnCall[len(fake.createIsolationSegmentArgsForCall)]
@@ -837,6 +921,60 @@ func (fake *FakeCloudControllerClient) GetApplicationTasksReturnsOnCall(i int, r
 	}
 	fake.getApplicationTasksReturnsOnCall[i] = struct {
 		result1 []ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetBuild(guid string) (ccv3.Build, ccv3.Warnings, error) {
+	fake.getBuildMutex.Lock()
+	ret, specificReturn := fake.getBuildReturnsOnCall[len(fake.getBuildArgsForCall)]
+	fake.getBuildArgsForCall = append(fake.getBuildArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("GetBuild", []interface{}{guid})
+	fake.getBuildMutex.Unlock()
+	if fake.GetBuildStub != nil {
+		return fake.GetBuildStub(guid)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getBuildReturns.result1, fake.getBuildReturns.result2, fake.getBuildReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetBuildCallCount() int {
+	fake.getBuildMutex.RLock()
+	defer fake.getBuildMutex.RUnlock()
+	return len(fake.getBuildArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetBuildArgsForCall(i int) string {
+	fake.getBuildMutex.RLock()
+	defer fake.getBuildMutex.RUnlock()
+	return fake.getBuildArgsForCall[i].guid
+}
+
+func (fake *FakeCloudControllerClient) GetBuildReturns(result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+	fake.GetBuildStub = nil
+	fake.getBuildReturns = struct {
+		result1 ccv3.Build
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetBuildReturnsOnCall(i int, result1 ccv3.Build, result2 ccv3.Warnings, result3 error) {
+	fake.GetBuildStub = nil
+	if fake.getBuildReturnsOnCall == nil {
+		fake.getBuildReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Build
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getBuildReturnsOnCall[i] = struct {
+		result1 ccv3.Build
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1392,6 +1530,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createApplicationTaskMutex.RLock()
 	defer fake.createApplicationTaskMutex.RUnlock()
+	fake.createBuildMutex.RLock()
+	defer fake.createBuildMutex.RUnlock()
 	fake.createIsolationSegmentMutex.RLock()
 	defer fake.createIsolationSegmentMutex.RUnlock()
 	fake.createPackageMutex.RLock()
@@ -1404,6 +1544,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationsMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
+	fake.getBuildMutex.RLock()
+	defer fake.getBuildMutex.RUnlock()
 	fake.getIsolationSegmentMutex.RLock()
 	defer fake.getIsolationSegmentMutex.RUnlock()
 	fake.getIsolationSegmentOrganizationsByIsolationSegmentMutex.RLock()
