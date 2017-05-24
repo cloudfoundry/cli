@@ -4,7 +4,6 @@ package generatorfakes
 import (
 	"sync"
 
-	. "code.cloudfoundry.org/cli/util/words"
 	"code.cloudfoundry.org/cli/util/words/generator"
 )
 
