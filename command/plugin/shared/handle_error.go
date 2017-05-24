@@ -28,9 +28,11 @@ func HandleError(err error) error {
 	case pluginaction.PluginInvalidError:
 		return PluginInvalidError{}
 	case pluginaction.PluginNotFoundError:
-		return PluginNotFoundError{PluginName: e.PluginName, RepositoryName: e.RepositoryName}
+		return PluginNotFoundError{PluginName: e.PluginName}
 	case pluginaction.RepositoryNameTakenError:
 		return RepositoryNameTakenError{Name: e.Name}
+	case pluginaction.RepositoryNotRegisteredError:
+		return RepositoryNotRegisteredError{Name: e.Name}
 	}
 	return err
 }

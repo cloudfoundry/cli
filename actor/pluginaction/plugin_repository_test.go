@@ -170,4 +170,51 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetPluginRepository", func() {
+		Context("when the repository is registered", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+					{Name: "some-repo", URL: "some-url"},
+				})
+			})
+
+			It("returns the repository", func() {
+				pluginRepo, err := actor.GetPluginRepository("some-repo")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(pluginRepo).To(Equal(configv3.PluginRepository{Name: "some-repo", URL: "some-url"}))
+			})
+		})
+
+		Context("when the repository is not registered", func() {
+			It("returns a RepositoryNotRegisteredError", func() {
+				_, err := actor.GetPluginRepository("some-repo")
+				Expect(err).To(MatchError(RepositoryNotRegisteredError{Name: "some-repo"}))
+			})
+		})
+	})
+
+	Describe("IsPluginRepositoryRegistered", func() {
+		Context("when the repository is registered", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+					{Name: "some-repo"},
+				})
+			})
+
+			It("returns true", func() {
+				Expect(actor.IsPluginRepositoryRegistered("some-repo")).To(BeTrue())
+			})
+		})
+
+		Context("when the repository is not registered", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{})
+			})
+
+			It("returns true", func() {
+				Expect(actor.IsPluginRepositoryRegistered("some-repo")).To(BeFalse())
+			})
+		})
+	})
 })

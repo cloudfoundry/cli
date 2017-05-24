@@ -27,7 +27,8 @@ var _ = Describe("PluginRepository", func() {
 						{
 							"name": "plugin-1",
 							"description": "useful plugin for useful things",
-							"version": "1.0.0"
+							"version": "1.0.0",
+							"binaries": [{"platform":"osx","url":"http://some-url","checksum":"somechecksum"},{"platform":"win64","url":"http://another-url","checksum":"anotherchecksum"},{"platform":"linux64","url":"http://last-url","checksum":"lastchecksum"}]
 						},
 						{
 							"name": "plugin-2",
@@ -53,6 +54,11 @@ var _ = Describe("PluginRepository", func() {
 							Name:        "plugin-1",
 							Description: "useful plugin for useful things",
 							Version:     "1.0.0",
+							Binaries: []PluginBinary{
+								{Platform: "osx", URL: "http://some-url", Checksum: "somechecksum"},
+								{Platform: "win64", URL: "http://another-url", Checksum: "anotherchecksum"},
+								{Platform: "linux64", URL: "http://last-url", Checksum: "lastchecksum"},
+							},
 						},
 						{
 							Name:        "plugin-2",

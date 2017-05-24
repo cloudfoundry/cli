@@ -7,10 +7,17 @@ type PluginRepository struct {
 	Plugins []Plugin `json:"plugins"`
 }
 
+type PluginBinary struct {
+	Platform string `json:"platform"`
+	URL      string `json:"url"`
+	Checksum string `json:"checksum"`
+}
+
 type Plugin struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Version     string `json:"version"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Version     string         `json:"version"`
+	Binaries    []PluginBinary `json:"binaries"`
 }
 
 func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepository, error) {

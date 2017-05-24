@@ -3,7 +3,17 @@ package pluginaction
 import (
 	"fmt"
 	"strings"
+
+	"code.cloudfoundry.org/cli/util/configv3"
 )
+
+type RepositoryNotRegisteredError struct {
+	Name string
+}
+
+func (e RepositoryNotRegisteredError) Error() string {
+	return fmt.Sprintf("Plugin repository %s not found", e.Name)
+}
 
 type RepositoryAlreadyExistsError struct {
 	Name string
@@ -68,7 +78,21 @@ func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {
 	return nil
 }
 
+func (actor Actor) GetPluginRepository(repositoryName string) (configv3.PluginRepository, error) {
+	for _, repository := range actor.config.PluginRepositories() {
+		if repositoryName == repository.Name {
+			return repository, nil
+		}
+	}
+	return configv3.PluginRepository{}, RepositoryNotRegisteredError{Name: repositoryName}
+}
+
 func (actor Actor) IsPluginRepositoryRegistered(repositoryName string) bool {
+	for _, repository := range actor.config.PluginRepositories() {
+		if repositoryName == repository.Name {
+			return true
+		}
+	}
 	return false
 }
 

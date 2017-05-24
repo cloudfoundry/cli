@@ -703,35 +703,45 @@ var _ = Describe("install-plugin command", func() {
 
 		Context("when the repo is not registered", func() {
 			BeforeEach(func() {
-				fakeActor.IsPluginRepositoryRegisteredReturns(false)
+				fakeActor.GetPluginRepositoryReturns(configv3.PluginRepository{}, pluginaction.RepositoryNotRegisteredError{Name: "some-repo"})
 			})
 
 			It("returns a RepositoryNotRegisteredError", func() {
 				Expect(executeErr).To(MatchError(shared.RepositoryNotRegisteredError{Name: "some-repo"}))
+
+				Expect(fakeActor.GetPluginRepositoryCallCount()).To(Equal(1))
+				repositoryNameArg := fakeActor.GetPluginRepositoryArgsForCall(0)
+				Expect(repositoryNameArg).To(Equal("some-repo"))
 			})
 		})
 
 		Context("when the repository is registered", func() {
 			BeforeEach(func() {
-				fakeActor.IsPluginRepositoryRegisteredReturns(true)
+				fakeActor.GetPluginRepositoryReturns(configv3.PluginRepository{Name: "some-repo", URL: "http://some-url"}, nil)
 			})
 
 			Context("when the plugin can't be found in the repository", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoryReturns(pluginaction.PluginInfo{}, pluginaction.PluginNotFoundError{PluginName: "some-plugin", RepositoryName: "some-repo"})
+					fakeActor.GetPluginInfoFromRepositoryReturns(pluginaction.PluginInfo{}, pluginaction.PluginNotFoundInRepositoryError{PluginName: "some-plugin", RepositoryName: "some-repo"})
 				})
 
-				It("returns the PluginNotFoundError", func() {
-					Expect(executeErr).To(MatchError(shared.PluginNotFoundError{PluginName: "some-plugin", RepositoryName: "some-repo"}))
+				It("returns the PluginNotFoundInRepositoryError", func() {
+					Expect(executeErr).To(MatchError(shared.PluginNotFoundInRepositoryError{BinaryName: "faceman", PluginName: "some-plugin", RepositoryName: "some-repo"}))
+
+					Expect(fakeActor.GetPluginInfoFromRepositoryCallCount()).To(Equal(1))
+					pluginNameArg, pluginRepositoryArg := fakeActor.GetPluginInfoFromRepositoryArgsForCall(0)
+					Expect(pluginNameArg).To(Equal("some-plugin"))
+					Expect(pluginRepositoryArg).To(Equal(configv3.PluginRepository{Name: "some-repo", URL: "http://some-url"}))
 				})
 			})
 
 			Context("when the plugin is found", func() {
 				BeforeEach(func() {
 					fakeActor.GetPluginInfoFromRepositoryReturns(pluginaction.PluginInfo{
-						Name:    "some-plugin",
-						Version: "1.2.3",
-						URL:     "http://some-url",
+						Name:     "some-plugin",
+						Version:  "1.2.3",
+						URL:      "http://some-url",
+						Checksum: "some-checksum",
 					}, nil)
 				})
 
@@ -767,6 +777,14 @@ var _ = Describe("install-plugin command", func() {
 
 								Expect(testUI.Out).ToNot(Say("downloaded"))
 								Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(0))
+
+								Expect(fakeConfig.GetPluginCallCount()).To(Equal(1))
+								Expect(fakeConfig.GetPluginArgsForCall(0)).To(Equal("some-plugin"))
+
+								Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
+								urlArg, dirArg := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+								Expect(urlArg).To(Equal("http://some-url"))
+								Expect(dirArg).To(ContainSubstring("temp"))
 							})
 						})
 
@@ -775,13 +793,13 @@ var _ = Describe("install-plugin command", func() {
 								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
 							})
 
-							Context("when creating an executable copy errors", func() {
+							Context("when the checksum fails", func() {
 								BeforeEach(func() {
-									fakeActor.CreateExecutableCopyReturns("", errors.New("some-error"))
+									fakeActor.ValidateFileChecksumReturns(false)
 								})
 
-								It("returns the error", func() {
-									Expect(executeErr).To(MatchError(errors.New("some-error")))
+								It("returns the checksum error", func() {
+									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
 									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
@@ -791,105 +809,129 @@ var _ = Describe("install-plugin command", func() {
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
 									Expect(testUI.Out).To(Say("4 bytes downloaded..."))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
+
+									Expect(fakeActor.ValidateFileChecksumCallCount()).To(Equal(1))
+									pathArg, checksumArg := fakeActor.ValidateFileChecksumArgsForCall(0)
+									Expect(pathArg).To(Equal("some-path"))
+									Expect(checksumArg).To(Equal("some-checksum"))
 								})
 							})
 
-							Context("when creating an exectubale copy succeeds", func() {
+							Context("when the checksum succeeds", func() {
 								BeforeEach(func() {
-									fakeActor.CreateExecutableCopyReturns("copy-path", nil)
+									fakeActor.ValidateFileChecksumReturns(true)
 								})
 
-								Context("when validating the new plugin errors", func() {
+								Context("when creating an executable copy errors", func() {
 									BeforeEach(func() {
-										fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
+										fakeActor.CreateExecutableCopyReturns("", errors.New("some-error"))
 									})
 
 									It("returns the error", func() {
-										Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+										Expect(executeErr).To(MatchError(errors.New("some-error")))
 
-										Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-										Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-										Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
-										Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-										Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-										Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
 										Expect(testUI.Out).To(Say("4 bytes downloaded..."))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
+
+										Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
+										pathArg, tempDirArg := fakeActor.CreateExecutableCopyArgsForCall(0)
+										Expect(pathArg).To(Equal("some-path"))
+										Expect(tempDirArg).To(ContainSubstring("temp"))
 									})
 								})
-							})
 
-							Context("when validating the new plugin succeeds", func() {
-								BeforeEach(func() {
-									fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
-										Name:    "some-plugin",
-										Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 3},
-									}, nil)
-								})
-
-								Context("when uninstalling the existing errors", func() {
+								Context("when creating an exectubale copy succeeds", func() {
 									BeforeEach(func() {
-										expectedErr = errors.New("uninstall plugin error")
-										fakeActor.UninstallPluginReturns(expectedErr)
+										fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 									})
 
-									It("returns the error", func() {
-										Expect(executeErr).To(MatchError(expectedErr))
-
-										Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-										Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-										Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
-										Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-										Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-										Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
-										Expect(testUI.Out).To(Say("4 bytes downloaded..."))
-										Expect(testUI.Out).To(Say("Uninstalling existing plugin..."))
-										Expect(testUI.Out).ToNot(Say("Plugin some-plugin successfully uninstalled\\."))
-									})
-								})
-
-								Context("when uninstalling the existing plugin succeeds", func() {
-									Context("when installing the new plugin errors", func() {
+									Context("when validating the new plugin errors", func() {
 										BeforeEach(func() {
-											expectedErr = errors.New("install plugin error")
-											fakeActor.InstallPluginFromPathReturns(expectedErr)
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(expectedErr))
+											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
 
-											Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
-											Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-											Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-											Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
 											Expect(testUI.Out).To(Say("4 bytes downloaded..."))
-											Expect(testUI.Out).To(Say("Uninstalling existing plugin..."))
-											Expect(testUI.Out).To(Say("OK"))
-											Expect(testUI.Out).To(Say("Plugin some-plugin successfully uninstalled."))
-											Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
-											Expect(testUI.Out).ToNot(Say("successfully installed"))
+											Expect(testUI.Out).ToNot(Say("Installing plugin"))
+
+											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
+											_, commandsArg, tempDirArg := fakeActor.GetAndValidatePluginArgsForCall(0)
+											Expect(commandsArg).To(Equal(Commands))
+											Expect(tempDirArg).To(Equal("copy-path"))
 										})
 									})
 
-									Context("when installing the new plugin succeeds", func() {
-										It("uninstalls the existing plugin and installs the new one", func() {
-											Expect(executeErr).ToNot(HaveOccurred())
+									Context("when validating the new plugin succeeds", func() {
+										BeforeEach(func() {
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
+												Name:    "some-plugin",
+												Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 3},
+											}, nil)
+										})
 
-											Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
-											Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-											Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-											Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
-											Expect(testUI.Out).To(Say("4 bytes downloaded..."))
-											Expect(testUI.Out).To(Say("Uninstalling existing plugin..."))
-											Expect(testUI.Out).To(Say("OK"))
-											Expect(testUI.Out).To(Say("Plugin some-plugin successfully uninstalled."))
-											Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("OK"))
-											Expect(testUI.Out).To(Say("some-plugin 1.2.3 successfully installed"))
+										Context("when uninstalling the existing errors", func() {
+											BeforeEach(func() {
+												expectedErr = errors.New("uninstall plugin error")
+												fakeActor.UninstallPluginReturns(expectedErr)
+											})
+
+											It("returns the error", func() {
+												Expect(executeErr).To(MatchError(expectedErr))
+
+												Expect(testUI.Out).To(Say("Uninstalling existing plugin..."))
+												Expect(testUI.Out).ToNot(Say("Plugin some-plugin successfully uninstalled\\."))
+
+												Expect(fakeActor.UninstallPluginCallCount()).To(Equal(1))
+												_, pluginNameArg := fakeActor.UninstallPluginArgsForCall(0)
+												Expect(pluginNameArg).To(Equal("some-plugin"))
+											})
+										})
+
+										Context("when uninstalling the existing plugin succeeds", func() {
+											Context("when installing the new plugin errors", func() {
+												BeforeEach(func() {
+													expectedErr = errors.New("install plugin error")
+													fakeActor.InstallPluginFromPathReturns(expectedErr)
+												})
+
+												It("returns the error", func() {
+													Expect(executeErr).To(MatchError(expectedErr))
+
+													Expect(testUI.Out).To(Say("Plugin some-plugin successfully uninstalled."))
+													Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
+													Expect(testUI.Out).ToNot(Say("successfully installed"))
+
+													Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
+													pathArg, pluginArg := fakeActor.InstallPluginFromPathArgsForCall(0)
+													Expect(pathArg).To(Equal("copy-path"))
+													Expect(pluginArg).To(Equal(configv3.Plugin{
+														Name:    "some-plugin",
+														Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 3},
+													}))
+												})
+											})
+
+											Context("when installing the new plugin succeeds", func() {
+												It("uninstalls the existing plugin and installs the new one", func() {
+													Expect(executeErr).ToNot(HaveOccurred())
+
+													Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
+													Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+													Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
+													Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
+													Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
+													Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
+													Expect(testUI.Out).To(Say("4 bytes downloaded..."))
+													Expect(testUI.Out).To(Say("Uninstalling existing plugin..."))
+													Expect(testUI.Out).To(Say("OK"))
+													Expect(testUI.Out).To(Say("Plugin some-plugin successfully uninstalled."))
+													Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
+													Expect(testUI.Out).To(Say("OK"))
+													Expect(testUI.Out).To(Say("some-plugin 1.2.3 successfully installed"))
+												})
+											})
 										})
 									})
 								})
@@ -923,13 +965,13 @@ var _ = Describe("install-plugin command", func() {
 								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
 							})
 
-							Context("when creating an executable copy errors", func() {
+							Context("when the checksum fails", func() {
 								BeforeEach(func() {
-									fakeActor.CreateExecutableCopyReturns("", errors.New("some-error"))
+									fakeActor.ValidateFileChecksumReturns(false)
 								})
 
-								It("returns the error", func() {
-									Expect(executeErr).To(MatchError(errors.New("some-error")))
+								It("returns the checksum error", func() {
+									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
 									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
@@ -941,70 +983,78 @@ var _ = Describe("install-plugin command", func() {
 								})
 							})
 
-							Context("when creating an executable copy succeeds", func() {
+							Context("when the checksum succeeds", func() {
 								BeforeEach(func() {
-									fakeActor.CreateExecutableCopyReturns("copy-path", nil)
+									fakeActor.ValidateFileChecksumReturns(true)
 								})
 
-								Context("when validating the plugin errors", func() {
+								Context("when creating an executable copy errors", func() {
 									BeforeEach(func() {
-										fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
+										fakeActor.CreateExecutableCopyReturns("", errors.New("some-error"))
 									})
 
 									It("returns the error", func() {
-										Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+										Expect(executeErr).To(MatchError(errors.New("some-error")))
 
-										Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-										Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-										Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-										Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-										Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
 										Expect(testUI.Out).To(Say("4 bytes downloaded..."))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
 									})
 								})
 
-								Context("when validating the plugin succeeds", func() {
+								Context("when creating an executable copy succeeds", func() {
 									BeforeEach(func() {
-										fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
-											Name:    "some-plugin",
-											Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 3},
-										}, nil)
+										fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 									})
 
-									Context("when installing the plugin errors", func() {
+									Context("when validating the plugin errors", func() {
 										BeforeEach(func() {
-											expectedErr = errors.New("install plugin error")
-											fakeActor.InstallPluginFromPathReturns(expectedErr)
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(expectedErr))
+											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
 
-											Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-											Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-											Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-											Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
 											Expect(testUI.Out).To(Say("4 bytes downloaded..."))
-											Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
-											Expect(testUI.Out).ToNot(Say("successfully installed"))
+											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 										})
 									})
 
-									Context("when installing the plugin succeeds", func() {
-										It("uninstalls the existing plugin and installs the new one", func() {
-											Expect(executeErr).ToNot(HaveOccurred())
+									Context("when validating the plugin succeeds", func() {
+										BeforeEach(func() {
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
+												Name:    "some-plugin",
+												Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 3},
+											}, nil)
+										})
 
-											Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
-											Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
-											Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
-											Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
-											Expect(testUI.Out).To(Say("4 bytes downloaded..."))
-											Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
-											Expect(testUI.Out).To(Say("OK"))
-											Expect(testUI.Out).To(Say("some-plugin 1.2.3 successfully installed"))
+										Context("when installing the plugin errors", func() {
+											BeforeEach(func() {
+												expectedErr = errors.New("install plugin error")
+												fakeActor.InstallPluginFromPathReturns(expectedErr)
+											})
+
+											It("returns the error", func() {
+												Expect(executeErr).To(MatchError(expectedErr))
+
+												Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
+												Expect(testUI.Out).ToNot(Say("successfully installed"))
+											})
+										})
+
+										Context("when installing the plugin succeeds", func() {
+											It("uninstalls the existing plugin and installs the new one", func() {
+												Expect(executeErr).ToNot(HaveOccurred())
+
+												Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
+												Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+												Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
+												Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
+												Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
+												Expect(testUI.Out).To(Say("4 bytes downloaded..."))
+												Expect(testUI.Out).To(Say("Installing plugin some-plugin..."))
+												Expect(testUI.Out).To(Say("OK"))
+												Expect(testUI.Out).To(Say("some-plugin 1.2.3 successfully installed"))
+											})
 										})
 									})
 								})
@@ -1014,6 +1064,10 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				Context("when the -f argument is not given (user is prompted for confirmation)", func() {
+					BeforeEach(func() {
+						fakeActor.ValidateFileChecksumReturns(true)
+					})
+
 					Context("when the plugin is already installed", func() {
 						BeforeEach(func() {
 							fakeConfig.GetPluginReturns(configv3.Plugin{

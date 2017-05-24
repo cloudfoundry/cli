@@ -2416,6 +2416,10 @@
     "translation": "下载的插件二进制文件的校验和与存储库元数据不匹配"
   },
   {
+    "id": "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author.",
+    "translation": ""
+  },
+  {
     "id": "Dump recent logs instead of tailing",
     "translation": "转储最近的日志，而不跟踪"
   },
@@ -4440,7 +4444,7 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}",
+    "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}.\nUse '{{.BinaryName}} repo-plugins -r {{.RepositoryName}}' to list plugins available in the repo.",
     "translation": ""
   },
   {

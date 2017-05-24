@@ -8,8 +8,7 @@ import (
 
 // PluginNotFoundError is an error returned when a plugin is not found.
 type PluginNotFoundError struct {
-	PluginName     string
-	RepositoryName string
+	PluginName string
 }
 
 // Error outputs a plugin not found error message.
