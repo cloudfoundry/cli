@@ -70,6 +70,11 @@ var _ = Describe("HandleError", func() {
 			err),
 	)
 
+	It("returns nil for a common.PluginInstallationCancelled error", func() {
+		err := HandleError(PluginInstallationCancelled{})
+		Expect(err).To(BeNil())
+	})
+
 	It("returns nil for a nil error", func() {
 		nilErr := HandleError(nil)
 		Expect(nilErr).To(BeNil())

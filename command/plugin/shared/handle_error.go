@@ -33,6 +33,9 @@ func HandleError(err error) error {
 		return RepositoryNameTakenError{Name: e.Name}
 	case pluginaction.RepositoryNotRegisteredError:
 		return RepositoryNotRegisteredError{Name: e.Name}
+
+	case PluginInstallationCancelled:
+		return nil
 	}
 	return err
 }
