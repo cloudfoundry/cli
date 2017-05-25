@@ -86,7 +86,21 @@ var _ = Describe("v3-stage Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 
-			fakeActor.StagePackageReturns(v3action.Build{Droplet: ccv3.Droplet{GUID: "some-droplet-guid"}}, v3action.Warnings{"some-warning", "some-other-warning"}, nil)
+			fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+				buildStream := make(chan v3action.Build)
+				warningsStream := make(chan v3action.Warnings)
+				errorStream := make(chan error)
+
+				go func() {
+					defer close(buildStream)
+					defer close(warningsStream)
+					defer close(errorStream)
+					warningsStream <- v3action.Warnings{"some-warning", "some-other-warning"}
+					buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "some-droplet-guid"}}
+				}()
+
+				return buildStream, warningsStream, errorStream
+			}
 		})
 
 		It("outputs the droplet GUID", func() {
@@ -111,7 +125,21 @@ var _ = Describe("v3-stage Command", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("any gibberish")
-				fakeActor.StagePackageReturns(v3action.Build{}, v3action.Warnings{"some-warning", "some-other-warning"}, expectedErr)
+				fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+					buildStream := make(chan v3action.Build)
+					warningsStream := make(chan v3action.Warnings)
+					errorStream := make(chan error)
+
+					go func() {
+						defer close(buildStream)
+						defer close(warningsStream)
+						defer close(errorStream)
+						warningsStream <- v3action.Warnings{"some-warning", "some-other-warning"}
+						errorStream <- expectedErr
+					}()
+
+					return buildStream, warningsStream, errorStream
+				}
 			})
 
 			It("returns the error and displays warnings", func() {
