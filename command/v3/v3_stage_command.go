@@ -10,7 +10,7 @@ import (
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
-	StagePackage(packageGUID string) (v3action.Build, v3action.Warnings, error)
+	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 }
 
 type V3StageCommand struct {
@@ -56,15 +56,35 @@ func (cmd V3StageCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	build, warnings, err := cmd.Actor.StagePackage(cmd.PackageGUID)
+	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
 
-	cmd.UI.DisplayWarnings(warnings)
-
-	if err != nil {
-		return err
+	var closedBuildStream, closedWarningsStream, closedErrStream bool
+	for {
+		select {
+		case build, ok := <-buildStream:
+			if !ok {
+				closedBuildStream = true
+				break
+			}
+			cmd.UI.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": build.Droplet.GUID})
+		case warnings, ok := <-warningsStream:
+			if !ok {
+				closedWarningsStream = true
+				break
+			}
+			cmd.UI.DisplayWarnings(warnings)
+		case err, ok := <-errStream:
+			if !ok {
+				closedErrStream = true
+				break
+			}
+			return shared.HandleError(err)
+		}
+		if closedBuildStream && closedWarningsStream && closedErrStream {
+			break
+		}
 	}
 
-	cmd.UI.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": build.Droplet.GUID})
 	cmd.UI.DisplayOK()
 
 	return nil

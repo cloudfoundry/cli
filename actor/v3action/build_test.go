@@ -27,9 +27,9 @@ var _ = Describe("Build Actions", func() {
 		var (
 			packageGUID string
 
-			build      Build
-			warnings   Warnings
-			executeErr error
+			buildStream    <-chan Build
+			warningsStream <-chan Warnings
+			errorStream    <-chan error
 
 			buildGUID string
 		)
@@ -38,8 +38,14 @@ var _ = Describe("Build Actions", func() {
 			packageGUID = "some-package-guid"
 		})
 
+		AfterEach(func() {
+			Eventually(errorStream).Should(BeClosed())
+			Eventually(warningsStream).Should(BeClosed())
+			Eventually(buildStream).Should(BeClosed())
+		})
+
 		JustBeforeEach(func() {
-			build, warnings, executeErr = actor.StagePackage(packageGUID)
+			buildStream, warningsStream, errorStream = actor.StagePackage(packageGUID)
 		})
 
 		Context("when the creation is successful", func() {
@@ -55,9 +61,10 @@ var _ = Describe("Build Actions", func() {
 				})
 
 				It("creates the build", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2", "get-warnings-1", "get-warnings-2", "get-warnings-3", "get-warnings-4"))
-					Expect(build).To(Equal(Build{GUID: buildGUID, State: ccv3.BuildStateStaged}))
+					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+					Eventually(buildStream).Should(Receive(Equal(Build{GUID: buildGUID, State: ccv3.BuildStateStaged})))
 
 					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.CreateBuildArgsForCall(0)).To(Equal(ccv3.Build{
@@ -68,8 +75,10 @@ var _ = Describe("Build Actions", func() {
 				})
 
 				It("polls until the build status is not 'STAGING'", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2", "get-warnings-1", "get-warnings-2", "get-warnings-3", "get-warnings-4"))
+					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+					Eventually(buildStream).Should(Receive())
 
 					Expect(fakeCloudControllerClient.GetBuildCallCount()).To(Equal(2))
 					Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
@@ -88,8 +97,10 @@ var _ = Describe("Build Actions", func() {
 				})
 
 				It("returns the error and warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2", "get-warnings-1", "get-warnings-2", "get-warnings-3", "get-warnings-4"))
+					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 				})
 			})
 		})
@@ -102,8 +113,8 @@ var _ = Describe("Build Actions", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("create-warnings-1", "create-warnings-2"))
+				Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+				Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 			})
 		})
 	})
