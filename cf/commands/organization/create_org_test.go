@@ -101,6 +101,7 @@ var _ = Describe("create-org command", func() {
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating org", "my-org", "my-user"},
 				[]string{"OK"},
+				[]string{`TIP: Use 'cf target -o "my-org"' to target new org`},
 			))
 			Expect(orgRepo.CreateArgsForCall(0).Name).To(Equal("my-org"))
 		})
@@ -114,6 +115,10 @@ var _ = Describe("create-org command", func() {
 				[]string{"Creating org", "my-org"},
 				[]string{"OK"},
 				[]string{"my-org", "already exists"},
+			))
+
+			Expect(ui.Outputs()).NotTo(ContainSubstrings(
+				[]string{`TIP: Use 'cf target -o "my-org"' to target new org`},
 			))
 		})
 
