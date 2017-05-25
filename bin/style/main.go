@@ -25,6 +25,8 @@ type warningPrinter struct {
 }
 
 func (w warningPrinter) print(writer io.Writer) {
+	w.sortWarnings()
+
 	for _, warning := range w.warnings {
 		coloredVars := make([]interface{}, len(warning.vars))
 		for i, v := range warning.vars {
@@ -39,6 +41,29 @@ func (w warningPrinter) print(writer io.Writer) {
 			color.MagentaString(fmt.Sprintf("+%d", warning.Position.Line)),
 			message)
 	}
+}
+
+func (w warningPrinter) sortWarnings() {
+	sort.Slice(w.warnings, func(i int, j int) bool {
+		if w.warnings[i].Position.Filename < w.warnings[j].Position.Filename {
+			return true
+		}
+		if w.warnings[i].Position.Filename > w.warnings[j].Position.Filename {
+			return false
+		}
+
+		if w.warnings[i].Position.Line < w.warnings[j].Position.Line {
+			return true
+		}
+		if w.warnings[i].Position.Line > w.warnings[j].Position.Line {
+			return false
+		}
+
+		iMessage := fmt.Sprintf(w.warnings[i].format, w.warnings[i].vars...)
+		jMessage := fmt.Sprintf(w.warnings[j].format, w.warnings[j].vars...)
+
+		return iMessage < jMessage
+	})
 }
 
 type visitor struct {
@@ -186,18 +211,28 @@ func (v *visitor) typeDefinedInFile(typeName string) bool {
 	return false
 }
 
-func main() {
-	var allWarnings []warning
+func check(fileSet *token.FileSet, path string) ([]warning, error) {
+	stat, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
 
-	fileSet := token.NewFileSet()
+	if stat.IsDir() {
+		return checkDir(fileSet, path)
+	} else {
+		return checkFile(fileSet, path)
+	}
+}
 
-	err := filepath.Walk(os.Args[1], func(path string, info os.FileInfo, err error) error {
+func checkDir(fileSet *token.FileSet, path string) ([]warning, error) {
+	var warnings []warning
+
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			return nil
 		}
 
-		base := filepath.Base(path)
-		if base == "vendor" || base == ".git" || strings.HasSuffix(base, "fakes") {
+		if shouldSkipDir(path) {
 			return filepath.SkipDir
 		}
 
@@ -206,39 +241,43 @@ func main() {
 			return err
 		}
 
-		var packageNames []string
-		for packageName, _ := range packages {
-			packageNames = append(packageNames, packageName)
-		}
-		sort.Strings(packageNames)
-
-		for _, packageName := range packageNames {
-			var fileNames []string
-			for fileName, _ := range packages[packageName].Files {
-				fileNames = append(fileNames, fileName)
-			}
-			sort.Strings(fileNames)
-
-			for _, fileName := range fileNames {
-				firstPass := visitor{
-					fileSet: fileSet,
-				}
-				ast.Walk(&firstPass, packages[packageName].Files[fileName])
-
-				v := visitor{
-					fileSet:      fileSet,
-					previousPass: &firstPass,
-				}
-				ast.Walk(&v, packages[packageName].Files[fileName])
-				allWarnings = append(allWarnings, v.warnings...)
+		for _, packag := range packages {
+			for _, file := range packag.Files {
+				warnings = append(warnings, walkFile(fileSet, file)...)
 			}
 		}
 
 		return nil
 	})
 
+	return warnings, err
+}
+
+func checkFile(fileSet *token.FileSet, path string) ([]warning, error) {
+	file, err := parser.ParseFile(fileSet, path, nil, 0)
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	return walkFile(fileSet, file), nil
+}
+
+func main() {
+	var allWarnings []warning
+
+	args := os.Args[1:]
+	if args[0] == "--" {
+		args = args[1:]
+	}
+
+	fileSet := token.NewFileSet()
+
+	for _, arg := range args {
+		warnings, err := check(fileSet, arg)
+		if err != nil {
+			panic(err)
+		}
+		allWarnings = append(allWarnings, warnings...)
 	}
 
 	warningPrinter := warningPrinter{
@@ -253,4 +292,24 @@ func main() {
 
 func shouldParseFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
+}
+
+func shouldSkipDir(path string) bool {
+	base := filepath.Base(path)
+	return base == "vendor" || base == ".git" || strings.HasSuffix(base, "fakes")
+}
+
+func walkFile(fileSet *token.FileSet, file *ast.File) []warning {
+	firstPass := visitor{
+		fileSet: fileSet,
+	}
+	ast.Walk(&firstPass, file)
+
+	v := visitor{
+		fileSet:      fileSet,
+		previousPass: &firstPass,
+	}
+	ast.Walk(&v, file)
+
+	return v.warnings
 }
