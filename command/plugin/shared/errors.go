@@ -2,6 +2,15 @@ package shared
 
 import "strings"
 
+// PluginInstallationCancelled is used to ignore the scenario when the user
+// responds with 'no' when prompted to install plugin and exit 0.
+type PluginInstallationCancelled struct {
+}
+
+func (_ PluginInstallationCancelled) Error() string {
+	return "Plugin installation cancelled"
+}
+
 type PluginNotFoundInRepositoryError struct {
 	BinaryName     string
 	PluginName     string

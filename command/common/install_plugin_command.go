@@ -30,15 +30,6 @@ type InstallPluginActor interface {
 
 const installConfirmationPrompt = "Do you want to install the plugin {{.Path}}?"
 
-// PluginInstallationCancelled is used to ignore the scenario when the user
-// responds with 'no' when prompted to install plugin and exit 0.
-type PluginInstallationCancelled struct {
-}
-
-func (_ PluginInstallationCancelled) Error() string {
-	return "Plugin installation cancelled"
-}
-
 type InvalidChecksumError struct {
 }
 
@@ -81,34 +72,31 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	defer os.RemoveAll(tempPluginDir)
 
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	tempPluginPath, pluginSource, err := cmd.getPluginBinaryAndSource(tempPluginDir)
-	if _, ok := err.(PluginInstallationCancelled); ok {
-		return nil
-	}
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
 	executablePath, err := cmd.Actor.CreateExecutableCopy(tempPluginPath, tempPluginDir)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, executablePath)
@@ -127,7 +115,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 
 		err = cmd.uninstallPlugin(plugin, rpcService)
 		if err != nil {
-			return err
+			return shared.HandleError(err)
 		}
 	}
 
@@ -216,7 +204,7 @@ func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPlug
 	var size int64
 	tempPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir)
 	if err != nil {
-		return "", 0, shared.HandleError(err)
+		return "", 0, err
 	}
 
 	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
@@ -236,7 +224,7 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 
 	pluginRepository, err = cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
 	if err != nil {
-		return "", 0, shared.HandleError(err)
+		return "", 0, err
 	}
 
 	cmd.UI.DisplayText("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
@@ -253,7 +241,7 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 				RepositoryName: cmd.RegisteredRepository,
 			}
 		}
-		return "", 0, shared.HandleError(err)
+		return "", 0, err
 	}
 	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.", map[string]interface{}{
 		"PluginName":     pluginName,
@@ -289,7 +277,7 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 	var size int64
 	tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
 	if err != nil {
-		return "", 0, shared.HandleError(err)
+		return "", 0, err
 	}
 
 	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
@@ -324,7 +312,7 @@ func (cmd InstallPluginCommand) installPluginPrompt(template string, templateVal
 
 	if !really {
 		cmd.UI.DisplayText("Plugin installation cancelled.")
-		return PluginInstallationCancelled{}
+		return shared.PluginInstallationCancelled{}
 	}
 
 	return nil
