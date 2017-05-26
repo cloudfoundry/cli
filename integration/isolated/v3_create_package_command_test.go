@@ -116,6 +116,7 @@ var _ = Describe("v3-create-package command", func() {
 				session := helpers.CF("v3-create-package", "--name", appName)
 				userName, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Uploading V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})

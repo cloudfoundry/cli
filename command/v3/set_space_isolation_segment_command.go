@@ -40,7 +40,7 @@ func (cmd *SetSpaceIsolationSegmentCommand) Setup(config command.Config, ui comm
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	client, err := shared.NewClients(config, ui, true)
+	client, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}

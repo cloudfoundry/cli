@@ -51,7 +51,7 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
 
-	ccClientV3, err := sharedV3.NewClients(config, ui, true)
+	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
 		if _, ok := err.(sharedV3.V3APIDoesNotExistError); !ok {
 			return err
