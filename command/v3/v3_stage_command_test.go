@@ -93,16 +93,17 @@ var _ = Describe("v3-stage Command", func() {
 		})
 
 		Context("when the logging does not error", func() {
+			allLogsWritten := make(chan bool)
+
 			BeforeEach(func() {
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
 					logStream := make(chan *v3action.LogMessage)
 					errorStream := make(chan error)
 
 					go func() {
-						// defer close(logStream)
-						// defer close(errorStream)
 						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
 						logStream <- v3action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
+						allLogsWritten <- true
 					}()
 
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
@@ -117,6 +118,7 @@ var _ = Describe("v3-stage Command", func() {
 						errorStream := make(chan error)
 
 						go func() {
+							<-allLogsWritten
 							defer close(buildStream)
 							defer close(warningsStream)
 							defer close(errorStream)
@@ -195,6 +197,7 @@ var _ = Describe("v3-stage Command", func() {
 
 		Context("when the logging stream has errors", func() {
 			var expectedErr error
+			allLogsWritten := make(chan bool)
 
 			BeforeEach(func() {
 				expectedErr = errors.New("banana")
@@ -208,6 +211,7 @@ var _ = Describe("v3-stage Command", func() {
 						defer close(errorStream)
 						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
 						errorStream <- expectedErr
+						allLogsWritten <- true
 					}()
 
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
@@ -219,6 +223,7 @@ var _ = Describe("v3-stage Command", func() {
 					errorStream := make(chan error)
 
 					go func() {
+						<-allLogsWritten
 						defer close(buildStream)
 						defer close(warningsStream)
 						defer close(errorStream)
@@ -233,13 +238,9 @@ var _ = Describe("v3-stage Command", func() {
 			It("displays the error and continues staging", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				stdErr, ok := testUI.Err.(*Buffer)
-				Expect(ok).To(BeTrue())
-				stdErrString := string(stdErr.Contents())
-
-				Expect(stdErrString).To(ContainSubstring("banana"))
-				Expect(stdErrString).To(ContainSubstring("some-warning"))
-				Expect(stdErrString).To(ContainSubstring("some-other-warning"))
+				Expect(testUI.Err).To(Say("banana"))
+				Expect(testUI.Err).To(Say("some-warning"))
+				Expect(testUI.Err).To(Say("some-other-warning"))
 			})
 		})
 
