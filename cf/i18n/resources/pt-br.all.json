@@ -1820,10 +1820,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Conectado, fazendo dump de logs recentes para o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}...\n"
   },
@@ -2002,6 +1998,10 @@
   {
     "id": "Creating an app manifest from current settings of app ",
     "translation": "Criando um manifest de app a partir das configurações atuais do app "
+  },
+  {
+    "id": "Creating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4568,10 +4568,6 @@
     "translation": "Enviar por push diversos apps com um manifest"
   },
   {
-    "id": "Pushing app with these attributes...",
-    "translation": ""
-  },
-  {
     "id": "QUOTA",
     "translation": "QUOTA"
   },
@@ -6186,6 +6182,10 @@
   {
     "id": "Updating a plan",
     "translation": "Atualizando um plano"
+  },
+  {
+    "id": "Updating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

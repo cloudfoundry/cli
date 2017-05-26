@@ -1820,10 +1820,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "接続されました、{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の最近のログをダンプしています...\n"
   },
@@ -2002,6 +1998,10 @@
   {
     "id": "Creating an app manifest from current settings of app ",
     "translation": "アプリの現在の設定からアプリ・マニフェストを作成しています "
+  },
+  {
+    "id": "Creating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4568,10 +4568,6 @@
     "translation": "マニフェストを使用して複数のアプリをプッシュします"
   },
   {
-    "id": "Pushing app with these attributes...",
-    "translation": ""
-  },
-  {
     "id": "QUOTA",
     "translation": "割り当て量"
   },
@@ -6186,6 +6182,10 @@
   {
     "id": "Updating a plan",
     "translation": "プランを更新しています"
+  },
+  {
+    "id": "Updating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

@@ -1820,10 +1820,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "已連接，正在以 {{.Username}} 身分傾出組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的最近日誌...\n"
   },
@@ -2002,6 +1998,10 @@
   {
     "id": "Creating an app manifest from current settings of app ",
     "translation": "正在根據現行應用程式的設定建立應用程式資訊清單"
+  },
+  {
+    "id": "Creating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -4568,10 +4568,6 @@
     "translation": "使用資訊清單推送多個應用程式"
   },
   {
-    "id": "Pushing app with these attributes...",
-    "translation": ""
-  },
-  {
     "id": "QUOTA",
     "translation": "配額"
   },
@@ -6186,6 +6182,10 @@
   {
     "id": "Updating a plan",
     "translation": "正在更新方案"
+  },
+  {
+    "id": "Updating app with these attributes...",
+    "translation": ""
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
