@@ -196,10 +196,6 @@
     "translation": ""
   },
   {
-    "id": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": "Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
-  },
-  {
     "id": "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}",
     "translation": ""
   },
@@ -213,6 +209,10 @@
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
+    "id": "Creating app with these attributes...",
     "translation": ""
   },
   {
@@ -572,10 +572,6 @@
     "translation": ""
   },
   {
-    "id": "Pushing app with these attributes...",
-    "translation": ""
-  },
-  {
     "id": "ROLE must be \"SpaceManager\", \"SpaceDeveloper\" and \"SpaceAuditor\"",
     "translation": ""
   },
@@ -861,6 +857,10 @@
   },
   {
     "id": "Uninstall CLI plugin",
+    "translation": ""
+  },
+  {
+    "id": "Updating app with these attributes...",
     "translation": ""
   },
   {
