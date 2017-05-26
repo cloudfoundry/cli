@@ -23,6 +23,40 @@ var _ = Describe("Application Config", func() {
 		actor = NewActor(fakeV2Actor)
 	})
 
+	Describe("ApplicationConfig", func() {
+		Describe("CreatingApplication", func() {
+			Context("when the app did not exist", func() {
+				It("returns true", func() {
+					config := ApplicationConfig{}
+					Expect(config.CreatingApplication()).To(BeTrue())
+				})
+			})
+
+			Context("when the app exists", func() {
+				It("returns false", func() {
+					config := ApplicationConfig{CurrentApplication: v2action.Application{GUID: "some-app-guid"}}
+					Expect(config.CreatingApplication()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("UpdatedApplication", func() {
+			Context("when the app did not exist", func() {
+				It("returns false", func() {
+					config := ApplicationConfig{}
+					Expect(config.UpdatingApplication()).To(BeFalse())
+				})
+			})
+
+			Context("when the app exists", func() {
+				It("returns true", func() {
+					config := ApplicationConfig{CurrentApplication: v2action.Application{GUID: "some-app-guid"}}
+					Expect(config.UpdatingApplication()).To(BeTrue())
+				})
+			})
+		})
+	})
+
 	Describe("ConvertToApplicationConfigs", func() {
 		var (
 			appName      string

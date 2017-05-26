@@ -46,6 +46,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.LoginCF()
 	organization = helpers.NewOrgName()
 	helpers.CreateOrg(organization)
+	helpers.TargetOrg(organization)
+	helpers.CreateSpace("empty-space")
 	helpers.DestroyHomeDir(homeDir)
 })
 

@@ -304,7 +304,7 @@ var _ = Describe("v2-push Command", func() {
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Configuring app %s in org %s / space %s as %s", appName, "some-org", "some-space", "some-user"))
+						Expect(testUI.Out).To(Say("Creating app with these attributes..."))
 						Expect(testUI.Out).To(Say("Mapping routes..."))
 						Expect(testUI.Out).To(Say("Packaging files to upload..."))
 						Expect(testUI.Out).To(Say("Uploading files..."))
