@@ -29,7 +29,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 
 		Context("when the -f flag is given", func() {
-			It("sets the installed plugin's permissiont to 0755", func() {
+			It("sets the installed plugin's permissions to 0755", func() {
 				session := helpers.CF("install-plugin", pluginPath, "-f")
 				Eventually(session).Should(Exit(0))
 

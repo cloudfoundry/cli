@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -722,22 +723,30 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when the plugin can't be found in the repository", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoryReturns(pluginaction.PluginInfo{}, pluginaction.PluginNotFoundInRepositoryError{PluginName: "some-plugin", RepositoryName: "some-repo"})
+					fakeActor.GetPlatformStringReturns("platform-i-dont-exist")
+					fakeActor.GetPluginInfoFromRepositoryForPlatformReturns(pluginaction.PluginInfo{}, pluginaction.PluginNotFoundInRepositoryError{PluginName: "some-plugin", RepositoryName: "some-repo"})
 				})
 
 				It("returns the PluginNotFoundInRepositoryError", func() {
 					Expect(executeErr).To(MatchError(shared.PluginNotFoundInRepositoryError{BinaryName: "faceman", PluginName: "some-plugin", RepositoryName: "some-repo"}))
 
-					Expect(fakeActor.GetPluginInfoFromRepositoryCallCount()).To(Equal(1))
-					pluginNameArg, pluginRepositoryArg := fakeActor.GetPluginInfoFromRepositoryArgsForCall(0)
+					Expect(fakeActor.GetPlatformStringCallCount()).To(Equal(1))
+					platformGOOS, platformGOARCH := fakeActor.GetPlatformStringArgsForCall(0)
+					Expect(platformGOOS).To(Equal(runtime.GOOS))
+					Expect(platformGOARCH).To(Equal(runtime.GOARCH))
+
+					Expect(fakeActor.GetPluginInfoFromRepositoryForPlatformCallCount()).To(Equal(1))
+					pluginNameArg, pluginRepositoryArg, pluginPlatform := fakeActor.GetPluginInfoFromRepositoryForPlatformArgsForCall(0)
 					Expect(pluginNameArg).To(Equal("some-plugin"))
 					Expect(pluginRepositoryArg).To(Equal(configv3.PluginRepository{Name: "some-repo", URL: "http://some-url"}))
+					Expect(pluginPlatform).To(Equal("platform-i-dont-exist"))
 				})
 			})
 
 			Context("when the plugin is found", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoryReturns(pluginaction.PluginInfo{
+					fakeActor.GetPlatformStringReturns("linux64")
+					fakeActor.GetPluginInfoFromRepositoryForPlatformReturns(pluginaction.PluginInfo{
 						Name:     "some-plugin",
 						Version:  "1.2.3",
 						URL:      "http://some-url",
@@ -780,6 +789,17 @@ var _ = Describe("install-plugin command", func() {
 
 								Expect(fakeConfig.GetPluginCallCount()).To(Equal(1))
 								Expect(fakeConfig.GetPluginArgsForCall(0)).To(Equal("some-plugin"))
+
+								Expect(fakeActor.GetPlatformStringCallCount()).To(Equal(1))
+								platformGOOS, platformGOARCH := fakeActor.GetPlatformStringArgsForCall(0)
+								Expect(platformGOOS).To(Equal(runtime.GOOS))
+								Expect(platformGOARCH).To(Equal(runtime.GOARCH))
+
+								Expect(fakeActor.GetPluginInfoFromRepositoryForPlatformCallCount()).To(Equal(1))
+								pluginNameArg, pluginRepositoryArg, pluginPlatform := fakeActor.GetPluginInfoFromRepositoryForPlatformArgsForCall(0)
+								Expect(pluginNameArg).To(Equal("some-plugin"))
+								Expect(pluginRepositoryArg).To(Equal(configv3.PluginRepository{Name: "some-repo", URL: "http://some-url"}))
+								Expect(pluginPlatform).To(Equal("linux64"))
 
 								Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
 								urlArg, dirArg := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
