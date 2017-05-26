@@ -41,6 +41,7 @@ func WarnAPIVersionCheck(config Config, ui UI) error {
 				"MinCLIVersion": config.MinCLIVersion(),
 				"BinaryVersion": config.BinaryVersion(),
 			})
+		ui.DisplayNewline()
 		return nil
 	}
 

@@ -68,7 +68,6 @@ var _ = Describe("Minimum Version Check", func() {
 		})
 
 		Context("when checking the cloud controller minimum version warning", func() {
-
 			Context("when the CLI version is less than the recommended minimum", func() {
 				BeforeEach(func() {
 					binaryVersion = "0.0.0"
@@ -153,6 +152,5 @@ var _ = Describe("Minimum Version Check", func() {
 				Expect(testUI.Err).NotTo(Say("Cloud Foundry API version %s requires CLI version %s. You are currently on version %s. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads", apiVersion, minCLIVersion, binaryVersion))
 			})
 		})
-
 	})
 })
