@@ -43,7 +43,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				session := helpers.CF("install-plugin", "-f", "-r", "repo-that-does-not-exist", "some-plugin")
 
 				Eventually(session.Err).Should(Say("Plugin repository repo-that-does-not-exist not found\\."))
-				Eventually(session.Err).Should(Say("Use 'cf list-plugin-repos' to list registered repositories\\."))
+				Eventually(session.Err).Should(Say("Use 'cf list-plugin-repos' to list registered repos\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -128,8 +128,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				session := helpers.CF("install-plugin", "-f", "-r", "kaka", "plugin-that-does-not-exist", "-k")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Plugin plugin-that-does-not-exist not found in repository kaka."))
-				Eventually(session.Err).Should(Say("Use 'cf repo-plugins -r kaka' to list plugins available in the repo."))
+				Eventually(session.Err).Should(Say("Plugin plugin-that-does-not-exist not found in repository kaka\\."))
+				Eventually(session.Err).Should(Say("Use 'cf repo-plugins -r kaka' to list plugins available in the repo\\."))
 
 				Eventually(session).Should(Exit(1))
 			})
@@ -151,8 +151,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				It("returns plugin not found", func() {
 					session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Plugin some-plugin not found in repository kaka."))
-					Eventually(session.Err).Should(Say("Use 'cf repo-plugins -r kaka' to list plugins available in the repo."))
+					Eventually(session.Err).Should(Say("Plugin some-plugin not found in repository kaka\\."))
+					Eventually(session.Err).Should(Say("Use 'cf repo-plugins -r kaka' to list plugins available in the repo\\."))
 
 					Eventually(session).Should(Exit(1))
 				})
@@ -173,7 +173,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 						It("installs the plugin", func() {
 							session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 found in: kaka"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 found in: kaka\n"))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka\\.\\.\\."))
@@ -230,8 +230,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 2\\.0\\.0 found in: kaka"))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed."))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 2\\.0\\.0 found in: kaka\n"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\."))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka\\.\\.\\."))
@@ -261,8 +261,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 2\\.0\\.0 found in: kaka"))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed."))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 2\\.0\\.0 found in: kaka\n"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\."))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka\\.\\.\\."))
@@ -303,7 +303,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 						It("installs the plugin", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", "-r", "kaka", "some-plugin", "-k")
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka\n"))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]: y"))
@@ -325,7 +325,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 						It("does not install the plugin", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", "-r", "kaka", "some-plugin", "-k")
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka\n"))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]: n"))
@@ -366,8 +366,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 								session := helpers.CFWithStdin(buffer, "install-plugin", "-r", "kaka", "some-plugin", "-k")
 
 								Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka"))
-								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka\n"))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\."))
 								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 								Eventually(session.Out).Should(Say("Do you want to uninstall the existing plugin and install some-plugin 1\\.2\\.3\\? \\[yN\\]: y"))
@@ -398,8 +398,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							It("fails with an error message", func() {
 								session := helpers.CFWithStdin(buffer, "install-plugin", "-r", "kaka", "some-plugin", "-k")
 								Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka"))
-								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka\n"))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\."))
 								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 								Eventually(session.Out).Should(Say("Do you want to uninstall the existing plugin and install some-plugin 1\\.2\\.3\\? \\[yN\\]: y"))
@@ -430,8 +430,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							session := helpers.CFWithStdin(buffer, "install-plugin", "-r", "kaka", "some-plugin", "-k")
 
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka"))
-							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed."))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka\n"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\."))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 							Eventually(session.Out).Should(Say("Do you want to uninstall the existing plugin and install some-plugin 1\\.2\\.3\\? \\[yN\\]: n"))
@@ -451,8 +451,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				session := helpers.CF("install-plugin", "some-plugin")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Plugin not-exist not found on disk or in any registered repo."))
-				Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos."))
+				Eventually(session.Err).Should(Say("Plugin not-exist not found on disk or in any registered repo\\."))
+				Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
 				Eventually(session).Should(Exit(1))
 			})
@@ -478,10 +478,10 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				It("fails and displays the plugin not found message", func() {
 					session := helpers.CF("install-plugin", "some-plugin")
 
-					Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin..."))
+					Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Plugin some-plugin not found on disk or in any registered repo."))
-					Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos."))
+					Eventually(session.Err).Should(Say("Plugin some-plugin not found on disk or in any registered repo\\."))
+					Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
 					Eventually(session).Should(Exit(1))
 				})
