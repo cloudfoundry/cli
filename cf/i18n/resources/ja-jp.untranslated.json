@@ -8,6 +8,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Create a new droplet for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
     "translation": ""
   },
@@ -153,6 +157,10 @@
   },
   {
     "id": "CF_NAME v3-create-package --name [name]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
     "translation": ""
   },
   {
@@ -732,6 +740,10 @@
     "translation": ""
   },
   {
+    "id": "Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information",
     "translation": ""
   },
@@ -793,6 +805,10 @@
   },
   {
     "id": "The desired application name",
+    "translation": ""
+  },
+  {
+    "id": "The guid of the package to stage",
     "translation": ""
   },
   {
@@ -937,6 +953,10 @@
   },
   {
     "id": "disable-org-isolation",
+    "translation": ""
+  },
+  {
+    "id": "droplet: {{.DropletGUID}}",
     "translation": ""
   },
   {

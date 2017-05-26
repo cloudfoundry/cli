@@ -176,6 +176,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Create a new droplet for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
     "translation": ""
   },
@@ -1661,6 +1665,10 @@
   },
   {
     "id": "CF_NAME v3-create-package --name [name]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
     "translation": ""
   },
   {
@@ -5380,6 +5388,10 @@
     "translation": ""
   },
   {
+    "id": "Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Start an app",
     "translation": "앱 시작"
   },
@@ -5618,6 +5630,10 @@
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "{{.PluginExecutableName}} 파일이 플러그인 디렉토리에 이미 있습니다.\n"
+  },
+  {
+    "id": "The guid of the package to stage",
+    "translation": ""
   },
   {
     "id": "The hostname",
@@ -6602,6 +6618,10 @@
   {
     "id": "down",
     "translation": "작동 중지"
+  },
+  {
+    "id": "droplet: {{.DropletGUID}}",
+    "translation": ""
   },
   {
     "id": "each route in 'routes' must have a 'route' property",

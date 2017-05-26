@@ -18,7 +18,7 @@ type V3StageActor interface {
 }
 
 type V3StageCommand struct {
-	usage       interface{} `usage:"CF_NAME v3-stage --name [name]"`
+	usage       interface{} `usage:"CF_NAME v3-stage --name [name] --package-guid [guid]"`
 	AppName     string      `short:"n" long:"name" description:"The desired application name" required:"true"`
 	PackageGUID string      `long:"package-guid" description:"The guid of the package to stage" required:"true"`
 
