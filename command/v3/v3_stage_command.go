@@ -1,6 +1,9 @@
 package v3
 
 import (
+	"net/url"
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -11,15 +14,17 @@ import (
 
 type V3StageActor interface {
 	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 }
 
 type V3StageCommand struct {
-	usage       interface{} `usage:"CF_NAME v3-create-app --name [name]"`
+	usage       interface{} `usage:"CF_NAME v3-stage --name [name]"`
 	AppName     string      `short:"n" long:"name" description:"The desired application name" required:"true"`
 	PackageGUID string      `long:"package-guid" description:"The guid of the package to stage" required:"true"`
 
 	UI          command.UI
 	Config      command.Config
+	NOAAClient  v3action.NOAAClient
 	SharedActor command.SharedActor
 	Actor       V3StageActor
 }
@@ -29,13 +34,34 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	client, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(client, config)
+	cmd.Actor = v3action.NewActor(ccClient, config)
+
+	dopplerURL, err := hackDopplerURLFromUAA(ccClient.UAA())
+	if err != nil {
+		return err
+	}
+	cmd.NOAAClient = shared.NewNOAAClient(dopplerURL, config, uaaClient, ui)
 
 	return nil
+}
+
+func hackDopplerURLFromUAA(uaaURL string) (string, error) {
+	parsedUAAURL, err := url.Parse(uaaURL)
+
+	if err != nil {
+		return "", err
+	}
+	parsedUAAURL.Scheme = "wss"
+	oldHost := parsedUAAURL.Host
+	newHost := strings.Replace(oldHost, "uaa", "doppler", 1) + ":443"
+	parsedUAAURL.Host = newHost
+
+	dopplerURL := parsedUAAURL.String()
+	return dopplerURL, nil
 }
 
 func (cmd V3StageCommand) Execute(args []string) error {
@@ -56,6 +82,12 @@ func (cmd V3StageCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
+	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	cmd.UI.DisplayWarnings(logWarnings)
+	if logErr != nil {
+		return shared.HandleError(logErr)
+	}
+
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
 
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
@@ -67,12 +99,22 @@ func (cmd V3StageCommand) Execute(args []string) error {
 				break
 			}
 			cmd.UI.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": build.Droplet.GUID})
+		case log, ok := <-logStream:
+			if !ok {
+				break
+			}
+			cmd.UI.DisplayLogMessage(log, false)
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				closedWarningsStream = true
 				break
 			}
 			cmd.UI.DisplayWarnings(warnings)
+		case logErr, ok := <-logErrStream:
+			if !ok {
+				break
+			}
+			cmd.UI.DisplayWarning(logErr.Error())
 		case err, ok := <-errStream:
 			if !ok {
 				closedErrStream = true

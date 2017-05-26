@@ -13,7 +13,7 @@ import (
 
 // NewClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Client, error) {
+func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Client, *uaa.Client, error) {
 	ccWrappers := []ccv3.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -36,11 +36,11 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	})
 
 	if !targetCF {
-		return ccClient, nil
+		return ccClient, nil, nil
 	}
 
 	if config.Target() == "" {
-		return nil, command.NoAPISetError{
+		return nil, nil, command.NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
@@ -52,10 +52,10 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	})
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return nil, V3APIDoesNotExistError{Message: err.Error()}
+			return nil, nil, V3APIDoesNotExistError{Message: err.Error()}
 		}
 
-		return nil, HandleError(err)
+		return nil, nil, HandleError(err)
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{
@@ -80,5 +80,5 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 
 	authWrapper.SetClient(uaaClient)
 
-	return ccClient, nil
+	return ccClient, uaaClient, nil
 }
