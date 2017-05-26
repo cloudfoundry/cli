@@ -186,17 +186,16 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	return plugin, nil
 }
 
-func (actor Actor) GetPluginInfoFromRepository(pluginName string, pluginRepo configv3.PluginRepository) (PluginInfo, error) {
+func (actor Actor) GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (PluginInfo, error) {
 	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
 	if err != nil {
 		return PluginInfo{}, err
 	}
 
-	currentPlatform := generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH)
 	for _, plugin := range pluginRepository.Plugins {
 		if plugin.Name == pluginName {
 			for _, pluginBinary := range plugin.Binaries {
-				if pluginBinary.Platform == currentPlatform {
+				if pluginBinary.Platform == platform {
 					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
 				}
 			}
@@ -204,6 +203,15 @@ func (actor Actor) GetPluginInfoFromRepository(pluginName string, pluginRepo con
 	}
 
 	return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
+}
+
+func (actor Actor) GetPluginInfoFromAllRepositories(pluginName string, pluginRepos []configv3.PluginRepository) (PluginInfo, error) {
+	return PluginInfo{}, nil
+}
+
+// GetPlatformString exists solely for the purposes of mocking it out for command-layers tests.
+func (actor Actor) GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string {
+	return generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH)
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
@@ -177,15 +176,13 @@ var _ = Describe("install actions", func() {
 	})
 
 	Describe("GetPluginInfoFromRepository", func() {
-		BeforeEach(func() {
-		})
 		Context("When getting the plugin repository errors", func() {
 			BeforeEach(func() {
 				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
 			})
 
 			It("returns the error", func() {
-				_, err := actor.GetPluginInfoFromRepository("some-plugin", configv3.PluginRepository{Name: "some-repository", URL: "some-url"})
+				_, err := actor.GetPluginInfoFromRepositoryForPlatform("some-plugin", configv3.PluginRepository{Name: "some-repository", URL: "some-url"}, "some-platform")
 				Expect(err).To(MatchError(errors.New("some-error")))
 			})
 		})
@@ -227,7 +224,7 @@ var _ = Describe("install actions", func() {
 
 			Context("when the specified plugin does not exist in the repository", func() {
 				It("returns a PluginNotFoundInRepositoryError", func() {
-					_, err := actor.GetPluginInfoFromRepository("plugin-i-dont-exist", configv3.PluginRepository{Name: "some-repo", URL: "some-url"})
+					_, err := actor.GetPluginInfoFromRepositoryForPlatform("plugin-i-dont-exist", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "platform-i-dont-exist")
 					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
 						PluginName:     "plugin-i-dont-exist",
 						RepositoryName: "some-repo",
@@ -235,21 +232,24 @@ var _ = Describe("install actions", func() {
 				})
 			})
 
+			Context("when the specified plugin for the provided platform does not exist in the repository", func() {
+
+				It("returns a PluginNotFoundInRepositoryError", func() {
+					_, err := actor.GetPluginInfoFromRepositoryForPlatform("linux-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "platform-i-dont-exist")
+					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
+						PluginName:     "linux-plugin",
+						RepositoryName: "some-repo",
+					}))
+				})
+			})
+
 			Context("when the specified plugin exists", func() {
 				It("returns the plugin info", func() {
-					pluginInfo, err := actor.GetPluginInfoFromRepository("some-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"})
+					pluginInfo, err := actor.GetPluginInfoFromRepositoryForPlatform("some-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "osx")
 					Expect(err).ToNot(HaveOccurred())
 					Expect(pluginInfo.Name).To(Equal("some-plugin"))
 					Expect(pluginInfo.Version).To(Equal("1.2.3"))
-
-					switch runtime.GOOS {
-					case "linux":
-						Expect(pluginInfo.URL).To(Equal("http://some-linux-url"))
-					case "darwin":
-						Expect(pluginInfo.URL).To(Equal("http://some-darwin-url"))
-					case "windows":
-						Expect(pluginInfo.URL).To(Equal("http://some-windows-url"))
-					}
+					Expect(pluginInfo.URL).To(Equal("http://some-darwin-url"))
 				})
 			})
 		})

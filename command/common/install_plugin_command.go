@@ -3,6 +3,7 @@ package common
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
@@ -20,7 +21,9 @@ type InstallPluginActor interface {
 	DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
-	GetPluginInfoFromRepository(pluginName string, pluginRepo configv3.PluginRepository) (pluginaction.PluginInfo, error)
+	GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string
+	GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (pluginaction.PluginInfo, error)
+	GetPluginInfoFromAllRepositories(pluginName string, pluginRepos []configv3.PluginRepository) (pluginaction.PluginInfo, error)
 	GetPluginRepository(repositoryName string) (configv3.PluginRepository, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
 	IsPluginInstalled(pluginName string) bool
@@ -232,7 +235,9 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 		"PluginName":     pluginName,
 	})
 
-	pluginInfo, err = cmd.Actor.GetPluginInfoFromRepository(pluginName, pluginRepository)
+	currentPlatform := cmd.Actor.GetPlatformString(runtime.GOOS, runtime.GOARCH)
+
+	pluginInfo, err = cmd.Actor.GetPluginInfoFromRepositoryForPlatform(pluginName, pluginRepository, currentPlatform)
 	if err != nil {
 		if _, ok := err.(pluginaction.PluginNotFoundInRepositoryError); ok {
 			return "", 0, shared.PluginNotFoundInRepositoryError{
