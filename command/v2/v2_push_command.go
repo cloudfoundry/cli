@@ -131,46 +131,9 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayText("Pushing app with these attributes...")
-	for _, appConfig := range appConfigs {
-		var currentRoutes []string
-		for _, route := range appConfig.CurrentRoutes {
-			currentRoutes = append(currentRoutes, route.String())
-		}
-
-		var desiredRotues []string
-		for _, route := range appConfig.DesiredRoutes {
-			desiredRotues = append(desiredRotues, route.String())
-		}
-
-		err = cmd.UI.DisplayChangesForPush([]ui.Change{
-			{
-				Header:       "name:",
-				CurrentValue: appConfig.CurrentApplication.Name,
-				NewValue:     appConfig.DesiredApplication.Name,
-			},
-			{
-				Header:       "path:",
-				CurrentValue: appConfig.Path,
-				NewValue:     appConfig.Path,
-			},
-			{
-				Header:       "routes:",
-				CurrentValue: currentRoutes,
-				NewValue:     desiredRotues,
-			},
-		})
-
-		if err != nil {
-			log.Errorln("display changes:", err)
-			return shared.HandleError(err)
-		}
-
-		cmd.UI.DisplayNewline()
-	}
-
 	for _, appConfig := range appConfigs {
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
+		cmd.displayChanges(appConfig)
 		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig, cmd.ProgressBar)
 		updatedConfig, err := cmd.processApplyStreams(user, appConfig, configStream, eventStream, warningsStream, errorStream)
 		if err != nil {
@@ -209,6 +172,50 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	log.Debugf("%#v", config)
 	return config, nil
+}
+
+func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) error {
+	if appConfig.CreatingApplication() {
+		cmd.UI.DisplayText("Creating app with these attributes...")
+	} else {
+		cmd.UI.DisplayText("Updating app with these attributes...")
+	}
+
+	var currentRoutes []string
+	for _, route := range appConfig.CurrentRoutes {
+		currentRoutes = append(currentRoutes, route.String())
+	}
+
+	var desiredRotues []string
+	for _, route := range appConfig.DesiredRoutes {
+		desiredRotues = append(desiredRotues, route.String())
+	}
+
+	err := cmd.UI.DisplayChangesForPush([]ui.Change{
+		{
+			Header:       "name:",
+			CurrentValue: appConfig.CurrentApplication.Name,
+			NewValue:     appConfig.DesiredApplication.Name,
+		},
+		{
+			Header:       "path:",
+			CurrentValue: appConfig.Path,
+			NewValue:     appConfig.Path,
+		},
+		{
+			Header:       "routes:",
+			CurrentValue: currentRoutes,
+			NewValue:     desiredRotues,
+		},
+	})
+
+	if err != nil {
+		log.Errorln("display changes:", err)
+		return shared.HandleError(err)
+	}
+
+	cmd.UI.DisplayNewline()
+	return nil
 }
 
 func (cmd V2PushCommand) processApplyStreams(
@@ -268,16 +275,6 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	log.Infoln("received apply event:", event)
 
 	switch event {
-	case pushaction.SettingUpApplication:
-		cmd.UI.DisplayTextWithFlavor(
-			"Configuring app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-			map[string]interface{}{
-				"AppName":   appConfig.DesiredApplication.Name,
-				"OrgName":   cmd.Config.TargetedOrganization().Name,
-				"SpaceName": cmd.Config.TargetedSpace().Name,
-				"Username":  user.Name,
-			},
-		)
 	case pushaction.ConfiguringRoutes:
 		cmd.UI.DisplayText("Mapping routes...")
 	case pushaction.CreatingArchive:

@@ -4,7 +4,7 @@ import log "github.com/Sirupsen/logrus"
 
 func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
 	log.Debugf("creating or updating application")
-	if config.DesiredApplication.GUID != "" {
+	if config.UpdatingApplication() {
 		log.Debugf("updating application: %#v", config.DesiredApplication)
 		app, warnings, err := actor.V2Actor.UpdateApplication(config.DesiredApplication)
 		if err != nil {

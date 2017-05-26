@@ -14,13 +14,11 @@ import (
 
 var _ = Describe("push with only an app name", func() {
 	var (
-		appName  string
-		username string
+		appName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
-		username, _ = helpers.GetCredentials()
 	})
 
 	Describe("app existence", func() {
@@ -29,12 +27,11 @@ var _ = Describe("push with only an app name", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
 					Eventually(session).Should(Say("Getting app info..."))
-					Eventually(session).Should(Say("Pushing app with these attributes..."))
+					Eventually(session).Should(Say("Creating app with these attributes..."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
-					Eventually(session).Should(Say("Configuring app %s in org %s / space %s as %s...", appName, organization, space, username))
 					Eventually(session).Should(Say("Mapping routes..."))
 					Eventually(session).Should(Say("Packaging files to upload..."))
 					Eventually(session).Should(Say("Uploading files..."))
@@ -64,12 +61,11 @@ var _ = Describe("push with only an app name", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
 					Eventually(session).Should(Say("Getting app info..."))
-					Eventually(session).Should(Say("Pushing app with these attributes..."))
+					Eventually(session).Should(Say("Updating app with these attributes..."))
 					Eventually(session).Should(Say("(?m)^\\s+name:\\s+%s$", appName))
 					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?mi)^\\s+%s.%s$", strings.ToLower(appName), defaultSharedDomain()))
-					Eventually(session).Should(Say("Configuring app %s in org %s / space %s as %s...", appName, organization, space, username))
 					Eventually(session).Should(Say("Mapping routes..."))
 					Eventually(session).Should(Say("Packaging files to upload..."))
 					Eventually(session).Should(Say("Uploading files..."))

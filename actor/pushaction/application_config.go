@@ -19,6 +19,14 @@ type ApplicationConfig struct {
 	Path              string
 }
 
+func (config ApplicationConfig) CreatingApplication() bool {
+	return config.CurrentApplication.GUID == ""
+}
+
+func (config ApplicationConfig) UpdatingApplication() bool {
+	return !config.CreatingApplication()
+}
+
 func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings
