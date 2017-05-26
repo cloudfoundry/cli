@@ -500,8 +500,8 @@
     "translation": ""
   },
   {
-    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
-    "translation": ""
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos.",
+    "translation": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos."
   },
   {
     "id": "Plugin {{.Name}} successfully uninstalled.",
@@ -544,8 +544,8 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
-    "translation": ""
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}",
+    "translation": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}"
   },
   {
     "id": "Plugin {{.PluginName}} {{.PluginVersion}} is already installed.",

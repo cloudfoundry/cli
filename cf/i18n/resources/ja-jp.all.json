@@ -4424,7 +4424,7 @@
     "translation": ""
   },
   {
-    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos.",
     "translation": ""
   },
   {
@@ -4480,7 +4480,7 @@
     "translation": "プラグイン {{.PluginName}} v{{.Version}} は正常にインストールされました。"
   },
   {
-    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}",
     "translation": ""
   },
   {

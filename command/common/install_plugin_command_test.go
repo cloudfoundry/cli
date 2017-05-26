@@ -769,7 +769,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(executeErr).To(MatchError(expectedErr))
 
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
@@ -802,7 +802,7 @@ var _ = Describe("install-plugin command", func() {
 									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
@@ -918,7 +918,7 @@ var _ = Describe("install-plugin command", func() {
 													Expect(executeErr).ToNot(HaveOccurred())
 
 													Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-													Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+													Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 													Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.2 is already installed."))
 													Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 													Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
@@ -950,7 +950,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(executeErr).To(MatchError(expectedErr))
 
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
 								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
@@ -974,7 +974,7 @@ var _ = Describe("install-plugin command", func() {
 									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+									Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
@@ -1046,7 +1046,7 @@ var _ = Describe("install-plugin command", func() {
 												Expect(executeErr).ToNot(HaveOccurred())
 
 												Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin..."))
-												Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo."))
+												Expect(testUI.Out).To(Say("Plugin some-plugin 1.2.3 found in: some-repo"))
 												Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors."))
 												Expect(testUI.Out).To(Say("Install and use plugins at your own risk."))
 												Expect(testUI.Out).To(Say("Starting download of plugin binary from repository some-repo..."))
@@ -1086,7 +1086,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo\\."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\."))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
@@ -1135,7 +1135,7 @@ var _ = Describe("install-plugin command", func() {
 
 							It("installs the plugin", func() {
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo\\."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\."))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
@@ -1162,7 +1162,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo\\."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]"))
@@ -1212,7 +1212,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Searching some-repo for plugin some-plugin\\.\\.\\."))
-								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo\\."))
+								Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 found in: some-repo"))
 								Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]"))

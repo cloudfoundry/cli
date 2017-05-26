@@ -227,7 +227,7 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 		return "", 0, err
 	}
 
-	cmd.UI.DisplayText("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
 		"RepositoryName": cmd.RegisteredRepository,
 		"PluginName":     pluginName,
 	})
@@ -243,7 +243,7 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 		}
 		return "", 0, err
 	}
-	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.", map[string]interface{}{
+	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}", map[string]interface{}{
 		"PluginName":     pluginName,
 		"PluginVersion":  pluginInfo.Version,
 		"RepositoryName": cmd.RegisteredRepository,

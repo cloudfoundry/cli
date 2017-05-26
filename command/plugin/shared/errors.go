@@ -200,7 +200,7 @@ type RepositoryNotRegisteredError struct {
 }
 
 func (_ RepositoryNotRegisteredError) Error() string {
-	return "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories."
+	return "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos."
 }
 
 func (e RepositoryNotRegisteredError) Translate(translate func(string, ...interface{}) string) string {
