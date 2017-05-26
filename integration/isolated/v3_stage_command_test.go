@@ -34,7 +34,7 @@ var _ = Describe("v3-stage command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("   v3-stage - \\*\\*EXPERIMENTAL\\*\\* Create a new droplet for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("   cf v3-stage --name \\[name\\]"))
+				Eventually(session.Out).Should(Say("   cf v3-stage --name \\[name\\] --package-guid \\[guid\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("   --name, -n          The desired application name"))
 				Eventually(session.Out).Should(Say("   --package-guid      The guid of the package to stage"))
