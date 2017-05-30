@@ -168,6 +168,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-start -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME version\\n\\n   'cf -v' and 'cf --version' are also accepted.",
     "translation": ""
   },
@@ -760,6 +764,10 @@
     "translation": ""
   },
   {
+    "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
@@ -805,6 +813,10 @@
   },
   {
     "id": "The application instance index cannot be negative",
+    "translation": ""
+  },
+  {
+    "id": "The application name to start",
     "translation": ""
   },
   {

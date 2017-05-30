@@ -81,3 +81,18 @@ func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropl
 
 	return allWarnings, err
 }
+
+// StartApplication starts an application.
+func (actor Actor) StartApplication(appName string, spaceGUID string) (Application, Warnings, error) {
+	allWarnings := Warnings{}
+	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+	updatedApp, apiWarnings, err := actor.CloudControllerClient.StartApplication(application.GUID)
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+
+	return Application(updatedApp), allWarnings, err
+}

@@ -19,6 +19,7 @@ type commandList struct {
 	V3CreatePackage v3.V3CreatePackageCommand `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 	V3Stage         v3.V3StageCommand         `command:"v3-stage" description:"**EXPERIMENTAL** Create a new droplet for an app"`
 	V3SetDroplet    v3.V3SetDropletCommand    `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3Start         v3.V3StartCommand         `command:"v3-start" description:"Start an app"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`

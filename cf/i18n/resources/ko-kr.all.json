@@ -1676,6 +1676,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-start -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME version",
     "translation": "CF_NAME version"
   },
@@ -5428,6 +5432,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 시작 중..."
   },
   {
+    "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
@@ -5594,6 +5602,10 @@
   {
     "id": "The application name",
     "translation": "애플리케이션 이름"
+  },
+  {
+    "id": "The application name to start",
+    "translation": ""
   },
   {
     "id": "The application name to which to assign the droplet",

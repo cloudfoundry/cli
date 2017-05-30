@@ -32,6 +32,7 @@ const (
 	PostIsolationSegmentsRequest                          = "PostIsolationSegments"
 	PostPackageRequest                                    = "PostPackageRequest"
 	PutTaskCancelRequest                                  = "PutTaskCancelRequest"
+	PutApplicationStartRequest                            = "PutApplicationStart"
 )
 
 const (
@@ -65,6 +66,7 @@ var APIRoutes = []Route{
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
 	{Path: "/:guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/relationships/organizations/:org_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid/start", Method: http.MethodPut, Name: PutApplicationStartRequest, Resource: AppsResource},
 	{Path: "/:guid/tasks", Method: http.MethodGet, Name: GetAppTasksRequest, Resource: AppsResource},
 	{Path: "/:guid/tasks", Method: http.MethodPost, Name: PostAppTasksRequest, Resource: AppsResource},
 }
