@@ -1668,6 +1668,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-set-droplet -n APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
     "translation": ""
   },
@@ -5216,12 +5220,20 @@
     "translation": "Définir ou afficher l'organisation ou l'espace ciblé"
   },
   {
+    "id": "Set the droplet used to run an app",
+    "translation": ""
+  },
+  {
     "id": "Set to 'port' or 'none'",
     "translation": ""
   },
   {
     "id": "Setting api endpoint to {{.Endpoint}}...",
     "translation": "Définition du noeud final d'API {{.Endpoint}}..."
+  },
+  {
+    "id": "Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5584,6 +5596,10 @@
     "translation": "Nom de l'application"
   },
   {
+    "id": "The application name to which to assign the droplet",
+    "translation": ""
+  },
+  {
     "id": "The buildpack",
     "translation": "Pack de construction"
   },
@@ -5626,6 +5642,10 @@
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "Le fichier {{.PluginExecutableName}} existe déjà sous le répertoire de plug-in.\n"
+  },
+  {
+    "id": "The guid of the droplet to use",
+    "translation": ""
   },
   {
     "id": "The guid of the package to stage",

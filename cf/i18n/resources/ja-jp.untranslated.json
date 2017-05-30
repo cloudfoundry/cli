@@ -160,6 +160,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-set-droplet -n APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
     "translation": ""
   },
@@ -712,7 +716,15 @@
     "translation": ""
   },
   {
+    "id": "Set the droplet used to run an app",
+    "translation": ""
+  },
+  {
     "id": "Set to 'port' or 'none'",
+    "translation": ""
+  },
+  {
+    "id": "Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
@@ -796,11 +808,19 @@
     "translation": ""
   },
   {
+    "id": "The application name to which to assign the droplet",
+    "translation": ""
+  },
+  {
     "id": "The command to execute",
     "translation": ""
   },
   {
     "id": "The desired application name",
+    "translation": ""
+  },
+  {
+    "id": "The guid of the droplet to use",
     "translation": ""
   },
   {

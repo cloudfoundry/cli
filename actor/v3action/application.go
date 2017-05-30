@@ -66,3 +66,18 @@ func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID str
 
 	return Application(app), Warnings(warnings), err
 }
+
+// SetApplicationDroplet sets the droplet for an application.
+func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (Warnings, error) {
+	allWarnings := Warnings{}
+	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+	_, apiWarnings, err := actor.CloudControllerClient.SetApplicationDroplet(application.GUID, dropletGUID)
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+
+	return allWarnings, err
+}
