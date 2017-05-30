@@ -264,4 +264,89 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 	})
+
+	Describe("StartApplication", func() {
+		Context("when there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.StartApplicationReturns(
+					ccv3.Application{GUID: "some-app-guid"},
+					ccv3.Warnings{"start-application-warning"},
+					nil,
+				)
+			})
+
+			It("sets the app's droplet", func() {
+				app, warnings, err := actor.StartApplication("some-app-name", "some-space-guid")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-applications-warning", "start-application-warning"))
+				Expect(app).To(Equal(Application{GUID: "some-app-guid"}))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
+				Expect(queryURL).To(Equal(query))
+
+				Expect(fakeCloudControllerClient.StartApplicationCallCount()).To(Equal(1))
+				appGUID := fakeCloudControllerClient.StartApplicationArgsForCall(0)
+				Expect(appGUID).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when getting the application fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get application error")
+
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"get-applications-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.StartApplication("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning"))
+			})
+		})
+
+		Context("when starting the application fails", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("some set start-application error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.StartApplicationReturns(
+					ccv3.Application{},
+					ccv3.Warnings{"start-application-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.StartApplication("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning", "start-application-warning"))
+			})
+		})
+	})
 })

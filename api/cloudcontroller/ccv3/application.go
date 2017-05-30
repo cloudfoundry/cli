@@ -92,3 +92,18 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 
 	return responseRelationship, response.Warnings, err
 }
+
+func (client *Client) StartApplication(appGUID string) (Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutApplicationStartRequest,
+		URIParams:   map[string]string{"guid": appGUID},
+	})
+
+	var responseApp Application
+	response := cloudcontroller.Response{
+		Result: &responseApp,
+	}
+	err = client.connection.Make(request, &response)
+
+	return responseApp, response.Warnings, err
+}

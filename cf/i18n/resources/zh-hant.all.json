@@ -1676,6 +1676,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-start -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME version",
     "translation": "CF_NAME version"
   },
@@ -5428,6 +5432,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分啟動組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
   },
   {
+    "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
@@ -5594,6 +5602,10 @@
   {
     "id": "The application name",
     "translation": "應用程式名稱"
+  },
+  {
+    "id": "The application name to start",
+    "translation": ""
   },
   {
     "id": "The application name to which to assign the droplet",
