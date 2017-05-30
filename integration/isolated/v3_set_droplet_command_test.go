@@ -139,7 +139,7 @@ var _ = Describe("v3-set-droplet command", func() {
 			setupCF(orgName, spaceName)
 		})
 
-		FContext("when the app exists", func() {
+		Context("when the app exists", func() {
 			var dropletGUID string
 
 			BeforeEach(func() {
