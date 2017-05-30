@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-rootfs_uri: docker:///busybox
+image: docker:///busybox
 
 inputs:
   - name: input1

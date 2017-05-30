@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-rootfs_uri: docker:///cloudfoundry/cli-vagrant-ci
+image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
   AWS_ACCESS_KEY_ID:
