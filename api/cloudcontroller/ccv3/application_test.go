@@ -220,4 +220,99 @@ var _ = Describe("Application", func() {
 			})
 		})
 	})
+
+	Describe("SetApplicationDroplet", func() {
+		Context("it sets the droplet", func() {
+			BeforeEach(func() {
+				response := `
+{
+  "data": {
+    "guid": "some-droplet-guid"
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/apps/some-app-guid/relationships/current_droplet"
+    },
+    "related": {
+      "href": "https://api.example.org/v3/apps/some-app-guid/droplets/current"
+    }
+  }
+}`
+				requestBody := map[string]interface{}{
+					"data": map[string]string{
+						"guid": "some-droplet-guid",
+					},
+				}
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid/relationships/current_droplet"),
+						VerifyJSONRepresenting(requestBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns warnings and no error", func() {
+				relationship, warnings, err := client.SetApplicationDroplet("some-app-guid", "some-droplet-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(relationship.GUID).To(Equal("some-droplet-guid"))
+			})
+		})
+	})
+	Context("when setting the app to the new droplet returns errors and warnings", func() {
+		BeforeEach(func() {
+			response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+			requestBody := map[string]interface{}{
+				"data": map[string]string{
+					"guid": "some-droplet-guid",
+				},
+			}
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPatch, "/v3/apps/no-such-app-guid/relationships/current_droplet"),
+					VerifyJSONRepresenting(requestBody),
+					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+
+		})
+
+		It("returns the error and all warnings", func() {
+			_, warnings, err := client.SetApplicationDroplet("no-such-app-guid", "some-droplet-guid")
+			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				ResponseCode: http.StatusTeapot,
+				V3ErrorResponse: ccerror.V3ErrorResponse{
+					[]ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				},
+			}))
+			Expect(warnings).To(ConsistOf("this is a warning"))
+		})
+	})
 })

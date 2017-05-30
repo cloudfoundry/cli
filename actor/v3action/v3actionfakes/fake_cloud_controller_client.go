@@ -305,6 +305,22 @@ type FakeCloudControllerClient struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
+	SetApplicationDropletStub        func(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
+	setApplicationDropletMutex       sync.RWMutex
+	setApplicationDropletArgsForCall []struct {
+		appGUID     string
+		dropletGUID string
+	}
+	setApplicationDropletReturns struct {
+		result1 ccv3.Relationship
+		result2 ccv3.Warnings
+		result3 error
+	}
+	setApplicationDropletReturnsOnCall map[int]struct {
+		result1 ccv3.Relationship
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	updateTaskMutex       sync.RWMutex
 	updateTaskArgsForCall []struct {
@@ -1410,6 +1426,61 @@ func (fake *FakeCloudControllerClient) RevokeIsolationSegmentFromOrganizationRet
 	}{result1, result2}
 }
 
+func (fake *FakeCloudControllerClient) SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error) {
+	fake.setApplicationDropletMutex.Lock()
+	ret, specificReturn := fake.setApplicationDropletReturnsOnCall[len(fake.setApplicationDropletArgsForCall)]
+	fake.setApplicationDropletArgsForCall = append(fake.setApplicationDropletArgsForCall, struct {
+		appGUID     string
+		dropletGUID string
+	}{appGUID, dropletGUID})
+	fake.recordInvocation("SetApplicationDroplet", []interface{}{appGUID, dropletGUID})
+	fake.setApplicationDropletMutex.Unlock()
+	if fake.SetApplicationDropletStub != nil {
+		return fake.SetApplicationDropletStub(appGUID, dropletGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.setApplicationDropletReturns.result1, fake.setApplicationDropletReturns.result2, fake.setApplicationDropletReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) SetApplicationDropletCallCount() int {
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
+	return len(fake.setApplicationDropletArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) SetApplicationDropletArgsForCall(i int) (string, string) {
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
+	return fake.setApplicationDropletArgsForCall[i].appGUID, fake.setApplicationDropletArgsForCall[i].dropletGUID
+}
+
+func (fake *FakeCloudControllerClient) SetApplicationDropletReturns(result1 ccv3.Relationship, result2 ccv3.Warnings, result3 error) {
+	fake.SetApplicationDropletStub = nil
+	fake.setApplicationDropletReturns = struct {
+		result1 ccv3.Relationship
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) SetApplicationDropletReturnsOnCall(i int, result1 ccv3.Relationship, result2 ccv3.Warnings, result3 error) {
+	fake.SetApplicationDropletStub = nil
+	if fake.setApplicationDropletReturnsOnCall == nil {
+		fake.setApplicationDropletReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Relationship
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.setApplicationDropletReturnsOnCall[i] = struct {
+		result1 ccv3.Relationship
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
 	fake.updateTaskMutex.Lock()
 	ret, specificReturn := fake.updateTaskReturnsOnCall[len(fake.updateTaskArgsForCall)]
@@ -1562,6 +1633,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceIsolationSegmentMutex.RUnlock()
 	fake.revokeIsolationSegmentFromOrganizationMutex.RLock()
 	defer fake.revokeIsolationSegmentFromOrganizationMutex.RUnlock()
+	fake.setApplicationDropletMutex.RLock()
+	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
 	defer fake.updateTaskMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
