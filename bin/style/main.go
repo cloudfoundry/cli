@@ -263,6 +263,11 @@ func checkFile(fileSet *token.FileSet, path string) ([]warning, error) {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s [--] [FILE or DIRECTORY]...\n", os.Args[0])
+		os.Exit(1)
+	}
+
 	var allWarnings []warning
 
 	args := os.Args[1:]
