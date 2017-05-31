@@ -140,6 +140,10 @@ func (cmd V2PushCommand) Execute(args []string) error {
 			return shared.HandleError(err)
 		}
 
+		if appConfig.CurrentApplication.Started() {
+			cmd.UI.DisplayText("Stopping app...")
+		}
+
 		messages, logErrs, appStarting, apiWarnings, errs := cmd.StartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
 		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
 		if err != nil {
