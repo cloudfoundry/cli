@@ -14,10 +14,6 @@ import (
 )
 
 var _ = Describe("install-plugin (from repo) command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
-	})
-
 	Describe("installing a plugin from a specific repo", func() {
 		Context("when the repo and the plugin name are swapped", func() {
 			var repoServer *Server

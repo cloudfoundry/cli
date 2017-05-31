@@ -48,7 +48,6 @@ var _ = Describe("install-plugin command", func() {
 		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
 		pluginHome = fmt.Sprintf("some-pluginhome-%s", tmpDirectorySeed)
 		fakeConfig.PluginHomeReturns(pluginHome)
-		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
 	})
 

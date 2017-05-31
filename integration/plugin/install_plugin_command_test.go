@@ -21,10 +21,6 @@ import (
 var _ = Describe("install-plugin command", func() {
 	var buffer *Buffer
 
-	BeforeEach(func() {
-		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
-	})
-
 	AfterEach(func() {
 		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
 		if os.IsNotExist(err) {
