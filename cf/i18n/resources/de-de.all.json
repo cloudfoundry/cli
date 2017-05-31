@@ -4440,6 +4440,10 @@
     "translation": "Das angeforderte Plug-in verfügt über keine Binärdatei für Ihr Betriebssystem: "
   },
   {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },

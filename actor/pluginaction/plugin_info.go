@@ -15,32 +15,46 @@ type PluginInfo struct {
 	Checksum string
 }
 
-// PluginNotFoundError is an error returned when a plugin is not found.
+// PluginNotFoundInRepositoryError is an error returned when a plugin is not found.
 type PluginNotFoundInRepositoryError struct {
 	PluginName     string
 	RepositoryName string
 }
 
-// Error outputs a plugin not found error message.
+// Error outputs the plugin not found in repository error message.
 func (e PluginNotFoundInRepositoryError) Error() string {
 	return fmt.Sprintf("Plugin %s not found in repository %s", e.PluginName, e.RepositoryName)
 }
 
-// PluginNotFoundError is an error returned when a plugin is not found.
+// PluginNotFoundInAnyRepositoryError is an error returned when a plugin cannot
+// be found in any repositories.
 type PluginNotFoundInAnyRepositoryError struct {
 	PluginName string
 }
 
-// Error outputs a plugin not found error message.
+// Error outputs that the plugin cannot be found in any repositories.
 func (e PluginNotFoundInAnyRepositoryError) Error() string {
 	return fmt.Sprintf("Plugin %s not found in any registered repo", e.PluginName)
 }
 
+// NoCompatibleBinaryError is returned when a repository contains a specified
+// plugin but not for the specified platform
+type NoCompatibleBinaryError struct {
+}
+
+func (e NoCompatibleBinaryError) Error() string {
+	return "Plugin requested has no binary available for your platform."
+}
+
+// GetPluginInfoFromRepositoryForPlatform returns the plugin info, if found, from
+// the specified repository for the specified platform.
 func (actor Actor) GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (PluginInfo, error) {
 	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
 	if err != nil {
 		return PluginInfo{}, err
 	}
+
+	var pluginFoundWithIncompatibleBinary bool
 
 	for _, plugin := range pluginRepository.Plugins {
 		if plugin.Name == pluginName {
@@ -49,10 +63,15 @@ func (actor Actor) GetPluginInfoFromRepositoryForPlatform(pluginName string, plu
 					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
 				}
 			}
+			pluginFoundWithIncompatibleBinary = true
 		}
 	}
 
-	return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
+	if pluginFoundWithIncompatibleBinary {
+		return PluginInfo{}, NoCompatibleBinaryError{}
+	} else {
+		return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
+	}
 }
 
 // GetPluginInfoFromRepositoriesForPlatform returns the newest version of the specified plugin
@@ -60,24 +79,34 @@ func (actor Actor) GetPluginInfoFromRepositoryForPlatform(pluginName string, plu
 func (actor Actor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (PluginInfo, []string, error) {
 	var reposWithPlugin []string
 	var newestPluginInfo PluginInfo
+	var pluginFoundWithIncompatibleBinary bool
 
 	for _, repo := range pluginRepos {
 		pluginInfo, err := actor.GetPluginInfoFromRepositoryForPlatform(pluginName, repo, platform)
-		if _, ok := err.(PluginNotFoundInRepositoryError); ok {
+		switch err.(type) {
+		case PluginNotFoundInRepositoryError:
 			continue
-		} else if err != nil {
+		case NoCompatibleBinaryError:
+			pluginFoundWithIncompatibleBinary = true
+			continue
+		case nil:
+			if len(reposWithPlugin) == 0 || lessThan(newestPluginInfo.Version, pluginInfo.Version) {
+				newestPluginInfo = pluginInfo
+				reposWithPlugin = []string{repo.Name}
+			} else if pluginInfo.Version == newestPluginInfo.Version {
+				reposWithPlugin = append(reposWithPlugin, repo.Name)
+			}
+		default:
 			return PluginInfo{}, nil, err
-		}
-		if len(reposWithPlugin) == 0 || lessThan(newestPluginInfo.Version, pluginInfo.Version) {
-			newestPluginInfo = pluginInfo
-			reposWithPlugin = []string{repo.Name}
-		} else if pluginInfo.Version == newestPluginInfo.Version {
-			reposWithPlugin = append(reposWithPlugin, repo.Name)
 		}
 	}
 
 	if len(reposWithPlugin) == 0 {
-		return PluginInfo{}, nil, PluginNotFoundInAnyRepositoryError{PluginName: pluginName}
+		if pluginFoundWithIncompatibleBinary {
+			return PluginInfo{}, nil, NoCompatibleBinaryError{}
+		} else {
+			return PluginInfo{}, nil, PluginNotFoundInAnyRepositoryError{PluginName: pluginName}
+		}
 	}
 	return newestPluginInfo, reposWithPlugin, nil
 }

@@ -123,6 +123,16 @@ var _ = Describe("install-plugin command", func() {
 				})
 			})
 
+			Context("when a compatible binary can't be found in the repository", func() {
+				BeforeEach(func() {
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.NoCompatibleBinaryError{})
+				})
+
+				It("returns the NoCompatibleBinaryError", func() {
+					Expect(executeErr).To(MatchError(shared.NoCompatibleBinaryError{}))
+				})
+			})
+
 			Context("when the plugin is found", func() {
 				var (
 					checksum                string

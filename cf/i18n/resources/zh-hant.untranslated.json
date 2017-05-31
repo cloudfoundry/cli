@@ -512,6 +512,10 @@
     "translation": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos."
   },
   {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },

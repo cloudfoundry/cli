@@ -39,6 +39,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("PluginNotFoundInRepositoryError", PluginNotFoundInRepositoryError{}),
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),
 		Entry("NoPluginRepositoriesError", NoPluginRepositoriesError{}),
+		Entry("NoCompatibleBinaryError", NoCompatibleBinaryError{}),
 		Entry("RepositoryNameTakenError", RepositoryNameTakenError{}),
 		Entry("AddPluginRepositoryError", AddPluginRepositoryError{}),
 		Entry("GettingPluginRepositoryError", GettingPluginRepositoryError{}),
