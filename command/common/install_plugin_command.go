@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
@@ -68,11 +67,6 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd InstallPluginCommand) Execute(_ []string) error {
-	if !cmd.Config.Experimental() {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
 		return shared.HandleError(err)
