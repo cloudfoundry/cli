@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
@@ -22,8 +23,7 @@ type InstallPluginActor interface {
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
 	GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string
-	GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (pluginaction.PluginInfo, error)
-	GetPluginInfoFromAllRepositories(pluginName string, pluginRepos []configv3.PluginRepository) (pluginaction.PluginInfo, error)
+	GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error)
 	GetPluginRepository(repositoryName string) (configv3.PluginRepository, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
 	IsPluginInstalled(pluginName string) bool
@@ -167,7 +167,24 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 	switch {
 	case cmd.RegisteredRepository != "":
-		return cmd.getPluginFromRepository(pluginNameOrLocation, tempPluginDir)
+		// path, pluginSource, err := cmd.getPluginFromRepository(pluginNameOrLocation, tempPluginDir)
+		pluginRepository, err := cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
+		if err != nil {
+			return "", 0, err
+		}
+		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, []configv3.PluginRepository{pluginRepository}, tempPluginDir)
+
+		if err != nil {
+			if _, ok := err.(pluginaction.PluginNotFoundInAnyRepositoryError); ok {
+				return "", 0, shared.PluginNotFoundInRepositoryError{
+					BinaryName:     cmd.Config.BinaryName(),
+					PluginName:     pluginNameOrLocation,
+					RepositoryName: cmd.RegisteredRepository,
+				}
+			}
+			return "", 0, err
+		}
+		return path, pluginSource, nil
 
 	case cmd.Actor.FileExists(pluginNameOrLocation):
 		return cmd.getPluginFromLocalFile(pluginNameOrLocation)
@@ -179,7 +196,19 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		return "", 0, command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 
 	default:
-		return "", 0, shared.FileNotFoundError{Path: pluginNameOrLocation}
+		repos := cmd.Config.PluginRepositories()
+		if len(repos) == 0 {
+			return "", 0, shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+		}
+
+		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, repos, tempPluginDir)
+		if err != nil {
+			if _, ok := err.(pluginaction.PluginNotFoundInAnyRepositoryError); ok {
+				return "", 0, shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+			}
+			return "", 0, err
+		}
+		return path, pluginSource, nil
 	}
 }
 
@@ -195,7 +224,9 @@ func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (s
 }
 
 func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPluginDir string) (string, PluginSource, error) {
-	err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	var err error
+
+	err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
 	if err != nil {
@@ -217,41 +248,28 @@ func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPlug
 	return tempPath, PluginFromURL, err
 }
 
-func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempPluginDir string) (string, PluginSource, error) {
-	var (
-		pluginRepository configv3.PluginRepository
-		pluginInfo       pluginaction.PluginInfo
-		err              error
-		tempPath         string
-	)
-
-	pluginRepository, err = cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
-	if err != nil {
-		return "", 0, err
+func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, repos []configv3.PluginRepository, tempPluginDir string) (string, PluginSource, error) {
+	var repoNames []string
+	for _, repo := range repos {
+		repoNames = append(repoNames, repo.Name)
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
-		"RepositoryName": cmd.RegisteredRepository,
+		"RepositoryName": strings.Join(repoNames, ", "),
 		"PluginName":     pluginName,
 	})
 
 	currentPlatform := cmd.Actor.GetPlatformString(runtime.GOOS, runtime.GOARCH)
+	pluginInfo, repoList, err := cmd.Actor.GetPluginInfoFromRepositoriesForPlatform(pluginName, repos, currentPlatform)
 
-	pluginInfo, err = cmd.Actor.GetPluginInfoFromRepositoryForPlatform(pluginName, pluginRepository, currentPlatform)
 	if err != nil {
-		if _, ok := err.(pluginaction.PluginNotFoundInRepositoryError); ok {
-			return "", 0, shared.PluginNotFoundInRepositoryError{
-				BinaryName:     cmd.Config.BinaryName(),
-				PluginName:     pluginName,
-				RepositoryName: cmd.RegisteredRepository,
-			}
-		}
 		return "", 0, err
 	}
+
 	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}", map[string]interface{}{
 		"PluginName":     pluginName,
 		"PluginVersion":  pluginInfo.Version,
-		"RepositoryName": cmd.RegisteredRepository,
+		"RepositoryName": strings.Join(repoList, ", "),
 	})
 
 	installedPlugin, exist := cmd.Config.GetPlugin(pluginName)
@@ -276,11 +294,11 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 	}
 
 	cmd.UI.DisplayText("Starting download of plugin binary from repository {{.RepositoryName}}...", map[string]interface{}{
-		"RepositoryName": cmd.RegisteredRepository,
+		"RepositoryName": repoList[0],
 	})
 
 	var size int64
-	tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
+	tempPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
 	if err != nil {
 		return "", 0, err
 	}

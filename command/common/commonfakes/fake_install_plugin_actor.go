@@ -78,34 +78,22 @@ type FakeInstallPluginActor struct {
 	getPlatformStringReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetPluginInfoFromRepositoryForPlatformStub        func(pluginName string, pluginRepo configv3.PluginRepository, platform string) (pluginaction.PluginInfo, error)
-	getPluginInfoFromRepositoryForPlatformMutex       sync.RWMutex
-	getPluginInfoFromRepositoryForPlatformArgsForCall []struct {
-		pluginName string
-		pluginRepo configv3.PluginRepository
-		platform   string
-	}
-	getPluginInfoFromRepositoryForPlatformReturns struct {
-		result1 pluginaction.PluginInfo
-		result2 error
-	}
-	getPluginInfoFromRepositoryForPlatformReturnsOnCall map[int]struct {
-		result1 pluginaction.PluginInfo
-		result2 error
-	}
-	GetPluginInfoFromAllRepositoriesStub        func(pluginName string, pluginRepos []configv3.PluginRepository) (pluginaction.PluginInfo, error)
-	getPluginInfoFromAllRepositoriesMutex       sync.RWMutex
-	getPluginInfoFromAllRepositoriesArgsForCall []struct {
+	GetPluginInfoFromRepositoriesForPlatformStub        func(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error)
+	getPluginInfoFromRepositoriesForPlatformMutex       sync.RWMutex
+	getPluginInfoFromRepositoriesForPlatformArgsForCall []struct {
 		pluginName  string
 		pluginRepos []configv3.PluginRepository
+		platform    string
 	}
-	getPluginInfoFromAllRepositoriesReturns struct {
+	getPluginInfoFromRepositoriesForPlatformReturns struct {
 		result1 pluginaction.PluginInfo
-		result2 error
+		result2 []string
+		result3 error
 	}
-	getPluginInfoFromAllRepositoriesReturnsOnCall map[int]struct {
+	getPluginInfoFromRepositoriesForPlatformReturnsOnCall map[int]struct {
 		result1 pluginaction.PluginInfo
-		result2 error
+		result2 []string
+		result3 error
 	}
 	GetPluginRepositoryStub        func(repositoryName string) (configv3.PluginRepository, error)
 	getPluginRepositoryMutex       sync.RWMutex
@@ -428,114 +416,65 @@ func (fake *FakeInstallPluginActor) GetPlatformStringReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (pluginaction.PluginInfo, error) {
-	fake.getPluginInfoFromRepositoryForPlatformMutex.Lock()
-	ret, specificReturn := fake.getPluginInfoFromRepositoryForPlatformReturnsOnCall[len(fake.getPluginInfoFromRepositoryForPlatformArgsForCall)]
-	fake.getPluginInfoFromRepositoryForPlatformArgsForCall = append(fake.getPluginInfoFromRepositoryForPlatformArgsForCall, struct {
-		pluginName string
-		pluginRepo configv3.PluginRepository
-		platform   string
-	}{pluginName, pluginRepo, platform})
-	fake.recordInvocation("GetPluginInfoFromRepositoryForPlatform", []interface{}{pluginName, pluginRepo, platform})
-	fake.getPluginInfoFromRepositoryForPlatformMutex.Unlock()
-	if fake.GetPluginInfoFromRepositoryForPlatformStub != nil {
-		return fake.GetPluginInfoFromRepositoryForPlatformStub(pluginName, pluginRepo, platform)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.getPluginInfoFromRepositoryForPlatformReturns.result1, fake.getPluginInfoFromRepositoryForPlatformReturns.result2
-}
-
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoryForPlatformCallCount() int {
-	fake.getPluginInfoFromRepositoryForPlatformMutex.RLock()
-	defer fake.getPluginInfoFromRepositoryForPlatformMutex.RUnlock()
-	return len(fake.getPluginInfoFromRepositoryForPlatformArgsForCall)
-}
-
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoryForPlatformArgsForCall(i int) (string, configv3.PluginRepository, string) {
-	fake.getPluginInfoFromRepositoryForPlatformMutex.RLock()
-	defer fake.getPluginInfoFromRepositoryForPlatformMutex.RUnlock()
-	return fake.getPluginInfoFromRepositoryForPlatformArgsForCall[i].pluginName, fake.getPluginInfoFromRepositoryForPlatformArgsForCall[i].pluginRepo, fake.getPluginInfoFromRepositoryForPlatformArgsForCall[i].platform
-}
-
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoryForPlatformReturns(result1 pluginaction.PluginInfo, result2 error) {
-	fake.GetPluginInfoFromRepositoryForPlatformStub = nil
-	fake.getPluginInfoFromRepositoryForPlatformReturns = struct {
-		result1 pluginaction.PluginInfo
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoryForPlatformReturnsOnCall(i int, result1 pluginaction.PluginInfo, result2 error) {
-	fake.GetPluginInfoFromRepositoryForPlatformStub = nil
-	if fake.getPluginInfoFromRepositoryForPlatformReturnsOnCall == nil {
-		fake.getPluginInfoFromRepositoryForPlatformReturnsOnCall = make(map[int]struct {
-			result1 pluginaction.PluginInfo
-			result2 error
-		})
-	}
-	fake.getPluginInfoFromRepositoryForPlatformReturnsOnCall[i] = struct {
-		result1 pluginaction.PluginInfo
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeInstallPluginActor) GetPluginInfoFromAllRepositories(pluginName string, pluginRepos []configv3.PluginRepository) (pluginaction.PluginInfo, error) {
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error) {
 	var pluginReposCopy []configv3.PluginRepository
 	if pluginRepos != nil {
 		pluginReposCopy = make([]configv3.PluginRepository, len(pluginRepos))
 		copy(pluginReposCopy, pluginRepos)
 	}
-	fake.getPluginInfoFromAllRepositoriesMutex.Lock()
-	ret, specificReturn := fake.getPluginInfoFromAllRepositoriesReturnsOnCall[len(fake.getPluginInfoFromAllRepositoriesArgsForCall)]
-	fake.getPluginInfoFromAllRepositoriesArgsForCall = append(fake.getPluginInfoFromAllRepositoriesArgsForCall, struct {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.Lock()
+	ret, specificReturn := fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall[len(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall)]
+	fake.getPluginInfoFromRepositoriesForPlatformArgsForCall = append(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall, struct {
 		pluginName  string
 		pluginRepos []configv3.PluginRepository
-	}{pluginName, pluginReposCopy})
-	fake.recordInvocation("GetPluginInfoFromAllRepositories", []interface{}{pluginName, pluginReposCopy})
-	fake.getPluginInfoFromAllRepositoriesMutex.Unlock()
-	if fake.GetPluginInfoFromAllRepositoriesStub != nil {
-		return fake.GetPluginInfoFromAllRepositoriesStub(pluginName, pluginRepos)
+		platform    string
+	}{pluginName, pluginReposCopy, platform})
+	fake.recordInvocation("GetPluginInfoFromRepositoriesForPlatform", []interface{}{pluginName, pluginReposCopy, platform})
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.Unlock()
+	if fake.GetPluginInfoFromRepositoriesForPlatformStub != nil {
+		return fake.GetPluginInfoFromRepositoriesForPlatformStub(pluginName, pluginRepos, platform)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getPluginInfoFromAllRepositoriesReturns.result1, fake.getPluginInfoFromAllRepositoriesReturns.result2
+	return fake.getPluginInfoFromRepositoriesForPlatformReturns.result1, fake.getPluginInfoFromRepositoriesForPlatformReturns.result2, fake.getPluginInfoFromRepositoriesForPlatformReturns.result3
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromAllRepositoriesCallCount() int {
-	fake.getPluginInfoFromAllRepositoriesMutex.RLock()
-	defer fake.getPluginInfoFromAllRepositoriesMutex.RUnlock()
-	return len(fake.getPluginInfoFromAllRepositoriesArgsForCall)
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformCallCount() int {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.RLock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.RUnlock()
+	return len(fake.getPluginInfoFromRepositoriesForPlatformArgsForCall)
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromAllRepositoriesArgsForCall(i int) (string, []configv3.PluginRepository) {
-	fake.getPluginInfoFromAllRepositoriesMutex.RLock()
-	defer fake.getPluginInfoFromAllRepositoriesMutex.RUnlock()
-	return fake.getPluginInfoFromAllRepositoriesArgsForCall[i].pluginName, fake.getPluginInfoFromAllRepositoriesArgsForCall[i].pluginRepos
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformArgsForCall(i int) (string, []configv3.PluginRepository, string) {
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.RLock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.RUnlock()
+	return fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].pluginName, fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].pluginRepos, fake.getPluginInfoFromRepositoriesForPlatformArgsForCall[i].platform
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromAllRepositoriesReturns(result1 pluginaction.PluginInfo, result2 error) {
-	fake.GetPluginInfoFromAllRepositoriesStub = nil
-	fake.getPluginInfoFromAllRepositoriesReturns = struct {
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformReturns(result1 pluginaction.PluginInfo, result2 []string, result3 error) {
+	fake.GetPluginInfoFromRepositoriesForPlatformStub = nil
+	fake.getPluginInfoFromRepositoriesForPlatformReturns = struct {
 		result1 pluginaction.PluginInfo
-		result2 error
-	}{result1, result2}
+		result2 []string
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeInstallPluginActor) GetPluginInfoFromAllRepositoriesReturnsOnCall(i int, result1 pluginaction.PluginInfo, result2 error) {
-	fake.GetPluginInfoFromAllRepositoriesStub = nil
-	if fake.getPluginInfoFromAllRepositoriesReturnsOnCall == nil {
-		fake.getPluginInfoFromAllRepositoriesReturnsOnCall = make(map[int]struct {
+func (fake *FakeInstallPluginActor) GetPluginInfoFromRepositoriesForPlatformReturnsOnCall(i int, result1 pluginaction.PluginInfo, result2 []string, result3 error) {
+	fake.GetPluginInfoFromRepositoriesForPlatformStub = nil
+	if fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall == nil {
+		fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall = make(map[int]struct {
 			result1 pluginaction.PluginInfo
-			result2 error
+			result2 []string
+			result3 error
 		})
 	}
-	fake.getPluginInfoFromAllRepositoriesReturnsOnCall[i] = struct {
+	fake.getPluginInfoFromRepositoriesForPlatformReturnsOnCall[i] = struct {
 		result1 pluginaction.PluginInfo
-		result2 error
-	}{result1, result2}
+		result2 []string
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeInstallPluginActor) GetPluginRepository(repositoryName string) (configv3.PluginRepository, error) {
@@ -797,10 +736,8 @@ func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	defer fake.getAndValidatePluginMutex.RUnlock()
 	fake.getPlatformStringMutex.RLock()
 	defer fake.getPlatformStringMutex.RUnlock()
-	fake.getPluginInfoFromRepositoryForPlatformMutex.RLock()
-	defer fake.getPluginInfoFromRepositoryForPlatformMutex.RUnlock()
-	fake.getPluginInfoFromAllRepositoriesMutex.RLock()
-	defer fake.getPluginInfoFromAllRepositoriesMutex.RUnlock()
+	fake.getPluginInfoFromRepositoriesForPlatformMutex.RLock()
+	defer fake.getPluginInfoFromRepositoriesForPlatformMutex.RUnlock()
 	fake.getPluginRepositoryMutex.RLock()
 	defer fake.getPluginRepositoryMutex.RUnlock()
 	fake.installPluginFromPathMutex.RLock()

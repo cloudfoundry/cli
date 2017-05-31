@@ -173,8 +173,8 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the file does not exist", func() {
 					It("tells the user that the file was not found and fails", func() {
 						session := helpers.CF("install-plugin", "some/path/that/does/not/exist", "-f")
-
-						Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path some/path/that/does/not/exist"))
+						Eventually(session.Err).Should(Say("Plugin some/path/that/does/not/exist not found on disk or in any registered repo\\."))
+						Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
 						Consistently(session.Out).ShouldNot(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Consistently(session.Out).ShouldNot(Say("Install and use plugins at your own risk\\."))
