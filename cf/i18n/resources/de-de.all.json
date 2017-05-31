@@ -4464,6 +4464,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin {{.PluginName}} not found on disk or in any registered repo.\nUse '{{.BinaryName}} repo-plugins' to list plugins available in the repos.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
     "translation": "Plug-in {{.PluginName}} wurde erfolgreich deinstalliert."
   },

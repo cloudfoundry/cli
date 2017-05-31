@@ -8,7 +8,6 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
-	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
@@ -171,86 +170,6 @@ var _ = Describe("install actions", func() {
 		Context("when the file does not exist", func() {
 			It("returns false", func() {
 				Expect(actor.FileExists("/some/path/that/does/not/exist")).To(BeFalse())
-			})
-		})
-	})
-
-	Describe("GetPluginInfoFromRepository", func() {
-		Context("When getting the plugin repository errors", func() {
-			BeforeEach(func() {
-				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
-			})
-
-			It("returns the error", func() {
-				_, err := actor.GetPluginInfoFromRepositoryForPlatform("some-plugin", configv3.PluginRepository{Name: "some-repository", URL: "some-url"}, "some-platform")
-				Expect(err).To(MatchError(errors.New("some-error")))
-			})
-		})
-
-		Context("when getting the plugin repository succeeds", func() {
-			BeforeEach(func() {
-				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{
-					Plugins: []plugin.Plugin{
-						{
-							Name:    "some-plugin",
-							Version: "1.2.3",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-darwin-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://some-windows-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://some-linux-url", Checksum: "lastchecksum"},
-							},
-						},
-						{
-							Name:    "linux-plugin",
-							Version: "1.5.0",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://another-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://last-url", Checksum: "lastchecksum"},
-							},
-						},
-						{
-							Name:    "osx-plugin",
-							Version: "3.0.0",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://another-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://last-url", Checksum: "lastchecksum"},
-							},
-						},
-					},
-				}, nil)
-			})
-
-			Context("when the specified plugin does not exist in the repository", func() {
-				It("returns a PluginNotFoundInRepositoryError", func() {
-					_, err := actor.GetPluginInfoFromRepositoryForPlatform("plugin-i-dont-exist", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "platform-i-dont-exist")
-					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
-						PluginName:     "plugin-i-dont-exist",
-						RepositoryName: "some-repo",
-					}))
-				})
-			})
-
-			Context("when the specified plugin for the provided platform does not exist in the repository", func() {
-
-				It("returns a PluginNotFoundInRepositoryError", func() {
-					_, err := actor.GetPluginInfoFromRepositoryForPlatform("linux-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "platform-i-dont-exist")
-					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
-						PluginName:     "linux-plugin",
-						RepositoryName: "some-repo",
-					}))
-				})
-			})
-
-			Context("when the specified plugin exists", func() {
-				It("returns the plugin info", func() {
-					pluginInfo, err := actor.GetPluginInfoFromRepositoryForPlatform("some-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "osx")
-					Expect(err).ToNot(HaveOccurred())
-					Expect(pluginInfo.Name).To(Equal("some-plugin"))
-					Expect(pluginInfo.Version).To(Equal("1.2.3"))
-					Expect(pluginInfo.URL).To(Equal("http://some-darwin-url"))
-				})
 			})
 		})
 	})

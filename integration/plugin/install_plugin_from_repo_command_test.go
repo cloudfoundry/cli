@@ -445,13 +445,13 @@ var _ = Describe("install-plugin (from repo) command", func() {
 		})
 	})
 
-	XDescribe("installing a plugin from any repo", func() {
+	Describe("installing a plugin from any repo", func() {
 		Context("when there are no repositories registered", func() {
 			It("fails and displays the plugin not found message", func() {
 				session := helpers.CF("install-plugin", "some-plugin")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Plugin not-exist not found on disk or in any registered repo\\."))
+				Eventually(session.Err).Should(Say("Plugin some-plugin not found on disk or in any registered repo\\."))
 				Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
 				Eventually(session).Should(Exit(1))
@@ -476,7 +476,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				})
 
 				It("fails and displays the plugin not found message", func() {
-					session := helpers.CF("install-plugin", "some-plugin")
+					session := helpers.CF("install-plugin", "some-plugin", "-k")
 
 					Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
@@ -489,63 +489,352 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 			Context("when -f is specified", func() {
 				Context("when identical versions of the plugin are found in the repositories", func() {
+					var repoServer1 *helpers.PluginRepositoryServerWithPlugin
+					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
+
+					BeforeEach(func() {
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
+
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						repoServer1.Cleanup()
+						repoServer2.Cleanup()
+					})
+
 					Context("when the plugin is not already installed", func() {
 						Context("when the checksum is valid", func() {
 							It("installs the plugin", func() {
+								session := helpers.CF("install-plugin", "some-plugin", "-f", "-k")
+
+								Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka1, kaka2"))
+								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+								Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+								Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka1\\.\\.\\."))
+								Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer1.PluginSize()))
+								Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 successfully installed\\."))
+
+								Eventually(session).Should(Exit(0))
 							})
 						})
 
-						Context("when the checksum is invalid", func() {
+						Context("when the plugin checksum is invalid", func() {
+							var repoServer3 *helpers.PluginRepositoryServerWithPlugin
+							var repoServer4 *helpers.PluginRepositoryServerWithPlugin
+
+							BeforeEach(func() {
+								repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+								Eventually(helpers.CF("add-plugin-repo", "kaka3", repoServer3.URL())).Should(Exit(0))
+
+								repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+								Eventually(helpers.CF("add-plugin-repo", "kaka4", repoServer4.URL())).Should(Exit(0))
+							})
+
+							AfterEach(func() {
+								repoServer3.Cleanup()
+								repoServer4.Cleanup()
+							})
+
 							It("fails with the invalid checksum message", func() {
+								session := helpers.CF("install-plugin", "some-plugin-with-bad-checksum", "-f", "-k")
+
+								Eventually(session.Out).Should(Say("Searching kaka1, kaka2, kaka3, kaka4 for plugin some-plugin-with-bad-checksum\\.\\.\\."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin-with-bad-checksum 2\\.2\\.3 found in: kaka3, kaka4"))
+								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+								Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+								Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka3\\.\\.\\."))
+								Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer3.PluginSize()))
+								Eventually(session.Out).Should(Say("FAILED"))
+								Eventually(session.Err).Should(Say("Downloaded plugin binary's checksum does not match repo metadata\\."))
+								Eventually(session.Err).Should(Say("Please try again or contact the plugin author\\."))
+
+								Eventually(session).Should(Exit(1))
 							})
 						})
 					})
 
 					Context("when the plugin is already installed", func() {
 						Context("when the checksum is valid", func() {
-							It("installs the plugin", func() {
+							BeforeEach(func() {
+								pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+									[]helpers.PluginCommand{
+										{Name: "some-command", Help: "some-command-help"},
+									},
+								)
+								Eventually(helpers.CF("install-plugin", pluginPath, "-f", "-k")).Should(Exit(0))
+							})
+
+							It("reinstalls the plugin", func() {
+								session := helpers.CF("install-plugin", "-f", "some-plugin", "-k")
+
+								Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka1, kaka2"))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\."))
+								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
 				})
 
+				Context("when the binary version for the current GOOS/GOARCH is exists in only one repo", func() {
+					var repoServer1 *helpers.PluginRepositoryServerWithPlugin
+					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
+
+					BeforeEach(func() {
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", "solaris", false)
+						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
+
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						repoServer1.Cleanup()
+						repoServer2.Cleanup()
+					})
+
+					It("installs the plugin from the correct repo", func() {
+						session := helpers.CF("install-plugin", "-f", "some-plugin", "-k")
+
+						Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka2"))
+						Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+						Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka2\\.\\.\\."))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when different versions of the plugin are found in the repositories", func() {
 					Context("when the checksum is valid", func() {
+						var repoServer1 *helpers.PluginRepositoryServerWithPlugin
+						var repoServer2 *helpers.PluginRepositoryServerWithPlugin
+
+						BeforeEach(func() {
+							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
+
+							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							repoServer1.Cleanup()
+							repoServer2.Cleanup()
+						})
+
 						It("installs the newest plugin", func() {
+							session := helpers.CF("install-plugin", "some-plugin", "-f", "-k")
+
+							Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1.2.4 found in: kaka2"))
+							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka2\\.\\.\\."))
+							Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer1.PluginSize()))
+							Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.4 successfully installed\\."))
+
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the checksum for the latest version is invalid", func() {
+						var repoServer1 *helpers.PluginRepositoryServerWithPlugin
+						var repoServer2 *helpers.PluginRepositoryServerWithPlugin
+
+						BeforeEach(func() {
+							repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+							Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
+
+							repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.4", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+							Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							repoServer1.Cleanup()
+							repoServer2.Cleanup()
+						})
+
+						It("prints the invalid checksum error", func() {
+							session := helpers.CF("install-plugin", "some-plugin", "-f", "-k")
+
+							Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+							Eventually(session.Out).Should(Say("Plugin some-plugin 1.2.4 found in: kaka2"))
+							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+							Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+							Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka2\\.\\.\\."))
+							Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer1.PluginSize()))
+							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session.Err).Should(Say("Downloaded plugin binary's checksum does not match repo metadata\\."))
+							Eventually(session.Err).Should(Say("Please try again or contact the plugin author\\."))
+
+							Eventually(session).Should(Exit(1))
 						})
 					})
 				})
 			})
 
 			Context("when -f is not specified", func() {
+				var buffer *Buffer
+
+				BeforeEach(func() {
+					buffer = NewBuffer()
+				})
+
 				Context("when identical versions of the plugin are found in the repositories", func() {
+					var repoServer1 *helpers.PluginRepositoryServerWithPlugin
+					var repoServer2 *helpers.PluginRepositoryServerWithPlugin
+
+					BeforeEach(func() {
+						repoServer1 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						Eventually(helpers.CF("add-plugin-repo", "kaka1", repoServer1.URL())).Should(Exit(0))
+
+						repoServer2 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), true)
+						Eventually(helpers.CF("add-plugin-repo", "kaka2", repoServer2.URL())).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						repoServer1.Cleanup()
+						repoServer2.Cleanup()
+					})
+
 					Context("when the plugin is not already installed", func() {
 						Context("when the user says yes", func() {
+							BeforeEach(func() {
+								buffer.Write([]byte("y\n"))
+							})
+
 							Context("when the checksum is valid", func() {
 								It("installs the plugin", func() {
+									session := helpers.CFWithStdin(buffer, "install-plugin", "some-plugin", "-k")
+
+									Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+									Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka1, kaka2"))
+									Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+									Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+									Eventually(session.Out).Should(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]: y"))
+									Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka1\\.\\.\\."))
+									Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer1.PluginSize()))
+									Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+									Eventually(session.Out).Should(Say("OK"))
+									Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 successfully installed\\."))
+
+									Eventually(session).Should(Exit(0))
 								})
 							})
 
 							Context("when the checksum is invalid", func() {
+								var repoServer3 *helpers.PluginRepositoryServerWithPlugin
+								var repoServer4 *helpers.PluginRepositoryServerWithPlugin
+
+								BeforeEach(func() {
+									repoServer3 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+									Eventually(helpers.CF("add-plugin-repo", "kaka3", repoServer3.URL())).Should(Exit(0))
+
+									repoServer4 = helpers.NewPluginRepositoryServerWithPlugin("some-plugin-with-bad-checksum", "2.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
+									Eventually(helpers.CF("add-plugin-repo", "kaka4", repoServer4.URL())).Should(Exit(0))
+								})
+
+								AfterEach(func() {
+									repoServer3.Cleanup()
+									repoServer4.Cleanup()
+								})
+
 								It("fails with the invalid checksum message", func() {
+									session := helpers.CFWithStdin(buffer, "install-plugin", "some-plugin-with-bad-checksum", "-k")
+
+									Eventually(session.Out).Should(Say("FAILED"))
+									Eventually(session.Err).Should(Say("Downloaded plugin binary's checksum does not match repo metadata\\."))
+									Eventually(session.Err).Should(Say("Please try again or contact the plugin author\\."))
+
+									Eventually(session).Should(Exit(1))
 								})
 							})
 						})
+
 						Context("when the user says no", func() {
+							BeforeEach(func() {
+								buffer.Write([]byte("n\n"))
+							})
+
 							It("does not install the plugin", func() {
+								session := helpers.CFWithStdin(buffer, "install-plugin", "some-plugin", "-k")
+
+								Eventually(session.Out).Should(Say("Do you want to install the plugin some-plugin\\? \\[yN\\]: n"))
+								Eventually(session.Out).Should(Say("Plugin installation cancelled"))
+
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
 
 					Context("when the plugin is already installed", func() {
+						BeforeEach(func() {
+							pluginPath := helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
+								[]helpers.PluginCommand{
+									{Name: "some-command", Help: "some-command-help"},
+								},
+							)
+							Eventually(helpers.CF("install-plugin", pluginPath, "-f", "-k")).Should(Exit(0))
+						})
+
 						Context("when the user says yes", func() {
+							BeforeEach(func() {
+								buffer.Write([]byte("y\n"))
+							})
+
 							Context("when the checksum is valid", func() {
 								It("installs the plugin", func() {
+									session := helpers.CFWithStdin(buffer, "install-plugin", "some-plugin", "-k")
+
+									Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+									Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka1, kaka2"))
+									Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed."))
+									Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+									Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+									Eventually(session.Out).Should(Say("Do you want to uninstall the existing plugin and install some-plugin 1\\.2\\.3\\? \\[yN\\]: y"))
+									Eventually(session.Out).Should(Say("Starting download of plugin binary from repository kaka1\\.\\.\\."))
+									Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", repoServer1.PluginSize()))
+									Eventually(session.Out).Should(Say("Uninstalling existing plugin\\.\\.\\."))
+									Eventually(session.Out).Should(Say("OK"))
+									Eventually(session.Out).Should(Say("Plugin some-plugin successfully uninstalled\\."))
+									Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
+									Eventually(session.Out).Should(Say("OK"))
+									Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 successfully installed\\."))
+
+									Eventually(session).Should(Exit(0))
 								})
 							})
 						})
+
 						Context("when the user says no", func() {
+							BeforeEach(func() {
+								buffer.Write([]byte("n\n"))
+							})
+
 							It("does not install the plugin", func() {
+								session := helpers.CFWithStdin(buffer, "install-plugin", "some-plugin", "-k")
+
+								Eventually(session.Out).Should(Say("Searching kaka1, kaka2 for plugin some-plugin\\.\\.\\."))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.2\\.3 found in: kaka1, kaka2"))
+								Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed."))
+								Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
+								Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
+								Eventually(session.Out).Should(Say("Do you want to uninstall the existing plugin and install some-plugin 1\\.2\\.3\\? \\[yN\\]: n"))
+								Eventually(session.Out).Should(Say("Plugin installation cancelled"))
+
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
