@@ -4440,6 +4440,10 @@
     "translation": "请求的插件没有可用于您操作系统的二进制文件: "
   },
   {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },

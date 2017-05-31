@@ -147,8 +147,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				It("returns plugin not found", func() {
 					session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Plugin some-plugin not found in repository kaka\\."))
-					Eventually(session.Err).Should(Say("Use 'cf repo-plugins -r kaka' to list plugins available in the repo\\."))
+					Eventually(session.Err).Should(Say("Plugin requested has no binary available for your platform\\."))
 
 					Eventually(session).Should(Exit(1))
 				})

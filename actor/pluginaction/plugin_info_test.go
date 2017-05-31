@@ -82,12 +82,9 @@ var _ = Describe("plugin info actions", func() {
 
 			Context("when the specified plugin for the provided platform does not exist in the repository", func() {
 
-				It("returns a PluginNotFoundInRepositoryError", func() {
+				It("returns a NoCompatibleBinaryError", func() {
 					_, err := actor.GetPluginInfoFromRepositoryForPlatform("linux-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"}, "platform-i-dont-exist")
-					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
-						PluginName:     "linux-plugin",
-						RepositoryName: "some-repo",
-					}))
+					Expect(err).To(MatchError(NoCompatibleBinaryError{}))
 				})
 			})
 
@@ -129,6 +126,56 @@ var _ = Describe("plugin info actions", func() {
 			It("returns the PluginNotFoundInAnyRepositoryError", func() {
 				_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
 				Expect(err).To(Equal(PluginNotFoundInAnyRepositoryError{PluginName: "some-plugin"}))
+			})
+		})
+
+		Context("when no compatible binaries are found for the plugin", func() {
+			BeforeEach(func() {
+				fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
+					return plugin.PluginRepository{[]plugin.Plugin{
+						{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
+							{Platform: "incompatible-platform", URL: "some-url", Checksum: "some-checksum"},
+						}},
+					}}, nil
+				}
+			})
+
+			It("returns the NoCompatibleBinaryError", func() {
+				_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
+				Expect(err).To(MatchError(NoCompatibleBinaryError{}))
+			})
+		})
+
+		Context("when some binaries are compatible and some are not", func() {
+			BeforeEach(func() {
+				fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
+					if repoURL == "url1" {
+						return plugin.PluginRepository{[]plugin.Plugin{
+							{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
+								{Platform: "incompatible-platform", URL: "some-url", Checksum: "some-checksum"},
+							}},
+						}}, nil
+					} else {
+						return plugin.PluginRepository{[]plugin.Plugin{
+							{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
+								{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
+							}},
+						}}, nil
+					}
+				}
+			})
+
+			It("returns the compatible plugin info and a list of the repositories it was found in", func() {
+				pluginInfo, repos, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(pluginInfo).To(Equal(PluginInfo{
+					Name:     "some-plugin",
+					Version:  "1.2.3",
+					URL:      "some-url",
+					Checksum: "some-checksum",
+				}))
+				Expect(repos).To(ConsistOf("repo2", "repo3"))
 			})
 		})
 

@@ -39,6 +39,9 @@ var _ = Describe("HandleError", func() {
 		Entry("pluginaction.GettingPluginRepositoryError -> GettingPluginRepositoryError",
 			pluginaction.GettingPluginRepositoryError{Name: "some-repo", Message: "404"},
 			GettingPluginRepositoryError{Name: "some-repo", Message: "404"}),
+		Entry("pluginaction.NoCompatibleBinaryError -> NoCompatibleBinaryError",
+			pluginaction.NoCompatibleBinaryError{},
+			NoCompatibleBinaryError{}),
 		Entry("pluginaction.PluginCommandConflictError -> PluginCommandConflictError",
 			pluginaction.PluginCommandsConflictError{
 				PluginName:     "some-plugin",

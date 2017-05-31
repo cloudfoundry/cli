@@ -4440,6 +4440,10 @@
     "translation": "所要求的外掛程式沒有可供您 OS 使用的二進位檔: "
   },
   {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },

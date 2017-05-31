@@ -18,6 +18,8 @@ func HandleError(err error) error {
 		return AddPluginRepositoryError{Name: e.Name, URL: e.URL, Message: e.Message}
 	case pluginaction.GettingPluginRepositoryError:
 		return GettingPluginRepositoryError{Name: e.Name, Message: e.Message}
+	case pluginaction.NoCompatibleBinaryError:
+		return NoCompatibleBinaryError{}
 	case pluginaction.PluginCommandsConflictError:
 		return PluginCommandsConflictError{
 			PluginName:     e.PluginName,

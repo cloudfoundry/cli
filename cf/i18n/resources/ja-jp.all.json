@@ -4440,6 +4440,10 @@
     "translation": "要求されたプラグインはご使用の OS に対応するバイナリーがありません: "
   },
   {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.Name}} successfully uninstalled.",
     "translation": ""
   },
