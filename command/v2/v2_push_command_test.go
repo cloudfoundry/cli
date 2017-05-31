@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -113,6 +114,7 @@ var _ = Describe("v2-push Command", func() {
 				BeforeEach(func() {
 					appConfigs = []pushaction.ApplicationConfig{
 						{
+							CurrentApplication: v2action.Application{Name: appName, State: ccv2.ApplicationStarted},
 							DesiredApplication: v2action.Application{Name: appName},
 							CurrentRoutes: []v2action.Route{
 								{
@@ -213,6 +215,7 @@ var _ = Describe("v2-push Command", func() {
 
 							return messages, logErrs, appStart, warnings, errs
 						}
+
 						applicationSummary := v2action.ApplicationSummary{
 							Application: v2action.Application{
 								Name:                 appName,
@@ -275,7 +278,7 @@ var _ = Describe("v2-push Command", func() {
 
 					It("outputs flavor text prior to generating app configuration", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("Getting app info..."))
+						Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
 					})
 
 					It("applies each of the application configurations", func() {
@@ -290,7 +293,7 @@ var _ = Describe("v2-push Command", func() {
 					It("display diff of changes", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("\\+\\s+name:\\s+%s", appName))
+						Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
 						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
 						Expect(testUI.Out).To(Say("\\s+routes:"))
 						for _, route := range appConfigs[0].CurrentRoutes {
@@ -304,12 +307,13 @@ var _ = Describe("v2-push Command", func() {
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Creating app with these attributes..."))
-						Expect(testUI.Out).To(Say("Mapping routes..."))
-						Expect(testUI.Out).To(Say("Packaging files to upload..."))
-						Expect(testUI.Out).To(Say("Uploading files..."))
-						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
-						Expect(testUI.Out).To(Say("Processing files..."))
+						Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Processing files\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 						Expect(testUI.Err).To(Say("apply-1"))
