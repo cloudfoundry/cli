@@ -5468,6 +5468,10 @@
     "translation": "Parando o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },
   {
+    "id": "Stopping app...",
+    "translation": ""
+  },
+  {
     "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
     "translation": ""
   },

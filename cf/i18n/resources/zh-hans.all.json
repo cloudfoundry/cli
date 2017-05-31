@@ -5468,6 +5468,10 @@
     "translation": "正在以 {{.CurrentUser}} 身份停止组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
   {
+    "id": "Stopping app...",
+    "translation": ""
+  },
+  {
     "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
     "translation": ""
   },
