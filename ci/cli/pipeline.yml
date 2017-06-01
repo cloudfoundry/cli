@@ -155,14 +155,6 @@ resources:
     versioned_file: master/cf-cli-installer_edge_winx64.zip
     region_name: us-west-1
 
-- name: bosh-lites-dea-pool
-  type: pool
-  source:
-    uri: git@github.com:cloudfoundry/cli-pools
-    private_key: {{cli-pools-github-private-key}}
-    branch: master
-    pool: bosh-lites-dea
-
 - name: hardknox-pool
   type: pool
   source:
@@ -217,10 +209,8 @@ groups:
   - units
   - build-binaries
   - integration
-  - cats-diego
+  - cats
   - integration-experimental
-  - cats-linux
-  - cats-windows
   - create-installers
 - name: images
   jobs:
@@ -341,7 +331,7 @@ jobs:
     params:
       release: bosh-lite-lock
 
-- name: cats-diego
+- name: cats
   serial: true
   plan:
   - aggregate:
@@ -360,7 +350,7 @@ jobs:
       params:
         acquire: true
   - do:
-    - task: cats-config
+    - task: config
       file: cli-ci/ci/cli/tasks/cats-config-diego.yml
       params:
         INCLUDE_V3: false
@@ -368,7 +358,7 @@ jobs:
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
-    - task: cats
+    - task: linux
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: diego
@@ -377,7 +367,16 @@ jobs:
         put: slack-alert
         params:
           channel: '#cli-firehose'
-          text: "cats diego failed :("
+          text: "cats linux failed :("
+    - task: windows
+      file: cli-ci/ci/cli/tasks/cats-windows.yml
+      params:
+        NODES: 16
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats windows failed :("
   ensure:
     put: hardknox-pool
     params:
@@ -388,10 +387,10 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [cats-diego]
+      passed: [cats]
       depth: 3
     - get: cf-cli-binaries
-      passed: [cats-diego]
+      passed: [cats]
       trigger: true
     - get: cli-ci
       depth: 3
@@ -436,99 +435,16 @@ jobs:
     params:
       release: bosh-lite-lock
 
-- name: cats-linux
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      trigger: true
-      passed: [build-binaries]
-      depth: 3
-    - get: cf-acceptance-tests
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-    - get: cli-ci
-      depth: 3
-    - put: bosh-lite-lock
-      resource: bosh-lites-dea-pool
-      params:
-        acquire: true
-  - do:
-    - task: cats-config
-      file: cli-ci/ci/cli/tasks/cats-config.yml
-      params:
-        BACKEND: dea
-        INCLUDE_V3: false
-        BROKER_START_TIMEOUT: 330
-        CF_PUSH_TIMEOUT: 210
-        DEFAULT_TIMEOUT: 60
-        LONG_CURL_TIMEOUT: 210
-    - task: cats
-      file: cli-ci/ci/cli/tasks/cats-linux.yml
-      params:
-        BACKEND: dea
-        NODES: 10
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-firehose'
-          text: "cats linux failed :("
-      ensure:
-        put: bosh-lites-dea-pool
-        params:
-          release: bosh-lite-lock
-
-- name: cats-windows
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      trigger: true
-      passed: [build-binaries]
-      depth: 3
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-    - get: cf-acceptance-tests
-    - get: cli-ci
-      depth: 3
-    - put: bosh-lite-lock
-      resource: bosh-lites-dea-pool
-      params:
-        acquire: true
-  - do:
-    - task: cats-config
-      file: cli-ci/ci/cli/tasks/cats-config.yml
-      params:
-        BACKEND: dea
-        INCLUDE_V3: false
-        BROKER_START_TIMEOUT: 330
-        CF_PUSH_TIMEOUT: 210
-        DEFAULT_TIMEOUT: 60
-        LONG_CURL_TIMEOUT: 210
-    - task: cats
-      file: cli-ci/ci/cli/tasks/cats-windows.yml
-      params:
-        NODES: 10
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats windows failed :("
-      ensure:
-        put: bosh-lites-dea-pool
-        params:
-          release: bosh-lite-lock
-
 - name: create-installers
   serial: true
   plan:
   - aggregate:
     - get: cli
       trigger: true
-      passed: [cats-linux, cats-windows, cats-diego]
+      passed: [cats]
       depth: 3
     - get: cf-cli-binaries
-      passed: [cats-linux, cats-windows, cats-diego]
+      passed: [cats]
     - get: cli-ci
       depth: 3
   - task: extract-binaries
