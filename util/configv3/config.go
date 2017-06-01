@@ -17,22 +17,25 @@ import (
 )
 
 const (
-	// DefaultStagingTimeout is the default timeout for application staging.
-	DefaultStagingTimeout = 15 * time.Minute
-
-	// DefaultStartupTimeout is the default timeout for application starting.
-	DefaultStartupTimeout = 5 * time.Minute
-	// DefaultPingerThrottle = 5 * time.Second
-
 	// DefaultDialTimeout is the default timeout for the dail.
 	DefaultDialTimeout = 5 * time.Second
 
 	// DefaultOverallPollingTimeout is the default maximum time that the CLI will
 	// poll a job running on the Cloud Controller. By default it's infinit, which
 	// is represented by MaxInt64.
-	DefaultOverallPollingTimeout = time.Duration(1<<63 - 1) // math.MaxInt64
-	// Developer note about constant above ^^^ do not replace with math.MaxInt64
-	// This will require the math package which is a dynamically linked library.
+	DefaultOverallPollingTimeout = time.Duration(1 << 62)
+	// Developer Note: Due to bugs in using MaxInt64 during comparison, the above
+	// was chosen as a replacement.
+
+	// DefaultPollingInterval is the time between consecutive polls of a status.
+	DefaultPollingInterval = 3 * time.Second
+
+	// DefaultStagingTimeout is the default timeout for application staging.
+	DefaultStagingTimeout = 15 * time.Minute
+
+	// DefaultStartupTimeout is the default timeout for application starting.
+	DefaultStartupTimeout = 5 * time.Minute
+	// DefaultPingerThrottle = 5 * time.Second
 
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
@@ -282,7 +285,7 @@ func (config *Config) Target() string {
 
 // PollingInterval returns the time between polls.
 func (config *Config) PollingInterval() time.Duration {
-	return 5 * time.Second
+	return DefaultPollingInterval
 }
 
 // OverallPollingTimeout returns the overall polling timeout for async
