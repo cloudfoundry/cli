@@ -275,7 +275,7 @@ var _ = Describe("Job", func() {
 					startTime := time.Now()
 					_, err := client.PollJob(Job{GUID: "some-job-guid"})
 					endTime := time.Now()
-					Expect(err).ToNot(HaveOccurred())
+					Expect(err).To(HaveOccurred())
 
 					// If the jobPollingTimeout is less than the PollingInterval,
 					// then the margin may be too small, we should not allow the
