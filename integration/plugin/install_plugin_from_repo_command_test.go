@@ -103,7 +103,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 			It("fails with an error message", func() {
 				session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 
-				Eventually(session.Err).Should(Say("invalid character '}' looking for beginning of value"))
+				Eventually(session.Err).Should(Say("Invalid JSON content from server: invalid character '}' looking for beginning of value"))
 				Eventually(session).Should(Exit(1))
 			})
 		})

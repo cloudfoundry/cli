@@ -2,6 +2,20 @@ package shared
 
 import "strings"
 
+type JSONSyntaxError struct {
+	Err error
+}
+
+func (e JSONSyntaxError) Error() string {
+	return "Invalid JSON content from server: {{.Err}}"
+}
+
+func (e JSONSyntaxError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Err": e.Err.Error(),
+	})
+}
+
 // PluginInstallationCancelled is used to ignore the scenario when the user
 // responds with 'no' when prompted to install plugin and exit 0.
 type PluginInstallationCancelled struct {

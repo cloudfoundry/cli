@@ -2,6 +2,7 @@ package shared_test
 
 import (
 	"bytes"
+	"errors"
 	"text/template"
 
 	. "code.cloudfoundry.org/cli/command/plugin/shared"
@@ -35,6 +36,7 @@ var _ = Describe("Translatable Errors", func() {
 			err.Translate(translateFunc)
 		},
 
+		Entry("JSONSyntaxError", JSONSyntaxError{Err: errors.New("some-error")}),
 		Entry("PluginNotFoundError", PluginNotFoundError{}),
 		Entry("PluginNotFoundInRepositoryError", PluginNotFoundInRepositoryError{}),
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),

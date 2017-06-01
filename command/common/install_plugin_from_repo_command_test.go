@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -100,6 +101,18 @@ var _ = Describe("install-plugin command", func() {
 				platform = helpers.PrefixedRandomName("platform")
 				fakeActor.GetPlatformStringReturns(platform)
 				fakeActor.GetPluginRepositoryReturns(configv3.PluginRepository{Name: repoName, URL: repoURL}, nil)
+			})
+
+			Context("when getting repository information returns a json syntax error", func() {
+				var jsonErr error
+				BeforeEach(func() {
+					jsonErr = &json.SyntaxError{}
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, jsonErr)
+				})
+
+				It("returns a JSONSyntaxError", func() {
+					Expect(executeErr).To(MatchError(shared.JSONSyntaxError{Err: jsonErr}))
+				})
 			})
 
 			Context("when the plugin can't be found in the repository", func() {
