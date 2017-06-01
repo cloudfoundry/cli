@@ -49,10 +49,10 @@ const (
 
 type InstallPluginCommand struct {
 	OptionalArgs         flag.InstallPluginArgs `positional-args:"yes"`
-	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
 	SkipSSLValidation    bool                   `short:"k" hidden:"true" description:"Skip SSL certificate validation"`
-	RegisteredRepository string                 `short:"r" description:"Name of a registered repository where the specified plugin is located"`
-	usage                interface{}            `usage:"CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
+	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
+	RegisteredRepository string                 `short:"r" description:"Restrict search for plugin to this registered repository"`
+	usage                interface{}            `usage:"CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
 	relatedCommands      interface{}            `related_commands:"add-plugin-repo, list-plugin-repos, plugins"`
 	UI                   command.UI
 	Config               command.Config
