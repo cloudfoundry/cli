@@ -1,7 +1,10 @@
 ---
 platform: darwin
 
-rootfs_uri: docker:///cloudfoundry/cli-ci
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
 
 params:
   CERT_COMMON_NAME:
