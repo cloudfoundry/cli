@@ -351,7 +351,7 @@ jobs:
         acquire: true
   - do:
     - task: config
-      file: cli-ci/ci/cli/tasks/cats-config-diego.yml
+      file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
         INCLUDE_V3: false
         BROKER_START_TIMEOUT: 330
