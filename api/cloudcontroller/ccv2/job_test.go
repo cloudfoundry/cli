@@ -269,15 +269,16 @@ var _ = Describe("Job", func() {
 
 				// Fuzzy test to ensure that the overall function time isn't [far]
 				// greater than the OverallPollingTimeout. Since this is partially
-				// dependant on the speed of the system, the expectation is that the
-				// function *should* never exceed twice the timeout.
+				// dependent on the speed of the system, the expectation is that the
+				// function *should* never exceed three times the timeout.
 				It("does not run [too much] longer than the timeout", func() {
 					startTime := time.Now()
-					client.PollJob(Job{GUID: "some-job-guid"})
+					_, err := client.PollJob(Job{GUID: "some-job-guid"})
 					endTime := time.Now()
+					Expect(err).ToNot(HaveOccurred())
 
 					// If the jobPollingTimeout is less than the PollingInterval,
-					// then the margin may be too small, we should install not allow the
+					// then the margin may be too small, we should not allow the
 					// jobPollingTimeout to be set to less than the PollingInterval
 					Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
 				})
@@ -591,7 +592,8 @@ var _ = Describe("Job", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
 							defer request.Body.Close()
-							request.Body.Read(make([]byte, 32*1024))
+							_, err := request.Body.Read(make([]byte, 32*1024))
+							Expect(err).ToNot(HaveOccurred())
 							return expectedErr
 						}
 						return connection.Make(request, response)
