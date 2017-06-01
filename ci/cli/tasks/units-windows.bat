@@ -11,4 +11,4 @@ go get github.com/onsi/ginkgo/ginkgo
 
 ginkgo version
 
-ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration .
+ginkgo -r -race -randomizeAllSpecs -randomizeSuites -skipPackage integration .
