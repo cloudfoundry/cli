@@ -1,7 +1,10 @@
 ---
 platform: linux
 
-image: docker:///cloudfoundry/cli-vagrant-ci
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-vagrant-ci
 
 params:
   AWS_ACCESS_KEY_ID:
