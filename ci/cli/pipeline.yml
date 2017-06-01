@@ -358,6 +358,15 @@ jobs:
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
+    - task: windows
+      file: cli-ci/ci/cli/tasks/cats-windows.yml
+      params:
+        NODES: 16
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats windows failed :("
     - task: linux
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
@@ -368,15 +377,6 @@ jobs:
         params:
           channel: '#cli-firehose'
           text: "cats linux failed :("
-    - task: windows
-      file: cli-ci/ci/cli/tasks/cats-windows.yml
-      params:
-        NODES: 16
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats windows failed :("
   ensure:
     put: hardknox-pool
     params:
