@@ -1,6 +1,7 @@
 package shared_test
 
 import (
+	"encoding/json"
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
@@ -13,12 +14,18 @@ import (
 
 var _ = Describe("HandleError", func() {
 	err := errors.New("some-error")
+	jsonErr := new(json.SyntaxError)
 
 	DescribeTable("error translations",
 		func(passedInErr error, expectedErr error) {
 			actualErr := HandleError(passedInErr)
 			Expect(actualErr).To(MatchError(expectedErr))
 		},
+
+		Entry("json.SyntaxError -> JSONSyntaxError",
+			jsonErr,
+			JSONSyntaxError{Err: jsonErr},
+		),
 
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",
 			pluginerror.RawHTTPStatusError{Status: "some status"},

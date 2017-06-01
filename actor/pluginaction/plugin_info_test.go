@@ -22,10 +22,9 @@ var _ = Describe("plugin info actions", func() {
 		actor = NewActor(nil, fakeClient)
 	})
 
-	Describe("GetPluginInfoFromRepository", func() {
+	Describe("GetPluginInfoFromRepositoryForPlatform", func() {
 		Context("When getting the plugin repository errors", func() {
 			BeforeEach(func() {
-
 				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
 			})
 

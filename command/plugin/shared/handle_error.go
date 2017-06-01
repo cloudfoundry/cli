@@ -1,12 +1,16 @@
 package shared
 
 import (
+	"encoding/json"
+
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
+	case *json.SyntaxError:
+		return JSONSyntaxError{Err: e}
 	case pluginerror.RawHTTPStatusError:
 		return DownloadPluginHTTPError{Message: e.Status}
 	case pluginerror.SSLValidationHostnameError:
