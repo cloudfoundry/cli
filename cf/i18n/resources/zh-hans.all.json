@@ -1044,12 +1044,12 @@
     "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   除非提供 '-f'，否则将提示进行确认。"
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME install-plugin -r My-Repo plugin-echo",
     "translation": "CF_NAME install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64",
@@ -3572,6 +3572,10 @@
     "translation": "实例必须为非负整数"
   },
   {
+    "id": "Invalid JSON content from server: {{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "来自服务器的 JSON 响应无效"
   },
@@ -4858,6 +4862,10 @@
   {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "正在以 {{.Username}} 身份重新启动应用程序 {{.AppName}} 的实例 {{.Instance}}"
+  },
+  {
+    "id": "Restrict search for plugin to this registered repository",
+    "translation": ""
   },
   {
     "id": "Retrieve an individual feature flag with status",

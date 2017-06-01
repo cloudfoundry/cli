@@ -1044,12 +1044,12 @@
     "translation": "CF_NAME install-plugin (CHEMIN_LOCAL_PLUG-IN | URL | -r NOM_REFERENTIEL NOM_PLUG-IN) [-f]\n\n   Demande confirmation sauf si '-f' est indiqué."
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME install-plugin -r My-Repo plugin-echo",
     "translation": "CF_NAME install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64",
@@ -3572,6 +3572,10 @@
     "translation": "L'instance doit correspondre à un entier non négatif"
   },
   {
+    "id": "Invalid JSON content from server: {{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON response from server",
     "translation": "Réponse JSON non valide du serveur"
   },
@@ -4858,6 +4862,10 @@
   {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "Redémarrage de l'instance {{.Instance}} de l'application {{.AppName}} en tant que {{.Username}}"
+  },
+  {
+    "id": "Restrict search for plugin to this registered repository",
+    "translation": ""
   },
   {
     "id": "Retrieve an individual feature flag with status",
