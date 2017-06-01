@@ -1,6 +1,10 @@
 ---
 platform: linux
-rootfs_uri: docker:///cloudfoundry/cli-ci
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
 
 inputs:
 - name: cli-integration
