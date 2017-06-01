@@ -22,7 +22,7 @@ run:
   args:
   - -c
   - |
-    set -eux
+    set -eu
 
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
