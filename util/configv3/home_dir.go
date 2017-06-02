@@ -9,13 +9,13 @@ import (
 
 // ConfigFilePath returns the location of the config file
 func ConfigFilePath() string {
-	return filepath.Join(homeDirectory(), ".cf", "config.json")
+	return filepath.Join(homeDirectory(true), ".cf", "config.json")
 }
 
-func homeDirectory() string {
+func homeDirectory(checkCFHome bool) string {
 	var homeDir string
 	switch {
-	case os.Getenv("CF_HOME") != "":
+	case checkCFHome && os.Getenv("CF_HOME") != "":
 		homeDir = os.Getenv("CF_HOME")
 	default:
 		homeDir = os.Getenv("HOME")

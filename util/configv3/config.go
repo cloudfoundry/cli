@@ -170,7 +170,7 @@ func WriteConfig(c *Config) error {
 		return err
 	}
 
-	err = os.MkdirAll(filepath.Join(homeDirectory(), ".cf"), 0700)
+	err = os.MkdirAll(filepath.Join(homeDirectory(true), ".cf"), 0700)
 	if err != nil {
 		return err
 	}
