@@ -312,7 +312,7 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Processing files\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
