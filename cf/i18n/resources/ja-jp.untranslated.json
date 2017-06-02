@@ -580,10 +580,6 @@
     "translation": ""
   },
   {
-    "id": "Processing files...",
-    "translation": "Processing files..."
-  },
-  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -946,6 +942,10 @@
   {
     "id": "VERSION:",
     "translation": ""
+  },
+  {
+    "id": "Waiting for API to complete processing files...",
+    "translation": "Waiting for API to complete processing files..."
   },
   {
     "id": "Waiting for app to start...",

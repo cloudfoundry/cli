@@ -4544,10 +4544,6 @@
     "translation": "Processo terminato dal segnale: {{.Signal}}. Terminato con {{.ExitCode}}"
   },
   {
-    "id": "Processing files...",
-    "translation": ""
-  },
-  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -6414,6 +6410,10 @@
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
     "translation": "AVVERTENZA: questa è un'operazione interna di Cloud Foundry; i broker dei servizi non verranno contattati e le risorse delle istanze del servizio non verranno modificate. Il caso di utilizzo primario per questa operazione è quello di sostituire un broker dei servizi che implementa l'API Broker dei servizi v1 con un broker che implementa l'API v2 mediante la riassociazione delle istanze del servizio dai piani della v1 ai piani della v2.  Si consiglia di rendere privato il piano v1 o di arrestare il broker v1 per impedire la creazione di istanze aggiuntive. Una volta che le istanze del servizio sono state migrate, i servizi e i piani della v1 possono essere rimossi da Cloud Foundry."
+  },
+  {
+    "id": "Waiting for API to complete processing files...",
+    "translation": ""
   },
   {
     "id": "Waiting for app to start...",
