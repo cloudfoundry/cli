@@ -2,6 +2,7 @@ package v3
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -73,12 +74,37 @@ func (cmd V3AppCommand) Execute(args []string) error {
 	return nil
 }
 
+// Sort processes alphabetically and put web first.
 func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
+	sort.Slice(summary.Processes, func(i int, j int) bool {
+		var iScore int
+		var jScore int
+
+		switch summary.Processes[i].Type {
+		case "web":
+			iScore = 0
+		default:
+			iScore = 1
+		}
+
+		switch summary.Processes[j].Type {
+		case "web":
+			jScore = 0
+		default:
+			jScore = 1
+		}
+
+		if iScore == 1 && jScore == 1 {
+			return summary.Processes[i].Type < summary.Processes[j].Type
+		}
+		return iScore < jScore
+	})
+
 	keyValueTable := [][]string{
 		{ui.TranslateText("name:"), summary.Application.Name},
 		{ui.TranslateText("requested state:"), summary.State},
 		{ui.TranslateText("processes:"), processesSummary(summary.Processes)},
-		{ui.TranslateText("memory usage:"), bytefmt.ByteSize(summary.TotalMemoryUsage())},
+		{ui.TranslateText("memory usage:"), usageSummary(summary.Processes)},
 		{ui.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		{ui.TranslateText("buildpacks:"), buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
@@ -132,10 +158,25 @@ func processesSummary(processes []v3action.Process) string {
 	return strings.Join(processesStrings, ", ")
 }
 
+func usageSummary(processes []v3action.Process) string {
+	var usageStrings []string
+	for _, process := range processes {
+		if process.TotalInstanceCount() > 0 {
+			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", process.MemoryInMB, process.TotalInstanceCount()))
+		}
+	}
+
+	return strings.Join(usageStrings, ", ")
+}
+
 func buildpackNames(buildpacks []v3action.Buildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
-		names = append(names, buildpack.Name)
+		if buildpack.DetectOutput != "" {
+			names = append(names, buildpack.DetectOutput)
+		} else {
+			names = append(names, buildpack.Name)
+		}
 	}
 
 	return strings.Join(names, ", ")

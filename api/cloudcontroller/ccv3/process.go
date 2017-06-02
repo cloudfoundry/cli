@@ -6,8 +6,9 @@ import (
 )
 
 type Process struct {
-	GUID string `json:"guid"`
-	Type string `json:"type"`
+	GUID       string `json:"guid"`
+	Type       string `json:"type"`
+	MemoryInMB int    `json:"memory_in_mb"`
 }
 
 // GetApplicationProcesses lists processes for a given app

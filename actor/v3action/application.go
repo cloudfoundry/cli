@@ -14,8 +14,9 @@ type Application ccv3.Application
 
 // Process represents a V3 actor process.
 type Process struct {
-	Type      string
-	Instances []Instance
+	Type       string
+	Instances  []Instance
+	MemoryInMB int
 }
 
 // Instance represents a V3 actor instance.
@@ -42,28 +43,12 @@ func (p Process) HealthyInstanceCount() int {
 	return count
 }
 
-type Droplet struct {
-	GUID       string
-	Stack      string
-	Buildpacks []Buildpack
-}
-
 type Buildpack ccv3.Buildpack
 
 type ApplicationSummary struct {
 	Application
 	Processes      []Process
 	CurrentDroplet Droplet
-}
-
-func (s ApplicationSummary) TotalMemoryUsage() uint64 {
-	usage := uint64(0)
-	for _, process := range s.Processes {
-		for _, instance := range process.Instances {
-			usage += instance.MemoryUsage
-		}
-	}
-	return usage
 }
 
 // ApplicationNotFoundError represents the error that occurs when the
@@ -141,8 +126,9 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 		}
 
 		process := Process{
-			Type:      ccv3Process.Type,
-			Instances: []Instance{},
+			Type:       ccv3Process.Type,
+			Instances:  []Instance{},
+			MemoryInMB: ccv3Process.MemoryInMB,
 		}
 		for _, instance := range instances {
 			process.Instances = append(process.Instances, Instance(instance))

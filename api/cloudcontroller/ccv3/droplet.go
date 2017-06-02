@@ -12,7 +12,8 @@ type Droplet struct {
 }
 
 type Buildpack struct {
-	Name string `json:"name"`
+	Name         string `json:"name"`
+	DetectOutput string `json:"detect_output"`
 }
 
 // GetApplicationCurrentDroplet returns the Current Droplet for a given app

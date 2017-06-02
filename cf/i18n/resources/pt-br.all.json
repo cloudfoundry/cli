@@ -184,6 +184,10 @@
     "translation": ""
   },
   {
+    "id": "2006-01-02 15:04:05 PM",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Uma ferramenta de linha de comandos para interagir com o Cloud Foundry"
   },
@@ -1660,6 +1664,10 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
+    "id": "CF_NAME v3-app -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-create-app --name [name]",
     "translation": ""
   },
@@ -2374,6 +2382,10 @@
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
     "translation": "Limite de disco (por exemplo, 256 M, 1024 M, 1 G)"
+  },
+  {
+    "id": "Display an app",
+    "translation": ""
   },
   {
     "id": "Display health and status for app",
@@ -5620,6 +5632,10 @@
     "translation": "O nome do aplicativo"
   },
   {
+    "id": "The application name to display",
+    "translation": ""
+  },
+  {
     "id": "The application name to start",
     "translation": ""
   },
@@ -5918,6 +5934,10 @@
   {
     "id": "There are no running instances of this app.",
     "translation": "Não há instâncias em execução desse app."
+  },
+  {
+    "id": "There are no running instances of this process.",
+    "translation": ""
   },
   {
     "id": "There are too many options to display, please type in the name.",
@@ -6564,6 +6584,10 @@
     "translation": "buildpack:"
   },
   {
+    "id": "buildpacks:",
+    "translation": ""
+  },
+  {
     "id": "bytes downloaded",
     "translation": "bytes transferidos por download"
   },
@@ -6812,6 +6836,10 @@
     "translation": "memória"
   },
   {
+    "id": "memory usage:",
+    "translation": ""
+  },
+  {
     "id": "memory:",
     "translation": "memória:"
   },
@@ -6898,6 +6926,10 @@
   {
     "id": "position",
     "translation": "posição"
+  },
+  {
+    "id": "processes:",
+    "translation": ""
   },
   {
     "id": "protocol",

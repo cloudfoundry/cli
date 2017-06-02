@@ -16,6 +16,10 @@
     "translation": ""
   },
   {
+    "id": "2006-01-02 15:04:05 PM",
+    "translation": ""
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": ""
   },
@@ -152,6 +156,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-app -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-create-app --name [name]",
     "translation": ""
   },
@@ -249,6 +257,10 @@
   },
   {
     "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
+    "id": "Display an app",
     "translation": ""
   },
   {
@@ -832,6 +844,10 @@
     "translation": ""
   },
   {
+    "id": "The application name to display",
+    "translation": ""
+  },
+  {
     "id": "The application name to start",
     "translation": ""
   },
@@ -869,6 +885,10 @@
   },
   {
     "id": "The task's unique sequence ID",
+    "translation": ""
+  },
+  {
+    "id": "There are no running instances of this process.",
     "translation": ""
   },
   {
@@ -984,6 +1004,10 @@
     "translation": ""
   },
   {
+    "id": "buildpacks:",
+    "translation": ""
+  },
+  {
     "id": "command help",
     "translation": ""
   },
@@ -1048,6 +1072,10 @@
     "translation": ""
   },
   {
+    "id": "memory usage:",
+    "translation": ""
+  },
+  {
     "id": "organization",
     "translation": ""
   },
@@ -1065,6 +1093,10 @@
   },
   {
     "id": "ports",
+    "translation": ""
+  },
+  {
+    "id": "processes:",
     "translation": ""
   },
   {

@@ -140,8 +140,9 @@ var _ = Describe("Application Actions", func() {
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
 					[]ccv3.Process{
 						{
-							GUID: "some-process-guid",
-							Type: "some-type",
+							GUID:       "some-process-guid",
+							Type:       "some-type",
+							MemoryInMB: 32,
 						},
 					},
 					ccv3.Warnings{"some-process-warning"},
@@ -184,7 +185,8 @@ var _ = Describe("Application Actions", func() {
 					},
 					Processes: []Process{
 						Process{
-							Type: "some-type",
+							MemoryInMB: 32,
+							Type:       "some-type",
 							Instances: []Instance{
 								{
 									State:       "RUNNING",
@@ -628,12 +630,6 @@ var _ = Describe("Application Actions", func() {
 					},
 				},
 			}
-		})
-
-		Describe("TotalMemoryUsage", func() {
-			It("returns the total memory usage of all processes and instances", func() {
-				Expect(summary.TotalMemoryUsage()).To(Equal(uint64(10000000)))
-			})
 		})
 	})
 
