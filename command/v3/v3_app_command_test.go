@@ -101,20 +101,46 @@ var _ = Describe("v3-app Command", func() {
 					Stack: "cflinuxfs2",
 					Buildpacks: []v3action.Buildpack{
 						{
-							Name: "ruby_buildpack",
+							Name:         "ruby_buildpack",
+							DetectOutput: "some-detect-output",
+						},
+						{
+							Name:         "some-buildpack",
+							DetectOutput: "",
 						},
 					},
 				},
 				Processes: []v3action.Process{
 					v3action.Process{
-						Type: "web",
+						Type:       "console",
+						Instances:  []v3action.Instance{},
+						MemoryInMB: 128,
+					},
+					v3action.Process{
+						Type:       "worker",
+						MemoryInMB: 64,
+						Instances: []v3action.Instance{
+							v3action.Instance{
+								Index:       0,
+								State:       "RUNNING",
+								MemoryUsage: 4000000,
+								DiskUsage:   4000000,
+								MemoryQuota: 67108864,
+								DiskQuota:   8000000,
+								Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
+							},
+						},
+					},
+					v3action.Process{
+						Type:       "web",
+						MemoryInMB: 32,
 						Instances: []v3action.Instance{
 							v3action.Instance{
 								Index:       0,
 								State:       "RUNNING",
 								MemoryUsage: 1000000,
 								DiskUsage:   1000000,
-								MemoryQuota: 2000000,
+								MemoryQuota: 33554432,
 								DiskQuota:   2000000,
 								Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
 							},
@@ -123,7 +149,7 @@ var _ = Describe("v3-app Command", func() {
 								State:       "RUNNING",
 								MemoryUsage: 2000000,
 								DiskUsage:   2000000,
-								MemoryQuota: 4000000,
+								MemoryQuota: 33554432,
 								DiskQuota:   4000000,
 								Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
 							},
@@ -132,29 +158,11 @@ var _ = Describe("v3-app Command", func() {
 								State:       "RUNNING",
 								MemoryUsage: 3000000,
 								DiskUsage:   3000000,
-								MemoryQuota: 6000000,
+								MemoryQuota: 33554432,
 								DiskQuota:   6000000,
 								Uptime:      int(time.Now().Sub(time.Unix(1277164800, 0)).Seconds()),
 							},
 						},
-					},
-					v3action.Process{
-						Type: "worker",
-						Instances: []v3action.Instance{
-							v3action.Instance{
-								Index:       0,
-								State:       "RUNNING",
-								MemoryUsage: 4000000,
-								DiskUsage:   4000000,
-								MemoryQuota: 8000000,
-								DiskQuota:   8000000,
-								Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
-							},
-						},
-					},
-					v3action.Process{
-						Type:      "console",
-						Instances: []v3action.Instance{},
 					},
 				},
 			}
@@ -167,20 +175,22 @@ var _ = Describe("v3-app Command", func() {
 			Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
 			Expect(testUI.Out).To(Say("name:\\s+some-app"))
 			Expect(testUI.Out).To(Say("requested state:\\s+started"))
-			Expect(testUI.Out).To(Say("processes:\\s+web:3/3, worker:1/1, console:0/0"))
-			Expect(testUI.Out).To(Say("memory usage:\\s+9.5M"))
+			Expect(testUI.Out).To(Say("processes:\\s+web:3/3, console:0/0, worker:1/1"))
+			Expect(testUI.Out).To(Say("memory usage:\\s+32M x 3, 64M x 1"))
 			Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-			Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+ruby_buildpack\n\n"))
+			Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output, some-buildpack\n\n"))
 			Expect(testUI.Out).To(Say("web"))
 			Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-			Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 1.9M\\s+976.6K of 1.9M"))
-			Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 3.8M\\s+1.9M of 3.8M"))
-			Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 5.7M\\s+2.9M of 5.7M"))
-			Expect(testUI.Out).To(Say("worker"))
-			Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-			Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 7.6M\\s+3.8M of 7.6M"))
+			Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
+			Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
+			Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
+
 			Expect(testUI.Out).To(Say("console"))
 			Expect(testUI.Out).To(Say("There are no running instances of this process."))
+
+			Expect(testUI.Out).To(Say("worker"))
+			Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+			Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))

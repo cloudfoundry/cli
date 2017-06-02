@@ -24,7 +24,8 @@ var _ = Describe("Droplet", func() {
 				response := fmt.Sprintf(`{
 					"stack": "some-stack",
 					"buildpacks": [{
-						"name": "some-buildpack"
+						"name": "some-buildpack",
+						"detect_output": "detected-buildpack"
 					}]
 				}`, server.URL())
 				server.AppendHandlers(
@@ -43,7 +44,8 @@ var _ = Describe("Droplet", func() {
 					Stack: "some-stack",
 					Buildpacks: []Buildpack{
 						{
-							Name: "some-buildpack",
+							Name:         "some-buildpack",
+							DetectOutput: "detected-buildpack",
 						},
 					},
 				}))

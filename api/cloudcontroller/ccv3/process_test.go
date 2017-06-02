@@ -21,34 +21,39 @@ var _ = Describe("Process", func() {
 	Describe("GetApplicationProcesses", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				response1 := fmt.Sprintf(`{
-					"pagination": {
-						"next": {
-							"href": "%s/v3/apps/some-app-guid/processes?page=2"
-						}
-					},
-					"resources": [
-						{
-							"guid": "process-1-guid",
-							"type": "web"
+				response1 := fmt.Sprintf(`
+					{
+						"pagination": {
+							"next": {
+								"href": "%s/v3/apps/some-app-guid/processes?page=2"
+							}
 						},
-						{
-							"guid": "process-2-guid",
-							"type": "worker"
-						}
-					]
-				}`, server.URL())
-				response2 := `{
-					"pagination": {
-						"next": null
-					},
-					"resources": [
-						{
-							"guid": "process-3-guid",
-							"type": "console"
-						}
-					]
-				}`
+						"resources": [
+							{
+								"guid": "process-1-guid",
+								"type": "web",
+								"memory_in_mb": 32
+							},
+							{
+								"guid": "process-2-guid",
+								"type": "worker",
+								"memory_in_mb": 64
+							}
+						]
+					}`, server.URL())
+				response2 := `
+					{
+						"pagination": {
+							"next": null
+						},
+						"resources": [
+							{
+								"guid": "process-3-guid",
+								"type": "console",
+								"memory_in_mb": 128
+							}
+						]
+					}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes"),
@@ -69,16 +74,19 @@ var _ = Describe("Process", func() {
 
 				Expect(processes).To(ConsistOf(
 					Process{
-						GUID: "process-1-guid",
-						Type: "web",
+						GUID:       "process-1-guid",
+						Type:       "web",
+						MemoryInMB: 32,
 					},
 					Process{
-						GUID: "process-2-guid",
-						Type: "worker",
+						GUID:       "process-2-guid",
+						Type:       "worker",
+						MemoryInMB: 64,
 					},
 					Process{
-						GUID: "process-3-guid",
-						Type: "console",
+						GUID:       "process-3-guid",
+						Type:       "console",
+						MemoryInMB: 128,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
