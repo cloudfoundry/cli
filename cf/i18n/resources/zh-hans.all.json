@@ -4544,10 +4544,6 @@
     "translation": "进程被以下信号终止: {{.Signal}}。已退出，并带有 {{.ExitCode}}"
   },
   {
-    "id": "Processing files...",
-    "translation": ""
-  },
-  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -6414,6 +6410,10 @@
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
     "translation": "警告: 这是 Cloud Foundry 的内部操作；不会联系服务代理程序，并且不会更改服务实例的资源。此操作的主要用例是通过将服务实例从 V1 套餐重新映射到 V2 套餐，将实现 V1 服务代理程序 API 的服务代理程序替换为实现 V2 API 的代理程序。我们建议将 V1 套餐设置为专用套餐或者关闭 V1 代理程序，以阻止创建更多实例。一旦迁移了服务实例，就可以从 Cloud Foundry 中除去 V1 服务和套餐。"
+  },
+  {
+    "id": "Waiting for API to complete processing files...",
+    "translation": ""
   },
   {
     "id": "Waiting for app to start...",
