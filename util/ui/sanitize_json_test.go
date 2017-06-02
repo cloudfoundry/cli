@@ -15,6 +15,7 @@ var _ = Describe("SanitizeJSON", func() {
 				"next_pAssword_all": "bar",
 				"again": {
 					"real password ": "Don't tell nobody, it's banana",
+					"token_endpoint": "some url",
 					"testtokentest": "banana pants"
 				}
 			}
@@ -26,6 +27,7 @@ var _ = Describe("SanitizeJSON", func() {
 				"next_pAssword_all": RedactedValue,
 				"again": map[string]interface{}{
 					"real password ": RedactedValue,
+					"token_endpoint": "some url",
 					"testtokentest":  RedactedValue,
 				},
 			},
