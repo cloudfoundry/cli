@@ -14,7 +14,10 @@ const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
 	GetAppsRequest                                        = "GetApps"
+	GetAppProcessesRequest                                = "GetAppProcesses"
 	GetAppTasksRequest                                    = "GetAppTasks"
+	GetAppDropletCurrent                                  = "GetAppDropletCurrent"
+	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetBuildRequest                                       = "GetBuild"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
@@ -41,6 +44,7 @@ const (
 	IsolationSegmentsResource = "isolation_segments"
 	OrgsResource              = "organizations"
 	PackagesResource          = "packages"
+	ProcessesResource         = "processes"
 	SpaceResource             = "spaces"
 	TasksResource             = "tasks"
 )
@@ -59,7 +63,10 @@ var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
+	{Path: "/:guid/droplets/current", Method: http.MethodGet, Name: GetAppDropletCurrent, Resource: AppsResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
+	{Path: "/:guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
+	{Path: "/:guid/stats", Method: http.MethodGet, Name: GetProcessInstancesRequest, Resource: ProcessesResource},
 	{Path: "/:guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationDefaultIsolationSegmentRequest, Resource: OrgsResource},
 	{Path: "/:guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest, Resource: SpaceResource},
 	{Path: "/:guid/relationships/current_droplet", Method: http.MethodPatch, Name: PatchApplicationCurrentDropletRequest, Resource: AppsResource},

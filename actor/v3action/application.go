@@ -3,6 +3,7 @@ package v3action
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -10,6 +11,60 @@ import (
 
 // Application represents a V3 actor application.
 type Application ccv3.Application
+
+// Process represents a V3 actor process.
+type Process struct {
+	Type      string
+	Instances []Instance
+}
+
+// Instance represents a V3 actor instance.
+type Instance ccv3.Instance
+
+// StartTime returns the time that the instance started.
+func (instance *Instance) StartTime() time.Time {
+	uptimeDuration := time.Duration(instance.Uptime) * time.Second
+
+	return time.Now().Add(-uptimeDuration)
+}
+
+func (p Process) TotalInstanceCount() int {
+	return len(p.Instances)
+}
+
+func (p Process) HealthyInstanceCount() int {
+	count := 0
+	for _, instance := range p.Instances {
+		if instance.State == "RUNNING" {
+			count++
+		}
+	}
+	return count
+}
+
+type Droplet struct {
+	GUID       string
+	Stack      string
+	Buildpacks []Buildpack
+}
+
+type Buildpack ccv3.Buildpack
+
+type ApplicationSummary struct {
+	Application
+	Processes      []Process
+	CurrentDroplet Droplet
+}
+
+func (s ApplicationSummary) TotalMemoryUsage() uint64 {
+	usage := uint64(0)
+	for _, process := range s.Processes {
+		for _, instance := range process.Instances {
+			usage += instance.MemoryUsage
+		}
+	}
+	return usage
+}
 
 // ApplicationNotFoundError represents the error that occurs when the
 // application is not found.
@@ -47,6 +102,61 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	}
 
 	return Application(apps[0]), Warnings(warnings), nil
+}
+
+// GetApplicationSummaryByNameAndSpace returns an application with process and
+// instance stats.
+func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
+	spaceGUID string) (ApplicationSummary, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return ApplicationSummary{}, allWarnings, err
+	}
+
+	ccv3Droplet, warnings, err := actor.CloudControllerClient.GetApplicationCurrentDroplet(app.GUID)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return ApplicationSummary{}, allWarnings, err
+	}
+	droplet := Droplet{
+		Stack: ccv3Droplet.Stack,
+	}
+	for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
+		droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
+	}
+
+	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(app.GUID)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return ApplicationSummary{}, allWarnings, err
+	}
+
+	var processes []Process
+	for _, ccv3Process := range ccv3Processes {
+		processGUID := ccv3Process.GUID
+		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
+		allWarnings = append(allWarnings, Warnings(warnings)...)
+		if err != nil {
+			return ApplicationSummary{}, allWarnings, err
+		}
+
+		process := Process{
+			Type:      ccv3Process.Type,
+			Instances: []Instance{},
+		}
+		for _, instance := range instances {
+			process.Instances = append(process.Instances, Instance(instance))
+		}
+
+		processes = append(processes, process)
+	}
+
+	summary := ApplicationSummary{
+		Application:    app,
+		Processes:      processes,
+		CurrentDroplet: droplet,
+	}
+	return summary, allWarnings, nil
 }
 
 // CreateApplicationByNameAndSpace creates and returns the application with the given
