@@ -11,11 +11,11 @@ var _ = Describe("Config", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		homeDir = setup()
+		homeDir = createAndSetHomeDir()
 	})
 
 	AfterEach(func() {
-		teardown(homeDir)
+		removeAndUnsetHomeDir(homeDir)
 	})
 
 	Describe("CurrentUser", func() {

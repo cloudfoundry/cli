@@ -14,17 +14,17 @@ var _ = Describe("Config", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		homeDir = setup()
+		homeDir = createAndSetHomeDir()
 	})
 
 	AfterEach(func() {
-		teardown(homeDir)
+		removeAndUnsetHomeDir(homeDir)
 	})
 
 	DescribeTable("ColorEnabled",
 		func(configVal string, envVal string, expected ColorSetting) {
 			rawConfig := fmt.Sprintf(`{"ColorEnabled":"%s"}`, configVal)
-			setConfig(homeDir, rawConfig)
+			writeConfig(homeDir, rawConfig)
 
 			defer os.Unsetenv("CF_COLOR")
 			if envVal == "" {

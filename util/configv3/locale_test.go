@@ -15,17 +15,17 @@ var _ = Describe("Config", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		homeDir = setup()
+		homeDir = createAndSetHomeDir()
 	})
 
 	AfterEach(func() {
-		teardown(homeDir)
+		removeAndUnsetHomeDir(homeDir)
 	})
 
 	DescribeTable("Locale",
 		func(langVal string, lcAllVall string, configVal string, expected string) {
 			rawConfig := fmt.Sprintf(`{"Locale":"%s"}`, configVal)
-			setConfig(homeDir, rawConfig)
+			writeConfig(homeDir, rawConfig)
 
 			defer os.Unsetenv("LANG")
 			if langVal == "" {
