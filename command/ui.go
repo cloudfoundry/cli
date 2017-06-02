@@ -23,6 +23,7 @@ type UI interface {
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
+	DisplayTextWithBold(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
 	RequestLoggerFileWriter(filePaths []string) *ui.RequestLoggerFileWriter

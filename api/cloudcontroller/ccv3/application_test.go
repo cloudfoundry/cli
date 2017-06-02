@@ -31,7 +31,14 @@ var _ = Describe("Application", func() {
   "resources": [
     {
       "name": "app-name-1",
-      "guid": "app-guid-1"
+      "guid": "app-guid-1",
+			"lifecycle": {
+				"type": "buildpack",
+				"data": {
+					"buildpacks": ["some-buildpack"],
+					"stack": "some-stack"
+				}
+			}
     },
     {
       "name": "app-name-2",
@@ -72,7 +79,10 @@ var _ = Describe("Application", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(apps).To(ConsistOf(
-					Application{Name: "app-name-1", GUID: "app-guid-1"},
+					Application{
+						Name: "app-name-1",
+						GUID: "app-guid-1",
+					},
 					Application{Name: "app-name-2", GUID: "app-guid-2"},
 					Application{Name: "app-name-3", GUID: "app-guid-3"},
 				))

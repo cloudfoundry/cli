@@ -298,6 +298,20 @@ func (ui *UI) DisplayTextWithFlavor(template string, templateValues ...map[strin
 	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
 }
 
+// DisplayTextWithBold translates the template, bolds the templateValues,
+// substitutes templateValues into the template, and outputs
+// the result to ui.Out. Only the first map in templateValues is used.
+func (ui *UI) DisplayTextWithBold(template string, templateValues ...map[string]interface{}) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	firstTemplateValues := getFirstSet(templateValues)
+	for key, value := range firstTemplateValues {
+		firstTemplateValues[key] = ui.modifyColor(fmt.Sprint(value), color.New(color.Bold))
+	}
+	fmt.Fprintf(ui.Out, "%s\n", ui.TranslateText(template, firstTemplateValues))
+}
+
 // DisplayWarning translates the warning, substitutes in templateValues, and
 // outputs to ui.Err. Only the first map in templateValues is used.
 func (ui *UI) DisplayWarning(template string, templateValues ...map[string]interface{}) {

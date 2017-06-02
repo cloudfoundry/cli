@@ -13,8 +13,9 @@ import (
 // Application represents a Cloud Controller V3 Application.
 type Application struct {
 	Name          string        `json:"name"`
-	GUID          string        `json:"guid,omitempty"`
 	Relationships Relationships `json:"relationships"`
+	GUID          string        `json:"guid,omitempty"`
+	State         string        `json:"state,omitempty"`
 }
 
 // DropletRelationship represents the relationship between a V3 Droplet and its
