@@ -6,8 +6,6 @@ import (
 	"regexp"
 )
 
-const RedactedValue = "[PRIVATE DATA HIDDEN]"
-
 var keysToSanitize = regexp.MustCompile("(?i).*(?:token|password).*")
 
 func SanitizeJSON(raw []byte) (map[string]interface{}, error) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"sync"
 	"time"
 
@@ -11,14 +12,16 @@ import (
 )
 
 type RequestLoggerTerminalDisplay struct {
-	ui   *UI
-	lock *sync.Mutex
+	ui            *UI
+	lock          *sync.Mutex
+	dumpSanitizer *regexp.Regexp
 }
 
 func newRequestLoggerTerminalDisplay(ui *UI, lock *sync.Mutex) *RequestLoggerTerminalDisplay {
 	return &RequestLoggerTerminalDisplay{
-		ui:   ui,
-		lock: lock,
+		ui:            ui,
+		lock:          lock,
+		dumpSanitizer: regexp.MustCompile(tokenRegexp),
 	}
 }
 
@@ -28,7 +31,8 @@ func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayDump(dump string) error {
-	fmt.Fprintf(display.ui.Out, "%s\n", dump)
+	sanitized := display.dumpSanitizer.ReplaceAllString(dump, RedactedValue)
+	fmt.Fprintf(display.ui.Out, "%s\n", sanitized)
 	return nil
 }
 

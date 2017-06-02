@@ -6,23 +6,26 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sync"
 	"time"
 )
 
 type RequestLoggerFileWriter struct {
-	ui        *UI
-	lock      *sync.Mutex
-	filePaths []string
-	logFiles  []*os.File
+	ui            *UI
+	lock          *sync.Mutex
+	filePaths     []string
+	logFiles      []*os.File
+	dumpSanitizer *regexp.Regexp
 }
 
 func newRequestLoggerFileWriter(ui *UI, lock *sync.Mutex, filePaths []string) *RequestLoggerFileWriter {
 	return &RequestLoggerFileWriter{
-		ui:        ui,
-		lock:      lock,
-		filePaths: filePaths,
-		logFiles:  []*os.File{},
+		ui:            ui,
+		lock:          lock,
+		filePaths:     filePaths,
+		logFiles:      []*os.File{},
+		dumpSanitizer: regexp.MustCompile(tokenRegexp),
 	}
 }
 
@@ -37,8 +40,9 @@ func (display *RequestLoggerFileWriter) DisplayBody(_ []byte) error {
 }
 
 func (display *RequestLoggerFileWriter) DisplayDump(dump string) error {
+	sanitized := display.dumpSanitizer.ReplaceAllString(dump, RedactedValue)
 	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(dump)
+		_, err := logFile.WriteString(sanitized)
 		if err != nil {
 			return err
 		}
