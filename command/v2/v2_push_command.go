@@ -292,7 +292,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	case pushaction.UploadComplete:
 		cmd.ProgressBar.Complete()
 		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("Processing files...")
+		cmd.UI.DisplayText("Waiting for API to complete processing files...")
 	case pushaction.Complete:
 		return true
 	default:
