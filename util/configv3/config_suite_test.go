@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"runtime"
 
+	. "code.cloudfoundry.org/cli/util/configv3"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -97,4 +99,17 @@ func writePluginConfig(pluginDir string, rawConfig string) {
 	Expect(err).ToNot(HaveOccurred())
 	err = ioutil.WriteFile(filepath.Join(pluginDir, "config.json"), []byte(rawConfig), 0644)
 	Expect(err).ToNot(HaveOccurred())
+}
+
+func getPluginsHome() string {
+	var pluginsRoot string
+
+	switch {
+	case os.Getenv("CF_PLUGIN_HOME") != "":
+		pluginsRoot = os.Getenv("CF_PLUGIN_HOME")
+	default:
+		pluginsRoot = HomeDirectory(false)
+	}
+
+	return filepath.Join(pluginsRoot, ".cf", "plugins")
 }

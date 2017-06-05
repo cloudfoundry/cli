@@ -36,7 +36,7 @@ var _ = Describe("Config", func() {
 			Expect(config.Target()).To(Equal(DefaultTarget))
 			Expect(config.SkipSSLValidation()).To(BeFalse())
 			Expect(config.ColorEnabled()).To(Equal(ColorEnabled))
-			Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
+			Expect(config.PluginHome()).To(Equal(filepath.Join(HomeDirectory(false), ".cf", "plugins")))
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
 			Expect(config.Locale()).To(BeEmpty())
