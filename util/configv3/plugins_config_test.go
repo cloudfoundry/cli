@@ -94,7 +94,7 @@ var _ = Describe("PluginsConfig", func() {
 		},
 
 		Entry("standard location", func() (string, string) {
-			return getPluginsHome(), ""
+			return filepath.Join(homeDir, ".cf", "plugins"), ""
 		}),
 
 		Entry("non-standard location", func() (string, string) {
@@ -272,7 +272,7 @@ var _ = Describe("PluginsConfig", func() {
     }
   }
 }`
-				writePluginConfig(getPluginsHome(), rawConfig)
+				writePluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -387,7 +387,7 @@ var _ = Describe("PluginsConfig", func() {
 		}
 	}
 }`
-				writePluginConfig(getPluginsHome(), rawConfig)
+				writePluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -409,7 +409,7 @@ var _ = Describe("PluginsConfig", func() {
 
 			Context("when an error is encountered", func() {
 				BeforeEach(func() {
-					pluginConfigPath := filepath.Join(getPluginsHome(), "config.json")
+					pluginConfigPath := filepath.Join(homeDir, ".cf", "plugins", "config.json")
 					err := os.Remove(pluginConfigPath)
 					Expect(err).ToNot(HaveOccurred())
 					err = os.Mkdir(pluginConfigPath, 0700)
@@ -435,7 +435,7 @@ var _ = Describe("PluginsConfig", func() {
 					}
 				}`
 
-				pluginsPath := getPluginsHome()
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
 				writePluginConfig(pluginsPath, rawConfig)
 			})
 
@@ -461,7 +461,7 @@ var _ = Describe("PluginsConfig", func() {
 					}
 				}`
 
-				pluginsPath := getPluginsHome()
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
 				writePluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -491,7 +491,7 @@ var _ = Describe("PluginsConfig", func() {
 					}
 				}`
 
-				pluginsPath := getPluginsHome()
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
 				writePluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -526,7 +526,7 @@ var _ = Describe("PluginsConfig", func() {
 					}
 				}`
 
-				pluginsPath := getPluginsHome()
+				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
 				writePluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())

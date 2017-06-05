@@ -8,18 +8,20 @@ import (
 )
 
 func ConfigFilePath() string {
-	return filepath.Join(HomeDirectory(false), ".cf", "config.json")
+	return filepath.Join(homeDirectory(false), ".cf", "config.json")
 }
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
-func HomeDirectory(checkCFHome bool) string {
+func homeDirectory(checkCFHome bool) string {
+	var homeDir string
 	switch {
 	case checkCFHome && os.Getenv("CF_HOME") != "":
-		return os.Getenv("CF_HOME")
+		homeDir = os.Getenv("CF_HOME")
 	case os.Getenv("HOMEDRIVE")+os.Getenv("HOMEPATH") != "":
-		return os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
 	default:
-		return os.Getenv("USERPROFILE")
+		homeDir = os.Getenv("USERPROFILE")
 	}
+	return homeDir
 }
