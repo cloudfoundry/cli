@@ -39,6 +39,7 @@ func CustomCF(cfEnv CFEnv, args ...string) *Session {
 		for key, val := range cfEnv.EnvVars {
 			env = AddOrReplaceEnvironment(env, key, val)
 		}
+		command.Env = env
 	}
 
 	session, err := Start(
@@ -61,17 +62,5 @@ func CFWithStdin(stdin io.Reader, args ...string) *Session {
 }
 
 func CFWithEnv(envVars map[string]string, args ...string) *Session {
-	env := os.Environ()
-	for key, val := range envVars {
-		env = AddOrReplaceEnvironment(env, key, val)
-	}
-
-	command := exec.Command("cf", args...)
-	command.Env = env
-	session, err := Start(
-		command,
-		NewPrefixedWriter("OUT: ", GinkgoWriter),
-		NewPrefixedWriter("ERR: ", GinkgoWriter))
-	Expect(err).NotTo(HaveOccurred())
-	return session
+	return CustomCF(CFEnv{EnvVars: envVars}, args...)
 }
