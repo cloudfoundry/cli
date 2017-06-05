@@ -103,7 +103,7 @@ func (config *Config) PluginHome() string {
 		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
 	}
 
-	return filepath.Join(HomeDirectory(false), ".cf", "plugins")
+	return filepath.Join(homeDirectory(false), ".cf", "plugins")
 }
 
 // AddPlugin adds the specified plugin to PluginsConfig
