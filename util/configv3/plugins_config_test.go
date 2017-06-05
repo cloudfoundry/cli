@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	. "code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -16,24 +15,20 @@ var _ = Describe("PluginsConfig", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		homeDir = createAndSetHomeDir()
+		homeDir = setup()
 	})
 
 	AfterEach(func() {
-		removeAndUnsetHomeDir(homeDir)
+		teardown(homeDir)
 	})
 
 	DescribeTable("when the plugin config exists",
-		// pass in a function since homeDir isn't set until runtime
-		// and location concatenates to homeDir
 		func(setup func() (string, string)) {
 			location, CFPluginHome := setup()
-			err := os.Setenv("CF_PLUGIN_HOME", CFPluginHome)
-			Expect(err).NotTo(HaveOccurred())
-			defer func() {
-				err := os.Unsetenv("CF_PLUGIN_HOME")
-				Expect(err).NotTo(HaveOccurred())
-			}()
+			if CFPluginHome != "" {
+				os.Setenv("CF_PLUGIN_HOME", CFPluginHome)
+				defer os.Unsetenv("CF_PLUGIN_HOME")
+			}
 
 			rawConfig := `
 {
@@ -68,7 +63,7 @@ var _ = Describe("PluginsConfig", func() {
 		}
 	}
 }`
-			writePluginConfig(location, rawConfig)
+			setPluginConfig(location, rawConfig)
 			config, err := LoadConfig()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(config).ToNot(BeNil())
@@ -223,10 +218,11 @@ var _ = Describe("PluginsConfig", func() {
 	})
 
 	Describe("Config", func() {
-		var config *Config
-
 		Describe("RemovePlugin", func() {
-			var err error
+			var (
+				config *Config
+				err    error
+			)
 
 			BeforeEach(func() {
 				rawConfig := `
@@ -272,7 +268,7 @@ var _ = Describe("PluginsConfig", func() {
     }
   }
 }`
-				writePluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
+				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -298,70 +294,9 @@ var _ = Describe("PluginsConfig", func() {
 			})
 		})
 
-		Describe("PluginHome", func() {
-			Context("when the CF_PLUGIN_HOME environment variable is set", func() {
-				BeforeEach(func() {
-					err := os.Setenv("CF_PLUGIN_HOME", "some-cf-plugin-home")
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				AfterEach(func() {
-					err := os.Unsetenv("CF_PLUGIN_HOME")
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				It("uses the CF_PLUGIN_HOME value", func() {
-					config, err := LoadConfig()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(config.PluginHome()).To(Equal("some-cf-plugin-home/.cf/plugins"))
-				})
-			})
-
-			Context("when the CF_HOME and HOME environment variables are set", func() {
-				BeforeEach(func() {
-					err := os.Setenv("CF_HOME", "some-cf-home")
-					Expect(err).ToNot(HaveOccurred())
-					err = os.Setenv("HOME", "some-home")
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				AfterEach(func() {
-					err := os.Unsetenv("CF_HOME")
-					Expect(err).ToNot(HaveOccurred())
-					err = os.Unsetenv("HOME")
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				It("uses the HOME value", func() {
-					config, err := LoadConfig()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(config.PluginHome()).To(Equal("some-home/.cf/plugins"))
-				})
-
-				Context("when the platform is windows", func() {
-					BeforeEach(func() {
-						if runtime.GOOS != "windows" {
-							Skip("skipping windows specific test")
-						}
-						err := os.Setenv("USERPROFILE", "some-windows-home")
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					AfterEach(func() {
-						err := os.Unsetenv("USERPROFILE")
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					It("should use the windows specific home environment variable", func() {
-						config, err := LoadConfig()
-						Expect(err).ToNot(HaveOccurred())
-						Expect(config.PluginHome()).To(Equal("some-windows-home/.cf/plugins"))
-					})
-				})
-			})
-		})
-
 		Describe("WritePluginConfig", func() {
+			var config *Config
+
 			BeforeEach(func() {
 				rawConfig := `
 {
@@ -387,7 +322,7 @@ var _ = Describe("PluginsConfig", func() {
 		}
 	}
 }`
-				writePluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
+				setPluginConfig(filepath.Join(homeDir, ".cf", "plugins"), rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -436,7 +371,7 @@ var _ = Describe("PluginsConfig", func() {
 				}`
 
 				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
-				writePluginConfig(pluginsPath, rawConfig)
+				setPluginConfig(pluginsPath, rawConfig)
 			})
 
 			It("returns the pluging sorted by name", func() {
@@ -451,7 +386,10 @@ var _ = Describe("PluginsConfig", func() {
 		})
 
 		Describe("AddPlugin", func() {
-			var err error
+			var (
+				config *Config
+				err    error
+			)
 
 			BeforeEach(func() {
 				rawConfig := `
@@ -462,7 +400,7 @@ var _ = Describe("PluginsConfig", func() {
 				}`
 
 				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
-				writePluginConfig(pluginsPath, rawConfig)
+				setPluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -480,7 +418,10 @@ var _ = Describe("PluginsConfig", func() {
 		})
 
 		Describe("GetPlugin", func() {
-			var err error
+			var (
+				config *Config
+				err    error
+			)
 
 			BeforeEach(func() {
 				rawConfig := `
@@ -492,7 +433,7 @@ var _ = Describe("PluginsConfig", func() {
 				}`
 
 				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
-				writePluginConfig(pluginsPath, rawConfig)
+				setPluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -514,7 +455,10 @@ var _ = Describe("PluginsConfig", func() {
 		})
 
 		Describe("GetPluginCaseInsensitive", func() {
-			var err error
+			var (
+				config *Config
+				err    error
+			)
 
 			BeforeEach(func() {
 				rawConfig := `
@@ -527,7 +471,7 @@ var _ = Describe("PluginsConfig", func() {
 				}`
 
 				pluginsPath := filepath.Join(homeDir, ".cf", "plugins")
-				writePluginConfig(pluginsPath, rawConfig)
+				setPluginConfig(pluginsPath, rawConfig)
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
 			})

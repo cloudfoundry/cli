@@ -19,16 +19,40 @@ var _ = Describe("Config", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		homeDir = createAndSetHomeDir()
+		homeDir = setup()
 	})
 
 	AfterEach(func() {
-		removeAndUnsetHomeDir(homeDir)
+		teardown(homeDir)
 	})
 
 	Context("when there isn't a config set", func() {
+		var (
+			oldLang  string
+			oldLCAll string
+		)
+
+		BeforeEach(func() {
+			oldLang = os.Getenv("LANG")
+			oldLCAll = os.Getenv("LC_ALL")
+			os.Unsetenv("LANG")
+			os.Unsetenv("LC_ALL")
+		})
+
 		It("returns a default config", func() {
+			defer os.Setenv("LANG", oldLang)
+			defer os.Setenv("LC_ALL", oldLCAll)
+
+			// specifically for when we run unit tests locally
+			// we save and unset this variable in case it's present
+			// since we want to load a default config
+			envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
+			os.Unsetenv("CF_CLI_EXPERIMENTAL")
+
 			config, err := LoadConfig()
+
+			// then we reset the env variable
+			os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
 
 			Expect(err).ToNot(HaveOccurred())
 
@@ -72,7 +96,7 @@ var _ = Describe("Config", func() {
 		Context("when UAAOAuthClient is not present", func() {
 			BeforeEach(func() {
 				rawConfig := `{}`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -93,7 +117,7 @@ var _ = Describe("Config", func() {
 					{
 						"UAAOAuthClient": ""
 					}`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				config, err = LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
@@ -151,7 +175,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				rawConfig := `{ "Target":"https://api.foo.com" }`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -170,7 +194,7 @@ var _ = Describe("Config", func() {
 			Context("when AsyncTimeout is set in config", func() {
 				BeforeEach(func() {
 					rawConfig := `{ "AsyncTimeout":5 }`
-					writeConfig(homeDir, rawConfig)
+					setConfig(homeDir, rawConfig)
 
 					var err error
 					config, err = LoadConfig()
@@ -189,7 +213,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				rawConfig := `{ "SSLDisabled":true }`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -207,7 +231,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				rawConfig := `{ "AccessToken":"some-token" }`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -225,7 +249,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				rawConfig := `{ "RefreshToken":"some-token" }`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -243,7 +267,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				rawConfig := `{ "UAAOAuthClient":"some-client" }`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -265,7 +289,7 @@ var _ = Describe("Config", func() {
 						"UAAOAuthClient": "some-client-id",
 						"UAAOAuthClientSecret": "some-client-secret"
 					}`
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				var err error
 				config, err = LoadConfig()
@@ -281,7 +305,7 @@ var _ = Describe("Config", func() {
 		DescribeTable("Experimental",
 			func(envVal string, expected bool) {
 				rawConfig := fmt.Sprintf(`{}`)
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				defer os.Unsetenv("CF_CLI_EXPERIMENTAL")
 				if envVal == "" {
@@ -414,7 +438,7 @@ var _ = Describe("Config", func() {
 		DescribeTable("Verbose",
 			func(env string, configTrace string, flag bool, expected bool, location []string) {
 				rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, configTrace)
-				writeConfig(homeDir, rawConfig)
+				setConfig(homeDir, rawConfig)
 
 				defer os.Unsetenv("CF_TRACE")
 				if env == "" {
