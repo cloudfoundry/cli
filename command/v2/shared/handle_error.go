@@ -21,7 +21,10 @@ func HandleError(err error) error {
 		return command.InvalidSSLCertError{API: e.URL}
 
 	case ccerror.JobFailedError:
-		return JobFailedError{JobGUID: e.JobGUID}
+		return JobFailedError{
+			JobGUID: e.JobGUID,
+			Message: e.Message,
+		}
 	case ccerror.JobTimeoutError:
 		return JobTimeoutError{JobGUID: e.JobGUID}
 

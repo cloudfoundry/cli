@@ -155,18 +155,25 @@ var _ = Describe("Job", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/jobs/some-job-guid"),
-						RespondWith(http.StatusAccepted, fmt.Sprintf(`{
-							"metadata": {
-								"guid": "some-job-guid",
-								"created_at": "2016-06-08T16:41:29Z",
-								"url": "/v2/jobs/some-job-guid"
-							},
-							"entity": {
-								"error": "%s",
-								"guid": "job-guid",
-								"status": "failed"
+						RespondWith(http.StatusOK, fmt.Sprintf(`
+							{
+								"metadata": {
+									"guid": "some-job-guid",
+									"created_at": "2016-06-08T16:41:29Z",
+									"url": "/v2/jobs/some-job-guid"
+								},
+								"entity": {
+									"error": "Use of entity>error is deprecated in favor of entity>error_details.",
+									"error_details": {
+										"code": 160001,
+										"description": "%s",
+										"error_code": "CF-AppBitsUploadInvalid"
+									},
+									"guid": "job-guid",
+									"status": "failed"
+								}
 							}
-						}`, jobFailureMessage), http.Header{"X-Cf-Warnings": {"warning-4"}}),
+							`, jobFailureMessage), http.Header{"X-Cf-Warnings": {"warning-4"}}),
 					))
 			})
 
@@ -324,19 +331,25 @@ var _ = Describe("Job", func() {
 
 		Context("when the job fails", func() {
 			BeforeEach(func() {
-				jsonResponse := `{
-					"metadata": {
-						"guid": "job-guid",
-						"created_at": "2016-06-08T16:41:27Z",
-						"url": "/v2/jobs/job-guid"
-					},
-					"entity": {
-						"error": "some-error",
-						"guid": "job-guid",
-						"status": "failed"
+				jsonResponse := `
+					{
+						"metadata": {
+							"guid": "some-job-guid",
+							"created_at": "2016-06-08T16:41:29Z",
+							"url": "/v2/jobs/some-job-guid"
+						},
+						"entity": {
+							"error": "Use of entity>error is deprecated in favor of entity>error_details.",
+							"error_details": {
+								"code": 160001,
+								"description": "some-error",
+								"error_code": "CF-AppBitsUploadInvalid"
+							},
+							"guid": "job-guid",
+							"status": "failed"
+						}
 					}
-				}`
-
+					`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/jobs/job-guid"),
@@ -351,7 +364,8 @@ var _ = Describe("Job", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.Status).To(Equal(JobStatusFailed))
-				Expect(job.Error).To(Equal("some-error"))
+				Expect(job.Error).To(Equal("Use of entity>error is deprecated in favor of entity>error_details."))
+				Expect(job.ErrorDetails.Description).To(Equal("some-error"))
 			})
 		})
 	})

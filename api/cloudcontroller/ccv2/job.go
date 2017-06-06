@@ -39,7 +39,10 @@ const (
 
 // Job represents a Cloud Controller Job.
 type Job struct {
-	Error  string
+	Error        string
+	ErrorDetails struct {
+		Description string
+	}
 	GUID   string
 	Status JobStatus
 }
@@ -48,7 +51,10 @@ type Job struct {
 func (job *Job) UnmarshalJSON(data []byte) error {
 	var ccJob struct {
 		Entity struct {
-			Error  string `json:"error"`
+			Error        string `json:"error"`
+			ErrorDetails struct {
+				Description string `json:"description"`
+			} `json:"error_details"`
 			GUID   string `json:"guid"`
 			Status string `json:"status"`
 		} `json:"entity"`
@@ -59,6 +65,7 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	}
 
 	job.Error = ccJob.Entity.Error
+	job.ErrorDetails.Description = ccJob.Entity.ErrorDetails.Description
 	job.GUID = ccJob.Entity.GUID
 	job.Status = JobStatus(ccJob.Entity.Status)
 	return nil
@@ -116,7 +123,7 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		if job.Failed() {
 			return allWarnings, ccerror.JobFailedError{
 				JobGUID: originalJobGUID,
-				Message: job.Error,
+				Message: job.ErrorDetails.Description,
 			}
 		}
 

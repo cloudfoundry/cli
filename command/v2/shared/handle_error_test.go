@@ -53,8 +53,8 @@ var _ = Describe("HandleError", func() {
 			command.ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
 		Entry("ccerror.JobFailedError -> JobFailedError",
-			ccerror.JobFailedError{JobGUID: "some-job-guid"},
-			JobFailedError{JobGUID: "some-job-guid"}),
+			ccerror.JobFailedError{JobGUID: "some-job-guid", Message: "some-message"},
+			JobFailedError{JobGUID: "some-job-guid", Message: "some-message"}),
 
 		Entry("ccerror.JobTimeoutError -> JobTimeoutError",
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
