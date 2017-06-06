@@ -31,6 +31,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			cmdSettings = CommandLineSettings{
 				Name:             "some-app",
 				CurrentDirectory: pwd,
+				DockerImage:      "some-image",
 			}
 		})
 
@@ -38,8 +39,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			manifests, err := actor.MergeAndValidateSettingsAndManifests(cmdSettings, nil)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(manifests).To(Equal([]manifest.Application{{
-				Name: "some-app",
-				Path: pwd,
+				Name:        "some-app",
+				Path:        pwd,
+				DockerImage: "some-image",
 			}}))
 		})
 	})

@@ -82,10 +82,12 @@ var _ = Describe("Apply", func() {
 		var createdApp v2action.Application
 
 		BeforeEach(func() {
-			createdApp = config.DesiredApplication
-			createdApp.GUID = "some-app-guid"
+			fakeV2Actor.CreateApplicationStub = func(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
+				createdApp = application
+				createdApp.GUID = "some-app-guid"
 
-			fakeV2Actor.CreateApplicationReturns(createdApp, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, nil)
+				return createdApp, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, nil
+			}
 		})
 
 		JustBeforeEach(func() {
@@ -216,6 +218,19 @@ var _ = Describe("Apply", func() {
 					It("sends warnings and errors, then stops", func() {
 						Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 						Consistently(eventStream).ShouldNot(Receive())
+					})
+				})
+
+				Context("when a docker image is provided", func() {
+					BeforeEach(func() {
+						config.DesiredApplication.DockerImage = "some-docker-image-path"
+					})
+
+					It("skips achiving and uploading", func() {
+						Eventually(configStream).Should(Receive())
+						Eventually(eventStream).Should(Receive(Equal(Complete)))
+
+						Expect(fakeV2Actor.ZipResourcesCallCount()).To(Equal(0))
 					})
 				})
 			})

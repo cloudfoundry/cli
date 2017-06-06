@@ -77,13 +77,17 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		// TODO: when working with all of routes, append to current route
 		config.DesiredRoutes = []v2action.Route{defaultRoute}
 
-		log.WithField("path_to_resources", app.Path).Info("determine resources to zip")
-		resources, err := actor.V2Actor.GatherResources(app.Path)
-		if err != nil {
-			return nil, warnings, err
+		if app.DockerImage == "" {
+			log.WithField("path_to_resources", app.Path).Info("determine resources to zip")
+			resources, err := actor.V2Actor.GatherResources(app.Path)
+			if err != nil {
+				return nil, warnings, err
+			}
+			config.AllResources = resources
+			log.WithField("number_of_files", len(resources)).Debug("completed file scan")
+		} else {
+			config.DesiredApplication.DockerImage = app.DockerImage
 		}
-		config.AllResources = resources
-		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
 
 		configs = append(configs, config)
 	}
