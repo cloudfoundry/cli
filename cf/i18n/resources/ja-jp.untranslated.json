@@ -1032,6 +1032,10 @@
     "translation": ""
   },
   {
+    "id": "docker image:",
+    "translation": ""
+  },
+  {
     "id": "droplet: {{.DropletGUID}}",
     "translation": ""
   },

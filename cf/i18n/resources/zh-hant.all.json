@@ -6664,6 +6664,10 @@
     "translation": "磁碟: "
   },
   {
+    "id": "docker image:",
+    "translation": ""
+  },
+  {
     "id": "does exist",
     "translation": "已存在"
   },
