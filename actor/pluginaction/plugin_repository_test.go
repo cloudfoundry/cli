@@ -175,21 +175,21 @@ var _ = Describe("Plugin Repository Actions", func() {
 		Context("when the repository is registered", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
-					{Name: "some-repo", URL: "some-url"},
+					{Name: "some-REPO", URL: "some-url"},
 				})
 			})
 
-			It("returns the repository", func() {
-				pluginRepo, err := actor.GetPluginRepository("some-repo")
+			It("returns the repository case-insensitively", func() {
+				pluginRepo, err := actor.GetPluginRepository("sOmE-rEpO")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(pluginRepo).To(Equal(configv3.PluginRepository{Name: "some-repo", URL: "some-url"}))
+				Expect(pluginRepo).To(Equal(configv3.PluginRepository{Name: "some-REPO", URL: "some-url"}))
 			})
 		})
 
 		Context("when the repository is not registered", func() {
 			It("returns a RepositoryNotRegisteredError", func() {
-				_, err := actor.GetPluginRepository("some-repo")
-				Expect(err).To(MatchError(RepositoryNotRegisteredError{Name: "some-repo"}))
+				_, err := actor.GetPluginRepository("some-rEPO")
+				Expect(err).To(MatchError(RepositoryNotRegisteredError{Name: "some-rEPO"}))
 			})
 		})
 	})

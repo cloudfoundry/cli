@@ -165,8 +165,8 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							repoServer.Cleanup()
 						})
 
-						It("installs the plugin", func() {
-							session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
+						It("installs the plugin case-insensitively", func() {
+							session := helpers.CF("install-plugin", "-f", "-r", "kAkA", "some-plugin", "-k")
 							Eventually(session.Out).Should(Say("Searching kaka for plugin some-plugin\\.\\.\\."))
 							Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 found in: kaka\n"))
 							Eventually(session.Out).Should(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
@@ -292,7 +292,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					Context("when the user says yes", func() {
 						BeforeEach(func() {
-							buffer.Write([]byte("y\n"))
+							_, _ = buffer.Write([]byte("y\n"))
 						})
 
 						It("installs the plugin", func() {
@@ -314,7 +314,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					Context("when the user says no", func() {
 						BeforeEach(func() {
-							buffer.Write([]byte("n\n"))
+							_, _ = buffer.Write([]byte("n\n"))
 						})
 
 						It("does not install the plugin", func() {
@@ -344,7 +344,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 					Context("when the user chooses yes", func() {
 						BeforeEach(func() {
-							buffer.Write([]byte("y\n"))
+							_, _ = buffer.Write([]byte("y\n"))
 						})
 
 						Context("when the plugin checksum is valid", func() {
@@ -414,7 +414,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							repoServer = helpers.NewPluginRepositoryServerWithPlugin("some-plugin", "1.2.3", generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH), false)
 							Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL())).Should(Exit(0))
 
-							buffer.Write([]byte("n\n"))
+							_, _ = buffer.Write([]byte("n\n"))
 						})
 
 						AfterEach(func() {
@@ -707,7 +707,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 					Context("when the plugin is not already installed", func() {
 						Context("when the user says yes", func() {
 							BeforeEach(func() {
-								buffer.Write([]byte("y\n"))
+								_, _ = buffer.Write([]byte("y\n"))
 							})
 
 							Context("when the checksum is valid", func() {
@@ -760,7 +760,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						Context("when the user says no", func() {
 							BeforeEach(func() {
-								buffer.Write([]byte("n\n"))
+								_, _ = buffer.Write([]byte("n\n"))
 							})
 
 							It("does not install the plugin", func() {
@@ -786,7 +786,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						Context("when the user says yes", func() {
 							BeforeEach(func() {
-								buffer.Write([]byte("y\n"))
+								_, _ = buffer.Write([]byte("y\n"))
 							})
 
 							Context("when the checksum is valid", func() {
@@ -815,7 +815,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 
 						Context("when the user says no", func() {
 							BeforeEach(func() {
-								buffer.Write([]byte("n\n"))
+								_, _ = buffer.Write([]byte("n\n"))
 							})
 
 							It("does not install the plugin", func() {
