@@ -92,7 +92,12 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V2PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.validateArgs()
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -321,4 +326,15 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 		log.WithField("event", event).Debug("ignoring event")
 	}
 	return false
+}
+
+func (cmd V2PushCommand) validateArgs() error {
+	if cmd.DockerImage.Path != "" && cmd.DirectoryPath != "" {
+		return command.ArgumentCombinationError{
+			Arg1: "--docker-image, -o",
+			Arg2: "-p",
+		}
+	}
+
+	return nil
 }

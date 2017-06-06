@@ -52,6 +52,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 
 		// Parse errors.
+		Entry("ArgumentCombinationError", ArgumentCombinationError{}),
 		Entry("ParseArgumentError", ParseArgumentError{}),
 		Entry("RequiredArgumentError", RequiredArgumentError{}),
 		Entry("ThreeRequiredArgumentsError", ThreeRequiredArgumentsError{}),
