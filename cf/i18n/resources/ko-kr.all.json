@@ -6664,6 +6664,10 @@
     "translation": "디스크:"
   },
   {
+    "id": "docker image:",
+    "translation": ""
+  },
+  {
     "id": "does exist",
     "translation": "존재함"
   },
