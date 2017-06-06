@@ -375,7 +375,7 @@ var _ = Describe("Verbose", func() {
 				Eventually(session).Should(Say("\\[PRIVATE DATA HIDDEN\\]"))
 				Eventually(session).Should(Say("WEBSOCKET REQUEST:"))
 				Eventually(session).Should(Say("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
-				Eventually(session.Terminate()).Should(Exit())
+				Eventually(session.Kill()).Should(Exit())
 			},
 
 			Entry("CF_TRACE true: enables verbose", "true", "", false),
@@ -430,7 +430,7 @@ var _ = Describe("Verbose", func() {
 				session := helpers.CFWithEnv(envMap, "logs", "-v", appName)
 
 				Eventually(session).Should(Say("WEBSOCKET RESPONSE"))
-				Eventually(session.Terminate()).Should(Exit())
+				Eventually(session.Kill()).Should(Exit())
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
