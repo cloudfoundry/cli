@@ -435,6 +435,20 @@ var _ = Describe("v2-push Command", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			})
 		})
+
+		Context("when the -o and -p flags are both given", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.DirectoryPath = "some-directory-path"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(command.ArgumentCombinationError{
+					Arg1: "--docker-image, -o",
+					Arg2: "-p",
+				}))
+			})
+		})
 	})
 
 	Describe("GetCommandLineSettings", func() {

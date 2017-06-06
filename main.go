@@ -174,13 +174,15 @@ func handleError(err error, commandUI UI) error {
 	}
 
 	commandUI.DisplayError(err)
-	if _, isParseArgumentError := err.(command.ParseArgumentError); isParseArgumentError {
+
+	switch err.(type) {
+	case command.ArgumentCombinationError:
 		return ParseErr
-	}
-	if _, isRequiredArgumentError := err.(command.RequiredArgumentError); isRequiredArgumentError {
+	case command.ParseArgumentError:
 		return ParseErr
-	}
-	if _, isThreeRequiredArgumentsError := err.(command.ThreeRequiredArgumentsError); isThreeRequiredArgumentsError {
+	case command.RequiredArgumentError:
+		return ParseErr
+	case command.ThreeRequiredArgumentsError:
 		return ParseErr
 	}
 
