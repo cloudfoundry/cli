@@ -182,6 +182,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	config := pushaction.CommandLineSettings{
 		CurrentDirectory: pwd,
+		DirectoryPath:    string(cmd.DirectoryPath),
 		DockerImage:      cmd.DockerImage.Path,
 		Name:             cmd.OptionalArgs.AppName,
 	}

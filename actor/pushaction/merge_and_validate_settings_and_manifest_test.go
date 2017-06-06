@@ -18,31 +18,48 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	})
 
 	Context("when only passed command line settings", func() {
-		var (
-			cmdSettings CommandLineSettings
-			pwd         string
-		)
+		var cmdSettings CommandLineSettings
 
-		BeforeEach(func() {
-			var err error
-			pwd, err = os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
+		Context("when pushing the current directory", func() {
+			var pwd string
 
-			cmdSettings = CommandLineSettings{
-				Name:             "some-app",
-				CurrentDirectory: pwd,
-				DockerImage:      "some-image",
-			}
+			BeforeEach(func() {
+				var err error
+				pwd, err = os.Getwd()
+				Expect(err).ToNot(HaveOccurred())
+
+				cmdSettings = CommandLineSettings{
+					Name:             "some-app",
+					CurrentDirectory: pwd,
+					DockerImage:      "some-image",
+				}
+			})
+
+			It("creates a manifest with only the command line settings", func() {
+				manifests, err := actor.MergeAndValidateSettingsAndManifests(cmdSettings, nil)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(manifests).To(Equal([]manifest.Application{{
+					Name:        "some-app",
+					Path:        pwd,
+					DockerImage: "some-image",
+				}}))
+			})
 		})
 
-		It("creates a manifest with only the command line settings", func() {
-			manifests, err := actor.MergeAndValidateSettingsAndManifests(cmdSettings, nil)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(manifests).To(Equal([]manifest.Application{{
-				Name:        "some-app",
-				Path:        pwd,
-				DockerImage: "some-image",
-			}}))
+		Context("when the command line settings directory path is not empty", func() {
+			BeforeEach(func() {
+				cmdSettings = CommandLineSettings{
+					CurrentDirectory: "some-current-directory",
+					DirectoryPath:    "some-directory-path",
+				}
+			})
+
+			It("uses the setting directory in the application manifest", func() {
+				manifests, err := actor.MergeAndValidateSettingsAndManifests(cmdSettings, nil)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(manifests).To(HaveLen(1))
+				Expect(manifests[0].Path).To(Equal("some-directory-path"))
+			})
 		})
 	})
 
