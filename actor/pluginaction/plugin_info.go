@@ -15,6 +15,26 @@ type PluginInfo struct {
 	Checksum string
 }
 
+// FetchingPluginInfoFromRepositoryError is returned an error is encountered
+// getting plugin info from a repository
+type FetchingPluginInfoFromRepositoryError struct {
+	RepositoryName string
+	Err            error
+}
+
+func (e FetchingPluginInfoFromRepositoryError) Error() string {
+	return fmt.Sprintf("Plugin repository %s returned %s.", e.RepositoryName, e.Err.Error())
+}
+
+// NoCompatibleBinaryError is returned when a repository contains a specified
+// plugin but not for the specified platform
+type NoCompatibleBinaryError struct {
+}
+
+func (e NoCompatibleBinaryError) Error() string {
+	return "Plugin requested has no binary available for your platform."
+}
+
 // PluginNotFoundInRepositoryError is an error returned when a plugin is not found.
 type PluginNotFoundInRepositoryError struct {
 	PluginName     string
@@ -35,15 +55,6 @@ type PluginNotFoundInAnyRepositoryError struct {
 // Error outputs that the plugin cannot be found in any repositories.
 func (e PluginNotFoundInAnyRepositoryError) Error() string {
 	return fmt.Sprintf("Plugin %s not found in any registered repo", e.PluginName)
-}
-
-// NoCompatibleBinaryError is returned when a repository contains a specified
-// plugin but not for the specified platform
-type NoCompatibleBinaryError struct {
-}
-
-func (e NoCompatibleBinaryError) Error() string {
-	return "Plugin requested has no binary available for your platform."
 }
 
 // GetPluginInfoFromRepositoriesForPlatform returns the newest version of the specified plugin
@@ -69,7 +80,10 @@ func (actor Actor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, p
 				reposWithPlugin = append(reposWithPlugin, repo.Name)
 			}
 		default:
-			return PluginInfo{}, nil, err
+			return PluginInfo{}, nil, FetchingPluginInfoFromRepositoryError{
+				RepositoryName: repo.Name,
+				Err:            err,
+			}
 		}
 	}
 

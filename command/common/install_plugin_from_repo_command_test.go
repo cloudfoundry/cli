@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/commonfakes"
@@ -19,6 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -112,6 +114,40 @@ var _ = Describe("install-plugin command", func() {
 
 				It("returns a JSONSyntaxError", func() {
 					Expect(executeErr).To(MatchError(shared.JSONSyntaxError{Err: jsonErr}))
+				})
+			})
+
+			Context("when getting the repository information errors", func() {
+				Context("with a generic error", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("some-client-error")
+						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            expectedErr,
+						})
+					})
+
+					It("returns the wrapped client(request/http status) error", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+					})
+				})
+
+				Context("with a RawHTTPStatusError error", func() {
+					var returnedErr pluginerror.RawHTTPStatusError
+
+					BeforeEach(func() {
+						returnedErr = pluginerror.RawHTTPStatusError{Status: "some-status"}
+						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            returnedErr,
+						})
+					})
+
+					It("returns the wrapped client(request/http status) error", func() {
+						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: returnedErr.Status}))
+					})
 				})
 			})
 
@@ -833,6 +869,54 @@ var _ = Describe("install-plugin command", func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{{Name: repoName, URL: repoURL}, {Name: repo2Name, URL: repo2URL}, {Name: repo3Name, URL: repo3URL}})
 			})
 
+			Context("when getting the repository information errors", func() {
+				DescribeTable("properly propagates errors",
+					func(clientErr error, expectedErr error) {
+						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(
+							pluginaction.PluginInfo{},
+							nil,
+							clientErr)
+
+						executeErr = cmd.Execute(nil)
+
+						Expect(executeErr).To(MatchError(expectedErr))
+					},
+
+					Entry("when the error is a RawHTTPStatusError",
+						pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            pluginerror.RawHTTPStatusError{Status: "some-status"},
+						},
+						shared.FetchingPluginInfoFromRepositoriesError{Message: "some-status", RepositoryName: "some-repo"},
+					),
+
+					Entry("when the error is a SSLValidationHostnameError",
+						pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            pluginerror.SSLValidationHostnameError{Message: "some-status"},
+						},
+
+						shared.FetchingPluginInfoFromRepositoriesError{Message: "Hostname does not match SSL Certificate (some-status)", RepositoryName: "some-repo"},
+					),
+
+					Entry("when the error is an UnverifiedServerError",
+						pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            pluginerror.UnverifiedServerError{URL: "some-url"},
+						},
+						shared.FetchingPluginInfoFromRepositoriesError{Message: "x509: certificate signed by unknown authority", RepositoryName: "some-repo"},
+					),
+
+					Entry("when the error is generic",
+						pluginaction.FetchingPluginInfoFromRepositoryError{
+							RepositoryName: "some-repo",
+							Err:            errors.New("generic-error"),
+						},
+						errors.New("generic-error"),
+					),
+				)
+			})
+
 			Context("when the plugin can't be found in any repos", func() {
 				BeforeEach(func() {
 					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
@@ -863,10 +947,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				Context("when the -f flag is provided, the plugin has already been installed, getting the binary succeeds, validating the checksum succeeds, creating an executable copy succeeds, validating the new plugin succeeds, uninstalling the existing plugin succeeds, and installing the plugin is succeeds", func() {
-					var (
-						pluginVersion      configv3.PluginVersion
-						pluginVersionRegex string
-					)
+					var pluginVersion configv3.PluginVersion
 
 					BeforeEach(func() {
 						cmd.Force = true
@@ -882,7 +963,6 @@ var _ = Describe("install-plugin command", func() {
 						minor := rand.Int()
 						build := rand.Int()
 						pluginVersion = configv3.PluginVersion{Major: major, Minor: minor, Build: build}
-						pluginVersionRegex = fmt.Sprintf("%d\\.%d\\.%d", major, minor, build)
 
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 							Name:    pluginName,
