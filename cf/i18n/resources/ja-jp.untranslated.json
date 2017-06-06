@@ -524,6 +524,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}.",
+    "translation": ""
+  },
+  {
     "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
     "translation": ""
   },

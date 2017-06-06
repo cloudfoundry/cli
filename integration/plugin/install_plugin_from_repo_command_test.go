@@ -44,7 +44,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 			})
 		})
 
-		Context("when fetching a list of plugins from a repo returns a 4xx or 5xx status", func() {
+		Context("when fetching a list of plugins from a repo returns a 4xx/5xx status or a SSL error", func() {
 			var repoServer *Server
 
 			BeforeEach(func() {
@@ -72,6 +72,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				session := helpers.CF("install-plugin", "-f", "-r", "kaka", "some-plugin", "-k")
 
 				Eventually(session.Err).Should(Say("Download attempt failed; server returned 418 I'm a teapot"))
+				Eventually(session.Err).Should(Say("Unable to install; plugin is not available from the given URL\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -454,6 +455,39 @@ var _ = Describe("install-plugin (from repo) command", func() {
 		})
 
 		Context("when there are repositories registered", func() {
+			Context("when fetching a list of plugins from a repo returns a 4xx/5xx status or a SSL error", func() {
+				var repoServer *Server
+
+				BeforeEach(func() {
+					repoServer = NewTLSServer()
+
+					repoServer.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/list"),
+							RespondWith(http.StatusOK, `{"plugins":[]}`),
+						),
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/list"),
+							RespondWith(http.StatusTeapot, nil),
+						),
+					)
+
+					Eventually(helpers.CF("add-plugin-repo", "kaka", repoServer.URL(), "-k")).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					repoServer.Close()
+				})
+
+				It("fails with an error message", func() {
+					session := helpers.CF("install-plugin", "-f", "some-plugin", "-k")
+
+					Eventually(session.Err).Should(Say("Plugin list download failed; repository kaka returned 418 I'm a teapot"))
+					Consistently(session.Err).ShouldNot(Say("Unable to install; plugin is not available from the given URL\\."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
 			Context("when the plugin isn't found in any of the repositories", func() {
 				var repoServer1 *Server
 				var repoServer2 *Server

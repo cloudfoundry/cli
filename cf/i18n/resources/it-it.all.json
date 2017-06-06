@@ -4436,6 +4436,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "Il nome del plug-in {{.PluginName}} non esiste"
   },

@@ -4436,6 +4436,10 @@
     "translation": ""
   },
   {
+    "id": "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}.",
+    "translation": ""
+  },
+  {
     "id": "Plugin name {{.PluginName}} does not exist",
     "translation": "外掛程式名稱 {{.PluginName}} 不存在"
   },

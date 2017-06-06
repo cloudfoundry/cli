@@ -29,9 +29,12 @@ var _ = Describe("plugin info actions", func() {
 					fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
 				})
 
-				It("returns the error", func() {
+				It("returns a FetchingPluginInfoFromRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", []configv3.PluginRepository{{Name: "some-repository", URL: "some-url"}}, "some-platform")
-					Expect(err).To(MatchError(errors.New("some-error")))
+					Expect(err).To(MatchError(FetchingPluginInfoFromRepositoryError{
+						RepositoryName: "some-repository",
+						Err:            errors.New("some-error"),
+					}))
 				})
 			})
 
@@ -112,12 +115,27 @@ var _ = Describe("plugin info actions", func() {
 
 			Context("when getting a plugin repository errors", func() {
 				BeforeEach(func() {
-					fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
+					fakeClient.GetPluginRepositoryReturnsOnCall(0, plugin.PluginRepository{
+						Plugins: []plugin.Plugin{
+							{
+								Name:    "some-plugin",
+								Version: "1.2.3",
+								Binaries: []plugin.PluginBinary{
+									{Platform: "osx", URL: "http://some-darwin-url", Checksum: "somechecksum"},
+									{Platform: "win64", URL: "http://some-windows-url", Checksum: "anotherchecksum"},
+									{Platform: "linux64", URL: "http://some-linux-url", Checksum: "lastchecksum"},
+								},
+							},
+						},
+					}, nil)
+					fakeClient.GetPluginRepositoryReturnsOnCall(1, plugin.PluginRepository{}, errors.New("some-error"))
 				})
 
-				It("returns the error", func() {
+				It("returns a FetchingPluginInfoFromRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
-					Expect(err).To(MatchError(errors.New("some-error")))
+					Expect(err).To(MatchError(FetchingPluginInfoFromRepositoryError{
+						RepositoryName: "repo2",
+						Err:            errors.New("some-error")}))
 				})
 			})
 
