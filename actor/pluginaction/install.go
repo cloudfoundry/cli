@@ -146,15 +146,15 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 		}
 	}
 
-	sort.Slice(conflictingNames, func(i, j int) bool {
-		return strings.ToLower(conflictingNames[i]) < strings.ToLower(conflictingNames[j])
-	})
-
-	sort.Slice(conflictingAliases, func(i, j int) bool {
-		return strings.ToLower(conflictingAliases[i]) < strings.ToLower(conflictingAliases[j])
-	})
-
 	if len(conflictingNames) > 0 || len(conflictingAliases) > 0 {
+		sort.Slice(conflictingNames, func(i, j int) bool {
+			return strings.ToLower(conflictingNames[i]) < strings.ToLower(conflictingNames[j])
+		})
+
+		sort.Slice(conflictingAliases, func(i, j int) bool {
+			return strings.ToLower(conflictingAliases[i]) < strings.ToLower(conflictingAliases[j])
+		})
+
 		return configv3.Plugin{}, PluginCommandsConflictError{
 			PluginName:     plugin.Name,
 			PluginVersion:  plugin.Version.String(),
