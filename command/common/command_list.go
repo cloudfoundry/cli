@@ -20,6 +20,7 @@ type commandList struct {
 	V3Stage         v3.V3StageCommand         `command:"v3-stage" description:"**EXPERIMENTAL** Create a new droplet for an app"`
 	V3SetDroplet    v3.V3SetDropletCommand    `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
 	V3Start         v3.V3StartCommand         `command:"v3-start" description:"Start an app"`
+	V3Push          v3.V3PushCommand          `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3App           v3.V3AppCommand           `command:"v3-app" description:"Display an app"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
