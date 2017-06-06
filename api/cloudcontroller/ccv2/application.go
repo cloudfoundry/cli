@@ -42,6 +42,9 @@ type Application struct {
 	// DiskQuota is the disk given to each instance, in megabytes.
 	DiskQuota int `json:"-"`
 
+	// DockerImage is the docker image location.
+	DockerImage string `json:"docker_image,omitempty"`
+
 	// GUID is the unique application identifier.
 	GUID string `json:"guid,omitempty"`
 
@@ -92,6 +95,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			DetectedBuildpack        string     `json:"detected_buildpack"`
 			DetectedStartCommand     string     `json:"detected_start_command"`
 			DiskQuota                int        `json:"disk_quota"`
+			DockerImage              string     `json:"docker_image"`
 			HealthCheckType          string     `json:"health_check_type"`
 			HealthCheckHTTPEndpoint  string     `json:"health_check_http_endpoint"`
 			Instances                int        `json:"instances"`
@@ -114,6 +118,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.DetectedBuildpack = ccApp.Entity.DetectedBuildpack
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
+	application.DockerImage = ccApp.Entity.DockerImage
 	application.HealthCheckType = ccApp.Entity.HealthCheckType
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.Instances = ccApp.Entity.Instances

@@ -38,7 +38,7 @@ type V2PushCommand struct {
 	BuildpackName        string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	StartupCommand       string                      `short:"c" description:"Startup command, set to null to reset to default start command"`
 	Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
-	DockerImage          string                      `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
+	DockerImage          flag.DockerImage            `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
 	PathToManifest       flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType      flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
@@ -133,10 +133,16 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	for _, appConfig := range appConfigs {
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
-		cmd.displayChanges(appConfig)
+		err := cmd.displayChanges(appConfig)
+		if err != nil {
+			log.Errorln("display changes:", err)
+			return shared.HandleError(err)
+		}
+
 		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig, cmd.ProgressBar)
 		updatedConfig, err := cmd.processApplyStreams(user, appConfig, configStream, eventStream, warningsStream, errorStream)
 		if err != nil {
+			log.Errorln("process apply stream:", err)
 			return shared.HandleError(err)
 		}
 
@@ -170,8 +176,9 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	}
 
 	config := pushaction.CommandLineSettings{
-		Name:             cmd.OptionalArgs.AppName,
 		CurrentDirectory: pwd,
+		DockerImage:      cmd.DockerImage.Path,
+		Name:             cmd.OptionalArgs.AppName,
 	}
 
 	log.Debugf("%#v", config)
@@ -195,23 +202,38 @@ func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) 
 		desiredRotues = append(desiredRotues, route.String())
 	}
 
-	err := cmd.UI.DisplayChangesForPush([]ui.Change{
+	changes := []ui.Change{
 		{
 			Header:       "name:",
 			CurrentValue: appConfig.CurrentApplication.Name,
 			NewValue:     appConfig.DesiredApplication.Name,
 		},
-		{
-			Header:       "path:",
-			CurrentValue: appConfig.Path,
-			NewValue:     appConfig.Path,
-		},
-		{
+	}
+
+	if appConfig.DesiredApplication.DockerImage != "" {
+		changes = append(changes,
+			ui.Change{
+				Header:       "docker image:",
+				CurrentValue: appConfig.CurrentApplication.DockerImage,
+				NewValue:     appConfig.DesiredApplication.DockerImage,
+			})
+	} else {
+		changes = append(changes,
+			ui.Change{
+				Header:       "path:",
+				CurrentValue: appConfig.Path,
+				NewValue:     appConfig.Path,
+			})
+	}
+
+	changes = append(changes,
+		ui.Change{
 			Header:       "routes:",
 			CurrentValue: currentRoutes,
 			NewValue:     desiredRotues,
-		},
-	})
+		})
+
+	err := cmd.UI.DisplayChangesForPush(changes)
 
 	if err != nil {
 		log.Errorln("display changes:", err)

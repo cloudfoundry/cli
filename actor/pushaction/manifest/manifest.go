@@ -5,6 +5,7 @@ type Manifest struct {
 }
 
 type Application struct {
-	Name string
-	Path string
+	DockerImage string
+	Name        string
+	Path        string
 }

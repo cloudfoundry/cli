@@ -290,20 +290,6 @@ var _ = Describe("v2-push Command", func() {
 						Expect(progressBar).To(Equal(fakeProgressBar))
 					})
 
-					It("display diff of changes", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
-						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
-						Expect(testUI.Out).To(Say("\\s+routes:"))
-						for _, route := range appConfigs[0].CurrentRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
-						for _, route := range appConfigs[0].DesiredRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
-					})
-
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
@@ -344,6 +330,44 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
 
 						Expect(testUI.Err).To(Say("app-summary-warning"))
+					})
+
+					Context("when pushing app bits", func() {
+						It("display diff of changes with path", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
+							Expect(testUI.Out).To(Say("\\s+routes:"))
+							for _, route := range appConfigs[0].CurrentRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+							for _, route := range appConfigs[0].DesiredRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+						})
+					})
+
+					Context("when pushing a docker image", func() {
+						var docker string
+						BeforeEach(func() {
+							docker = "some-path"
+							appConfigs[0].DesiredApplication.DockerImage = docker
+						})
+
+						It("display diff of changes with docker image", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("\\s+docker image:\\s+%s", docker))
+							Expect(testUI.Out).To(Say("\\s+routes:"))
+							for _, route := range appConfigs[0].CurrentRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+							for _, route := range appConfigs[0].DesiredRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+						})
 					})
 				})
 
@@ -410,6 +434,19 @@ var _ = Describe("v2-push Command", func() {
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			})
+		})
+	})
+
+	Describe("GetCommandLineSettings", func() {
+		BeforeEach(func() {
+			cmd.DockerImage.Path = "some-docker-image-path"
+		})
+
+		It("creates command line setting from command line arguments", func() {
+			settings, err := cmd.GetCommandLineSettings()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(settings.Name).To(Equal(appName))
+			Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
 		})
 	})
 })

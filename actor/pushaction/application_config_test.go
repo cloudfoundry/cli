@@ -129,11 +129,10 @@ var _ = Describe("Application Config", func() {
 					fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{route}, v2action.Warnings{"app-route-warnings"}, nil)
 				})
 
-				It("sets the current and desired application to the current", func() {
+				It("sets the current application to the existing application", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
 					Expect(firstConfig.CurrentApplication).To(Equal(app))
-					Expect(firstConfig.DesiredApplication).To(Equal(app))
 					Expect(firstConfig.Path).To(Equal("some-path"))
 					Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 
@@ -265,6 +264,19 @@ var _ = Describe("Application Config", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 				})
+			})
+		})
+
+		Context("when a docker image is configured", func() {
+			BeforeEach(func() {
+				manifestApps[0].DockerImage = "some-docker-image-path"
+			})
+
+			It("sets the docker image on DesiredApplication and does not gather resources", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image-path"))
+
+				Expect(fakeV2Actor.GatherResourcesCallCount()).To(Equal(0))
 			})
 		})
 	})

@@ -135,6 +135,33 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/docker/distribution/digestset",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "digestset",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/distribution/reference",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "/reference",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/distribution/vendor/github.com/opencontainers/go-digest",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "vendor/github.com/opencontainers/go-digest",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",

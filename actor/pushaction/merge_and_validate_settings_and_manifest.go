@@ -12,8 +12,9 @@ func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSetting
 		return nil, errors.New("functionality still pending")
 	}
 	manifests := []manifest.Application{{
-		Name: cmdConfig.Name,
-		Path: cmdConfig.CurrentDirectory,
+		Name:        cmdConfig.Name,
+		Path:        cmdConfig.CurrentDirectory,
+		DockerImage: cmdConfig.DockerImage,
 	}}
 
 	//TODO Add validations

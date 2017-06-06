@@ -98,6 +98,7 @@ var _ = Describe("Application", func() {
 							"detected_start_command": "echo 'I am a banana'",
 							"disk_quota": 586,
 							"detected_buildpack": null,
+							"docker_image": "some-docker-path",
 							"health_check_type": "port",
 							"health_check_http_endpoint": "/",
 							"instances": 13,
@@ -132,6 +133,7 @@ var _ = Describe("Application", func() {
 					DetectedBuildpack:        "",
 					DetectedStartCommand:     "echo 'I am a banana'",
 					DiskQuota:                586,
+					DockerImage:              "some-docker-path",
 					GUID:                     "app-guid-1",
 					HealthCheckType:          "port",
 					HealthCheckHTTPEndpoint:  "/",
@@ -280,6 +282,7 @@ var _ = Describe("Application", func() {
 					"detected_start_command": "echo 'I am a banana'",
 					"disk_quota": 586,
 					"detected_buildpack": null,
+					"docker_image": "some-docker-path",
 					"health_check_type": "some-health-check-type",
 					"health_check_http_endpoint": "/anything",
 					"instances": 13,
@@ -294,6 +297,7 @@ var _ = Describe("Application", func() {
 						"health_check_http_endpoint": "/anything",
 						"health_check_type":          "some-health-check-type",
 						"state":                      "STARTED",
+						"docker_image":               "some-docker-path",
 					}
 
 					server.AppendHandlers(
@@ -307,6 +311,7 @@ var _ = Describe("Application", func() {
 
 				It("returns the updated object and warnings and sends all updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
+						DockerImage:             "some-docker-path",
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/anything",
@@ -322,6 +327,7 @@ var _ = Describe("Application", func() {
 						DetectedBuildpack:       "",
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
+						DockerImage:             "some-docker-path",
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/anything",
