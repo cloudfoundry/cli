@@ -89,45 +89,10 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	}
 
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
-
-	var closedBuildStream, closedWarningsStream, closedErrStream bool
-	for {
-		select {
-		case build, ok := <-buildStream:
-			if !ok {
-				closedBuildStream = true
-				break
-			}
-			cmd.UI.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": build.Droplet.GUID})
-		case log, ok := <-logStream:
-			if !ok {
-				break
-			}
-			cmd.UI.DisplayLogMessage(log, false)
-		case warnings, ok := <-warningsStream:
-			if !ok {
-				closedWarningsStream = true
-				break
-			}
-			cmd.UI.DisplayWarnings(warnings)
-		case logErr, ok := <-logErrStream:
-			if !ok {
-				break
-			}
-			cmd.UI.DisplayWarning(logErr.Error())
-		case err, ok := <-errStream:
-			if !ok {
-				closedErrStream = true
-				break
-			}
-			return shared.HandleError(err)
-		}
-		if closedBuildStream && closedWarningsStream && closedErrStream {
-			break
-		}
+	err, _ = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	if err == nil {
+		cmd.UI.DisplayOK()
 	}
 
-	cmd.UI.DisplayOK()
-
-	return nil
+	return err
 }
