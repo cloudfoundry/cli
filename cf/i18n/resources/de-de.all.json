@@ -3532,6 +3532,10 @@
     "translation": "Falsche Verwendung:"
   },
   {
+    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together.",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
