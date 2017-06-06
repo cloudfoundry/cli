@@ -46,34 +46,6 @@ func (e NoCompatibleBinaryError) Error() string {
 	return "Plugin requested has no binary available for your platform."
 }
 
-// GetPluginInfoFromRepositoryForPlatform returns the plugin info, if found, from
-// the specified repository for the specified platform.
-func (actor Actor) GetPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (PluginInfo, error) {
-	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
-	if err != nil {
-		return PluginInfo{}, err
-	}
-
-	var pluginFoundWithIncompatibleBinary bool
-
-	for _, plugin := range pluginRepository.Plugins {
-		if plugin.Name == pluginName {
-			for _, pluginBinary := range plugin.Binaries {
-				if pluginBinary.Platform == platform {
-					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
-				}
-			}
-			pluginFoundWithIncompatibleBinary = true
-		}
-	}
-
-	if pluginFoundWithIncompatibleBinary {
-		return PluginInfo{}, NoCompatibleBinaryError{}
-	} else {
-		return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
-	}
-}
-
 // GetPluginInfoFromRepositoriesForPlatform returns the newest version of the specified plugin
 // and all the repositories that contain that version.
 func (actor Actor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (PluginInfo, []string, error) {
@@ -82,7 +54,7 @@ func (actor Actor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, p
 	var pluginFoundWithIncompatibleBinary bool
 
 	for _, repo := range pluginRepos {
-		pluginInfo, err := actor.GetPluginInfoFromRepositoryForPlatform(pluginName, repo, platform)
+		pluginInfo, err := actor.getPluginInfoFromRepositoryForPlatform(pluginName, repo, platform)
 		switch err.(type) {
 		case PluginNotFoundInRepositoryError:
 			continue
@@ -114,4 +86,32 @@ func (actor Actor) GetPluginInfoFromRepositoriesForPlatform(pluginName string, p
 // GetPlatformString exists solely for the purposes of mocking it out for command-layers tests.
 func (actor Actor) GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string {
 	return generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH)
+}
+
+// getPluginInfoFromRepositoryForPlatform returns the plugin info, if found, from
+// the specified repository for the specified platform.
+func (actor Actor) getPluginInfoFromRepositoryForPlatform(pluginName string, pluginRepo configv3.PluginRepository, platform string) (PluginInfo, error) {
+	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
+	if err != nil {
+		return PluginInfo{}, err
+	}
+
+	var pluginFoundWithIncompatibleBinary bool
+
+	for _, plugin := range pluginRepository.Plugins {
+		if plugin.Name == pluginName {
+			for _, pluginBinary := range plugin.Binaries {
+				if pluginBinary.Platform == platform {
+					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
+				}
+			}
+			pluginFoundWithIncompatibleBinary = true
+		}
+	}
+
+	if pluginFoundWithIncompatibleBinary {
+		return PluginInfo{}, NoCompatibleBinaryError{}
+	} else {
+		return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
+	}
 }
