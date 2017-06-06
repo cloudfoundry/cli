@@ -11,9 +11,15 @@ func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSetting
 	if len(apps) != 0 {
 		return nil, errors.New("functionality still pending")
 	}
+
+	path := cmdConfig.DirectoryPath
+	if path == "" {
+		path = cmdConfig.CurrentDirectory
+	}
+
 	manifests := []manifest.Application{{
 		Name:        cmdConfig.Name,
-		Path:        cmdConfig.CurrentDirectory,
+		Path:        path,
 		DockerImage: cmdConfig.DockerImage,
 	}}
 
