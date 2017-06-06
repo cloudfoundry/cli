@@ -18,9 +18,10 @@ var _ = Describe("Suggest Command", func() {
 
 			Eventually(session.Out).Should(Say("'logn' is not a registered command. See 'cf help -a'"))
 			Eventually(session.Out).Should(Say("Did you mean?"))
+			Eventually(session).Should(Exit(1))
+
 			Eventually(session.Out.Contents()).Should(ContainSubstring("login"))
 			Eventually(session.Out.Contents()).Should(ContainSubstring("logs"))
-			Eventually(session).Should(Exit(1))
 		})
 	})
 
