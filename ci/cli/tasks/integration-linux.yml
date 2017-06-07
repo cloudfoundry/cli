@@ -23,7 +23,7 @@ run:
   - |
     set -e
 
-    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /cf_admin_password)
 
     set -x
 

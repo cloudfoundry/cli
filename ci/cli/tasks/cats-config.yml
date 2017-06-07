@@ -32,7 +32,7 @@ run:
     API="api.${DOMAIN}"
     CF_USER="admin"
 
-    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /cf_admin_password)
 
     cat << EOF | jq -S . > cats-config/integration_config.json
     {
