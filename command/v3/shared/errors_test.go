@@ -41,5 +41,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("V3APIDoesNotExistError", V3APIDoesNotExistError{}),
 		Entry("IsolationSegmentNotFoundError", IsolationSegmentNotFoundError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
+		Entry("StartupTimeoutError", StartupTimeoutError{}),
 	)
 })
