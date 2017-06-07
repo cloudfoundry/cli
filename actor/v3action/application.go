@@ -3,6 +3,7 @@ package v3action
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -80,4 +81,62 @@ func (actor Actor) StartApplication(appName string, spaceGUID string) (Applicati
 	allWarnings = append(allWarnings, actorWarnings...)
 
 	return Application(updatedApp), allWarnings, err
+}
+
+func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) error {
+	processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
+	warningsChannel <- Warnings(warnings)
+	if err != nil {
+		return err
+	}
+
+	timeout := time.Now().Add(actor.Config.StartupTimeout())
+	for time.Now().Before(timeout) {
+		readyProcs := 0
+		for _, process := range processes {
+			ready, err := actor.processReady(process, warningsChannel)
+			if err != nil {
+				return err
+			}
+
+			if ready {
+				readyProcs++
+			}
+		}
+
+		if readyProcs == len(processes) {
+			return nil
+		}
+		time.Sleep(actor.Config.PollingInterval())
+	}
+
+	return StartupTimeoutError{}
+}
+
+// StartupTimeoutError is returned when startup timeout is reached waiting for
+// an application to start.
+type StartupTimeoutError struct {
+}
+
+func (e StartupTimeoutError) Error() string {
+	return fmt.Sprintf("Timed out waiting for application to start")
+}
+
+func (actor Actor) processReady(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
+	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
+	warningsChannel <- Warnings(warnings)
+	if err != nil {
+		return false, err
+	}
+	if len(instances) == 0 {
+		return true, nil
+	}
+
+	for _, instance := range instances {
+		if instance.State == "RUNNING" {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

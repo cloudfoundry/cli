@@ -1,5 +1,21 @@
 package shared
 
+// StartupTimeoutError is returned when startup timeout is reached waiting for
+// an application to start.
+type StartupTimeoutError struct {
+	AppName string
+}
+
+func (e StartupTimeoutError) Error() string {
+	return "Timed out waiting for application {{.AppName}} to start"
+}
+
+func (e StartupTimeoutError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"AppName": e.AppName,
+	})
+}
+
 type RunTaskError struct {
 	Message string
 }

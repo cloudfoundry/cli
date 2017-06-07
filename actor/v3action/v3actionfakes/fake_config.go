@@ -18,6 +18,15 @@ type FakeConfig struct {
 	pollingIntervalReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
+	StartupTimeoutStub        func() time.Duration
+	startupTimeoutMutex       sync.RWMutex
+	startupTimeoutArgsForCall []struct{}
+	startupTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	startupTimeoutReturnsOnCall map[int]struct {
+		result1 time.Duration
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -62,11 +71,53 @@ func (fake *FakeConfig) PollingIntervalReturnsOnCall(i int, result1 time.Duratio
 	}{result1}
 }
 
+func (fake *FakeConfig) StartupTimeout() time.Duration {
+	fake.startupTimeoutMutex.Lock()
+	ret, specificReturn := fake.startupTimeoutReturnsOnCall[len(fake.startupTimeoutArgsForCall)]
+	fake.startupTimeoutArgsForCall = append(fake.startupTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StartupTimeout", []interface{}{})
+	fake.startupTimeoutMutex.Unlock()
+	if fake.StartupTimeoutStub != nil {
+		return fake.StartupTimeoutStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.startupTimeoutReturns.result1
+}
+
+func (fake *FakeConfig) StartupTimeoutCallCount() int {
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
+	return len(fake.startupTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StartupTimeoutReturns(result1 time.Duration) {
+	fake.StartupTimeoutStub = nil
+	fake.startupTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.StartupTimeoutStub = nil
+	if fake.startupTimeoutReturnsOnCall == nil {
+		fake.startupTimeoutReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.startupTimeoutReturnsOnCall[i] = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()
 	defer fake.pollingIntervalMutex.RUnlock()
+	fake.startupTimeoutMutex.RLock()
+	defer fake.startupTimeoutMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
