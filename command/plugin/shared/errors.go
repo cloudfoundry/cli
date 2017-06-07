@@ -181,6 +181,38 @@ type PluginCommandsConflictError struct {
 	CommandAliases []string
 }
 
+// PluginBinaryRemoveFailedError is returned when the removal of a plugin
+// binary fails.
+type PluginBinaryRemoveFailedError struct {
+	Err error
+}
+
+func (e PluginBinaryRemoveFailedError) Error() string {
+	return "The plugin has been uninstalled but removing the plugin binary failed.\nRemove it manually or subsequent installations of the plugin may fail\n{{.Err}}"
+}
+
+func (e PluginBinaryRemoveFailedError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Err": e.Err,
+	})
+}
+
+// PluginBinaryUninstallError is returned when running the plugin's uninstall
+// hook fails.
+type PluginBinaryUninstallError struct {
+	Err error
+}
+
+func (e PluginBinaryUninstallError) Error() string {
+	return "The plugin's uninstall method returned an unexpected error.\nThe plugin uninstall will proceed. Contact the plugin author if you need help.\n{{.Err}}"
+}
+
+func (e PluginBinaryUninstallError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Err": e.Err,
+	})
+}
+
 func (e PluginCommandsConflictError) Error() string {
 	switch {
 	case len(e.CommandNames) > 0 && len(e.CommandAliases) > 0:

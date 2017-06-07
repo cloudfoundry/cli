@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
@@ -89,7 +90,45 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when the plugin uninstaller returns an error", func() {
+			Context("when the plugin binary does not exist", func() {
+				BeforeEach(func() {
+					Expect(os.Remove(binaryPath)).ToNot(HaveOccurred())
+				})
+
+				It("removes the plugin config", func() {
+					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakePluginUninstaller.RunCallCount()).To(Equal(0))
+
+					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(1))
+					Expect(fakeConfig.RemovePluginArgsForCall(0)).To(Equal("some-plugin"))
+
+					Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("when the plugin uninstaller returns an exec.ExitError", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = &exec.ExitError{}
+					fakePluginUninstaller.RunReturns(expectedErr)
+				})
+
+				It("returns the error, deletes the binary and removes the plugin config", func() {
+					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
+					Expect(err).To(MatchError(expectedErr))
+
+					_, err = os.Stat(binaryPath)
+					Expect(os.IsNotExist(err)).To(BeTrue())
+
+					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(1))
+					Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("when the plugin uninstaller returns any other error", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
@@ -122,7 +161,7 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
-			Context("when deleting the plugin binary returns any other error", func() {
+			Context("when deleting the plugin binary returns a path error", func() {
 				BeforeEach(func() {
 					err = os.Remove(binaryPath)
 					Expect(err).ToNot(HaveOccurred())
@@ -132,13 +171,13 @@ var _ = Describe("Plugin actor", func() {
 					Expect(err).ToNot(HaveOccurred())
 				})
 
-				It("does not return the error and removes the plugin config", func() {
+				It("returns the error and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					_, ok := err.(*os.PathError)
-					Expect(ok).To(BeTrue())
+					_, isPathError := err.(*os.PathError)
+					Expect(isPathError).To(BeTrue())
 
-					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(0))
-					Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(0))
+					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(1))
+					Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(1))
 				})
 			})
 

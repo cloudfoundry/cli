@@ -3,6 +3,7 @@ package pluginaction
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -28,19 +29,36 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 		return PluginNotFoundError{PluginName: name}
 	}
 
-	err := uninstaller.Run(plugin.Location, "CLI-MESSAGE-UNINSTALL")
+	var binaryErr error
+
+	if actor.FileExists(plugin.Location) {
+		err := uninstaller.Run(plugin.Location, "CLI-MESSAGE-UNINSTALL")
+		if err != nil {
+			if _, isExitError := err.(*exec.ExitError); isExitError {
+				binaryErr = err
+			} else {
+				return err
+			}
+		}
+
+		// No test for sleeping for 500 ms for parity with pre-refactored behavior.
+		time.Sleep(500 * time.Millisecond)
+
+		err = os.Remove(plugin.Location)
+		if err != nil && !os.IsNotExist(err) {
+			if _, isPathError := err.(*os.PathError); isPathError {
+				binaryErr = err
+			} else {
+				return err
+			}
+		}
+	}
+
+	actor.config.RemovePlugin(name)
+	err := actor.config.WritePluginConfig()
 	if err != nil {
 		return err
 	}
 
-	// No test for sleeping for 500 ms for parity with pre-refactored behavior.
-	time.Sleep(500 * time.Millisecond)
-
-	err = os.Remove(plugin.Location)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	actor.config.RemovePlugin(name)
-	return actor.config.WritePluginConfig()
+	return binaryErr
 }

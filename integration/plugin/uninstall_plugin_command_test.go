@@ -1,7 +1,11 @@
 package plugin
 
 import (
+	"os"
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -77,14 +81,39 @@ var _ = Describe("uninstall-plugin command", func() {
 			It("exits with an error, and does not remove the plugin", func() {
 				session := helpers.CF("uninstall-plugin", "failing-plugin")
 				Eventually(session.Out).Should(Say("Uninstalling plugin failing-plugin\\.\\.\\."))
-				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("I'm failing...I'm failing..."))
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("The plugin's uninstall method returned an unexpected error\\."))
+				Eventually(session.Err).Should(Say("The plugin uninstall will proceed\\. Contact the plugin author if you need help\\."))
+				Eventually(session.Err).Should(Say("exit status 1"))
 				Eventually(session).Should(Exit(1))
 
 				session = helpers.CF("plugins")
 				Eventually(session.Out).Should(Say("banana-plugin-name-1"))
 				Eventually(session.Out).Should(Say("banana-plugin-name-2"))
-				Eventually(session.Out).Should(Say("failing-plugin"))
+				Consistently(session.Out).ShouldNot(Say("failing-plugin"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the plugin binary has been deleted", func() {
+			BeforeEach(func() {
+				helpers.InstallConfigurablePlugin(
+					"banana-plugin-name-1",
+					"2.0.1",
+					[]helpers.PluginCommand{
+						{
+							Name: "banana-command-1",
+							Help: "banana-command-1"},
+					})
+
+				binaryPath := generic.ExecutableFilename(
+					filepath.Join(homeDir, ".cf", "plugins", "banana-plugin-name-1"))
+				Expect(os.Remove(binaryPath)).ToNot(HaveOccurred())
+			})
+
+			It("uninstalls the plugin with no warning or error and exits 0", func() {
+				session := helpers.CF("uninstall-plugin", "banana-plugin-name-1")
 				Eventually(session).Should(Exit(0))
 			})
 		})

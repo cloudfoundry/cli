@@ -5816,12 +5816,20 @@
     "translation": "Chemin du fichier de pack de construction"
   },
   {
+    "id": "The plugin has been uninstalled but removing the plugin binary failed.\nRemove it manually or subsequent installations of the plugin may fail\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "The plugin name",
     "translation": "Nom du plug-in"
   },
   {
     "id": "The plugin repo name",
     "translation": "Nom du référentiel du plug-in"
+  },
+  {
+    "id": "The plugin's uninstall method returned an unexpected error.\nThe plugin uninstall will proceed. Contact the plugin author if you need help.\n{{.Err}}",
+    "translation": ""
   },
   {
     "id": "The position that sets priority",
