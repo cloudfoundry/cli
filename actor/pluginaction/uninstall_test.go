@@ -108,6 +108,28 @@ var _ = Describe("Plugin actor", func() {
 				})
 			})
 
+			Context("when the plugin uninstaller returns an os.PathError", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = &os.PathError{}
+					fakePluginUninstaller.RunReturns(expectedErr)
+				})
+
+				It("returns a PluginExecuteError, deletes the binary and removes the plugin config", func() {
+					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
+					Expect(err).To(MatchError(PluginExecuteError{
+						Err: expectedErr,
+					}))
+
+					_, err = os.Stat(binaryPath)
+					Expect(os.IsNotExist(err)).To(BeTrue())
+
+					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(1))
+					Expect(fakeConfig.WritePluginConfigCallCount()).To(Equal(1))
+				})
+			})
+
 			Context("when the plugin uninstaller returns an exec.ExitError", func() {
 				var expectedErr error
 
@@ -118,7 +140,9 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns the error, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					Expect(err).To(MatchError(expectedErr))
+					Expect(err).To(MatchError(PluginExecuteError{
+						Err: expectedErr,
+					}))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -173,7 +197,9 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns the error and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					_, isPathError := err.(*os.PathError)
+					pluginBinaryRemoveErr, ok := err.(PluginBinaryRemoveFailedError)
+					Expect(ok).To(BeTrue())
+					_, isPathError := pluginBinaryRemoveErr.Err.(*os.PathError)
 					Expect(isPathError).To(BeTrue())
 
 					Expect(fakeConfig.RemovePluginCallCount()).To(Equal(1))
