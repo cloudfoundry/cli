@@ -169,7 +169,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, []configv3.PluginRepository{pluginRepository}, tempPluginDir)
 
 		if err != nil {
-			switch err.(type) {
+			switch pluginErr := err.(type) {
 			case pluginaction.PluginNotFoundInAnyRepositoryError:
 				return "", 0, shared.PluginNotFoundInRepositoryError{
 					BinaryName:     cmd.Config.BinaryName(),
@@ -178,11 +178,10 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 				}
 
 			case pluginaction.FetchingPluginInfoFromRepositoryError:
-				// The error wrapped inside fetchErr is handled differently in the case of
-				// a specified repo from that of searching through all repos.  fetchErr.Err
+				// The error wrapped inside pluginErr is handled differently in the case of
+				// a specified repo from that of searching through all repos.  pluginErr.Err
 				// is then processed by shared.HandleError by this function's caller.
-				fetchErr, _ := err.(pluginaction.FetchingPluginInfoFromRepositoryError)
-				return "", 0, fetchErr.Err
+				return "", 0, pluginErr.Err
 
 			default:
 				return "", 0, err
@@ -207,13 +206,12 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, repos, tempPluginDir)
 		if err != nil {
-			switch err.(type) {
+			switch pluginErr := err.(type) {
 			case pluginaction.PluginNotFoundInAnyRepositoryError:
 				return "", 0, shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
 
 			case pluginaction.FetchingPluginInfoFromRepositoryError:
-				fetchErr, _ := err.(pluginaction.FetchingPluginInfoFromRepositoryError)
-				return "", 0, cmd.handleFetchingPluginInfoFromRepositoriesError(fetchErr)
+				return "", 0, cmd.handleFetchingPluginInfoFromRepositoriesError(pluginErr)
 
 			default:
 				return "", 0, err
@@ -226,27 +224,22 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 // These are specific errors that we output to the user in the context of
 // installing from any repository.
 func (_ InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
-	clientErr := fetchErr.Err
-
-	switch clientErr.(type) {
+	switch clientErr := fetchErr.Err.(type) {
 	case pluginerror.RawHTTPStatusError:
-		rawHTTPErr, _ := clientErr.(pluginerror.RawHTTPStatusError)
 		return shared.FetchingPluginInfoFromRepositoriesError{
-			Message:        rawHTTPErr.Status,
+			Message:        clientErr.Status,
 			RepositoryName: fetchErr.RepositoryName,
 		}
 
 	case pluginerror.SSLValidationHostnameError:
-		sslErr, _ := clientErr.(pluginerror.SSLValidationHostnameError)
 		return shared.FetchingPluginInfoFromRepositoriesError{
-			Message:        sslErr.Error(),
+			Message:        clientErr.Error(),
 			RepositoryName: fetchErr.RepositoryName,
 		}
 
 	case pluginerror.UnverifiedServerError:
-		unverifiedErr, _ := clientErr.(pluginerror.UnverifiedServerError)
 		return shared.FetchingPluginInfoFromRepositoriesError{
-			Message:        unverifiedErr.Error(),
+			Message:        clientErr.Error(),
 			RepositoryName: fetchErr.RepositoryName,
 		}
 
