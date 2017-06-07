@@ -2,6 +2,7 @@ package plugin_test
 
 import (
 	"errors"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -70,7 +71,26 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin encounters an error", func() {
+		Context("when uninstalling the plugin returns a path error", func() {
+			var pathError error
+
+			BeforeEach(func() {
+				pathError = &os.PathError{
+					Op:  "some-op",
+					Err: errors.New("some error"),
+				}
+
+				fakeActor.UninstallPluginReturns(pathError)
+			})
+
+			It("returns a PluginBinaryRemoveFailedError", func() {
+				Expect(executeErr).To(MatchError(shared.PluginBinaryRemoveFailedError{
+					Err: pathError,
+				}))
+			})
+		})
+
+		Context("when uninstalling the plugin encounters any other error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {

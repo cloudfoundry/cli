@@ -37,6 +37,8 @@ var _ = Describe("Translatable Errors", func() {
 		},
 
 		Entry("JSONSyntaxError", JSONSyntaxError{Err: errors.New("some-error")}),
+		Entry("PluginBinaryRemoveFailedError", PluginBinaryRemoveFailedError{}),
+		Entry("PluginBinaryUninstallError", PluginBinaryUninstallError{}),
 		Entry("PluginNotFoundError", PluginNotFoundError{}),
 		Entry("PluginNotFoundInRepositoryError", PluginNotFoundInRepositoryError{}),
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),

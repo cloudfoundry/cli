@@ -5816,12 +5816,20 @@
     "translation": "ビルドパック・ファイルへのパス"
   },
   {
+    "id": "The plugin has been uninstalled but removing the plugin binary failed.\nRemove it manually or subsequent installations of the plugin may fail\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "The plugin name",
     "translation": "プラグイン名"
   },
   {
     "id": "The plugin repo name",
     "translation": "プラグイン・リポジトリー名"
+  },
+  {
+    "id": "The plugin's uninstall method returned an unexpected error.\nThe plugin uninstall will proceed. Contact the plugin author if you need help.\n{{.Err}}",
+    "translation": ""
   },
   {
     "id": "The position that sets priority",
