@@ -103,6 +103,21 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
+				Context("when the plugin is valid but generates an error when fetching metadata", func() {
+					var wrappedErr error
+
+					BeforeEach(func() {
+						wrappedErr = errors.New("some-error")
+						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{Err: wrappedErr})
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError(shared.PluginInvalidError{Err: wrappedErr}))
+
+						Expect(testUI.Out).ToNot(Say("Installing plugin"))
+					})
+				})
+
 				Context("when the plugin is already installed", func() {
 					var plugin configv3.Plugin
 

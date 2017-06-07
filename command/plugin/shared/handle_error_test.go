@@ -15,6 +15,7 @@ import (
 var _ = Describe("HandleError", func() {
 	err := errors.New("some-error")
 	jsonErr := new(json.SyntaxError)
+	genericErr := errors.New("some-generic-error")
 
 	DescribeTable("error translations",
 		func(passedInErr error, expectedErr error) {
@@ -65,6 +66,9 @@ var _ = Describe("HandleError", func() {
 		Entry("pluginaction.PluginInvalidError -> PluginInvalidError",
 			pluginaction.PluginInvalidError{},
 			PluginInvalidError{}),
+		Entry("pluginaction.PluginInvalidError -> PluginInvalidError",
+			pluginaction.PluginInvalidError{Err: genericErr},
+			PluginInvalidError{Err: genericErr}),
 		Entry("pluginaction.PluginNotFoundError -> PluginNotFoundError",
 			pluginaction.PluginNotFoundError{PluginName: "some-plugin"},
 			PluginNotFoundError{PluginName: "some-plugin"}),

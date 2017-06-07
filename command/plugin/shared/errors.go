@@ -1,6 +1,9 @@
 package shared
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type JSONSyntaxError struct {
 	Err error
@@ -162,10 +165,17 @@ func (e FileNotFoundError) Translate(translate func(string, ...interface{}) stri
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
+	Err error
 }
 
 func (e PluginInvalidError) Error() string {
-	return "File is not a valid cf CLI plugin binary."
+	baseErrString := "File is not a valid cf CLI plugin binary."
+
+	if e.Err != nil {
+		return fmt.Sprintf("%s\n%s", e.Err, baseErrString)
+	}
+
+	return baseErrString
 }
 
 func (e PluginInvalidError) Translate(translate func(string, ...interface{}) string) string {

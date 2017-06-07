@@ -28,6 +28,7 @@ type CommandList interface {
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
+	Err error
 }
 
 func (_ PluginInvalidError) Error() string {
@@ -109,7 +110,7 @@ func (actor Actor) FileExists(path string) bool {
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
 	plugin, err := pluginMetadata.GetMetadata(path)
 	if err != nil || plugin.Name == "" || len(plugin.Commands) == 0 {
-		return configv3.Plugin{}, PluginInvalidError{}
+		return configv3.Plugin{}, PluginInvalidError{Err: err}
 	}
 
 	installedPlugins := actor.config.Plugins()

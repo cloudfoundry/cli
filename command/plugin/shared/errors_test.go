@@ -49,9 +49,26 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("GettingPluginRepositoryError", GettingPluginRepositoryError{}),
 		Entry("FileNotFoundError", FileNotFoundError{}),
 		Entry("PluginInvalidError", PluginInvalidError{}),
+		Entry("PluginInvalidError", PluginInvalidError{Err: errors.New("invalid error")}),
 		Entry("PluginCommandsConflictError", PluginCommandsConflictError{}),
 		Entry("PluginAlreadyInstalledError", PluginAlreadyInstalledError{}),
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),
 		Entry("FetchingPluginInfoFromRepositoriesError", FetchingPluginInfoFromRepositoriesError{}),
 	)
+
+	Describe("PluginInvalidError", func() {
+		Context("when the wrapped error is nil", func() {
+			It("does not concatenate the nil error in the returned Error()", func() {
+				err := PluginInvalidError{}
+				Expect(err.Error()).To(Equal("File is not a valid cf CLI plugin binary."))
+			})
+		})
+
+		Context("when the wrapped error is not nil", func() {
+			It("does prepends the error message in the returned Error()", func() {
+				err := PluginInvalidError{Err: errors.New("ello")}
+				Expect(err.Error()).To(Equal("ello\nFile is not a valid cf CLI plugin binary."))
+			})
+		})
+	})
 })
