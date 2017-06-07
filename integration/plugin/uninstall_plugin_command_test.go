@@ -78,7 +78,7 @@ var _ = Describe("uninstall-plugin command", func() {
 				})
 			})
 
-			It("exits with an error, and does not remove the plugin", func() {
+			It("exits with an error but still uninstalls the plugin", func() {
 				session := helpers.CF("uninstall-plugin", "failing-plugin")
 				Eventually(session.Out).Should(Say("Uninstalling plugin failing-plugin\\.\\.\\."))
 				Eventually(session.Err).Should(Say("I'm failing...I'm failing..."))
@@ -87,6 +87,11 @@ var _ = Describe("uninstall-plugin command", func() {
 				Eventually(session.Err).Should(Say("The plugin uninstall will proceed\\. Contact the plugin author if you need help\\."))
 				Eventually(session.Err).Should(Say("exit status 1"))
 				Eventually(session).Should(Exit(1))
+
+				binaryPath := generic.ExecutableFilename(
+					filepath.Join(homeDir, ".cf", "plugins", "failing-plugin"))
+				_, err := os.Stat(binaryPath)
+				Expect(os.IsNotExist(err)).To(BeTrue())
 
 				session = helpers.CF("plugins")
 				Eventually(session.Out).Should(Say("banana-plugin-name-1"))

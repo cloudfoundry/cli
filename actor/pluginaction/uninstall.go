@@ -23,6 +23,24 @@ type PluginUninstaller interface {
 	Run(pluginPath string, command string) error
 }
 
+// PluginBinaryRemoveFailedError is returned when running the plugin binary fails.
+type PluginBinaryRemoveFailedError struct {
+	Err error
+}
+
+func (p PluginBinaryRemoveFailedError) Error() string {
+	return p.Err.Error()
+}
+
+// PluginExecuteError is returned when running the plugin binary fails.
+type PluginExecuteError struct {
+	Err error
+}
+
+func (p PluginExecuteError) Error() string {
+	return p.Err.Error()
+}
+
 func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) error {
 	plugin, exist := actor.config.GetPlugin(name)
 	if !exist {
@@ -34,9 +52,16 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 	if actor.FileExists(plugin.Location) {
 		err := uninstaller.Run(plugin.Location, "CLI-MESSAGE-UNINSTALL")
 		if err != nil {
-			if _, isExitError := err.(*exec.ExitError); isExitError {
-				binaryErr = err
-			} else {
+			switch err.(type) {
+			case *exec.ExitError:
+				binaryErr = PluginExecuteError{
+					Err: err,
+				}
+			case *os.PathError:
+				binaryErr = PluginExecuteError{
+					Err: err,
+				}
+			default:
 				return err
 			}
 		}
@@ -47,7 +72,9 @@ func (actor Actor) UninstallPlugin(uninstaller PluginUninstaller, name string) e
 		err = os.Remove(plugin.Location)
 		if err != nil && !os.IsNotExist(err) {
 			if _, isPathError := err.(*os.PathError); isPathError {
-				binaryErr = err
+				binaryErr = PluginBinaryRemoveFailedError{
+					Err: err,
+				}
 			} else {
 				return err
 			}

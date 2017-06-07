@@ -71,7 +71,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin returns a path error", func() {
+		Context("when uninstalling the plugin returns a plugin binary remove failed error", func() {
 			var pathError error
 
 			BeforeEach(func() {
@@ -80,11 +80,32 @@ var _ = Describe("uninstall-plugin command", func() {
 					Err: errors.New("some error"),
 				}
 
-				fakeActor.UninstallPluginReturns(pathError)
+				fakeActor.UninstallPluginReturns(pluginaction.PluginBinaryRemoveFailedError{
+					Err: pathError,
+				})
 			})
 
 			It("returns a PluginBinaryRemoveFailedError", func() {
 				Expect(executeErr).To(MatchError(shared.PluginBinaryRemoveFailedError{
+					Err: pathError,
+				}))
+			})
+		})
+
+		Context("when uninstalling the plugin returns a plugin execute error", func() {
+			var pathError error
+
+			BeforeEach(func() {
+				pathError = &os.PathError{
+					Op:  "some-op",
+					Err: errors.New("some error"),
+				}
+
+				fakeActor.UninstallPluginReturns(pluginaction.PluginExecuteError{Err: pathError})
+			})
+
+			It("returns a PluginBinaryUninstallError", func() {
+				Expect(executeErr).To(MatchError(shared.PluginBinaryUninstallError{
 					Err: pathError,
 				}))
 			})
