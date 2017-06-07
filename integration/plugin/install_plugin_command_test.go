@@ -77,8 +77,10 @@ var _ = Describe("install-plugin command", func() {
 				goos := os.Getenv("GOOS")
 				goarch := os.Getenv("GOARCH")
 
-				os.Setenv("GOOS", "openbsd")
-				os.Setenv("GOARCH", "amd64")
+				err := os.Setenv("GOOS", "openbsd")
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Setenv("GOARCH", "amd64")
+				Expect(err).ToNot(HaveOccurred())
 
 				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
@@ -86,8 +88,10 @@ var _ = Describe("install-plugin command", func() {
 					},
 				)
 
-				os.Setenv("GOOS", goos)
-				os.Setenv("GOARCH", goarch)
+				err = os.Setenv("GOOS", goos)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Setenv("GOARCH", goarch)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("fails and reports the file is not a valid CLI plugin", func() {
@@ -185,7 +189,8 @@ var _ = Describe("install-plugin command", func() {
 						badPlugin, err := ioutil.TempFile("", "")
 						Expect(err).ToNot(HaveOccurred())
 						pluginPath = badPlugin.Name()
-						badPlugin.Close()
+						err = badPlugin.Close()
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					AfterEach(func() {
@@ -216,7 +221,23 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("command conflict", func() {
+				Context("when getting metadata from the plugin errors", func() {
+					BeforeEach(func() {
+						var err error
+						pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_fails_metadata")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("displays the error to stderr", func() {
+						session := helpers.CF("install-plugin", pluginPath, "-f")
+						Eventually(session.Err).Should(Say("exit status 51"))
+						Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
+
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when there is a command conflict", func() {
 					Context("when the plugin has a command that is the same as a built-in command", func() {
 						var pluginPath string
 
@@ -454,7 +475,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user says yes", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("y\n"))
+						_, _ = buffer.Write([]byte("y\n"))
 					})
 
 					It("installs the plugin", func() {
@@ -502,7 +523,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user says no", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("n\n"))
+						_, _ = buffer.Write([]byte("n\n"))
 					})
 
 					It("does not install the plugin", func() {
@@ -538,7 +559,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user interrupts with control-c", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("y")) // but not enter
+						_, _ = buffer.Write([]byte("y")) // but not enter
 					})
 
 					It("does not install the plugin and does not create a bad state", func() {
@@ -763,7 +784,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user says yes", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("y\n"))
+					_, _ = buffer.Write([]byte("y\n"))
 				})
 
 				It("installs the plugin", func() {
@@ -809,7 +830,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user says no", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("n\n"))
+					_, _ = buffer.Write([]byte("n\n"))
 				})
 
 				It("does not install the plugin", func() {
@@ -829,7 +850,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user interrupts with control-c", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("y")) // but not enter
+					_, _ = buffer.Write([]byte("y")) // but not enter
 				})
 
 				It("does not install the plugin and does not create a bad state", func() {

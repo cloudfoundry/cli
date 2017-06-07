@@ -218,7 +218,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{}))
+				Expect(validateErr).To(MatchError(PluginInvalidError{Err: expectedErr}))
 			})
 		})
 

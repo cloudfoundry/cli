@@ -32,7 +32,7 @@ func HandleError(err error) error {
 			CommandAliases: e.CommandAliases,
 		}
 	case pluginaction.PluginInvalidError:
-		return PluginInvalidError{}
+		return PluginInvalidError{Err: e.Err}
 	case pluginaction.PluginNotFoundError:
 		return PluginNotFoundError{PluginName: e.PluginName}
 	case pluginaction.RepositoryNameTakenError:
