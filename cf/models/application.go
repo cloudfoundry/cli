@@ -96,6 +96,8 @@ type AppParams struct {
 	HealthCheckHTTPEndpoint *string
 	HealthCheckTimeout      *int
 	DockerImage             *string
+	DockerUsername          *string
+	DockerPassword          *string
 	Diego                   *bool
 	EnableSSH               *bool
 	Hosts                   []string

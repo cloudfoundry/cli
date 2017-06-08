@@ -43,6 +43,11 @@ type ApplicationResource struct {
 	Entity ApplicationEntity
 }
 
+type DockerCredentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 type ApplicationEntity struct {
 	Name                    *string                 `json:"name,omitempty"`
 	Command                 *string                 `json:"command,omitempty"`
@@ -65,6 +70,7 @@ type ApplicationEntity struct {
 	StagingFailedReason     *string                 `json:"staging_failed_reason,omitempty"`
 	Diego                   *bool                   `json:"diego,omitempty"`
 	DockerImage             *string                 `json:"docker_image,omitempty"`
+	DockerCredentials       *DockerCredentials      `json:"docker_credentials,omitempty"`
 	EnableSSH               *bool                   `json:"enable_ssh,omitempty"`
 	PackageUpdatedAt        *time.Time              `json:"package_updated_at,omitempty"`
 	AppPorts                *[]int                  `json:"ports,omitempty"`
@@ -118,6 +124,14 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 
 	if app.EnvironmentVars != nil && *app.EnvironmentVars != nil {
 		entity.EnvironmentJSON = app.EnvironmentVars
+	}
+
+	if app.DockerUsername != nil {
+		creds := DockerCredentials{
+			Username: *app.DockerUsername,
+			Password: *app.DockerPassword,
+		}
+		entity.DockerCredentials = &creds
 	}
 
 	return entity

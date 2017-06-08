@@ -54,6 +54,8 @@ var _ = Describe("Application resources", func() {
 			command,
 			healthCheckType,
 			dockerImage,
+			dockerUsername,
+			dockerPassword,
 			name,
 			spaceGUID,
 			stackGUID,
@@ -72,6 +74,8 @@ var _ = Describe("Application resources", func() {
 			healthCheckTimeout = 5
 			healthCheckHTTPEndpoint = "/some-endpoint"
 			dockerImage = "docker-image"
+			dockerUsername = "docker-user"
+			dockerPassword = "docker-pass"
 			diego = true
 			enableSSH = true
 			instanceCount = 5
@@ -92,6 +96,8 @@ var _ = Describe("Application resources", func() {
 				HealthCheckTimeout:      &healthCheckTimeout,
 				HealthCheckHTTPEndpoint: &healthCheckHTTPEndpoint,
 				DockerImage:             &dockerImage,
+				DockerUsername:          &dockerUsername,
+				DockerPassword:          &dockerPassword,
 				Diego:                   &diego,
 				EnableSSH:               &enableSSH,
 				InstanceCount:           &instanceCount,
@@ -119,6 +125,8 @@ var _ = Describe("Application resources", func() {
 			Expect(*entity.HealthCheckTimeout).To(Equal(healthCheckTimeout))
 			Expect(*entity.HealthCheckHTTPEndpoint).To(Equal(healthCheckHTTPEndpoint))
 			Expect(*entity.DockerImage).To(Equal(dockerImage))
+			Expect(entity.DockerCredentials.Username).To(Equal(dockerUsername))
+			Expect(entity.DockerCredentials.Password).To(Equal(dockerPassword))
 			Expect(*entity.Diego).To(Equal(diego))
 			Expect(*entity.EnableSSH).To(Equal(enableSSH))
 			Expect(*entity.PackageUpdatedAt).To(Equal(packageUpdatedAt))

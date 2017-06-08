@@ -848,6 +848,38 @@ var _ = Describe("Push Command", func() {
 							Expect(*params.DockerImage).To(Equal("sample/dockerImage"))
 						})
 					})
+
+					Context("when using --docker-username", func() {
+						BeforeEach(func() {
+							args = append(args, "--docker-username", "some-docker-username")
+						})
+
+						Context("when CF_DOCKER_PASSWORD is set", func() {
+							BeforeEach(func() {
+								err := os.Setenv("CF_DOCKER_PASSWORD", "some-docker-pass")
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							AfterEach(func() {
+								err := os.Unsetenv("CF_DOCKER_PASSWORD")
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							It("it passes the credentials to create call", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
+
+								params := appRepo.CreateArgsForCall(0)
+								Expect(*params.DockerUsername).To(Equal("some-docker-username"))
+								Expect(*params.DockerPassword).To(Equal("some-docker-pass"))
+							})
+						})
+
+						Context("when CF_DOCKER_PASSWORD is not set", func() {
+							It("returns an error", func() {
+								Expect(executeErr).To(MatchError("Environment variable CF_DOCKER_PASSWORD not set."))
+							})
+						})
+					})
 				})
 
 				Context("when health-check-type '-u' or '--health-check-type' is set", func() {
