@@ -640,7 +640,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("OK"))
@@ -686,7 +686,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
 						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
 						Eventually(session.Out).Should(Say("CLI-MESSAGE-UNINSTALL"))
@@ -795,7 +795,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("OK"))
@@ -817,7 +817,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
 						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
