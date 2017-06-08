@@ -14,6 +14,7 @@ type PushCommand struct {
 	StartupCommand       string                      `short:"c" description:"Startup command, set to null to reset to default start command"`
 	Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage          string                      `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
+	DockerUsername       string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	PathToManifest       flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType      flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
@@ -29,9 +30,10 @@ type PushCommand struct {
 	RoutePath            string                      `long:"route-path" description:"Path for the route"`
 	Stack                string                      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	ApplicationStartTime int                         `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
-	usage                interface{}                 `usage:"Push a single app (with or without a manifest):\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n   Push multiple apps with a manifest:\n   cf push [-f MANIFEST_PATH]"`
+	usage                interface{}                 `usage:"cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [--no-start]"`
 	envCFStagingTimeout  interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout  interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	dockerPassword       interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 	relatedCommands      interface{}                 `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 }
 
