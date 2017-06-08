@@ -4,6 +4,10 @@
     "translation": ""
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },

@@ -152,6 +152,10 @@
     "translation": "' no es un mandato registrado. Consulte 'cf help'"
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes' debe ser una lista"
   },

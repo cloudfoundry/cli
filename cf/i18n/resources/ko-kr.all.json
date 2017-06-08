@@ -152,6 +152,10 @@
     "translation": "'은(는) 등록된 명령이 아닙니다. 'cf 도움말'을 참조하십시오."
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes'는 목록이어야 함"
   },
