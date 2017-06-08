@@ -7308,10 +7308,6 @@
     "translation": ""
   },
   {
-    "id": "{{.Bytes}} bytes downloaded...",
-    "translation": ""
-  },
-  {
     "id": "{{.CFName}} api",
     "translation": "API de {{.CFName}}"
   },

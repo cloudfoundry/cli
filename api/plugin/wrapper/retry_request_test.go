@@ -34,7 +34,7 @@ var _ = Describe("Retry Request", func() {
 			expectedErr := pluginerror.RawHTTPStatusError{
 				Status: fmt.Sprintf("%d", responseStatusCode),
 			}
-			fakeConnection.MakeStub = func(req *http.Request, passedResponse *plugin.Response) error {
+			fakeConnection.MakeStub = func(req *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 				defer req.Body.Close()
 				body, err := ioutil.ReadAll(request.Body)
 				Expect(err).ToNot(HaveOccurred())
@@ -43,7 +43,7 @@ var _ = Describe("Retry Request", func() {
 			}
 
 			wrapper := NewRetryRequest(2).Wrap(fakeConnection)
-			err = wrapper.Make(request, response)
+			err = wrapper.Make(request, response, nil)
 			Expect(err).To(MatchError(expectedErr))
 			Expect(fakeConnection.MakeCallCount()).To(Equal(expectedNumberOfRetries))
 		},
@@ -72,9 +72,12 @@ var _ = Describe("Retry Request", func() {
 
 		fakeConnection := new(pluginfakes.FakeConnection)
 		wrapper := NewRetryRequest(2).Wrap(fakeConnection)
+		fakeProxyReader := new(pluginfakes.FakeProxyReader)
 
-		err = wrapper.Make(request, response)
+		err = wrapper.Make(request, response, fakeProxyReader)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+		_, _, proxyReader := fakeConnection.MakeArgsForCall(0)
+		Expect(proxyReader).To(Equal(fakeProxyReader))
 	})
 })

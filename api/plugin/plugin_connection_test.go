@@ -2,12 +2,15 @@ package plugin_test
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"runtime"
 	"strings"
 
 	. "code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -20,10 +23,18 @@ type DummyResponse struct {
 }
 
 var _ = Describe("Plugin Connection", func() {
-	var connection *PluginConnection
+	var (
+		connection      *PluginConnection
+		fakeProxyReader *pluginfakes.FakeProxyReader
+	)
 
 	BeforeEach(func() {
 		connection = NewConnection(true, 0)
+		fakeProxyReader = new(pluginfakes.FakeProxyReader)
+
+		fakeProxyReader.WrapStub = func(reader io.Reader, _ int64) io.ReadCloser {
+			return ioutil.NopCloser(reader)
+		}
 	})
 
 	Describe("Make", func() {
@@ -55,11 +66,15 @@ var _ = Describe("Plugin Connection", func() {
 						Result: &body,
 					}
 
-					err := connection.Make(request, &response)
+					err := connection.Make(request, &response, fakeProxyReader)
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(body.Val1).To(Equal("2.59.0"))
 					Expect(body.Val2).To(Equal(2))
+
+					Expect(fakeProxyReader.WrapCallCount()).To(Equal(1))
+					_, size := fakeProxyReader.WrapArgsForCall(0)
+					Expect(size).To(BeNumerically("==", 0))
 				})
 
 				It("keeps numbers unmarshalled to interfaces as interfaces", func() {
@@ -68,7 +83,7 @@ var _ = Describe("Plugin Connection", func() {
 						Result: &body,
 					}
 
-					err := connection.Make(request, &response)
+					err := connection.Make(request, &response, nil)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(fmt.Sprint(body.Val3)).To(Equal("1111111111111111111"))
 				})
@@ -77,7 +92,7 @@ var _ = Describe("Plugin Connection", func() {
 			Context("when passed an empty response", func() {
 				It("skips the unmarshalling step", func() {
 					var response Response
-					err := connection.Make(request, &response)
+					err := connection.Make(request, &response, nil)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(response.Result).To(BeNil())
 				})
@@ -104,7 +119,7 @@ var _ = Describe("Plugin Connection", func() {
 			It("returns the status", func() {
 				response := Response{}
 
-				err := connection.Make(request, &response)
+				err := connection.Make(request, &response, nil)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(response.HTTPResponse.Status).To(Equal("200 OK"))
@@ -122,7 +137,7 @@ var _ = Describe("Plugin Connection", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					var response Response
-					err = connection.Make(request, &response)
+					err = connection.Make(request, &response, nil)
 					Expect(err).To(HaveOccurred())
 
 					requestErr, ok := err.(pluginerror.RequestError)
@@ -148,7 +163,7 @@ var _ = Describe("Plugin Connection", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						var response Response
-						err = connection.Make(request, &response)
+						err = connection.Make(request, &response, nil)
 						Expect(err).To(MatchError(pluginerror.UnverifiedServerError{URL: server.URL()}))
 					})
 				})
@@ -176,7 +191,7 @@ var _ = Describe("Plugin Connection", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						var response Response
-						err = connection.Make(request, &response)
+						err = connection.Make(request, &response, nil)
 						Expect(err).To(MatchError(pluginerror.SSLValidationHostnameError{
 							Message: "x509: certificate is valid for example.com, not loopback.cli.ci.cf-app.com",
 						}))
@@ -207,7 +222,7 @@ var _ = Describe("Plugin Connection", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					var response Response
-					err = connection.Make(request, &response)
+					err = connection.Make(request, &response, nil)
 					Expect(err).To(MatchError(pluginerror.RawHTTPStatusError{
 						Status:      "418 I'm a teapot",
 						RawResponse: []byte(rawResponse),

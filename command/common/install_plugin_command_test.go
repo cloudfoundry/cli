@@ -402,14 +402,12 @@ var _ = Describe("install-plugin command", func() {
 		var (
 			plugin               configv3.Plugin
 			pluginName           string
-			downloadedPluginPath string
 			executablePluginPath string
 		)
 
 		BeforeEach(func() {
 			cmd.OptionalArgs.PluginNameOrLocation = "http://some-url"
 			pluginName = "some-plugin"
-			downloadedPluginPath = "some-path"
 			executablePluginPath = "executable-path"
 		})
 
@@ -427,7 +425,7 @@ var _ = Describe("install-plugin command", func() {
 				Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
 
 				Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-				url, tempPluginDir := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+				url, tempPluginDir, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 				Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
 				Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
 				Expect(tempPluginDir).To(ContainSubstring("temp"))
@@ -436,7 +434,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("When getting the binary fails", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, expectedErr)
+					fakeActor.DownloadExecutableBinaryFromURLReturns("", expectedErr)
 				})
 
 				It("returns the error", func() {
@@ -448,7 +446,7 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when a 4xx or 5xx status is encountered while downloading the plugin", func() {
 					BeforeEach(func() {
-						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, pluginerror.RawHTTPStatusError{Status: "some-status"})
+						fakeActor.DownloadExecutableBinaryFromURLReturns("", pluginerror.RawHTTPStatusError{Status: "some-status"})
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
@@ -458,7 +456,7 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when a SSL error is encountered while downloading the plugin", func() {
 					BeforeEach(func() {
-						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, pluginerror.UnverifiedServerError{})
+						fakeActor.DownloadExecutableBinaryFromURLReturns("", pluginerror.UnverifiedServerError{})
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
@@ -469,19 +467,19 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when getting the binary succeeds", func() {
 				BeforeEach(func() {
-					fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+					fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 					fakeActor.CreateExecutableCopyReturns(executablePluginPath, nil)
 				})
 
 				It("displays the bytes downloaded", func() {
-					Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+					Expect(testUI.Out).To(Say("0 B / ?"))
 
 					Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 					_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
 					Expect(path).To(Equal(executablePluginPath))
 
 					Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-					urlArg, pluginDirArg := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+					urlArg, pluginDirArg, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 					Expect(urlArg).To(Equal("http://some-url"))
 					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome"))
 					Expect(pluginDirArg).To(ContainSubstring("temp"))
@@ -600,7 +598,7 @@ var _ = Describe("install-plugin command", func() {
 				}
 
 				cmd.Force = false
-				fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+				fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 				fakeActor.CreateExecutableCopyReturns("executable-path", nil)
 			})
 
@@ -657,14 +655,13 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", cmd.OptionalArgs.PluginNameOrLocation))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
-
-						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.3 successfully installed\\.", pluginName))
 
 						Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-						url, tempPluginDir := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+						url, tempPluginDir, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 						Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
 						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
 						Expect(tempPluginDir).To(ContainSubstring("temp"))

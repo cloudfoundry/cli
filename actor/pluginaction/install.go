@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	"code.cloudfoundry.org/gofileutils/fileutils"
@@ -81,23 +82,18 @@ func (actor Actor) CreateExecutableCopy(path string, tempPluginDir string) (stri
 
 // DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
 // it exists.
-func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string) (string, int64, error) {
+func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error) {
 	tempFile, err := makeTempFile(tempPluginDir)
 	if err != nil {
-		return "", 0, err
+		return "", err
 	}
 
-	err = actor.client.DownloadPlugin(pluginURL, tempFile.Name())
+	err = actor.client.DownloadPlugin(pluginURL, tempFile.Name(), proxyReader)
 	if err != nil {
-		return "", 0, err
+		return "", err
 	}
 
-	stat, err := os.Stat(tempFile.Name())
-	if err != nil {
-		return "", 0, err
-	}
-
-	return tempFile.Name(), stat.Size(), nil
+	return tempFile.Name(), nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file

@@ -6,7 +6,10 @@ import (
 	"runtime"
 	"strings"
 
+	pb "gopkg.in/cheggaaa/pb.v1"
+
 	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -19,7 +22,7 @@ import (
 
 type InstallPluginActor interface {
 	CreateExecutableCopy(path string, tempPluginDir string) (string, error)
-	DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error)
+	DownloadExecutableBinaryFromURL(url string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
 	GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string
@@ -271,15 +274,14 @@ func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPlug
 
 	cmd.UI.DisplayText("Starting download of plugin binary from URL...")
 
-	var size int64
-	tempPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir)
+	bar := pb.New(0).SetUnits(pb.U_BYTES)
+	bar.Output = cmd.UI.Writer()
+	bar.Start()
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir, shared.NewProgressBarProxyReader(bar))
+	bar.Finish()
 	if err != nil {
 		return "", 0, err
 	}
-
-	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
-		"Bytes": size,
-	})
 
 	return tempPath, PluginFromURL, err
 }
@@ -333,15 +335,14 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 		"RepositoryName": repoList[0],
 	})
 
-	var size int64
-	tempPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
+	bar := pb.New(0).SetUnits(pb.U_BYTES)
+	bar.Output = cmd.UI.Writer()
+	bar.Start()
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir, shared.NewProgressBarProxyReader(bar))
+	bar.Finish()
 	if err != nil {
 		return "", 0, err
 	}
-
-	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
-		"Bytes": size,
-	})
 
 	if !cmd.Actor.ValidateFileChecksum(tempPath, pluginInfo.Checksum) {
 		return "", 0, InvalidChecksumError{}
