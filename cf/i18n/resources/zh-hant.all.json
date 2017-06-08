@@ -5656,6 +5656,10 @@
     "translation": ""
   },
   {
+    "id": "The application name to push",
+    "translation": ""
+  },
+  {
     "id": "The application name to start",
     "translation": ""
   },
@@ -6028,6 +6032,10 @@
     "translation": "啟動應用程式與來自應用程式的第一個健全回應之間允許經過的時間（以秒為單位）"
   },
   {
+    "id": "Timed out waiting for application {{.AppName}} to start",
+    "translation": ""
+  },
+  {
     "id": "Timeout for async HTTP requests",
     "translation": "非同步 HTTP 要求的逾時"
   },
@@ -6274,6 +6282,10 @@
   {
     "id": "Updated: {{.Updated}}",
     "translation": "已更新: {{.Updated}}"
+  },
+  {
+    "id": "Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Updating a plan",
@@ -6642,6 +6654,10 @@
   {
     "id": "cf target -s",
     "translation": "cf target -s"
+  },
+  {
+    "id": "cf v3-push -n APP_NAME",
+    "translation": ""
   },
   {
     "id": "command help",

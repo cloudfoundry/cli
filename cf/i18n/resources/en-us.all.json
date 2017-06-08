@@ -5656,6 +5656,10 @@
     "translation": ""
   },
   {
+    "id": "The application name to push",
+    "translation": ""
+  },
+  {
     "id": "The application name to start",
     "translation": ""
   },
@@ -6028,6 +6032,10 @@
     "translation": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"
   },
   {
+    "id": "Timed out waiting for application {{.AppName}} to start",
+    "translation": ""
+  },
+  {
     "id": "Timeout for async HTTP requests",
     "translation": "Timeout for async HTTP requests"
   },
@@ -6274,6 +6282,10 @@
   {
     "id": "Updated: {{.Updated}}",
     "translation": "Updated: {{.Updated}}"
+  },
+  {
+    "id": "Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Updating a plan",
@@ -6642,6 +6654,10 @@
   {
     "id": "cf target -s",
     "translation": "cf target -s"
+  },
+  {
+    "id": "cf v3-push -n APP_NAME",
+    "translation": ""
   },
   {
     "id": "command help",
