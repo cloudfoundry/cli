@@ -2548,6 +2548,10 @@
     "translation": "环境变量 {{.VarName}} 未设置。"
   },
   {
+    "id": "Environment variable CF_DOCKER_PASSWORD not set.",
+    "translation": ""
+  },
+  {
     "id": "Error accessing org {{.OrgName}} for GUID': ",
     "translation": "访问以下 GUID 的组织 {{.OrgName}} 时出错: "
   },
@@ -4336,6 +4340,10 @@
     "translation": "密码"
   },
   {
+    "id": "Password used for private docker repository",
+    "translation": ""
+  },
+  {
     "id": "Password verification does not match",
     "translation": "密码验证不匹配"
   },
@@ -4592,10 +4600,6 @@
     "translation": "推送单个应用程序（使用或不使用清单）"
   },
   {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
-    "translation": "推送单个应用程序（使用或不使用清单）: \\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   使用清单推送多个应用程序: \\n   cf push [-f MANIFEST_PATH]"
-  },
-  {
     "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
@@ -4826,6 +4830,10 @@
   {
     "id": "Reports whether SSH is enabled on an application container instance",
     "translation": "报告是否在应用程序容器实例上启用了 SSH"
+  },
+  {
+    "id": "Repository username; used with password from environment variable CF_DOCKER_PASSWORD",
+    "translation": ""
   },
   {
     "id": "Repository: ",
@@ -6392,6 +6400,10 @@
     "translation": "用户名"
   },
   {
+    "id": "Using docker repository password from environment variable CF_DOCKER_PASSWORD.",
+    "translation": ""
+  },
+  {
     "id": "Using manifest file {{.Path}}\n",
     "translation": "正在使用清单文件 {{.Path}}\n"
   },
@@ -6614,6 +6626,10 @@
   {
     "id": "cf -v",
     "translation": "cf -v"
+  },
+  {
+    "id": "cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [--no-start]",
+    "translation": ""
   },
   {
     "id": "cf services",
