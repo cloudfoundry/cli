@@ -882,6 +882,17 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
+				Context("when pushing with --docker-username and not --docker-image", func() {
+					BeforeEach(func() {
+						deps.UI = uiWithContents
+						args = []string{"testApp", "--docker-username", "some-docker-username"}
+					})
+
+					It("it returns an error", func() {
+						Expect(executeErr).To(MatchError("'--docker-username' requires '--docker-image' to be specified"))
+					})
+				})
+
 				Context("when health-check-type '-u' or '--health-check-type' is set", func() {
 					Context("when the value is not 'http', 'none', 'port', or 'process'", func() {
 						BeforeEach(func() {

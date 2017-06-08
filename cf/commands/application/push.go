@@ -228,18 +228,6 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		if c.IsSet("docker-image") {
 			diego := true
 			appParams.Diego = &diego
-
-			if c.IsSet("docker-username") {
-				username := c.String("docker-username")
-				appParams.DockerUsername = &username
-
-				password := os.Getenv("CF_DOCKER_PASSWORD")
-				if password == "" {
-					return errors.New(T("Environment variable CF_DOCKER_PASSWORD not set."))
-				}
-				appParams.DockerPassword = &password
-				cmd.ui.Say(T("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
-			}
 		}
 
 		var app, existingApp models.Application
@@ -792,6 +780,22 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	if c.String("docker-image") != "" {
 		dockerImage := c.String("docker-image")
 		appParams.DockerImage = &dockerImage
+	}
+
+	if c.String("docker-username") != "" {
+		if appParams.DockerImage == nil {
+			return models.AppParams{}, errors.New(T("'--docker-username' requires '--docker-image' to be specified"))
+		}
+
+		username := c.String("docker-username")
+		appParams.DockerUsername = &username
+
+		password := os.Getenv("CF_DOCKER_PASSWORD")
+		if password == "" {
+			return models.AppParams{}, errors.New(T("Environment variable CF_DOCKER_PASSWORD not set."))
+		}
+		appParams.DockerPassword = &password
+		cmd.ui.Say(T("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
 	}
 
 	if c.String("p") != "" {
