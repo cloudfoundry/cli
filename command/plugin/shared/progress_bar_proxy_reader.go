@@ -8,14 +8,24 @@ import (
 
 // ProgressBarProxyReader wraps a progress bar in a ProxyReader interface.
 type ProgressBarProxyReader struct {
-	bar *pb.ProgressBar
+	writer io.Writer
+	bar    *pb.ProgressBar
 }
 
-func (p ProgressBarProxyReader) Wrap(reader io.Reader, size int64) io.ReadCloser {
-	p.bar.Total = size
+func (p ProgressBarProxyReader) Wrap(reader io.Reader) io.ReadCloser {
 	return p.bar.NewProxyReader(reader)
 }
 
-func NewProgressBarProxyReader(bar *pb.ProgressBar) *ProgressBarProxyReader {
-	return &ProgressBarProxyReader{bar: bar}
+func (p *ProgressBarProxyReader) Start(size int64) {
+	p.bar = pb.New(int(size)).SetUnits(pb.U_BYTES)
+	p.bar.Output = p.writer
+	p.bar.Start()
+}
+
+func (p ProgressBarProxyReader) Finish() {
+	p.bar.Finish()
+}
+
+func NewProgressBarProxyReader(writer io.Writer) *ProgressBarProxyReader {
+	return &ProgressBarProxyReader{writer: writer}
 }

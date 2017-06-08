@@ -32,7 +32,7 @@ var _ = Describe("Plugin Connection", func() {
 		connection = NewConnection(true, 0)
 		fakeProxyReader = new(pluginfakes.FakeProxyReader)
 
-		fakeProxyReader.WrapStub = func(reader io.Reader, _ int64) io.ReadCloser {
+		fakeProxyReader.WrapStub = func(reader io.Reader) io.ReadCloser {
 			return ioutil.NopCloser(reader)
 		}
 	})
@@ -75,9 +75,12 @@ var _ = Describe("Plugin Connection", func() {
 					Expect(body.Val1).To(Equal("2.59.0"))
 					Expect(body.Val2).To(Equal(2))
 
+					Expect(fakeProxyReader.StartCallCount()).To(Equal(1))
+					Expect(fakeProxyReader.StartArgsForCall(0)).To(BeEquivalentTo(len(responseBody)))
+
 					Expect(fakeProxyReader.WrapCallCount()).To(Equal(1))
-					_, size := fakeProxyReader.WrapArgsForCall(0)
-					Expect(size).To(BeNumerically("==", len(responseBody)))
+
+					Expect(fakeProxyReader.FinishCallCount()).To(Equal(1))
 				})
 
 				It("keeps numbers unmarshalled to interfaces as interfaces", func() {

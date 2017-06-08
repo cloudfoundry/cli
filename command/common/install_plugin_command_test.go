@@ -9,6 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
@@ -23,14 +24,15 @@ import (
 
 var _ = Describe("install-plugin command", func() {
 	var (
-		cmd         InstallPluginCommand
-		testUI      *ui.UI
-		input       *Buffer
-		fakeConfig  *commandfakes.FakeConfig
-		fakeActor   *commonfakes.FakeInstallPluginActor
-		executeErr  error
-		expectedErr error
-		pluginHome  string
+		cmd             InstallPluginCommand
+		testUI          *ui.UI
+		input           *Buffer
+		fakeConfig      *commandfakes.FakeConfig
+		fakeActor       *commonfakes.FakeInstallPluginActor
+		fakeProgressBar *pluginfakes.FakeProxyReader
+		executeErr      error
+		expectedErr     error
+		pluginHome      string
 	)
 
 	BeforeEach(func() {
@@ -38,11 +40,13 @@ var _ = Describe("install-plugin command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeActor = new(commonfakes.FakeInstallPluginActor)
+		fakeProgressBar = new(pluginfakes.FakeProxyReader)
 
 		cmd = InstallPluginCommand{
-			UI:     testUI,
-			Config: fakeConfig,
-			Actor:  fakeActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			Actor:       fakeActor,
+			ProgressBar: fakeProgressBar,
 		}
 
 		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
@@ -425,10 +429,11 @@ var _ = Describe("install-plugin command", func() {
 				Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
 
 				Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-				url, tempPluginDir, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+				url, tempPluginDir, proxyReader := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 				Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
 				Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
 				Expect(tempPluginDir).To(ContainSubstring("temp"))
+				Expect(proxyReader).To(Equal(fakeProgressBar))
 			})
 
 			Context("When getting the binary fails", func() {
@@ -471,18 +476,17 @@ var _ = Describe("install-plugin command", func() {
 					fakeActor.CreateExecutableCopyReturns(executablePluginPath, nil)
 				})
 
-				It("displays the bytes downloaded", func() {
-					Expect(testUI.Out).To(Say("0 B / ?"))
-
+				It("sets up the progress bar", func() {
 					Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
 					_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
 					Expect(path).To(Equal(executablePluginPath))
 
 					Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-					urlArg, pluginDirArg, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+					urlArg, pluginDirArg, proxyReader := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 					Expect(urlArg).To(Equal("http://some-url"))
 					Expect(pluginDirArg).To(ContainSubstring("some-pluginhome"))
 					Expect(pluginDirArg).To(ContainSubstring("temp"))
+					Expect(proxyReader).To(Equal(fakeProgressBar))
 
 					Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
 					pathArg, pluginDirArg := fakeActor.CreateExecutableCopyArgsForCall(0)
@@ -655,16 +659,16 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", cmd.OptionalArgs.PluginNameOrLocation))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.3 successfully installed\\.", pluginName))
 
 						Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-						url, tempPluginDir, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+						url, tempPluginDir, proxyReader := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 						Expect(url).To(Equal(cmd.OptionalArgs.PluginNameOrLocation.String()))
 						Expect(tempPluginDir).To(ContainSubstring("some-pluginhome"))
 						Expect(tempPluginDir).To(ContainSubstring("temp"))
+						Expect(proxyReader).To(Equal(fakeProgressBar))
 
 						Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
 						path, tempPluginDir := fakeActor.CreateExecutableCopyArgsForCall(0)
