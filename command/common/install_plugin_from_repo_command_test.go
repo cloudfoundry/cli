@@ -11,6 +11,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/commonfakes"
@@ -27,15 +28,16 @@ import (
 
 var _ = Describe("install-plugin command", func() {
 	var (
-		cmd         InstallPluginCommand
-		testUI      *ui.UI
-		input       *Buffer
-		fakeConfig  *commandfakes.FakeConfig
-		fakeActor   *commonfakes.FakeInstallPluginActor
-		executeErr  error
-		expectedErr error
-		pluginHome  string
-		binaryName  string
+		cmd             InstallPluginCommand
+		testUI          *ui.UI
+		input           *Buffer
+		fakeConfig      *commandfakes.FakeConfig
+		fakeActor       *commonfakes.FakeInstallPluginActor
+		fakeProgressBar *pluginfakes.FakeProxyReader
+		executeErr      error
+		expectedErr     error
+		pluginHome      string
+		binaryName      string
 	)
 
 	BeforeEach(func() {
@@ -43,11 +45,13 @@ var _ = Describe("install-plugin command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeActor = new(commonfakes.FakeInstallPluginActor)
+		fakeProgressBar = new(pluginfakes.FakeProxyReader)
 
 		cmd = InstallPluginCommand{
-			UI:     testUI,
-			Config: fakeConfig,
-			Actor:  fakeActor,
+			UI:          testUI,
+			Config:      fakeConfig,
+			Actor:       fakeActor,
+			ProgressBar: fakeProgressBar,
 		}
 
 		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
@@ -243,9 +247,10 @@ var _ = Describe("install-plugin command", func() {
 								Expect(pluginPlatform).To(Equal(platform))
 
 								Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-								urlArg, dirArg, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+								urlArg, dirArg, proxyReader := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 								Expect(urlArg).To(Equal(pluginURL))
 								Expect(dirArg).To(ContainSubstring("temp"))
+								Expect(proxyReader).To(Equal(fakeProgressBar))
 							})
 						})
 
@@ -271,7 +276,6 @@ var _ = Describe("install-plugin command", func() {
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-									Expect(testUI.Out).To(Say("0 B / ?"))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 									Expect(fakeActor.ValidateFileChecksumCallCount()).To(Equal(1))
@@ -293,7 +297,6 @@ var _ = Describe("install-plugin command", func() {
 
 									It("returns the error", func() {
 										Expect(executeErr).To(MatchError(errors.New("some-error")))
-										Expect(testUI.Out).To(Say("0 B / ?"))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 										Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
@@ -315,7 +318,6 @@ var _ = Describe("install-plugin command", func() {
 
 										It("returns the error", func() {
 											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
-											Expect(testUI.Out).To(Say("0 B / ?"))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
@@ -396,7 +398,6 @@ var _ = Describe("install-plugin command", func() {
 													Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 													Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 													Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-													Expect(testUI.Out).To(Say("0 B / ?"))
 													Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 													Expect(testUI.Out).To(Say("OK"))
 													Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -451,7 +452,6 @@ var _ = Describe("install-plugin command", func() {
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-									Expect(testUI.Out).To(Say("0 B / ?"))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 								})
 							})
@@ -468,7 +468,6 @@ var _ = Describe("install-plugin command", func() {
 
 									It("returns the error", func() {
 										Expect(executeErr).To(MatchError(errors.New("some-error")))
-										Expect(testUI.Out).To(Say("0 B / ?"))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
 									})
 								})
@@ -485,7 +484,6 @@ var _ = Describe("install-plugin command", func() {
 
 										It("returns the error", func() {
 											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
-											Expect(testUI.Out).To(Say("0 B / ?"))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 										})
 									})
@@ -521,7 +519,6 @@ var _ = Describe("install-plugin command", func() {
 												Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 												Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 												Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-												Expect(testUI.Out).To(Say("0 B / ?"))
 												Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 												Expect(testUI.Out).To(Say("OK"))
 												Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
@@ -612,7 +609,6 @@ var _ = Describe("install-plugin command", func() {
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("0 B / ?"))
 								Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -691,7 +687,6 @@ var _ = Describe("install-plugin command", func() {
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
 								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("0 B / ?"))
 								Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
@@ -821,7 +816,6 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -853,7 +847,6 @@ var _ = Describe("install-plugin command", func() {
 							Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 							Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 							Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-							Expect(testUI.Out).To(Say("0 B / ?"))
 						})
 					})
 				})
@@ -1053,7 +1046,6 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
-						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -1084,7 +1076,6 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
-						Expect(testUI.Out).To(Say("0 B / ?"))
 					})
 				})
 			})

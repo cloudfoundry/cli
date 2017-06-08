@@ -6,8 +6,6 @@ import (
 	"runtime"
 	"strings"
 
-	pb "gopkg.in/cheggaaa/pb.v1"
-
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
@@ -61,12 +59,16 @@ type InstallPluginCommand struct {
 	UI                   command.UI
 	Config               command.Config
 	Actor                InstallPluginActor
+	ProgressBar          plugin.ProxyReader
 }
 
 func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui, cmd.SkipSSLValidation))
+
+	cmd.ProgressBar = shared.NewProgressBarProxyReader(cmd.UI.Writer())
+
 	return nil
 }
 
@@ -274,11 +276,7 @@ func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPlug
 
 	cmd.UI.DisplayText("Starting download of plugin binary from URL...")
 
-	bar := pb.New(0).SetUnits(pb.U_BYTES)
-	bar.Output = cmd.UI.Writer()
-	bar.Start()
-	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir, shared.NewProgressBarProxyReader(bar))
-	bar.Finish()
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir, cmd.ProgressBar)
 	if err != nil {
 		return "", 0, err
 	}
@@ -335,11 +333,7 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 		"RepositoryName": repoList[0],
 	})
 
-	bar := pb.New(0).SetUnits(pb.U_BYTES)
-	bar.Output = cmd.UI.Writer()
-	bar.Start()
-	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir, shared.NewProgressBarProxyReader(bar))
-	bar.Finish()
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir, cmd.ProgressBar)
 	if err != nil {
 		return "", 0, err
 	}

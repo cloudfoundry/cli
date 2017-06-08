@@ -55,7 +55,7 @@ var _ = Describe("DownloadPlugin", func() {
 		It("downloads the plugin, and writes the plugin file to the specified path", func() {
 			fakeProxyReader := new(pluginfakes.FakeProxyReader)
 
-			fakeProxyReader.WrapStub = func(reader io.Reader, _ int64) io.ReadCloser {
+			fakeProxyReader.WrapStub = func(reader io.Reader) io.ReadCloser {
 				return ioutil.NopCloser(reader)
 			}
 			err := client.DownloadPlugin(server.URL(), tempPath, fakeProxyReader)
