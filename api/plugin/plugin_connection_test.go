@@ -39,10 +39,13 @@ var _ = Describe("Plugin Connection", func() {
 
 	Describe("Make", func() {
 		Describe("Data Unmarshalling", func() {
-			var request *http.Request
+			var (
+				request      *http.Request
+				responseBody string
+			)
 
 			BeforeEach(func() {
-				response := `{
+				responseBody = `{
 					"val1":"2.59.0",
 					"val2":2,
 					"val3":1111111111111111111
@@ -50,7 +53,7 @@ var _ = Describe("Plugin Connection", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/list", ""),
-						RespondWith(http.StatusOK, response),
+						RespondWith(http.StatusOK, responseBody),
 					),
 				)
 
@@ -74,7 +77,7 @@ var _ = Describe("Plugin Connection", func() {
 
 					Expect(fakeProxyReader.WrapCallCount()).To(Equal(1))
 					_, size := fakeProxyReader.WrapArgsForCall(0)
-					Expect(size).To(BeNumerically("==", 0))
+					Expect(size).To(BeNumerically("==", len(responseBody)))
 				})
 
 				It("keeps numbers unmarshalled to interfaces as interfaces", func() {

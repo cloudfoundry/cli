@@ -53,7 +53,7 @@ func (connection *PluginConnection) Make(request *http.Request, passedResponse *
 
 	body := response.Body
 	if proxyReader != nil {
-		body = proxyReader.Wrap(response.Body, 0)
+		body = proxyReader.Wrap(response.Body, response.ContentLength)
 	}
 
 	return connection.populateResponse(response, passedResponse, body)
