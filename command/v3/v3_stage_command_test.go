@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v3-stage Command", func() {
+var _ = XDescribe("v3-stage Command", func() {
 	var (
 		cmd             v3.V3StageCommand
 		testUI          *ui.UI
