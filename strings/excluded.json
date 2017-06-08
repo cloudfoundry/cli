@@ -1,5 +1,7 @@
 {
   "excludedStrings": [
+    "docker-username",
+    "CF_DOCKER_PASSWORD",
     ".",
     "\\",
     "help",

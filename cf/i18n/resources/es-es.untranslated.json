@@ -308,6 +308,10 @@
     "translation": ""
   },
   {
+    "id": "Environment variable CF_DOCKER_PASSWORD not set.",
+    "translation": ""
+  },
+  {
     "id": "Error creating user {{.User}}.",
     "translation": ""
   },
@@ -512,6 +516,10 @@
     "translation": ""
   },
   {
+    "id": "Password used for private docker repository",
+    "translation": ""
+  },
+  {
     "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
     "translation": ""
   },
@@ -638,6 +646,10 @@
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Repository username; used with password from environment variable CF_DOCKER_PASSWORD",
+    "translation": ""
   },
   {
     "id": "Reset the isolation segment assignment of a space to the org's default",
@@ -976,6 +988,10 @@
     "translation": ""
   },
   {
+    "id": "Using docker repository password from environment variable CF_DOCKER_PASSWORD.",
+    "translation": ""
+  },
+  {
     "id": "VERSION:",
     "translation": ""
   },
@@ -1025,6 +1041,10 @@
   },
   {
     "id": "buildpacks:",
+    "translation": ""
+  },
+  {
+    "id": "cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [--no-start]",
     "translation": ""
   },
   {

@@ -68,7 +68,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app")}
 	fs["docker-image"] = &flags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("Docker-image to be used (e.g. user/docker-image-name)")}
-	fs["docker-username"] = &flags.StringFlag{Name: "docker-username", Usage: T("Username used for Docker registry authentication. A 'CF_DOCKER_PASSWORD' environment variable is required to be set in order to use this flag.")}
+	fs["docker-username"] = &flags.StringFlag{Name: "docker-username", Usage: T("")}
 	fs["health-check-type"] = &flags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')")}
 	fs["no-hostname"] = &flags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &flags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
