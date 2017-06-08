@@ -6,5 +6,5 @@ import "net/http"
 
 // Connection creates and executes http requests
 type Connection interface {
-	Make(request *http.Request, passedResponse *Response) error
+	Make(request *http.Request, passedResponse *Response, proxyReader ProxyReader) error
 }

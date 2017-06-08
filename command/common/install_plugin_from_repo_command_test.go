@@ -212,7 +212,7 @@ var _ = Describe("install-plugin command", func() {
 						Context("when getting the binary errors", func() {
 							BeforeEach(func() {
 								expectedErr = errors.New("some-error")
-								fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, expectedErr)
+								fakeActor.DownloadExecutableBinaryFromURLReturns("", expectedErr)
 							})
 
 							It("returns the error", func() {
@@ -243,7 +243,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(pluginPlatform).To(Equal(platform))
 
 								Expect(fakeActor.DownloadExecutableBinaryFromURLCallCount()).To(Equal(1))
-								urlArg, dirArg := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
+								urlArg, dirArg, _ := fakeActor.DownloadExecutableBinaryFromURLArgsForCall(0)
 								Expect(urlArg).To(Equal(pluginURL))
 								Expect(dirArg).To(ContainSubstring("temp"))
 							})
@@ -254,7 +254,7 @@ var _ = Describe("install-plugin command", func() {
 
 							BeforeEach(func() {
 								execPath = helpers.PrefixedRandomName("some-path")
-								fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, 4, nil)
+								fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 							})
 
 							Context("when the checksum fails", func() {
@@ -271,7 +271,7 @@ var _ = Describe("install-plugin command", func() {
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-									Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+									Expect(testUI.Out).To(Say("0 B / ?"))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 									Expect(fakeActor.ValidateFileChecksumCallCount()).To(Equal(1))
@@ -293,8 +293,7 @@ var _ = Describe("install-plugin command", func() {
 
 									It("returns the error", func() {
 										Expect(executeErr).To(MatchError(errors.New("some-error")))
-
-										Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+										Expect(testUI.Out).To(Say("0 B / ?"))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 										Expect(fakeActor.CreateExecutableCopyCallCount()).To(Equal(1))
@@ -316,8 +315,7 @@ var _ = Describe("install-plugin command", func() {
 
 										It("returns the error", func() {
 											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
-
-											Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+											Expect(testUI.Out).To(Say("0 B / ?"))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
@@ -398,7 +396,7 @@ var _ = Describe("install-plugin command", func() {
 													Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 													Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 													Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-													Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+													Expect(testUI.Out).To(Say("0 B / ?"))
 													Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 													Expect(testUI.Out).To(Say("OK"))
 													Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -418,7 +416,7 @@ var _ = Describe("install-plugin command", func() {
 						Context("when getting the binary errors", func() {
 							BeforeEach(func() {
 								expectedErr = errors.New("some-error")
-								fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, expectedErr)
+								fakeActor.DownloadExecutableBinaryFromURLReturns("", expectedErr)
 							})
 
 							It("returns the error", func() {
@@ -437,7 +435,7 @@ var _ = Describe("install-plugin command", func() {
 
 						Context("when getting the binary succeeds", func() {
 							BeforeEach(func() {
-								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 							})
 
 							Context("when the checksum fails", func() {
@@ -453,7 +451,7 @@ var _ = Describe("install-plugin command", func() {
 									Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 									Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 									Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-									Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+									Expect(testUI.Out).To(Say("0 B / ?"))
 									Expect(testUI.Out).ToNot(Say("Installing plugin"))
 								})
 							})
@@ -470,8 +468,7 @@ var _ = Describe("install-plugin command", func() {
 
 									It("returns the error", func() {
 										Expect(executeErr).To(MatchError(errors.New("some-error")))
-
-										Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+										Expect(testUI.Out).To(Say("0 B / ?"))
 										Expect(testUI.Out).ToNot(Say("Installing plugin"))
 									})
 								})
@@ -488,8 +485,7 @@ var _ = Describe("install-plugin command", func() {
 
 										It("returns the error", func() {
 											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
-
-											Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+											Expect(testUI.Out).To(Say("0 B / ?"))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 										})
 									})
@@ -525,7 +521,7 @@ var _ = Describe("install-plugin command", func() {
 												Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 												Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 												Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-												Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+												Expect(testUI.Out).To(Say("0 B / ?"))
 												Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 												Expect(testUI.Out).To(Say("OK"))
 												Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
@@ -600,7 +596,7 @@ var _ = Describe("install-plugin command", func() {
 						Context("when the user chooses yes", func() {
 							BeforeEach(func() {
 								input.Write([]byte("y\n"))
-								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+								fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 								fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 								fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 									Name:    pluginName,
@@ -616,7 +612,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+								Expect(testUI.Out).To(Say("0 B / ?"))
 								Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -678,7 +674,7 @@ var _ = Describe("install-plugin command", func() {
 							BeforeEach(func() {
 								input.Write([]byte("y\n"))
 								execPath = helpers.PrefixedRandomName("some-path")
-								fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, 4, nil)
+								fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 								fakeActor.CreateExecutableCopyReturns("copy-path", nil)
 								fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 									Name:    pluginName,
@@ -695,7 +691,7 @@ var _ = Describe("install-plugin command", func() {
 								Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 								Expect(testUI.Out).To(Say("Do you want to install the plugin %s\\? \\[yN\\]", pluginName))
 								Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-								Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+								Expect(testUI.Out).To(Say("0 B / ?"))
 								Expect(testUI.Out).To(Say("Installing plugin %s\\.\\.\\.", pluginName))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Out).To(Say("%s 1\\.2\\.3 successfully installed", pluginName))
@@ -787,7 +783,7 @@ var _ = Describe("install-plugin command", func() {
 					fakeActor.IsPluginInstalledReturns(true)
 
 					execPath = helpers.PrefixedRandomName("some-path")
-					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, 4, nil)
+					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 				})
 
 				Context("when the -f flag is provided, the plugin has already been installed, getting the binary succeeds, validating the checksum succeeds, creating an executable copy succeeds, validating the new plugin succeeds, uninstalling the existing plugin succeeds, and installing the plugin is succeeds", func() {
@@ -825,7 +821,7 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -837,7 +833,7 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when the -f flag is not provided, the plugin has already been installed, getting the binary succeeds, but validating the checksum fails", func() {
 					BeforeEach(func() {
-						fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", 4, nil)
+						fakeActor.DownloadExecutableBinaryFromURLReturns("some-path", nil)
 					})
 
 					Context("when the checksum fails", func() {
@@ -857,7 +853,7 @@ var _ = Describe("install-plugin command", func() {
 							Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 							Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 							Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repoName))
-							Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+							Expect(testUI.Out).To(Say("0 B / ?"))
 						})
 					})
 				})
@@ -952,7 +948,7 @@ var _ = Describe("install-plugin command", func() {
 					BeforeEach(func() {
 						cmd.Force = true
 
-						fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, 4, nil)
+						fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 
 						fakeActor.ValidateFileChecksumReturns(true)
 						checksum = helpers.PrefixedRandomName("checksum")
@@ -982,7 +978,7 @@ var _ = Describe("install-plugin command", func() {
 
 					BeforeEach(func() {
 						cmd.Force = false
-						fakeActor.DownloadExecutableBinaryFromURLReturns("", 0, errors.New("some-error"))
+						fakeActor.DownloadExecutableBinaryFromURLReturns("", errors.New("some-error"))
 						input.Write([]byte("y\n"))
 					})
 
@@ -1019,7 +1015,7 @@ var _ = Describe("install-plugin command", func() {
 					fakeActor.IsPluginInstalledReturns(true)
 
 					execPath = helpers.PrefixedRandomName("some-path")
-					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, 4, nil)
+					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
 				})
 
 				Context("when the -f flag is provided, the plugin has already been installed, getting the binary succeeds, validating the checksum succeeds, creating an executable copy succeeds, validating the new plugin succeeds, uninstalling the existing plugin succeeds, and installing the plugin is succeeds", func() {
@@ -1057,7 +1053,7 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
-						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+						Expect(testUI.Out).To(Say("0 B / ?"))
 						Expect(testUI.Out).To(Say("Uninstalling existing plugin\\.\\.\\."))
 						Expect(testUI.Out).To(Say("OK"))
 						Expect(testUI.Out).To(Say("Plugin %s successfully uninstalled\\.", pluginName))
@@ -1088,7 +1084,7 @@ var _ = Describe("install-plugin command", func() {
 						Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
 						Expect(testUI.Out).To(Say("Do you want to uninstall the existing plugin and install %s %s\\? \\[yN\\]", pluginName, downloadedVersionString))
 						Expect(testUI.Out).To(Say("Starting download of plugin binary from repository %s\\.\\.\\.", repo2Name))
-						Expect(testUI.Out).To(Say("4 bytes downloaded\\.\\.\\."))
+						Expect(testUI.Out).To(Say("0 B / ?"))
 					})
 				})
 			})

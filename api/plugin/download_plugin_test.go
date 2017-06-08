@@ -1,6 +1,7 @@
 package plugin_test
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -8,6 +9,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -51,18 +53,25 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 
 		It("downloads the plugin, and writes the plugin file to the specified path", func() {
-			err := client.DownloadPlugin(server.URL(), tempPath)
+			fakeProxyReader := new(pluginfakes.FakeProxyReader)
+
+			fakeProxyReader.WrapStub = func(reader io.Reader, _ int64) io.ReadCloser {
+				return ioutil.NopCloser(reader)
+			}
+			err := client.DownloadPlugin(server.URL(), tempPath, fakeProxyReader)
 			Expect(err).ToNot(HaveOccurred())
 
 			fileData, err := ioutil.ReadFile(tempPath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fileData).To(Equal(data))
+
+			Expect(fakeProxyReader.WrapCallCount()).To(Equal(1))
 		})
 	})
 
 	Context("when the URL is invalid", func() {
 		It("returns an URL error", func() {
-			err := client.DownloadPlugin("://", tempPath)
+			err := client.DownloadPlugin("://", tempPath, nil)
 			_, isURLError := err.(*url.Error)
 			Expect(isURLError).To(BeTrue())
 		})
@@ -79,7 +88,7 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 
 		It("returns a RawHTTPStatusError", func() {
-			err := client.DownloadPlugin(server.URL(), tempPath)
+			err := client.DownloadPlugin(server.URL(), tempPath, nil)
 			Expect(err).To(MatchError(pluginerror.RawHTTPStatusError{Status: "418 I'm a teapot", RawResponse: []byte("")}))
 		})
 	})
@@ -95,7 +104,7 @@ var _ = Describe("DownloadPlugin", func() {
 		})
 
 		It("returns some error", func() {
-			err := client.DownloadPlugin(server.URL(), "/a/path/that/does/not/exist")
+			err := client.DownloadPlugin(server.URL(), "/a/path/that/does/not/exist", nil)
 			_, isPathError := err.(*os.PathError)
 			Expect(isPathError).To(BeTrue())
 		})

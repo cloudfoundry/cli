@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -16,7 +17,8 @@ import (
 
 // PluginConnection represents a connection to a plugin repo.
 type PluginConnection struct {
-	HTTPClient *http.Client
+	HTTPClient  *http.Client
+	proxyReader ProxyReader
 }
 
 // NewConnection returns a new PluginConnection
@@ -38,7 +40,7 @@ func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *PluginCon
 }
 
 // Make performs the request and parses the response.
-func (connection *PluginConnection) Make(request *http.Request, passedResponse *Response) error {
+func (connection *PluginConnection) Make(request *http.Request, passedResponse *Response, proxyReader ProxyReader) error {
 	// In case this function is called from a retry, passedResponse may already
 	// be populated with a previous response. We reset in case there's an HTTP
 	// error and we don't repopulate it in populateResponse.
@@ -49,7 +51,12 @@ func (connection *PluginConnection) Make(request *http.Request, passedResponse *
 		return connection.processRequestErrors(request, err)
 	}
 
-	return connection.populateResponse(response, passedResponse)
+	body := response.Body
+	if proxyReader != nil {
+		body = proxyReader.Wrap(response.Body, 0)
+	}
+
+	return connection.populateResponse(response, passedResponse, body)
 }
 
 // processRequestError handles errors that occur while making the request.
@@ -73,11 +80,11 @@ func (connection *PluginConnection) processRequestErrors(request *http.Request, 
 	}
 }
 
-func (connection *PluginConnection) populateResponse(response *http.Response, passedResponse *Response) error {
+func (connection *PluginConnection) populateResponse(response *http.Response, passedResponse *Response, body io.ReadCloser) error {
 	passedResponse.HTTPResponse = response
 
-	rawBytes, err := ioutil.ReadAll(response.Body)
-	defer response.Body.Close()
+	rawBytes, err := ioutil.ReadAll(body)
+	defer body.Close()
 	if err != nil {
 		return err
 	}

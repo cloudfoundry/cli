@@ -8,6 +8,8 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
+	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
@@ -79,13 +81,14 @@ var _ = Describe("install actions", func() {
 
 	Describe("DownloadExecutableBinaryFromURL", func() {
 		var (
-			path        string
-			size        int64
-			downloadErr error
+			path            string
+			downloadErr     error
+			fakeProxyReader *pluginfakes.FakeProxyReader
 		)
 
 		JustBeforeEach(func() {
-			path, size, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir)
+			fakeProxyReader = new(pluginfakes.FakeProxyReader)
+			path, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir, fakeProxyReader)
 		})
 
 		Context("when the downloaded is successful", func() {
@@ -95,7 +98,7 @@ var _ = Describe("install actions", func() {
 
 			BeforeEach(func() {
 				data = []byte("some test data")
-				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
+				fakeClient.DownloadPluginStub = func(_ string, path string, _ plugin.ProxyReader) error {
 					err := ioutil.WriteFile(path, data, 0700)
 					Expect(err).ToNot(HaveOccurred())
 					return nil
@@ -106,12 +109,12 @@ var _ = Describe("install actions", func() {
 				fileData, err := ioutil.ReadFile(path)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fileData).To(Equal(data))
-				Expect(size).To(BeEquivalentTo(len(data)))
 
 				Expect(fakeClient.DownloadPluginCallCount()).To(Equal(1))
-				pluginURL, downloadPath := fakeClient.DownloadPluginArgsForCall(0)
+				pluginURL, downloadPath, proxyReader := fakeClient.DownloadPluginArgsForCall(0)
 				Expect(pluginURL).To(Equal("some-plugin-url.com"))
 				Expect(downloadPath).To(Equal(path))
+				Expect(proxyReader).To(Equal(fakeProxyReader))
 			})
 		})
 
@@ -125,21 +128,6 @@ var _ = Describe("install actions", func() {
 
 			It("returns the error", func() {
 				Expect(downloadErr).To(MatchError(expectedErr))
-			})
-		})
-
-		Context("when there is an error getting the file size", func() {
-			BeforeEach(func() {
-				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
-					err := os.Remove(path)
-					Expect(err).ToNot(HaveOccurred())
-					return nil
-				}
-			})
-
-			It("returns the error", func() {
-				_, isPathError := downloadErr.(*os.PathError)
-				Expect(isPathError).To(BeTrue())
 			})
 		})
 	})

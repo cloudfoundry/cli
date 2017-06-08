@@ -36,7 +36,7 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 	response := Response{
 		Result: &pluginRepository,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response, nil)
 	if err != nil {
 		return PluginRepository{}, err
 	}

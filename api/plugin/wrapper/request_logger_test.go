@@ -20,8 +20,9 @@ import (
 
 var _ = Describe("Request Logger", func() {
 	var (
-		fakeConnection *pluginfakes.FakeConnection
-		fakeOutput     *wrapperfakes.FakeRequestLoggerOutput
+		fakeConnection  *pluginfakes.FakeConnection
+		fakeOutput      *wrapperfakes.FakeRequestLoggerOutput
+		fakeProxyReader *pluginfakes.FakeProxyReader
 
 		wrapper plugin.Connection
 
@@ -33,6 +34,7 @@ var _ = Describe("Request Logger", func() {
 	BeforeEach(func() {
 		fakeConnection = new(pluginfakes.FakeConnection)
 		fakeOutput = new(wrapperfakes.FakeRequestLoggerOutput)
+		fakeProxyReader = new(pluginfakes.FakeProxyReader)
 
 		wrapper = NewRequestLogger(fakeOutput).Wrap(fakeConnection)
 
@@ -58,7 +60,7 @@ var _ = Describe("Request Logger", func() {
 	})
 
 	JustBeforeEach(func() {
-		err = wrapper.Make(request, response)
+		err = wrapper.Make(request, response, fakeProxyReader)
 	})
 
 	Describe("Make", func() {
@@ -90,6 +92,11 @@ var _ = Describe("Request Logger", func() {
 			name, value = fakeOutput.DisplayHeaderArgsForCall(2)
 			Expect(name).To(Equal("Aghi"))
 			Expect(value).To(Equal("bar"))
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+			_, _, proxyReader := fakeConnection.MakeArgsForCall(0)
+			Expect(proxyReader).To(Equal(fakeProxyReader))
 		})
 
 		Context("when an authorization header is in the request", func() {

@@ -22,11 +22,12 @@ type FakePluginClient struct {
 		result1 plugin.PluginRepository
 		result2 error
 	}
-	DownloadPluginStub        func(pluginURL string, path string) error
+	DownloadPluginStub        func(pluginURL string, path string, proxyReader plugin.ProxyReader) error
 	downloadPluginMutex       sync.RWMutex
 	downloadPluginArgsForCall []struct {
-		pluginURL string
-		path      string
+		pluginURL   string
+		path        string
+		proxyReader plugin.ProxyReader
 	}
 	downloadPluginReturns struct {
 		result1 error
@@ -89,17 +90,18 @@ func (fake *FakePluginClient) GetPluginRepositoryReturnsOnCall(i int, result1 pl
 	}{result1, result2}
 }
 
-func (fake *FakePluginClient) DownloadPlugin(pluginURL string, path string) error {
+func (fake *FakePluginClient) DownloadPlugin(pluginURL string, path string, proxyReader plugin.ProxyReader) error {
 	fake.downloadPluginMutex.Lock()
 	ret, specificReturn := fake.downloadPluginReturnsOnCall[len(fake.downloadPluginArgsForCall)]
 	fake.downloadPluginArgsForCall = append(fake.downloadPluginArgsForCall, struct {
-		pluginURL string
-		path      string
-	}{pluginURL, path})
-	fake.recordInvocation("DownloadPlugin", []interface{}{pluginURL, path})
+		pluginURL   string
+		path        string
+		proxyReader plugin.ProxyReader
+	}{pluginURL, path, proxyReader})
+	fake.recordInvocation("DownloadPlugin", []interface{}{pluginURL, path, proxyReader})
 	fake.downloadPluginMutex.Unlock()
 	if fake.DownloadPluginStub != nil {
-		return fake.DownloadPluginStub(pluginURL, path)
+		return fake.DownloadPluginStub(pluginURL, path, proxyReader)
 	}
 	if specificReturn {
 		return ret.result1
@@ -113,10 +115,10 @@ func (fake *FakePluginClient) DownloadPluginCallCount() int {
 	return len(fake.downloadPluginArgsForCall)
 }
 
-func (fake *FakePluginClient) DownloadPluginArgsForCall(i int) (string, string) {
+func (fake *FakePluginClient) DownloadPluginArgsForCall(i int) (string, string, plugin.ProxyReader) {
 	fake.downloadPluginMutex.RLock()
 	defer fake.downloadPluginMutex.RUnlock()
-	return fake.downloadPluginArgsForCall[i].pluginURL, fake.downloadPluginArgsForCall[i].path
+	return fake.downloadPluginArgsForCall[i].pluginURL, fake.downloadPluginArgsForCall[i].path, fake.downloadPluginArgsForCall[i].proxyReader
 }
 
 func (fake *FakePluginClient) DownloadPluginReturns(result1 error) {

@@ -9,11 +9,12 @@ import (
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(request *http.Request, passedResponse *plugin.Response) error
+	MakeStub        func(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
 		request        *http.Request
 		passedResponse *plugin.Response
+		proxyReader    plugin.ProxyReader
 	}
 	makeReturns struct {
 		result1 error
@@ -36,17 +37,18 @@ type FakeConnectionWrapper struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *plugin.Response) error {
+func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
 		request        *http.Request
 		passedResponse *plugin.Response
-	}{request, passedResponse})
-	fake.recordInvocation("Make", []interface{}{request, passedResponse})
+		proxyReader    plugin.ProxyReader
+	}{request, passedResponse, proxyReader})
+	fake.recordInvocation("Make", []interface{}{request, passedResponse, proxyReader})
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
-		return fake.MakeStub(request, passedResponse)
+		return fake.MakeStub(request, passedResponse, proxyReader)
 	}
 	if specificReturn {
 		return ret.result1
@@ -60,10 +62,10 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
-func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*http.Request, *plugin.Response) {
+func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*http.Request, *plugin.Response, plugin.ProxyReader) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse
+	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse, fake.makeArgsForCall[i].proxyReader
 }
 
 func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
