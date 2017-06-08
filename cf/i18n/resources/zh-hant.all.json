@@ -152,6 +152,10 @@
     "translation": "' 不是已登錄的指令。請參閱 'cf help'"
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes' 應該為清單"
   },
