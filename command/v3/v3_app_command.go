@@ -111,6 +111,20 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 
 	ui.DisplayKeyValueTable("", keyValueTable, 3)
 
+	appHasARunningInstance := false
+
+	for processIdx := range summary.Processes {
+		if processHasAnInstance(&summary.Processes[processIdx]) {
+			appHasARunningInstance = true
+			break
+		}
+	}
+
+	if !appHasARunningInstance {
+		ui.DisplayText("There are no running instances of this app.")
+		return
+	}
+
 	for _, process := range summary.Processes {
 		ui.DisplayNewline()
 
@@ -118,7 +132,7 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 			"ProcessType": process.Type,
 		})
 
-		if len(process.Instances) == 0 {
+		if !processHasAnInstance(&process) {
 			ui.DisplayText("There are no running instances of this process.")
 			continue
 		}
@@ -184,4 +198,14 @@ func buildpackNames(buildpacks []v3action.Buildpack) string {
 
 func appInstanceDate(input time.Time) string {
 	return input.Local().Format("2006-01-02 15:04:05 PM")
+}
+
+func processHasAnInstance(process *v3action.Process) bool {
+	for instanceIdx := range process.Instances {
+		if process.Instances[instanceIdx].State != "DOWN" {
+			return true
+		}
+	}
+
+	return false
 }

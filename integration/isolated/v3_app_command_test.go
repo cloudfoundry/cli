@@ -167,24 +167,40 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session.Out).Should(Say(fmt.Sprintf("name:\\s+%s", appName)))
 				Eventually(session.Out).Should(Say("requested state:\\s+STARTED"))
 				Eventually(session.Out).Should(Say("processes:\\s+web:[01]/1"))
-				Expect(session.Out).To(Say("buildpacks:\\s+staticfile 1.4.6"))
-				Expect(session.Out).To(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile 1.4.6"))
+				Eventually(session.Out).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))
 			})
 
-			Context("when the app does not exist", func() {
-				It("displays app not found and exits 1", func() {
-					invalidAppName := "invalid-app-name"
-					session := helpers.CF("v3-app", "-n", invalidAppName)
+			Context("when the app is stopped", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("stop", appName)).Should(Exit(0))
+				})
+
+				It("displays that there are no running instances of the app", func() {
 					userName, _ := helpers.GetCredentials()
 
-					Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-					Eventually(session.Out).Should(Say("FAILED"))
+					session := helpers.CF("v3-app", "-n", appName)
 
-					Eventually(session).Should(Exit(1))
+					Eventually(session.Out).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
+					Consistently(session.Out).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("There are no running instances of this app"))
 				})
+			})
+		})
+
+		Context("when the app does not exist", func() {
+			It("displays app not found and exits 1", func() {
+				invalidAppName := "invalid-app-name"
+				session := helpers.CF("v3-app", "-n", invalidAppName)
+				userName, _ := helpers.GetCredentials()
+
+				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
+				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+				Eventually(session.Out).Should(Say("FAILED"))
+
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
