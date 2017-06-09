@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {

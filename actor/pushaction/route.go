@@ -2,7 +2,7 @@ package pushaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {

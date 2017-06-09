@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/progressbar"
 	"code.cloudfoundry.org/cli/util/ui"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/cloudfoundry/noaa/consumer"
 )
 
