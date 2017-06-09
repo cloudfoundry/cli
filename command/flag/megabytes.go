@@ -15,7 +15,8 @@ func (m *Megabytes) UnmarshalFlag(val string) error {
 	size, err := bytefmt.ToMegabytes(val)
 
 	if err != nil ||
-		!strings.ContainsAny(strings.ToLower(val), "mg") {
+		!strings.ContainsAny(strings.ToLower(val), "mg") ||
+		strings.Contains(strings.ToLower(val), ".") {
 		return &flags.Error{
 			Type:    flags.ErrRequired,
 			Message: `Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB`,

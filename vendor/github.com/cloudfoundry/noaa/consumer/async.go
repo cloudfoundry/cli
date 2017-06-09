@@ -101,14 +101,41 @@ func (c *Consumer) StreamWithoutReconnect(appGuid string, authToken string) (<-c
 //
 // Whenever an error is encountered, the error will be sent down the error
 // channel and Firehose will attempt to reconnect indefinitely.
-func (c *Consumer) Firehose(subscriptionId string, authToken string) (<-chan *events.Envelope, <-chan error) {
-	return c.firehose(subscriptionId, authToken, true)
+func (c *Consumer) Firehose(
+	subscriptionId string,
+	authToken string,
+) (<-chan *events.Envelope, <-chan error) {
+	return c.firehose(newFirehose(
+		subscriptionId,
+		authToken,
+	))
 }
 
 // FirehoseWithoutReconnect functions identically to Firehose but without any
 // reconnect attempts when errors occur.
-func (c *Consumer) FirehoseWithoutReconnect(subscriptionId string, authToken string) (<-chan *events.Envelope, <-chan error) {
-	return c.firehose(subscriptionId, authToken, false)
+func (c *Consumer) FirehoseWithoutReconnect(
+	subscriptionId string,
+	authToken string,
+) (<-chan *events.Envelope, <-chan error) {
+	return c.firehose(newFirehose(
+		subscriptionId,
+		authToken,
+		WithRetry(false),
+	))
+}
+
+// FilteredFirehose streams a filtered set of envelopes. It has functionality
+// similar to Firehose.
+func (c *Consumer) FilteredFirehose(
+	subscriptionId string,
+	authToken string,
+	filter EnvelopeFilter,
+) (<-chan *events.Envelope, <-chan error) {
+	return c.firehose(newFirehose(
+		subscriptionId,
+		authToken,
+		WithEnvelopeFilter(filter),
+	))
 }
 
 // SetDebugPrinter sets the websocket connection to write debug information to
@@ -198,23 +225,22 @@ func (c *Consumer) streamAppDataTo(conn *connection, appGuid, authToken string, 
 	errors <- err
 }
 
-func (c *Consumer) firehose(subID, authToken string, retry bool) (<-chan *events.Envelope, <-chan error) {
+func (c *Consumer) firehose(options *firehose) (<-chan *events.Envelope, <-chan error) {
 	outputs := make(chan *events.Envelope)
 	errors := make(chan error, 1)
 	callback := func(env *events.Envelope) {
 		outputs <- env
 	}
 
-	streamPath := "/firehose/" + subID
 	conn := c.newConn()
 	go func() {
 		defer close(errors)
 		defer close(outputs)
-		if retry {
-			c.retryAction(c.listenAction(conn, streamPath, authToken, callback), errors)
+		if options.retry {
+			c.retryAction(c.listenAction(conn, options.streamPath(), options.authToken, callback), errors)
 			return
 		}
-		err, _ := c.listenAction(conn, streamPath, authToken, callback)()
+		err, _ := c.listenAction(conn, options.streamPath(), options.authToken, callback)()
 		errors <- err
 	}()
 	return outputs, errors

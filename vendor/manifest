@@ -32,7 +32,7 @@
 			"importpath": "code.cloudfoundry.org/lager",
 			"repository": "https://github.com/cloudfoundry/lager",
 			"vcs": "git",
-			"revision": "6cfe365fb6bb84343f0034b4a53cd250d173b61f",
+			"revision": "b4f07fd10491fae0d6d9a0d07145e9f90935ac50",
 			"branch": "master",
 			"notests": true
 		},
@@ -64,7 +64,7 @@
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
-			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
+			"revision": "85b1699d505667d13f8ac4478c1debbf85d6c5de",
 			"branch": "master",
 			"notests": true
 		},
@@ -72,7 +72,7 @@
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
-			"revision": "3a37c301dda64cbe17f16f661b4c976803c0e2d2",
+			"revision": "4a1e882c79dcf4ec00d2e29fac74b9c8938d5052",
 			"branch": "master",
 			"notests": true
 		},
@@ -97,7 +97,7 @@
 			"importpath": "github.com/cloudfoundry/bytefmt",
 			"repository": "https://github.com/cloudfoundry/bytefmt",
 			"vcs": "git",
-			"revision": "b12c1522f4cbb5f35861bd5dd2c39a4fa996441a",
+			"revision": "f4415fafc5619dd75599a54a7c91fb3948ad58bd",
 			"branch": "master",
 			"notests": true
 		},
@@ -105,7 +105,7 @@
 			"importpath": "github.com/cloudfoundry/dropsonde",
 			"repository": "https://github.com/cloudfoundry/dropsonde",
 			"vcs": "git",
-			"revision": "01bc88882911289a6eaa67311ac0d06f77196c4f",
+			"revision": "566965a4f337c6c72c0bc7f0854c564001bab69e",
 			"branch": "master",
 			"notests": true
 		},
@@ -121,7 +121,7 @@
 			"importpath": "github.com/cloudfoundry/noaa",
 			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
-			"revision": "dd6ec6bd0a0182d44fbd738bcb044adeed8171bb",
+			"revision": "ea8759ba3628ce69b0c332ccea75ac6e373a938b",
 			"branch": "master",
 			"notests": true
 		},
