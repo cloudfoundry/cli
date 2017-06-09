@@ -332,7 +332,7 @@
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/curve25519",
 			"notests": true
@@ -341,7 +341,7 @@
 			"importpath": "golang.org/x/crypto/ed25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/ed25519",
 			"notests": true
@@ -350,7 +350,7 @@
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/ssh",
 			"notests": true
@@ -359,7 +359,7 @@
 			"importpath": "golang.org/x/net/websocket",
 			"repository": "https://go.googlesource.com/net",
 			"vcs": "git",
-			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revision": "59a0b19b5533c7977ddeb86b017bf507ed407b12",
 			"branch": "master",
 			"path": "/websocket",
 			"notests": true
@@ -368,7 +368,7 @@
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
-			"revision": "d75a52659825e75fff6158388dddc6a5b04f9ba5",
+			"revision": "0b25a408a50076fbbcae6b7ac0ea5fbb0b085e79",
 			"branch": "master",
 			"path": "/unix",
 			"notests": true

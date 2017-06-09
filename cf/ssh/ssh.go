@@ -349,9 +349,7 @@ func base64Sha256Fingerprint(key ssh.PublicKey) string {
 	return base64.RawStdEncoding.EncodeToString(sum[:])
 }
 
-type hostKeyCallback func(hostname string, remote net.Addr, key ssh.PublicKey) error
-
-func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) hostKeyCallback {
+func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) ssh.HostKeyCallback {
 	if opts.SkipHostValidation {
 		return nil
 	}
