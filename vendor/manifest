@@ -171,6 +171,42 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/github.com/Azure/go-ansiterm",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/github.com/Sirupsen/logrus",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/github.com/Sirupsen/logrus",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/golang.org/x/sys/unix",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/golang.org/x/sys/unix",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/golang.org/x/sys/windows",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/golang.org/x/sys/windows",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/fatih/color",
 			"repository": "https://github.com/fatih/color",
 			"vcs": "git",
