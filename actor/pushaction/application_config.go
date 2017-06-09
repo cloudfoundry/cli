@@ -3,7 +3,7 @@ package pushaction
 import (
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type ApplicationConfig struct {

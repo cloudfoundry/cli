@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {

@@ -8,7 +8,7 @@ import (
 
 	"testing"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestPushAction(t *testing.T) {

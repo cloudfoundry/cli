@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const PushRetries = 3

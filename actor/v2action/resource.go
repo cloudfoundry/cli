@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type FileChangedError struct {
