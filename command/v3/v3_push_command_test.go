@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = XDescribe("v3-push Command", func() {
+var _ = Describe("v3-push Command", func() {
 	var (
 		cmd             v3.V3PushCommand
 		testUI          *ui.UI
@@ -83,7 +83,7 @@ var _ = XDescribe("v3-push Command", func() {
 
 			cmd.AppName = app
 
-			// we stub out StagePackage out here so partial-happy paths below don't hang
+			// we stub out StagePackage out here so the happy paths below don't hang
 			fakeActor.StagePackageStub = func(_ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 				buildStream := make(chan v3action.Build)
 				warningsStream := make(chan v3action.Warnings)
@@ -93,7 +93,6 @@ var _ = XDescribe("v3-push Command", func() {
 					defer close(buildStream)
 					defer close(warningsStream)
 					defer close(errorStream)
-					warningsStream <- v3action.Warnings{"some-staging-warning", "some-other-staging-warning"}
 				}()
 
 				return buildStream, warningsStream, errorStream
@@ -115,7 +114,6 @@ var _ = XDescribe("v3-push Command", func() {
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
 					Expect(testUI.Out).ToNot(Say("V3 app some-app in org some-org / space some-space as banana..."))
-
 				})
 			})
 
@@ -225,9 +223,10 @@ var _ = XDescribe("v3-push Command", func() {
 				})
 
 				Context("when the logging does not error", func() {
-					allLogsWritten := make(chan bool)
+					var allLogsWritten chan bool
 
 					BeforeEach(func() {
+						allLogsWritten = make(chan bool)
 						fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
 							logStream := make(chan *v3action.LogMessage)
 							errorStream := make(chan error)
@@ -253,6 +252,7 @@ var _ = XDescribe("v3-push Command", func() {
 								errorStream := make(chan error)
 
 								go func() {
+									<-allLogsWritten
 									defer close(buildStream)
 									defer close(warningsStream)
 									defer close(errorStream)

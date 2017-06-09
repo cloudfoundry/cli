@@ -96,18 +96,21 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText("Waiting for app to start...")
 
 	warnings := make(chan v3action.Warnings)
+	done := make(chan bool)
 	go func() {
 		for {
-			message, ok := <-warnings
-			if !ok {
+			select {
+			case message := <-warnings:
+				cmd.UI.DisplayWarnings(message)
+			case <-done:
 				return
 			}
-			cmd.UI.DisplayWarnings(message)
 		}
 	}()
 
 	err = cmd.Actor.PollStart(app.GUID, warnings)
-	close(warnings)
+	done <- true
+
 	if err != nil {
 		if _, ok := err.(v3action.StartupTimeoutError); ok {
 			return shared.StartupTimeoutError{AppName: cmd.AppName}

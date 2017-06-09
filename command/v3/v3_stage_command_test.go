@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = XDescribe("v3-stage Command", func() {
+var _ = Describe("v3-stage Command", func() {
 	var (
 		cmd             v3.V3StageCommand
 		testUI          *ui.UI
@@ -93,9 +93,10 @@ var _ = XDescribe("v3-stage Command", func() {
 		})
 
 		Context("when the logging does not error", func() {
-			allLogsWritten := make(chan bool)
+			var allLogsWritten chan bool
 
 			BeforeEach(func() {
+				allLogsWritten = make(chan bool)
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
 					logStream := make(chan *v3action.LogMessage)
 					errorStream := make(chan error)
@@ -175,6 +176,7 @@ var _ = XDescribe("v3-stage Command", func() {
 						errorStream := make(chan error)
 
 						go func() {
+							<-allLogsWritten
 							defer close(buildStream)
 							defer close(warningsStream)
 							defer close(errorStream)
@@ -196,10 +198,13 @@ var _ = XDescribe("v3-stage Command", func() {
 		})
 
 		Context("when the logging stream has errors", func() {
-			var expectedErr error
-			allLogsWritten := make(chan bool)
+			var (
+				expectedErr    error
+				allLogsWritten chan bool
+			)
 
 			BeforeEach(func() {
+				allLogsWritten = make(chan bool)
 				expectedErr = errors.New("banana")
 
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
@@ -235,7 +240,7 @@ var _ = XDescribe("v3-stage Command", func() {
 				}
 			})
 
-			It("displays the error and continues staging", func() {
+			It("displays the errors and continues staging", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("banana"))
@@ -246,6 +251,7 @@ var _ = XDescribe("v3-stage Command", func() {
 
 		Context("when the logging returns an error due to an API error", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
 				expectedErr = errors.New("something is wrong!")
 				logStream := make(chan *v3action.LogMessage)
