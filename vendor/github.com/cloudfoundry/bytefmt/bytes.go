@@ -21,7 +21,7 @@ const (
 	TERABYTE = 1024 * GIGABYTE
 )
 
-var bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT]B?|B)$`)
+var bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+(?:\.\d+)?)([KMGT]B?|B)$`)
 
 var invalidByteQuantityError = errors.New("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB")
 
@@ -77,8 +77,8 @@ func ToBytes(s string) (uint64, error) {
 		return 0, invalidByteQuantityError
 	}
 
-	value, err := strconv.ParseUint(parts[1], 10, 0)
-	if err != nil || value < 1 {
+	value, err := strconv.ParseFloat(parts[1], 64)
+	if err != nil || value <= 0 {
 		return 0, invalidByteQuantityError
 	}
 
@@ -86,15 +86,15 @@ func ToBytes(s string) (uint64, error) {
 	unit := strings.ToUpper(parts[2])
 	switch unit[:1] {
 	case "T":
-		bytes = value * TERABYTE
+		bytes = uint64(value * TERABYTE)
 	case "G":
-		bytes = value * GIGABYTE
+		bytes = uint64(value * GIGABYTE)
 	case "M":
-		bytes = value * MEGABYTE
+		bytes = uint64(value * MEGABYTE)
 	case "K":
-		bytes = value * KILOBYTE
+		bytes = uint64(value * KILOBYTE)
 	case "B":
-		bytes = value * BYTE
+		bytes = uint64(value * BYTE)
 	}
 
 	return bytes, nil

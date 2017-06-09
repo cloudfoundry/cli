@@ -22,12 +22,13 @@ type batch struct {
 
 // MetricBatcher batches counter increment/add calls into periodic, aggregate events.
 type MetricBatcher struct {
-	metrics      []batch
-	batchTicker  *time.Ticker
-	metricSender MetricSender
-	lock         sync.Mutex
-	closed       bool
-	closedChan   chan struct{}
+	metrics                        []batch
+	batchTicker                    *time.Ticker
+	metricSender                   MetricSender
+	lock                           sync.Mutex
+	closed                         bool
+	closedChan                     chan struct{}
+	consistentlyEmittedMetricNames []string
 }
 
 // New instantiates a running MetricBatcher. Eventswill be emitted once per batchDuration. All
@@ -144,7 +145,39 @@ func (mb *MetricBatcher) resetAndReturnMetrics() []batch {
 func (mb *MetricBatcher) unsafeResetAndReturnMetrics() []batch {
 	localMetrics := mb.metrics
 	mb.metrics = make([]batch, 0, len(mb.metrics))
+
+	matched := make(map[string]struct{})
+
+	for _, previousMetric := range localMetrics {
+		for _, name := range mb.consistentlyEmittedMetricNames {
+			if previousMetric.name == name {
+				matched[name] = struct{}{}
+				mb.metrics = append(mb.metrics, batch{
+					name:  name,
+					value: 0,
+					tags:  previousMetric.tags,
+				})
+			}
+		}
+	}
+
+	for _, name := range mb.consistentlyEmittedMetricNames {
+		if _, ok := matched[name]; !ok {
+			mb.metrics = append(mb.metrics, batch{
+				name:  name,
+				value: 0,
+			})
+		}
+	}
+
 	return localMetrics
+}
+
+func (mb *MetricBatcher) AddConsistentlyEmittedMetrics(names ...string) {
+	mb.lock.Lock()
+	defer mb.lock.Unlock()
+
+	mb.consistentlyEmittedMetricNames = append(mb.consistentlyEmittedMetricNames, names...)
 }
 
 type BatchCounterChainer interface {
