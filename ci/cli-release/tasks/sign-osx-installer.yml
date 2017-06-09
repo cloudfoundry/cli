@@ -1,11 +1,6 @@
 ---
 platform: darwin
 
-image_resource:
-  type: docker-image
-  source:
-    repository: cloudfoundry/cli-ci
-
 params:
   CERT_COMMON_NAME:
   CERT_LOCATION:
