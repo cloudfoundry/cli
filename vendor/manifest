@@ -129,7 +129,7 @@
 			"importpath": "github.com/cloudfoundry/sonde-go/events",
 			"repository": "https://github.com/cloudfoundry/sonde-go",
 			"vcs": "git",
-			"revision": "64ff74a60c9558e7fcb55c9d22eff49412ec5826",
+			"revision": "5f5bca3bcb61dbf9371b8db82497c6396cc0ea9b",
 			"branch": "master",
 			"path": "/events",
 			"notests": true
@@ -165,7 +165,7 @@
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "a7c3389a8223449ed72d796b33a667e603811db8",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
 			"branch": "master",
 			"path": "/pkg/term",
 			"notests": true
