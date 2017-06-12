@@ -102,7 +102,7 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 
 	keyValueTable := [][]string{
 		{ui.TranslateText("name:"), summary.Application.Name},
-		{ui.TranslateText("requested state:"), summary.State},
+		{ui.TranslateText("requested state:"), strings.ToLower(summary.State)},
 		{ui.TranslateText("processes:"), processesSummary(summary.Processes)},
 		{ui.TranslateText("memory usage:"), usageSummary(summary.Processes)},
 		{ui.TranslateText("stack:"), summary.CurrentDroplet.Stack},
