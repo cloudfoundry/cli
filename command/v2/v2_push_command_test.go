@@ -436,6 +436,9 @@ var _ = Describe("v2-push Command", func() {
 			})
 		})
 
+	})
+
+	Describe("GetCommandLineSettings", func() {
 		Context("when the -o and -p flags are both given", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
@@ -443,26 +446,38 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(command.ArgumentCombinationError{
+				_, err := cmd.GetCommandLineSettings()
+				Expect(err).To(MatchError(command.ArgumentCombinationError{
 					Arg1: "--docker-image, -o",
 					Arg2: "-p",
 				}))
 			})
 		})
-	})
 
-	Describe("GetCommandLineSettings", func() {
-		BeforeEach(func() {
-			cmd.DockerImage.Path = "some-docker-image-path"
-			cmd.DirectoryPath = "some-directory-path"
+		Context("when only -o flag is passed", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image-path"
+			})
+
+			It("creates command line setting from command line arguments", func() {
+				settings, err := cmd.GetCommandLineSettings()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(settings.Name).To(Equal(appName))
+				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+			})
 		})
 
-		It("creates command line setting from command line arguments", func() {
-			settings, err := cmd.GetCommandLineSettings()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(settings.Name).To(Equal(appName))
-			Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-			Expect(settings.DirectoryPath).To(Equal("some-directory-path"))
+		Context("when only -p flag is passed", func() {
+			BeforeEach(func() {
+				cmd.DirectoryPath = "some-directory-path"
+			})
+
+			It("creates command line setting from command line arguments", func() {
+				settings, err := cmd.GetCommandLineSettings()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(settings.Name).To(Equal(appName))
+				Expect(settings.DirectoryPath).To(Equal("some-directory-path"))
+			})
 		})
 	})
 })
