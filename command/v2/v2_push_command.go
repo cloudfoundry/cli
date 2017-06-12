@@ -94,12 +94,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V2PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := cmd.validateArgs()
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -177,6 +172,11 @@ func (cmd V2PushCommand) Execute(args []string) error {
 }
 
 func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {
+	err := cmd.validateArgs()
+	if err != nil {
+		return pushaction.CommandLineSettings{}, shared.HandleError(err)
+	}
+
 	pwd, err := os.Getwd()
 	if err != nil {
 		return pushaction.CommandLineSettings{}, err
