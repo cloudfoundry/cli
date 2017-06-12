@@ -99,7 +99,7 @@ var _ = Describe("v3-app Command", func() {
 				summary := v3action.ApplicationSummary{
 					Application: v3action.Application{
 						Name:  "some-app",
-						State: "started",
+						State: "STARTED",
 					},
 					CurrentDroplet: v3action.Droplet{
 						Stack: "cflinuxfs2",
@@ -153,7 +153,7 @@ var _ = Describe("v3-app Command", func() {
 				summary := v3action.ApplicationSummary{
 					Application: v3action.Application{
 						Name:  "some-app",
-						State: "started",
+						State: "STARTED",
 					},
 					CurrentDroplet: v3action.Droplet{
 						Stack: "cflinuxfs2",
@@ -207,7 +207,7 @@ var _ = Describe("v3-app Command", func() {
 				summary := v3action.ApplicationSummary{
 					Application: v3action.Application{
 						Name:  "some-app",
-						State: "started",
+						State: "STARTED",
 					},
 					CurrentDroplet: v3action.Droplet{
 						Stack: "cflinuxfs2",
