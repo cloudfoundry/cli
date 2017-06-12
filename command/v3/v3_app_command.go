@@ -109,7 +109,14 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 		{ui.TranslateText("buildpacks:"), buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
 
-	ui.DisplayKeyValueTable("", keyValueTable, 3)
+	crashedProcesses := []string{}
+	for i := range summary.Processes {
+		if processInstancesAreAllCrashed(&summary.Processes[i]) {
+			crashedProcesses = append(crashedProcesses, summary.Processes[i].Type)
+		}
+	}
+
+	ui.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
 
 	appHasARunningInstance := false
 
@@ -208,4 +215,18 @@ func processHasAnInstance(process *v3action.Process) bool {
 	}
 
 	return false
+}
+
+func processInstancesAreAllCrashed(process *v3action.Process) bool {
+	if len(process.Instances) < 1 {
+		return false
+	}
+
+	for instanceIdx := range process.Instances {
+		if process.Instances[instanceIdx].State != "CRASHED" {
+			return false
+		}
+	}
+
+	return true
 }
