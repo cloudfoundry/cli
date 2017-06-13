@@ -79,7 +79,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 
 		if app.DockerImage == "" {
 			log.WithField("path_to_resources", app.Path).Info("determine resources to zip")
-			resources, err := actor.V2Actor.GatherResources(app.Path)
+			resources, err := actor.V2Actor.GatherDirectoryResources(app.Path)
 			if err != nil {
 				return nil, warnings, err
 			}

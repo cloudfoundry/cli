@@ -239,7 +239,7 @@ var _ = Describe("Application Config", func() {
 						{Filename: "I am a file!"},
 						{Filename: "I am not a file"},
 					}
-					fakeV2Actor.GatherResourcesReturns(resources, nil)
+					fakeV2Actor.GatherDirectoryResourcesReturns(resources, nil)
 				})
 
 				It("sets the full resource list on the config", func() {
@@ -247,8 +247,8 @@ var _ = Describe("Application Config", func() {
 					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 					Expect(firstConfig.AllResources).To(Equal(resources))
 
-					Expect(fakeV2Actor.GatherResourcesCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.GatherResourcesArgsForCall(0)).To(Equal("some-path"))
+					Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GatherDirectoryResourcesArgsForCall(0)).To(Equal("some-path"))
 				})
 			})
 
@@ -257,7 +257,7 @@ var _ = Describe("Application Config", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("dios mio")
-					fakeV2Actor.GatherResourcesReturns(nil, expectedErr)
+					fakeV2Actor.GatherDirectoryResourcesReturns(nil, expectedErr)
 				})
 
 				It("returns the error and warnings", func() {
@@ -276,7 +276,7 @@ var _ = Describe("Application Config", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image-path"))
 
-				Expect(fakeV2Actor.GatherResourcesCallCount()).To(Equal(0))
+				Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
 			})
 		})
 	})

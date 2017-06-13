@@ -50,7 +50,7 @@ type V2PushCommand struct {
 	// NoManifest           bool                        `long:"no-manifest" description:"Ignore manifest file"`
 	// NoRoute              bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
 	// NoStart              bool                        `long:"no-start" description:"Do not start an app after pushing"`
-	DirectoryPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
 	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
 	// Stack                string                      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
@@ -184,7 +184,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	config := pushaction.CommandLineSettings{
 		CurrentDirectory: pwd,
-		DirectoryPath:    string(cmd.DirectoryPath),
+		AppPath:          string(cmd.AppPath),
 		DockerImage:      cmd.DockerImage.Path,
 		Name:             cmd.OptionalArgs.AppName,
 	}
@@ -332,7 +332,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 }
 
 func (cmd V2PushCommand) validateArgs() error {
-	if cmd.DockerImage.Path != "" && cmd.DirectoryPath != "" {
+	if cmd.DockerImage.Path != "" && cmd.AppPath != "" {
 		return command.ArgumentCombinationError{
 			Arg1: "--docker-image, -o",
 			Arg2: "-p",

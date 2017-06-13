@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/ykk"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,8 +24,54 @@ func (e FileChangedError) Error() string {
 
 type Resource ccv2.Resource
 
-// GatherResources returns a list of resources for a directory.
-func (_ Actor) GatherResources(sourceDir string) ([]Resource, error) {
+// GatherArchiveResources returns a list of resources for a directory.
+func (_ Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
+	var resources []Resource
+
+	archive, err := os.Open(archivePath)
+	if err != nil {
+		return nil, err
+	}
+	defer archive.Close()
+
+	info, err := archive.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	reader, err := ykk.NewReader(archive, info.Size())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, archivedFile := range reader.File {
+		resource := Resource{Filename: filepath.ToSlash(archivedFile.Name)}
+		if !archivedFile.FileInfo().IsDir() {
+			fileReader, err := archivedFile.Open()
+			if err != nil {
+				return nil, err
+			}
+			defer fileReader.Close()
+
+			hash := sha1.New()
+
+			_, err = io.Copy(hash, fileReader)
+			if err != nil {
+				return nil, err
+			}
+			info := archivedFile.FileInfo()
+
+			resource.Size = archivedFile.FileInfo().Size()
+			resource.SHA1 = fmt.Sprintf("%x", hash.Sum(nil))
+			resource.Mode = info.Mode()
+		}
+		resources = append(resources, resource)
+	}
+	return resources, nil
+}
+
+// GatherDirectoryResources returns a list of resources for a directory.
+func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	var resources []Resource
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

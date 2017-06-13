@@ -50,7 +50,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			BeforeEach(func() {
 				cmdSettings = CommandLineSettings{
 					CurrentDirectory: "some-current-directory",
-					DirectoryPath:    "some-directory-path",
+					AppPath:          "some-directory-path",
 				}
 			})
 
