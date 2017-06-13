@@ -46,7 +46,11 @@ var _ = Describe("Resource Actions", func() {
 		Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
 	})
 
-	Describe("GatherResources", func() {
+	Describe("GatherArchiveResources", func() {
+		// tests are under resource_unix_test.go and resource_windows_test.go
+	})
+
+	Describe("GatherDirectoryResources", func() {
 		// tests are under resource_unix_test.go and resource_windows_test.go
 	})
 

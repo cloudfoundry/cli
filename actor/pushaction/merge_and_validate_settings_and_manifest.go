@@ -12,7 +12,7 @@ func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSetting
 		return nil, errors.New("functionality still pending")
 	}
 
-	path := cmdConfig.DirectoryPath
+	path := cmdConfig.AppPath
 	if path == "" {
 		path = cmdConfig.CurrentDirectory
 	}

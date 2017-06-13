@@ -13,7 +13,7 @@ type V2Actor interface {
 	CreateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	CreateRoute(route v2action.Route, generatePort bool) (v2action.Route, v2action.Warnings, error)
 	FindRouteBoundToSpaceWithSettings(route v2action.Route) (v2action.Route, v2action.Warnings, error)
-	GatherResources(sourceDir string) ([]v2action.Resource, error)
+	GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error)
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationRoutes(applicationGUID string) ([]v2action.Route, v2action.Warnings, error)
 	GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)

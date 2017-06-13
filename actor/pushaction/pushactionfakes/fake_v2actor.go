@@ -70,16 +70,16 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GatherResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
-	gatherResourcesMutex       sync.RWMutex
-	gatherResourcesArgsForCall []struct {
+	GatherDirectoryResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
+	gatherDirectoryResourcesMutex       sync.RWMutex
+	gatherDirectoryResourcesArgsForCall []struct {
 		sourceDir string
 	}
-	gatherResourcesReturns struct {
+	gatherDirectoryResourcesReturns struct {
 		result1 []v2action.Resource
 		result2 error
 	}
-	gatherResourcesReturnsOnCall map[int]struct {
+	gatherDirectoryResourcesReturnsOnCall map[int]struct {
 		result1 []v2action.Resource
 		result2 error
 	}
@@ -408,52 +408,52 @@ func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GatherResources(sourceDir string) ([]v2action.Resource, error) {
-	fake.gatherResourcesMutex.Lock()
-	ret, specificReturn := fake.gatherResourcesReturnsOnCall[len(fake.gatherResourcesArgsForCall)]
-	fake.gatherResourcesArgsForCall = append(fake.gatherResourcesArgsForCall, struct {
+func (fake *FakeV2Actor) GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error) {
+	fake.gatherDirectoryResourcesMutex.Lock()
+	ret, specificReturn := fake.gatherDirectoryResourcesReturnsOnCall[len(fake.gatherDirectoryResourcesArgsForCall)]
+	fake.gatherDirectoryResourcesArgsForCall = append(fake.gatherDirectoryResourcesArgsForCall, struct {
 		sourceDir string
 	}{sourceDir})
-	fake.recordInvocation("GatherResources", []interface{}{sourceDir})
-	fake.gatherResourcesMutex.Unlock()
-	if fake.GatherResourcesStub != nil {
-		return fake.GatherResourcesStub(sourceDir)
+	fake.recordInvocation("GatherDirectoryResources", []interface{}{sourceDir})
+	fake.gatherDirectoryResourcesMutex.Unlock()
+	if fake.GatherDirectoryResourcesStub != nil {
+		return fake.GatherDirectoryResourcesStub(sourceDir)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.gatherResourcesReturns.result1, fake.gatherResourcesReturns.result2
+	return fake.gatherDirectoryResourcesReturns.result1, fake.gatherDirectoryResourcesReturns.result2
 }
 
-func (fake *FakeV2Actor) GatherResourcesCallCount() int {
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
-	return len(fake.gatherResourcesArgsForCall)
+func (fake *FakeV2Actor) GatherDirectoryResourcesCallCount() int {
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
+	return len(fake.gatherDirectoryResourcesArgsForCall)
 }
 
-func (fake *FakeV2Actor) GatherResourcesArgsForCall(i int) string {
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
-	return fake.gatherResourcesArgsForCall[i].sourceDir
+func (fake *FakeV2Actor) GatherDirectoryResourcesArgsForCall(i int) string {
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
+	return fake.gatherDirectoryResourcesArgsForCall[i].sourceDir
 }
 
-func (fake *FakeV2Actor) GatherResourcesReturns(result1 []v2action.Resource, result2 error) {
-	fake.GatherResourcesStub = nil
-	fake.gatherResourcesReturns = struct {
+func (fake *FakeV2Actor) GatherDirectoryResourcesReturns(result1 []v2action.Resource, result2 error) {
+	fake.GatherDirectoryResourcesStub = nil
+	fake.gatherDirectoryResourcesReturns = struct {
 		result1 []v2action.Resource
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeV2Actor) GatherResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
-	fake.GatherResourcesStub = nil
-	if fake.gatherResourcesReturnsOnCall == nil {
-		fake.gatherResourcesReturnsOnCall = make(map[int]struct {
+func (fake *FakeV2Actor) GatherDirectoryResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
+	fake.GatherDirectoryResourcesStub = nil
+	if fake.gatherDirectoryResourcesReturnsOnCall == nil {
+		fake.gatherDirectoryResourcesReturnsOnCall = make(map[int]struct {
 			result1 []v2action.Resource
 			result2 error
 		})
 	}
-	fake.gatherResourcesReturnsOnCall[i] = struct {
+	fake.gatherDirectoryResourcesReturnsOnCall[i] = struct {
 		result1 []v2action.Resource
 		result2 error
 	}{result1, result2}
@@ -857,8 +857,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.createRouteMutex.RUnlock()
 	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
 	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()

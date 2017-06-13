@@ -2,7 +2,7 @@ package pushaction
 
 type CommandLineSettings struct {
 	CurrentDirectory string
-	DirectoryPath    string
+	AppPath          string
 	DockerImage      string
 	Name             string
 }

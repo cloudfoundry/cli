@@ -442,7 +442,7 @@ var _ = Describe("v2-push Command", func() {
 		Context("when the -o and -p flags are both given", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
-				cmd.DirectoryPath = "some-directory-path"
+				cmd.AppPath = "some-directory-path"
 			})
 
 			It("returns an error", func() {
@@ -469,14 +469,14 @@ var _ = Describe("v2-push Command", func() {
 
 		Context("when only -p flag is passed", func() {
 			BeforeEach(func() {
-				cmd.DirectoryPath = "some-directory-path"
+				cmd.AppPath = "some-directory-path"
 			})
 
 			It("creates command line setting from command line arguments", func() {
 				settings, err := cmd.GetCommandLineSettings()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(settings.Name).To(Equal(appName))
-				Expect(settings.DirectoryPath).To(Equal("some-directory-path"))
+				Expect(settings.AppPath).To(Equal("some-directory-path"))
 			})
 		})
 	})
