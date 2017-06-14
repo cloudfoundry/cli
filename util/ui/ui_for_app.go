@@ -48,7 +48,6 @@ func (ui *UI) DisplayKeyValueTableForV3App(table [][]string, crashedProcesses []
 			}
 
 			if isCrashedProcess {
-				println("modifying color")
 				newProcesses = append(newProcesses, ui.modifyColor(process, redColor))
 			} else {
 				newProcesses = append(newProcesses, process)
