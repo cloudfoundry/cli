@@ -17,7 +17,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/lunixbochs/vtclean"
 	runewidth "github.com/mattn/go-runewidth"
-	"github.com/nicksnyder/go-i18n/i18n"
 	"github.com/vito/go-interact/interact"
 )
 
@@ -70,7 +69,7 @@ type UI struct {
 	Err io.Writer
 
 	colorEnabled configv3.ColorSetting
-	translate    i18n.TranslateFunc
+	translate    TranslateFunc
 
 	terminalLock *sync.Mutex
 	fileLock     *sync.Mutex
@@ -108,12 +107,17 @@ func NewUI(config Config) (*UI, error) {
 // NewTestUI will return a UI object where Out, In, and Err are customizable,
 // and colors are disabled
 func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
+	translationFunc, translateErr := generateTranslationFunc([]byte("[]"))
+	if translateErr != nil {
+		panic(translateErr)
+	}
+
 	return &UI{
 		In:               in,
 		Out:              out,
 		Err:              err,
 		colorEnabled:     configv3.ColorDisabled,
-		translate:        translationWrapper(i18n.IdentityTfunc()),
+		translate:        translationFunc,
 		terminalLock:     &sync.Mutex{},
 		fileLock:         &sync.Mutex{},
 		TimezoneLocation: time.UTC,
