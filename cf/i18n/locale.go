@@ -5,15 +5,17 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/resources"
-	"github.com/nicksnyder/go-i18n/i18n/language"
+	"code.cloudfoundry.org/cli/util/ui"
 )
+
+const resourceSuffix = ".all.json"
 
 func SupportedLocales() []string {
 	languages := supportedLanguages()
 	localeNames := make([]string, len(languages))
 
 	for i, l := range languages {
-		localeParts := strings.Split(l.String(), "-")
+		localeParts := strings.Split(l, "-")
 		lang := localeParts[0]
 		regionOrScript := localeParts[1]
 
@@ -23,7 +25,7 @@ func SupportedLocales() []string {
 		case 4: // Script
 			localeNames[i] = lang + "-" + strings.Title(regionOrScript)
 		default:
-			localeNames[i] = l.String()
+			localeNames[i] = l
 		}
 	}
 
@@ -31,24 +33,28 @@ func SupportedLocales() []string {
 }
 
 func IsSupportedLocale(locale string) bool {
+	sanitizedLocale, err := ui.ParseLocale(locale)
+	if err != nil {
+		return false
+	}
+
 	for _, supportedLanguage := range supportedLanguages() {
-		for _, l := range language.Parse(locale) {
-			if supportedLanguage.String() == l.String() {
-				return true
-			}
+		if supportedLanguage == sanitizedLocale {
+			return true
 		}
 	}
 
 	return false
 }
 
-func supportedLanguages() []*language.Language {
+func supportedLanguages() []string {
 	assetNames := resources.AssetNames()
-	languages := []*language.Language{}
 
+	var languages []string
 	for _, assetName := range assetNames {
 		assetLocale := strings.TrimSuffix(path.Base(assetName), resourceSuffix)
-		languages = append(languages, language.Parse(assetLocale)...)
+		locale, _ := ui.ParseLocale(assetLocale)
+		languages = append(languages, locale)
 	}
 
 	return languages

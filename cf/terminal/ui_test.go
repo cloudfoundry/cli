@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	io_helpers "code.cloudfoundry.org/cli/util/testhelpers/io"
-	go_i18n "github.com/nicksnyder/go-i18n/i18n"
+	newUI "code.cloudfoundry.org/cli/util/ui"
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
@@ -341,7 +341,7 @@ var _ = Describe("UI", func() {
 
 	Describe("failing", func() {
 		Context("when 'T' func is not initialized", func() {
-			var t go_i18n.TranslateFunc
+			var t newUI.TranslateFunc
 			BeforeEach(func() {
 				t = i18n.T
 				i18n.T = nil

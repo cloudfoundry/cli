@@ -14,11 +14,6 @@ function cleanup {
 }
 trap cleanup EXIT
 
-if [ ! $(which goi18n) ];then
-  echo -e "\n Installing go-i18n..."
-  go get github.com/nicksnyder/go-i18n/goi18n
-fi
-
 echo -e "\n Updating i18n4go..."
 go get -u github.com/XenoPhex/i18n4go/i18n4go
 if [ $? -ne 0 ]; then
@@ -35,13 +30,4 @@ i18n4go -c merge-strings -d ${tmpdir}
 
 i18n4go -c fixup --source-language-file ${tmpdir}/en.all.json
 
-set +e
-
-goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json
-if [ $? -ne 0 ]; then
-  printf "Failed to run `goi18n -outdir cf/i18n/resources cf/i18n/resources/*.all.json`"
-  exit 1
-fi
-
-git checkout cf/i18n/resources/en-us.untranslated.json
-
+go run bin/reformat_translated_json.go cf/i18n/resources

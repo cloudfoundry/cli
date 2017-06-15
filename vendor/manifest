@@ -308,15 +308,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/nicksnyder/go-i18n/i18n",
-			"repository": "https://github.com/nicksnyder/go-i18n",
-			"vcs": "git",
-			"revision": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb",
-			"branch": "master",
-			"path": "/i18n",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/nu7hatch/gouuid",
 			"repository": "https://github.com/nu7hatch/gouuid",
 			"vcs": "git",
