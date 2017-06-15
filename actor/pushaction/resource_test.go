@@ -56,15 +56,15 @@ var _ = Describe("Resources", func() {
 			var fakeArchivePath string
 			BeforeEach(func() {
 				fakeArchivePath = "some-archive-path"
-				fakeV2Actor.ZipResourcesReturns(fakeArchivePath, nil)
+				fakeV2Actor.ZipDirectoryResourcesReturns(fakeArchivePath, nil)
 			})
 
 			It("returns the path to the zip", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(archivePath).To(Equal(fakeArchivePath))
 
-				Expect(fakeV2Actor.ZipResourcesCallCount()).To(Equal(1))
-				sourceDir, passedResources := fakeV2Actor.ZipResourcesArgsForCall(0)
+				Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(1))
+				sourceDir, passedResources := fakeV2Actor.ZipDirectoryResourcesArgsForCall(0)
 				Expect(sourceDir).To(Equal("some-path"))
 				Expect(passedResources).To(Equal(resourcesToArchive))
 			})
@@ -75,7 +75,7 @@ var _ = Describe("Resources", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("oh no")
-				fakeV2Actor.ZipResourcesReturns("", expectedErr)
+				fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
 			})
 
 			It("sends errors and returns true", func() {

@@ -114,10 +114,10 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	return resources, walkErr
 }
 
-// ZipResources zips a directory and a sorted (based on full path/filename)
-// list of resources and returns the location. On Windows, the filemode for
-// user is forced to be readable and executable.
-func (actor Actor) ZipResources(sourceDir string, filesToInclude []Resource) (string, error) {
+// ZipDirectoryResources zips a directory and a sorted (based on full
+// path/filename) list of resources and returns the location. On Windows, the
+// filemode for user is forced to be readable and executable.
+func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Resource) (string, error) {
 	log.WithField("sourceDir", sourceDir).Info("zipping source files")
 	zipFile, err := ioutil.TempFile("", "cf-cli-")
 	if err != nil {
