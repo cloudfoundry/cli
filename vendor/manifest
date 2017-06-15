@@ -61,14 +61,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/sirupsen/logrus",
-			"repository": "https://github.com/sirupsen/logrus",
-			"vcs": "git",
-			"revision": "85b1699d505667d13f8ac4478c1debbf85d6c5de",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
@@ -336,6 +328,14 @@
 			"repository": "https://github.com/sajari/fuzzy",
 			"vcs": "git",
 			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sirupsen/logrus",
+			"repository": "https://github.com/sirupsen/logrus",
+			"vcs": "git",
+			"revision": "85b1699d505667d13f8ac4478c1debbf85d6c5de",
 			"branch": "master",
 			"notests": true
 		},
