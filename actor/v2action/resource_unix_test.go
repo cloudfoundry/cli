@@ -97,7 +97,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 	})
 
-	Describe("ZipResources", func() {
+	Describe("ZipDirectoryResources", func() {
 		var (
 			resultZip  string
 			resources  []Resource
@@ -115,7 +115,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			resultZip, executeErr = actor.ZipResources(srcDir, resources)
+			resultZip, executeErr = actor.ZipDirectoryResources(srcDir, resources)
 		})
 
 		AfterEach(func() {

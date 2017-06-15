@@ -54,7 +54,7 @@ var _ = Describe("Resource Actions", func() {
 		// tests are under resource_unix_test.go and resource_windows_test.go
 	})
 
-	Describe("ZipResources", func() {
+	Describe("ZipDirectoryResources", func() {
 		var (
 			resultZip  string
 			resources  []Resource
@@ -62,7 +62,7 @@ var _ = Describe("Resource Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			resultZip, executeErr = actor.ZipResources(srcDir, resources)
+			resultZip, executeErr = actor.ZipDirectoryResources(srcDir, resources)
 		})
 
 		AfterEach(func() {

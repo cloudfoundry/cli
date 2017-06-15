@@ -175,17 +175,17 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	ZipResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
-	zipResourcesMutex       sync.RWMutex
-	zipResourcesArgsForCall []struct {
+	ZipDirectoryResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
+	zipDirectoryResourcesMutex       sync.RWMutex
+	zipDirectoryResourcesArgsForCall []struct {
 		sourceDir      string
 		filesToInclude []v2action.Resource
 	}
-	zipResourcesReturns struct {
+	zipDirectoryResourcesReturns struct {
 		result1 string
 		result2 error
 	}
-	zipResourcesReturnsOnCall map[int]struct {
+	zipDirectoryResourcesReturnsOnCall map[int]struct {
 		result1 string
 		result2 error
 	}
@@ -789,58 +789,58 @@ func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) ZipResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
+func (fake *FakeV2Actor) ZipDirectoryResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
 	var filesToIncludeCopy []v2action.Resource
 	if filesToInclude != nil {
 		filesToIncludeCopy = make([]v2action.Resource, len(filesToInclude))
 		copy(filesToIncludeCopy, filesToInclude)
 	}
-	fake.zipResourcesMutex.Lock()
-	ret, specificReturn := fake.zipResourcesReturnsOnCall[len(fake.zipResourcesArgsForCall)]
-	fake.zipResourcesArgsForCall = append(fake.zipResourcesArgsForCall, struct {
+	fake.zipDirectoryResourcesMutex.Lock()
+	ret, specificReturn := fake.zipDirectoryResourcesReturnsOnCall[len(fake.zipDirectoryResourcesArgsForCall)]
+	fake.zipDirectoryResourcesArgsForCall = append(fake.zipDirectoryResourcesArgsForCall, struct {
 		sourceDir      string
 		filesToInclude []v2action.Resource
 	}{sourceDir, filesToIncludeCopy})
-	fake.recordInvocation("ZipResources", []interface{}{sourceDir, filesToIncludeCopy})
-	fake.zipResourcesMutex.Unlock()
-	if fake.ZipResourcesStub != nil {
-		return fake.ZipResourcesStub(sourceDir, filesToInclude)
+	fake.recordInvocation("ZipDirectoryResources", []interface{}{sourceDir, filesToIncludeCopy})
+	fake.zipDirectoryResourcesMutex.Unlock()
+	if fake.ZipDirectoryResourcesStub != nil {
+		return fake.ZipDirectoryResourcesStub(sourceDir, filesToInclude)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.zipResourcesReturns.result1, fake.zipResourcesReturns.result2
+	return fake.zipDirectoryResourcesReturns.result1, fake.zipDirectoryResourcesReturns.result2
 }
 
-func (fake *FakeV2Actor) ZipResourcesCallCount() int {
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
-	return len(fake.zipResourcesArgsForCall)
+func (fake *FakeV2Actor) ZipDirectoryResourcesCallCount() int {
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
+	return len(fake.zipDirectoryResourcesArgsForCall)
 }
 
-func (fake *FakeV2Actor) ZipResourcesArgsForCall(i int) (string, []v2action.Resource) {
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
-	return fake.zipResourcesArgsForCall[i].sourceDir, fake.zipResourcesArgsForCall[i].filesToInclude
+func (fake *FakeV2Actor) ZipDirectoryResourcesArgsForCall(i int) (string, []v2action.Resource) {
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
+	return fake.zipDirectoryResourcesArgsForCall[i].sourceDir, fake.zipDirectoryResourcesArgsForCall[i].filesToInclude
 }
 
-func (fake *FakeV2Actor) ZipResourcesReturns(result1 string, result2 error) {
-	fake.ZipResourcesStub = nil
-	fake.zipResourcesReturns = struct {
+func (fake *FakeV2Actor) ZipDirectoryResourcesReturns(result1 string, result2 error) {
+	fake.ZipDirectoryResourcesStub = nil
+	fake.zipDirectoryResourcesReturns = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeV2Actor) ZipResourcesReturnsOnCall(i int, result1 string, result2 error) {
-	fake.ZipResourcesStub = nil
-	if fake.zipResourcesReturnsOnCall == nil {
-		fake.zipResourcesReturnsOnCall = make(map[int]struct {
+func (fake *FakeV2Actor) ZipDirectoryResourcesReturnsOnCall(i int, result1 string, result2 error) {
+	fake.ZipDirectoryResourcesStub = nil
+	if fake.zipDirectoryResourcesReturnsOnCall == nil {
+		fake.zipDirectoryResourcesReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 error
 		})
 	}
-	fake.zipResourcesReturnsOnCall[i] = struct {
+	fake.zipDirectoryResourcesReturnsOnCall[i] = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
@@ -871,8 +871,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

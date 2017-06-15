@@ -131,7 +131,7 @@ var _ = Describe("Apply", func() {
 						Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 						archivePath = tmpfile.Name()
-						fakeV2Actor.ZipResourcesReturns(archivePath, nil)
+						fakeV2Actor.ZipDirectoryResourcesReturns(archivePath, nil)
 					})
 
 					JustBeforeEach(func() {
@@ -212,7 +212,7 @@ var _ = Describe("Apply", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("dios mio")
-						fakeV2Actor.ZipResourcesReturns("", expectedErr)
+						fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
 					})
 
 					It("sends warnings and errors, then stops", func() {
@@ -230,7 +230,7 @@ var _ = Describe("Apply", func() {
 						Eventually(configStream).Should(Receive())
 						Eventually(eventStream).Should(Receive(Equal(Complete)))
 
-						Expect(fakeV2Actor.ZipResourcesCallCount()).To(Equal(0))
+						Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(0))
 					})
 				})
 			})

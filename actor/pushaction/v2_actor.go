@@ -20,5 +20,5 @@ type V2Actor interface {
 	PollJob(job v2action.Job) (v2action.Warnings, error)
 	UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Job, v2action.Warnings, error)
-	ZipResources(sourceDir string, filesToInclude []v2action.Resource) (string, error)
+	ZipDirectoryResources(sourceDir string, filesToInclude []v2action.Resource) (string, error)
 }
