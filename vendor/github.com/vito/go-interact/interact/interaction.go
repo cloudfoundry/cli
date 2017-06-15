@@ -59,7 +59,7 @@ func (interaction Interaction) Resolve(dst interface{}) error {
 	prompt := interaction.prompt(dst)
 
 	var user userIO
-	if file, ok := interaction.Input.(*os.File); ok && terminal.IsTerminal(int(file.Fd())) {
+	if file, ok := interaction.Output.(*os.File); ok && terminal.IsTerminal(int(file.Fd())) {
 		state, err := terminal.MakeRaw(int(file.Fd()))
 		if err != nil {
 			return err
@@ -67,7 +67,12 @@ func (interaction Interaction) Resolve(dst interface{}) error {
 
 		defer terminal.Restore(int(file.Fd()), state)
 
-		user = newTTYUser(interaction.Input, interaction.Output)
+		term, err := newTTYUser(interaction.Input, file)
+		if err != nil {
+			return err
+		}
+
+		user = term
 	} else {
 		user = newNonTTYUser(interaction.Input, interaction.Output)
 	}
