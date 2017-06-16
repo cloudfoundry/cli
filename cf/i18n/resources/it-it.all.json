@@ -660,7 +660,7 @@
     "translation": "CF_NAME bind-security-group GRUPPO_SICUREZZA ORG [SPAZIO]"
   },
   {
-    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]\\n\\nTIP: Changes will not apply to existing running applications until they are restarted.",
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE] [--lifecycle (running | staging)]\\n\\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": "CF_NAME bind-security-group GRUPPO_SICUREZZA ORG [SPAZIO]\\n\\nSUGGERIMENTO: le modifiche non verranno applicate alle applicazioni in esecuzione esistenti finché non vengono riavviate."
   },
   {
@@ -3736,6 +3736,14 @@
     "translation": "Ultima operazione"
   },
   {
+    "id": "Lifecycle phase the group applies to",
+    "translation": ""
+  },
+  {
+    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "List all apps in the target space",
     "translation": "Elenca tutte le applicazioni nello spazio di destinazione"
   },
@@ -5544,6 +5552,10 @@
     "translation": ""
   },
   {
+    "id": "TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
     "translation": "SUGGERIMENTO: le modifiche non verranno applicate alle applicazioni in esecuzione esistenti finché non vengono riavviate."
   },
@@ -7186,6 +7198,10 @@
   {
     "id": "stack:",
     "translation": "stack:"
+  },
+  {
+    "id": "staging",
+    "translation": ""
   },
   {
     "id": "start command:",
