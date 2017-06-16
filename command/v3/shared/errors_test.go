@@ -42,5 +42,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("IsolationSegmentNotFoundError", IsolationSegmentNotFoundError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
 		Entry("StartupTimeoutError", StartupTimeoutError{}),
+		Entry("AssignDropletError", AssignDropletError{}),
 	)
 })

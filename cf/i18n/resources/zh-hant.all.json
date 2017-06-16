@@ -6124,6 +6124,10 @@
     "translation": "無法從授權回應中獲得一次性代碼"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "無法鑑別。"
   },

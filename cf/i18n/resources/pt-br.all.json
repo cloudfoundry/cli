@@ -6124,6 +6124,10 @@
     "translation": "Não é possível adquirir um código descartável da resposta de autorização"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "Não é possível autenticar."
   },

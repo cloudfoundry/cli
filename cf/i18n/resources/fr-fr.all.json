@@ -6124,6 +6124,10 @@
     "translation": "Impossible d'acquérir un code à utilisation unique depuis la réponse d'autorisation"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "Echec de l'authentification."
   },

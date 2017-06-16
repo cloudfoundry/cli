@@ -40,6 +40,8 @@ func HandleError(err error) error {
 		return OrganizationNotFoundError{Name: e.Name}
 	case v3action.IsolationSegmentNotFoundError:
 		return IsolationSegmentNotFoundError{Name: e.Name}
+	case v3action.AssignDropletError:
+		return AssignDropletError{}
 	}
 
 	return err

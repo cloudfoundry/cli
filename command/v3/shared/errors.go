@@ -1,5 +1,18 @@
 package shared
 
+// AssignDropletError is returned when assigning the current droplet of an app
+// fails
+type AssignDropletError struct {
+}
+
+func (_ AssignDropletError) Error() string {
+	return "Unable to assign droplet. Ensure the droplet exists and belongs to this app."
+}
+
+func (e AssignDropletError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error())
+}
+
 // StartupTimeoutError is returned when startup timeout is reached waiting for
 // an application to start.
 type StartupTimeoutError struct {

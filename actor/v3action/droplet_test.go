@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -105,6 +106,24 @@ var _ = Describe("Droplet Actions", func() {
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
 			})
+
+			Context("when the cc client response contains an UnprocessableEntityError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.SetApplicationDropletReturns(
+						ccv3.Relationship{},
+						ccv3.Warnings{"set-application-droplet-warning"},
+						ccerror.UnprocessableEntityError{},
+					)
+				})
+
+				It("raises the error as AssignDropletError and returns warnings", func() {
+					warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
+
+					Expect(err).To(MatchError(AssignDropletError{}))
+					Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
+				})
+			})
+
 		})
 	})
 })
