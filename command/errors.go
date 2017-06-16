@@ -238,6 +238,22 @@ func (e MinimumAPIVersionNotMetError) Translate(translate func(string, ...interf
 	})
 }
 
+type LifecycleMinimumAPIVersionNotMetError struct {
+	CurrentVersion string
+	MinimumVersion string
+}
+
+func (_ LifecycleMinimumAPIVersionNotMetError) Error() string {
+	return "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}."
+}
+
+func (e LifecycleMinimumAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"CurrentVersion": e.CurrentVersion,
+		"MinimumVersion": e.MinimumVersion,
+	})
+}
+
 type HealthCheckTypeUnsupportedError struct {
 	SupportedTypes []string
 }
