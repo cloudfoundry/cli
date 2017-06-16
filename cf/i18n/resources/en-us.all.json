@@ -6124,6 +6124,10 @@
     "translation": "Unable to acquire one time code from authorization response"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "Unable to authenticate."
   },

@@ -6124,6 +6124,10 @@
     "translation": "許可応答からワンタイム・コードを獲得できません"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "認証できません。"
   },

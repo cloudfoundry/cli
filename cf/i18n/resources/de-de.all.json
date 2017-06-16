@@ -6124,6 +6124,10 @@
     "translation": "Es konnte kein Zeitcode aus der Autorisierungsantwort bezogen werden"
   },
   {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "translation": ""
+  },
+  {
     "id": "Unable to authenticate.",
     "translation": "Authentifizierung konnte nicht ausgeführt werden."
   },
