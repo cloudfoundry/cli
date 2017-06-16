@@ -19,6 +19,16 @@ type SecurityGroupWithOrganizationAndSpace struct {
 	Space         *Space
 }
 
+// InvalidLifecycleError is returned when the lifecycle specified is neither
+// running nor staging.
+type InvalidLifecycleError struct {
+	lifecycle string
+}
+
+func (e InvalidLifecycleError) Error() string {
+	return fmt.Sprintf("Invalid lifecycle: %s", e.lifecycle)
+}
+
 // SecurityGroupNotFoundError is returned when a requested security group is
 // not found.
 type SecurityGroupNotFoundError struct {
@@ -29,8 +39,21 @@ func (e SecurityGroupNotFoundError) Error() string {
 	return fmt.Sprintf("Security group '%s' not found.", e.Name)
 }
 
-func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.AssociateSpaceWithSecurityGroup(securityGroupGUID, spaceGUID)
+func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle string) (Warnings, error) {
+	var (
+		warnings ccv2.Warnings
+		err      error
+	)
+
+	switch lifecycle {
+	case "running":
+		warnings, err = actor.CloudControllerClient.AssociateSpaceWithRunningSecurityGroup(securityGroupGUID, spaceGUID)
+	case "staging":
+		warnings, err = actor.CloudControllerClient.AssociateSpaceWithStagingSecurityGroup(securityGroupGUID, spaceGUID)
+	default:
+		err = InvalidLifecycleError{lifecycle: lifecycle}
+	}
+
 	return Warnings(warnings), err
 }
 

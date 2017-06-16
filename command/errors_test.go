@@ -59,6 +59,7 @@ var _ = Describe("Translatable Errors", func() {
 
 		// Version errors.
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
+		Entry("LifecycleMinimumAPIVersionNotMetError", LifecycleMinimumAPIVersionNotMetError{}),
 		Entry("HealthCheckTypeUnsupportedError", HealthCheckTypeUnsupportedError{
 			SupportedTypes: []string{"some-type", "another-type"},
 		}),

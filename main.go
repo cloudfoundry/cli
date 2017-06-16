@@ -40,7 +40,7 @@ func parse(args []string) {
 
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
-		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument:
+		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument, flags.ErrInvalidChoice:
 			_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
 					field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
@@ -61,7 +61,7 @@ func parse(args []string) {
 				return
 			}
 
-			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
+			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument || flagErr.Type == flags.ErrInvalidChoice {
 				fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
 			}
 
@@ -86,7 +86,7 @@ func parse(args []string) {
 				}
 			}
 
-			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
+			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument || flagErr.Type == flags.ErrInvalidChoice {
 				os.Exit(1)
 			}
 		case flags.ErrRequired:

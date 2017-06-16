@@ -53,9 +53,28 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (client *Client) AssociateSpaceWithSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+func (client *Client) AssociateSpaceWithRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutSecurityGroupSpaceRequest,
+		RequestName: internal.PutRunningSecurityGroupSpaceRequest,
+		URIParams: Params{
+			"security_group_guid": securityGroupGUID,
+			"space_guid":          spaceGUID,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := cloudcontroller.Response{}
+
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
+
+func (client *Client) AssociateSpaceWithStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutStagingSecurityGroupSpaceRequest,
 		URIParams: Params{
 			"security_group_guid": securityGroupGUID,
 			"space_guid":          spaceGUID,

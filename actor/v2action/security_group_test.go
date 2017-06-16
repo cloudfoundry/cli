@@ -2,6 +2,7 @@ package v2action_test
 
 import (
 	"errors"
+	"fmt"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
@@ -512,45 +513,102 @@ var _ = Describe("Security Group Actions", func() {
 
 	Describe("BindSecurityGroupToSpace", func() {
 		var (
-			err      error
-			warnings []string
+			lifecycle string
+			err       error
+			warnings  []string
 		)
 
 		JustBeforeEach(func() {
-			warnings, err = actor.BindSecurityGroupToSpace("some-security-group-guid", "some-space-guid")
+			warnings, err = actor.BindSecurityGroupToSpace("some-security-group-guid", "some-space-guid", lifecycle)
 		})
 
-		Context("when binding the space does not retun an error", func() {
+		Context("when the lifecycle is neither running nor staging", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.AssociateSpaceWithSecurityGroupReturns(
-					ccv2.Warnings{"warning-1", "warning-2"},
-					nil,
-				)
+				lifecycle = "bill & ted"
 			})
 
-			It("returns warnings and no error", func() {
-				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-				Expect(fakeCloudControllerClient.AssociateSpaceWithSecurityGroupCallCount()).To(Equal(1))
-				securityGroupGUID, spaceGUID := fakeCloudControllerClient.AssociateSpaceWithSecurityGroupArgsForCall(0)
-				Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
+			It("returns and appropriate error", func() {
+				Expect(err).To(MatchError(fmt.Sprintf("Invalid lifecycle: %s", lifecycle)))
 			})
 		})
 
-		Context("when binding the space returns an error", func() {
-			var returnedError error
+		Context("when the lifecycle is running", func() {
 			BeforeEach(func() {
-				returnedError = errors.New("associate-space-error")
-				fakeCloudControllerClient.AssociateSpaceWithSecurityGroupReturns(
-					ccv2.Warnings{"warning-1", "warning-2"},
-					returnedError,
-				)
+				lifecycle = "running"
 			})
 
-			It("returns the error and warnings", func() {
-				Expect(err).To(Equal(returnedError))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			Context("when binding the space does not return an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+			})
+
+			Context("when binding the space returns an error", func() {
+				var returnedError error
+				BeforeEach(func() {
+					returnedError = errors.New("associate-space-error")
+					fakeCloudControllerClient.AssociateSpaceWithRunningSecurityGroupReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						returnedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(returnedError))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+		})
+
+		Context("when the lifecycle is staging", func() {
+			BeforeEach(func() {
+				lifecycle = "staging"
+			})
+
+			Context("when binding the space does not return an error", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				It("returns warnings and no error", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupCallCount()).To(Equal(1))
+					securityGroupGUID, spaceGUID := fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupArgsForCall(0)
+					Expect(securityGroupGUID).To(Equal("some-security-group-guid"))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+				})
+			})
+
+			Context("when binding the space returns an error", func() {
+				var returnedError error
+				BeforeEach(func() {
+					returnedError = errors.New("associate-space-error")
+					fakeCloudControllerClient.AssociateSpaceWithStagingSecurityGroupReturns(
+						ccv2.Warnings{"warning-1", "warning-2"},
+						returnedError,
+					)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(err).To(Equal(returnedError))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
 			})
 		})
 	})
