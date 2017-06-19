@@ -17,6 +17,7 @@ func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action
 				break
 			}
 			dropletGUID = build.Droplet.GUID
+			ui.DisplayNewline()
 			ui.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": dropletGUID})
 		case log, ok := <-logStream:
 			if !ok {
