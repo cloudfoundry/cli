@@ -55,8 +55,8 @@ var CommonHelpCategoryList = []HelpCategory{
 	{
 		CategoryName: "Org management:",
 		CommandList: [][]string{
-			{"orgs", "set-org-role"},
-			{"org-users", "unset-org-role"},
+			{"orgs", "create-org", "set-org-role"},
+			{"org-users", "delete-org", "unset-org-role"},
 		},
 	},
 
