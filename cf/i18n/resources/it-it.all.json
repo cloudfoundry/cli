@@ -2024,6 +2024,10 @@
     "translation": ""
   },
   {
+    "id": "Creating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creazione dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
@@ -5280,10 +5284,6 @@
     "translation": ""
   },
   {
-    "id": "Setting V3 app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting api endpoint to {{.Endpoint}}...",
     "translation": "Impostazione dell'endpoint api su {{.Endpoint}} in corso..."
   },
@@ -5384,10 +5384,6 @@
     "translation": "Visualizzazione della scala corrente dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.CurrentUser}} in corso..."
   },
   {
-    "id": "Showing health and status for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Visualizzazione dell'integrità e dello stato per l'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
@@ -5456,7 +5452,7 @@
     "translation": ""
   },
   {
-    "id": "Staging package for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Staging package for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
@@ -5486,10 +5482,6 @@
   {
     "id": "Started: {{.Started}}",
     "translation": "Avviata: {{.Started}}"
-  },
-  {
-    "id": "Starting V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
   },
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5528,7 +5520,7 @@
     "translation": "Arresta un'applicazione"
   },
   {
-    "id": "Stopping V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "id": "Stopping app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -6316,15 +6308,15 @@
     "translation": "Aggiornato: {{.Updated}}"
   },
   {
-    "id": "Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
-  },
-  {
     "id": "Updating a plan",
     "translation": "Aggiornamento di un piano "
   },
   {
     "id": "Updating app with these attributes...",
+    "translation": ""
+  },
+  {
+    "id": "Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -6382,6 +6374,10 @@
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "Caricamento dei file di applicazione da: {{.Path}}"
+  },
+  {
+    "id": "Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",

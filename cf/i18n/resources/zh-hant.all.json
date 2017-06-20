@@ -2024,6 +2024,10 @@
     "translation": ""
   },
   {
+    "id": "Creating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分於組織 {{.OrgName}}/空間 {{.SpaceName}} 中建立應用程式 {{.AppName}}..."
   },
@@ -5280,10 +5284,6 @@
     "translation": ""
   },
   {
-    "id": "Setting V3 app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting api endpoint to {{.Endpoint}}...",
     "translation": "正在將 API 端點設定為 {{.Endpoint}}..."
   },
@@ -5384,10 +5384,6 @@
     "translation": "正在以 {{.CurrentUser}} 身分顯示組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的現行調整..."
   },
   {
-    "id": "Showing health and status for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分顯示組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的性能和狀態..."
   },
@@ -5456,7 +5452,7 @@
     "translation": ""
   },
   {
-    "id": "Staging package for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Staging package for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
@@ -5486,10 +5482,6 @@
   {
     "id": "Started: {{.Started}}",
     "translation": "已啟動: {{.Started}}"
-  },
-  {
-    "id": "Starting V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
   },
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5528,7 +5520,7 @@
     "translation": "停止應用程式"
   },
   {
-    "id": "Stopping V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "id": "Stopping app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -6316,15 +6308,15 @@
     "translation": "已更新: {{.Updated}}"
   },
   {
-    "id": "Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
-  },
-  {
     "id": "Updating a plan",
     "translation": "正在更新方案"
   },
   {
     "id": "Updating app with these attributes...",
+    "translation": ""
+  },
+  {
+    "id": "Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -6382,6 +6374,10 @@
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "正在從 {{.Path}} 上傳應用程式檔案"
+  },
+  {
+    "id": "Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
