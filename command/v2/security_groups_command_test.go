@@ -80,24 +80,27 @@ var _ = Describe("security-groups Command", func() {
 	})
 
 	Context("when the list of security groups is returned", func() {
-		var secGroups []v2action.SecurityGroupWithOrganizationAndSpace
+		var secGroups []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 
 		BeforeEach(func() {
-			secGroups = []v2action.SecurityGroupWithOrganizationAndSpace{
+			secGroups = []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle{
 				{
 					SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 					Organization:  &v2action.Organization{Name: "org-11"},
 					Space:         &v2action.Space{Name: "space-111"},
+					Lifecycle:     "running",
 				},
 				{
 					SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 					Organization:  &v2action.Organization{Name: "org-12"},
 					Space:         &v2action.Space{Name: "space-121"},
+					Lifecycle:     "running",
 				},
 				{
 					SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-1"},
 					Organization:  &v2action.Organization{Name: "org-12"},
 					Space:         &v2action.Space{Name: "space-122"},
+					Lifecycle:     "running",
 				},
 				{
 					SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-2"},
@@ -108,24 +111,25 @@ var _ = Describe("security-groups Command", func() {
 					SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-3"},
 					Organization:  &v2action.Organization{Name: "org-31"},
 					Space:         &v2action.Space{Name: "space-311"},
+					Lifecycle:     "running",
 				},
 			}
-			fakeActor.GetSecurityGroupsWithOrganizationAndSpaceReturns(secGroups, v2action.Warnings{"warning-1", "warning-2"}, nil)
+			fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(secGroups, v2action.Warnings{"warning-1", "warning-2"}, nil)
 		})
 
-		It("displays a table containing the security groups, the spaces to which they are bound, and the spaces' orgs", func() {
+		It("displays a table containing the security groups, the spaces to which they are bound, the spaces' orgs, and the lifecycle of the app they were assigned to", func() {
 			Expect(executeErr).To(BeNil())
 
-			Expect(fakeActor.GetSecurityGroupsWithOrganizationAndSpaceCallCount()).To(Equal(1))
+			Expect(fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleCallCount()).To(Equal(1))
 
 			Expect(testUI.Out).To(Say("Getting security groups as some-user\\.\\.\\."))
 			Expect(testUI.Out).To(Say("OK\\n\\n"))
-			Expect(testUI.Out).To(Say("\\s+name\\s+organization\\s+space"))
-			Expect(testUI.Out).To(Say("#0\\s+seg-group-1\\s+org-11\\s+space-111"))
-			Expect(testUI.Out).To(Say("(?m)\\s+seg-group-1\\s+org-12\\s+space-121"))
-			Expect(testUI.Out).To(Say("(?m)\\s+seg-group-1\\s+org-12\\s+space-122"))
+			Expect(testUI.Out).To(Say("\\s+name\\s+organization\\s+space\\s+lifecycle"))
+			Expect(testUI.Out).To(Say("#0\\s+seg-group-1\\s+org-11\\s+space-111\\s+running"))
+			Expect(testUI.Out).To(Say("(?m)\\s+seg-group-1\\s+org-12\\s+space-121\\s+running"))
+			Expect(testUI.Out).To(Say("(?m)\\s+seg-group-1\\s+org-12\\s+space-122\\s+running"))
 			Expect(testUI.Out).To(Say("#1\\s+seg-group-2\\s+"))
-			Expect(testUI.Out).To(Say("#2\\s+seg-group-3\\s+org-31\\s+space-311"))
+			Expect(testUI.Out).To(Say("#2\\s+seg-group-3\\s+org-31\\s+space-311\\s+running"))
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
 		})
@@ -133,7 +137,7 @@ var _ = Describe("security-groups Command", func() {
 
 	Context("when an error is encountered fetching the security groups", func() {
 		BeforeEach(func() {
-			fakeActor.GetSecurityGroupsWithOrganizationAndSpaceReturns(nil, v2action.Warnings{"warning-1", "warning-2"}, errors.New("generic"))
+			fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(nil, v2action.Warnings{"warning-1", "warning-2"}, errors.New("generic"))
 		})
 
 		It("returns the error", func() {

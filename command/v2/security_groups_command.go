@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter . SecurityGroupsActor
 
 type SecurityGroupsActor interface {
-	GetSecurityGroupsWithOrganizationAndSpace() ([]v2action.SecurityGroupWithOrganizationAndSpace, v2action.Warnings, error)
+	GetSecurityGroupsWithOrganizationSpaceAndLifecycle() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
 }
 
 type SecurityGroupsCommand struct {
@@ -62,7 +62,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 	cmd.UI.DisplayTextWithFlavor("Getting security groups as {{.UserName}}...",
 		map[string]interface{}{"UserName": user.Name})
 
-	secGroupOrgSpaces, warnings, err := cmd.Actor.GetSecurityGroupsWithOrganizationAndSpace()
+	secGroupOrgSpaces, warnings, err := cmd.Actor.GetSecurityGroupsWithOrganizationSpaceAndLifecycle()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -77,6 +77,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 			cmd.UI.TranslateText("name"),
 			cmd.UI.TranslateText("organization"),
 			cmd.UI.TranslateText("space"),
+			cmd.UI.TranslateText("lifecycle"),
 		},
 	}
 
@@ -96,6 +97,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 			secGroupOrgSpace.SecurityGroup.Name,
 			secGroupOrgSpace.Organization.Name,
 			secGroupOrgSpace.Space.Name,
+			secGroupOrgSpace.Lifecycle,
 		})
 	}
 

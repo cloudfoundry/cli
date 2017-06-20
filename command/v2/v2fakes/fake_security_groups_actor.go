@@ -9,16 +9,16 @@ import (
 )
 
 type FakeSecurityGroupsActor struct {
-	GetSecurityGroupsWithOrganizationAndSpaceStub        func() ([]v2action.SecurityGroupWithOrganizationAndSpace, v2action.Warnings, error)
-	getSecurityGroupsWithOrganizationAndSpaceMutex       sync.RWMutex
-	getSecurityGroupsWithOrganizationAndSpaceArgsForCall []struct{}
-	getSecurityGroupsWithOrganizationAndSpaceReturns     struct {
-		result1 []v2action.SecurityGroupWithOrganizationAndSpace
+	GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub        func() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex       sync.RWMutex
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall []struct{}
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns     struct {
+		result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 		result2 v2action.Warnings
 		result3 error
 	}
-	getSecurityGroupsWithOrganizationAndSpaceReturnsOnCall map[int]struct {
-		result1 []v2action.SecurityGroupWithOrganizationAndSpace
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall map[int]struct {
+		result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -26,47 +26,47 @@ type FakeSecurityGroupsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationAndSpace() ([]v2action.SecurityGroupWithOrganizationAndSpace, v2action.Warnings, error) {
-	fake.getSecurityGroupsWithOrganizationAndSpaceMutex.Lock()
-	ret, specificReturn := fake.getSecurityGroupsWithOrganizationAndSpaceReturnsOnCall[len(fake.getSecurityGroupsWithOrganizationAndSpaceArgsForCall)]
-	fake.getSecurityGroupsWithOrganizationAndSpaceArgsForCall = append(fake.getSecurityGroupsWithOrganizationAndSpaceArgsForCall, struct{}{})
-	fake.recordInvocation("GetSecurityGroupsWithOrganizationAndSpace", []interface{}{})
-	fake.getSecurityGroupsWithOrganizationAndSpaceMutex.Unlock()
-	if fake.GetSecurityGroupsWithOrganizationAndSpaceStub != nil {
-		return fake.GetSecurityGroupsWithOrganizationAndSpaceStub()
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error) {
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.Lock()
+	ret, specificReturn := fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall[len(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall)]
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall = append(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall, struct{}{})
+	fake.recordInvocation("GetSecurityGroupsWithOrganizationSpaceAndLifecycle", []interface{}{})
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.Unlock()
+	if fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub != nil {
+		return fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getSecurityGroupsWithOrganizationAndSpaceReturns.result1, fake.getSecurityGroupsWithOrganizationAndSpaceReturns.result2, fake.getSecurityGroupsWithOrganizationAndSpaceReturns.result3
+	return fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns.result1, fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns.result2, fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns.result3
 }
 
-func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationAndSpaceCallCount() int {
-	fake.getSecurityGroupsWithOrganizationAndSpaceMutex.RLock()
-	defer fake.getSecurityGroupsWithOrganizationAndSpaceMutex.RUnlock()
-	return len(fake.getSecurityGroupsWithOrganizationAndSpaceArgsForCall)
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycleCallCount() int {
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RLock()
+	defer fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RUnlock()
+	return len(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall)
 }
 
-func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationAndSpaceReturns(result1 []v2action.SecurityGroupWithOrganizationAndSpace, result2 v2action.Warnings, result3 error) {
-	fake.GetSecurityGroupsWithOrganizationAndSpaceStub = nil
-	fake.getSecurityGroupsWithOrganizationAndSpaceReturns = struct {
-		result1 []v2action.SecurityGroupWithOrganizationAndSpace
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, result2 v2action.Warnings, result3 error) {
+	fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub = nil
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns = struct {
+		result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationAndSpaceReturnsOnCall(i int, result1 []v2action.SecurityGroupWithOrganizationAndSpace, result2 v2action.Warnings, result3 error) {
-	fake.GetSecurityGroupsWithOrganizationAndSpaceStub = nil
-	if fake.getSecurityGroupsWithOrganizationAndSpaceReturnsOnCall == nil {
-		fake.getSecurityGroupsWithOrganizationAndSpaceReturnsOnCall = make(map[int]struct {
-			result1 []v2action.SecurityGroupWithOrganizationAndSpace
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall(i int, result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, result2 v2action.Warnings, result3 error) {
+	fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub = nil
+	if fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall == nil {
+		fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall = make(map[int]struct {
+			result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 			result2 v2action.Warnings
 			result3 error
 		})
 	}
-	fake.getSecurityGroupsWithOrganizationAndSpaceReturnsOnCall[i] = struct {
-		result1 []v2action.SecurityGroupWithOrganizationAndSpace
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall[i] = struct {
+		result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -75,8 +75,8 @@ func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationAndSpaceRe
 func (fake *FakeSecurityGroupsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getSecurityGroupsWithOrganizationAndSpaceMutex.RLock()
-	defer fake.getSecurityGroupsWithOrganizationAndSpaceMutex.RUnlock()
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RLock()
+	defer fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

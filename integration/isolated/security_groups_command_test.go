@@ -25,13 +25,9 @@ var _ = Describe("security-groups command", func() {
 	})
 
 	Describe("Unrefactored command", func() {
-		var (
-			username string
-		)
-
 		BeforeEach(func() {
 			helpers.SkipIfExperimental("skipping tests around the old code behavior")
-			username = helpers.LoginCF()
+			helpers.LoginCF()
 		})
 
 		Context("when no API endpoint is set", func() {
@@ -116,13 +112,12 @@ var _ = Describe("security-groups command", func() {
 
 	Describe("Refactored command", func() {
 		var (
-			username string
-			session  *Session
+			session *Session
 		)
 
 		BeforeEach(func() {
 			helpers.RunIfExperimental("skipping until approved")
-			username = helpers.LoginCF()
+			helpers.LoginCF()
 		})
 
 		JustBeforeEach(func() {
@@ -258,51 +253,59 @@ var _ = Describe("security-groups command", func() {
 			It("lists the security groups", func() {
 				Eventually(session.Out).Should(Say("Getting security groups as admin"))
 				Eventually(session.Out).Should(Say("OK\\n\\n"))
-				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space"))
+				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space\\s+lifecycle"))
 				// How to test alphabetization with auto-generated names?  Here's how.
-				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s", securityGroup1.Name, org11, space11))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup1.Name, org12, space12))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup1.Name, org13, space13))
-				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s", securityGroup2.Name, org11, space22))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup2.Name, org21, space21))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup2.Name, org23, space23))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org11, space11))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org12, space12))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org13, space13))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org11, space22))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org21, space21))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org23, space23))
 				Eventually(session.Out).Should(Say("#\\d+\\s+%s", securityGroup3.Name))
-				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s", securityGroup4.Name, org11, space32))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup4.Name, org23, space31))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s", securityGroup4.Name, org33, space33))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org11, space32))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org23, space31))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org33, space33))
 				Eventually(session).Should(Exit(0))
 			})
 		})
 
-		XContext("When some security groups are assigned to staging", func() {
+		Context("When some security groups are assigned to staging", func() {
 			var (
-				runningSecurityGroup helpers.SecurityGroup
-				stagingSecurityGroup helpers.SecurityGroup
+				securityGroup1 helpers.SecurityGroup
+				securityGroup2 helpers.SecurityGroup
 			)
 
 			BeforeEach(func() {
-				runningSecurityGroup = helpers.NewSecurityGroup("running-security-group", "tcp", "11.1.1.0/24", "80,443", "SG1")
-				stagingSecurityGroup = helpers.NewSecurityGroup("staging-security-group", "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup1 = helpers.NewSecurityGroup("security-group-1", "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup1.Create()
+				securityGroup2 = helpers.NewSecurityGroup("security-group-2", "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup2.Create()
 
-				helpers.CreateOrgAndSpace("some-org", "some-space")
+				helpers.CreateOrgAndSpace("some-org", "some-space-1")
 				helpers.TargetOrg("some-org")
 				helpers.CreateSpace("some-space-2")
 
-				Eventually(helpers.CF("bind-security-group", "running-security-group", "some-org", "some-space", "--lifecycle", "running")).Should(Exit(0))
-				Eventually(helpers.CF("bind-security-group", "running-security-group", "some-org", "some-space-2", "--lifecycle", "running")).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-1", "--lifecycle", "running")).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-1", "--lifecycle", "staging")).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-2", "--lifecycle", "running")).Should(Exit(0))
 
-				Eventually(helpers.CF("bind-security-group", "staging-security-group", "some-org", "some-space", "--lifecycle", "staging")).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", "security-group-2", "some-org", "some-space-1", "--lifecycle", "staging")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				securityGroup1.Delete()
+				securityGroup2.Delete()
 			})
 
 			It("displays staging under lifecycle", func() {
 				Eventually(session.Out).Should(Say("Getting security groups as admin"))
 				Eventually(session.Out).Should(Say("OK\\n\\n"))
-				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space"))
-				Eventually(session.Out).Should(Say("\\s+#0\\s+running-security-group\\s+some-org\\s+some-space\\s+running"))
-				Eventually(session.Out).Should(Say("\\s+running-security-grooup\\s+some-org\\s+some-space-2\\s+running"))
+				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space\\s+lifecycle"))
+				Eventually(session.Out).Should(Say("\\s+#\\d+\\s+security-group-1\\s+some-org\\s+some-space-1\\s+staging"))
+				Eventually(session.Out).Should(Say("\\s+security-group-1\\s+some-org\\s+some-space-1\\s+running"))
+				Eventually(session.Out).Should(Say("\\s+security-group-1\\s+some-org\\s+some-space-2\\s+running"))
 
-				Eventually(session.Out).Should(Say("\\s+#1staging-security-group\\s+some-org\\s+some-space\\s+staging"))
-				Eventually(session.Out).Should(Say("\\s+#1staging-security-group\\s+some-org\\s+some-space\\s+running"))
+				Eventually(session.Out).Should(Say("\\s+#\\d+\\s+security-group-2\\s+some-org\\s+some-space-1\\s+staging"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
