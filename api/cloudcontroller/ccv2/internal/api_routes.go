@@ -35,7 +35,8 @@ const (
 	GetRouteReservedRequest               = "GetRouteReserved"
 	GetRouteRouteMappingsRequest          = "GetRouteRouteMappings"
 	GetRoutesRequest                      = "GetRoutes"
-	GetSecurityGroupSpacesRequest         = "GetSecurityGroupSpaces"
+	GetSecurityGroupRunningSpacesRequest  = "GetSecurityGroupRunningSpaces"
+	GetSecurityGroupStagingSpacesRequest  = "GetSecurityGroupStagingSpaces"
 	GetSecurityGroupsRequest              = "GetSecurityGroups"
 	GetServiceBindingsRequest             = "GetServiceBindings"
 	GetServiceInstancesRequest            = "GetServiceInstances"
@@ -87,9 +88,10 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
-	{Path: "/v2/security_groups/:security_group_guid/spaces", Method: http.MethodGet, Name: GetSecurityGroupSpacesRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces", Method: http.MethodGet, Name: GetSecurityGroupRunningSpacesRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutRunningSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSecurityGroupSpaceRequest},
+	{Path: "/v2/security_groups/:security_group_guid/staging_spaces", Method: http.MethodGet, Name: GetSecurityGroupStagingSpacesRequest},
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodPut, Name: PutStagingSecurityGroupSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},

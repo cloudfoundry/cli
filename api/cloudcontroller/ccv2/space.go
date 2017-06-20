@@ -65,11 +65,38 @@ func (client *Client) GetSpaces(queries []Query) ([]Space, Warnings, error) {
 	return fullSpacesList, warnings, err
 }
 
-// GetSecurityGroupSpaces returns a list of Spaces based on the provided
+// GetStagingSpacesBySecurityGroup returns a list of Spaces based on the provided
 // SecurityGroup GUID.
-func (client *Client) GetSpacesBySecurityGroup(securityGroupGUID string) ([]Space, Warnings, error) {
+func (client *Client) GetStagingSpacesBySecurityGroup(securityGroupGUID string) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetSecurityGroupSpacesRequest,
+		RequestName: internal.GetSecurityGroupStagingSpacesRequest,
+		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullSpacesList []Space
+	warnings, err := client.paginate(request, Space{}, func(item interface{}) error {
+		if space, ok := item.(Space); ok {
+			fullSpacesList = append(fullSpacesList, space)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Space{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullSpacesList, warnings, err
+}
+
+// GetRunningSpacesBySecurityGroup returns a list of Spaces based on the provided
+// SecurityGroup GUID.
+func (client *Client) GetRunningSpacesBySecurityGroup(securityGroupGUID string) ([]Space, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetSecurityGroupRunningSpacesRequest,
 		URIParams:   map[string]string{"security_group_guid": securityGroupGUID},
 	})
 	if err != nil {

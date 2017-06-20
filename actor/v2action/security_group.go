@@ -13,10 +13,11 @@ type SecurityGroup ccv2.SecurityGroup
 
 // SecurityGroupWithOrganizationAndSpace represents a security group with
 // organization and space information.
-type SecurityGroupWithOrganizationAndSpace struct {
+type SecurityGroupWithOrganizationSpaceAndLifecycle struct {
 	SecurityGroup *SecurityGroup
 	Organization  *Organization
 	Space         *Space
+	Lifecycle     string
 }
 
 // InvalidLifecycleError is returned when the lifecycle specified is neither
@@ -81,9 +82,43 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 	return securityGroup, Warnings(warnings), nil
 }
 
+type SpaceWithLifecycle struct {
+	ccv2.Space
+	Lifecycle string
+}
+
+func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID string) ([]SpaceWithLifecycle, Warnings, error) {
+	var (
+		spacesWithLifecycles []SpaceWithLifecycle
+		allWarnings          Warnings
+	)
+
+	runningSpaces, warnings, err := actor.CloudControllerClient.GetRunningSpacesBySecurityGroup(securityGroupGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, Warnings(allWarnings), err
+	}
+
+	for _, space := range runningSpaces {
+		spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: "running"})
+	}
+
+	stagingSpaces, warnings, err := actor.CloudControllerClient.GetStagingSpacesBySecurityGroup(securityGroupGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, Warnings(allWarnings), err
+	}
+
+	for _, space := range stagingSpaces {
+		spacesWithLifecycles = append(spacesWithLifecycles, SpaceWithLifecycle{Space: space, Lifecycle: "staging"})
+	}
+
+	return spacesWithLifecycles, allWarnings, nil
+}
+
 // GetSecurityGroupsWithOrganizationAndSpace returns a list of security groups
 // with org and space information.
-func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupWithOrganizationAndSpace, Warnings, error) {
+func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle() ([]SecurityGroupWithOrganizationSpaceAndLifecycle, Warnings, error) {
 	var err error
 
 	securityGroups, allWarnings, err := actor.CloudControllerClient.GetSecurityGroups(nil)
@@ -93,7 +128,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupW
 
 	cachedOrgs := make(map[string]Organization)
 
-	var secGroupOrgSpaces []SecurityGroupWithOrganizationAndSpace
+	var secGroupOrgSpaces []SecurityGroupWithOrganizationSpaceAndLifecycle
 
 	for _, s := range securityGroups {
 		securityGroup := SecurityGroup{
@@ -101,7 +136,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupW
 			Name: s.Name,
 		}
 
-		spaces, warnings, err := actor.CloudControllerClient.GetSpacesBySecurityGroup(s.GUID)
+		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, Warnings(allWarnings), err
@@ -109,7 +144,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupW
 
 		if len(spaces) == 0 {
 			secGroupOrgSpaces = append(secGroupOrgSpaces,
-				SecurityGroupWithOrganizationAndSpace{
+				SecurityGroupWithOrganizationSpaceAndLifecycle{
 					SecurityGroup: &securityGroup,
 					Organization:  &Organization{},
 					Space:         &Space{},
@@ -142,10 +177,11 @@ func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupW
 			}
 
 			secGroupOrgSpaces = append(secGroupOrgSpaces,
-				SecurityGroupWithOrganizationAndSpace{
+				SecurityGroupWithOrganizationSpaceAndLifecycle{
 					SecurityGroup: &securityGroup,
 					Organization:  &org,
 					Space:         &space,
+					Lifecycle:     sp.Lifecycle,
 				})
 		}
 	}
@@ -162,9 +198,13 @@ func (actor Actor) GetSecurityGroupsWithOrganizationAndSpace() ([]SecurityGroupW
 				return true
 			case secGroupOrgSpaces[i].Organization.Name > secGroupOrgSpaces[j].Organization.Name:
 				return false
+			case secGroupOrgSpaces[i].Space.Name < secGroupOrgSpaces[j].Space.Name:
+				return true
+			case secGroupOrgSpaces[i].Space.Name > secGroupOrgSpaces[j].Space.Name:
+				return false
 			}
 
-			return secGroupOrgSpaces[i].Space.Name < secGroupOrgSpaces[j].Space.Name
+			return secGroupOrgSpaces[i].Lifecycle == "staging"
 		})
 	return secGroupOrgSpaces, Warnings(allWarnings), err
 }
