@@ -6820,10 +6820,6 @@
     "translation": "事件"
   },
   {
-    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
-    "translation": "关闭密码输入的控制台回传失败: \n{{.ErrorDescription}}"
-  },
-  {
     "id": "filename",
     "translation": "文件名"
   },

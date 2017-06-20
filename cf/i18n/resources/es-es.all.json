@@ -6820,10 +6820,6 @@
     "translation": "suceso"
   },
   {
-    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
-    "translation": "no se ha podido desactivar el eco de la consola para la entrada de contraseña:\n{{.ErrorDescription}}"
-  },
-  {
     "id": "filename",
     "translation": "filename"
   },

@@ -6820,10 +6820,6 @@
     "translation": "event"
   },
   {
-    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
-    "translation": "failed turning off console echo for password entry:\n{{.ErrorDescription}}"
-  },
-  {
     "id": "filename",
     "translation": "filename"
   },
