@@ -18,6 +18,7 @@ type V3PushActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 	StartApplication(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	StopApplication(appName string, spaceGUID string) (v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
@@ -68,9 +69,16 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	app, err := cmd.createOrUpdateApplication(user.Name)
+	app, appExists, err := cmd.createApplication(user.Name)
 	if err != nil {
 		return shared.HandleError(err)
+	}
+
+	if appExists {
+		app, err = cmd.updateApplication(user.Name)
+		if err != nil {
+			return shared.HandleError(err)
+		}
 	}
 
 	pkg, err := cmd.uploadPackage(user.Name)
@@ -81,6 +89,13 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	dropletGUID, err := cmd.stagePackage(pkg, user.Name)
 	if err != nil {
 		return shared.HandleError(err)
+	}
+
+	if appExists {
+		err = cmd.stopApplication(user.Name)
+		if err != nil {
+			return shared.HandleError(err)
+		}
 	}
 
 	err = cmd.setApplicationDroplet(dropletGUID, user.Name)
@@ -122,32 +137,40 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	return cmd.displayAppInfo(user.Name)
 }
 
-func (cmd V3PushCommand) createOrUpdateApplication(userName string) (v3action.Application, error) {
+func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, bool, error) {
 	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
-		cmd.UI.DisplayTextWithFlavor("Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-			"AppName":      cmd.AppName,
-			"CurrentSpace": cmd.Config.TargetedSpace().Name,
-			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-			"CurrentUser":  userName,
-		})
-
-		app, warnings, err = cmd.Actor.GetApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
-		cmd.UI.DisplayWarnings(warnings)
-		if err != nil {
-			return v3action.Application{}, err
-		}
+		return app, true, nil
 	} else if err != nil {
+		return v3action.Application{}, false, err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+		"AppName":      cmd.AppName,
+		"CurrentSpace": cmd.Config.TargetedSpace().Name,
+		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+		"CurrentUser":  userName,
+	})
+
+	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
+	return app, false, nil
+}
+
+func (cmd V3PushCommand) updateApplication(userName string) (v3action.Application, error) {
+	cmd.UI.DisplayTextWithFlavor("Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+		"AppName":      cmd.AppName,
+		"CurrentSpace": cmd.Config.TargetedSpace().Name,
+		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+		"CurrentUser":  userName,
+	})
+
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
 		return v3action.Application{}, err
-	} else {
-		cmd.UI.DisplayTextWithFlavor("Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-			"AppName":      cmd.AppName,
-			"CurrentSpace": cmd.Config.TargetedSpace().Name,
-			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-			"CurrentUser":  userName,
-		})
 	}
 
 	cmd.UI.DisplayOK()
@@ -180,7 +203,7 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 }
 
 func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (string, error) {
-	cmd.UI.DisplayTextWithFlavor("Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Staging package for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -205,7 +228,7 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 }
 
 func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName string) error {
-	cmd.UI.DisplayTextWithFlavor("Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting V3 app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":     cmd.AppName,
 		"DropletGUID": dropletGUID,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
@@ -225,7 +248,7 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 }
 
 func (cmd V3PushCommand) startApplication(userName string) error {
-	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Starting V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -242,8 +265,26 @@ func (cmd V3PushCommand) startApplication(userName string) error {
 	return nil
 }
 
+func (cmd V3PushCommand) stopApplication(userName string) error {
+	cmd.UI.DisplayTextWithFlavor("Stopping V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+		"AppName":      cmd.AppName,
+		"CurrentSpace": cmd.Config.TargetedSpace().Name,
+		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+		"CurrentUser":  userName,
+	})
+
+	warnings, err := cmd.Actor.StopApplication(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return err
+	}
+	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
+	return nil
+}
+
 func (cmd V3PushCommand) displayAppInfo(userName string) error {
-	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Showing health and status for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
