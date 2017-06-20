@@ -434,6 +434,88 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
+	Describe("StopApplication", func() {
+		Context("when there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.StopApplicationReturns(
+					ccv3.Warnings{"stop-application-warning"},
+					nil,
+				)
+			})
+
+			It("stops the application", func() {
+				warnings, err := actor.StopApplication("some-app-name", "some-space-guid")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-applications-warning", "stop-application-warning"))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
+				Expect(queryURL).To(Equal(query))
+
+				Expect(fakeCloudControllerClient.StopApplicationCallCount()).To(Equal(1))
+				appGUID := fakeCloudControllerClient.StopApplicationArgsForCall(0)
+				Expect(appGUID).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when getting the application fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get application error")
+
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"get-applications-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				warnings, err := actor.StopApplication("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning"))
+			})
+		})
+
+		Context("when stopping the application fails", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("some set stop-application error")
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.StopApplicationReturns(
+					ccv3.Warnings{"stop-application-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				warnings, err := actor.StopApplication("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning", "stop-application-warning"))
+			})
+		})
+	})
+
 	Describe("StartApplication", func() {
 		Context("when there are no client errors", func() {
 			BeforeEach(func() {
@@ -452,7 +534,7 @@ var _ = Describe("Application Actions", func() {
 				)
 			})
 
-			It("sets the app's droplet", func() {
+			It("starts the application", func() {
 				app, warnings, err := actor.StartApplication("some-app-name", "some-space-guid")
 
 				Expect(err).ToNot(HaveOccurred())

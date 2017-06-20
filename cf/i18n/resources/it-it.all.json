@@ -5280,6 +5280,10 @@
     "translation": ""
   },
   {
+    "id": "Setting V3 app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting api endpoint to {{.Endpoint}}...",
     "translation": "Impostazione dell'endpoint api su {{.Endpoint}} in corso..."
   },
@@ -5380,6 +5384,10 @@
     "translation": "Visualizzazione della scala corrente dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.CurrentUser}} in corso..."
   },
   {
+    "id": "Showing health and status for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Visualizzazione dell'integrità e dello stato per l'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
@@ -5448,6 +5456,10 @@
     "translation": ""
   },
   {
+    "id": "Staging package for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -5474,6 +5486,10 @@
   {
     "id": "Started: {{.Started}}",
     "translation": "Avviata: {{.Started}}"
+  },
+  {
+    "id": "Starting V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5510,6 +5526,10 @@
   {
     "id": "Stop an app",
     "translation": "Arresta un'applicazione"
+  },
+  {
+    "id": "Stopping V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",

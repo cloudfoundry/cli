@@ -326,6 +326,79 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("StopApplication", func() {
+		Context("when the response succeeds", func() {
+			BeforeEach(func() {
+				response := `
+{
+	"guid": "some-app-guid",
+	"name": "some-app",
+	"state": "STOPPED"
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v3/apps/some-app-guid/stop"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns warnings and no error", func() {
+				warnings, err := client.StopApplication("some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Context("when stopping the app returns errors and warnings", func() {
+		BeforeEach(func() {
+			response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodPut, "/v3/apps/no-such-app-guid/stop"),
+					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+
+		})
+
+		It("returns the error and all warnings", func() {
+			warnings, err := client.StopApplication("no-such-app-guid")
+			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+				ResponseCode: http.StatusTeapot,
+				V3ErrorResponse: ccerror.V3ErrorResponse{
+					[]ccerror.V3Error{
+						{
+							Code:   10008,
+							Detail: "The request is semantically invalid: command presence",
+							Title:  "CF-UnprocessableEntity",
+						},
+						{
+							Code:   10010,
+							Detail: "App not found",
+							Title:  "CF-ResourceNotFound",
+						},
+					},
+				},
+			}))
+			Expect(warnings).To(ConsistOf("this is a warning"))
+		})
+	})
+
 	Describe("StartApplication", func() {
 		Context("when the response succeeds", func() {
 			BeforeEach(func() {

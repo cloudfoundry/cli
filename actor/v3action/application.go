@@ -68,6 +68,20 @@ func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID str
 	return Application(app), Warnings(warnings), err
 }
 
+// StopApplication stops an application.
+func (actor Actor) StopApplication(appName string, spaceGUID string) (Warnings, error) {
+	allWarnings := Warnings{}
+	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+	apiWarnings, err := actor.CloudControllerClient.StopApplication(application.GUID)
+	allWarnings = append(allWarnings, apiWarnings...)
+
+	return allWarnings, err
+}
+
 // StartApplication starts an application.
 func (actor Actor) StartApplication(appName string, spaceGUID string) (Application, Warnings, error) {
 	allWarnings := Warnings{}
@@ -77,8 +91,7 @@ func (actor Actor) StartApplication(appName string, spaceGUID string) (Applicati
 		return Application{}, allWarnings, err
 	}
 	updatedApp, apiWarnings, err := actor.CloudControllerClient.StartApplication(application.GUID)
-	actorWarnings := Warnings(apiWarnings)
-	allWarnings = append(allWarnings, actorWarnings...)
+	allWarnings = append(allWarnings, apiWarnings...)
 
 	return Application(updatedApp), allWarnings, err
 }

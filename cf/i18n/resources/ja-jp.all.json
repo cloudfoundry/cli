@@ -5280,6 +5280,10 @@
     "translation": ""
   },
   {
+    "id": "Setting V3 app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting api endpoint to {{.Endpoint}}...",
     "translation": "API エンドポイントを {{.Endpoint}} に設定しています..."
   },
@@ -5380,6 +5384,10 @@
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の現在のスケールを表示しています..."
   },
   {
+    "id": "Showing health and status for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} の正常性と状況を表示しています..."
   },
@@ -5448,6 +5456,10 @@
     "translation": ""
   },
   {
+    "id": "Staging package for V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -5474,6 +5486,10 @@
   {
     "id": "Started: {{.Started}}",
     "translation": "開始されました: {{.Started}}"
+  },
+  {
+    "id": "Starting V3 app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -5510,6 +5526,10 @@
   {
     "id": "Stop an app",
     "translation": "アプリを停止します"
+  },
+  {
+    "id": "Stopping V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",

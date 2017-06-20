@@ -36,6 +36,7 @@ const (
 	PostPackageRequest                                    = "PostPackageRequest"
 	PutTaskCancelRequest                                  = "PutTaskCancelRequest"
 	PutApplicationStartRequest                            = "PutApplicationStart"
+	PutApplicationStopRequest                             = "PutApplicationStop"
 )
 
 const (
@@ -74,6 +75,7 @@ var APIRoutes = []Route{
 	{Path: "/:guid/relationships/organizations", Method: http.MethodPost, Name: PostIsolationSegmentRelationshipOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/relationships/organizations/:org_guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRelationshipOrganizationRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/start", Method: http.MethodPut, Name: PutApplicationStartRequest, Resource: AppsResource},
+	{Path: "/:guid/stop", Method: http.MethodPut, Name: PutApplicationStopRequest, Resource: AppsResource},
 	{Path: "/:guid/tasks", Method: http.MethodGet, Name: GetAppTasksRequest, Resource: AppsResource},
 	{Path: "/:guid/tasks", Method: http.MethodPost, Name: PostAppTasksRequest, Resource: AppsResource},
 }

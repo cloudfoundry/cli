@@ -201,7 +201,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(testUI.Err).To(Say("I am a package warning"))
 					Expect(testUI.Err).To(Say("I am also a package warning"))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as banana...", app))
+					Expect(testUI.Out).To(Say("Staging package for V3 app %s in org some-org / space some-space as banana...", app))
 				})
 
 				Context("when getting streaming logs fails", func() {
@@ -214,7 +214,7 @@ var _ = Describe("v3-push Command", func() {
 					It("returns the error and displays warnings", func() {
 						Expect(executeErr).To(Equal(expectedErr))
 
-						Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as banana...", app))
+						Expect(testUI.Out).To(Say("Staging package for V3 app %s in org some-org / space some-space as banana...", app))
 
 						Expect(testUI.Err).To(Say("some-logging-warning"))
 						Expect(testUI.Err).To(Say("some-other-logging-warning"))
@@ -267,7 +267,7 @@ var _ = Describe("v3-push Command", func() {
 						It("returns the error and displays warnings", func() {
 							Expect(executeErr).To(Equal(expectedErr))
 
-							Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as banana...", app))
+							Expect(testUI.Out).To(Say("Staging package for V3 app %s in org some-org / space some-space as banana...", app))
 
 							Expect(testUI.Err).To(Say("some-staging-warning"))
 							Expect(testUI.Err).To(Say("some-other-staging-warning"))
@@ -299,7 +299,7 @@ var _ = Describe("v3-push Command", func() {
 						It("outputs the droplet GUID", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as banana...", app))
+							Expect(testUI.Out).To(Say("Staging package for V3 app %s in org some-org / space some-space as banana...", app))
 							Expect(testUI.Out).To(Say("droplet: some-droplet-guid"))
 							Expect(testUI.Out).To(Say("OK"))
 
@@ -337,12 +337,12 @@ var _ = Describe("v3-push Command", func() {
 							It("returns the error", func() {
 								Expect(executeErr).To(Equal(errors.New("some-error")))
 
-								Expect(testUI.Out).To(Say("Setting app some-app to droplet some-droplet-guid in org some-org / space some-space as banana..."))
+								Expect(testUI.Out).To(Say("Setting V3 app some-app to droplet some-droplet-guid in org some-org / space some-space as banana..."))
 
 								Expect(testUI.Err).To(Say("droplet-warning-1"))
 								Expect(testUI.Err).To(Say("droplet-warning-2"))
 
-								Expect(testUI.Out).ToNot(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+								Expect(testUI.Out).ToNot(Say("Starting V3 app some-app in org some-org / space some-space as banana\\.\\.\\."))
 							})
 						})
 
@@ -352,11 +352,13 @@ var _ = Describe("v3-push Command", func() {
 							})
 
 							It("displays that the droplet was assigned", func() {
-								Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as banana...", app))
+								Expect(testUI.Out).To(Say("Staging package for V3 app %s in org some-org / space some-space as banana...", app))
 								Expect(testUI.Out).To(Say("droplet: some-droplet-guid"))
 								Expect(testUI.Out).To(Say("OK"))
 
-								Expect(testUI.Out).To(Say("Setting app some-app to droplet some-droplet-guid in org some-org / space some-space as banana..."))
+								Expect(testUI.Out).ToNot(Say("Stopping .*"))
+
+								Expect(testUI.Out).To(Say("Setting V3 app some-app to droplet some-droplet-guid in org some-org / space some-space as banana..."))
 
 								Expect(testUI.Err).To(Say("droplet-warning-1"))
 								Expect(testUI.Err).To(Say("droplet-warning-2"))
@@ -376,7 +378,7 @@ var _ = Describe("v3-push Command", func() {
 
 								It("says that the app failed to start", func() {
 									Expect(executeErr).To(Equal(errors.New("some-error")))
-									Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+									Expect(testUI.Out).To(Say("Starting V3 app some-app in org some-org / space some-space as banana\\.\\.\\."))
 
 									Expect(testUI.Err).To(Say("start-warning-1"))
 									Expect(testUI.Err).To(Say("start-warning-2"))
@@ -391,7 +393,7 @@ var _ = Describe("v3-push Command", func() {
 								})
 
 								It("says that the app was started and outputs warnings", func() {
-									Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+									Expect(testUI.Out).To(Say("Starting V3 app some-app in org some-org / space some-space as banana\\.\\.\\."))
 
 									Expect(testUI.Err).To(Say("start-warning-1"))
 									Expect(testUI.Err).To(Say("start-warning-2"))
@@ -459,7 +461,7 @@ var _ = Describe("v3-push Command", func() {
 									It("returns the error and prints warnings", func() {
 										Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
 
-										Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Out).To(Say("Showing health and status for V3 app some-app in org some-org / space some-space as banana\\.\\.\\."))
 
 										Expect(testUI.Err).To(Say("display-warning-1"))
 										Expect(testUI.Err).To(Say("display-warning-2"))
@@ -509,7 +511,7 @@ var _ = Describe("v3-push Command", func() {
 									It("prints the application summary and outputs warnings", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
+										Expect(testUI.Out).To(Say("(?m)Showing health and status for V3 app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
 										Expect(testUI.Out).To(Say("name:\\s+some-app"))
 										Expect(testUI.Out).To(Say("requested state:\\s+started"))
 										Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
@@ -534,6 +536,22 @@ var _ = Describe("v3-push Command", func() {
 						})
 					})
 				})
+			})
+		})
+
+		Context("when the application already exists", func() {
+			BeforeEach(func() {
+				fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, nil, v3action.ApplicationAlreadyExistsError{})
+			})
+
+			It("stops the application and pushes it", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Out).To(Say("Stopping V3 app some-app in org some-org / space some-space as banana..."))
+
+				Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+				appNameArg, spaceGUIDArg := fakeActor.StopApplicationArgsForCall(0)
+				Expect(appNameArg).To(Equal("some-app"))
+				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 			})
 		})
 	})

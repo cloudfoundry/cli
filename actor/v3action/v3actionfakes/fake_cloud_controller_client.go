@@ -381,6 +381,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	StopApplicationStub        func(appGUID string) (ccv3.Warnings, error)
+	stopApplicationMutex       sync.RWMutex
+	stopApplicationArgsForCall []struct {
+		appGUID string
+	}
+	stopApplicationReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	stopApplicationReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	updateTaskMutex       sync.RWMutex
 	updateTaskArgsForCall []struct {
@@ -1757,6 +1770,57 @@ func (fake *FakeCloudControllerClient) StartApplicationReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) StopApplication(appGUID string) (ccv3.Warnings, error) {
+	fake.stopApplicationMutex.Lock()
+	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
+	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("StopApplication", []interface{}{appGUID})
+	fake.stopApplicationMutex.Unlock()
+	if fake.StopApplicationStub != nil {
+		return fake.StopApplicationStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.stopApplicationReturns.result1, fake.stopApplicationReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) StopApplicationCallCount() int {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	return len(fake.stopApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) StopApplicationArgsForCall(i int) string {
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
+	return fake.stopApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) StopApplicationReturns(result1 ccv3.Warnings, result2 error) {
+	fake.StopApplicationStub = nil
+	fake.stopApplicationReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) StopApplicationReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.StopApplicationStub = nil
+	if fake.stopApplicationReturnsOnCall == nil {
+		fake.stopApplicationReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.stopApplicationReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
 	fake.updateTaskMutex.Lock()
 	ret, specificReturn := fake.updateTaskReturnsOnCall[len(fake.updateTaskArgsForCall)]
@@ -1919,6 +1983,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.setApplicationDropletMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
+	fake.stopApplicationMutex.RLock()
+	defer fake.stopApplicationMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
 	defer fake.updateTaskMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
