@@ -273,5 +273,38 @@ var _ = Describe("security-groups command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		XContext("When some security groups are assigned to staging", func() {
+			var (
+				runningSecurityGroup helpers.SecurityGroup
+				stagingSecurityGroup helpers.SecurityGroup
+			)
+
+			BeforeEach(func() {
+				runningSecurityGroup = helpers.NewSecurityGroup("running-security-group", "tcp", "11.1.1.0/24", "80,443", "SG1")
+				stagingSecurityGroup = helpers.NewSecurityGroup("staging-security-group", "tcp", "11.1.1.0/24", "80,443", "SG1")
+
+				helpers.CreateOrgAndSpace("some-org", "some-space")
+				helpers.TargetOrg("some-org")
+				helpers.CreateSpace("some-space-2")
+
+				Eventually(helpers.CF("bind-security-group", "running-security-group", "some-org", "some-space", "--lifecycle", "running")).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", "running-security-group", "some-org", "some-space-2", "--lifecycle", "running")).Should(Exit(0))
+
+				Eventually(helpers.CF("bind-security-group", "staging-security-group", "some-org", "some-space", "--lifecycle", "staging")).Should(Exit(0))
+			})
+
+			It("displays staging under lifecycle", func() {
+				Eventually(session.Out).Should(Say("Getting security groups as admin"))
+				Eventually(session.Out).Should(Say("OK\\n\\n"))
+				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space"))
+				Eventually(session.Out).Should(Say("\\s+#0\\s+running-security-group\\s+some-org\\s+some-space\\s+running"))
+				Eventually(session.Out).Should(Say("\\s+running-security-grooup\\s+some-org\\s+some-space-2\\s+running"))
+
+				Eventually(session.Out).Should(Say("\\s+#1staging-security-group\\s+some-org\\s+some-space\\s+staging"))
+				Eventually(session.Out).Should(Say("\\s+#1staging-security-group\\s+some-org\\s+some-space\\s+running"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
