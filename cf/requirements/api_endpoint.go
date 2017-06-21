@@ -3,11 +3,12 @@ package requirements
 import (
 	"fmt"
 
+	"errors"
+
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"errors"
 )
 
 type APIEndpointRequirement struct {
@@ -20,8 +21,8 @@ func NewAPIEndpointRequirement(config coreconfig.Reader) APIEndpointRequirement 
 
 func (req APIEndpointRequirement) Execute() error {
 	if req.config.APIEndpoint() == "" {
-		loginTip := terminal.CommandColor(fmt.Sprintf(T("{{.CFName}} login", map[string]interface{}{"CFName": cf.Name})))
-		apiTip := terminal.CommandColor(fmt.Sprintf(T("{{.CFName}} api", map[string]interface{}{"CFName": cf.Name})))
+		loginTip := terminal.CommandColor(fmt.Sprintf("%s login", cf.Name))
+		apiTip := terminal.CommandColor(fmt.Sprintf("%s api", cf.Name))
 		return errors.New(T("No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
 			map[string]interface{}{
 				"LoginTip": loginTip,
