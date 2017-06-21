@@ -2,11 +2,9 @@ package v2
 
 import (
 	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
@@ -14,7 +12,8 @@ import (
 //go:generate counterfeiter . SecurityGroupsActor
 
 type SecurityGroupsActor interface {
-	GetSecurityGroupsWithOrganizationSpaceAndLifecycle() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
+	CloudControllerAPIVersion() string
+	GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging bool) ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
 }
 
 type SecurityGroupsCommand struct {
@@ -42,13 +41,6 @@ func (cmd *SecurityGroupsCommand) Setup(config command.Config, ui command.UI) er
 }
 
 func (cmd SecurityGroupsCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return shared.HandleError(err)
@@ -59,10 +51,23 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
+	includeStaging := true
+
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.36.0")
+	if err != nil {
+		switch err.(type) {
+		case command.MinimumAPIVersionNotMetError:
+			includeStaging = false
+
+		default:
+			return err
+		}
+	}
+
 	cmd.UI.DisplayTextWithFlavor("Getting security groups as {{.UserName}}...",
 		map[string]interface{}{"UserName": user.Name})
 
-	secGroupOrgSpaces, warnings, err := cmd.Actor.GetSecurityGroupsWithOrganizationSpaceAndLifecycle()
+	secGroupOrgSpaces, warnings, err := cmd.Actor.GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -97,7 +102,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 			secGroupOrgSpace.SecurityGroup.Name,
 			secGroupOrgSpace.Organization.Name,
 			secGroupOrgSpace.Space.Name,
-			secGroupOrgSpace.Lifecycle,
+			string(secGroupOrgSpace.Lifecycle),
 		})
 	}
 
