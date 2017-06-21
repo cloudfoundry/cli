@@ -15,6 +15,7 @@ var _ = Describe("bind-security-group command", func() {
 	var (
 		orgName      string
 		secGroupName string
+		someOrgName  string
 		spaceName1   string
 		spaceName2   string
 	)
@@ -22,6 +23,7 @@ var _ = Describe("bind-security-group command", func() {
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
 		secGroupName = helpers.NewSecGroupName()
+		someOrgName = helpers.NewOrgName()
 		spaceName1 = helpers.NewSpaceName()
 		spaceName2 = helpers.NewSpaceName()
 
@@ -48,7 +50,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	Context("when the lifecycle flag is invalid", func() {
 		It("outputs a message and usage", func() {
-			session := helpers.CF("bind-security-group", secGroupName, "some-org", "--lifecycle", "invalid")
+			session := helpers.CF("bind-security-group", secGroupName, someOrgName, "--lifecycle", "invalid")
 			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `invalid' for option `--lifecycle'. Allowed values are: running or staging"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session).Should(Exit(1))
@@ -57,7 +59,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	Context("when the lifecycle flag has no argument", func() {
 		It("outputs a message and usage", func() {
-			session := helpers.CF("bind-security-group", secGroupName, "some-org", "--lifecycle")
+			session := helpers.CF("bind-security-group", secGroupName, someOrgName, "--lifecycle")
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--lifecycle'"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session).Should(Exit(1))
@@ -71,7 +73,7 @@ var _ = Describe("bind-security-group command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("bind-security-group", secGroupName, "some-org")
+				session := helpers.CF("bind-security-group", secGroupName, someOrgName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
@@ -84,7 +86,7 @@ var _ = Describe("bind-security-group command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("bind-security-group", secGroupName, "some-org")
+				session := helpers.CF("bind-security-group", secGroupName, someOrgName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
@@ -144,7 +146,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	Context("when the security group doesn't exist", func() {
 		It("fails with a security group not found message", func() {
-			session := helpers.CF("bind-security-group", "some-security-group-that-doesn't-exist", "some-org")
+			session := helpers.CF("bind-security-group", "some-security-group-that-doesn't-exist", someOrgName)
 			Eventually(session.Err).Should(Say("Security group 'some-security-group-that-doesn't-exist' not found."))
 			Eventually(session.Out).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
@@ -165,8 +167,8 @@ var _ = Describe("bind-security-group command", func() {
 
 		Context("when the org doesn't exist", func() {
 			It("fails with an org not found message", func() {
-				session := helpers.CF("bind-security-group", secGroupName, "some-org")
-				Eventually(session.Err).Should(Say("Organization 'some-org' not found."))
+				session := helpers.CF("bind-security-group", secGroupName, someOrgName)
+				Eventually(session.Err).Should(Say("Organization '%s' not found.", someOrgName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

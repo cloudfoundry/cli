@@ -149,11 +149,11 @@ var _ = Describe("org command", func() {
 
 					spacesSorted := []string{spaceName, spaceName2}
 					sort.Strings(spacesSorted)
-					Eventually(session.Out).Should(Say("spaces:\\s+%s, %s", spacesSorted[0], spacesSorted[1]))
+					Eventually(session.Out).Should(Say("spaces:\\s+%s,.* %s", spacesSorted[0], spacesSorted[1]))
 
 					isolationSegmentsSorted := []string{isolationSegmentName1, isolationSegmentName2}
 					sort.Strings(isolationSegmentsSorted)
-					Eventually(session.Out).Should(Say("isolation segments:\\s+%s, %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
+					Eventually(session.Out).Should(Say("isolation segments:\\s+.*%s,.* %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
 
 					Eventually(session).Should(Exit(0))
 				})
