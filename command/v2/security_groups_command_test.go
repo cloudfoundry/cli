@@ -82,7 +82,7 @@ var _ = Describe("security-groups Command", func() {
 
 	Context("when the API version is low enough not to support fetching staging", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("2.34.0")
+			fakeActor.CloudControllerAPIVersionReturns("2.36.0")
 		})
 
 		It("makes the fetch indicating that staging should not be included", func() {
@@ -98,7 +98,7 @@ var _ = Describe("security-groups Command", func() {
 
 	Context("when the API version is high enough to support fetching staging", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("2.36.0")
+			fakeActor.CloudControllerAPIVersionReturns("2.69.0")
 		})
 
 		Context("when the list of security groups is returned", func() {
