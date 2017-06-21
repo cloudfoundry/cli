@@ -143,7 +143,7 @@ var _ = Describe("org command", func() {
 
 					domainsSorted := []string{defaultSharedDomain(), domainName}
 					sort.Strings(domainsSorted)
-					Eventually(session.Out).Should(Say("domains:\\s+%s, %s", domainsSorted[0], domainsSorted[1]))
+					Eventually(session.Out).Should(Say("domains:.+%s,.+%s", domainsSorted[0], domainsSorted[1]))
 
 					Eventually(session.Out).Should(Say("quota:\\s+%s", quotaName))
 
