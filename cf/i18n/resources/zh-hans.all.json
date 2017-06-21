@@ -1512,7 +1512,7 @@
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
-    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\nTIP: Changes will not apply to existing running applications until they are restarted.",
+    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\\n\\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\n提示: 现有运行中应用程序仅在重新启动之后才会应用更改。"
   },
   {
@@ -5152,6 +5152,10 @@
     "translation": ""
   },
   {
+    "id": "Security group {{.Name}} not bound to this space for lifecycle phase {{.Lifecycle}}.",
+    "translation": ""
+  },
+  {
     "id": "Security group {{.security_group}} does not exist",
     "translation": "安全组 {{.security_group}} 不存在"
   },
@@ -7218,10 +7222,6 @@
   {
     "id": "stack:",
     "translation": "堆栈: "
-  },
-  {
-    "id": "staging",
-    "translation": ""
   },
   {
     "id": "start command:",

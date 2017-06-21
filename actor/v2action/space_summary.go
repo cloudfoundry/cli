@@ -1,12 +1,16 @@
 package v2action
 
-import "sort"
+import (
+	"sort"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 type SecurityGroupRule struct {
 	Name        string
 	Description string
 	Destination string
-	Lifecycle   string
+	Lifecycle   ccv2.SecurityGroupLifecycle
 	Ports       string
 	Protocol    string
 }
@@ -82,7 +86,7 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 
 	for _, securityGroup := range securityGroups {
 		securityGroupNames = append(securityGroupNames, securityGroup.Name)
-		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, "running")...)
+		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleRunning)...)
 	}
 
 	if includeStagingSecurityGroupsRules {
@@ -92,7 +96,7 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 			return SpaceSummary{}, allWarnings, err
 		}
 		for _, securityGroup := range securityGroups {
-			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, "staging")...)
+			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleStaging)...)
 		}
 	}
 

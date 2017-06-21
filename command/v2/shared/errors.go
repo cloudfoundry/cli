@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
@@ -59,6 +60,22 @@ func (_ OrganizationNotFoundError) Error() string {
 func (e OrganizationNotFoundError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Name": e.Name,
+	})
+}
+
+type SecurityGroupNotBoundError struct {
+	Lifecycle ccv2.SecurityGroupLifecycle
+	Name      string
+}
+
+func (_ SecurityGroupNotBoundError) Error() string {
+	return "Security group {{.Name}} not bound to this space for lifecycle phase {{.Lifecycle}}."
+}
+
+func (e SecurityGroupNotBoundError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"Name":      e.Name,
+		"Lifecycle": e.Lifecycle,
 	})
 }
 

@@ -165,7 +165,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 				securityGroupRule.Destination,
 				securityGroupRule.Ports,
 				securityGroupRule.Protocol,
-				securityGroupRule.Lifecycle,
+				string(securityGroupRule.Lifecycle),
 				securityGroupRule.Description,
 			})
 		}

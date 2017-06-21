@@ -52,6 +52,7 @@ var _ = Describe("Translatable Errors", func() {
 		// Command errors.
 		Entry("NoOrgTargetedError", NoOrganizationTargetedError{}),
 		Entry("OrgNotFoundError", OrganizationNotFoundError{}),
+		Entry("SecurityGroupNotBoundError", SecurityGroupNotBoundError{}),
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
 		Entry("UnsuccessfulStartError", UnsuccessfulStartError{}),

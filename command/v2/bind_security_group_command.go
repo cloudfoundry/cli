@@ -3,6 +3,7 @@ package v2
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -11,7 +12,7 @@ import (
 //go:generate counterfeiter . BindSecurityGroupActor
 
 type BindSecurityGroupActor interface {
-	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle string) (v2action.Warnings, error)
+	BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
 	CloudControllerAPIVersion() string
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 	GetOrganizationSpaces(orgGUID string) ([]v2action.Space, v2action.Warnings, error)
@@ -20,10 +21,10 @@ type BindSecurityGroupActor interface {
 }
 
 type BindSecurityGroupCommand struct {
-	RequiredArgs    flag.BindSecurityGroupArgs `positional-args:"yes"`
-	Lifecycle       string                     `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
-	usage           interface{}                `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE] [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
-	relatedCommands interface{}                `related_commands:"apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"`
+	RequiredArgs    flag.BindSecurityGroupArgs  `positional-args:"yes"`
+	Lifecycle       ccv2.SecurityGroupLifecycle `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
+	usage           interface{}                 `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE] [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
+	relatedCommands interface{}                 `related_commands:"apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"`
 
 	UI          command.UI
 	Config      command.Config
@@ -47,7 +48,7 @@ func (cmd *BindSecurityGroupCommand) Setup(config command.Config, ui command.UI)
 
 func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if cmd.Lifecycle == "staging" {
+	if cmd.Lifecycle == ccv2.SecurityGroupLifecycleStaging {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.36.0")
 		if err != nil {
 			switch e := err.(type) {
