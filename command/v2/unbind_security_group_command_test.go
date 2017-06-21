@@ -318,7 +318,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			It("returns a MinimumAPIVersionNotMetError", func() {
 				Expect(executeErr).To(MatchError(command.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: "2.34.0",
-					MinimumVersion: "2.36.0",
+					MinimumVersion: "2.69.0",
 				}))
 				Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
