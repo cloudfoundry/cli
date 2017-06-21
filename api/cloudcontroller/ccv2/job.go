@@ -140,31 +140,6 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 	}
 }
 
-// DeleteOrganization deletes the Organization associated with the provided
-// GUID. It will return the Cloud Controller job that is assigned to the
-// organization deletion.
-func (client *Client) DeleteOrganization(orgGUID string) (Job, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteOrganizationRequest,
-		URIParams:   Params{"organization_guid": orgGUID},
-		Query: url.Values{
-			"recursive": {"true"},
-			"async":     {"true"},
-		},
-	})
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	var job Job
-	response := cloudcontroller.Response{
-		Result: &job,
-	}
-
-	err = client.connection.Make(request, &response)
-	return job, response.Warnings, err
-}
-
 // UploadApplicationPackage uploads the newResources and a list of existing
 // resources to the cloud controller. A job that combines the requested/newly
 // uploaded bits is returned. If passed an io.Reader, this request will return
