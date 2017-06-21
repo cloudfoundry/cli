@@ -14,7 +14,7 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 	for _, route := range config.DesiredRoutes {
 		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
 			log.Debugf("binding route: %#v", route)
-			warnings, err := actor.bindRouteToApp(route, config.DesiredApplication.GUID)
+			warnings, err := actor.BindRouteToApp(route, config.DesiredApplication.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				log.Errorln("binding route:", err)
@@ -88,7 +88,7 @@ func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceG
 	}
 }
 
-func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
+func (actor Actor) BindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
 	warnings, err := actor.V2Actor.BindRouteToApplication(route.GUID, appGUID)
 	if _, ok := err.(v2action.RouteInDifferentSpaceError); ok {
 		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
