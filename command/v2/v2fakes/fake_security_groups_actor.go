@@ -9,10 +9,21 @@ import (
 )
 
 type FakeSecurityGroupsActor struct {
-	GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub        func() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct{}
+	cloudControllerAPIVersionReturns     struct {
+		result1 string
+	}
+	cloudControllerAPIVersionReturnsOnCall map[int]struct {
+		result1 string
+	}
+	GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub        func(includeStaging bool) ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error)
 	getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex       sync.RWMutex
-	getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall []struct{}
-	getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns     struct {
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall []struct {
+		includeStaging bool
+	}
+	getSecurityGroupsWithOrganizationSpaceAndLifecycleReturns struct {
 		result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle
 		result2 v2action.Warnings
 		result3 error
@@ -26,14 +37,56 @@ type FakeSecurityGroupsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle() ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error) {
+func (fake *FakeSecurityGroupsActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	ret, specificReturn := fake.cloudControllerAPIVersionReturnsOnCall[len(fake.cloudControllerAPIVersionArgsForCall)]
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.cloudControllerAPIVersionReturns.result1
+}
+
+func (fake *FakeSecurityGroupsActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeSecurityGroupsActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeSecurityGroupsActor) CloudControllerAPIVersionReturnsOnCall(i int, result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	if fake.cloudControllerAPIVersionReturnsOnCall == nil {
+		fake.cloudControllerAPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cloudControllerAPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging bool) ([]v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, v2action.Warnings, error) {
 	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.Lock()
 	ret, specificReturn := fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleReturnsOnCall[len(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall)]
-	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall = append(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall, struct{}{})
-	fake.recordInvocation("GetSecurityGroupsWithOrganizationSpaceAndLifecycle", []interface{}{})
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall = append(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall, struct {
+		includeStaging bool
+	}{includeStaging})
+	fake.recordInvocation("GetSecurityGroupsWithOrganizationSpaceAndLifecycle", []interface{}{includeStaging})
 	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.Unlock()
 	if fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub != nil {
-		return fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub()
+		return fake.GetSecurityGroupsWithOrganizationSpaceAndLifecycleStub(includeStaging)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -45,6 +98,12 @@ func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLi
 	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RLock()
 	defer fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RUnlock()
 	return len(fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall)
+}
+
+func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall(i int) bool {
+	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RLock()
+	defer fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RUnlock()
+	return fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleArgsForCall[i].includeStaging
 }
 
 func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(result1 []v2action.SecurityGroupWithOrganizationSpaceAndLifecycle, result2 v2action.Warnings, result3 error) {
@@ -75,6 +134,8 @@ func (fake *FakeSecurityGroupsActor) GetSecurityGroupsWithOrganizationSpaceAndLi
 func (fake *FakeSecurityGroupsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RLock()
 	defer fake.getSecurityGroupsWithOrganizationSpaceAndLifecycleMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
