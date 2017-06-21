@@ -234,6 +234,7 @@ var _ = Describe("v3-push Command", func() {
 							go func() {
 								logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
 								logStream <- v3action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
+								logStream <- v3action.NewLogMessage("not from staging", 1, time.Now(), "potato", "sourceInstance")
 								allLogsWritten <- true
 							}()
 
@@ -316,6 +317,7 @@ var _ = Describe("v3-push Command", func() {
 						It("displays staging logs and their warnings", func() {
 							Expect(testUI.Out).To(Say("Here are some staging logs!"))
 							Expect(testUI.Out).To(Say("Here are some other staging logs!"))
+							Expect(testUI.Out).ToNot(Say("not from staging"))
 
 							Expect(testUI.Err).To(Say("steve for all I care"))
 

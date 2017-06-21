@@ -23,7 +23,9 @@ func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action
 			if !ok {
 				break
 			}
-			ui.DisplayLogMessage(log, false)
+			if log.Staging() {
+				ui.DisplayLogMessage(log, false)
+			}
 		case warnings, ok := <-warningsStream:
 			if !ok {
 				closedWarningsStream = true
