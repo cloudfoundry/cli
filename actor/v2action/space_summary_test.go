@@ -304,12 +304,14 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
+					Expect(queriesRunning).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
+					Expect(queriesStaging).To(BeNil())
 				})
 
 				Context("when no space quota is assigned", func() {
@@ -882,8 +884,9 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(queries).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
 				})

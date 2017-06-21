@@ -1512,7 +1512,7 @@
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
-    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\nTIP: Changes will not apply to existing running applications until they are restarted.",
+    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\\n\\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\n팁: 애플리케이션이 다시 시작될 때까지 기존의 실행 중인 애플리케이션에 변경사항이 적용되지 않습니다. "
   },
   {
@@ -5152,6 +5152,10 @@
     "translation": ""
   },
   {
+    "id": "Security group {{.Name}} not bound to this space for lifecycle phase {{.Lifecycle}}.",
+    "translation": ""
+  },
+  {
     "id": "Security group {{.security_group}} does not exist",
     "translation": "보안 그룹 {{.security_group}} 없음"
   },
@@ -7218,10 +7222,6 @@
   {
     "id": "stack:",
     "translation": "스택:"
-  },
-  {
-    "id": "staging",
-    "translation": ""
   },
   {
     "id": "start command:",

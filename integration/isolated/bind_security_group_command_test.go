@@ -92,6 +92,36 @@ var _ = Describe("bind-security-group command", func() {
 		})
 	})
 
+	Context("when the server's API version is too low", func() {
+		var server *Server
+
+		BeforeEach(func() {
+			server = NewTLSServer()
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/info"),
+					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
+				),
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/info"),
+					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
+				),
+			)
+			Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
+		})
+
+		AfterEach(func() {
+			server.Close()
+		})
+
+		It("reports an error with a minimum-version message", func() {
+			session := helpers.CF("bind-security-group", secGroupName, orgName, spaceName1, "--lifecycle", "staging")
+
+			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.36\\.0\\. Your target is 2\\.34\\.0\\."))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
 	Context("when the input is invalid", func() {
 		Context("when the security group is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
@@ -134,7 +164,7 @@ var _ = Describe("bind-security-group command", func() {
 		})
 
 		Context("when the org doesn't exist", func() {
-			It("fails with a org not found message", func() {
+			It("fails with an org not found message", func() {
 				session := helpers.CF("bind-security-group", secGroupName, "some-org")
 				Eventually(session.Err).Should(Say("Organization 'some-org' not found."))
 				Eventually(session.Out).Should(Say("FAILED"))
@@ -238,36 +268,6 @@ var _ = Describe("bind-security-group command", func() {
 					})
 				})
 			})
-		})
-	})
-
-	Context("when the server's API version is too low", func() {
-		var server *Server
-
-		BeforeEach(func() {
-			server = NewTLSServer()
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-				),
-				CombineHandlers(
-					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-				),
-			)
-			Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			server.Close()
-		})
-
-		It("reports an error with a minimum-version message", func() {
-			session := helpers.CF("bind-security-group", secGroupName, orgName, spaceName1, "--lifecycle", "staging")
-
-			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.36\\.0\\. Your target is 2\\.34\\.0\\."))
-			Eventually(session).Should(Exit(1))
 		})
 	})
 })
