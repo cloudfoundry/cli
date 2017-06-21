@@ -791,6 +791,9 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 		appParams.DockerUsername = &username
 
 		password := os.Getenv("CF_DOCKER_PASSWORD")
+		for attempts := 0; password == "" && attempts < 3; attempts += 1 {
+			password = cmd.ui.AskForPassword("Docker password")
+		}
 		if password == "" {
 			return models.AppParams{}, errors.New(T("Environment variable CF_DOCKER_PASSWORD not set."))
 		}

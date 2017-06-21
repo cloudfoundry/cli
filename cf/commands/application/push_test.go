@@ -220,12 +220,14 @@ var _ = Describe("Push Command", func() {
 			executeErr     error
 			args           []string
 			uiWithContents terminal.UI
+			input          *gbytes.Buffer
 			output         *gbytes.Buffer
 		)
 
 		BeforeEach(func() {
+			input = gbytes.NewBuffer()
 			output = gbytes.NewBuffer()
-			uiWithContents = terminal.NewUI(gbytes.NewBuffer(), output, terminal.NewTeePrinter(output), trace.NewWriterPrinter(output, false))
+			uiWithContents = terminal.NewUI(input, output, terminal.NewTeePrinter(output), trace.NewWriterPrinter(output, false))
 
 			domainRepo.FirstOrDefaultStub = func(orgGUID string, name *string) (models.DomainFields, error) {
 				if name == nil {
@@ -868,6 +870,7 @@ var _ = Describe("Push Command", func() {
 							It("it passes the credentials to create call", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
+								Expect(appRepo.CreateCallCount()).To(Equal(1))
 								params := appRepo.CreateArgsForCall(0)
 								Expect(*params.DockerUsername).To(Equal("some-docker-username"))
 								Expect(*params.DockerPassword).To(Equal("some-docker-pass"))
@@ -875,8 +878,42 @@ var _ = Describe("Push Command", func() {
 						})
 
 						Context("when CF_DOCKER_PASSWORD is not set", func() {
-							It("returns an error", func() {
-								Expect(executeErr).To(MatchError("Environment variable CF_DOCKER_PASSWORD not set."))
+							Context("when the user gets prompted for the docker password", func() {
+								Context("when the user inputs the password on the first attempt", func() {
+									BeforeEach(func() {
+										_, err := input.Write([]byte("some-docker-pass\n"))
+										Expect(err).NotTo(HaveOccurred())
+									})
+
+									It("it passes the credentials to create call", func() {
+										Expect(executeErr).NotTo(HaveOccurred())
+
+										Expect(output).To(gbytes.Say("Docker password:"))
+										Expect(output).ToNot(gbytes.Say("Docker password:")) // Only prompt once
+
+										Expect(appRepo.CreateCallCount()).To(Equal(1))
+										params := appRepo.CreateArgsForCall(0)
+										Expect(*params.DockerUsername).To(Equal("some-docker-username"))
+										Expect(*params.DockerPassword).To(Equal("some-docker-pass"))
+									})
+								})
+
+								Context("when the user fails to input the password 3 times", func() {
+									BeforeEach(func() {
+										_, err := input.Write([]byte("\n\n\n"))
+										Expect(err).NotTo(HaveOccurred())
+									})
+
+									It("returns an error", func() {
+										Expect(executeErr).To(MatchError("Environment variable CF_DOCKER_PASSWORD not set."))
+
+										Expect(output).To(gbytes.Say("Docker password:"))
+										Expect(output).To(gbytes.Say("Docker password:"))
+										Expect(output).To(gbytes.Say("Docker password:"))
+
+										Expect(appRepo.CreateCallCount()).To(Equal(0))
+									})
+								})
 							})
 						})
 					})
