@@ -7364,14 +7364,6 @@
     "translation": ""
   },
   {
-    "id": "{{.CFName}} api",
-    "translation": "API de {{.CFName}}"
-  },
-  {
-    "id": "{{.CFName}} login",
-    "translation": "Inicio de sesión de {{.CFName}}"
-  },
-  {
     "id": "{{.CountOfServices}} migrated.",
     "translation": "Se ha/n migrado {{.CountOfServices}}."
   },

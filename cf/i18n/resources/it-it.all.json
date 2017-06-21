@@ -7364,14 +7364,6 @@
     "translation": ""
   },
   {
-    "id": "{{.CFName}} api",
-    "translation": "api {{.CFName}}"
-  },
-  {
-    "id": "{{.CFName}} login",
-    "translation": "accesso {{.CFName}}"
-  },
-  {
     "id": "{{.CountOfServices}} migrated.",
     "translation": "{{.CountOfServices}} migrati."
   },
