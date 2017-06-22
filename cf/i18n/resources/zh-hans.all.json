@@ -7092,12 +7092,12 @@
     "translation": "正在运行"
   },
   {
-    "id": "security group",
-    "translation": "安全组"
+    "id": "running security groups:",
+    "translation": ""
   },
   {
-    "id": "security groups:",
-    "translation": ""
+    "id": "security group",
+    "translation": "安全组"
   },
   {
     "id": "service",
@@ -7222,6 +7222,10 @@
   {
     "id": "stack:",
     "translation": "堆栈: "
+  },
+  {
+    "id": "staging security groups:",
+    "translation": ""
   },
   {
     "id": "start command:",
