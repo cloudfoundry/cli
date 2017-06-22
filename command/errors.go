@@ -86,29 +86,29 @@ func (e NotLoggedInError) Translate(translate func(string, ...interface{}) strin
 	})
 }
 
-type NoTargetedOrganizationError struct {
+type NoOrganizationTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedOrganizationError) Error() string {
+func (_ NoOrganizationTargetedError) Error() string {
 	return "No org targeted, use '{{.Command}}' to target an org."
 }
 
-func (e NoTargetedOrganizationError) Translate(translate func(string, ...interface{}) string) string {
+func (e NoOrganizationTargetedError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Command": fmt.Sprintf("%s target -o ORG", e.BinaryName),
 	})
 }
 
-type NoTargetedSpaceError struct {
+type NoSpaceTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedSpaceError) Error() string {
+func (_ NoSpaceTargetedError) Error() string {
 	return "No space targeted, use '{{.Command}}' to target a space."
 }
 
-func (e NoTargetedSpaceError) Translate(translate func(string, ...interface{}) string) string {
+func (e NoSpaceTargetedError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"Command": fmt.Sprintf("%s target -s SPACE", e.BinaryName),
 	})

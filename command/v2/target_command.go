@@ -169,7 +169,7 @@ func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 // setSpace sets space
 func (cmd *TargetCommand) setSpace() error {
 	if !cmd.Config.HasTargetedOrganization() {
-		return shared.NoOrganizationTargetedError{}
+		return command.NoOrganizationTargetedError{}
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.Space)

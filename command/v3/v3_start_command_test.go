@@ -55,11 +55,11 @@ var _ = Describe("v3-start Command", func() {
 
 	Context("when checking target fails", func() {
 		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(sharedaction.NoTargetedOrganizationError{BinaryName: binaryName})
+			fakeSharedActor.CheckTargetReturns(sharedaction.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NoTargetedOrganizationError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
