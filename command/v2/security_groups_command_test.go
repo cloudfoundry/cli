@@ -98,7 +98,7 @@ var _ = Describe("security-groups Command", func() {
 
 	Context("when the API version is high enough to support fetching staging", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns("2.68.0")
+			fakeActor.CloudControllerAPIVersionReturns(command.MinVersionLifecyleStagingV2)
 		})
 
 		Context("when the list of security groups is returned", func() {

@@ -45,7 +45,7 @@ var _ = Describe("tasks Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionRunTaskV3)
 	})
 
 	JustBeforeEach(func() {
@@ -60,7 +60,7 @@ var _ = Describe("tasks Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.0.0",
+				MinimumVersion: command.MinVersionRunTaskV3,
 			}))
 		})
 	})

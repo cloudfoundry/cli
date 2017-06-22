@@ -46,7 +46,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		isolationSegment = "segment1"
-		fakeActor.CloudControllerAPIVersionReturns("3.11.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -61,7 +61,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.11.0",
+				MinimumVersion: command.MinVersionIsolationSegmentV3,
 			}))
 		})
 	})
