@@ -7092,12 +7092,12 @@
     "translation": "en ejecución"
   },
   {
-    "id": "security group",
-    "translation": "grupo de seguridad"
+    "id": "running security groups:",
+    "translation": ""
   },
   {
-    "id": "security groups:",
-    "translation": ""
+    "id": "security group",
+    "translation": "grupo de seguridad"
   },
   {
     "id": "service",
@@ -7222,6 +7222,10 @@
   {
     "id": "stack:",
     "translation": "pila:"
+  },
+  {
+    "id": "staging security groups:",
+    "translation": ""
   },
   {
     "id": "start command:",

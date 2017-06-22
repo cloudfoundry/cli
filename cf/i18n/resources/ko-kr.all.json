@@ -7092,12 +7092,12 @@
     "translation": "실행 중"
   },
   {
-    "id": "security group",
-    "translation": "보안 그룹"
+    "id": "running security groups:",
+    "translation": ""
   },
   {
-    "id": "security groups:",
-    "translation": ""
+    "id": "security group",
+    "translation": "보안 그룹"
   },
   {
     "id": "service",
@@ -7222,6 +7222,10 @@
   {
     "id": "stack:",
     "translation": "스택:"
+  },
+  {
+    "id": "staging security groups:",
+    "translation": ""
   },
   {
     "id": "start command:",

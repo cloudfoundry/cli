@@ -7092,12 +7092,12 @@
     "translation": "aktiv"
   },
   {
-    "id": "security group",
-    "translation": "Sicherheitsgruppe"
+    "id": "running security groups:",
+    "translation": ""
   },
   {
-    "id": "security groups:",
-    "translation": ""
+    "id": "security group",
+    "translation": "Sicherheitsgruppe"
   },
   {
     "id": "service",
@@ -7222,6 +7222,10 @@
   {
     "id": "stack:",
     "translation": "Stack:"
+  },
+  {
+    "id": "staging security groups:",
+    "translation": ""
   },
   {
     "id": "start command:",
