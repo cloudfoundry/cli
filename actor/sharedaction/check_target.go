@@ -11,23 +11,23 @@ func (_ NotLoggedInError) Error() string {
 	return ""
 }
 
-// NoTargetedOrganizationError represents the scenario when an org is not targeted.
-type NoTargetedOrganizationError struct {
+// NoOrganizationTargetedError represents the scenario when an org is not targeted.
+type NoOrganizationTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedOrganizationError) Error() string {
+func (_ NoOrganizationTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
 }
 
-// NoTargetedSpaceError represents the scenario when a space is not targeted.
-type NoTargetedSpaceError struct {
+// NoSpaceTargetedError represents the scenario when a space is not targeted.
+type NoSpaceTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedSpaceError) Error() string {
+func (_ NoSpaceTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -44,14 +44,14 @@ func (_ Actor) CheckTarget(config Config, targetedOrganizationRequired bool, tar
 
 	if targetedOrganizationRequired {
 		if !config.HasTargetedOrganization() {
-			return NoTargetedOrganizationError{
+			return NoOrganizationTargetedError{
 				BinaryName: config.BinaryName(),
 			}
 		}
 
 		if targetedSpaceRequired {
 			if !config.HasTargetedSpace() {
-				return NoTargetedSpaceError{
+				return NoSpaceTargetedError{
 					BinaryName: config.BinaryName(),
 				}
 			}

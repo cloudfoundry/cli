@@ -50,7 +50,7 @@ var _ = Describe("CheckTarget", func() {
 				}
 			},
 
-			Entry("it returns an error", false, true, NoTargetedOrganizationError{BinaryName: "faceman"}),
+			Entry("it returns an error", false, true, NoOrganizationTargetedError{BinaryName: "faceman"}),
 			Entry("it does not return an error", false, false, nil),
 			Entry("it does not return an error", true, false, nil),
 			Entry("it does not return an error", true, true, nil),
@@ -74,7 +74,7 @@ var _ = Describe("CheckTarget", func() {
 					}
 				},
 
-				Entry("it returns an error", false, true, NoTargetedSpaceError{BinaryName: "faceman"}),
+				Entry("it returns an error", false, true, NoSpaceTargetedError{BinaryName: "faceman"}),
 				Entry("it does not return an error", false, false, nil),
 				Entry("it does not return an error", true, false, nil),
 				Entry("it does not return an error", true, true, nil),

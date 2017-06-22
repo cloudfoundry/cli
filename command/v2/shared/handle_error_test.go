@@ -72,13 +72,13 @@ var _ = Describe("HandleError", func() {
 			sharedaction.NotLoggedInError{BinaryName: "faceman"},
 			command.NotLoggedInError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoTargetedOrganizationError -> NoTargetedOrganizationError",
-			sharedaction.NoTargetedOrganizationError{BinaryName: "faceman"},
-			command.NoTargetedOrganizationError{BinaryName: "faceman"}),
+		Entry("sharedaction.NoOrganizationTargetedError -> NoOrganizationTargetedError",
+			sharedaction.NoOrganizationTargetedError{BinaryName: "faceman"},
+			command.NoOrganizationTargetedError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoTargetedSpaceError -> NoTargetedSpaceError",
-			sharedaction.NoTargetedSpaceError{BinaryName: "faceman"},
-			command.NoTargetedSpaceError{BinaryName: "faceman"}),
+		Entry("sharedaction.NoSpaceTargetedError -> NoSpaceTargetedError",
+			sharedaction.NoSpaceTargetedError{BinaryName: "faceman"},
+			command.NoSpaceTargetedError{BinaryName: "faceman"}),
 
 		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
 			v2action.HTTPHealthCheckInvalidError{},

@@ -39,16 +39,6 @@ func (e JobTimeoutError) Translate(translate func(string, ...interface{}) string
 	})
 }
 
-type NoOrganizationTargetedError struct{}
-
-func (_ NoOrganizationTargetedError) Error() string {
-	return "An org must be targeted before targeting a space"
-}
-
-func (e NoOrganizationTargetedError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error())
-}
-
 type OrganizationNotFoundError struct {
 	Name string
 }

@@ -35,10 +35,10 @@ func HandleError(err error) error {
 
 	case sharedaction.NotLoggedInError:
 		return command.NotLoggedInError{BinaryName: e.BinaryName}
-	case sharedaction.NoTargetedOrganizationError:
-		return command.NoTargetedOrganizationError{BinaryName: e.BinaryName}
-	case sharedaction.NoTargetedSpaceError:
-		return command.NoTargetedSpaceError{BinaryName: e.BinaryName}
+	case sharedaction.NoOrganizationTargetedError:
+		return command.NoOrganizationTargetedError{BinaryName: e.BinaryName}
+	case sharedaction.NoSpaceTargetedError:
+		return command.NoSpaceTargetedError{BinaryName: e.BinaryName}
 
 	case v2action.ApplicationNotFoundError:
 		return command.ApplicationNotFoundError{Name: e.Name}

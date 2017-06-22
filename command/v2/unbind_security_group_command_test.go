@@ -70,11 +70,11 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when checking target fails", func() {
 		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(sharedaction.NoTargetedOrganizationError{BinaryName: binaryName})
+			fakeSharedActor.CheckTargetReturns(sharedaction.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NoTargetedOrganizationError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -186,11 +186,11 @@ var _ = Describe("unbind-security-group Command", func() {
 
 			Context("when checking target fails", func() {
 				BeforeEach(func() {
-					fakeSharedActor.CheckTargetReturns(sharedaction.NoTargetedOrganizationError{BinaryName: binaryName})
+					fakeSharedActor.CheckTargetReturns(sharedaction.NoOrganizationTargetedError{BinaryName: binaryName})
 				})
 
 				It("returns an error", func() {
-					Expect(executeErr).To(MatchError(command.NoTargetedOrganizationError{BinaryName: "faceman"}))
+					Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
