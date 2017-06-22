@@ -5,6 +5,15 @@ import (
 	"github.com/blang/semver"
 )
 
+const (
+	MinVersionLifecyleStagingV2         = "2.68.0"
+	MinVersionHTTPEndpointHealthCheckV2 = "2.68.0"
+	MinVersionProcessHealthCheckV2      = "2.47.0"
+
+	MinVersionRunTaskV3          = "3.0.0"
+	MinVersionIsolationSegmentV3 = "3.11.0"
+)
+
 func MinimumAPIVersionCheck(current string, minimum string) error {
 	if current == version.DefaultVersion || minimum == "" {
 		return nil

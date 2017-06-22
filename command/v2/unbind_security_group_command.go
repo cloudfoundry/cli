@@ -46,7 +46,7 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	var err error
 	if cmd.Lifecycle == ccv2.SecurityGroupLifecycleStaging {
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.68.0")
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
 			case command.MinimumAPIVersionNotMetError:

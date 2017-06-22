@@ -53,7 +53,7 @@ var _ = Describe("set-health-check Command", func() {
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
-		fakeActor.CloudControllerAPIVersionReturns("2.68.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionHTTPEndpointHealthCheckV2)
 	})
 
 	JustBeforeEach(func() {

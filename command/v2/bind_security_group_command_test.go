@@ -420,7 +420,7 @@ var _ = Describe("bind-security-group Command", func() {
 			It("returns a MinimumAPIVersionNotMetError", func() {
 				Expect(executeErr).To(MatchError(command.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: "2.34.0",
-					MinimumVersion: "2.68.0",
+					MinimumVersion: command.MinVersionLifecyleStagingV2,
 				}))
 				Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
@@ -429,7 +429,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 		Context("when the version check succeeds", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns("2.68.0")
+				fakeActor.CloudControllerAPIVersionReturns(command.MinVersionLifecyleStagingV2)
 			})
 
 			Context("when a space is provided", func() {

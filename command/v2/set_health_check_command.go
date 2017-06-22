@@ -44,16 +44,16 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 
 	switch cmd.RequiredArgs.HealthCheck.Type {
 	case "http":
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.47.0")
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionProcessHealthCheckV2)
 		if err != nil {
 			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
 		}
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.68.0")
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionHTTPEndpointHealthCheckV2)
 		if err != nil {
 			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none", "process"}}
 		}
 	case "process":
-		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.47.0")
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionProcessHealthCheckV2)
 		if err != nil {
 			return command.HealthCheckTypeUnsupportedError{SupportedTypes: []string{"port", "none"}}
 		}

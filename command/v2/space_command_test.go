@@ -47,8 +47,8 @@ var _ = Describe("space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns("2.68.0")
-		fakeActorV3.CloudControllerAPIVersionReturns("3.11.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionLifecyleStagingV2)
+		fakeActorV3.CloudControllerAPIVersionReturns(command.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -234,7 +234,7 @@ var _ = Describe("space Command", func() {
 
 			Context("when v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.68.0")
+					fakeActor.CloudControllerAPIVersionReturns(command.MinVersionLifecyleStagingV2)
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
 

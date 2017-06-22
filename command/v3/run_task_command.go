@@ -47,7 +47,7 @@ func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionRunTaskV3)
 	if err != nil {
 		return err
 	}

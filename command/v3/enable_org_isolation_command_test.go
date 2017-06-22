@@ -47,7 +47,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		org = "some-org"
 		isolationSegment = "segment1"
-		fakeActor.CloudControllerAPIVersionReturns("3.11.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -62,7 +62,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.11.0",
+				MinimumVersion: command.MinVersionIsolationSegmentV3,
 			}))
 		})
 	})
