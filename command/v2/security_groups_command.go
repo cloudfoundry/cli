@@ -53,7 +53,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 
 	includeStaging := true
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.69.0")
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.68.0")
 	if err != nil {
 		switch err.(type) {
 		case command.MinimumAPIVersionNotMetError:
