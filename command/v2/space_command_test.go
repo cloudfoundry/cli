@@ -47,7 +47,7 @@ var _ = Describe("space Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns("2.74.0")
+		fakeActor.CloudControllerAPIVersionReturns("2.68.0")
 		fakeActorV3.CloudControllerAPIVersionReturns("3.11.0")
 	})
 
@@ -171,24 +171,26 @@ var _ = Describe("space Command", func() {
 						AppNames:                       []string{"app1", "app2", "app3"},
 						ServiceInstanceNames:           []string{"service1", "service2", "service3"},
 						SpaceQuotaName:                 "some-space-quota",
-						SecurityGroupNames:             []string{"public_networks", "dns", "load_balancer"},
+						RunningSecurityGroupNames:      []string{"public_networks", "dns", "load_balancer"},
+						StagingSecurityGroupNames:      []string{"staging-sec-1", "staging-sec-2"},
 					},
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
 			})
 
-			Context("when the v3 actor is nil", func() {
+			Context("when there is no v3 API", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
 				})
+
 				It("displays the space summary with no isolation segment row", func() {
 					Expect(executeErr).To(BeNil())
 					Expect(testUI.Out).ToNot(Say("isolation segment:"))
 				})
 			})
 
-			Context("when there are no errors", func() {
+			Context("when there is a v3 API", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
 						v3action.IsolationSegment{
@@ -209,7 +211,8 @@ var _ = Describe("space Command", func() {
 					Expect(testUI.Out).To(Say("services:\\s+service1, service2, service3"))
 					Expect(testUI.Out).To(Say("isolation segment:\\s+some-isolation-segment"))
 					Expect(testUI.Out).To(Say("space quota:\\s+some-space-quota"))
-					Expect(testUI.Out).To(Say("security groups:\\s+public_networks, dns, load_balancer"))
+					Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
+					Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -229,9 +232,9 @@ var _ = Describe("space Command", func() {
 				})
 			})
 
-			Context("when v3 api version is below 3.11.0 and the v2 api version is no less than 2.74.0", func() {
+			Context("when v3 api version is below 3.11.0 and the v2 api version is no less than 2.68.0", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.74.0")
+					fakeActor.CloudControllerAPIVersionReturns("2.68.0")
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
 
@@ -248,13 +251,13 @@ var _ = Describe("space Command", func() {
 				})
 			})
 
-			Context("when v3 api version is below 3.11.0 and the v2 api version is less than 2.74.0 (v2 will never be above 2.74.0 if v3 is lower than 3.11.0)", func() {
+			Context("when v3 api version is below 3.11.0 and the v2 api version is less than 2.68.0 (v2 will never be above 2.68.0 if v3 is lower than 3.11.0)", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.68.0")
+					fakeActor.CloudControllerAPIVersionReturns("2.54.0")
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
 
-				It("displays warnings and a table with space name, org, apps, services, space quota and security groups", func() {
+				It("displays warnings and a table with no values for staging security groups", func() {
 					Expect(executeErr).To(BeNil())
 
 					Expect(testUI.Out).NotTo(Say("isolation segment:"))
@@ -379,11 +382,12 @@ var _ = Describe("space Command", func() {
 					Space: v2action.Space{
 						Name: "some-space",
 					},
-					OrgName:              "some-org",
-					AppNames:             []string{"app1", "app2", "app3"},
-					ServiceInstanceNames: []string{"service1", "service2", "service3"},
-					SpaceQuotaName:       "some-space-quota",
-					SecurityGroupNames:   []string{"public_networks", "dns", "load_balancer"},
+					OrgName:                   "some-org",
+					AppNames:                  []string{"app1", "app2", "app3"},
+					ServiceInstanceNames:      []string{"service1", "service2", "service3"},
+					SpaceQuotaName:            "some-space-quota",
+					RunningSecurityGroupNames: []string{"public_networks", "dns", "load_balancer"},
+					StagingSecurityGroupNames: []string{"staging-sec-1", "staging-sec-2"},
 					SecurityGroupRules: []v2action.SecurityGroupRule{
 						{
 							Description: "Public networks",
@@ -433,6 +437,8 @@ var _ = Describe("space Command", func() {
 			Expect(includeStagingSecurityGroupRules).To(BeTrue())
 
 			Expect(testUI.Out).To(Say("name:\\s+some-space"))
+			Expect(testUI.Out).To(Say("running security groups:\\s+public_networks, dns, load_balancer"))
+			Expect(testUI.Out).To(Say("staging security groups:\\s+staging-sec-1, staging-sec-2"))
 			Expect(testUI.Out).To(Say("(?m)^\n^\\s+security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description$"))
 			Expect(testUI.Out).To(Say("#0\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+staging\\s+Public networks"))
 			Expect(testUI.Out).To(Say("(?m)^\\s+public_networks\\s+0.0.0.0-9.255.255.255\\s+12345\\s+tcp\\s+running\\s+Public networks"))
