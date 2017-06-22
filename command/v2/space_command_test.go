@@ -250,7 +250,7 @@ var _ = Describe("space Command", func() {
 
 			Context("when v3 api version is below 3.11.0 and the v2 api version is less than 2.74.0 (v2 will never be above 2.74.0 if v3 is lower than 3.11.0)", func() {
 				BeforeEach(func() {
-					fakeActor.CloudControllerAPIVersionReturns("2.69.0")
+					fakeActor.CloudControllerAPIVersionReturns("2.68.0")
 					fakeActorV3.CloudControllerAPIVersionReturns("3.10.0")
 				})
 
