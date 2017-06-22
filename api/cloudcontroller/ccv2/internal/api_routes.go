@@ -20,6 +20,7 @@ const (
 	DeleteOrganizationRequest              = "DeleteOrganization"
 	DeleteRouteRequest                     = "DeleteRoute"
 	DeleteRunningSecurityGroupSpaceRequest = "DeleteRunningSecurityGroupSpace"
+	DeleteSpaceRequest                     = "DeleteSpaceRequest"
 	DeleteServiceBindingRequest            = "DeleteServiceBinding"
 	GetAppInstancesRequest                 = "GetAppInstances"
 	GetAppRequest                          = "GetApp"
@@ -104,6 +105,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},
 	{Path: "/v2/space_quota_definitions/:space_quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaDefinitionRequest},
 	{Path: "/v2/spaces", Method: http.MethodGet, Name: GetSpacesRequest},
+	{Path: "/v2/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: GetSpaceServiceInstancesRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: GetSpaceRoutesRequest},
 	{Path: "/v2/spaces/:space_guid/security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},

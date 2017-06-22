@@ -17,6 +17,7 @@ type CloudControllerClient interface {
 	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
+	DeleteSpace(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
 	GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error)
 	GetApplicationInstancesByApplication(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error)
 	GetApplicationInstanceStatusesByApplication(guid string) (map[int]ccv2.ApplicationInstanceStatus, ccv2.Warnings, error)

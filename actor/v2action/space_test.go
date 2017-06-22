@@ -49,6 +49,149 @@ var _ = Describe("Space", func() {
 			actor = NewActor(fakeCloudControllerClient, nil)
 		})
 
+		Describe("DeleteSpaceByNameAndOrganizationName", func() {
+			var (
+				warnings Warnings
+				err      error
+			)
+
+			JustBeforeEach(func() {
+				warnings, err = actor.DeleteSpaceByNameAndOrganizationName("some-space", "some-org")
+			})
+
+			Context("when the org is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns(
+						[]ccv2.Organization{},
+						ccv2.Warnings{
+							"warning-1",
+							"warning-2",
+						},
+						nil,
+					)
+				})
+
+				It("returns an OrganizationNotFoundError", func() {
+					Expect(err).To(MatchError(OrganizationNotFoundError{Name: "some-org"}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
+			})
+
+			Context("when the org is found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetOrganizationsReturns(
+						[]ccv2.Organization{{Name: "some-org", GUID: "some-org-guid"}},
+						ccv2.Warnings{"warning-1", "warning-2"},
+						nil,
+					)
+				})
+
+				Context("when the space is not found", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetSpacesReturns(
+							[]ccv2.Space{},
+							ccv2.Warnings{"warning-3", "warning-4"},
+							nil,
+						)
+					})
+
+					It("returns an SpaceNotFoundError", func() {
+						Expect(err).To(MatchError(SpaceNotFoundError{Name: "some-space"}))
+						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
+					})
+				})
+
+				Context("when the space is found", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetSpacesReturns(
+							[]ccv2.Space{{GUID: "some-space-guid"}},
+							ccv2.Warnings{"warning-3", "warning-4"},
+							nil,
+						)
+					})
+
+					Context("when the delete returns an error", func() {
+						var expectedErr error
+
+						BeforeEach(func() {
+							expectedErr = errors.New("some delete space error")
+							fakeCloudControllerClient.DeleteSpaceReturns(
+								ccv2.Job{},
+								ccv2.Warnings{"warning-5", "warning-6"},
+								expectedErr,
+							)
+						})
+
+						It("returns the error", func() {
+							Expect(err).To(Equal(expectedErr))
+							Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6"))
+						})
+					})
+
+					Context("when the delete returns a job", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.DeleteSpaceReturns(
+								ccv2.Job{GUID: "some-job-guid"},
+								ccv2.Warnings{"warning-5", "warning-6"},
+								nil,
+							)
+						})
+
+						Context("when polling errors", func() {
+							var expectedErr error
+
+							BeforeEach(func() {
+								expectedErr = errors.New("Never expected, by anyone")
+								fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"warning-7", "warning-8"}, expectedErr)
+							})
+
+							It("returns the error", func() {
+								Expect(err).To(Equal(expectedErr))
+								Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
+							})
+						})
+
+						Context("when the job is successful", func() {
+							BeforeEach(func() {
+								fakeCloudControllerClient.PollJobReturns(ccv2.Warnings{"warning-7", "warning-8"}, nil)
+							})
+
+							It("returns warnings and no error", func() {
+								Expect(err).ToNot(HaveOccurred())
+								Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
+
+								Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Query{{
+									Filter:   ccv2.NameFilter,
+									Operator: ccv2.EqualOperator,
+									Value:    "some-org",
+								}}))
+
+								Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Query{{
+									Filter:   ccv2.NameFilter,
+									Operator: ccv2.EqualOperator,
+									Value:    "some-space",
+								},
+									{
+										Filter:   ccv2.OrganizationGUIDFilter,
+										Operator: ccv2.EqualOperator,
+										Value:    "some-org-guid",
+									},
+								}))
+
+								Expect(fakeCloudControllerClient.DeleteSpaceCallCount()).To(Equal(1))
+								Expect(fakeCloudControllerClient.DeleteSpaceArgsForCall(0)).To(Equal("some-space-guid"))
+
+								Expect(fakeCloudControllerClient.PollJobCallCount()).To(Equal(1))
+								Expect(fakeCloudControllerClient.PollJobArgsForCall(0)).To(Equal(ccv2.Job{GUID: "some-job-guid"}))
+							})
+						})
+					})
+				})
+			})
+		})
+
 		Describe("GetOrganizationSpaces", func() {
 			Context("when there are spaces in the org", func() {
 				BeforeEach(func() {

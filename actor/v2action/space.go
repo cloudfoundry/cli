@@ -39,6 +39,33 @@ func (e MultipleSpacesFoundError) Error() string {
 	return fmt.Sprintf("Multiple spaces found matching organization GUID '%s' and name '%s'", e.OrgGUID, e.Name)
 }
 
+func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	space, warnings, err := actor.GetSpaceByOrganizationAndName(org.GUID, spaceName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	job, deleteWarnings, err := actor.CloudControllerClient.DeleteSpace(space.GUID)
+	allWarnings = append(allWarnings, Warnings(deleteWarnings)...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	warnings, err = actor.PollJob(Job(job))
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+
+	return allWarnings, err
+}
+
 // GetOrganizationSpaces returns a list of spaces in the specified org
 func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
 	query := []ccv2.Query{
