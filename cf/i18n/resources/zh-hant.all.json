@@ -4700,6 +4700,10 @@
     "translation": ""
   },
   {
+    "id": "Really delete the space {{.SpaceName}}?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "真的要刪除{{.ModelType}} {{.ModelName}} 以及與其相關聯的所有項目嗎？"
   },

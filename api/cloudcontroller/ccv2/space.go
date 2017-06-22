@@ -39,6 +39,9 @@ func (space *Space) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Space codetemplates/delete_async_by_guid.go.template delete_space.go
+//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Space codetemplates/delete_async_by_guid_test.go.template delete_space_test.go
+
 // GetSpaces returns a list of Spaces based off of the provided queries.
 func (client *Client) GetSpaces(queries []Query) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{

@@ -4700,6 +4700,10 @@
     "translation": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?"
   },
   {
+    "id": "Really delete the space {{.SpaceName}}?",
+    "translation": ""
+  },
+  {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
     "translation": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?"
   },
