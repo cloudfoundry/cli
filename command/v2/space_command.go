@@ -104,7 +104,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.74.0")
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.68.0")
 	includeStagingSecurityGroupsRules := err == nil
 
 	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
@@ -131,7 +131,9 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	table = append(table,
 		[]string{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName})
 	table = append(table,
-		[]string{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")})
+		[]string{cmd.UI.TranslateText("running security groups:"), strings.Join(spaceSummary.RunningSecurityGroupNames, ", ")})
+	table = append(table,
+		[]string{cmd.UI.TranslateText("staging security groups:"), strings.Join(spaceSummary.StagingSecurityGroupNames, ", ")})
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 

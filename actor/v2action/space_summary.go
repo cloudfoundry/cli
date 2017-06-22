@@ -22,7 +22,8 @@ type SpaceSummary struct {
 	AppNames                       []string
 	ServiceInstanceNames           []string
 	SpaceQuotaName                 string
-	SecurityGroupNames             []string
+	RunningSecurityGroupNames      []string
+	StagingSecurityGroupNames      []string
 	SecurityGroupRules             []SecurityGroupRule
 }
 
@@ -81,13 +82,16 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		return SpaceSummary{}, allWarnings, err
 	}
 
-	var securityGroupNames []string
+	var runningSecurityGroupNames []string
+	var stagingSecurityGroupNames []string
 	var securityGroupRules []SecurityGroupRule
 
 	for _, securityGroup := range securityGroups {
-		securityGroupNames = append(securityGroupNames, securityGroup.Name)
+		runningSecurityGroupNames = append(runningSecurityGroupNames, securityGroup.Name)
 		securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleRunning)...)
 	}
+
+	sort.Strings(runningSecurityGroupNames)
 
 	if includeStagingSecurityGroupsRules {
 		securityGroups, warnings, err = actor.GetSpaceStagingSecurityGroupsBySpace(space.GUID)
@@ -95,9 +99,13 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		if err != nil {
 			return SpaceSummary{}, allWarnings, err
 		}
+
 		for _, securityGroup := range securityGroups {
+			stagingSecurityGroupNames = append(stagingSecurityGroupNames, securityGroup.Name)
 			securityGroupRules = append(securityGroupRules, extractSecurityGroupRules(securityGroup, ccv2.SecurityGroupLifecycleStaging)...)
 		}
+
+		sort.Strings(stagingSecurityGroupNames)
 	}
 
 	sort.Slice(securityGroupRules, func(i int, j int) bool {
@@ -116,8 +124,6 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		return securityGroupRules[i].Lifecycle < securityGroupRules[j].Lifecycle
 	})
 
-	sort.Strings(securityGroupNames)
-
 	spaceSummary := SpaceSummary{
 		Space:   space,
 		OrgName: org.Name,
@@ -125,7 +131,8 @@ func (actor Actor) GetSpaceSummaryByOrganizationAndName(orgGUID string, name str
 		AppNames:                       appNames,
 		ServiceInstanceNames:           serviceInstanceNames,
 		SpaceQuotaName:                 spaceQuota.Name,
-		SecurityGroupNames:             securityGroupNames,
+		RunningSecurityGroupNames:      runningSecurityGroupNames,
+		StagingSecurityGroupNames:      stagingSecurityGroupNames,
 		SecurityGroupRules:             securityGroupRules,
 	}
 

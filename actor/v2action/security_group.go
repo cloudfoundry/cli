@@ -217,7 +217,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 				return false
 			}
 
-			return secGroupOrgSpaces[i].Lifecycle == "staging"
+			return secGroupOrgSpaces[i].Lifecycle == ccv2.SecurityGroupLifecycleStaging
 		})
 	return secGroupOrgSpaces, Warnings(allWarnings), err
 }
