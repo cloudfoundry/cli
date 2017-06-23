@@ -2424,6 +2424,10 @@
     "translation": ""
   },
   {
+    "id": "Docker password",
+    "translation": ""
+  },
+  {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
     "translation": "要使用的 Docker-image（例如，user/docker-image-name）"
   },
