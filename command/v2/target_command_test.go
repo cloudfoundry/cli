@@ -261,7 +261,7 @@ var _ = Describe("target Command", func() {
 
 					Context("when no org is targeted", func() {
 						It("returns NoOrgTargeted error and clears existing space", func() {
-							Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{}))
+							Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
