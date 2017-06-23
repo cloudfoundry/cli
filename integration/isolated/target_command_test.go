@@ -255,7 +255,7 @@ var _ = Describe("target command", func() {
 		Context("when there is not an existing targeted org", func() {
 			It("displays org must be targeted first and exits 1", func() {
 				session := helpers.CF("target", "-s", spaceName)
-				Eventually(session.Err).Should(Say("An org must be targeted before targeting a space"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
