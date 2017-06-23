@@ -9,7 +9,6 @@ import (
 )
 
 type PushCommand struct {
-	RequiredArgs         flag.AppName                `positional-args:"yes"`
 	AppPorts             string                      `long:"app-ports" description:"Comma delimited list of ports the application may listen on" hidden:"true"` //TODO: Custom AppPorts flag
 	BuildpackName        string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	StartupCommand       string                      `short:"c" description:"Startup command, set to null to reset to default start command"`
