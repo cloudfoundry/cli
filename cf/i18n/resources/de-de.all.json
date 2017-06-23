@@ -164,10 +164,6 @@
     "translation": "'{{.VersionShort}}' und '{{.VersionLong}}' werden auch akzeptiert."
   },
   {
-    "id": "(process | port | http)",
-    "translation": "(Prozess | Port | HTTP)"
-  },
-  {
     "id": ") already exists.",
     "translation": ") ist bereits vorhanden."
   },
@@ -498,10 +494,6 @@
   {
     "id": "BUILDPACKS:",
     "translation": ""
-  },
-  {
-    "id": "BUILDPACK_NAME",
-    "translation": "BUILDPACKNAME"
   },
   {
     "id": "Basic ",
@@ -1192,10 +1184,6 @@
     "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\\n\\nWARNUNG: Bei dieser Operation wird davon ausgegangen, dass der für dieses Serviceangebot verantwortliche Service-Broker nicht mehr verfügbar ist. Ferner wird angenommen, dass alle Serviceinstanzen gelöscht wurden und verwaiste Datensätze in der Cloud Foundry-Datenbank hinterlassen haben. Das gesamte Wissen des Service einschließen Serviceinstanzen und Servicebindungen wird aus Cloud Foundry entfernt. Es wird kein Versuch unternommen, den Service-Broker zu kontaktieren; die Ausführung dieses Befehls ohne Löschen des Service-Brokers führt zu verwaisten Serviceinstanzen. Nach der Ausführung dieses Befehls möchten Sie möglicherweise delete-service-auth-token oder delete-service-broker ausführen, um die Bereinigung abzuschließen."
   },
   {
-    "id": "CF_NAME push ",
-    "translation": "CF_NAME push "
-  },
-  {
     "id": "CF_NAME quota QUOTA",
     "translation": "CF_NAME quota QUOTA"
   },
@@ -1712,10 +1700,6 @@
     "translation": ""
   },
   {
-    "id": "COMMAND",
-    "translation": "BEFEHL"
-  },
-  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
@@ -2134,14 +2118,6 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden"
-  },
-  {
-    "id": "DISK",
-    "translation": "PLATTE"
-  },
-  {
-    "id": "DOCKER_IMAGE",
-    "translation": "DOCKER-IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -3268,10 +3244,6 @@
     "translation": "HEALTH_CHECK_TYPE muss \"port\", \"process\" oder \"http\" sein"
   },
   {
-    "id": "HOST",
-    "translation": "HOST"
-  },
-  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -3896,10 +3868,6 @@
     "translation": "Im Repository '{{.repoName}}' nach '{{.filePath}}' suchen"
   },
   {
-    "id": "MANIFEST_PATH",
-    "translation": "MANIFEST_PATH (MANIFESTPFAD)"
-  },
-  {
     "id": "MEMORY",
     "translation": "HAUPTSPEICHER"
   },
@@ -3990,10 +3958,6 @@
   {
     "id": "NEW_NAME",
     "translation": "NEUER NAME"
-  },
-  {
-    "id": "NUM_INSTANCES",
-    "translation": "ANZAHL INSTANZEN"
   },
   {
     "id": "Name",
@@ -4616,14 +4580,6 @@
     "translation": "Neue App oder Synchronisationsänderungen mit einer Push-Operation an eine vorhandene App übertragen"
   },
   {
-    "id": "Push a single app (with or without a manifest)",
-    "translation": "Eine einzelne App mit einer Push-Operation übertragen (mit oder ohne Manifest):"
-  },
-  {
-    "id": "Push multiple apps with a manifest",
-    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:"
-  },
-  {
     "id": "QUOTA",
     "translation": "GRÖßENBESCHRÄNKUNG"
   },
@@ -4674,10 +4630,6 @@
   {
     "id": "ROUTES:",
     "translation": ""
-  },
-  {
-    "id": "ROUTE_PATH",
-    "translation": "ROUTENPFAD"
   },
   {
     "id": "RUNNING",
@@ -5128,10 +5080,6 @@
     "translation": ""
   },
   {
-    "id": "STACK",
-    "translation": "STACK"
-  },
-  {
     "id": "SUCCEEDED",
     "translation": ""
   },
@@ -5554,10 +5502,6 @@
   {
     "id": "TASK_ID",
     "translation": ""
-  },
-  {
-    "id": "TIMEOUT",
-    "translation": "ZEITLIMIT"
   },
   {
     "id": "TIP:\n",
@@ -6570,10 +6514,6 @@
   {
     "id": "[--allow-paid-service-plans] ",
     "translation": "[--allow-paid-service-plans] "
-  },
-  {
-    "id": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
-    "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",

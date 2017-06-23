@@ -591,7 +591,8 @@
     "{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}",
     "temp",
     "CRASHED",
-    "DOWN"
+    "DOWN",
+    "\\n"
   ],
   "excludedRegexps": [
     "^(?:\\s*{{.\\w+}}[^\\w{]*)+$",

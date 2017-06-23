@@ -68,7 +68,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app")}
 	fs["docker-image"] = &flags.StringFlag{Name: "docker-image", ShortName: "o", Usage: T("Docker-image to be used (e.g. user/docker-image-name)")}
-	fs["docker-username"] = &flags.StringFlag{Name: "docker-username", Usage: T("")}
+	fs["docker-username"] = &flags.StringFlag{Name: "docker-username", Usage: T("Repository username; used with password from environment variable CF_DOCKER_PASSWORD")}
 	fs["health-check-type"] = &flags.StringFlag{Name: "health-check-type", ShortName: "u", Usage: T("Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')")}
 	fs["no-hostname"] = &flags.BoolFlag{Name: "no-hostname", Usage: T("Map the root domain to this app")}
 	fs["no-manifest"] = &flags.BoolFlag{Name: "no-manifest", Usage: T("Ignore manifest file")}
@@ -83,35 +83,8 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
-		Usage: []string{
-			T("Push a single app (with or without a manifest)"),
-			":\n   ",
-			fmt.Sprintf("CF_NAME push %s ", T("APP_NAME")),
-			fmt.Sprintf("[-b %s] ", T("BUILDPACK_NAME")),
-			fmt.Sprintf("[-c %s] ", T("COMMAND")),
-			fmt.Sprintf("[-d %s] ", T("DOMAIN")),
-			fmt.Sprintf("[-f %s] ", T("MANIFEST_PATH")),
-			fmt.Sprintf("[--docker-image %s]", T("DOCKER_IMAGE")),
-			"\n   ",
-			fmt.Sprintf("[-i %s] ", T("NUM_INSTANCES")),
-			fmt.Sprintf("[-k %s] ", T("DISK")),
-			fmt.Sprintf("[-m %s] ", T("MEMORY")),
-			fmt.Sprintf("[--hostname %s] ", T("HOST")),
-			fmt.Sprintf("[-p %s] ", T("PATH")),
-			fmt.Sprintf("[-s %s] ", T("STACK")),
-			fmt.Sprintf("[-t %s] ", T("TIMEOUT")),
-			fmt.Sprintf("[-u %s] ", T("(process | port | http)")),
-			fmt.Sprintf("[--route-path %s] ", T("ROUTE_PATH")),
-			"\n   ",
-			// Commented to hide app-ports for release #117189491
-			// fmt.Sprintf("[--app-ports %s] ", T("APP_PORTS")),
-			"[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
-			"\n   ",
-			T("Push multiple apps with a manifest"),
-			":\n   ",
-			"CF_NAME push ",
-			fmt.Sprintf("[-f %s] ", T("MANIFEST_PATH")),
-		},
+		// strings.Replace \\n with newline so this string matches the new usage string but still gets displayed correctly
+		Usage: []string{strings.Replace(T("cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [--no-start]"), "\\n", "\n", -1)},
 		Flags: fs,
 	}
 }
