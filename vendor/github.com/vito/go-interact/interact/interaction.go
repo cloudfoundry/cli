@@ -59,15 +59,15 @@ func (interaction Interaction) Resolve(dst interface{}) error {
 	prompt := interaction.prompt(dst)
 
 	var user userIO
-	if file, ok := interaction.Output.(*os.File); ok && terminal.IsTerminal(int(file.Fd())) {
-		state, err := terminal.MakeRaw(int(file.Fd()))
+	if input, output, ok := interaction.getStreams(); ok && terminal.IsTerminal(int(output.Fd())) {
+		state, err := terminal.MakeRaw(int(input.Fd()))
 		if err != nil {
 			return err
 		}
 
-		defer terminal.Restore(int(file.Fd()), state)
+		defer terminal.Restore(int(input.Fd()), state)
 
-		term, err := newTTYUser(interaction.Input, file)
+		term, err := newTTYUser(input, output)
 		if err != nil {
 			return err
 		}
@@ -82,6 +82,12 @@ func (interaction Interaction) Resolve(dst interface{}) error {
 	}
 
 	return interaction.resolveChoices(dst, user, prompt)
+}
+
+func (interaction Interaction) getStreams() (*os.File, *os.File, bool) {
+	input, inputConverted := interaction.Input.(*os.File)
+	output, outputConverted := interaction.Output.(*os.File)
+	return input, output, inputConverted && outputConverted
 }
 
 func (interaction Interaction) prompt(dst interface{}) string {
