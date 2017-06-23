@@ -164,10 +164,6 @@
     "translation": "'{{.VersionShort}}' 및 '{{.VersionLong}}'도 허용됩니다. "
   },
   {
-    "id": "(process | port | http)",
-    "translation": "(process | port | http)"
-  },
-  {
     "id": ") already exists.",
     "translation": ")이(가) 이미 있습니다."
   },
@@ -498,10 +494,6 @@
   {
     "id": "BUILDPACKS:",
     "translation": ""
-  },
-  {
-    "id": "BUILDPACK_NAME",
-    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Basic ",
@@ -1192,10 +1184,6 @@
     "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\\n\\n경고: 이 조작은 이 서비스 오퍼링을 책임지는 서비스 브로커를 더 이상 사용할 수 없으며 모든 서비스 인스턴스가 Cloud Foundry의 데이터베이스에 고아 레코드를 남겨두고 삭제되었다고 가정합니다. 서비스 인스턴스와 서비스 바인딩을 비롯한 서비스에 대한 모든 지식은 Cloud Foundry에서 제거됩니다. 서비스 브로커에 접속하려고 시도하지 않습니다. 서비스 브로커를 영구 삭제하지 않고 이 명령을 실행하면 고아 서비스 인스턴스가 발생합니다. 이 명령을 실행한 후 delete-service-auth-token 또는 delete-service-broker를 실행하여 정리를 완료할 수 있습니다."
   },
   {
-    "id": "CF_NAME push ",
-    "translation": "CF_NAME push "
-  },
-  {
     "id": "CF_NAME quota QUOTA",
     "translation": "CF_NAME quota QUOTA"
   },
@@ -1712,10 +1700,6 @@
     "translation": ""
   },
   {
-    "id": "COMMAND",
-    "translation": "명령"
-  },
-  {
     "id": "Can not provision instances of paid service plans",
     "translation": "유료 서비스 플랜의 인스턴스를 프로비저닝할 수 없음"
   },
@@ -2134,14 +2118,6 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "요청에 포함할 사용자 정의 헤더, 플래그를 여러 번 지정할 수 있음"
-  },
-  {
-    "id": "DISK",
-    "translation": "디스크"
-  },
-  {
-    "id": "DOCKER_IMAGE",
-    "translation": "DOCKER_IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -3268,10 +3244,6 @@
     "translation": "HEALTH_CHECK_TYPE은 \"port\", \"process\" 또는 \"http\"여야 함"
   },
   {
-    "id": "HOST",
-    "translation": "호스트"
-  },
-  {
     "id": "HOSTNAME",
     "translation": "호스트 이름"
   },
@@ -3896,10 +3868,6 @@
     "translation": "'{{.repoName}}' 저장소에서 '{{.filePath}}' 검색"
   },
   {
-    "id": "MANIFEST_PATH",
-    "translation": "MANIFEST_PATH"
-  },
-  {
     "id": "MEMORY",
     "translation": "메모리"
   },
@@ -3990,10 +3958,6 @@
   {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
-  },
-  {
-    "id": "NUM_INSTANCES",
-    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -4616,14 +4580,6 @@
     "translation": "새 앱 또는 동기화 변경사항을 기존 앱에 푸시"
   },
   {
-    "id": "Push a single app (with or without a manifest)",
-    "translation": "단일 앱 푸시(Manifest 사용 또는 사용 안 함)"
-  },
-  {
-    "id": "Push multiple apps with a manifest",
-    "translation": "Manifest를 사용하여 여러 개의 앱 푸시"
-  },
-  {
     "id": "QUOTA",
     "translation": "할당량"
   },
@@ -4674,10 +4630,6 @@
   {
     "id": "ROUTES:",
     "translation": ""
-  },
-  {
-    "id": "ROUTE_PATH",
-    "translation": "ROUTE_PATH"
   },
   {
     "id": "RUNNING",
@@ -5128,10 +5080,6 @@
     "translation": ""
   },
   {
-    "id": "STACK",
-    "translation": "스택"
-  },
-  {
     "id": "SUCCEEDED",
     "translation": ""
   },
@@ -5554,10 +5502,6 @@
   {
     "id": "TASK_ID",
     "translation": ""
-  },
-  {
-    "id": "TIMEOUT",
-    "translation": "제한시간"
   },
   {
     "id": "TIP:\n",
@@ -6570,10 +6514,6 @@
   {
     "id": "[--allow-paid-service-plans] ",
     "translation": "[--allow-paid-service-plans] "
-  },
-  {
-    "id": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
-    "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",

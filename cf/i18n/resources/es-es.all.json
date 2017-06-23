@@ -164,10 +164,6 @@
     "translation": "'{{.VersionShort}}' y '{{.VersionLong}}' también se aceptan."
   },
   {
-    "id": "(process | port | http)",
-    "translation": "(proceso | puerto | http)"
-  },
-  {
     "id": ") already exists.",
     "translation": ") ya existe."
   },
@@ -498,10 +494,6 @@
   {
     "id": "BUILDPACKS:",
     "translation": ""
-  },
-  {
-    "id": "BUILDPACK_NAME",
-    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Basic ",
@@ -1192,10 +1184,6 @@
     "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\\n\\nAVISO: Esta operación da por supuesto que el intermediario de servicio responsable de esta oferta de servicio ya no está disponible, y todas las instancias de servicio se han suprimido, dejando registros huérfanos en la base de datos de Cloud Foundry. Se eliminará de Cloud Foundry todo el conocimiento del servicio, incluidos los enlaces y las instancias de servicio. No se realizará ningún intento por contactar con el intermediario de servicio; la ejecución de este mandato sin destruir el intermediario de servicio hará que las instancias de servicio se queden huérfanas. Después de ejecutar este mandato, puede que desee ejecutar delete-service-auth-token o delete-service-broker para completar la limpieza."
   },
   {
-    "id": "CF_NAME push ",
-    "translation": "CF_NAME push "
-  },
-  {
     "id": "CF_NAME quota QUOTA",
     "translation": "CF_NAME quota QUOTA"
   },
@@ -1712,10 +1700,6 @@
     "translation": ""
   },
   {
-    "id": "COMMAND",
-    "translation": "COMMAND"
-  },
-  {
     "id": "Can not provision instances of paid service plans",
     "translation": "No se han podido suministrar instancias de planes de servicio pagados"
   },
@@ -2134,14 +2118,6 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "Cabeceras personalizadas para incluir en la solicitud, el distintivo puede especificarse varias veces"
-  },
-  {
-    "id": "DISK",
-    "translation": "DISK"
-  },
-  {
-    "id": "DOCKER_IMAGE",
-    "translation": "DOCKER_IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -3268,10 +3244,6 @@
     "translation": "HEALTH_CHECK_TYPE debería ser \"port\", \"process\" o \"http\""
   },
   {
-    "id": "HOST",
-    "translation": "HOST"
-  },
-  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -3896,10 +3868,6 @@
     "translation": "Búsqueda de '{{.filePath}}' del repositorio '{{.repoName}}'"
   },
   {
-    "id": "MANIFEST_PATH",
-    "translation": "MANIFEST_PATH"
-  },
-  {
     "id": "MEMORY",
     "translation": "MEMORIA"
   },
@@ -3990,10 +3958,6 @@
   {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
-  },
-  {
-    "id": "NUM_INSTANCES",
-    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -4616,14 +4580,6 @@
     "translation": "Enviar una nueva app o sincronizar cambios con una app existente"
   },
   {
-    "id": "Push a single app (with or without a manifest)",
-    "translation": "Enviar por push una app única (con o sin un manifiesto)"
-  },
-  {
-    "id": "Push multiple apps with a manifest",
-    "translation": "Enviar por push varias apps con un manifiesto"
-  },
-  {
     "id": "QUOTA",
     "translation": "CUOTA"
   },
@@ -4674,10 +4630,6 @@
   {
     "id": "ROUTES:",
     "translation": ""
-  },
-  {
-    "id": "ROUTE_PATH",
-    "translation": "ROUTE_PATH"
   },
   {
     "id": "RUNNING",
@@ -5128,10 +5080,6 @@
     "translation": ""
   },
   {
-    "id": "STACK",
-    "translation": "STACK"
-  },
-  {
     "id": "SUCCEEDED",
     "translation": ""
   },
@@ -5554,10 +5502,6 @@
   {
     "id": "TASK_ID",
     "translation": ""
-  },
-  {
-    "id": "TIMEOUT",
-    "translation": "TIMEOUT"
   },
   {
     "id": "TIP:\n",
@@ -6570,10 +6514,6 @@
   {
     "id": "[--allow-paid-service-plans] ",
     "translation": "[--allow-paid-service-plans] "
-  },
-  {
-    "id": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
-    "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
