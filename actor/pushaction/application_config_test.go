@@ -287,6 +287,7 @@ var _ = Describe("Application Config", func() {
 					f, err := ioutil.TempFile("", "convert-to-application-configs-archive")
 					Expect(err).ToNot(HaveOccurred())
 					archive = f.Name()
+					Expect(f.Close()).ToNot(HaveOccurred())
 
 					manifestApps[0].Path = archive
 				})
