@@ -6764,6 +6764,10 @@
     "translation": "이벤트"
   },
   {
+    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+    "translation": "비밀번호 항목의 콘솔 에코 설정 해제 실패:\n{{.ErrorDescription}}"
+  },
+  {
     "id": "filename",
     "translation": "파일 이름"
   },
