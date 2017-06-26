@@ -1,6 +1,8 @@
 package pushaction
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	log "github.com/sirupsen/logrus"
@@ -14,9 +16,10 @@ type ApplicationConfig struct {
 	DesiredRoutes []v2action.Route
 
 	AllResources []v2action.Resource
+	Archive      bool
+	Path         string
 
 	TargetedSpaceGUID string
-	Path              string
 }
 
 func (config ApplicationConfig) CreatingApplication() bool {
@@ -47,20 +50,13 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		}
 
 		if appExists {
-			log.Debugf("found app: %#v", foundApp)
-			config.CurrentApplication = foundApp
-			config.DesiredApplication = foundApp
-
-			log.Info("looking up application routes")
-			var routes []v2action.Route
-			var routeWarnings v2action.Warnings
-			routes, routeWarnings, err = actor.V2Actor.GetApplicationRoutes(foundApp.GUID)
-			warnings = append(warnings, routeWarnings...)
+			var configWarnings v2action.Warnings
+			config, configWarnings, err = actor.configureExistingApp(config, app, foundApp)
+			warnings = append(warnings, configWarnings...)
 			if err != nil {
-				log.Errorln("existing routes lookup:", err)
+				log.Errorln("configuring existing app:", err)
 				return nil, warnings, err
 			}
-			config.CurrentRoutes = routes
 		} else {
 			log.Debug("using empty app as base")
 			config.DesiredApplication.Name = app.Name
@@ -77,16 +73,10 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		// TODO: when working with all of routes, append to current route
 		config.DesiredRoutes = []v2action.Route{defaultRoute}
 
-		if app.DockerImage == "" {
-			log.WithField("path_to_resources", app.Path).Info("determine resources to zip")
-			resources, err := actor.V2Actor.GatherDirectoryResources(app.Path)
-			if err != nil {
-				return nil, warnings, err
-			}
-			config.AllResources = resources
-			log.WithField("number_of_files", len(resources)).Debug("completed file scan")
-		} else {
-			config.DesiredApplication.DockerImage = app.DockerImage
+		config, err = actor.configureResources(config, app)
+		if err != nil {
+			log.Errorln("configuring resources", err)
+			return nil, warnings, err
 		}
 
 		configs = append(configs, config)
@@ -102,4 +92,47 @@ func (actor Actor) FindOrReturnPartialApp(appName string, spaceGUID string) (boo
 		return false, v2action.Application{}, v2Warnings, nil
 	}
 	return true, foundApp, v2Warnings, err
+}
+
+func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.Application, foundApp v2action.Application) (ApplicationConfig, v2action.Warnings, error) {
+	log.Debugf("found app: %#v", foundApp)
+	config.CurrentApplication = foundApp
+	config.DesiredApplication = foundApp
+
+	log.Info("looking up application routes")
+	routes, warnings, err := actor.V2Actor.GetApplicationRoutes(foundApp.GUID)
+	if err != nil {
+		log.Errorln("existing routes lookup:", err)
+		return config, warnings, err
+	}
+	config.CurrentRoutes = routes
+	return config, warnings, nil
+}
+
+func (actor Actor) configureResources(config ApplicationConfig, app manifest.Application) (ApplicationConfig, error) {
+	if app.DockerImage == "" {
+		info, err := os.Stat(app.Path)
+		if err != nil {
+			return config, err
+		}
+
+		var resources []v2action.Resource
+		if info.IsDir() {
+			log.WithField("path_to_resources", app.Path).Info("determine directory resources to zip")
+			resources, err = actor.V2Actor.GatherDirectoryResources(app.Path)
+		} else {
+			config.Archive = true
+			log.WithField("path_to_resources", app.Path).Info("determine archive resources to zip")
+			resources, err = actor.V2Actor.GatherArchiveResources(app.Path)
+		}
+		if err != nil {
+			return config, err
+		}
+		config.AllResources = resources
+		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
+	} else {
+		config.DesiredApplication.DockerImage = app.DockerImage
+	}
+
+	return config, nil
 }

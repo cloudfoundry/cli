@@ -52,34 +52,74 @@ var _ = Describe("Resources", func() {
 			archivePath, executeErr = actor.CreateArchive(config)
 		})
 
-		Context("when the zipping is successful", func() {
-			var fakeArchivePath string
+		Context("when the source is an archive", func() {
 			BeforeEach(func() {
-				fakeArchivePath = "some-archive-path"
-				fakeV2Actor.ZipDirectoryResourcesReturns(fakeArchivePath, nil)
+				config.Archive = true
 			})
 
-			It("returns the path to the zip", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(archivePath).To(Equal(fakeArchivePath))
+			Context("when the zipping is successful", func() {
+				var fakeArchivePath string
 
-				Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(1))
-				sourceDir, passedResources := fakeV2Actor.ZipDirectoryResourcesArgsForCall(0)
-				Expect(sourceDir).To(Equal("some-path"))
-				Expect(passedResources).To(Equal(resourcesToArchive))
+				BeforeEach(func() {
+					fakeArchivePath = "some-archive-path"
+					fakeV2Actor.ZipArchiveResourcesReturns(fakeArchivePath, nil)
+				})
+
+				It("returns the path to the zip", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(archivePath).To(Equal(fakeArchivePath))
+
+					Expect(fakeV2Actor.ZipArchiveResourcesCallCount()).To(Equal(1))
+					sourceDir, passedResources := fakeV2Actor.ZipArchiveResourcesArgsForCall(0)
+					Expect(sourceDir).To(Equal("some-path"))
+					Expect(passedResources).To(Equal(resourcesToArchive))
+				})
+			})
+
+			Context("when creating the archive errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("oh no")
+					fakeV2Actor.ZipArchiveResourcesReturns("", expectedErr)
+				})
+
+				It("sends errors and returns true", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+				})
 			})
 		})
 
-		Context("when creating the archive errors", func() {
-			var expectedErr error
+		Context("when the source is a directory", func() {
+			Context("when the zipping is successful", func() {
+				var fakeArchivePath string
+				BeforeEach(func() {
+					fakeArchivePath = "some-archive-path"
+					fakeV2Actor.ZipDirectoryResourcesReturns(fakeArchivePath, nil)
+				})
 
-			BeforeEach(func() {
-				expectedErr = errors.New("oh no")
-				fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
+				It("returns the path to the zip", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(archivePath).To(Equal(fakeArchivePath))
+
+					Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(1))
+					sourceDir, passedResources := fakeV2Actor.ZipDirectoryResourcesArgsForCall(0)
+					Expect(sourceDir).To(Equal("some-path"))
+					Expect(passedResources).To(Equal(resourcesToArchive))
+				})
 			})
 
-			It("sends errors and returns true", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
+			Context("when creating the archive errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("oh no")
+					fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
+				})
+
+				It("sends errors and returns true", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+				})
 			})
 		})
 	})

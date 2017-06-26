@@ -10,7 +10,14 @@ import (
 func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	log.Info("creating archive")
 
-	archivePath, err := actor.V2Actor.ZipDirectoryResources(config.Path, config.AllResources)
+	var archivePath string
+	var err error
+
+	if config.Archive {
+		archivePath, err = actor.V2Actor.ZipArchiveResources(config.Path, config.AllResources)
+	} else {
+		archivePath, err = actor.V2Actor.ZipDirectoryResources(config.Path, config.AllResources)
+	}
 	if err != nil {
 		log.WithField("path", config.Path).Errorln("archiving resources:", err)
 		return "", err

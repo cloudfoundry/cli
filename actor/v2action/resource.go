@@ -8,10 +8,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/ykk"
 	log "github.com/sirupsen/logrus"
+)
+
+const (
+	DefaultFolderPermissions      = 0755
+	DefaultArchiveFilePermissions = 0744
 )
 
 type FileChangedError struct {
@@ -25,7 +31,7 @@ func (e FileChangedError) Error() string {
 type Resource ccv2.Resource
 
 // GatherArchiveResources returns a list of resources for a directory.
-func (_ Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
+func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
 	var resources []Resource
 
 	archive, err := os.Open(archivePath)
@@ -34,19 +40,16 @@ func (_ Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
 	}
 	defer archive.Close()
 
-	info, err := archive.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	reader, err := ykk.NewReader(archive, info.Size())
+	reader, err := actor.newArchiveReader(archive)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, archivedFile := range reader.File {
 		resource := Resource{Filename: filepath.ToSlash(archivedFile.Name)}
-		if !archivedFile.FileInfo().IsDir() {
+		if archivedFile.FileInfo().IsDir() {
+			resource.Mode = DefaultFolderPermissions
+		} else {
 			fileReader, err := archivedFile.Open()
 			if err != nil {
 				return nil, err
@@ -59,11 +62,10 @@ func (_ Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
 			if err != nil {
 				return nil, err
 			}
-			info := archivedFile.FileInfo()
 
-			resource.Size = archivedFile.FileInfo().Size()
+			resource.Mode = DefaultArchiveFilePermissions
 			resource.SHA1 = fmt.Sprintf("%x", hash.Sum(nil))
-			resource.Mode = info.Mode()
+			resource.Size = archivedFile.FileInfo().Size()
 		}
 		resources = append(resources, resource)
 	}
@@ -91,9 +93,9 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 			Filename: filepath.ToSlash(relPath),
 		}
 
-		if !info.IsDir() {
-			resource.Size = info.Size()
-			resource.Mode = fixMode(info.Mode())
+		if info.IsDir() {
+			resource.Mode = DefaultFolderPermissions
+		} else {
 			file, err := os.Open(path)
 			if err != nil {
 				return err
@@ -105,7 +107,10 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 			if err != nil {
 				return err
 			}
+
+			resource.Mode = fixMode(info.Mode())
 			resource.SHA1 = fmt.Sprintf("%x", sum.Sum(nil))
+			resource.Size = info.Size()
 		}
 		resources = append(resources, resource)
 		return nil
@@ -114,11 +119,63 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	return resources, walkErr
 }
 
+// ZipArchiveResources zips an archive and a sorted (based on full
+// path/filename) list of resources and returns the location. On Windows, the
+// filemode for user is forced to be readable and executable.
+func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude []Resource) (string, error) {
+	log.WithField("sourceArchive", sourceArchivePath).Info("zipping source files from archive")
+	zipFile, err := ioutil.TempFile("", "cf-cli-")
+	if err != nil {
+		return "", err
+	}
+	defer zipFile.Close()
+
+	writer := zip.NewWriter(zipFile)
+	defer writer.Close()
+
+	source, err := os.Open(sourceArchivePath)
+	if err != nil {
+		return "", err
+	}
+	defer source.Close()
+
+	reader, err := actor.newArchiveReader(source)
+	if err != nil {
+		return "", err
+	}
+
+	for _, archiveFile := range reader.File {
+		log.WithField("archiveFileName", archiveFile.Name).Debug("zipping file")
+
+		resource := actor.findInResources(archiveFile.Name, filesToInclude)
+		reader, openErr := archiveFile.Open()
+		if openErr != nil {
+			log.WithField("archiveFile", archiveFile.Name).Errorln("opening path in dir:", openErr)
+			return "", openErr
+		}
+
+		err = actor.addFileToZipFromFileSystem(
+			resource.Filename, reader, archiveFile.FileInfo(),
+			resource.Filename, resource.SHA1, resource.Mode, writer,
+		)
+		if err != nil {
+			log.WithField("archiveFileName", archiveFile.Name).Errorln("zipping file:", err)
+			return "", err
+		}
+	}
+
+	log.WithFields(log.Fields{
+		"zip_file_location": zipFile.Name(),
+		"zipped_file_count": len(filesToInclude),
+	}).Info("zip file created")
+	return zipFile.Name(), nil
+}
+
 // ZipDirectoryResources zips a directory and a sorted (based on full
 // path/filename) list of resources and returns the location. On Windows, the
 // filemode for user is forced to be readable and executable.
 func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Resource) (string, error) {
-	log.WithField("sourceDir", sourceDir).Info("zipping source files")
+	log.WithField("sourceDir", sourceDir).Info("zipping source files from directory")
 	zipFile, err := ioutil.TempFile("", "cf-cli-")
 	if err != nil {
 		return "", err
@@ -131,7 +188,23 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 	for _, resource := range filesToInclude {
 		fullPath := filepath.Join(sourceDir, resource.Filename)
 		log.WithField("fullPath", fullPath).Debug("zipping file")
-		err := actor.addFileToZip(fullPath, resource.Filename, resource.SHA1, writer)
+
+		srcFile, err := os.Open(fullPath)
+		if err != nil {
+			log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
+			return "", err
+		}
+
+		fileInfo, err := srcFile.Stat()
+		if err != nil {
+			log.WithField("fullPath", fullPath).Errorln("stat error in dir:", err)
+			return "", err
+		}
+
+		err = actor.addFileToZipFromFileSystem(
+			fullPath, srcFile, fileInfo,
+			resource.Filename, resource.SHA1, resource.Mode, writer,
+		)
 		if err != nil {
 			log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
 			return "", err
@@ -155,19 +228,11 @@ func (_ Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
 	return apiResources
 }
 
-func (_ Actor) addFileToZip(srcPath string, destPath string, sha1Sum string, zipFile *zip.Writer) error {
-	srcFile, err := os.Open(srcPath)
-	if err != nil {
-		log.WithField("srcPath", srcPath).Errorln("opening path in dir:", err)
-		return err
-	}
+func (_ Actor) addFileToZipFromFileSystem(
+	srcPath string, srcFile io.ReadCloser, fileInfo os.FileInfo,
+	destPath string, sha1Sum string, mode os.FileMode, zipFile *zip.Writer,
+) error {
 	defer srcFile.Close()
-
-	fileInfo, err := srcFile.Stat()
-	if err != nil {
-		log.WithField("srcPath", srcPath).Errorln("stat error in dir:", err)
-		return err
-	}
 
 	header, err := zip.FileInfoHeader(fileInfo)
 	if err != nil {
@@ -176,14 +241,13 @@ func (_ Actor) addFileToZip(srcPath string, destPath string, sha1Sum string, zip
 	}
 
 	// An extra '/' indicates that this file is a directory
-	if fileInfo.IsDir() {
+	if fileInfo.IsDir() && !strings.HasSuffix(destPath, "/") {
 		destPath += "/"
 	}
 
 	header.Name = destPath
 	header.Method = zip.Deflate
 
-	mode := fixMode(fileInfo.Mode())
 	header.SetMode(mode)
 	log.WithFields(log.Fields{
 		"srcPath":  srcPath,
@@ -206,10 +270,35 @@ func (_ Actor) addFileToZip(srcPath string, destPath string, sha1Sum string, zip
 			return err
 		}
 
-		if sha1Sum != fmt.Sprintf("%x", sum.Sum(nil)) {
+		if currentSum := fmt.Sprintf("%x", sum.Sum(nil)); sha1Sum != currentSum {
+			log.WithFields(log.Fields{
+				"expected":   sha1Sum,
+				"currentSum": currentSum,
+			}).Error("setting mode for file")
 			return FileChangedError{Filename: srcPath}
 		}
 	}
 
 	return nil
+}
+
+func (_ Actor) findInResources(path string, filesToInclude []Resource) Resource {
+	for _, resource := range filesToInclude {
+		if resource.Filename == filepath.ToSlash(path) {
+			log.WithField("resource", resource.Filename).Debug("found resource in files to include")
+			return resource
+		}
+	}
+
+	log.WithField("path", path).Debug("did not find resource in files to include")
+	return Resource{}
+}
+
+func (_ Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
+	info, err := archive.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	return ykk.NewReader(archive, info.Size())
 }
