@@ -6764,6 +6764,10 @@
     "translation": "Ereignis"
   },
   {
+    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+    "translation": "Abschalten von Konsolenecho für Kennworteingabe fehlgeschlagen: \n{{.ErrorDescription}}"
+  },
+  {
     "id": "filename",
     "translation": "Dateiname"
   },

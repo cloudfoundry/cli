@@ -6764,6 +6764,10 @@
     "translation": "イベント"
   },
   {
+    "id": "failed turning off console echo for password entry:\n{{.ErrorDescription}}",
+    "translation": "パスワード入力のコンソール・エコーをオフにできませんでした:\n{{.ErrorDescription}}"
+  },
+  {
     "id": "filename",
     "translation": "ファイル名"
   },
