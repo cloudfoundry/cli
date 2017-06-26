@@ -72,31 +72,38 @@ var _ = Describe("pushing a path with the -p flag", func() {
 	})
 
 	Context("pushing a zip file", func() {
-		FIt("pushes the app from the zip file", func() {
+		var archive string
+
+		BeforeEach(func() {
 			helpers.WithHelloWorldApp(func(appDir string) {
-				tmpfile, err := ioutil.TempFile("", "example")
+				tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 				Expect(err).ToNot(HaveOccurred())
-				tmpfileName := tmpfile.Name()
+				archive = tmpfile.Name()
 
-				defer os.Remove(tmpfileName)
-				err = zipit(appDir, tmpfileName, "")
+				err = zipit(appDir, archive, "")
 				Expect(err).ToNot(HaveOccurred())
-
-				session := helpers.CF(PushCommandName, appName, "-p", tmpfileName)
-
-				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-				Eventually(session).Should(Say("path:\\s+%s", tmpfileName))
-				Eventually(session).Should(Say("routes:"))
-				Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-				Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
-				Eventually(session).Should(Say("Uploading files\\.\\.\\."))
-				Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-				Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
-				Eventually(session).Should(Say("name:\\s+%s", appName))
-
-				Eventually(session).Should(Exit(0))
 			})
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+		})
+
+		It("pushes the app from the zip file", func() {
+			session := helpers.CF(PushCommandName, appName, "-p", archive)
+
+			Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+			Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+			Eventually(session).Should(Say("path:\\s+%s", archive))
+			Eventually(session).Should(Say("routes:"))
+			Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+			Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
+			Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+			Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+			Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
+			Eventually(session).Should(Say("name:\\s+%s", appName))
+
+			Eventually(session).Should(Exit(0))
 		})
 	})
 })
@@ -125,17 +132,23 @@ func zipit(source, target, prefix string) error {
 			return err
 		}
 
+		if path == source {
+			return nil
+		}
+
 		header, err := zip.FileInfoHeader(info)
 		if err != nil {
 			return err
 		}
 
-		header.Name = strings.TrimPrefix(path, source)
+		header.Name = strings.TrimPrefix(path, source+string(filepath.Separator))
 
 		if info.IsDir() {
 			header.Name += string(os.PathSeparator)
+			header.SetMode(0755)
 		} else {
 			header.Method = zip.Deflate
+			header.SetMode(0744)
 		}
 
 		writer, err := archive.CreateHeader(header)
