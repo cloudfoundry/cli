@@ -764,14 +764,18 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 		appParams.DockerUsername = &username
 
 		password := os.Getenv("CF_DOCKER_PASSWORD")
-		for attempts := 0; password == "" && attempts < 3; attempts += 1 {
-			password = cmd.ui.AskForPassword("Docker password")
-		}
-		if password == "" {
-			return models.AppParams{}, errors.New(T("Environment variable CF_DOCKER_PASSWORD not set."))
+		if password != "" {
+			cmd.ui.Say(T("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+		} else {
+			cmd.ui.Say(T("Environment variable CF_DOCKER_PASSWORD not set."))
+			for attempts := 0; password == "" && attempts < 3; attempts += 1 {
+				password = cmd.ui.AskForPassword("Docker password")
+			}
+			if password == "" {
+				return models.AppParams{}, errors.New(T("Please provide a password"))
+			}
 		}
 		appParams.DockerPassword = &password
-		cmd.ui.Say(T("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
 	}
 
 	if c.String("p") != "" {
