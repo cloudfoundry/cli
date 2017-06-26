@@ -4412,6 +4412,10 @@
     "translation": "请重新登录。"
   },
   {
+    "id": "Please provide a password",
+    "translation": ""
+  },
+  {
     "id": "Please provide the space within the organization containing the target application",
     "translation": "请提供组织中包含目标应用程序的空间"
   },
@@ -5942,10 +5946,6 @@
   {
     "id": "There are no running instances of this app.",
     "translation": "没有此应用程序的运行实例。"
-  },
-  {
-    "id": "There are no running instances of this process.",
-    "translation": ""
   },
   {
     "id": "There are too many options to display, please type in the name.",
