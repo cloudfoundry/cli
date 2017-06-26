@@ -128,6 +128,7 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 	}
 
 	if !appHasARunningInstance {
+		ui.DisplayNewline()
 		ui.DisplayText("There are no running instances of this app.")
 		return
 	}
@@ -135,12 +136,13 @@ func displayAppTable(ui command.UI, summary v3action.ApplicationSummary) {
 	for _, process := range summary.Processes {
 		ui.DisplayNewline()
 
-		ui.DisplayTextWithBold("{{.ProcessType}}", map[string]interface{}{
-			"ProcessType": process.Type,
+		ui.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
+			"ProcessType":          process.Type,
+			"HealthyInstanceCount": process.HealthyInstanceCount(),
+			"TotalInstanceCount":   process.TotalInstanceCount(),
 		})
 
 		if !processHasAnInstance(&process) {
-			ui.DisplayText("There are no running instances of this process.")
 			continue
 		}
 

@@ -521,7 +521,7 @@ var _ = Describe("v3-push Command", func() {
 										Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
 										Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
 
-										Expect(testUI.Out).To(Say("worker"))
+										Expect(testUI.Out).To(Say("worker:1/1"))
 										Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 										Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
 
