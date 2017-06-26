@@ -5,32 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
-	log.Info("binding routes")
-
-	var boundRoutes bool
-	var allWarnings Warnings
-
-	for _, route := range config.DesiredRoutes {
-		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
-			log.Debugf("binding route: %#v", route)
-			warnings, err := actor.BindRouteToApp(route, config.DesiredApplication.GUID)
-			allWarnings = append(allWarnings, warnings...)
-			if err != nil {
-				log.Errorln("binding route:", err)
-				return ApplicationConfig{}, false, allWarnings, err
-			}
-			boundRoutes = true
-		} else {
-			log.Debugf("route %s already bound to app", route)
-		}
-	}
-	log.Debug("binding routes complete")
-	config.CurrentRoutes = config.DesiredRoutes
-
-	return config, boundRoutes, allWarnings, nil
-}
-
 func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
 	log.Info("creating routes")
 
@@ -59,6 +33,32 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 	config.DesiredRoutes = routes
 
 	return config, createdRoutes, allWarnings, nil
+}
+
+func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
+	log.Info("binding routes")
+
+	var boundRoutes bool
+	var allWarnings Warnings
+
+	for _, route := range config.DesiredRoutes {
+		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
+			log.Debugf("binding route: %#v", route)
+			warnings, err := actor.BindRouteToApp(route, config.DesiredApplication.GUID)
+			allWarnings = append(allWarnings, warnings...)
+			if err != nil {
+				log.Errorln("binding route:", err)
+				return ApplicationConfig{}, false, allWarnings, err
+			}
+			boundRoutes = true
+		} else {
+			log.Debugf("route %s already bound to app", route)
+		}
+	}
+	log.Debug("binding routes complete")
+	config.CurrentRoutes = config.DesiredRoutes
+
+	return config, boundRoutes, allWarnings, nil
 }
 
 // GetRouteWithDefaultDomain returns a route with the host and the default org

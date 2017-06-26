@@ -22,6 +22,88 @@ var _ = Describe("Routes", func() {
 		actor = NewActor(fakeV2Actor)
 	})
 
+	Describe("CreateRoutes", func() {
+		var (
+			config ApplicationConfig
+
+			returnedConfig ApplicationConfig
+			createdRoutes  bool
+			warnings       Warnings
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			config = ApplicationConfig{}
+		})
+
+		JustBeforeEach(func() {
+			returnedConfig, createdRoutes, warnings, executeErr = actor.CreateRoutes(config)
+		})
+
+		Describe("when routes need to be created", func() {
+			BeforeEach(func() {
+				config.DesiredRoutes = []v2action.Route{
+					{GUID: "", Host: "some-route-1"},
+					{GUID: "some-route-guid-2", Host: "some-route-2"},
+					{GUID: "", Host: "some-route-3"},
+				}
+			})
+
+			Context("when the creation is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.CreateRouteReturnsOnCall(0, v2action.Route{GUID: "some-route-guid-1", Host: "some-route-1"}, v2action.Warnings{"create-route-warning"}, nil)
+					fakeV2Actor.CreateRouteReturnsOnCall(1, v2action.Route{GUID: "some-route-guid-3", Host: "some-route-3"}, v2action.Warnings{"create-route-warning"}, nil)
+				})
+
+				It("only creates the routes that do not exist", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("create-route-warning", "create-route-warning"))
+					Expect(createdRoutes).To(BeTrue())
+					Expect(returnedConfig.DesiredRoutes).To(Equal([]v2action.Route{
+						{GUID: "some-route-guid-1", Host: "some-route-1"},
+						{GUID: "some-route-guid-2", Host: "some-route-2"},
+						{GUID: "some-route-guid-3", Host: "some-route-3"},
+					}))
+
+					Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(2))
+					Expect(fakeV2Actor.CreateRouteArgsForCall(0)).To(Equal(v2action.Route{Host: "some-route-1"}))
+					Expect(fakeV2Actor.CreateRouteArgsForCall(1)).To(Equal(v2action.Route{Host: "some-route-3"}))
+				})
+			})
+
+			Context("when the creation errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("oh my")
+					fakeV2Actor.CreateRouteReturns(
+						v2action.Route{},
+						v2action.Warnings{"create-route-warning"},
+						expectedErr)
+				})
+
+				It("sends the warnings and errors and returns true", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("create-route-warning"))
+				})
+			})
+		})
+
+		Context("when no routes are created", func() {
+			BeforeEach(func() {
+				config.DesiredRoutes = []v2action.Route{
+					{GUID: "some-route-guid-1", Host: "some-route-1"},
+					{GUID: "some-route-guid-2", Host: "some-route-2"},
+					{GUID: "some-route-guid-3", Host: "some-route-3"},
+				}
+			})
+
+			It("returns false", func() {
+				Expect(createdRoutes).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("BindRoutes", func() {
 		var (
 			config ApplicationConfig
@@ -110,88 +192,6 @@ var _ = Describe("Routes", func() {
 		Context("when no routes need to be bound", func() {
 			It("returns false", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-			})
-		})
-	})
-
-	Describe("CreateRoutes", func() {
-		var (
-			config ApplicationConfig
-
-			returnedConfig ApplicationConfig
-			createdRoutes  bool
-			warnings       Warnings
-			executeErr     error
-		)
-
-		BeforeEach(func() {
-			config = ApplicationConfig{}
-		})
-
-		JustBeforeEach(func() {
-			returnedConfig, createdRoutes, warnings, executeErr = actor.CreateRoutes(config)
-		})
-
-		Describe("when routes need to be created", func() {
-			BeforeEach(func() {
-				config.DesiredRoutes = []v2action.Route{
-					{GUID: "", Host: "some-route-1"},
-					{GUID: "some-route-guid-2", Host: "some-route-2"},
-					{GUID: "", Host: "some-route-3"},
-				}
-			})
-
-			Context("when the creation is successful", func() {
-				BeforeEach(func() {
-					fakeV2Actor.CreateRouteReturnsOnCall(0, v2action.Route{GUID: "some-route-guid-1", Host: "some-route-1"}, v2action.Warnings{"create-route-warning"}, nil)
-					fakeV2Actor.CreateRouteReturnsOnCall(1, v2action.Route{GUID: "some-route-guid-3", Host: "some-route-3"}, v2action.Warnings{"create-route-warning"}, nil)
-				})
-
-				It("only creates the routes that do not exist", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("create-route-warning", "create-route-warning"))
-					Expect(createdRoutes).To(BeTrue())
-					Expect(returnedConfig.DesiredRoutes).To(Equal([]v2action.Route{
-						{GUID: "some-route-guid-1", Host: "some-route-1"},
-						{GUID: "some-route-guid-2", Host: "some-route-2"},
-						{GUID: "some-route-guid-3", Host: "some-route-3"},
-					}))
-
-					Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(2))
-					Expect(fakeV2Actor.CreateRouteArgsForCall(0)).To(Equal(v2action.Route{Host: "some-route-1"}))
-					Expect(fakeV2Actor.CreateRouteArgsForCall(1)).To(Equal(v2action.Route{Host: "some-route-3"}))
-				})
-			})
-
-			Context("when the creation errors", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("oh my")
-					fakeV2Actor.CreateRouteReturns(
-						v2action.Route{},
-						v2action.Warnings{"create-route-warning"},
-						expectedErr)
-				})
-
-				It("sends the warnings and errors and returns true", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("create-route-warning"))
-				})
-			})
-		})
-
-		Context("when no routes are created", func() {
-			BeforeEach(func() {
-				config.DesiredRoutes = []v2action.Route{
-					{GUID: "some-route-guid-1", Host: "some-route-1"},
-					{GUID: "some-route-guid-2", Host: "some-route-2"},
-					{GUID: "some-route-guid-3", Host: "some-route-3"},
-				}
-			})
-
-			It("returns false", func() {
-				Expect(createdRoutes).To(BeFalse())
 			})
 		})
 	})
