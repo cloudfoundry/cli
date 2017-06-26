@@ -135,6 +135,18 @@ var _ = Describe("security-groups Command", func() {
 						Space:         &v2action.Space{Name: "space-311"},
 						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 					},
+					{
+						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-4"},
+						Organization:  &v2action.Organization{Name: "<all>"},
+						Space:         &v2action.Space{Name: "<all>"},
+						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+					},
+					{
+						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-4"},
+						Organization:  &v2action.Organization{Name: "<all>"},
+						Space:         &v2action.Space{Name: "<all>"},
+						Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+					},
 				}
 				fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(secGroups, v2action.Warnings{"warning-1", "warning-2"}, nil)
 			})
@@ -156,6 +168,8 @@ var _ = Describe("security-groups Command", func() {
 				Expect(testUI.Out).To(Say("(?m)\\s+seg-group-1\\s+org-12\\s+space-122\\s+staging"))
 				Expect(testUI.Out).To(Say("#1\\s+seg-group-2\\s+"))
 				Expect(testUI.Out).To(Say("#2\\s+seg-group-3\\s+org-31\\s+space-311\\s+running"))
+				Expect(testUI.Out).To(Say("#3\\s+seg-group-4\\s+<all>\\s+<all>\\s+running"))
+				Expect(testUI.Out).To(Say("(?m)\\s+seg-group-4\\s+<all>\\s+<all>\\s+staging"))
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 			})

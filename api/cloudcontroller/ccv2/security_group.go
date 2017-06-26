@@ -28,9 +28,11 @@ type SecurityGroupRule struct {
 }
 
 type SecurityGroup struct {
-	GUID  string
-	Name  string
-	Rules []SecurityGroupRule
+	GUID           string
+	Name           string
+	Rules          []SecurityGroupRule
+	RunningDefault bool
+	StagingDefault bool
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Security Group response
@@ -46,6 +48,8 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 				Ports       string `json:"ports"`
 				Protocol    string `json:"protocol"`
 			} `json:"rules"`
+			RunningDefault bool `json:"running_default"`
+			StagingDefault bool `json:"staging_default"`
 		} `json:"entity"`
 	}
 
@@ -62,6 +66,8 @@ func (securityGroup *SecurityGroup) UnmarshalJSON(data []byte) error {
 		securityGroup.Rules[i].Ports = ccRule.Ports
 		securityGroup.Rules[i].Protocol = ccRule.Protocol
 	}
+	securityGroup.RunningDefault = ccSecurityGroup.Entity.RunningDefault
+	securityGroup.StagingDefault = ccSecurityGroup.Entity.StagingDefault
 	return nil
 }
 

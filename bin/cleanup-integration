@@ -39,6 +39,8 @@ cf create-org temp-org
 cf target -o temp-org
 cf domains | grep -i ^integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
 
+cf security-groups | grep -i "^#.* integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
+
 cf delete-org -f temp-org
 
 cf curl /v2/users?results-per-page=100 | \

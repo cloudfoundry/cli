@@ -145,8 +145,38 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 
 	for _, s := range securityGroups {
 		securityGroup := SecurityGroup{
-			GUID: s.GUID,
-			Name: s.Name,
+			GUID:           s.GUID,
+			Name:           s.Name,
+			RunningDefault: s.RunningDefault,
+			StagingDefault: s.StagingDefault,
+		}
+
+		if securityGroup.RunningDefault {
+			secGroupOrgSpaces = append(secGroupOrgSpaces,
+				SecurityGroupWithOrganizationSpaceAndLifecycle{
+					SecurityGroup: &securityGroup,
+					Organization: &Organization{
+						Name: "<all>",
+					},
+					Space: &Space{
+						Name: "<all>",
+					},
+					Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+				})
+		}
+
+		if securityGroup.StagingDefault {
+			secGroupOrgSpaces = append(secGroupOrgSpaces,
+				SecurityGroupWithOrganizationSpaceAndLifecycle{
+					SecurityGroup: &securityGroup,
+					Organization: &Organization{
+						Name: "<all>",
+					},
+					Space: &Space{
+						Name: "<all>",
+					},
+					Lifecycle: ccv2.SecurityGroupLifecycleStaging,
+				})
 		}
 
 		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
@@ -156,12 +186,15 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 		}
 
 		if len(spaces) == 0 {
-			secGroupOrgSpaces = append(secGroupOrgSpaces,
-				SecurityGroupWithOrganizationSpaceAndLifecycle{
-					SecurityGroup: &securityGroup,
-					Organization:  &Organization{},
-					Space:         &Space{},
-				})
+			if !securityGroup.RunningDefault && !securityGroup.StagingDefault {
+				secGroupOrgSpaces = append(secGroupOrgSpaces,
+					SecurityGroupWithOrganizationSpaceAndLifecycle{
+						SecurityGroup: &securityGroup,
+						Organization:  &Organization{},
+						Space:         &Space{},
+					})
+			}
+
 			continue
 		}
 
@@ -217,7 +250,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 				return false
 			}
 
-			return secGroupOrgSpaces[i].Lifecycle == ccv2.SecurityGroupLifecycleStaging
+			return secGroupOrgSpaces[i].Lifecycle < secGroupOrgSpaces[j].Lifecycle
 		})
 	return secGroupOrgSpaces, Warnings(allWarnings), err
 }
