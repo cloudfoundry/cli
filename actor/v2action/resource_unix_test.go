@@ -44,40 +44,44 @@ var _ = Describe("Resource Actions", func() {
 	})
 
 	Describe("GatherArchiveResources", func() {
-		var archive string
+		Context("when the archive exists", func() {
+			var archive string
 
-		BeforeEach(func() {
-			tmpfile, err := ioutil.TempFile("", "example")
-			Expect(err).ToNot(HaveOccurred())
-			defer tmpfile.Close()
-			archive = tmpfile.Name()
+			BeforeEach(func() {
+				tmpfile, err := ioutil.TempFile("", "example")
+				Expect(err).ToNot(HaveOccurred())
+				defer tmpfile.Close()
+				archive = tmpfile.Name()
 
-			err = zipit(srcDir, archive, "")
-			Expect(err).ToNot(HaveOccurred())
+				err = zipit(srcDir, archive, "")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+			})
+
+			It("gathers a list of all files in a source archive", func() {
+				resources, err := actor.GatherArchiveResources(archive)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(resources).To(Equal(
+					[]Resource{
+						{Filename: "/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/level2/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: DefaultArchiveFilePermissions},
+						{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
+						{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
+					}))
+			})
 		})
 
-		AfterEach(func() {
-			Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
-		})
-
-		It("gathers a list of all files in a source archive", func() {
-			resources, err := actor.GatherArchiveResources(archive)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(resources).To(Equal(
-				[]Resource{
-					{Filename: "/"},
-					{Filename: "/level1/"},
-					{Filename: "/level1/level2/"},
-					{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
-					{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
-					{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
-				}))
-		})
-
-		It("returns an error if the file is problematic", func() {
-			_, err := actor.GatherArchiveResources("/does/not/exist")
-			Expect(os.IsNotExist(err)).To(BeTrue())
+		Context("when the archive does not exist", func() {
+			It("returns an error if the file is problematic", func() {
+				_, err := actor.GatherArchiveResources("/does/not/exist")
+				Expect(os.IsNotExist(err)).To(BeTrue())
+			})
 		})
 	})
 
@@ -88,8 +92,8 @@ var _ = Describe("Resource Actions", func() {
 
 			Expect(resources).To(Equal(
 				[]Resource{
-					{Filename: "level1"},
-					{Filename: "level1/level2"},
+					{Filename: "level1", Mode: DefaultFolderPermissions},
+					{Filename: "level1/level2", Mode: DefaultFolderPermissions},
 					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
 					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
 					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},

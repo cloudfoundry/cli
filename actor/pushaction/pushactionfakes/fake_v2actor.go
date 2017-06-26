@@ -70,6 +70,19 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	GatherArchiveResourcesStub        func(archivePath string) ([]v2action.Resource, error)
+	gatherArchiveResourcesMutex       sync.RWMutex
+	gatherArchiveResourcesArgsForCall []struct {
+		archivePath string
+	}
+	gatherArchiveResourcesReturns struct {
+		result1 []v2action.Resource
+		result2 error
+	}
+	gatherArchiveResourcesReturnsOnCall map[int]struct {
+		result1 []v2action.Resource
+		result2 error
+	}
 	GatherDirectoryResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
 	gatherDirectoryResourcesMutex       sync.RWMutex
 	gatherDirectoryResourcesArgsForCall []struct {
@@ -174,6 +187,20 @@ type FakeV2Actor struct {
 		result1 v2action.Job
 		result2 v2action.Warnings
 		result3 error
+	}
+	ZipArchiveResourcesStub        func(sourceArchivePath string, filesToInclude []v2action.Resource) (string, error)
+	zipArchiveResourcesMutex       sync.RWMutex
+	zipArchiveResourcesArgsForCall []struct {
+		sourceArchivePath string
+		filesToInclude    []v2action.Resource
+	}
+	zipArchiveResourcesReturns struct {
+		result1 string
+		result2 error
+	}
+	zipArchiveResourcesReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
 	}
 	ZipDirectoryResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
 	zipDirectoryResourcesMutex       sync.RWMutex
@@ -406,6 +433,57 @@ func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsReturnsOnCall(i int, r
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GatherArchiveResources(archivePath string) ([]v2action.Resource, error) {
+	fake.gatherArchiveResourcesMutex.Lock()
+	ret, specificReturn := fake.gatherArchiveResourcesReturnsOnCall[len(fake.gatherArchiveResourcesArgsForCall)]
+	fake.gatherArchiveResourcesArgsForCall = append(fake.gatherArchiveResourcesArgsForCall, struct {
+		archivePath string
+	}{archivePath})
+	fake.recordInvocation("GatherArchiveResources", []interface{}{archivePath})
+	fake.gatherArchiveResourcesMutex.Unlock()
+	if fake.GatherArchiveResourcesStub != nil {
+		return fake.GatherArchiveResourcesStub(archivePath)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.gatherArchiveResourcesReturns.result1, fake.gatherArchiveResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) GatherArchiveResourcesCallCount() int {
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
+	return len(fake.gatherArchiveResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) GatherArchiveResourcesArgsForCall(i int) string {
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
+	return fake.gatherArchiveResourcesArgsForCall[i].archivePath
+}
+
+func (fake *FakeV2Actor) GatherArchiveResourcesReturns(result1 []v2action.Resource, result2 error) {
+	fake.GatherArchiveResourcesStub = nil
+	fake.gatherArchiveResourcesReturns = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) GatherArchiveResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
+	fake.GatherArchiveResourcesStub = nil
+	if fake.gatherArchiveResourcesReturnsOnCall == nil {
+		fake.gatherArchiveResourcesReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Resource
+			result2 error
+		})
+	}
+	fake.gatherArchiveResourcesReturnsOnCall[i] = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeV2Actor) GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error) {
@@ -789,6 +867,63 @@ func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude []v2action.Resource) (string, error) {
+	var filesToIncludeCopy []v2action.Resource
+	if filesToInclude != nil {
+		filesToIncludeCopy = make([]v2action.Resource, len(filesToInclude))
+		copy(filesToIncludeCopy, filesToInclude)
+	}
+	fake.zipArchiveResourcesMutex.Lock()
+	ret, specificReturn := fake.zipArchiveResourcesReturnsOnCall[len(fake.zipArchiveResourcesArgsForCall)]
+	fake.zipArchiveResourcesArgsForCall = append(fake.zipArchiveResourcesArgsForCall, struct {
+		sourceArchivePath string
+		filesToInclude    []v2action.Resource
+	}{sourceArchivePath, filesToIncludeCopy})
+	fake.recordInvocation("ZipArchiveResources", []interface{}{sourceArchivePath, filesToIncludeCopy})
+	fake.zipArchiveResourcesMutex.Unlock()
+	if fake.ZipArchiveResourcesStub != nil {
+		return fake.ZipArchiveResourcesStub(sourceArchivePath, filesToInclude)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.zipArchiveResourcesReturns.result1, fake.zipArchiveResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) ZipArchiveResourcesCallCount() int {
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
+	return len(fake.zipArchiveResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) ZipArchiveResourcesArgsForCall(i int) (string, []v2action.Resource) {
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
+	return fake.zipArchiveResourcesArgsForCall[i].sourceArchivePath, fake.zipArchiveResourcesArgsForCall[i].filesToInclude
+}
+
+func (fake *FakeV2Actor) ZipArchiveResourcesReturns(result1 string, result2 error) {
+	fake.ZipArchiveResourcesStub = nil
+	fake.zipArchiveResourcesReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) ZipArchiveResourcesReturnsOnCall(i int, result1 string, result2 error) {
+	fake.ZipArchiveResourcesStub = nil
+	if fake.zipArchiveResourcesReturnsOnCall == nil {
+		fake.zipArchiveResourcesReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.zipArchiveResourcesReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV2Actor) ZipDirectoryResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
 	var filesToIncludeCopy []v2action.Resource
 	if filesToInclude != nil {
@@ -857,6 +992,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.createRouteMutex.RUnlock()
 	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
 	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
 	fake.gatherDirectoryResourcesMutex.RLock()
 	defer fake.gatherDirectoryResourcesMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
@@ -871,6 +1008,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
 	fake.zipDirectoryResourcesMutex.RLock()
 	defer fake.zipDirectoryResourcesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
