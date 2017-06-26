@@ -3,10 +3,7 @@ package terminal
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
-
-	"github.com/vito/go-interact/interact"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 
@@ -312,15 +309,4 @@ func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
 				"CLIVer": config.CLIVersion(),
 			}))
 	}
-}
-
-func (ui *terminalUI) AskForPassword(prompt string) string {
-	interactivePrompt := interact.NewInteraction(prompt)
-	if _, ok := ui.stdin.(*os.File); !ok { //only set them for tests
-		interactivePrompt.Input = ui.stdin
-		interactivePrompt.Output = ui.stdout
-	}
-	var response interact.Password
-	interactivePrompt.Resolve(interact.Required(&response)) // Explicitly ignoring error because blank is the default value on error
-	return string(response)
 }
