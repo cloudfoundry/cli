@@ -870,6 +870,8 @@ var _ = Describe("Push Command", func() {
 							It("it passes the credentials to create call", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
+								Expect(output).To(gbytes.Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
 								Expect(appRepo.CreateCallCount()).To(Equal(1))
 								params := appRepo.CreateArgsForCall(0)
 								Expect(*params.DockerUsername).To(Equal("some-docker-username"))
@@ -888,6 +890,7 @@ var _ = Describe("Push Command", func() {
 									It("it passes the credentials to create call", func() {
 										Expect(executeErr).NotTo(HaveOccurred())
 
+										Expect(output).To(gbytes.Say("Environment variable CF_DOCKER_PASSWORD not set."))
 										Expect(output).To(gbytes.Say("Docker password:"))
 										Expect(output).ToNot(gbytes.Say("Docker password:")) // Only prompt once
 
@@ -905,7 +908,7 @@ var _ = Describe("Push Command", func() {
 									})
 
 									It("returns an error", func() {
-										Expect(executeErr).To(MatchError("Environment variable CF_DOCKER_PASSWORD not set."))
+										Expect(executeErr).To(MatchError("Please provide a password"))
 
 										Expect(output).To(gbytes.Say("Docker password:"))
 										Expect(output).To(gbytes.Say("Docker password:"))
