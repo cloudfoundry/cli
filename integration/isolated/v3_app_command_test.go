@@ -167,7 +167,8 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session.Out).Should(Say(fmt.Sprintf("name:\\s+%s", appName)))
 				Eventually(session.Out).Should(Say("requested state:\\s+started"))
 				Eventually(session.Out).Should(Say("processes:\\s+web:[01]/1"))
-				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile 1.4.6"))
+				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+				Eventually(session.Out).Should(Say("web:[01]/1"))
 				Eventually(session.Out).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))

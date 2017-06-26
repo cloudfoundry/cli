@@ -191,6 +191,8 @@ var _ = Describe("v3-app Command", func() {
 
 			It("says no instances are running", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Out).To(Say("buildpacks:"))
+				Expect(testUI.Out).To(Say("\n\n"))
 
 				Expect(testUI.Out).To(Say("There are no running instances of this app."))
 			})
@@ -291,17 +293,15 @@ var _ = Describe("v3-app Command", func() {
 				Expect(testUI.Out).To(Say("memory usage:\\s+32M x 3, 64M x 1"))
 				Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
 				Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output, some-buildpack\n\n"))
-				Expect(testUI.Out).To(Say("web"))
+				Expect(testUI.Out).To(Say("web:3/3"))
 				Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
 				Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
 				Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
 				Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
 
-				Expect(testUI.Out).To(Say("console"))
-				Expect(testUI.Out).To(Say("There are no running instances of this process."))
+				Expect(testUI.Out).To(Say("console:0/0"))
 
-				Expect(testUI.Out).To(Say("worker"))
-				Expect(testUI.Out).To(Say("There are no running instances of this process."))
+				Expect(testUI.Out).To(Say("worker:0/1"))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
