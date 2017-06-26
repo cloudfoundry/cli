@@ -76,6 +76,9 @@ var _ = Describe("security-groups command", func() {
 				securityGroup2 helpers.SecurityGroup
 				securityGroup3 helpers.SecurityGroup
 				securityGroup4 helpers.SecurityGroup
+				securityGroup5 helpers.SecurityGroup
+				securityGroup6 helpers.SecurityGroup
+				securityGroup7 helpers.SecurityGroup
 
 				org11 string
 				org12 string
@@ -107,6 +110,12 @@ var _ = Describe("security-groups command", func() {
 				securityGroup3.Create()
 				securityGroup4 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-4"), "tcp", "11.1.1.0/24", "80,443", "SG1")
 				securityGroup4.Create()
+				securityGroup5 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-5"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup5.Create()
+				securityGroup6 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-6"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup6.Create()
+				securityGroup7 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-7"), "tcp", "11.1.1.0/24", "80,443", "SG1")
+				securityGroup7.Create()
 
 				org11 = helpers.PrefixedRandomName("INTEGRATION-ORG-11")
 				org12 = helpers.PrefixedRandomName("INTEGRATION-ORG-12")
@@ -126,14 +135,16 @@ var _ = Describe("security-groups command", func() {
 				space33 = helpers.PrefixedRandomName("INTEGRATION-SPACE-33")
 
 				helpers.CreateOrgAndSpace(org11, space11)
+				Eventually(helpers.CF("bind-running-security-group", securityGroup1.Name)).Should(Exit(0))
 				Eventually(helpers.CF("bind-security-group", securityGroup1.Name, org11, space11)).Should(Exit(0))
 				helpers.CreateSpace(space22)
-				Eventually(helpers.CF("bind-security-group", securityGroup2.Name, org11, space22)).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", securityGroup2.Name, org11, space22, "--lifecycle", "staging")).Should(Exit(0))
 				helpers.CreateSpace(space32)
 				Eventually(helpers.CF("bind-security-group", securityGroup4.Name, org11, space32)).Should(Exit(0))
 				helpers.CreateOrgAndSpace(org12, space12)
-				Eventually(helpers.CF("bind-security-group", securityGroup1.Name, org12, space12)).Should(Exit(0))
+				Eventually(helpers.CF("bind-security-group", securityGroup1.Name, org12, space12, "--lifecycle", "staging")).Should(Exit(0))
 				helpers.CreateOrgAndSpace(org13, space13)
+				Eventually(helpers.CF("bind-staging-security-group", securityGroup2.Name)).Should(Exit(0))
 				Eventually(helpers.CF("bind-security-group", securityGroup1.Name, org13, space13)).Should(Exit(0))
 				helpers.CreateOrgAndSpace(org21, space21)
 				Eventually(helpers.CF("bind-security-group", securityGroup2.Name, org21, space21)).Should(Exit(0))
@@ -143,14 +154,18 @@ var _ = Describe("security-groups command", func() {
 				Eventually(helpers.CF("bind-security-group", securityGroup4.Name, org23, space31)).Should(Exit(0))
 				helpers.CreateOrgAndSpace(org33, space33)
 				Eventually(helpers.CF("bind-security-group", securityGroup4.Name, org33, space33)).Should(Exit(0))
+				Eventually(helpers.CF("bind-running-security-group", securityGroup5.Name)).Should(Exit(0))
+				Eventually(helpers.CF("bind-staging-security-group", securityGroup6.Name)).Should(Exit(0))
+				Eventually(helpers.CF("bind-running-security-group", securityGroup7.Name)).Should(Exit(0))
+				Eventually(helpers.CF("bind-staging-security-group", securityGroup7.Name)).Should(Exit(0))
 			})
 
 			AfterEach(func() {
 				// Delete Security Groups, Organizations, and Spaces with predictable and unique names for testing sorting
 				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org11, space11)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org11, space22)).Should(Exit(0))
+				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org11, space22, "--lifecycle", "staging")).Should(Exit(0))
 				Eventually(helpers.CF("unbind-security-group", securityGroup4.Name, org11, space32)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org12, space12)).Should(Exit(0))
+				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org12, space12, "--lifecycle", "staging")).Should(Exit(0))
 				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org13, space13)).Should(Exit(0))
 				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org21, space21)).Should(Exit(0))
 				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org23, space23)).Should(Exit(0))
@@ -161,6 +176,9 @@ var _ = Describe("security-groups command", func() {
 				securityGroup2.Delete()
 				securityGroup3.Delete()
 				securityGroup4.Delete()
+				securityGroup5.Delete()
+				securityGroup6.Delete()
+				securityGroup7.Delete()
 			})
 
 			It("lists the security groups", func() {
@@ -168,57 +186,22 @@ var _ = Describe("security-groups command", func() {
 				Eventually(session.Out).Should(Say("OK\\n\\n"))
 				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space\\s+lifecycle"))
 				// How to test alphabetization with auto-generated names?  Here's how.
-				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org11, space11))
-				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org12, space12))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+<all>\\s+<all>\\s+running", securityGroup1.Name))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org11, space11))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+staging", securityGroup1.Name, org12, space12))
 				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup1.Name, org13, space13))
-				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org11, space22))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+<all>\\s+<all>\\s+staging", securityGroup2.Name))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+staging", securityGroup2.Name, org11, space22))
 				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org21, space21))
 				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup2.Name, org23, space23))
 				Eventually(session.Out).Should(Say("#\\d+\\s+%s", securityGroup3.Name))
 				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org11, space32))
 				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org23, space31))
 				Eventually(session.Out).Should(Say("\\s+%s\\s+%s\\s+%s\\s+running", securityGroup4.Name, org33, space33))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("When some security groups are assigned to staging", func() {
-			var (
-				securityGroup1 helpers.SecurityGroup
-				securityGroup2 helpers.SecurityGroup
-			)
-
-			BeforeEach(func() {
-				securityGroup1 = helpers.NewSecurityGroup("security-group-1", "tcp", "11.1.1.0/24", "80,443", "SG1")
-				securityGroup1.Create()
-				securityGroup2 = helpers.NewSecurityGroup("security-group-2", "tcp", "11.1.1.0/24", "80,443", "SG1")
-				securityGroup2.Create()
-
-				helpers.CreateOrgAndSpace("some-org", "some-space-1")
-				helpers.TargetOrg("some-org")
-				helpers.CreateSpace("some-space-2")
-
-				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-1", "--lifecycle", "running")).Should(Exit(0))
-				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-1", "--lifecycle", "staging")).Should(Exit(0))
-				Eventually(helpers.CF("bind-security-group", "security-group-1", "some-org", "some-space-2", "--lifecycle", "running")).Should(Exit(0))
-
-				Eventually(helpers.CF("bind-security-group", "security-group-2", "some-org", "some-space-1", "--lifecycle", "staging")).Should(Exit(0))
-			})
-
-			AfterEach(func() {
-				securityGroup1.Delete()
-				securityGroup2.Delete()
-			})
-
-			It("displays staging under lifecycle", func() {
-				Eventually(session.Out).Should(Say("Getting security groups as admin"))
-				Eventually(session.Out).Should(Say("OK\\n\\n"))
-				Eventually(session.Out).Should(Say("\\s+name\\s+organization\\s+space\\s+lifecycle"))
-				Eventually(session.Out).Should(Say("\\s+#\\d+\\s+security-group-1\\s+some-org\\s+some-space-1\\s+staging"))
-				Eventually(session.Out).Should(Say("\\s+security-group-1\\s+some-org\\s+some-space-1\\s+running"))
-				Eventually(session.Out).Should(Say("\\s+security-group-1\\s+some-org\\s+some-space-2\\s+running"))
-
-				Eventually(session.Out).Should(Say("\\s+#\\d+\\s+security-group-2\\s+some-org\\s+some-space-1\\s+staging"))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+<all>\\s+<all>\\s+running", securityGroup5.Name))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+<all>\\s+<all>\\s+staging", securityGroup6.Name))
+				Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+<all>\\s+<all>\\s+running", securityGroup7.Name))
+				Eventually(session.Out).Should(Say("\\s+%s\\s+<all>\\s+<all>\\s+staging", securityGroup7.Name))
 				Eventually(session).Should(Exit(0))
 			})
 		})

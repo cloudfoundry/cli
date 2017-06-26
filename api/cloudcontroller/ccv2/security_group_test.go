@@ -132,7 +132,7 @@ var _ = Describe("Security Groups", func() {
 									"rules": [
 									],
 									"running_default": false,
-									"staging_default": false,
+									"staging_default": true,
 									"spaces_url": "/v2/security_groups/security-group-guid-1/spaces"
 								}
 							}
@@ -150,7 +150,7 @@ var _ = Describe("Security Groups", func() {
 									"name": "security-group-2",
 									"rules": [
 									],
-									"running_default": false,
+									"running_default": true,
 									"staging_default": false,
 									"spaces_url": "/v2/security_groups/security-group-guid-2/spaces"
 								}
@@ -179,14 +179,18 @@ var _ = Describe("Security Groups", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(securityGroups).To(Equal([]SecurityGroup{
 						{
-							GUID:  "security-group-guid-1",
-							Name:  "security-group-1",
-							Rules: []SecurityGroupRule{},
+							GUID:           "security-group-guid-1",
+							Name:           "security-group-1",
+							Rules:          []SecurityGroupRule{},
+							RunningDefault: false,
+							StagingDefault: true,
 						},
 						{
-							GUID:  "security-group-guid-2",
-							Name:  "security-group-2",
-							Rules: []SecurityGroupRule{},
+							GUID:           "security-group-guid-2",
+							Name:           "security-group-2",
+							Rules:          []SecurityGroupRule{},
+							RunningDefault: true,
+							StagingDefault: false,
 						},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))

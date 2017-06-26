@@ -186,16 +186,150 @@ var _ = Describe("Security Group Actions", func() {
 		})
 
 		Context("when no errors are encountered", func() {
+			var (
+				expectedSecurityGroup1 SecurityGroup
+				expectedSecurityGroup2 SecurityGroup
+				expectedSecurityGroup3 SecurityGroup
+				expectedSecurityGroup4 SecurityGroup
+				expectedSecurityGroup5 SecurityGroup
+				expectedSecurityGroup6 SecurityGroup
+				expectedSecurityGroup7 SecurityGroup
+
+				expectedOrg11  Organization
+				expectedOrg12  Organization
+				expectedOrg13  Organization
+				expectedOrg21  Organization
+				expectedOrg23  Organization
+				expectedOrg33  Organization
+				expectedOrgAll Organization
+
+				expectedSpace11  Space
+				expectedSpace12  Space
+				expectedSpace13  Space
+				expectedSpace21  Space
+				expectedSpace22  Space
+				expectedSpace23  Space
+				expectedSpace31  Space
+				expectedSpace32  Space
+				expectedSpace33  Space
+				expectedSpaceAll Space
+			)
+
 			BeforeEach(func() {
+				expectedSecurityGroup1 = SecurityGroup{
+					GUID:           "security-group-guid-1",
+					Name:           "security-group-1",
+					RunningDefault: true,
+				}
+				expectedSecurityGroup2 = SecurityGroup{
+					GUID:           "security-group-guid-2",
+					Name:           "security-group-2",
+					StagingDefault: true,
+				}
+				expectedSecurityGroup3 = SecurityGroup{
+					GUID: "security-group-guid-3",
+					Name: "security-group-3",
+				}
+				expectedSecurityGroup4 = SecurityGroup{
+					GUID: "security-group-guid-4",
+					Name: "security-group-4",
+				}
+				expectedSecurityGroup5 = SecurityGroup{
+					GUID:           "security-group-guid-5",
+					Name:           "security-group-5",
+					RunningDefault: true,
+				}
+				expectedSecurityGroup6 = SecurityGroup{
+					GUID:           "security-group-guid-6",
+					Name:           "security-group-6",
+					StagingDefault: true,
+				}
+				expectedSecurityGroup7 = SecurityGroup{
+					GUID:           "security-group-guid-7",
+					Name:           "security-group-7",
+					RunningDefault: true,
+					StagingDefault: true,
+				}
+
+				expectedOrg11 = Organization{
+					GUID: "org-guid-11",
+					Name: "org-11",
+				}
+				expectedOrg12 = Organization{
+					GUID: "org-guid-12",
+					Name: "org-12",
+				}
+				expectedOrg13 = Organization{
+					GUID: "org-guid-13",
+					Name: "org-13",
+				}
+				expectedOrg21 = Organization{
+					GUID: "org-guid-21",
+					Name: "org-21",
+				}
+				expectedOrg23 = Organization{
+					GUID: "org-guid-23",
+					Name: "org-23",
+				}
+				expectedOrg33 = Organization{
+					GUID: "org-guid-33",
+					Name: "org-33",
+				}
+				expectedOrgAll = Organization{
+					Name: "<all>",
+				}
+
+				expectedSpace11 = Space{
+					GUID: "space-guid-11",
+					Name: "space-11",
+				}
+				expectedSpace12 = Space{
+					GUID: "space-guid-12",
+					Name: "space-12",
+				}
+				expectedSpace13 = Space{
+					GUID: "space-guid-13",
+					Name: "space-13",
+				}
+				expectedSpace21 = Space{
+					GUID: "space-guid-21",
+					Name: "space-21",
+				}
+				expectedSpace22 = Space{
+					GUID: "space-guid-22",
+					Name: "space-22",
+				}
+				expectedSpace23 = Space{
+					GUID: "space-guid-23",
+					Name: "space-23",
+				}
+				expectedSpace31 = Space{
+					GUID: "space-guid-31",
+					Name: "space-31",
+				}
+				expectedSpace32 = Space{
+					GUID: "space-guid-32",
+					Name: "space-32",
+				}
+				expectedSpace33 = Space{
+					GUID: "space-guid-33",
+					Name: "space-33",
+				}
+				expectedSpaceAll = Space{
+					Name: "<all>",
+				}
+
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
 					[]ccv2.SecurityGroup{
 						{
-							GUID: "security-group-guid-1",
-							Name: "security-group-1",
+							GUID:           "security-group-guid-1",
+							Name:           "security-group-1",
+							RunningDefault: true,
 						},
 						{
-							GUID: "security-group-guid-2",
-							Name: "security-group-2",
+							GUID:           "security-group-guid-2",
+							Name:           "security-group-2",
+							StagingDefault: true,
 						},
 						{
 							GUID: "security-group-guid-3",
@@ -204,6 +338,22 @@ var _ = Describe("Security Group Actions", func() {
 						{
 							GUID: "security-group-guid-4",
 							Name: "security-group-4",
+						},
+						{
+							GUID:           "security-group-guid-5",
+							Name:           "security-group-5",
+							RunningDefault: true,
+						},
+						{
+							GUID:           "security-group-guid-6",
+							Name:           "security-group-6",
+							StagingDefault: true,
+						},
+						{
+							GUID:           "security-group-guid-7",
+							Name:           "security-group-7",
+							RunningDefault: true,
+							StagingDefault: true,
 						},
 					},
 					ccv2.Warnings{"warning-1", "warning-2"},
@@ -300,6 +450,21 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-11", "warning-12"},
 					nil,
 				)
+				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(4,
+					[]ccv2.Space{},
+					ccv2.Warnings{"warning-31", "warning-32"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(5,
+					[]ccv2.Space{},
+					ccv2.Warnings{"warning-33", "warning-34"},
+					nil,
+				)
+				fakeCloudControllerClient.GetRunningSpacesBySecurityGroupReturnsOnCall(6,
+					[]ccv2.Space{},
+					ccv2.Warnings{"warning-35", "warning-36"},
+					nil,
+				)
 				fakeCloudControllerClient.GetOrganizationReturnsOnCall(0,
 					ccv2.Organization{
 						GUID: "org-guid-13",
@@ -370,212 +535,146 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-19", "warning-20",
 						"warning-21", "warning-22",
 						"warning-25", "warning-26",
+						"warning-31", "warning-32",
+						"warning-33", "warning-34",
+						"warning-35", "warning-36",
 					))
 					expected := []SecurityGroupWithOrganizationSpaceAndLifecycle{
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-11",
-								Name: "space-11",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleStaging,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-11",
-								Name: "space-11",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace11,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-12",
-								Name: "org-12",
-							},
-							Space: &Space{
-								GUID: "space-guid-12",
-								Name: "space-12",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleStaging,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace11,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-12",
-								Name: "org-12",
-							},
-							Space: &Space{
-								GUID: "space-guid-12",
-								Name: "space-12",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg12,
+							Space:         &expectedSpace12,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-13",
-								Name: "org-13",
-							},
-							Space: &Space{
-								GUID: "space-guid-13",
-								Name: "space-13",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleStaging,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg12,
+							Space:         &expectedSpace12,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-13",
-								Name: "org-13",
-							},
-							Space: &Space{
-								GUID: "space-guid-13",
-								Name: "space-13",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg13,
+							Space:         &expectedSpace13,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-22",
-								Name: "space-22",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg13,
+							Space:         &expectedSpace13,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-21",
-								Name: "org-21",
-							},
-							Space: &Space{
-								GUID: "space-guid-21",
-								Name: "space-21",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-23",
-								Name: "org-23",
-							},
-							Space: &Space{
-								GUID: "space-guid-23",
-								Name: "space-23",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace22,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-3",
-								Name: "security-group-3",
-							},
-							Organization: &Organization{},
-							Space:        &Space{},
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg21,
+							Space:         &expectedSpace21,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-32",
-								Name: "space-32",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg23,
+							Space:         &expectedSpace23,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-23",
-								Name: "org-23",
-							},
-							Space: &Space{
-								GUID: "space-guid-31",
-								Name: "space-31",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup3,
+							Organization:  &Organization{},
+							Space:         &Space{},
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-33",
-								Name: "org-33",
-							},
-							Space: &Space{
-								GUID: "space-guid-33",
-								Name: "space-33",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace32,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg23,
+							Space:         &expectedSpace31,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg33,
+							Space:         &expectedSpace33,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup5,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup6,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup7,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup7,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 					}
 					Expect(secGroupOrgSpaces).To(Equal(expected))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(4))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(7))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
 
-					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(4))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(7))
 					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
 					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
 					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
 					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
 
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
@@ -606,162 +705,120 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-19", "warning-20",
 						"warning-21", "warning-22",
 						"warning-25", "warning-26",
+						"warning-31", "warning-32",
+						"warning-33", "warning-34",
+						"warning-35", "warning-36",
 					))
 
 					expected := []SecurityGroupWithOrganizationSpaceAndLifecycle{
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-11",
-								Name: "space-11",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-12",
-								Name: "org-12",
-							},
-							Space: &Space{
-								GUID: "space-guid-12",
-								Name: "space-12",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace11,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-1",
-								Name: "security-group-1",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-13",
-								Name: "org-13",
-							},
-							Space: &Space{
-								GUID: "space-guid-13",
-								Name: "space-13",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg12,
+							Space:         &expectedSpace12,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-22",
-								Name: "space-22",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup1,
+							Organization:  &expectedOrg13,
+							Space:         &expectedSpace13,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-21",
-								Name: "org-21",
-							},
-							Space: &Space{
-								GUID: "space-guid-21",
-								Name: "space-21",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-2",
-								Name: "security-group-2",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-23",
-								Name: "org-23",
-							},
-							Space: &Space{
-								GUID: "space-guid-23",
-								Name: "space-23",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace22,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-3",
-								Name: "security-group-3",
-							},
-							Organization: &Organization{},
-							Space:        &Space{},
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg21,
+							Space:         &expectedSpace21,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-11",
-								Name: "org-11",
-							},
-							Space: &Space{
-								GUID: "space-guid-32",
-								Name: "space-32",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup2,
+							Organization:  &expectedOrg23,
+							Space:         &expectedSpace23,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-23",
-								Name: "org-23",
-							},
-							Space: &Space{
-								GUID: "space-guid-31",
-								Name: "space-31",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup3,
+							Organization:  &Organization{},
+							Space:         &Space{},
 						},
 						{
-							SecurityGroup: &SecurityGroup{
-								GUID: "security-group-guid-4",
-								Name: "security-group-4",
-							},
-							Organization: &Organization{
-								GUID: "org-guid-33",
-								Name: "org-33",
-							},
-							Space: &Space{
-								GUID: "space-guid-33",
-								Name: "space-33",
-							},
-							Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg11,
+							Space:         &expectedSpace32,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg23,
+							Space:         &expectedSpace31,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup4,
+							Organization:  &expectedOrg33,
+							Space:         &expectedSpace33,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup5,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup6,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup7,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						},
+						{
+							SecurityGroup: &expectedSecurityGroup7,
+							Organization:  &expectedOrgAll,
+							Space:         &expectedSpaceAll,
+							Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 						},
 					}
 					Expect(secGroupOrgSpaces).To(Equal(expected))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
 
-					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(4))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(7))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(1)).To(Equal("security-group-guid-2"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(2)).To(Equal("security-group-guid-3"))
 					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(3)).To(Equal("security-group-guid-4"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(4)).To(Equal("security-group-guid-5"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(5)).To(Equal("security-group-guid-6"))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(6)).To(Equal("security-group-guid-7"))
 
 					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(0))
 
