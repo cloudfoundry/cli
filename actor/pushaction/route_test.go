@@ -196,7 +196,7 @@ var _ = Describe("Routes", func() {
 		})
 	})
 
-	FDescribe("CreateAndBindApplicationRoutes", func() {
+	Describe("CreateAndBindApplicationRoutes", func() {
 		var (
 			warnings   Warnings
 			executeErr error

@@ -2384,6 +2384,10 @@
     "translation": "Non eseguire un comando remoto"
   },
   {
+    "id": "Do not map a route to this app",
+    "translation": ""
+  },
+  {
     "id": "Do not map a route to this app and remove routes from previous pushes of this app",
     "translation": "Non associare una rotta a questa applicazione e rimuovi le rotte dalle distribuzioni precedenti di questa applicazione"
   },

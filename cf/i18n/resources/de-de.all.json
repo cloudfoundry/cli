@@ -2384,6 +2384,10 @@
     "translation": "Fernbefehl nicht ausführen"
   },
   {
+    "id": "Do not map a route to this app",
+    "translation": ""
+  },
+  {
     "id": "Do not map a route to this app and remove routes from previous pushes of this app",
     "translation": "Dieser App keine Route zuordnen und Routen von vorherigen Push-Operationen dieser App entfernen"
   },

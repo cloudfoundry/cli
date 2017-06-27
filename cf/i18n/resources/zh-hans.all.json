@@ -2384,6 +2384,10 @@
     "translation": "不执行远程命令"
   },
   {
+    "id": "Do not map a route to this app",
+    "translation": ""
+  },
+  {
     "id": "Do not map a route to this app and remove routes from previous pushes of this app",
     "translation": "不要将路径映射到此应用程序并从此应用程序的先前推送中除去路径"
   },
