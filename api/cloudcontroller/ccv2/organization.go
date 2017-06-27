@@ -56,7 +56,7 @@ func (client *Client) GetOrganization(guid string) (Organization, Warnings, erro
 	}
 
 	err = client.connection.Make(request, &response)
-	return Organization(org), response.Warnings, err
+	return org, response.Warnings, err
 }
 
 // GetOrganizations returns back a list of Organizations based off of the
