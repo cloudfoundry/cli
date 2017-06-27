@@ -4412,8 +4412,8 @@
     "translation": "Please log in again"
   },
   {
-    "id": "Please provide a password",
-    "translation": ""
+    "id": "Please provide a password.",
+    "translation": "Please provide a password."
   },
   {
     "id": "Please provide the space within the organization containing the target application",

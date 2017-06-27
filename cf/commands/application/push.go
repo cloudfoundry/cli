@@ -772,7 +772,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 				password = cmd.ui.AskForPassword("Docker password")
 			}
 			if password == "" {
-				return models.AppParams{}, errors.New(T("Please provide a password"))
+				return models.AppParams{}, errors.New(T("Please provide a password."))
 			}
 		}
 		appParams.DockerPassword = &password
