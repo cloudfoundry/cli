@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("unbind-security-group command", func() {
+var _ = Describe("unbind-security-group command", func() {
 	var (
 		orgName           string
 		secGroupName      string
