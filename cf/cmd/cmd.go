@@ -98,6 +98,7 @@ func Main(traceEnv string, args []string) {
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
 			deps.UI.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
+			os.Exit(1)
 		}
 
 		cmd = cmd.SetDependency(deps, false)
