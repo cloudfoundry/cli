@@ -5112,7 +5112,7 @@
     "translation": ""
   },
   {
-    "id": "Security group {{.Name}} not bound to this space for lifecycle phase {{.Lifecycle}}.",
+    "id": "Security group {{.Name}} not bound to this space for lifecycle phase '{{.Lifecycle}}'.",
     "translation": ""
   },
   {
