@@ -58,6 +58,8 @@ func HandleError(err error) error {
 		return RouteInDifferentSpaceError{Route: e.Route}
 	case v2action.FileChangedError:
 		return FileChangedError{Filename: e.Filename}
+	case v2action.EmptyDirectoryError:
+		return EmptyDirectoryError{Path: e.Path}
 
 	case pushaction.NoDomainsFoundError:
 		return NoDomainsFoundError{}

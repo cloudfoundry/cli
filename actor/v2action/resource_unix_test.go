@@ -26,7 +26,7 @@ var _ = Describe("Resource Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "")
+		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
@@ -41,6 +41,10 @@ var _ = Describe("Resource Actions", func() {
 
 		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0655)
 		Expect(err).ToNot(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
 	})
 
 	Describe("GatherArchiveResources", func() {
@@ -86,18 +90,39 @@ var _ = Describe("Resource Actions", func() {
 	})
 
 	Describe("GatherDirectoryResources", func() {
-		It("gathers a list of all directories files in a source directory", func() {
-			resources, err := actor.GatherDirectoryResources(srcDir)
-			Expect(err).ToNot(HaveOccurred())
+		Context("when files exist in the directory", func() {
+			It("gathers a list of all directories files in a source directory", func() {
+				resources, err := actor.GatherDirectoryResources(srcDir)
+				Expect(err).ToNot(HaveOccurred())
 
-			Expect(resources).To(Equal(
-				[]Resource{
-					{Filename: "level1", Mode: DefaultFolderPermissions},
-					{Filename: "level1/level2", Mode: DefaultFolderPermissions},
-					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
-					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
-					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
-				}))
+				Expect(resources).To(Equal(
+					[]Resource{
+						{Filename: "level1", Mode: DefaultFolderPermissions},
+						{Filename: "level1/level2", Mode: DefaultFolderPermissions},
+						{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
+						{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
+						{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
+					}))
+			})
+		})
+
+		Context("when the directory is empty", func() {
+			var emptyDir string
+
+			BeforeEach(func() {
+				var err error
+				emptyDir, err = ioutil.TempDir("", "v2-resource-actions-empty")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
+			})
+
+			It("returns an EmptyDirectoryError", func() {
+				_, err := actor.GatherDirectoryResources(emptyDir)
+				Expect(err).To(MatchError(EmptyDirectoryError{Path: emptyDir}))
+			})
 		})
 	})
 

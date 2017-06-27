@@ -29,7 +29,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 		var path string
 
 		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile("", "")
+			tempFile, err := ioutil.TempFile("", "integration-push-path")
 			Expect(err).ToNot(HaveOccurred())
 			path = tempFile.Name()
 		})
@@ -51,22 +51,44 @@ var _ = Describe("pushing a path with the -p flag", func() {
 	})
 
 	Context("pushing a directory", func() {
-		It("pushes the app from the directory", func() {
-			helpers.WithHelloWorldApp(func(appDir string) {
-				session := helpers.CF(PushCommandName, appName, "-p", appDir)
+		Context("when the directory contains files", func() {
+			It("pushes the app from the directory", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CF(PushCommandName, appName, "-p", appDir)
 
-				Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-				Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-				Eventually(session).Should(Say("path:\\s+%s", appDir))
-				Eventually(session).Should(Say("routes:"))
-				Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-				Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
-				Eventually(session).Should(Say("Uploading files\\.\\.\\."))
-				Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-				Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
-				Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+					Eventually(session).Should(Say("path:\\s+%s", appDir))
+					Eventually(session).Should(Say("routes:"))
+					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+					Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
+					Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+					Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+					Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
+					Eventually(session).Should(Say("name:\\s+%s", appName))
 
-				Eventually(session).Should(Exit(0))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		Context("when the directory is empty", func() {
+			var emptyDir string
+
+			BeforeEach(func() {
+				var err error
+				emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				session := helpers.CF(PushCommandName, appName, "-p", emptyDir)
+				Eventually(session.Err).Should(Say("No app files found in '%s'", emptyDir))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 	})
