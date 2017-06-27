@@ -106,7 +106,18 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		switch e := err.(type) {
+		case v2action.SecurityGroupNotBoundError:
+			cmd.UI.DisplayWarning("Security group {{.Name}} not bound to this space for lifecycle phase '{{.Lifecycle}}'.",
+				map[string]interface{}{
+					"Name":      e.Name,
+					"Lifecycle": e.Lifecycle,
+				})
+			cmd.UI.DisplayOK()
+			return nil
+		default:
+			return shared.HandleError(err)
+		}
 	}
 
 	cmd.UI.DisplayOK()

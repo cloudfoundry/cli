@@ -44,8 +44,6 @@ func HandleError(err error) error {
 		return command.ApplicationNotFoundError{Name: e.Name}
 	case v2action.OrganizationNotFoundError:
 		return OrganizationNotFoundError{Name: e.Name}
-	case v2action.SecurityGroupNotBoundError:
-		return SecurityGroupNotBoundError{Name: e.Name, Lifecycle: e.Lifecycle}
 	case v2action.SecurityGroupNotFoundError:
 		return SecurityGroupNotFoundError{Name: e.Name}
 	case v2action.ServiceInstanceNotFoundError:

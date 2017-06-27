@@ -147,13 +147,14 @@ var _ = Describe("unbind-security-group Command", func() {
 							})
 					})
 
-					It("returns a translated security group not bound error", func() {
+					It("returns a translated security group not bound warning but has no error", func() {
 						Expect(testUI.Err).To(Say("unbind warning"))
+						Expect(testUI.Err).To(Say("Security group some-security-group not bound to this space for lifecycle phase 'some-lifecycle'."))
 
-						Expect(executeErr).To(MatchError(shared.SecurityGroupNotBoundError{
-							Name:      "some-security-group",
-							Lifecycle: "some-lifecycle",
-						}))
+						Expect(testUI.Out).To(Say("OK"))
+						Expect(testUI.Out).NotTo(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+
+						Expect(executeErr).NotTo(HaveOccurred())
 					})
 				})
 
@@ -246,13 +247,14 @@ var _ = Describe("unbind-security-group Command", func() {
 						})
 				})
 
-				It("returns a translated security group not bound error", func() {
+				It("returns a translated security group not bound warning but has no error", func() {
 					Expect(testUI.Err).To(Say("unbind warning"))
+					Expect(testUI.Err).To(Say("Security group some-security-group not bound to this space for lifecycle phase 'some-lifecycle'."))
 
-					Expect(executeErr).To(MatchError(shared.SecurityGroupNotBoundError{
-						Name:      "some-security-group",
-						Lifecycle: ccv2.SecurityGroupLifecycle("some-lifecycle"),
-					}))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).NotTo(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
+
+					Expect(executeErr).NotTo(HaveOccurred())
 				})
 			})
 

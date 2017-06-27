@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("unbind-security-group command", func() {
+var _ = FDescribe("unbind-security-group command", func() {
 	var (
 		orgName           string
 		secGroupName      string
@@ -309,9 +309,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "staging")
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase staging\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 
@@ -323,9 +323,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase staging\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
@@ -345,9 +345,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName)
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase running\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 
@@ -359,9 +359,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase running\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
@@ -375,9 +375,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "running")
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase running\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 
@@ -389,9 +389,9 @@ var _ = Describe("unbind-security-group command", func() {
 							It("displays an error and exits 1", func() {
 								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "running")
 								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
-								Eventually(session.Out).Should(Say("FAILED"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase running\\.", secGroupName))
-								Eventually(session).Should(Exit(1))
+								Eventually(session.Out).Should(Say("OK"))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session).Should(Exit(0))
 							})
 						})
 					})
