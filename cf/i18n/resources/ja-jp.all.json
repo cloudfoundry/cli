@@ -3724,7 +3724,7 @@
     "translation": ""
   },
   {
-    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
     "translation": ""
   },
   {
@@ -5984,7 +5984,7 @@
     "translation": ""
   },
   {
-    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
     "translation": ""
   },
   {
@@ -7352,7 +7352,7 @@
     "translation": "{{.Feature}} が動作するのは、CF API バージョン {{.MaximumVersion}} までのみです。ターゲットは {{.APIVersion}} です。"
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}} or higher. Your target is {{.APIVersion}}.",
     "translation": "{{.Feature}} には、CF API バージョン {{.RequiredVersion}} 以上が必要です。ターゲットは {{.APIVersion}} です。"
   },
   {

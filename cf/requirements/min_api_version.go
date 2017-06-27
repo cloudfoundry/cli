@@ -40,7 +40,7 @@ func (r MinAPIVersionRequirement) Execute() error {
 	}
 
 	if apiVersion.LT(r.requiredVersion) {
-		return errors.New(T(`{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.`,
+		return errors.New(T(`{{.Feature}} requires CF API version {{.RequiredVersion}} or higher. Your target is {{.APIVersion}}.`,
 			map[string]interface{}{
 				"APIVersion":      r.config.APIVersion(),
 				"Feature":         r.feature,
