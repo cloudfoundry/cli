@@ -153,6 +153,9 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("Setting app %s to droplet .+ in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Mapping routes\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
@@ -200,12 +203,43 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("Setting app %s to droplet .+ in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Mapping routes\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
 				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+				Eventually(session.Out).Should(Say("requested state:\\s+started"))
+				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+				Eventually(session.Out).Should(Say("memory usage:\\s+32M x 1"))
+				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("web:1/1"))
+				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			})
+		})
+
+		Context("when the --no-route flag is set", func() {
+			var session *Session
+
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					err := os.Chdir(appDir)
+					Expect(err).ToNot(HaveOccurred())
+
+					session = helpers.CF("v3-push", "--name", appName, "--no-route")
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			It("does not map any routes to the app", func() {
+				Consistently(session.Out).ShouldNot(Say("Mapping routes\\.\\.\\."))
 				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
 				Eventually(session.Out).Should(Say("requested state:\\s+started"))
 				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))

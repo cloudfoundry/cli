@@ -4,7 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -28,6 +30,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeActor       *v3fakes.FakeV3PushActor
+		fakeV2PushActor *v3fakes.FakeV2PushActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -38,6 +41,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3PushActor)
+		fakeV2PushActor = new(v3fakes.FakeV2PushActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
 		binaryName = "faceman"
@@ -51,7 +55,9 @@ var _ = Describe("v3-push Command", func() {
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
-			NOAAClient:  fakeNOAAClient,
+			V2PushActor: fakeV2PushActor,
+
+			NOAAClient: fakeNOAAClient,
 		}
 
 	})
@@ -79,7 +85,7 @@ var _ = Describe("v3-push Command", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
 
 			cmd.AppName = app
 
@@ -167,7 +173,7 @@ var _ = Describe("v3-push Command", func() {
 
 		Context("when the application doesn't already exist", func() {
 			BeforeEach(func() {
-				fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{Name: "some-app", GUID: "some-app-guid"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			Context("when creating the package fails", func() {
@@ -373,165 +379,212 @@ var _ = Describe("v3-push Command", func() {
 								Expect(dropletGUID).To(Equal("some-droplet-guid"))
 							})
 
-							Context("when starting the application fails", func() {
+							Context("when --no-route flag is set to true", func() {
 								BeforeEach(func() {
-									fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, errors.New("some-error"))
+									cmd.NoRoute = true
 								})
 
-								It("says that the app failed to start", func() {
-									Expect(executeErr).To(Equal(errors.New("some-error")))
-									Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
-
-									Expect(testUI.Err).To(Say("start-warning-1"))
-									Expect(testUI.Err).To(Say("start-warning-2"))
-
-									Expect(testUI.Out).ToNot(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
-								})
-							})
-
-							Context("when starting the application succeeds", func() {
-								BeforeEach(func() {
-									fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
-								})
-
-								It("says that the app was started and outputs warnings", func() {
-									Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
-
-									Expect(testUI.Err).To(Say("start-warning-1"))
-									Expect(testUI.Err).To(Say("start-warning-2"))
-									Expect(testUI.Out).To(Say("OK"))
+								It("does not create any routes", func() {
+									Expect(fakeV2PushActor.CreateAndBindApplicationRoutesCallCount()).To(Equal(0))
 
 									Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-									appName, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
-									Expect(appName).To(Equal("some-app"))
-									Expect(spaceGUID).To(Equal("some-space-guid"))
 								})
 							})
 
-							Context("when polling the start fails", func() {
+							Context("when mapping routes fails", func() {
 								BeforeEach(func() {
-									fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-										return errors.New("some-error")
-									}
+									fakeV2PushActor.CreateAndBindApplicationRoutesReturns(pushaction.Warnings{"route-warning"}, errors.New("some-error"))
 								})
 
-								It("displays all warnings and fails", func() {
-									Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
-
-									Expect(testUI.Err).To(Say("some-poll-warning-1"))
-									Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
+								It("returns the error", func() {
 									Expect(executeErr).To(MatchError("some-error"))
+									Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+									Expect(testUI.Err).To(Say("route-warning"))
+
+									Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
 								})
 							})
 
-							Context("when polling times out", func() {
+							Context("when mapping routes succeeds", func() {
 								BeforeEach(func() {
-									fakeActor.PollStartReturns(v3action.StartupTimeoutError{})
+									fakeV2PushActor.CreateAndBindApplicationRoutesReturns(pushaction.Warnings{"route-warning"}, nil)
 								})
 
-								It("returns the StartupTimeoutError", func() {
-									Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app"}))
-								})
-							})
+								It("displays the header and OK", func() {
+									Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+									Expect(testUI.Out).To(Say("OK"))
 
-							Context("when polling the start succeeds", func() {
-								BeforeEach(func() {
-									fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-										warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-										return nil
-									}
-								})
+									Expect(testUI.Err).To(Say("route-warning"))
 
-								It("displays all warnings", func() {
-									Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+									Expect(fakeV2PushActor.CreateAndBindApplicationRoutesCallCount()).To(Equal(1), "Expected CreateAndBindApplicationRoutes to be called")
+									orgArg, spaceArg, appArg := fakeV2PushActor.CreateAndBindApplicationRoutesArgsForCall(0)
+									Expect(orgArg).To(Equal("some-org-guid"))
+									Expect(spaceArg).To(Equal("some-space-guid"))
+									Expect(appArg).To(Equal(v2action.Application{Name: "some-app", GUID: "some-app-guid"}))
 
-									Expect(testUI.Err).To(Say("some-poll-warning-1"))
-									Expect(testUI.Err).To(Say("some-poll-warning-2"))
-
-									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 								})
 
-								Context("when displaying the application info fails", func() {
+								Context("when starting the application fails", func() {
 									BeforeEach(func() {
-										var expectedErr error
-										expectedErr = v3action.ApplicationNotFoundError{Name: app}
-										fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"display-warning-1", "display-warning-2"}, expectedErr)
+										fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, errors.New("some-error"))
 									})
 
-									It("returns the error and prints warnings", func() {
-										Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+									It("says that the app failed to start", func() {
+										Expect(executeErr).To(Equal(errors.New("some-error")))
+										Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
 
-										Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+										Expect(testUI.Err).To(Say("start-warning-1"))
+										Expect(testUI.Err).To(Say("start-warning-2"))
 
-										Expect(testUI.Err).To(Say("display-warning-1"))
-										Expect(testUI.Err).To(Say("display-warning-2"))
-
-										Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+										Expect(testUI.Out).ToNot(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
 									})
 								})
 
-								Context("when displaying the application info is successful", func() {
+								Context("when starting the application succeeds", func() {
 									BeforeEach(func() {
-										summary := v3action.ApplicationSummary{
-											Application: v3action.Application{
-												Name:  "some-app",
-												State: "started",
-											},
-											CurrentDroplet: v3action.Droplet{
-												Stack: "cflinuxfs2",
-												Buildpacks: []v3action.Buildpack{
-													{
-														Name:         "ruby_buildpack",
-														DetectOutput: "some-detect-output",
-													},
+										fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+									})
+
+									It("says that the app was started and outputs warnings", func() {
+										Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as banana\\.\\.\\."))
+
+										Expect(testUI.Err).To(Say("start-warning-1"))
+										Expect(testUI.Err).To(Say("start-warning-2"))
+										Expect(testUI.Out).To(Say("OK"))
+
+										Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+										appName, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
+										Expect(appName).To(Equal("some-app"))
+										Expect(spaceGUID).To(Equal("some-space-guid"))
+									})
+								})
+
+								Context("when polling the start fails", func() {
+									BeforeEach(func() {
+										fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+											warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+											return errors.New("some-error")
+										}
+									})
+
+									It("displays all warnings and fails", func() {
+										Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+
+										Expect(testUI.Err).To(Say("some-poll-warning-1"))
+										Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+										Expect(executeErr).To(MatchError("some-error"))
+									})
+								})
+
+								Context("when polling times out", func() {
+									BeforeEach(func() {
+										fakeActor.PollStartReturns(v3action.StartupTimeoutError{})
+									})
+
+									It("returns the StartupTimeoutError", func() {
+										Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app"}))
+									})
+								})
+
+								Context("when polling the start succeeds", func() {
+									BeforeEach(func() {
+										fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+											warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+											return nil
+										}
+									})
+
+									It("displays all warnings", func() {
+										Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+
+										Expect(testUI.Err).To(Say("some-poll-warning-1"))
+										Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+										Expect(executeErr).ToNot(HaveOccurred())
+									})
+
+									Context("when displaying the application info fails", func() {
+										BeforeEach(func() {
+											var expectedErr error
+											expectedErr = v3action.ApplicationNotFoundError{Name: app}
+											fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"display-warning-1", "display-warning-2"}, expectedErr)
+										})
+
+										It("returns the error and prints warnings", func() {
+											Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+
+											Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
+
+											Expect(testUI.Err).To(Say("display-warning-1"))
+											Expect(testUI.Err).To(Say("display-warning-2"))
+
+											Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+										})
+									})
+
+									Context("when displaying the application info is successful", func() {
+										BeforeEach(func() {
+											summary := v3action.ApplicationSummary{
+												Application: v3action.Application{
+													Name:  "some-app",
+													State: "started",
 												},
-											},
-											Processes: []v3action.Process{
-												v3action.Process{
-													Type:       "worker",
-													MemoryInMB: 64,
-													Instances: []v3action.Instance{
-														v3action.Instance{
-															Index:       0,
-															State:       "RUNNING",
-															MemoryUsage: 4000000,
-															DiskUsage:   4000000,
-															MemoryQuota: 67108864,
-															DiskQuota:   8000000,
-															Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
+												CurrentDroplet: v3action.Droplet{
+													Stack: "cflinuxfs2",
+													Buildpacks: []v3action.Buildpack{
+														{
+															Name:         "ruby_buildpack",
+															DetectOutput: "some-detect-output",
 														},
 													},
 												},
-											},
-										}
+												Processes: []v3action.Process{
+													v3action.Process{
+														Type:       "worker",
+														MemoryInMB: 64,
+														Instances: []v3action.Instance{
+															v3action.Instance{
+																Index:       0,
+																State:       "RUNNING",
+																MemoryUsage: 4000000,
+																DiskUsage:   4000000,
+																MemoryQuota: 67108864,
+																DiskQuota:   8000000,
+																Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
+															},
+														},
+													},
+												},
+											}
 
-										fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v3action.Warnings{"display-warning-1", "display-warning-2"}, nil)
-									})
+											fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v3action.Warnings{"display-warning-1", "display-warning-2"}, nil)
+										})
 
-									It("prints the application summary and outputs warnings", func() {
-										Expect(executeErr).ToNot(HaveOccurred())
+										It("prints the application summary and outputs warnings", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
 
-										Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-										Expect(testUI.Out).To(Say("name:\\s+some-app"))
-										Expect(testUI.Out).To(Say("requested state:\\s+started"))
-										Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
-										Expect(testUI.Out).To(Say("memory usage:\\s+64M x 1"))
-										Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-										Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+											Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
+											Expect(testUI.Out).To(Say("name:\\s+some-app"))
+											Expect(testUI.Out).To(Say("requested state:\\s+started"))
+											Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
+											Expect(testUI.Out).To(Say("memory usage:\\s+64M x 1"))
+											Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
+											Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
 
-										Expect(testUI.Out).To(Say("worker:1/1"))
-										Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-										Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+											Expect(testUI.Out).To(Say("worker:1/1"))
+											Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+											Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
 
-										Expect(testUI.Err).To(Say("display-warning-1"))
-										Expect(testUI.Err).To(Say("display-warning-2"))
+											Expect(testUI.Err).To(Say("display-warning-1"))
+											Expect(testUI.Err).To(Say("display-warning-2"))
 
-										Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-										appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-										Expect(appName).To(Equal("some-app"))
-										Expect(spaceGUID).To(Equal("some-space-guid"))
+											Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+											appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+											Expect(appName).To(Equal("some-app"))
+											Expect(spaceGUID).To(Equal("some-space-guid"))
+										})
 									})
 								})
 							})
