@@ -55,7 +55,7 @@ var _ = Describe("MinAPIVersionRequirement", func() {
 
 			It("errors", func() {
 				err := requirement.Execute()
-				Expect(err.Error()).To(ContainSubstring("version-restricted-feature requires CF API version 1.2.3+. Your target is 1.2.2."))
+				Expect(err.Error()).To(ContainSubstring("version-restricted-feature requires CF API version 1.2.3 or higher. Your target is 1.2.2."))
 			})
 		})
 

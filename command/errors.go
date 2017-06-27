@@ -228,7 +228,7 @@ type MinimumAPIVersionNotMetError struct {
 }
 
 func (_ MinimumAPIVersionNotMetError) Error() string {
-	return "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}."
+	return "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
 }
 
 func (e MinimumAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {
@@ -244,7 +244,7 @@ type LifecycleMinimumAPIVersionNotMetError struct {
 }
 
 func (_ LifecycleMinimumAPIVersionNotMetError) Error() string {
-	return "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}."
+	return "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
 }
 
 func (e LifecycleMinimumAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {

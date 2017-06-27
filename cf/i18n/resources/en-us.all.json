@@ -3724,8 +3724,8 @@
     "translation": ""
   },
   {
-    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
-    "translation": ""
+    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
   },
   {
     "id": "List all apps in the target space",
@@ -5984,8 +5984,8 @@
     "translation": ""
   },
   {
-    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
-    "translation": ""
+    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
@@ -7352,8 +7352,8 @@
     "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}."
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
-    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}} or higher. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}} or higher. Your target is {{.APIVersion}}."
   },
   {
     "id": "{{.FlappingCount}} failing",
