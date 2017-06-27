@@ -95,6 +95,11 @@ var _ = Describe("HandleError", func() {
 			FileChangedError{Filename: "some-filename"},
 		),
 
+		Entry("v2action.EmptyDirectoryError -> EmptyDirectoryError",
+			v2action.EmptyDirectoryError{Path: "some-filename"},
+			EmptyDirectoryError{Path: "some-filename"},
+		),
+
 		Entry("uaa.BadCredentialsError -> command.BadCredentialsError",
 			uaa.BadCredentialsError{},
 			command.BadCredentialsError{},

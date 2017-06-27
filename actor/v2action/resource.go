@@ -28,6 +28,14 @@ func (e FileChangedError) Error() string {
 	return fmt.Sprint("SHA1 mismatch for:", e.Filename)
 }
 
+type EmptyDirectoryError struct {
+	Path string
+}
+
+func (e EmptyDirectoryError) Error() string {
+	return fmt.Sprint(e.Path, "is empty")
+}
+
 type Resource ccv2.Resource
 
 // GatherArchiveResources returns a list of resources for a directory.
@@ -115,6 +123,10 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 		resources = append(resources, resource)
 		return nil
 	})
+
+	if len(resources) == 0 {
+		return nil, EmptyDirectoryError{Path: sourceDir}
+	}
 
 	return resources, walkErr
 }

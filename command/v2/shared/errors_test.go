@@ -38,6 +38,7 @@ var _ = Describe("Translatable Errors", func() {
 
 		// Actor errors.
 		Entry("FileChangedError", FileChangedError{}),
+		Entry("EmptyDirectoryError", EmptyDirectoryError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 		Entry("JobFailedError", JobFailedError{}),
 		Entry("JobTimeoutError", JobTimeoutError{}),
