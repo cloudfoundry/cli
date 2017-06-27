@@ -19,7 +19,7 @@ type UnbindSecurityGroupActor interface {
 
 type UnbindSecurityGroupCommand struct {
 	RequiredArgs    flag.UnbindSecurityGroupArgs `positional-args:"yes"`
-	Lifecycle       ccv2.SecurityGroupLifecycle  `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
+	Lifecycle       flag.SecurityGroupLifecycle  `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
 	usage           interface{}                  `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}                  `related_commands:"apps, restart, security-groups"`
 
@@ -45,7 +45,7 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if cmd.Lifecycle == ccv2.SecurityGroupLifecycleStaging {
+	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
@@ -81,7 +81,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         space.Name,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, cmd.Lifecycle)
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	case cmd.RequiredArgs.OrganizationName != "" && cmd.RequiredArgs.SpaceName != "":
 		err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
@@ -95,7 +95,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         cmd.RequiredArgs.SpaceName,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, cmd.Lifecycle)
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	default:
 		return command.ThreeRequiredArgumentsError{

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -88,7 +89,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		// lifecycle phase.  We use 'some-lifecycle' to test that the command
 		// merely passes the value presented by Goflags.
 		BeforeEach(func() {
-			cmd.Lifecycle = ccv2.SecurityGroupLifecycle("some-lifecycle")
+			cmd.Lifecycle = flag.SecurityGroupLifecycle("some-lifecycle")
 		})
 
 		Context("when only the security group is provided", func() {
@@ -298,7 +299,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when lifecycle is 'running'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = ccv2.SecurityGroupLifecycleRunning
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleRunning)
 			fakeActor.CloudControllerAPIVersionReturns("2.34.0")
 		})
 
@@ -309,7 +310,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when lifecycle is 'staging'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = ccv2.SecurityGroupLifecycleStaging
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleStaging)
 		})
 
 		Context("when the version check fails", func() {
