@@ -3,11 +3,20 @@ package v3
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
+
+//go:generate counterfeiter . V2PushActor
+
+type V2PushActor interface {
+	CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
+}
 
 //go:generate counterfeiter . V3PushActor
 
@@ -27,12 +36,14 @@ type V3PushActor interface {
 type V3PushCommand struct {
 	usage   interface{} `usage:"cf v3-push -n APP_NAME"`
 	AppName string      `short:"n" long:"name" description:"The application name to push" required:"true"`
+	NoRoute bool        `long:"no-route" description:"Do not map a route to this app"`
 
 	UI          command.UI
 	Config      command.Config
 	NOAAClient  v3action.NOAAClient
 	SharedActor command.SharedActor
 	Actor       V3PushActor
+	V2PushActor V2PushActor
 }
 
 func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -45,6 +56,14 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config)
+
+	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+
+	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2)
+	cmd.V2PushActor = pushaction.NewActor(v2Actor)
 
 	dopplerURL, err := hackDopplerURLFromUAA(ccClient.UAA())
 	if err != nil {
@@ -101,6 +120,13 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	err = cmd.setApplicationDroplet(dropletGUID, user.Name)
 	if err != nil {
 		return shared.HandleError(err)
+	}
+
+	if !cmd.NoRoute {
+		err = cmd.createAndBindRoutes(app)
+		if err != nil {
+			return shared.HandleError(err)
+		}
 	}
 
 	err = cmd.startApplication(user.Name)
@@ -176,6 +202,19 @@ func (cmd V3PushCommand) updateApplication(userName string) (v3action.Applicatio
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 	return app, nil
+}
+
+func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
+	cmd.UI.DisplayText("Mapping routes...")
+	routeWarnings, err := cmd.V2PushActor.CreateAndBindApplicationRoutes(cmd.Config.TargetedOrganization().GUID, cmd.Config.TargetedSpace().GUID, v2action.Application{Name: app.Name, GUID: app.GUID})
+	cmd.UI.DisplayWarnings(routeWarnings)
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
+	return nil
 }
 
 func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error) {
