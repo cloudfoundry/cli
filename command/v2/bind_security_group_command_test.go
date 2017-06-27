@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -68,7 +69,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 	Context("when lifecycle is 'running'", func() {
 		BeforeEach(func() {
-			cmd.Lifecycle = ccv2.SecurityGroupLifecycleRunning
+			cmd.Lifecycle = flag.SecurityGroupLifecycle(ccv2.SecurityGroupLifecycleRunning)
 		})
 
 		Context("when checking target fails", func() {

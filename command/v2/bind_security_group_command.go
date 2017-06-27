@@ -22,7 +22,7 @@ type BindSecurityGroupActor interface {
 
 type BindSecurityGroupCommand struct {
 	RequiredArgs    flag.BindSecurityGroupArgs  `positional-args:"yes"`
-	Lifecycle       ccv2.SecurityGroupLifecycle `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
+	Lifecycle       flag.SecurityGroupLifecycle `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
 	usage           interface{}                 `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE] [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}                 `related_commands:"apps, bind-running-security-group, bind-staging-security-group, restart, security-groups"`
 
@@ -48,7 +48,7 @@ func (cmd *BindSecurityGroupCommand) Setup(config command.Config, ui command.UI)
 
 func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	var err error
-	if cmd.Lifecycle == ccv2.SecurityGroupLifecycleStaging {
+	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
@@ -112,7 +112,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 			"username":       user.Name,
 		})
 
-		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, cmd.Lifecycle)
+		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
