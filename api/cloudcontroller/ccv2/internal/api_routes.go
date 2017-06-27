@@ -15,13 +15,13 @@ import (
 //
 // The const name should always be the const value + Request.
 const (
-	DeleteSecurityGroupSpaceRequest        = "DeleteSecurityGroupSpace"
-	DeleteStagingSecurityGroupSpaceRequest = "DeleteStagingSecurityGroupSpace"
 	DeleteOrganizationRequest              = "DeleteOrganization"
 	DeleteRouteRequest                     = "DeleteRoute"
 	DeleteRunningSecurityGroupSpaceRequest = "DeleteRunningSecurityGroupSpace"
-	DeleteSpaceRequest                     = "DeleteSpaceRequest"
+	DeleteSecurityGroupSpaceRequest        = "DeleteSecurityGroupSpace"
 	DeleteServiceBindingRequest            = "DeleteServiceBinding"
+	DeleteSpaceRequest                     = "DeleteSpaceRequest"
+	DeleteStagingSecurityGroupSpaceRequest = "DeleteStagingSecurityGroupSpace"
 	GetAppInstancesRequest                 = "GetAppInstances"
 	GetAppRequest                          = "GetApp"
 	GetAppRoutesRequest                    = "GetAppRoutes"
@@ -39,8 +39,8 @@ const (
 	GetRouteRouteMappingsRequest           = "GetRouteRouteMappings"
 	GetRoutesRequest                       = "GetRoutes"
 	GetSecurityGroupRunningSpacesRequest   = "GetSecurityGroupRunningSpaces"
-	GetSecurityGroupStagingSpacesRequest   = "GetSecurityGroupStagingSpaces"
 	GetSecurityGroupsRequest               = "GetSecurityGroups"
+	GetSecurityGroupStagingSpacesRequest   = "GetSecurityGroupStagingSpaces"
 	GetServiceBindingsRequest              = "GetServiceBindings"
 	GetServiceInstancesRequest             = "GetServiceInstances"
 	GetSharedDomainRequest                 = "GetSharedDomain"
@@ -57,9 +57,10 @@ const (
 	PostRouteRequest                       = "PostRoute"
 	PostServiceBindingRequest              = "PostServiceBinding"
 	PostUserRequest                        = "PostUser"
-	PutAppRequest                          = "PutApp"
 	PutAppBitsRequest                      = "PutAppBits"
+	PutAppRequest                          = "PutApp"
 	PutBindRouteAppRequest                 = "PutBindRouteApp"
+	PutResourceMatch                       = "PutResourceMatch"
 	PutRunningSecurityGroupSpaceRequest    = "PutRunningSecurityGroupSpace"
 	PutStagingSecurityGroupSpaceRequest    = "PutStagingSecurityGroupSpace"
 )
@@ -83,6 +84,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/organizations/:organization_guid/private_domains", Method: http.MethodGet, Name: GetOrganizationPrivateDomainsRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: GetPrivateDomainRequest},
 	{Path: "/v2/quota_definitions/:organization_quota_guid", Method: http.MethodGet, Name: GetOrganizationQuotaDefinitionRequest},
+	{Path: "/v2/resource_match", Method: http.MethodPut, Name: PutResourceMatch},
 	{Path: "/v2/routes", Method: http.MethodGet, Name: GetRoutesRequest},
 	{Path: "/v2/routes", Method: http.MethodPost, Name: PostRouteRequest},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
@@ -92,11 +94,11 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces", Method: http.MethodGet, Name: GetSecurityGroupRunningSpacesRequest},
-	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutRunningSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteRunningSecurityGroupSpaceRequest},
+	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodPut, Name: PutRunningSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces", Method: http.MethodGet, Name: GetSecurityGroupStagingSpacesRequest},
-	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodPut, Name: PutStagingSecurityGroupSpaceRequest},
 	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodDelete, Name: DeleteStagingSecurityGroupSpaceRequest},
+	{Path: "/v2/security_groups/:security_group_guid/staging_spaces/:space_guid", Method: http.MethodPut, Name: PutStagingSecurityGroupSpaceRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodGet, Name: GetServiceBindingsRequest},
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
@@ -105,8 +107,8 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},
 	{Path: "/v2/space_quota_definitions/:space_quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaDefinitionRequest},
 	{Path: "/v2/spaces", Method: http.MethodGet, Name: GetSpacesRequest},
-	{Path: "/v2/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: GetSpaceServiceInstancesRequest},
+	{Path: "/v2/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteSpaceRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: GetSpaceRoutesRequest},
 	{Path: "/v2/spaces/:space_guid/security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
 	{Path: "/v2/spaces/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
