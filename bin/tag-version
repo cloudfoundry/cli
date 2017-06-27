@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+version=$(cat ci/VERSION)
+
+echo "Creating v$version tag at current version"
+git tag v$version
+git push --tags

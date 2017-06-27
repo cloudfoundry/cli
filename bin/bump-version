@@ -2,7 +2,7 @@
 
 ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
-set -ex
+set -e
 
 component=$1
 
@@ -36,16 +36,17 @@ version=$major.$minor.$patch
 echo "Updating VERSION file to $version"
 echo $version > ci/VERSION
 
+echo "Regenerating i18n resources file"
+$ROOT_DIR/bin/generate-language-resources
+if [ $? -ne 0 ]; then
+  printf "Failed to run `bin/generate-language-resources`"
+  exit 1
+fi
+
 echo "Committing change"
 git reset .
 git add ci/VERSION
+git add cf/i18n
+git add cf/resources/i18n_resources.go
 
-git ci -m "Bump version to $version"
-
-echo "Creating v$version tag"
-git tag v$version
-
-$ROOT_DIR/bin/generate-changelog $old_version $version
-$ROOT_DIR/bin/commit-version-bump
-
-echo -e "All Done! You should go update \033[0;37;41mThe CLAW\033[m"
+git ci -m "Bump version to $version and update translations"
