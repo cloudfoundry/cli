@@ -1660,27 +1660,27 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
-    "id": "CF_NAME v3-app -n APP_NAME",
+    "id": "CF_NAME v3-app APP_NAME",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-app --name [name]",
+    "id": "CF_NAME v3-create-app APP_NAME",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-package --name [name]",
+    "id": "CF_NAME v3-create-package APP_NAME",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-set-droplet -n APP_NAME -d DROPLET_GUID",
+    "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
+    "id": "CF_NAME v3-stage APP_NAME --package-guid GUID",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-start -n APP_NAME",
+    "id": "CF_NAME v3-start APP_NAME",
     "translation": ""
   },
   {
@@ -5640,22 +5640,6 @@
     "translation": "El nombre de la aplicación"
   },
   {
-    "id": "The application name to display",
-    "translation": ""
-  },
-  {
-    "id": "The application name to push",
-    "translation": ""
-  },
-  {
-    "id": "The application name to start",
-    "translation": ""
-  },
-  {
-    "id": "The application name to which to assign the droplet",
-    "translation": ""
-  },
-  {
     "id": "The buildpack",
     "translation": "El paquete de compilación"
   },
@@ -5665,10 +5649,6 @@
   },
   {
     "id": "The command to execute",
-    "translation": ""
-  },
-  {
-    "id": "The desired application name",
     "translation": ""
   },
   {
@@ -6648,7 +6628,7 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push -n APP_NAME",
+    "id": "cf v3-push APP_NAME",
     "translation": ""
   },
   {
