@@ -1,8 +1,6 @@
 package isolated
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -118,9 +116,6 @@ var _ = Describe("v3-app command", func() {
 
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					err := os.Chdir(appDir)
-					Expect(err).ToNot(HaveOccurred())
-
 					Eventually(helpers.CF("v3-push", appName)).Should(Exit(0))
 				})
 
