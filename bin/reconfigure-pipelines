@@ -35,3 +35,6 @@ configure_pipeline cli \
 
 configure_pipeline infrastructure-hardknox \
   $pipelines_path/infrastructure/hardknox.yml
+
+configure_pipeline infrastructure-beque \
+  $pipelines_path/infrastructure/beque.yml
