@@ -252,7 +252,7 @@ var _ = Describe("Security Group Actions", func() {
 				}
 
 				expectedOrg11 = Organization{
-					GUID: "org-guid-11",
+					GUID: "<<org-guid-11",
 					Name: "org-11",
 				}
 				expectedOrg12 = Organization{
@@ -276,7 +276,7 @@ var _ = Describe("Security Group Actions", func() {
 					Name: "org-33",
 				}
 				expectedOrgAll = Organization{
-					Name: "<all>",
+					Name: "",
 				}
 
 				expectedSpace11 = Space{
@@ -316,7 +316,7 @@ var _ = Describe("Security Group Actions", func() {
 					Name: "space-33",
 				}
 				expectedSpaceAll = Space{
-					Name: "<all>",
+					Name: "",
 				}
 
 				fakeCloudControllerClient.GetSecurityGroupsReturns(
@@ -374,7 +374,7 @@ var _ = Describe("Security Group Actions", func() {
 						{
 							GUID:             "space-guid-11",
 							Name:             "space-11",
-							OrganizationGUID: "org-guid-11",
+							OrganizationGUID: "<<org-guid-11",
 						},
 					},
 					ccv2.Warnings{"warning-3", "warning-4"},
@@ -396,7 +396,7 @@ var _ = Describe("Security Group Actions", func() {
 						{
 							GUID:             "space-guid-11",
 							Name:             "space-11",
-							OrganizationGUID: "org-guid-11",
+							OrganizationGUID: "<<org-guid-11",
 						},
 					},
 					ccv2.Warnings{"warning-5", "warning-6"},
@@ -418,7 +418,7 @@ var _ = Describe("Security Group Actions", func() {
 						{
 							GUID:             "space-guid-22",
 							Name:             "space-22",
-							OrganizationGUID: "org-guid-11",
+							OrganizationGUID: "<<org-guid-11",
 						},
 					},
 					ccv2.Warnings{"warning-7", "warning-8"},
@@ -439,7 +439,7 @@ var _ = Describe("Security Group Actions", func() {
 						{
 							GUID:             "space-guid-32",
 							Name:             "space-32",
-							OrganizationGUID: "org-guid-11",
+							OrganizationGUID: "<<org-guid-11",
 						},
 						{
 							GUID:             "space-guid-33",
@@ -483,7 +483,7 @@ var _ = Describe("Security Group Actions", func() {
 				)
 				fakeCloudControllerClient.GetOrganizationReturnsOnCall(2,
 					ccv2.Organization{
-						GUID: "org-guid-11",
+						GUID: "<<org-guid-11",
 						Name: "org-11",
 					},
 					ccv2.Warnings{"warning-17", "warning-18"},
@@ -679,7 +679,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(1)).To(Equal("org-guid-12"))
-					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(2)).To(Equal("org-guid-11"))
+					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(2)).To(Equal("<<org-guid-11"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(3)).To(Equal("org-guid-21"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(4)).To(Equal("org-guid-23"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(5)).To(Equal("org-guid-33"))
@@ -825,7 +825,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(6))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-13"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(1)).To(Equal("org-guid-12"))
-					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(2)).To(Equal("org-guid-11"))
+					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(2)).To(Equal("<<org-guid-11"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(3)).To(Equal("org-guid-21"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(4)).To(Equal("org-guid-23"))
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(5)).To(Equal("org-guid-33"))

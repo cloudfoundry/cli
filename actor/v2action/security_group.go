@@ -155,13 +155,9 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			secGroupOrgSpaces = append(secGroupOrgSpaces,
 				SecurityGroupWithOrganizationSpaceAndLifecycle{
 					SecurityGroup: &securityGroup,
-					Organization: &Organization{
-						Name: "<all>",
-					},
-					Space: &Space{
-						Name: "<all>",
-					},
-					Lifecycle: ccv2.SecurityGroupLifecycleRunning,
+					Organization:  &Organization{},
+					Space:         &Space{},
+					Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 				})
 		}
 
@@ -169,13 +165,9 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			secGroupOrgSpaces = append(secGroupOrgSpaces,
 				SecurityGroupWithOrganizationSpaceAndLifecycle{
 					SecurityGroup: &securityGroup,
-					Organization: &Organization{
-						Name: "<all>",
-					},
-					Space: &Space{
-						Name: "<all>",
-					},
-					Lifecycle: ccv2.SecurityGroupLifecycleStaging,
+					Organization:  &Organization{},
+					Space:         &Space{},
+					Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 				})
 		}
 
@@ -240,9 +232,17 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 				return true
 			case secGroupOrgSpaces[i].SecurityGroup.Name > secGroupOrgSpaces[j].SecurityGroup.Name:
 				return false
+			case secGroupOrgSpaces[i].SecurityGroup.RunningDefault && !secGroupOrgSpaces[i].SecurityGroup.RunningDefault:
+				return true
+			case !secGroupOrgSpaces[i].SecurityGroup.RunningDefault && secGroupOrgSpaces[i].SecurityGroup.RunningDefault:
+				return false
 			case secGroupOrgSpaces[i].Organization.Name < secGroupOrgSpaces[j].Organization.Name:
 				return true
 			case secGroupOrgSpaces[i].Organization.Name > secGroupOrgSpaces[j].Organization.Name:
+				return false
+			case secGroupOrgSpaces[i].SecurityGroup.StagingDefault && !secGroupOrgSpaces[i].SecurityGroup.StagingDefault:
+				return true
+			case !secGroupOrgSpaces[i].SecurityGroup.StagingDefault && secGroupOrgSpaces[i].SecurityGroup.StagingDefault:
 				return false
 			case secGroupOrgSpaces[i].Space.Name < secGroupOrgSpaces[j].Space.Name:
 				return true

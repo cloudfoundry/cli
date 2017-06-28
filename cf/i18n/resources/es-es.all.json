@@ -188,6 +188,10 @@
     "translation": ""
   },
   {
+    "id": "\u003call\u003e",
+    "translation": ""
+  },
+  {
     "id": "A command line tool to interact with Cloud Foundry",
     "translation": "Una herramienta de línea de mandatos para interactuar con Cloud Foundry"
   },
