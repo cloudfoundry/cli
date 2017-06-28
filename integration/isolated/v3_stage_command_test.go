@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"os"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -132,13 +131,7 @@ var _ = Describe("v3-stage command", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 
-				prevDir, err := os.Getwd()
-				Expect(err).ToNot(HaveOccurred())
-
 				helpers.WithHelloWorldApp(func(appDir string) {
-					err := os.Chdir(appDir)
-					Expect(err).ToNot(HaveOccurred())
-
 					pkgSession := helpers.CF("v3-create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
 					regex, err := regexp.Compile(`package guid: (.+)`)
@@ -148,9 +141,6 @@ var _ = Describe("v3-stage command", func() {
 
 					packageGUID = matches[1]
 				})
-
-				err = os.Chdir(prevDir)
-				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("stages the package", func() {
