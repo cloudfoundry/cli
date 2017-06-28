@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -14,8 +15,8 @@ type V3StartActor interface {
 }
 
 type V3StartCommand struct {
-	usage   interface{} `usage:"CF_NAME v3-start -n APP_NAME"`
-	AppName string      `short:"n" long:"name" description:"The application name to start" required:"true"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"CF_NAME v3-start APP_NAME"`
 
 	UI          command.UI
 	Config      command.Config
@@ -49,13 +50,13 @@ func (cmd V3StartCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
+		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
 
-	_, warnings, err := cmd.Actor.StartApplication(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.StartApplication(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

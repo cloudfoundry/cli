@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -14,9 +15,9 @@ type V3SetDropletActor interface {
 }
 
 type V3SetDropletCommand struct {
-	usage       interface{} `usage:"CF_NAME v3-set-droplet -n APP_NAME -d DROPLET_GUID"`
-	AppName     string      `short:"n" long:"name" description:"The application name to which to assign the droplet" required:"true"`
-	DropletGUID string      `short:"d" long:"droplet-guid" description:"The guid of the droplet to use" required:"true"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID"`
+	DropletGUID  string       `short:"d" long:"droplet-guid" description:"The guid of the droplet to use" required:"true"`
 
 	UI          command.UI
 	Config      command.Config
@@ -50,14 +51,14 @@ func (cmd V3SetDropletCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":     cmd.AppName,
+		"AppName":     cmd.RequiredArgs.AppName,
 		"DropletGUID": cmd.DropletGUID,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"SpaceName":   cmd.Config.TargetedSpace().Name,
 		"Username":    user.Name,
 	})
 
-	warnings, err := cmd.Actor.SetApplicationDroplet(cmd.AppName, cmd.Config.TargetedSpace().GUID, cmd.DropletGUID)
+	warnings, err := cmd.Actor.SetApplicationDroplet(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

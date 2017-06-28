@@ -102,6 +102,16 @@ var _ = Describe("app command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		Context("when the app name is not provided", func() {
+			It("tells the user that the app name is required, prints help text, and exits 1", func() {
+				session := helpers.CF("app")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		Context("when the app does not exist", func() {
 			Context("when no flags are given", func() {
 				It("tells the user that the app is not found and exits 1", func() {

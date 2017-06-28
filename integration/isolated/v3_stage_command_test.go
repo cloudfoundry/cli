@@ -34,9 +34,8 @@ var _ = Describe("v3-stage command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("   v3-stage - \\*\\*EXPERIMENTAL\\*\\* Create a new droplet for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("   cf v3-stage --name \\[name\\] --package-guid \\[guid\\]"))
+				Eventually(session.Out).Should(Say("   cf v3-stage APP_NAME --package-guid \\[guid\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("   --name, -n          The desired application name"))
 				Eventually(session.Out).Should(Say("   --package-guid      The guid of the package to stage"))
 
 				Eventually(session).Should(Exit(0))
@@ -44,31 +43,19 @@ var _ = Describe("v3-stage command", func() {
 		})
 	})
 
-	Context("when no flags are given", func() {
-		It("displays incorrect usage", func() {
+	Context("when the app name is not provided", func() {
+		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-stage")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required flags `--package-guid' and `-n, --name' were not specified"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))
-
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	Context("when the name flag is missing", func() {
-		It("displays incorrect usage", func() {
-			session := helpers.CF("v3-stage", "--package-guid", "some-package-guid")
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `-n, --name' was not specified"))
-			Eventually(session.Out).Should(Say("NAME:"))
-
 			Eventually(session).Should(Exit(1))
 		})
 	})
 
 	Context("when the package GUID flag is missing", func() {
 		It("displays incorrect usage", func() {
-			session := helpers.CF("v3-stage", "--name", "some-app")
+			session := helpers.CF("v3-stage", "some-app")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--package-guid' was not specified"))
 			Eventually(session.Out).Should(Say("NAME:"))
@@ -84,7 +71,7 @@ var _ = Describe("v3-stage command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
@@ -97,7 +84,7 @@ var _ = Describe("v3-stage command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
@@ -111,7 +98,7 @@ var _ = Describe("v3-stage command", func() {
 			})
 
 			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
@@ -126,7 +113,7 @@ var _ = Describe("v3-stage command", func() {
 			})
 
 			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
@@ -143,7 +130,7 @@ var _ = Describe("v3-stage command", func() {
 			var packageGUID string
 
 			BeforeEach(func() {
-				Eventually(helpers.CF("v3-create-app", "--name", appName)).Should(Exit(0))
+				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 
 				prevDir, err := os.Getwd()
 				Expect(err).ToNot(HaveOccurred())
@@ -152,7 +139,7 @@ var _ = Describe("v3-stage command", func() {
 					err := os.Chdir(appDir)
 					Expect(err).ToNot(HaveOccurred())
 
-					pkgSession := helpers.CF("v3-create-package", "--name", appName)
+					pkgSession := helpers.CF("v3-create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
 					regex, err := regexp.Compile(`package guid: (.+)`)
 					Expect(err).ToNot(HaveOccurred())
@@ -167,7 +154,7 @@ var _ = Describe("v3-stage command", func() {
 			})
 
 			It("stages the package", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", packageGUID)
+				session := helpers.CF("v3-stage", appName, "--package-guid", packageGUID)
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -181,7 +168,7 @@ var _ = Describe("v3-stage command", func() {
 
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -194,11 +181,11 @@ var _ = Describe("v3-stage command", func() {
 
 		Context("when the package does not exist", func() {
 			BeforeEach(func() {
-				Eventually(helpers.CF("v3-create-app", "--name", appName)).Should(Exit(0))
+				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 			})
 
 			It("displays package not found and exits 1", func() {
-				session := helpers.CF("v3-stage", "--name", appName, "--package-guid", "some-package-guid")
+				session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))

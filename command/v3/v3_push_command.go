@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -34,9 +35,9 @@ type V3PushActor interface {
 }
 
 type V3PushCommand struct {
-	usage   interface{} `usage:"cf v3-push -n APP_NAME"`
-	AppName string      `short:"n" long:"name" description:"The application name to push" required:"true"`
-	NoRoute bool        `long:"no-route" description:"Do not map a route to this app"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"cf v3-push APP_NAME"`
+	NoRoute      bool         `long:"no-route" description:"Do not map a route to this app"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -78,7 +79,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 		Config:          cmd.Config,
 		Actor:           cmd.Actor,
 		V2AppRouteActor: v2AppActor,
-		AppName:         cmd.AppName,
+		AppName:         cmd.RequiredArgs.AppName,
 	}
 	return nil
 }
@@ -163,7 +164,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(v3action.StartupTimeoutError); ok {
-			return shared.StartupTimeoutError{AppName: cmd.AppName}
+			return shared.StartupTimeoutError{AppName: cmd.RequiredArgs.AppName}
 		} else {
 			return shared.HandleError(err)
 		}
@@ -173,7 +174,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 }
 
 func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, bool, error) {
-	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
@@ -183,7 +184,7 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  userName,
@@ -196,13 +197,13 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 
 func (cmd V3PushCommand) updateApplication(userName string) (v3action.Application, error) {
 	cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  userName,
 	})
 
-	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err
@@ -228,7 +229,7 @@ func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
 
 func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error) {
 	cmd.UI.DisplayTextWithFlavor("Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  userName,
@@ -239,7 +240,7 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 		return v3action.Package{}, err
 	}
 
-	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, pwd)
+	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err
@@ -252,13 +253,13 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 
 func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (string, error) {
 	cmd.UI.DisplayTextWithFlavor("Staging package for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
+		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  userName,
 	})
 
-	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return "", logErr
@@ -277,14 +278,14 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 
 func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":     cmd.AppName,
+		"AppName":     cmd.RequiredArgs.AppName,
 		"DropletGUID": dropletGUID,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"SpaceName":   cmd.Config.TargetedSpace().Name,
 		"Username":    userName,
 	})
 
-	warnings, err := cmd.Actor.SetApplicationDroplet(cmd.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
+	warnings, err := cmd.Actor.SetApplicationDroplet(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, dropletGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -297,13 +298,13 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 
 func (cmd V3PushCommand) startApplication(userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
+		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  userName,
 	})
 
-	_, warnings, err := cmd.Actor.StartApplication(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.StartApplication(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -315,13 +316,13 @@ func (cmd V3PushCommand) startApplication(userName string) error {
 
 func (cmd V3PushCommand) stopApplication(userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Stopping app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  userName,
 	})
 
-	warnings, err := cmd.Actor.StopApplication(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.StopApplication(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
