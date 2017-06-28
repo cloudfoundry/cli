@@ -136,16 +136,22 @@ var _ = Describe("security-groups Command", func() {
 						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
 					},
 					{
-						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-4"},
-						Organization:  &v2action.Organization{Name: "<all>"},
-						Space:         &v2action.Space{Name: "<all>"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleRunning,
+						SecurityGroup: &v2action.SecurityGroup{
+							Name:           "seg-group-4",
+							RunningDefault: true,
+						},
+						Organization: &v2action.Organization{Name: ""},
+						Space:        &v2action.Space{Name: ""},
+						Lifecycle:    ccv2.SecurityGroupLifecycleRunning,
 					},
 					{
-						SecurityGroup: &v2action.SecurityGroup{Name: "seg-group-4"},
-						Organization:  &v2action.Organization{Name: "<all>"},
-						Space:         &v2action.Space{Name: "<all>"},
-						Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
+						SecurityGroup: &v2action.SecurityGroup{
+							Name:           "seg-group-4",
+							StagingDefault: true,
+						},
+						Organization: &v2action.Organization{Name: ""},
+						Space:        &v2action.Space{Name: ""},
+						Lifecycle:    ccv2.SecurityGroupLifecycleStaging,
 					},
 				}
 				fakeActor.GetSecurityGroupsWithOrganizationSpaceAndLifecycleReturns(secGroups, v2action.Warnings{"warning-1", "warning-2"}, nil)

@@ -97,13 +97,26 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 			currentGroupName = secGroupOrgSpace.SecurityGroup.Name
 		}
 
-		table = append(table, []string{
-			currentGroupIndexString,
-			secGroupOrgSpace.SecurityGroup.Name,
-			secGroupOrgSpace.Organization.Name,
-			secGroupOrgSpace.Space.Name,
-			string(secGroupOrgSpace.Lifecycle),
-		})
+		switch {
+		case secGroupOrgSpace.Organization.Name == "" && secGroupOrgSpace.Space.Name == "" &&
+			(secGroupOrgSpace.SecurityGroup.RunningDefault ||
+				secGroupOrgSpace.SecurityGroup.StagingDefault):
+			table = append(table, []string{
+				currentGroupIndexString,
+				secGroupOrgSpace.SecurityGroup.Name,
+				cmd.UI.TranslateText("<all>"),
+				cmd.UI.TranslateText("<all>"),
+				string(secGroupOrgSpace.Lifecycle),
+			})
+		default:
+			table = append(table, []string{
+				currentGroupIndexString,
+				secGroupOrgSpace.SecurityGroup.Name,
+				secGroupOrgSpace.Organization.Name,
+				secGroupOrgSpace.Space.Name,
+				string(secGroupOrgSpace.Lifecycle),
+			})
+		}
 	}
 
 	cmd.UI.DisplayTableWithHeader("", table, 3)
