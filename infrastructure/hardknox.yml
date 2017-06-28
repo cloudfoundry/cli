@@ -68,7 +68,7 @@ jobs:
       BBL_GCP_ZONE: us-central1-f
       BBL_LB_CERT: {{hardknox_cf_ssl_cert}}
       BBL_LB_KEY: {{hardknox_cf_ssl_cert_private_key}}
-      LB_DOMAIN: hardknox.cli.ci.cf-app.com
+      LB_DOMAIN: hardknox.cli.fun
       BBL_ENV_NAME: hardknox
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
@@ -112,7 +112,7 @@ jobs:
       vars-files: cf-state
       ops-files: combine_inputs_output
     params:
-      SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
+      SYSTEM_DOMAIN: hardknox.cli.fun
       OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
