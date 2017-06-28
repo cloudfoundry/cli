@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
@@ -59,7 +60,7 @@ var _ = Describe("v3-push Command", func() {
 		}
 
 		cmd = v3.V3PushCommand{
-			AppName: app,
+			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -97,8 +98,6 @@ var _ = Describe("v3-push Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
-
-			cmd.AppName = app
 
 			// we stub out StagePackage out here so the happy paths below don't hang
 			fakeActor.StagePackageStub = func(_ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {

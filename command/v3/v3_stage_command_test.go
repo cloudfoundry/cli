@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -46,8 +47,8 @@ var _ = Describe("v3-stage Command", func() {
 		packageGUID = "some-package-guid"
 
 		cmd = v3.V3StageCommand{
-			AppName:     app,
-			PackageGUID: packageGUID,
+			RequiredArgs: flag.AppName{AppName: app},
+			PackageGUID:  packageGUID,
 
 			UI:          testUI,
 			Config:      fakeConfig,

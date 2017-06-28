@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
@@ -53,7 +54,7 @@ var _ = Describe("v3-app Command", func() {
 		}
 
 		cmd = v3.V3AppCommand{
-			AppName: app,
+			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:                  testUI,
 			Config:              fakeConfig,

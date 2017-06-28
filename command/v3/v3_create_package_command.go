@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -16,8 +17,8 @@ type V3CreatePackageActor interface {
 }
 
 type V3CreatePackageCommand struct {
-	usage   interface{} `usage:"CF_NAME v3-create-package --name [name]"`
-	AppName string      `short:"n" long:"name" description:"The application name" required:"true"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"CF_NAME v3-create-package APP_NAME"`
 
 	UI          command.UI
 	Config      command.Config
@@ -54,7 +55,7 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  user.Name,
@@ -65,7 +66,7 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, pwd)
+	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

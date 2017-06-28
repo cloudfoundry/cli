@@ -34,22 +34,19 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("v3-app - Display an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-app -n APP_NAME"))
-				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("--name, -n\\s+The application name to display"))
+				Eventually(session.Out).Should(Say("cf v3-app APP_NAME"))
 
 				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
 
-	Context("when the name flag is missing", func() {
-		It("displays incorrect usage", func() {
+	Context("when the app name is not provided", func() {
+		It("tells the user that the app name is required, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-app")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `-n, --name' was not specified"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))
-
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -61,7 +58,7 @@ var _ = Describe("v3-app command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-app", "--name", appName)
+				session := helpers.CF("v3-app", appName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
@@ -74,7 +71,7 @@ var _ = Describe("v3-app command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-app", "--name", appName)
+				session := helpers.CF("v3-app", appName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
@@ -88,7 +85,7 @@ var _ = Describe("v3-app command", func() {
 			})
 
 			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-app", "--name", appName)
+				session := helpers.CF("v3-app", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
@@ -103,7 +100,7 @@ var _ = Describe("v3-app command", func() {
 			})
 
 			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-app", "--name", appName)
+				session := helpers.CF("v3-app", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
@@ -124,7 +121,7 @@ var _ = Describe("v3-app command", func() {
 					err := os.Chdir(appDir)
 					Expect(err).ToNot(HaveOccurred())
 
-					Eventually(helpers.CF("v3-push", "--name", appName)).Should(Exit(0))
+					Eventually(helpers.CF("v3-push", appName)).Should(Exit(0))
 				})
 
 				domainName = defaultSharedDomain()
@@ -133,7 +130,7 @@ var _ = Describe("v3-app command", func() {
 			It("displays the app summary", func() {
 				userName, _ := helpers.GetCredentials()
 
-				session := helpers.CF("v3-app", "-n", appName)
+				session := helpers.CF("v3-app", appName)
 				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
@@ -157,7 +154,7 @@ var _ = Describe("v3-app command", func() {
 				It("displays that there are no running instances of the app", func() {
 					userName, _ := helpers.GetCredentials()
 
-					session := helpers.CF("v3-app", "-n", appName)
+					session := helpers.CF("v3-app", appName)
 
 					Eventually(session.Out).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
@@ -169,7 +166,7 @@ var _ = Describe("v3-app command", func() {
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
-				session := helpers.CF("v3-app", "-n", invalidAppName)
+				session := helpers.CF("v3-app", invalidAppName)
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))

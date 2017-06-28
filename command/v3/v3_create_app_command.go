@@ -4,6 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -14,8 +15,8 @@ type V3CreateAppActor interface {
 }
 
 type V3CreateAppCommand struct {
-	usage   interface{} `usage:"CF_NAME v3-create-app --name [name]"`
-	AppName string      `short:"n" long:"name" description:"The desired application name" required:"true"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"CF_NAME v3-create-app APP_NAME"`
 
 	UI          command.UI
 	Config      command.Config
@@ -52,17 +53,17 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.AppName,
+		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  user.Name,
 	})
 
-	_, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
 		cmd.UI.DisplayWarning("App {{.AppName}} already exists.", map[string]interface{}{
-			"AppName": cmd.AppName,
+			"AppName": cmd.RequiredArgs.AppName,
 		})
 	} else if err != nil {
 		return shared.HandleError(err)

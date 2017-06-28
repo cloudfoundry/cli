@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -39,7 +40,7 @@ var _ = Describe("v3-start Command", func() {
 		app = "some-app"
 
 		cmd = v3.V3StartCommand{
-			AppName: app,
+			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:          testUI,
 			Config:      fakeConfig,

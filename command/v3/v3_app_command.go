@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -22,8 +23,8 @@ type V3AppActor interface {
 }
 
 type V3AppCommand struct {
-	usage   interface{} `usage:"CF_NAME v3-app -n APP_NAME"`
-	AppName string      `short:"n" long:"name" description:"The application name to display" required:"true"`
+	RequiredArgs flag.AppName `positional-args:"yes"`
+	usage        interface{}  `usage:"CF_NAME v3-app APP_NAME"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -55,7 +56,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 		Config:          cmd.Config,
 		Actor:           cmd.Actor,
 		V2AppRouteActor: v2Actor,
-		AppName:         cmd.AppName,
+		AppName:         cmd.RequiredArgs.AppName,
 	}
 	return nil
 }

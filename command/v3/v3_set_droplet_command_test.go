@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -41,8 +42,8 @@ var _ = Describe("v3-set-droplet Command", func() {
 		dropletGUID = "some-droplet-guid"
 
 		cmd = v3.V3SetDropletCommand{
-			AppName:     app,
-			DropletGUID: dropletGUID,
+			RequiredArgs: flag.AppName{AppName: app},
+			DropletGUID:  dropletGUID,
 
 			UI:          testUI,
 			Config:      fakeConfig,
