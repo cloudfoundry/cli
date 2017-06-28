@@ -5,10 +5,13 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
+	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -24,6 +27,7 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3AppActor
+		fakeV2Actor     *v3fakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -34,20 +38,40 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3AppActor)
+		fakeV2Actor = new(v3fakes.FakeV2AppActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 
+		appSummaryDisplayer := shared.AppSummaryDisplayer{
+			UI:              testUI,
+			Config:          fakeConfig,
+			Actor:           fakeActor,
+			V2AppRouteActor: fakeV2Actor,
+			AppName:         app,
+		}
+
 		cmd = v3.V3AppCommand{
 			AppName: app,
 
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
+			UI:                  testUI,
+			Config:              fakeConfig,
+			SharedActor:         fakeSharedActor,
+			Actor:               fakeActor,
+			AppSummaryDisplayer: appSummaryDisplayer,
 		}
 
+		fakeConfig.TargetedOrganizationReturns(configv3.Organization{
+			Name: "some-org",
+			GUID: "some-org-guid",
+		})
+		fakeConfig.TargetedSpaceReturns(configv3.Space{
+			Name: "some-space",
+			GUID: "some-space-guid",
+		})
+
+		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 	})
 
 	JustBeforeEach(func() {
@@ -82,16 +106,52 @@ var _ = Describe("v3-app Command", func() {
 		})
 	})
 
-	Context("when the actor does not return an error", func() {
+	Context("when getting the application summary returns an error", func() {
+		var expectedErr error
+
 		BeforeEach(func() {
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-				Name: "some-org",
-			})
-			fakeConfig.TargetedSpaceReturns(configv3.Space{
-				Name: "some-space",
-				GUID: "some-space-guid",
-			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+			expectedErr = v3action.ApplicationNotFoundError{Name: app}
+			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
+		})
+
+		It("returns the error and prints warnings", func() {
+			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+
+			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+		})
+	})
+
+	Context("when getting routes returns an error", func() {
+		var expectedErr error
+
+		BeforeEach(func() {
+			expectedErr = ccerror.RequestError{}
+			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
+
+			fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{}, v2action.Warnings{"route-warning-1", "route-warning-2"}, expectedErr)
+		})
+
+		It("returns the error and prints warnings", func() {
+			Expect(executeErr).To(Equal(command.APIRequestError{}))
+
+			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+			Expect(testUI.Err).To(Say("route-warning-1"))
+			Expect(testUI.Err).To(Say("route-warning-2"))
+		})
+	})
+
+	Context("when the actor does not return any errors", func() {
+		BeforeEach(func() {
+			fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{
+				{Domain: v2action.Domain{Name: "some-other-domain"}}, {
+					Domain: v2action.Domain{Name: "some-domain"}}},
+				v2action.Warnings{"route-warning-1", "route-warning-2"}, nil)
 		})
 
 		Context("when there are no instances of any process in the app", func() {
@@ -291,6 +351,7 @@ var _ = Describe("v3-app Command", func() {
 				Expect(testUI.Out).To(Say("requested state:\\s+started"))
 				Expect(testUI.Out).To(Say("processes:\\s+web:3/3, console:0/0, worker:0/1"))
 				Expect(testUI.Out).To(Say("memory usage:\\s+32M x 3, 64M x 1"))
+				Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
 				Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
 				Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output, some-buildpack\n\n"))
 				Expect(testUI.Out).To(Say("web:3/3"))
@@ -311,31 +372,6 @@ var _ = Describe("v3-app Command", func() {
 				Expect(appName).To(Equal("some-app"))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 			})
-		})
-	})
-
-	Context("when the actor returns an error", func() {
-		var expectedErr error
-
-		BeforeEach(func() {
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
-				Name: "some-org",
-			})
-			fakeConfig.TargetedSpaceReturns(configv3.Space{
-				Name: "some-space",
-			})
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			expectedErr = v3action.ApplicationNotFoundError{Name: app}
-			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
-		})
-
-		It("returns the error and prints warnings", func() {
-			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
-
-			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
-
-			Expect(testUI.Err).To(Say("warning-1"))
-			Expect(testUI.Err).To(Say("warning-2"))
 		})
 	})
 })

@@ -31,7 +31,6 @@ func HandleError(err error) error {
 		return command.NoOrganizationTargetedError{BinaryName: e.BinaryName}
 	case sharedaction.NoSpaceTargetedError:
 		return command.NoSpaceTargetedError{BinaryName: e.BinaryName}
-
 	case v3action.ApplicationNotFoundError:
 		return command.ApplicationNotFoundError{Name: e.Name}
 	case v3action.TaskWorkersUnavailableError:

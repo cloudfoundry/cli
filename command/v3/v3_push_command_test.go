@@ -31,6 +31,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeActor       *v3fakes.FakeV3PushActor
 		fakeV2PushActor *v3fakes.FakeV2PushActor
+		fakeV2AppActor  *v3fakes.FakeV2AppActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -42,11 +43,20 @@ var _ = Describe("v3-push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3PushActor)
 		fakeV2PushActor = new(v3fakes.FakeV2PushActor)
+		fakeV2AppActor = new(v3fakes.FakeV2AppActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
+
+		appSummaryDisplayer := shared.AppSummaryDisplayer{
+			UI:              testUI,
+			Config:          fakeConfig,
+			Actor:           fakeActor,
+			V2AppRouteActor: fakeV2AppActor,
+			AppName:         app,
+		}
 
 		cmd = v3.V3PushCommand{
 			AppName: app,
@@ -57,7 +67,8 @@ var _ = Describe("v3-push Command", func() {
 			Actor:       fakeActor,
 			V2PushActor: fakeV2PushActor,
 
-			NOAAClient: fakeNOAAClient,
+			NOAAClient:          fakeNOAAClient,
+			AppSummaryDisplayer: appSummaryDisplayer,
 		}
 
 	})
@@ -524,11 +535,12 @@ var _ = Describe("v3-push Command", func() {
 										})
 									})
 
-									Context("when displaying the application info is successful", func() {
+									Context("when getting the application summary is successful", func() {
 										BeforeEach(func() {
 											summary := v3action.ApplicationSummary{
 												Application: v3action.Application{
 													Name:  "some-app",
+													GUID:  "some-app-guid",
 													State: "started",
 												},
 												CurrentDroplet: v3action.Droplet{
@@ -562,28 +574,63 @@ var _ = Describe("v3-push Command", func() {
 											fakeActor.GetApplicationSummaryByNameAndSpaceReturns(summary, v3action.Warnings{"display-warning-1", "display-warning-2"}, nil)
 										})
 
-										It("prints the application summary and outputs warnings", func() {
-											Expect(executeErr).ToNot(HaveOccurred())
+										Context("when getting the application routes fails", func() {
+											BeforeEach(func() {
+												fakeV2AppActor.GetApplicationRoutesReturns([]v2action.Route{},
+													v2action.Warnings{"route-warning-1", "route-warning-2"}, errors.New("some-error"))
+											})
 
-											Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
-											Expect(testUI.Out).To(Say("name:\\s+some-app"))
-											Expect(testUI.Out).To(Say("requested state:\\s+started"))
-											Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
-											Expect(testUI.Out).To(Say("memory usage:\\s+64M x 1"))
-											Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
-											Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+											It("displays all warnings and returns the error", func() {
+												Expect(executeErr).To(MatchError("some-error"))
 
-											Expect(testUI.Out).To(Say("worker:1/1"))
-											Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-											Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+												Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
 
-											Expect(testUI.Err).To(Say("display-warning-1"))
-											Expect(testUI.Err).To(Say("display-warning-2"))
+												Expect(testUI.Err).To(Say("display-warning-1"))
+												Expect(testUI.Err).To(Say("display-warning-2"))
+												Expect(testUI.Err).To(Say("route-warning-1"))
+												Expect(testUI.Err).To(Say("route-warning-2"))
 
-											Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-											appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-											Expect(appName).To(Equal("some-app"))
-											Expect(spaceGUID).To(Equal("some-space-guid"))
+												Expect(testUI.Out).ToNot(Say("name:\\s+some-app"))
+											})
+										})
+
+										Context("when getting the application routes is successful", func() {
+											BeforeEach(func() {
+												fakeV2AppActor.GetApplicationRoutesReturns([]v2action.Route{
+													{Domain: v2action.Domain{Name: "some-other-domain"}}, {
+														Domain: v2action.Domain{Name: "some-domain"}}},
+													v2action.Warnings{"route-warning-1", "route-warning-2"}, nil)
+											})
+
+											It("prints the application summary and outputs warnings", func() {
+												Expect(executeErr).ToNot(HaveOccurred())
+
+												Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\.\n\n"))
+												Expect(testUI.Out).To(Say("name:\\s+some-app"))
+												Expect(testUI.Out).To(Say("requested state:\\s+started"))
+												Expect(testUI.Out).To(Say("processes:\\s+worker:1/1"))
+												Expect(testUI.Out).To(Say("memory usage:\\s+64M x 1"))
+												Expect(testUI.Out).To(Say("routes:\\s+some-other-domain, some-domain"))
+												Expect(testUI.Out).To(Say("stack:\\s+cflinuxfs2"))
+												Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output\n\n"))
+
+												Expect(testUI.Out).To(Say("worker:1/1"))
+												Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
+												Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+
+												Expect(testUI.Err).To(Say("display-warning-1"))
+												Expect(testUI.Err).To(Say("display-warning-2"))
+												Expect(testUI.Err).To(Say("route-warning-1"))
+												Expect(testUI.Err).To(Say("route-warning-2"))
+
+												Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+												appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+												Expect(appName).To(Equal("some-app"))
+												Expect(spaceGUID).To(Equal("some-space-guid"))
+
+												Expect(fakeV2AppActor.GetApplicationRoutesCallCount()).To(Equal(1))
+												Expect(fakeV2AppActor.GetApplicationRoutesArgsForCall(0)).To(Equal("some-app-guid"))
+											})
 										})
 									})
 								})
