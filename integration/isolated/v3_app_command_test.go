@@ -1,9 +1,7 @@
 package isolated
 
 import (
-	"fmt"
 	"os"
-	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -119,43 +117,17 @@ var _ = Describe("v3-app command", func() {
 		})
 
 		Context("when the app exists", func() {
+			var domainName string
+
 			BeforeEach(func() {
-				var packageGUID string
-				Eventually(helpers.CF("v3-create-app", "--name", appName)).Should(Exit(0))
-
-				prevDir, err := os.Getwd()
-				Expect(err).ToNot(HaveOccurred())
-
 				helpers.WithHelloWorldApp(func(appDir string) {
 					err := os.Chdir(appDir)
 					Expect(err).ToNot(HaveOccurred())
 
-					pkgSession := helpers.CF("v3-create-package", "--name", appName)
-					Eventually(pkgSession).Should(Exit(0))
-					regex, err := regexp.Compile(`package guid: (.+)`)
-					Expect(err).ToNot(HaveOccurred())
-					matches := regex.FindStringSubmatch(string(pkgSession.Out.Contents()))
-					Expect(matches).To(HaveLen(2))
-
-					packageGUID = matches[1]
+					Eventually(helpers.CF("v3-push", "--name", appName)).Should(Exit(0))
 				})
 
-				err = os.Chdir(prevDir)
-				Expect(err).ToNot(HaveOccurred())
-
-				stageSession := helpers.CF("v3-stage", "--name", appName, "--package-guid", packageGUID)
-				Eventually(stageSession).Should(Exit(0))
-
-				regex, err := regexp.Compile(`droplet: (.+)`)
-				Expect(err).ToNot(HaveOccurred())
-				matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
-				Expect(matches).To(HaveLen(2))
-
-				dropletGUID := matches[1]
-				setDropletSession := helpers.CF("v3-set-droplet", "--name", appName, "--droplet-guid", dropletGUID)
-				Eventually(setDropletSession).Should(Exit(0))
-
-				Eventually(helpers.CF("v3-start", "-n", appName)).Should(Exit(0))
+				domainName = defaultSharedDomain()
 			})
 
 			It("displays the app summary", func() {
@@ -164,12 +136,15 @@ var _ = Describe("v3-app command", func() {
 				session := helpers.CF("v3-app", "-n", appName)
 				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
-				Eventually(session.Out).Should(Say(fmt.Sprintf("name:\\s+%s", appName)))
+				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
 				Eventually(session.Out).Should(Say("requested state:\\s+started"))
-				Eventually(session.Out).Should(Say("processes:\\s+web:[01]/1"))
+				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+				Eventually(session.Out).Should(Say("memory usage:\\s+\\d{2}M x 1"))
+				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
 				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
-				Eventually(session.Out).Should(Say("web:[01]/1"))
-				Eventually(session.Out).Should(Say("#0\\s+(starting|running)\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				Eventually(session.Out).Should(Say("web:1/1"))
+				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 
 				Eventually(session).Should(Exit(0))
 			})

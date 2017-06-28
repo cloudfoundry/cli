@@ -38,12 +38,13 @@ type V3PushCommand struct {
 	AppName string      `short:"n" long:"name" description:"The application name to push" required:"true"`
 	NoRoute bool        `long:"no-route" description:"Do not map a route to this app"`
 
-	UI          command.UI
-	Config      command.Config
-	NOAAClient  v3action.NOAAClient
-	SharedActor command.SharedActor
-	Actor       V3PushActor
-	V2PushActor V2PushActor
+	UI                  command.UI
+	Config              command.Config
+	NOAAClient          v3action.NOAAClient
+	SharedActor         command.SharedActor
+	Actor               V3PushActor
+	V2PushActor         V2PushActor
+	AppSummaryDisplayer shared.AppSummaryDisplayer
 }
 
 func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -64,6 +65,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2)
 	cmd.V2PushActor = pushaction.NewActor(v2Actor)
+	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2)
 
 	dopplerURL, err := hackDopplerURLFromUAA(ccClient.UAA())
 	if err != nil {
@@ -71,6 +73,13 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.NOAAClient = shared.NewNOAAClient(dopplerURL, config, uaaClient, ui)
 
+	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
+		UI:              cmd.UI,
+		Config:          cmd.Config,
+		Actor:           cmd.Actor,
+		V2AppRouteActor: v2AppActor,
+		AppName:         cmd.AppName,
+	}
 	return nil
 }
 
@@ -160,7 +169,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		}
 	}
 
-	return cmd.displayAppInfo(user.Name)
+	return cmd.AppSummaryDisplayer.DisplayAppInfo()
 }
 
 func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, bool, error) {
@@ -319,25 +328,5 @@ func (cmd V3PushCommand) stopApplication(userName string) error {
 	}
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	return nil
-}
-
-func (cmd V3PushCommand) displayAppInfo(userName string) error {
-	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  userName,
-	})
-	cmd.UI.DisplayNewline()
-
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	displayAppTable(cmd.UI, summary)
-
 	return nil
 }
