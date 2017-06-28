@@ -155,7 +155,7 @@ resources:
     versioned_file: master/cf-cli-installer_edge_winx64.zip
     region_name: us-west-1
 
-- name: gpc-bosh-pool
+- name: gcp-bosh-pool
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
@@ -291,7 +291,7 @@ jobs:
     - get: cli-integration
     - get: vars-store
     - put: bosh-lite-lock
-      resource: gpc-bosh-pool
+      resource: gcp-bosh-pool
       params:
         acquire: true
   - do:
@@ -320,7 +320,7 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
   ensure:
-    put: gpc-bosh-pool
+    put: gcp-bosh-pool
     params:
       release: bosh-lite-lock
 
@@ -337,7 +337,7 @@ jobs:
     - get: cli-ci
     - get: vars-store
     - put: bosh-lite-lock
-      resource: gpc-bosh-pool
+      resource: gcp-bosh-pool
       params:
         acquire: true
   - do:
@@ -369,7 +369,7 @@ jobs:
           channel: '#cli-firehose'
           text: "cats linux failed :("
   ensure:
-    put: gpc-bosh-pool
+    put: gcp-bosh-pool
     params:
       release: bosh-lite-lock
 
@@ -386,7 +386,7 @@ jobs:
     - get: cli-integration
     - get: vars-store
     - put: bosh-lite-lock
-      resource: gpc-bosh-pool
+      resource: gcp-bosh-pool
       params:
         acquire: true
   - do:
@@ -419,7 +419,7 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
   ensure:
-    put: gpc-bosh-pool
+    put: gcp-bosh-pool
     params:
       release: bosh-lite-lock
 
