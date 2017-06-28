@@ -144,7 +144,7 @@ var _ = Describe("unbind-security-group command", func() {
 		It("reports an error with a minimum-version message", func() {
 			session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")
 
-			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.68\\.0\\. Your target is 2\\.34\\.0\\."))
+			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.68\\.0\\ or higher. Your target is 2\\.34\\.0\\."))
 			Eventually(session).Should(Exit(1))
 		})
 	})
