@@ -33,7 +33,7 @@ var _ = Describe("v3-stage command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("   v3-stage - \\*\\*EXPERIMENTAL\\*\\* Create a new droplet for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("   cf v3-stage APP_NAME --package-guid \\[guid\\]"))
+				Eventually(session.Out).Should(Say("   cf v3-stage APP_NAME --package-guid PACKAGE_GUID"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("   --package-guid      The guid of the package to stage"))
 
@@ -44,7 +44,7 @@ var _ = Describe("v3-stage command", func() {
 
 	Context("when the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("v3-stage")
+			session := helpers.CF("v3-stage", "--package-guid", "some-package-guid")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))

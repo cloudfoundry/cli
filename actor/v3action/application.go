@@ -12,6 +12,10 @@ import (
 // Application represents a V3 actor application.
 type Application ccv3.Application
 
+func (app Application) Started() bool {
+	return app.State == "STARTED"
+}
+
 // ApplicationNotFoundError represents the error that occurs when the
 // application is not found.
 type ApplicationNotFoundError struct {
@@ -69,31 +73,17 @@ func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID str
 }
 
 // StopApplication stops an application.
-func (actor Actor) StopApplication(appName string, spaceGUID string) (Warnings, error) {
-	allWarnings := Warnings{}
-	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-	apiWarnings, err := actor.CloudControllerClient.StopApplication(application.GUID)
-	allWarnings = append(allWarnings, apiWarnings...)
+func (actor Actor) StopApplication(appGUID string, spaceGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.StopApplication(appGUID)
 
-	return allWarnings, err
+	return Warnings(warnings), err
 }
 
 // StartApplication starts an application.
-func (actor Actor) StartApplication(appName string, spaceGUID string) (Application, Warnings, error) {
-	allWarnings := Warnings{}
-	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return Application{}, allWarnings, err
-	}
-	updatedApp, apiWarnings, err := actor.CloudControllerClient.StartApplication(application.GUID)
-	allWarnings = append(allWarnings, apiWarnings...)
+func (actor Actor) StartApplication(appGUID string, spaceGUID string) (Application, Warnings, error) {
+	updatedApp, warnings, err := actor.CloudControllerClient.StartApplication(appGUID)
 
-	return Application(updatedApp), allWarnings, err
+	return Application(updatedApp), Warnings(warnings), err
 }
 
 func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) error {
