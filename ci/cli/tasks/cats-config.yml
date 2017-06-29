@@ -32,7 +32,8 @@ run:
     API="api.${DOMAIN}"
     CF_USER="admin"
 
-    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /cf_admin_password)
+    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     cat << EOF | jq -S . > cats-config/integration_config.json
     {
