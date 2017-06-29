@@ -18,8 +18,6 @@ var _ = Describe("v3-start-application command", func() {
 	)
 
 	BeforeEach(func() {
-		Skip("don't run in the pipeline until cf-deployment master supports it")
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
