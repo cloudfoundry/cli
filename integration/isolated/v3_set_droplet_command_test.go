@@ -44,7 +44,7 @@ var _ = Describe("v3-set-droplet command", func() {
 
 	Context("when the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("v3-set-droplet")
+			session := helpers.CF("v3-set-droplet", "-d", "some-droplet-guid")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))
@@ -185,7 +185,7 @@ var _ = Describe("v3-set-droplet command", func() {
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session.Out).Should(Say("Setting app %s to droplet %s in org %s / space %s as %s\\.\\.\\.", appName, invalidDropletGUID, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say("Unable to assign current droplet\\. Ensure the droplet exists and belongs to this app\\."))
+					Eventually(session.Err).Should(Say("Unable to assign droplet\\. Ensure the droplet exists and belongs to this app\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})

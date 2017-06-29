@@ -20,7 +20,7 @@ type V3StageActor interface {
 
 type V3StageCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid GUID"`
+	usage        interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID"`
 	PackageGUID  string       `long:"package-guid" description:"The guid of the package to stage" required:"true"`
 
 	UI          command.UI

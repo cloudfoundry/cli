@@ -453,7 +453,7 @@ var _ = Describe("v3-push Command", func() {
 
 								Context("when starting the application succeeds", func() {
 									BeforeEach(func() {
-										fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+										fakeActor.StartApplicationReturns(v3action.Application{GUID: "some-app-guid"}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
 									})
 
 									It("says that the app was started and outputs warnings", func() {
@@ -464,8 +464,8 @@ var _ = Describe("v3-push Command", func() {
 										Expect(testUI.Out).To(Say("OK"))
 
 										Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-										appName, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
-										Expect(appName).To(Equal("some-app"))
+										appGUID, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
+										Expect(appGUID).To(Equal("some-app-guid"))
 										Expect(spaceGUID).To(Equal("some-space-guid"))
 									})
 								})
@@ -645,14 +645,43 @@ var _ = Describe("v3-push Command", func() {
 				fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, nil, v3action.ApplicationAlreadyExistsError{})
 			})
 
-			It("stops the application and pushes it", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as banana..."))
+			Context("when the application is stopped", func() {
+				BeforeEach(func() {
+					fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: "STOPPED"}, nil, nil)
+				})
 
-				Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-				appNameArg, spaceGUIDArg := fakeActor.StopApplicationArgsForCall(0)
-				Expect(appNameArg).To(Equal("some-app"))
-				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+				It("skips stopping the application and pushes it", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).ToNot(Say("Stopping"))
+
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0), "Expected StopApplication to not be called")
+
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1), "Expected StartApplication to be called")
+					appGUIDArg, spaceGUIDArg := fakeActor.StartApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+				})
+			})
+
+			Context("when the application is started", func() {
+				BeforeEach(func() {
+					fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: "STARTED"}, nil, nil)
+				})
+
+				It("stops the application and pushes it", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as banana..."))
+
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+					appGUIDArg, spaceGUIDArg := fakeActor.StopApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1), "Expected StartApplication to be called")
+					appGUIDArg, spaceGUIDArg = fakeActor.StartApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+				})
 			})
 		})
 	})

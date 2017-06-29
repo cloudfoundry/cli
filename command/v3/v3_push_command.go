@@ -27,8 +27,8 @@ type V3PushActor interface {
 	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
-	StartApplication(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StopApplication(appName string, spaceGUID string) (v3action.Warnings, error)
+	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
@@ -120,8 +120,8 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	if appExists {
-		err = cmd.stopApplication(user.Name)
+	if appExists && app.Started() {
+		err = cmd.stopApplication(app.GUID, user.Name)
 		if err != nil {
 			return shared.HandleError(err)
 		}
@@ -139,7 +139,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		}
 	}
 
-	err = cmd.startApplication(user.Name)
+	err = cmd.startApplication(app.GUID, user.Name)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -296,7 +296,7 @@ func (cmd V3PushCommand) setApplicationDroplet(dropletGUID string, userName stri
 	return nil
 }
 
-func (cmd V3PushCommand) startApplication(userName string) error {
+func (cmd V3PushCommand) startApplication(appGUID string, userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -304,7 +304,7 @@ func (cmd V3PushCommand) startApplication(userName string) error {
 		"Username":  userName,
 	})
 
-	_, warnings, err := cmd.Actor.StartApplication(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.StartApplication(appGUID, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -314,7 +314,7 @@ func (cmd V3PushCommand) startApplication(userName string) error {
 	return nil
 }
 
-func (cmd V3PushCommand) stopApplication(userName string) error {
+func (cmd V3PushCommand) stopApplication(appGUID string, userName string) error {
 	cmd.UI.DisplayTextWithFlavor("Stopping app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
@@ -322,7 +322,7 @@ func (cmd V3PushCommand) stopApplication(userName string) error {
 		"CurrentUser":  userName,
 	})
 
-	warnings, err := cmd.Actor.StopApplication(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.StopApplication(appGUID, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

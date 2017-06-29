@@ -17,13 +17,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v3-start Command", func() {
+var _ = Describe("v3-stop Command", func() {
 	var (
-		cmd             v3.V3StartCommand
+		cmd             v3.V3StopCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeV3StartActor
+		fakeActor       *v3fakes.FakeV3StopActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -33,13 +33,13 @@ var _ = Describe("v3-start Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeV3StartActor)
+		fakeActor = new(v3fakes.FakeV3StopActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 
-		cmd = v3.V3StartCommand{
+		cmd = v3.V3StopCommand{
 			RequiredArgs: flag.AppName{AppName: app},
 
 			UI:          testUI,
@@ -47,7 +47,6 @@ var _ = Describe("v3-start Command", func() {
 			SharedActor: fakeSharedActor,
 			Actor:       fakeActor,
 		}
-
 	})
 
 	JustBeforeEach(func() {
@@ -92,24 +91,24 @@ var _ = Describe("v3-start Command", func() {
 				GUID: "some-space-guid",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid", State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, nil)
 		})
 
-		It("says that the app was started and outputs warnings", func() {
+		It("says that the app was stopped and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("start-warning-1"))
-			Expect(testUI.Err).To(Say("start-warning-2"))
+			Expect(testUI.Err).To(Say("stop-warning-1"))
+			Expect(testUI.Err).To(Say("stop-warning-2"))
 			Expect(testUI.Out).To(Say("OK"))
 
-			Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-			appName, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
-			Expect(appName).To(Equal("some-app-guid"))
+			Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+			appGUID, spaceGUID := fakeActor.StopApplicationArgsForCall(0)
+			Expect(appGUID).To(Equal("some-app-guid"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
 		})
 	})
@@ -126,19 +125,19 @@ var _ = Describe("v3-start Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = v3action.ApplicationNotFoundError{Name: app}
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
-		It("says that the app failed to start", func() {
+		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
-			Expect(testUI.Out).ToNot(Say("Starting"))
+			Expect(testUI.Out).ToNot(Say("Stopping"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
 		})
 	})
 
-	Context("when the start app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
+	Context("when the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -149,23 +148,23 @@ var _ = Describe("v3-start Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = v3action.ApplicationNotFoundError{Name: app}
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+			fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 		})
 
-		It("says that the app failed to start", func() {
+		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
-			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("start-warning-1"))
-			Expect(testUI.Err).To(Say("start-warning-2"))
+			Expect(testUI.Err).To(Say("stop-warning-1"))
+			Expect(testUI.Err).To(Say("stop-warning-2"))
 		})
 	})
 
-	Context("when the app is already started", func() {
+	Context("when the app is already stopped", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 				Name: "some-org",
@@ -174,19 +173,19 @@ var _ = Describe("v3-start Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 		})
 
-		It("says that the app failed to start", func() {
+		It("says that the app failed to stop", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
-			Expect(testUI.Out).ToNot(Say("Starting"))
+			Expect(testUI.Out).ToNot(Say("Stopping"))
 			Expect(testUI.Out).To(Say("OK"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("App some-app is already started"))
+			Expect(testUI.Err).To(Say("App some-app is already stopped"))
 
-			Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
+			Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
 		})
 	})
 
@@ -202,21 +201,21 @@ var _ = Describe("v3-start Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			expectedErr = errors.New("some-error")
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
-		It("says that the app failed to start", func() {
+		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(expectedErr))
-			Expect(testUI.Out).ToNot(Say("Starting"))
+			Expect(testUI.Out).ToNot(Say("Stopping"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
 
-			Expect(fakeActor.StartApplicationCallCount()).To(BeZero(), "Expected StartApplication to not be called")
+			Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
 		})
 	})
 
-	Context("when the start application returns an unknown error", func() {
+	Context("when the stop application returns an unknown error", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
@@ -227,19 +226,19 @@ var _ = Describe("v3-start Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STOPPED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 			expectedErr = errors.New("some-error")
-			fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, expectedErr)
+			fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 		})
 
-		It("says that the app failed to start", func() {
+		It("says that the app failed to stop", func() {
 			Expect(executeErr).To(Equal(expectedErr))
-			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
 			Expect(testUI.Err).To(Say("get-warning-2"))
-			Expect(testUI.Err).To(Say("start-warning-1"))
-			Expect(testUI.Err).To(Say("start-warning-2"))
+			Expect(testUI.Err).To(Say("stop-warning-1"))
+			Expect(testUI.Err).To(Say("stop-warning-2"))
 		})
 	})
 })
