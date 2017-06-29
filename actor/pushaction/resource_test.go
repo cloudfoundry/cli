@@ -45,7 +45,7 @@ var _ = Describe("Resources", func() {
 			}
 
 			resourcesToArchive = []v2action.Resource{{Filename: "file1"}, {Filename: "file2"}}
-			config.AllResources = resourcesToArchive
+			config.UnmatchedResources = resourcesToArchive
 		})
 
 		JustBeforeEach(func() {
@@ -124,6 +124,54 @@ var _ = Describe("Resources", func() {
 		})
 	})
 
+	Describe("SetMatchedResources", func() {
+		var (
+			inputConfig  ApplicationConfig
+			outputConfig ApplicationConfig
+			warnings     Warnings
+		)
+		JustBeforeEach(func() {
+			outputConfig, warnings = actor.SetMatchedResources(inputConfig)
+		})
+
+		BeforeEach(func() {
+			inputConfig.AllResources = []v2action.Resource{
+				{Filename: "file-1"},
+				{Filename: "file-2"},
+			}
+		})
+
+		Context("when the resource matching is successful", func() {
+			BeforeEach(func() {
+				fakeV2Actor.ResourceMatchReturns(
+					[]v2action.Resource{{Filename: "file-1"}},
+					[]v2action.Resource{{Filename: "file-2"}},
+					v2action.Warnings{"warning-1"},
+					nil,
+				)
+			})
+
+			It("sets the matched and unmatched resources", func() {
+				Expect(outputConfig.MatchedResources).To(ConsistOf(v2action.Resource{Filename: "file-1"}))
+				Expect(outputConfig.UnmatchedResources).To(ConsistOf(v2action.Resource{Filename: "file-2"}))
+
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when resource matching returns an error", func() {
+			BeforeEach(func() {
+				fakeV2Actor.ResourceMatchReturns(nil, nil, v2action.Warnings{"warning-1"}, errors.New("some-error"))
+			})
+
+			It("sets the unmatched resources to AllResources", func() {
+				Expect(outputConfig.UnmatchedResources).To(Equal(inputConfig.AllResources))
+
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
+
 	Describe("UploadPackage", func() {
 		var (
 			config          ApplicationConfig
@@ -133,13 +181,21 @@ var _ = Describe("Resources", func() {
 
 			warnings   Warnings
 			executeErr error
+
+			resources []v2action.Resource
 		)
 
 		BeforeEach(func() {
+			resources = []v2action.Resource{
+				{Filename: "file-1"},
+				{Filename: "file-2"},
+			}
+
 			config = ApplicationConfig{
 				DesiredApplication: v2action.Application{
 					GUID: "some-app-guid",
 				},
+				MatchedResources: resources,
 			}
 			fakeProgressBar = new(pushactionfakes.FakeProgressBar)
 			eventStream = make(chan Event)
@@ -201,7 +257,7 @@ var _ = Describe("Resources", func() {
 						Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
 						appGUID, existingResources, _, newResourcesLength := fakeV2Actor.UploadApplicationPackageArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
-						Expect(existingResources).To(BeEmpty())
+						Expect(existingResources).To(Equal(resources))
 						Expect(newResourcesLength).To(BeNumerically("==", 6))
 
 						Expect(fakeV2Actor.PollJobCallCount()).To(Equal(1))

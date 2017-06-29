@@ -3,7 +3,6 @@ package pushaction
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,10 +12,11 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	var archivePath string
 	var err error
 
+	//change to look at unmatched
 	if config.Archive {
-		archivePath, err = actor.V2Actor.ZipArchiveResources(config.Path, config.AllResources)
+		archivePath, err = actor.V2Actor.ZipArchiveResources(config.Path, config.UnmatchedResources)
 	} else {
-		archivePath, err = actor.V2Actor.ZipDirectoryResources(config.Path, config.AllResources)
+		archivePath, err = actor.V2Actor.ZipDirectoryResources(config.Path, config.UnmatchedResources)
 	}
 	if err != nil {
 		log.WithField("path", config.Path).Errorln("archiving resources:", err)
@@ -24,6 +24,21 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	}
 	log.WithField("archivePath", archivePath).Debug("archive created")
 	return archivePath, nil
+}
+
+func (actor Actor) SetMatchedResources(config ApplicationConfig) (ApplicationConfig, Warnings) {
+	matched, unmatched, warnings, err := actor.V2Actor.ResourceMatch(config.AllResources)
+
+	if err != nil {
+		log.Error("uploading all resources instead of resource matching")
+		config.UnmatchedResources = config.AllResources
+		return config, Warnings(warnings)
+	}
+
+	config.MatchedResources = matched
+	config.UnmatchedResources = unmatched
+
+	return config, Warnings(warnings)
 }
 
 func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, progressbar ProgressBar, eventStream chan<- Event) (Warnings, error) {
@@ -50,7 +65,8 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, p
 	reader := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
 
 	var allWarnings Warnings
-	job, warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, []v2action.Resource{}, reader, archiveInfo.Size())
+	// change to look at matched resoruces
+	job, warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, config.MatchedResources, reader, archiveInfo.Size())
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 
 	if err != nil {

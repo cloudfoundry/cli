@@ -17,6 +17,31 @@ type Resource struct {
 	Mode     os.FileMode `json:"mode"`
 }
 
+func (r *Resource) UnmarshalJSON(rawJSON []byte) error {
+	var ccResource struct {
+		Filename string `json:"fn,omitempty"`
+		Size     int64  `json:"size"`
+		SHA1     string `json:"sha1"`
+		Mode     string `json:"mode,omitempty"`
+	}
+
+	err := json.Unmarshal(rawJSON, &ccResource)
+	if err != nil {
+		return err
+	}
+
+	r.Filename = ccResource.Filename
+	r.Size = ccResource.Size
+	r.SHA1 = ccResource.SHA1
+	mode, err := strconv.ParseUint(ccResource.Mode, 8, 32)
+	if err != nil {
+		return err
+	}
+
+	r.Mode = os.FileMode(mode)
+	return nil
+}
+
 func (r Resource) MarshalJSON() ([]byte, error) {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
@@ -32,6 +57,8 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ccResource)
 }
 
+// ResourceMatch returns the resources that exist on the cloud foundry instance
+// from the set of resources given.
 func (client *Client) ResourceMatch(resourcesToMatch []Resource) ([]Resource, Warnings, error) {
 	body, err := json.Marshal(resourcesToMatch)
 	if err != nil {

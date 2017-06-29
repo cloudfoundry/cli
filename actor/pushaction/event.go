@@ -10,6 +10,7 @@ const (
 	CreatedRoutes        Event = "created routes"
 	BoundRoutes          Event = "bound routes"
 	CreatingArchive      Event = "creating archive"
+	ResourceMatching     Event = "resource matching"
 	UploadingApplication Event = "uploading application"
 	UploadComplete       Event = "upload complete"
 	RetryUpload          Event = "retry upload"

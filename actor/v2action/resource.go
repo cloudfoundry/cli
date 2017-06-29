@@ -18,6 +18,7 @@ import (
 const (
 	DefaultFolderPermissions      = 0755
 	DefaultArchiveFilePermissions = 0744
+	MaxResourceMatchChunkSize     = 1000
 )
 
 type FileChangedError struct {
@@ -131,6 +132,68 @@ func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	return resources, walkErr
 }
 
+// ResourceMatch returns a set of matched resources and unmatched resources in
+// the order they were given in allResources.
+func (actor Actor) ResourceMatch(allResources []Resource) ([]Resource, []Resource, Warnings, error) {
+	resourcesToSend := [][]ccv2.Resource{{}}
+	var currentList, sendCount int
+	for _, resource := range allResources {
+		if resource.Size == 0 {
+			continue
+		}
+
+		resourcesToSend[currentList] = append(
+			resourcesToSend[currentList],
+			ccv2.Resource(resource),
+		)
+		sendCount += 1
+
+		if len(resourcesToSend[currentList]) == MaxResourceMatchChunkSize {
+			currentList += 1
+			resourcesToSend = append(resourcesToSend, []ccv2.Resource{})
+		}
+	}
+
+	log.WithFields(log.Fields{
+		"total_resources":    len(allResources),
+		"resources_to_match": sendCount,
+		"chunks":             len(resourcesToSend),
+	}).Debug("sending resource match stats")
+
+	matchedCCResources := map[string]ccv2.Resource{}
+	var allWarnings Warnings
+	for _, chunk := range resourcesToSend {
+		if len(chunk) == 0 {
+			log.Debug("chunk size 0, stopping resource match requests")
+			break
+		}
+
+		returnedResources, warnings, err := actor.CloudControllerClient.ResourceMatch(chunk)
+		allWarnings = append(allWarnings, warnings...)
+
+		if err != nil {
+			log.Errorln("during resource matching", err)
+			return nil, nil, allWarnings, err
+		}
+
+		for _, resource := range returnedResources {
+			matchedCCResources[resource.SHA1] = resource
+		}
+	}
+	log.WithField("matched_resource_count", len(matchedCCResources)).Debug("total number of matched resources")
+
+	var matchedResources, unmatchedResources []Resource
+	for _, resource := range allResources {
+		if _, ok := matchedCCResources[resource.SHA1]; ok {
+			matchedResources = append(matchedResources, resource)
+		} else {
+			unmatchedResources = append(unmatchedResources, resource)
+		}
+	}
+
+	return matchedResources, unmatchedResources, allWarnings, nil
+}
+
 // ZipArchiveResources zips an archive and a sorted (based on full
 // path/filename) list of resources and returns the location. On Windows, the
 // filemode for user is forced to be readable and executable.
@@ -157,9 +220,13 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 	}
 
 	for _, archiveFile := range reader.File {
-		log.WithField("archiveFileName", archiveFile.Name).Debug("zipping file")
+		resource, ok := actor.findInResources(archiveFile.Name, filesToInclude)
+		if !ok {
+			log.WithField("archiveFileName", archiveFile.Name).Debug("skipping file")
+			continue
+		}
 
-		resource := actor.findInResources(archiveFile.Name, filesToInclude)
+		log.WithField("archiveFileName", archiveFile.Name).Debug("zipping file")
 		reader, openErr := archiveFile.Open()
 		if openErr != nil {
 			log.WithField("archiveFile", archiveFile.Name).Errorln("opening path in dir:", openErr)
@@ -294,16 +361,16 @@ func (_ Actor) addFileToZipFromFileSystem(
 	return nil
 }
 
-func (_ Actor) findInResources(path string, filesToInclude []Resource) Resource {
+func (_ Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
 	for _, resource := range filesToInclude {
 		if resource.Filename == filepath.ToSlash(path) {
 			log.WithField("resource", resource.Filename).Debug("found resource in files to include")
-			return resource
+			return resource, true
 		}
 	}
 
 	log.WithField("path", path).Debug("did not find resource in files to include")
-	return Resource{}
+	return Resource{}, false
 }
 
 func (_ Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
