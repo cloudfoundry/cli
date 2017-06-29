@@ -142,6 +142,23 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	ResourceMatchStub        func(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error)
+	resourceMatchMutex       sync.RWMutex
+	resourceMatchArgsForCall []struct {
+		allResources []v2action.Resource
+	}
+	resourceMatchReturns struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}
+	resourceMatchReturnsOnCall map[int]struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}
 	PollJobStub        func(job v2action.Job) (v2action.Warnings, error)
 	pollJobMutex       sync.RWMutex
 	pollJobArgsForCall []struct {
@@ -700,6 +717,68 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) ResourceMatch(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error) {
+	var allResourcesCopy []v2action.Resource
+	if allResources != nil {
+		allResourcesCopy = make([]v2action.Resource, len(allResources))
+		copy(allResourcesCopy, allResources)
+	}
+	fake.resourceMatchMutex.Lock()
+	ret, specificReturn := fake.resourceMatchReturnsOnCall[len(fake.resourceMatchArgsForCall)]
+	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
+		allResources []v2action.Resource
+	}{allResourcesCopy})
+	fake.recordInvocation("ResourceMatch", []interface{}{allResourcesCopy})
+	fake.resourceMatchMutex.Unlock()
+	if fake.ResourceMatchStub != nil {
+		return fake.ResourceMatchStub(allResources)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	return fake.resourceMatchReturns.result1, fake.resourceMatchReturns.result2, fake.resourceMatchReturns.result3, fake.resourceMatchReturns.result4
+}
+
+func (fake *FakeV2Actor) ResourceMatchCallCount() int {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return len(fake.resourceMatchArgsForCall)
+}
+
+func (fake *FakeV2Actor) ResourceMatchArgsForCall(i int) []v2action.Resource {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return fake.resourceMatchArgsForCall[i].allResources
+}
+
+func (fake *FakeV2Actor) ResourceMatchReturns(result1 []v2action.Resource, result2 []v2action.Resource, result3 v2action.Warnings, result4 error) {
+	fake.ResourceMatchStub = nil
+	fake.resourceMatchReturns = struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeV2Actor) ResourceMatchReturnsOnCall(i int, result1 []v2action.Resource, result2 []v2action.Resource, result3 v2action.Warnings, result4 error) {
+	fake.ResourceMatchStub = nil
+	if fake.resourceMatchReturnsOnCall == nil {
+		fake.resourceMatchReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Resource
+			result2 []v2action.Resource
+			result3 v2action.Warnings
+			result4 error
+		})
+	}
+	fake.resourceMatchReturnsOnCall[i] = struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
 func (fake *FakeV2Actor) PollJob(job v2action.Job) (v2action.Warnings, error) {
 	fake.pollJobMutex.Lock()
 	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
@@ -1002,6 +1081,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()

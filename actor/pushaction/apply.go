@@ -72,6 +72,10 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		}
 
 		if config.DesiredApplication.DockerImage == "" {
+			eventStream <- ResourceMatching
+			config, warnings = actor.SetMatchedResources(config)
+			warningsStream <- warnings
+
 			archivePath, err := actor.CreateArchive(config)
 			if err != nil {
 				errorStream <- err

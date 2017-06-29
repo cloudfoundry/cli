@@ -15,9 +15,11 @@ type ApplicationConfig struct {
 	CurrentRoutes []v2action.Route
 	DesiredRoutes []v2action.Route
 
-	AllResources []v2action.Resource
-	Archive      bool
-	Path         string
+	AllResources       []v2action.Resource
+	MatchedResources   []v2action.Resource
+	UnmatchedResources []v2action.Resource
+	Archive            bool
+	Path               string
 
 	TargetedSpaceGUID string
 }

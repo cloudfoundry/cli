@@ -22,10 +22,14 @@ var _ = Describe("Resource", func() {
 			BeforeEach(func() {
 				responseBody := `[
 						{
+							"fn":   "some-file-1",
+							"mode": "744",
 							"sha1": "some-sha-1",
 							"size": 1
 						},
 						{
+							"fn":   "some-file-3",
+							"mode": "744",
 							"sha1": "some-sha-3",
 							"size": 3
 						}
@@ -88,12 +92,16 @@ var _ = Describe("Resource", func() {
 
 				Expect(matchedResources).To(ConsistOf(
 					Resource{
-						SHA1: "some-sha-1",
-						Size: 1,
+						Filename: "some-file-1",
+						Mode:     0744,
+						SHA1:     "some-sha-1",
+						Size:     1,
 					},
 					Resource{
-						SHA1: "some-sha-3",
-						Size: 3,
+						Filename: "some-file-3",
+						Mode:     0744,
+						SHA1:     "some-sha-3",
+						Size:     3,
 					}))
 			})
 		})
