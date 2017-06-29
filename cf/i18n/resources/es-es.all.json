@@ -364,6 +364,18 @@
     "translation": ""
   },
   {
+    "id": "App {{.AppName}} is already started.",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} is already stopped",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} is already stopped.",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -1676,11 +1688,15 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-stage APP_NAME --package-guid GUID",
+    "id": "CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID",
     "translation": ""
   },
   {
     "id": "CF_NAME v3-start APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-stop APP_NAME",
     "translation": ""
   },
   {
@@ -5498,6 +5514,10 @@
   {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Deteniendo app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.CurrentUser}}..."
+  },
+  {
+    "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Stopping app...",
