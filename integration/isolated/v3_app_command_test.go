@@ -16,9 +16,6 @@ var _ = Describe("v3-app command", func() {
 	)
 
 	BeforeEach(func() {
-		// TMP: this command also depends on https://www.pivotaltracker.com/story/show/146469509
-		Skip("don't run in the pipeline until cf-deployment master supports it")
-
 		orgName = helpers.NewOrgName()
 		spaceName = helpers.NewSpaceName()
 		appName = helpers.PrefixedRandomName("app")
