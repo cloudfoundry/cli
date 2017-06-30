@@ -51,23 +51,11 @@ func (display *RequestLoggerFileWriter) DisplayDump(dump string) error {
 }
 
 func (display *RequestLoggerFileWriter) DisplayHeader(name string, value string) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("%s: %s\n", name, value))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return display.DisplayMessage(fmt.Sprintf("%s: %s", name, value))
 }
 
 func (display *RequestLoggerFileWriter) DisplayHost(name string) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("Host: %s\n", name))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return display.DisplayMessage(fmt.Sprintf("Host: %s", name))
 }
 
 func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
@@ -98,34 +86,26 @@ func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
 	return nil
 }
 
-func (display *RequestLoggerFileWriter) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
+func (display *RequestLoggerFileWriter) DisplayMessage(msg string) error {
 	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("%s %s %s\n", method, uri, httpProtocol))
+		_, err := logFile.WriteString(fmt.Sprintf("%s\n", msg))
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (display *RequestLoggerFileWriter) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
+	return display.DisplayMessage(fmt.Sprintf("%s %s %s", method, uri, httpProtocol))
 }
 
 func (display *RequestLoggerFileWriter) DisplayResponseHeader(httpProtocol string, status string) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("%s %s\n", httpProtocol, status))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return display.DisplayMessage(fmt.Sprintf("%s %s", httpProtocol, status))
 }
 
 func (display *RequestLoggerFileWriter) DisplayType(name string, requestDate time.Time) error {
-	for _, logFile := range display.logFiles {
-		_, err := logFile.WriteString(fmt.Sprintf("%s: [%s]\n", name, requestDate.Format(time.RFC3339)))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return display.DisplayMessage(fmt.Sprintf("%s: [%s]", name, requestDate.Format(time.RFC3339)))
 }
 
 func (display *RequestLoggerFileWriter) HandleInternalError(err error) {

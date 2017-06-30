@@ -1,6 +1,7 @@
 package wrapper
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -14,9 +15,10 @@ import (
 
 // RequestLoggerOutput is the interface for displaying logs
 type RequestLoggerOutput interface {
-	DisplayJSONBody(body []byte) error
 	DisplayHeader(name string, value string) error
 	DisplayHost(name string) error
+	DisplayJSONBody(body []byte) error
+	DisplayMessage(msg string) error
 	DisplayRequestHeader(method string, uri string, httpProtocol string) error
 	DisplayResponseHeader(httpProtocol string, status string) error
 	DisplayType(name string, requestDate time.Time) error
@@ -88,7 +90,8 @@ func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) er
 		return err
 	}
 
-	if request.Body != nil && strings.Contains(request.Header.Get("Content-Type"), "json") {
+	contentType := request.Header.Get("Content-Type")
+	if request.Body != nil && strings.Contains(contentType, "json") {
 		rawRequestBody, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			return err
@@ -96,13 +99,10 @@ func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) er
 
 		defer request.ResetBody()
 
-		err = logger.output.DisplayJSONBody(rawRequestBody)
-		if err != nil {
-			return err
-		}
+		return logger.output.DisplayJSONBody(rawRequestBody)
+	} else {
+		return logger.output.DisplayMessage(fmt.Sprintf("[%s Content Hidden]", strings.Split(contentType, ";")[0]))
 	}
-
-	return nil
 }
 
 func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Response) error {
