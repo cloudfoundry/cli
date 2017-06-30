@@ -64,7 +64,7 @@ run:
       "include_sso": false,
       "include_tasks": true,
       "include_v3": true,
-      "include_zipkin": false
+      "include_zipkin": false,
     }
     EOF
 
