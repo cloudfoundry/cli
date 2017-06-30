@@ -151,7 +151,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 
 		Describe("DisplayJSONBody", func() {
 			Context("when provided well formed JSON", func() {
-				It("writes a formated output", func() {
+				It("writes a formatted output", func() {
 					raw := `{"a":"b", "c":"d", "don't escape HTML":"<&>"}`
 					formatted := `{
   "a": "b",
@@ -196,8 +196,27 @@ Origin: wss://doppler.bosh-lite.com:443`
 			})
 		})
 
+		Describe("DisplayMessage", func() {
+			It("writes the message", func() {
+				msg := "i am a message!!!!"
+				err := display.DisplayMessage(msg)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				contents, err := ioutil.ReadFile(logFile1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(ContainSubstring(msg))
+
+				contents, err = ioutil.ReadFile(logFile2)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(ContainSubstring(msg))
+			})
+		})
+
 		Describe("DisplayRequestHeader", func() {
-			It("writes the method, uri and http protocal", func() {
+			It("writes the method, uri and http protocol", func() {
 				err := display.DisplayRequestHeader("GET", "/v2/spaces/guid/summary", "HTTP/1.1")
 				Expect(err).ToNot(HaveOccurred())
 
@@ -215,7 +234,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 		})
 
 		Describe("DisplayResponseHeader", func() {
-			It("writes the method, uri and http protocal", func() {
+			It("writes the method, uri and http protocol", func() {
 				err := display.DisplayResponseHeader("HTTP/1.1", "200 OK")
 				Expect(err).ToNot(HaveOccurred())
 

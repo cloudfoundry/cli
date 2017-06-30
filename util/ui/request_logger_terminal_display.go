@@ -69,6 +69,11 @@ func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error 
 	return nil
 }
 
+func (display *RequestLoggerTerminalDisplay) DisplayMessage(msg string) error {
+	fmt.Fprintf(display.ui.Out, "%s\n", msg)
+	return nil
+}
+
 func (display *RequestLoggerTerminalDisplay) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
 	fmt.Fprintf(display.ui.Out, "%s %s %s\n", method, uri, httpProtocol)
 	return nil

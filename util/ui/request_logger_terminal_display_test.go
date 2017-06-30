@@ -22,12 +22,17 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		out = NewBuffer()
 		testUI = NewTestUI(nil, out, NewBuffer())
 		display = testUI.RequestLoggerTerminalDisplay()
+		Expect(display.Start()).ToNot(HaveOccurred())
 	})
 
 	Describe("DisplayBody", func() {
 		It("displays the redacted value", func() {
 			err := display.DisplayBody([]byte("some-string body"))
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("\\[PRIVATE DATA HIDDEN\\]"))
 		})
 	})
@@ -36,6 +41,10 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("displays the passed in string", func() {
 			err := display.DisplayDump("some-dump-of-string")
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("some-dump-of-string"))
 		})
 
@@ -50,6 +59,10 @@ Authorization: bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImtleS0xIiwidHlwIjoiSldUIn0.ey
 Origin: wss://doppler.bosh-lite.com:443`
 			err := display.DisplayDump(dump)
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("Connection: Upgrade"))
 			Expect(testUI.Out).To(Say("Authorization: \\[PRIVATE DATA HIDDEN\\]"))
 			Expect(testUI.Out).To(Say("Origin: wss://doppler.bosh-lite.com:443"))
@@ -60,6 +73,10 @@ Origin: wss://doppler.bosh-lite.com:443`
 		It("displays the header key and value", func() {
 			err := display.DisplayHeader("Header", "Value")
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("Header: Value"))
 		})
 	})
@@ -68,6 +85,10 @@ Origin: wss://doppler.bosh-lite.com:443`
 		It("displays the host", func() {
 			err := display.DisplayHost("banana")
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("Host: banana"))
 		})
 	})
@@ -83,6 +104,10 @@ Origin: wss://doppler.bosh-lite.com:443`
 }`
 				err := display.DisplayJSONBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
 				Expect(testUI.Out).To(Say(formatted))
 			})
 		})
@@ -92,23 +117,47 @@ Origin: wss://doppler.bosh-lite.com:443`
 				err := display.DisplayJSONBody(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(out.Contents()).To(BeEmpty())
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(string(out.Contents())).To(Equal("\n"))
 			})
 		})
 	})
 
+	Describe("DisplayMessage", func() {
+		It("writes the message", func() {
+			msg := "i am a message!!!!"
+			err := display.DisplayMessage(msg)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(testUI.Out).To(Say(msg))
+		})
+	})
+
 	Describe("DisplayRequestHeader", func() {
-		It("displays the method, uri and http protocal", func() {
+		It("displays the method, uri and http protocol", func() {
 			err := display.DisplayRequestHeader("GET", "/v2/spaces/guid/summary", "HTTP/1.1")
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("GET /v2/spaces/guid/summary HTTP/1.1"))
 		})
 	})
 
 	Describe("DisplayResponseHeader", func() {
-		It("displays the method, uri and http protocal", func() {
+		It("displays the method, uri and http protocol", func() {
 			err := display.DisplayResponseHeader("HTTP/1.1", "200 OK")
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("HTTP/1.1 200 OK"))
 		})
 	})
@@ -118,6 +167,10 @@ Origin: wss://doppler.bosh-lite.com:443`
 			passedTime := time.Now()
 			err := display.DisplayType("banana", passedTime)
 			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Out).To(Say("banana: \\[%s\\]", passedTime.Format(time.RFC3339)))
 		})
 	})
@@ -126,6 +179,10 @@ Origin: wss://doppler.bosh-lite.com:443`
 		It("sends error to standard error", func() {
 			err := errors.New("foobar")
 			display.HandleInternalError(err)
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
 			Expect(testUI.Err).To(Say("foobar"))
 		})
 	})
@@ -133,8 +190,6 @@ Origin: wss://doppler.bosh-lite.com:443`
 	Describe("Start and Stop", func() {
 		It("locks and then unlocks the mutex properly", func() {
 			c := make(chan bool)
-			err := display.Start()
-			Expect(err).ToNot(HaveOccurred())
 			go func() {
 				Expect(display.Start()).NotTo(HaveOccurred())
 				c <- true
@@ -142,6 +197,7 @@ Origin: wss://doppler.bosh-lite.com:443`
 			Consistently(c).ShouldNot(Receive())
 			Expect(display.Stop()).NotTo(HaveOccurred())
 			Eventually(c).Should(Receive())
+			Expect(display.Stop()).NotTo(HaveOccurred())
 		})
 	})
 })
