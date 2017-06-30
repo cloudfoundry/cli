@@ -372,10 +372,6 @@
     "translation": ""
   },
   {
-    "id": "App {{.AppName}} is already stopped.",
-    "translation": ""
-  },
-  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
