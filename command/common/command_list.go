@@ -140,6 +140,7 @@ type commandList struct {
 	Service                            v2.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	SetEnv                             v2.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v2.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app"`
+	SetOrgDefaultIsolationSegment      v3.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set a default isolation segment used by spaces in an org"`
 	SetOrgRole                         v2.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetQuota                           v2.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
 	SetRunningEnvironmentVariableGroup v2.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`

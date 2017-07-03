@@ -128,7 +128,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 			isolationSegmentNames := []string{}
 			for _, iso := range isolationSegments {
 				if iso.GUID == orgSummary.DefaultIsolationSegmentGUID {
-					isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default")))
+					isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default)")))
 				} else {
 					isolationSegmentNames = append(isolationSegmentNames, iso.Name)
 				}

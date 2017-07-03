@@ -202,3 +202,7 @@ func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegment
 	allWarnings = append(allWarnings, apiWarnings...)
 	return allWarnings, err
 }
+
+func (actor Actor) SetDefaultIsolationSegmentOnOrganizationByName(isolationSegmentName string, orgName string) (Warnings, error) {
+	return nil, nil
+}

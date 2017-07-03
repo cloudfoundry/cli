@@ -91,10 +91,10 @@ type FakeV3PushActor struct {
 		result1 v3action.Warnings
 		result2 error
 	}
-	StartApplicationStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplicationStub        func(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
 	}
 	startApplicationReturns struct {
@@ -107,10 +107,10 @@ type FakeV3PushActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StopApplicationStub        func(appName string, spaceGUID string) (v3action.Warnings, error)
+	StopApplicationStub        func(appGUID string, spaceGUID string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
 	stopApplicationArgsForCall []struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
 	}
 	stopApplicationReturns struct {
@@ -446,17 +446,17 @@ func (fake *FakeV3PushActor) SetApplicationDropletReturnsOnCall(i int, result1 v
 	}{result1, result2}
 }
 
-func (fake *FakeV3PushActor) StartApplication(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3PushActor) StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("StartApplication", []interface{}{appName, spaceGUID})
+	}{appGUID, spaceGUID})
+	fake.recordInvocation("StartApplication", []interface{}{appGUID, spaceGUID})
 	fake.startApplicationMutex.Unlock()
 	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(appName, spaceGUID)
+		return fake.StartApplicationStub(appGUID, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -473,7 +473,7 @@ func (fake *FakeV3PushActor) StartApplicationCallCount() int {
 func (fake *FakeV3PushActor) StartApplicationArgsForCall(i int) (string, string) {
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
-	return fake.startApplicationArgsForCall[i].appName, fake.startApplicationArgsForCall[i].spaceGUID
+	return fake.startApplicationArgsForCall[i].appGUID, fake.startApplicationArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeV3PushActor) StartApplicationReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
@@ -501,17 +501,17 @@ func (fake *FakeV3PushActor) StartApplicationReturnsOnCall(i int, result1 v3acti
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3PushActor) StopApplication(appName string, spaceGUID string) (v3action.Warnings, error) {
+func (fake *FakeV3PushActor) StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error) {
 	fake.stopApplicationMutex.Lock()
 	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("StopApplication", []interface{}{appName, spaceGUID})
+	}{appGUID, spaceGUID})
+	fake.recordInvocation("StopApplication", []interface{}{appGUID, spaceGUID})
 	fake.stopApplicationMutex.Unlock()
 	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(appName, spaceGUID)
+		return fake.StopApplicationStub(appGUID, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -528,7 +528,7 @@ func (fake *FakeV3PushActor) StopApplicationCallCount() int {
 func (fake *FakeV3PushActor) StopApplicationArgsForCall(i int) (string, string) {
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
-	return fake.stopApplicationArgsForCall[i].appName, fake.stopApplicationArgsForCall[i].spaceGUID
+	return fake.stopApplicationArgsForCall[i].appGUID, fake.stopApplicationArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeV3PushActor) StopApplicationReturns(result1 v3action.Warnings, result2 error) {

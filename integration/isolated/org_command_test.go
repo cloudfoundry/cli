@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("org command", func() {
+var _ = FDescribe("org command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -98,12 +98,11 @@ var _ = Describe("org command", func() {
 
 			Context("when no flags are used", func() {
 				var (
-					domainName            string
-					orgGUID               string
-					quotaName             string
-					spaceName2            string
-					isolationSegmentName1 string
-					isolationSegmentName2 string
+					domainName        string
+					orgGUID           string
+					quotaName         string
+					spaceName2        string
+					isolationSegments []string
 				)
 
 				BeforeEach(func() {
@@ -121,37 +120,30 @@ var _ = Describe("org command", func() {
 					spaceName2 = helpers.NewSpaceName()
 					helpers.CreateSpace(spaceName2)
 
-					isolationSegmentName1 = helpers.IsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName1)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName1)).Should(Exit(0))
+					isolationSegments := []string{helpers.IsolationSegmentName(), helpers.IsolationSegmentName()}
+					sort.Strings(isolationSegments)
+					Eventually(helpers.CF("create-isolation-segment", isolationSegments[0])).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegments[0])).Should(Exit(0))
 
-					isolationSegmentName2 = helpers.IsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName2)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName2)).Should(Exit(0))
+					Eventually(helpers.CF("create-isolation-segment", isolationSegments[1])).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegments[1])).Should(Exit(0))
 
-					isolationSegmentsSorted := []string{isolationSegmentName1, isolationSegmentName2}
-					sort.Strings(isolationSegmentsSorted)
-
-					// TODO:  Replace the following curl with `cf set-org-default-isolation-segment`
-					defaultIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(isolationSegmentsSorted[0])
-					Eventually(helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
-						"-X", "PATCH", "-d", fmt.Sprintf("'{\"data\":{\"guid\":\"%s\"}}'", defaultIsolationSegmentGUID))).Should(Exit(0))
-					// Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
+					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegments[0])).Should(Exit(0))
 				})
 
-				// @TODO remove and add to cleanup script
 				AfterEach(func() {
 					// TODO:  Replace the following curl with `cf set-org-default-isolation-segment`
 					Eventually(helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
 						"-X", "PATCH", "-d", "'{\"data\":{\"guid\":null}}'")).Should(Exit(0))
 					// Eventually(helpers.CF("reset-org-default-isolation-segment", orgName)).Should(Exit(0))
 
+					// @TODO remove and add to cleanup script
 					Eventually(helpers.CF("delete-org", "-f", orgName))
-					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName1))
-					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName2))
+					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegments[0]))
+					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegments[1]))
 				})
 
-				It("displays a table with org domains, quotas, spaces, space quotas and isolation segments, and exits 0", func() {
+				FIt("displays a table with org domains, quotas, spaces, space quotas and isolation segments, and exits 0", func() {
 					session := helpers.CF("org", orgName)
 					userName, _ := helpers.GetCredentials()
 					Eventually(session.Out).Should(Say("Getting info for org %s as %s\\.\\.\\.", orgName, userName))
@@ -168,9 +160,7 @@ var _ = Describe("org command", func() {
 					sort.Strings(spacesSorted)
 					Eventually(session.Out).Should(Say("spaces:\\s+%s,.* %s", spacesSorted[0], spacesSorted[1]))
 
-					isolationSegmentsSorted := []string{isolationSegmentName1, isolationSegmentName2}
-					sort.Strings(isolationSegmentsSorted)
-					Eventually(session.Out).Should(Say("isolation segments:\\s+.*%s \\(default\\),.* %s", isolationSegmentsSorted[0], isolationSegmentsSorted[1]))
+					Eventually(session.Out).Should(Say("isolation segments:\\s+.*%s \\(default\\),.* %s", isolationSegments[0], isolationSegments[1]))
 
 					Eventually(session).Should(Exit(0))
 				})
