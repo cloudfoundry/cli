@@ -158,6 +158,7 @@ var _ = Describe("org Command", func() {
 						Organization: v2action.Organization{
 							Name: "some-org",
 							GUID: "some-org-guid",
+							DefaultIsolationSegmentGUID: "default-isolation-segment-guid",
 						},
 						DomainNames: []string{
 							"a-shared.com",
@@ -174,6 +175,7 @@ var _ = Describe("org Command", func() {
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
+
 			Context("when the v3 actor is nil", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
@@ -188,8 +190,13 @@ var _ = Describe("org Command", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
 						[]v3action.IsolationSegment{
-							{Name: "isolation-segment-1"},
-							{Name: "isolation-segment-2"},
+							{
+								Name: "isolation-segment-1",
+								GUID: "default-isolation-segment-guid",
+							}, {
+								Name: "isolation-segment-2",
+								GUID: "some-other-isolation-segment-guid",
+							},
 						},
 						v3action.Warnings{"warning-3", "warning-4"},
 						nil)
@@ -206,14 +213,10 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-4"))
 
 					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
-
 					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
-
 					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
-
 					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
-
-					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1, isolation-segment-2"))
+					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1 \\(default\\), isolation-segment-2"))
 
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
@@ -240,13 +243,9 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-2"))
 
 					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
-
 					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
-
 					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
-
 					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
-
 					Expect(testUI.Out).ToNot(Say("isolation segments:"))
 
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))

@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -126,7 +127,11 @@ func (cmd OrgCommand) displayOrgSummary() error {
 
 			isolationSegmentNames := []string{}
 			for _, iso := range isolationSegments {
-				isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+				if iso.GUID == orgSummary.DefaultIsolationSegmentGUID {
+					isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default")))
+				} else {
+					isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+				}
 			}
 
 			sort.Strings(isolationSegmentNames)
