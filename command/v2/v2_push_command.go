@@ -311,6 +311,8 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	switch event {
 	case pushaction.ConfiguringRoutes:
 		cmd.UI.DisplayText("Mapping routes...")
+	case pushaction.ResourceMatching:
+		cmd.UI.DisplayText("Checking for existing files on server...")
 	case pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
