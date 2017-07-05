@@ -37,7 +37,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-acceptance-tests
-    branch: owned-by-cf-cli
+    branch: master
 
 - name: cf-cli-binaries
   type: s3
