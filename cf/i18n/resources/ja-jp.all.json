@@ -1784,6 +1784,10 @@
     "translation": "パスワードを変更しています..."
   },
   {
+    "id": "Checking for existing files on server...",
+    "translation": ""
+  },
+  {
     "id": "Checking for route...",
     "translation": "経路を確認しています..."
   },

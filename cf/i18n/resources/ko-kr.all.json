@@ -1784,6 +1784,10 @@
     "translation": "비밀번호 변경 중..."
   },
   {
+    "id": "Checking for existing files on server...",
+    "translation": ""
+  },
+  {
     "id": "Checking for route...",
     "translation": "라우트 확인 중..."
   },
