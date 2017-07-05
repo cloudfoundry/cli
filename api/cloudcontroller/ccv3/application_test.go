@@ -19,6 +19,59 @@ var _ = Describe("Application", func() {
 		client = NewTestClient()
 	})
 
+	Describe("MarshalJSON", func() {
+		var (
+			app      Application
+			appBytes []byte
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			appBytes, err = app.MarshalJSON()
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when no buildpacks are provided", func() {
+			BeforeEach(func() {
+				app = Application{}
+			})
+
+			It("omits the Lifecycle from the JSON", func() {
+				Expect(string(appBytes)).To(Equal("{}"))
+			})
+		})
+
+		Context("when default buildpack is provided", func() {
+			BeforeEach(func() {
+				app = Application{Buildpacks: []string{"default"}}
+			})
+
+			It("sets the Lifecycle buildpack to be empty in the JSON", func() {
+				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+			})
+		})
+
+		Context("when null buildpack is provided", func() {
+			BeforeEach(func() {
+				app = Application{Buildpacks: []string{"null"}}
+			})
+
+			It("sets the Lifecycle buildpack to be empty in the JSON", func() {
+				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+			})
+		})
+
+		Context("when other buildpacks are provided", func() {
+			BeforeEach(func() {
+				app = Application{Buildpacks: []string{"some-buildpack"}}
+			})
+
+			It("sets them in the JSON", func() {
+				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+			})
+		})
+	})
+
 	Describe("GetApplications", func() {
 		Context("when applications exist", func() {
 			BeforeEach(func() {
