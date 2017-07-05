@@ -6100,7 +6100,7 @@
     "translation": "无法从授权响应获取一次性代码"
   },
   {
-    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
+    "id": "Unable to assign droplet: {{.CloudControllerMessage}}",
     "translation": ""
   },
   {
@@ -6648,7 +6648,7 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME",
+    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME]",
     "translation": ""
   },
   {

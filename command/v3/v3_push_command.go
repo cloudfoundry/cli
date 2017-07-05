@@ -22,8 +22,9 @@ type V2PushActor interface {
 //go:generate counterfeiter . V3PushActor
 
 type V3PushActor interface {
-	CreateApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 	CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
 	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
@@ -36,8 +37,9 @@ type V3PushActor interface {
 
 type V3PushCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"cf v3-push APP_NAME"`
+	usage        interface{}  `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME]"`
 	NoRoute      bool         `long:"no-route" description:"Do not map a route to this app"`
+	Buildpack    string       `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -88,7 +90,12 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	var (
+		app v3action.Application
+		err error
+	)
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -98,13 +105,16 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return err
 	}
 
-	app, appExists, err := cmd.createApplication(user.Name)
-	if err != nil {
+	app, err = cmd.getApplication()
+	if _, ok := err.(v3action.ApplicationNotFoundError); ok {
+		app, err = cmd.createApplication(user.Name)
+		if err != nil {
+			return shared.HandleError(err)
+		}
+	} else if err != nil {
 		return shared.HandleError(err)
-	}
-
-	if appExists {
-		app, err = cmd.updateApplication(user.Name)
+	} else {
+		app, err = cmd.updateApplication(user.Name, app.GUID)
 		if err != nil {
 			return shared.HandleError(err)
 		}
@@ -120,7 +130,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	if appExists && app.Started() {
+	if app.Started() {
 		err = cmd.stopApplication(app.GUID, user.Name)
 		if err != nil {
 			return shared.HandleError(err)
@@ -173,14 +183,18 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	return cmd.AppSummaryDisplayer.DisplayAppInfo()
 }
 
-func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, bool, error) {
-	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, error) {
+	createInput := v3action.CreateApplicationInput{
+		AppName:   cmd.RequiredArgs.AppName,
+		SpaceGUID: cmd.Config.TargetedSpace().GUID,
+	}
+	if cmd.Buildpack != "" {
+		createInput.Buildpacks = []string{cmd.Buildpack}
+	}
+	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(createInput)
 	cmd.UI.DisplayWarnings(warnings)
-
-	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
-		return app, true, nil
-	} else if err != nil {
-		return v3action.Application{}, false, err
+	if err != nil {
+		return v3action.Application{}, err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -192,10 +206,22 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	return app, false, nil
+	return app, nil
 }
 
-func (cmd V3PushCommand) updateApplication(userName string) (v3action.Application, error) {
+func (cmd V3PushCommand) getApplication() (v3action.Application, error) {
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return v3action.Application{}, err
+	}
+
+	return app, nil
+}
+
+func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3action.Application, error) {
+	var buildpacks []string
+
 	cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
@@ -203,7 +229,11 @@ func (cmd V3PushCommand) updateApplication(userName string) (v3action.Applicatio
 		"CurrentUser":  userName,
 	})
 
-	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	if cmd.Buildpack != "" {
+		buildpacks = []string{cmd.Buildpack}
+	}
+
+	app, warnings, err := cmd.Actor.UpdateApplication(appGUID, buildpacks)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err

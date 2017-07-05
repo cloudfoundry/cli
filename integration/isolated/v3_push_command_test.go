@@ -30,7 +30,9 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("v3-push - Push a new app or sync changes to an existing app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-push APP_NAME"))
+				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK_NAME\\]"))
+				Eventually(session.Out).Should(Say("OPTIONS:"))
+				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -42,6 +44,16 @@ var _ = Describe("v3-push command", func() {
 			session := helpers.CF("v3-push")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when the -b flag is not given an arg", func() {
+		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+			session := helpers.CF("v3-push", appName, "-b")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-b, --buildpack'"))
 			Eventually(session.Out).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
@@ -121,7 +133,7 @@ var _ = Describe("v3-push command", func() {
 				})
 
 				helpers.WithHelloWorldApp(func(appDir string) {
-					session = helpers.CF("v3-push", appName)
+					session = helpers.CF("v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -158,7 +170,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("memory usage:\\s+32M x 1"))
 				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
 				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
-				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+				Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("web:1/1"))
 				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
@@ -237,6 +249,48 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("web:1/1"))
 				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			})
+		})
+
+		Context("when the --buildpack flag is set", func() {
+			var session *Session
+
+			Context("when the buildpack is invalid", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session = helpers.CF("v3-push", appName, "--buildpack", "wut")
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				It("errors and does not push the app", func() {
+					Consistently(session.Out).ShouldNot(Say("Creating app"))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Buildpack must be an existing admin buildpack or a valid git URI"))
+				})
+			})
+
+			Context("when the buildpack is valid", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session = helpers.CF("v3-push", appName, "--buildpack", "https://github.com/cloudfoundry/staticfile-buildpack")
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				It("uses the specified buildpack", func() {
+					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session.Out).Should(Say("requested state:\\s+started"))
+					Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+					Eventually(session.Out).Should(Say("memory usage:\\s+32M x 1"))
+					Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
+					Eventually(session.Out).Should(Say(""))
+					Eventually(session.Out).Should(Say("web:1/1"))
+					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				})
 			})
 		})
 	})

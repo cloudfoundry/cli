@@ -11,7 +11,7 @@ import (
 //go:generate counterfeiter . V3CreateAppActor
 
 type V3CreateAppActor interface {
-	CreateApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3CreateAppCommand struct {
@@ -59,7 +59,10 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 		"CurrentUser":  user.Name,
 	})
 
-	_, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(v3action.CreateApplicationInput{
+		AppName:   cmd.RequiredArgs.AppName,
+		SpaceGUID: cmd.Config.TargetedSpace().GUID,
+	})
 	cmd.UI.DisplayWarnings(warnings)
 	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
 		cmd.UI.DisplayWarning("App {{.AppName}} already exists.", map[string]interface{}{

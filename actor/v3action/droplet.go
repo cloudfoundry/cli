@@ -17,10 +17,11 @@ type Buildpack ccv3.Buildpack
 // AssignDropletError is returned when assigning the current droplet of an app
 // fails
 type AssignDropletError struct {
+	Message string
 }
 
 func (a AssignDropletError) Error() string {
-	return "Unable to assign current droplet. Ensure the droplet exists and belongs to this app."
+	return a.Message
 }
 
 // SetApplicationDroplet sets the droplet for an application.
@@ -35,8 +36,8 @@ func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropl
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 
-	if _, ok := err.(ccerror.UnprocessableEntityError); ok {
-		return allWarnings, AssignDropletError{}
+	if newErr, ok := err.(ccerror.UnprocessableEntityError); ok {
+		return allWarnings, AssignDropletError{Message: newErr.Message}
 	}
 
 	return allWarnings, err

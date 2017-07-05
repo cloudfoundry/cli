@@ -54,19 +54,26 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	return Application(apps[0]), Warnings(warnings), nil
 }
 
+type CreateApplicationInput struct {
+	AppName    string
+	SpaceGUID  string
+	Buildpacks []string
+}
+
 // CreateApplicationByNameAndSpace creates and returns the application with the given
 // name in the given space.
-func (actor Actor) CreateApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
+func (actor Actor) CreateApplicationByNameAndSpace(input CreateApplicationInput) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.CreateApplication(
 		ccv3.Application{
-			Name: appName,
+			Name: input.AppName,
 			Relationships: ccv3.Relationships{
-				ccv3.SpaceRelationship: ccv3.Relationship{GUID: spaceGUID},
+				ccv3.SpaceRelationship: ccv3.Relationship{GUID: input.SpaceGUID},
 			},
+			Buildpacks: input.Buildpacks,
 		})
 
-	if _, ok := err.(ccerror.UnprocessableEntityError); ok {
-		return Application{}, Warnings(warnings), ApplicationAlreadyExistsError{Name: appName}
+	if _, ok := err.(ccerror.NameNotUniqueInSpaceError); ok {
+		return Application{}, Warnings(warnings), ApplicationAlreadyExistsError{Name: input.AppName}
 	}
 
 	return Application(app), Warnings(warnings), err
@@ -114,6 +121,15 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 	}
 
 	return StartupTimeoutError{}
+}
+
+func (actor Actor) UpdateApplication(appGUID string, buildpacks []string) (Application, Warnings, error) {
+	app := ccv3.Application{
+		GUID:       appGUID,
+		Buildpacks: buildpacks,
+	}
+	app, warnings, err := actor.CloudControllerClient.UpdateApplication(app)
+	return Application(app), Warnings(warnings), err
 }
 
 // StartupTimeoutError is returned when startup timeout is reached waiting for

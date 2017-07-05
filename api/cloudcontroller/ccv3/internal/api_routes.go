@@ -26,6 +26,7 @@ const (
 	GetOrgsRequest                                        = "GetOrgs"
 	GetPackageRequest                                     = "GetPackage"
 	GetSpaceRelationshipIsolationSegmentRequest           = "GetSpaceRelationshipIsolationSegmentRequest"
+	PatchApplicationRequest                               = "PatchApplicationRequest"
 	PatchApplicationCurrentDropletRequest                 = "PatchApplicationCurrentDroplet"
 	PatchSpaceRelationshipIsolationSegmentRequest         = "PatchSpaceRelationshipIsolationSegmentRequest"
 	PostApplicationRequest                                = "PostApplicationRequest"
@@ -63,6 +64,7 @@ var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodGet, Name: GetBuildRequest, Resource: BuildsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
+	{Path: "/:guid", Method: http.MethodPatch, Name: PatchApplicationRequest, Resource: AppsResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
 	{Path: "/:guid/droplets/current", Method: http.MethodGet, Name: GetAppDropletCurrent, Resource: AppsResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},

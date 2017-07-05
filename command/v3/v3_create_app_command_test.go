@@ -90,9 +90,11 @@ var _ = Describe("v3-create-app Command", func() {
 
 				Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(1))
 
-				appName, spaceGUID := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
-				Expect(appName).To(Equal(app))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
+				createAppInput := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
+				Expect(createAppInput).To(Equal(v3action.CreateApplicationInput{
+					AppName:   app,
+					SpaceGUID: "some-space-guid",
+				}))
 			})
 		})
 

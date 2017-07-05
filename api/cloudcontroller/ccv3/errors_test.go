@@ -13,15 +13,16 @@ import (
 
 var _ = Describe("Error Wrapper", func() {
 	var (
-		response           string
+		serverResponse     string
 		serverResponseCode int
+		makeError          error
 
 		client *Client
 	)
 
 	Describe("Make", func() {
 		BeforeEach(func() {
-			response = `
+			serverResponse = `
 {
   "errors": [
     {
@@ -39,7 +40,7 @@ var _ = Describe("Error Wrapper", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v3/apps"),
-					RespondWith(serverResponseCode, response, http.Header{
+					RespondWith(serverResponseCode, serverResponse, http.Header{
 						"X-Vcap-Request-Id": {
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
@@ -48,30 +49,30 @@ var _ = Describe("Error Wrapper", func() {
 					),
 				),
 			)
+
+			_, _, makeError = client.GetApplications(nil)
 		})
 
 		Context("when the error is not from the cloud controller", func() {
 			Context("and the raw status is 404", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusNotFound
-					response = "some not found message"
+					serverResponse = "some not found message"
 				})
 				It("returns a NotFoundError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
+					Expect(makeError).To(MatchError(ccerror.NotFoundError{Message: serverResponse}))
 				})
 			})
 
 			Context("and the raw status is another error", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot
-					response = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
+					serverResponse = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
 				})
 				It("returns a RawHTTPStatusError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
+					Expect(makeError).To(MatchError(ccerror.RawHTTPStatusError{
 						StatusCode:  http.StatusTeapot,
-						RawResponse: []byte(response),
+						RawResponse: []byte(serverResponse),
 						RequestIDs: []string{
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
@@ -85,12 +86,11 @@ var _ = Describe("Error Wrapper", func() {
 			Context("when an empty list of errors is returned", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusUnauthorized
-					response = `{ "errors": [] }`
+					serverResponse = `{ "errors": [] }`
 				})
 
 				It("returns an UnexpectedResponseError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					Expect(makeError).To(MatchError(ccerror.V3UnexpectedResponseError{
 						ResponseCode:    http.StatusUnauthorized,
 						V3ErrorResponse: ccerror.V3ErrorResponse{Errors: []ccerror.V3Error{}},
 					}))
@@ -104,14 +104,13 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
-						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
+						Expect(makeError).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
 
 				Context("invalid token", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 							"errors": [
 								{
 									"code": 1000,
@@ -123,8 +122,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns an InvalidAuthTokenError", func() {
-						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						Expect(makeError).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
 			})
@@ -135,8 +133,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns a ForbiddenError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
+					Expect(makeError).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -146,8 +143,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns a ResourceNotFoundError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+					Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 				})
 
 			})
@@ -155,11 +151,60 @@ var _ = Describe("Error Wrapper", func() {
 			Context("(422) Unprocessable Entity", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusUnprocessableEntity
+					serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "SomeCC Error Message",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
 				})
 
-				It("returns a UnprocessableEntityError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+				Context("when the name isn't unique to space", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "name must be unique in space",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+					})
+
+					It("returns a NameNotUniqueInSpaceError", func() {
+						Expect(makeError).To(MatchError(ccerror.NameNotUniqueInSpaceError{}))
+					})
+				})
+
+				Context("when the buildpack is invalid", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "Buildpack must be an existing admin buildpack or a valid git URI",
+      "title": "CF-UnprocessableEntity"
+    }
+  ]
+}`
+					})
+
+					It("returns an InvalidBuildpackError", func() {
+						Expect(makeError).To(MatchError(ccerror.InvalidBuildpackError{}))
+					})
+				})
+
+				Context("when the detail describes something else", func() {
+					It("returns a UnprocessableEntityError", func() {
+						Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+					})
 				})
 			})
 
@@ -169,13 +214,12 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns a ServiceUnavailableError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.ServiceUnavailableError{Message: "SomeCC Error Message"}))
+					Expect(makeError).To(MatchError(ccerror.ServiceUnavailableError{Message: "SomeCC Error Message"}))
 				})
 
 				Context("when the title is 'CF-TaskWorkersUnavailable'", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
   "errors": [
     {
       "code": 170020,
@@ -187,8 +231,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns a TaskWorkersUnavailableError", func() {
-						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(ccerror.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
+						Expect(makeError).To(MatchError(ccerror.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
 					})
 				})
 			})
@@ -199,8 +242,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns an UnexpectedResponseError", func() {
-					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					Expect(makeError).To(MatchError(ccerror.V3UnexpectedResponseError{
 						ResponseCode: http.StatusTeapot,
 						V3ErrorResponse: ccerror.V3ErrorResponse{
 							Errors: []ccerror.V3Error{

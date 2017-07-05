@@ -77,8 +77,8 @@ var _ = Describe("HandleError", func() {
 			OrganizationNotFoundError{Name: "some-org"}),
 
 		Entry("v3action.AssignDropletError -> AssignDropletError",
-			v3action.AssignDropletError{},
-			AssignDropletError{}),
+			v3action.AssignDropletError{Message: "some-message"},
+			AssignDropletError{Message: "some-message"}),
 
 		Entry("default case -> original error",
 			err,

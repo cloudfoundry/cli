@@ -114,12 +114,27 @@ var _ = Describe("Application Actions", func() {
 	})
 
 	Describe("CreateApplicationByNameAndSpace", func() {
+		var (
+			application Application
+			warnings    Warnings
+			err         error
+		)
+
+		JustBeforeEach(func() {
+			application, warnings, err = actor.CreateApplicationByNameAndSpace(CreateApplicationInput{
+				AppName:    "some-app-name",
+				SpaceGUID:  "some-space-guid",
+				Buildpacks: []string{"buildpack-1", "buildpack-2"},
+			})
+		})
+
 		Context("when the app successfully gets created", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationReturns(
 					ccv3.Application{
-						Name: "some-app-name",
-						GUID: "some-app-guid",
+						Name:       "some-app-name",
+						GUID:       "some-app-guid",
+						Buildpacks: []string{"buildpack-1", "buildpack-2"},
 					},
 					ccv3.Warnings{"some-warning"},
 					nil,
@@ -127,12 +142,11 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("creates and returns the application and warnings", func() {
-				app, warnings, err := actor.CreateApplicationByNameAndSpace("some-app-name", "some-space-guid")
-
 				Expect(err).ToNot(HaveOccurred())
-				Expect(app).To(Equal(Application{
-					Name: "some-app-name",
-					GUID: "some-app-guid",
+				Expect(application).To(Equal(Application{
+					Name:       "some-app-name",
+					GUID:       "some-app-guid",
+					Buildpacks: []string{"buildpack-1", "buildpack-2"},
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
@@ -142,6 +156,7 @@ var _ = Describe("Application Actions", func() {
 					Relationships: ccv3.Relationships{
 						ccv3.SpaceRelationship: ccv3.Relationship{GUID: "some-space-guid"},
 					},
+					Buildpacks: []string{"buildpack-1", "buildpack-2"},
 				}
 				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(expectedApp))
 			})
@@ -160,26 +175,81 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("raises the error and warnings", func() {
-				_, warnings, err := actor.CreateApplicationByNameAndSpace("some-app-name", "some-space-guid")
-
 				Expect(err).To(MatchError(expectedError))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
 
-		Context("when the cc client response contains an UnprocessableEntityError", func() {
+		Context("when the cc client returns an NameNotUniqueInSpaceError", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationReturns(
 					ccv3.Application{},
 					ccv3.Warnings{"some-warning"},
-					ccerror.UnprocessableEntityError{},
+					ccerror.NameNotUniqueInSpaceError{},
 				)
 			})
 
-			It("raises the error as ApplicationAlreadyExistsError and warnings", func() {
-				_, warnings, err := actor.CreateApplicationByNameAndSpace("some-app-name", "some-space-guid")
-
+			It("returns the ApplicationAlreadyExistsError and warnings", func() {
 				Expect(err).To(MatchError(ApplicationAlreadyExistsError{Name: "some-app-name"}))
+				Expect(warnings).To(ConsistOf("some-warning"))
+			})
+		})
+	})
+
+	Describe("UpdateApplication", func() {
+		var (
+			application Application
+			warnings    Warnings
+			err         error
+		)
+
+		JustBeforeEach(func() {
+			application, warnings, err = actor.UpdateApplication("some-app-guid", []string{"buildpack-1", "buildpack-2"})
+		})
+
+		Context("when the app successfully gets updated", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv3.Application{
+						GUID:       "some-app-guid",
+						Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					},
+					ccv3.Warnings{"some-warning"},
+					nil,
+				)
+			})
+
+			It("creates and returns the application and warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(application).To(Equal(Application{
+					GUID:       "some-app-guid",
+					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+				}))
+				Expect(warnings).To(ConsistOf("some-warning"))
+
+				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+				expectedApp := ccv3.Application{
+					GUID:       "some-app-guid",
+					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+				}
+				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(expectedApp))
+			})
+		})
+
+		Context("when the cc client returns an error", func() {
+			var expectedError error
+
+			BeforeEach(func() {
+				expectedError = errors.New("I am a CloudControllerClient Error")
+				fakeCloudControllerClient.UpdateApplicationReturns(
+					ccv3.Application{},
+					ccv3.Warnings{"some-warning"},
+					expectedError,
+				)
+			})
+
+			It("raises the error and warnings", func() {
+				Expect(err).To(MatchError(expectedError))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
