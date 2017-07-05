@@ -255,6 +255,36 @@ var _ = Describe("v3-push command", func() {
 		Context("when the --buildpack flag is set", func() {
 			var session *Session
 
+			Context("when resetting the buildpack to default", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("v3-push", appName, "--buildpack", "java_buildpack")).Should(Exit(1))
+						session = helpers.CF("v3-push", appName, "--buildpack", "default")
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				It("successfully pushes the app", func() {
+					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				})
+			})
+
+			Context("when omitting the buildpack", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CF("v3-push", appName, "--buildpack", "java_buildpack")).Should(Exit(1))
+						session = helpers.CF("v3-push", appName)
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				It("continues using previously set buildpack", func() {
+					Eventually(session.Out).Should(Say("FAILED"))
+				})
+			})
+
 			Context("when the buildpack is invalid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {

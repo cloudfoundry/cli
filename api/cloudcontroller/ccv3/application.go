@@ -29,11 +29,21 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp.Name = a.Name
 	ccApp.Relationships = a.Relationships
 	if len(a.Buildpacks) > 0 {
-		ccApp.Lifecycle = map[string]interface{}{
-			"type": "buildpack",
-			"data": map[string]interface{}{
-				"buildpacks": a.Buildpacks,
-			},
+		switch a.Buildpacks[0] {
+		case "default", "null":
+			ccApp.Lifecycle = map[string]interface{}{
+				"type": "buildpack",
+				"data": map[string]interface{}{
+					"buildpacks": nil,
+				},
+			}
+		default:
+			ccApp.Lifecycle = map[string]interface{}{
+				"type": "buildpack",
+				"data": map[string]interface{}{
+					"buildpacks": a.Buildpacks,
+				},
+			}
 		}
 	}
 

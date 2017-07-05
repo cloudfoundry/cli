@@ -123,11 +123,13 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 	return StartupTimeoutError{}
 }
 
+// UpdateApplication updates the buildpacks on an application
 func (actor Actor) UpdateApplication(appGUID string, buildpacks []string) (Application, Warnings, error) {
 	app := ccv3.Application{
 		GUID:       appGUID,
 		Buildpacks: buildpacks,
 	}
+
 	app, warnings, err := actor.CloudControllerClient.UpdateApplication(app)
 	return Application(app), Warnings(warnings), err
 }
