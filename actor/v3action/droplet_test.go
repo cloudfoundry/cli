@@ -112,14 +112,14 @@ var _ = Describe("Droplet Actions", func() {
 					fakeCloudControllerClient.SetApplicationDropletReturns(
 						ccv3.Relationship{},
 						ccv3.Warnings{"set-application-droplet-warning"},
-						ccerror.UnprocessableEntityError{},
+						ccerror.UnprocessableEntityError{Message: "some-message"},
 					)
 				})
 
 				It("raises the error as AssignDropletError and returns warnings", func() {
 					warnings, err := actor.SetApplicationDroplet("some-app-name", "some-space-guid", "some-droplet-guid")
 
-					Expect(err).To(MatchError(AssignDropletError{}))
+					Expect(err).To(MatchError("some-message"))
 					Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
 				})
 			})

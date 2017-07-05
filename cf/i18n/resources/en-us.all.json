@@ -6100,8 +6100,8 @@
     "translation": "Unable to acquire one time code from authorization response"
   },
   {
-    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
-    "translation": ""
+    "id": "Unable to assign droplet: {{.CloudControllerMessage}}",
+    "translation": "Unable to assign droplet: {{.CloudControllerMessage}}"
   },
   {
     "id": "Unable to authenticate.",
@@ -6648,8 +6648,8 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME",
-    "translation": "cf v3-push APP_NAME"
+    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME]",
+    "translation": "cf v3-push APP_NAME [-b BUILDPACK_NAME]"
   },
   {
     "id": "command help",

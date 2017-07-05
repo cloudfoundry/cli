@@ -80,8 +80,9 @@ var _ = Describe("Application", func() {
 
 				Expect(apps).To(ConsistOf(
 					Application{
-						Name: "app-name-1",
-						GUID: "app-guid-1",
+						Name:       "app-name-1",
+						GUID:       "app-guid-1",
+						Buildpacks: []string{"some-buildpack"},
 					},
 					Application{Name: "app-name-2", GUID: "app-guid-2"},
 					Application{Name: "app-name-3", GUID: "app-guid-3"},
@@ -116,6 +117,107 @@ var _ = Describe("Application", func() {
 
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetApplications(nil)
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("UpdateApplication", func() {
+		Context("when the application successfully is updated", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name"
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"lifecycle": map[string]interface{}{
+						"type": "buildpack",
+						"data": map[string]interface{}{
+							"buildpacks": []string{"some-buildpack"},
+						},
+					},
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated app and warnings", func() {
+				app, warnings, err := client.UpdateApplication(Application{
+					GUID:       "some-app-guid",
+					Name:       "some-app-name",
+					Buildpacks: []string{"some-buildpack"},
+					Relationships: Relationships{
+						SpaceRelationship: Relationship{GUID: "some-space-guid"},
+					},
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(app).To(Equal(Application{
+					Name: "some-app-name",
+					GUID: "some-app-guid",
+				}))
+			})
+		})
+
+		Context("when cc returns back an error or warnings", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/apps/some-app-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.UpdateApplication(Application{GUID: "some-app-guid"})
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
@@ -179,6 +281,64 @@ var _ = Describe("Application", func() {
 				Expect(app).To(Equal(Application{
 					Name: "some-app-name",
 					GUID: "some-app-guid",
+				}))
+			})
+		})
+
+		Context("when the caller specifies a buildpack", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-app-guid",
+					"name": "some-app-name",
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {
+							"buildpacks": ["some-buildpack"]
+					  }
+					}
+				}`
+
+				expectedBody := map[string]interface{}{
+					"name": "some-app-name",
+					"lifecycle": map[string]interface{}{
+						"type": "buildpack",
+						"data": map[string]interface{}{
+							"buildpacks": []string{"some-buildpack"},
+						},
+					},
+					"relationships": map[string]interface{}{
+						"space": map[string]interface{}{
+							"data": map[string]string{
+								"guid": "some-space-guid",
+							},
+						},
+					},
+				}
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps"),
+						VerifyJSONRepresenting(expectedBody),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the created app and warnings", func() {
+				app, warnings, err := client.CreateApplication(Application{
+					Name:       "some-app-name",
+					Buildpacks: []string{"some-buildpack"},
+					Relationships: Relationships{
+						SpaceRelationship: Relationship{GUID: "some-space-guid"},
+					},
+				})
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+
+				Expect(app).To(Equal(Application{
+					Name:       "some-app-name",
+					GUID:       "some-app-guid",
+					Buildpacks: []string{"some-buildpack"},
 				}))
 			})
 		})

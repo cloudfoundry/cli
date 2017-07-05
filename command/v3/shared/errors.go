@@ -3,14 +3,17 @@ package shared
 // AssignDropletError is returned when assigning the current droplet of an app
 // fails
 type AssignDropletError struct {
+	Message string
 }
 
 func (_ AssignDropletError) Error() string {
-	return "Unable to assign droplet. Ensure the droplet exists and belongs to this app."
+	return "Unable to assign droplet: {{.CloudControllerMessage}}"
 }
 
 func (e AssignDropletError) Translate(translate func(string, ...interface{}) string) string {
-	return translate(e.Error())
+	return translate(e.Error(), map[string]interface{}{
+		"CloudControllerMessage": e.Message,
+	})
 }
 
 // StartupTimeoutError is returned when startup timeout is reached waiting for

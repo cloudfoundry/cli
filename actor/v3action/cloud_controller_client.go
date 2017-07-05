@@ -36,6 +36,7 @@ type CloudControllerClient interface {
 	SetApplicationDroplet(appGUID string, dropletGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	StartApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	StopApplication(appGUID string) (ccv3.Warnings, error)
+	UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
 	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }

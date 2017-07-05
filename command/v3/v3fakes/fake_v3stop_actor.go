@@ -25,10 +25,10 @@ type FakeV3StopActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StopApplicationStub        func(appName string, spaceGUID string) (v3action.Warnings, error)
+	StopApplicationStub        func(appGUID string, spaceGUID string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
 	stopApplicationArgsForCall []struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
 	}
 	stopApplicationReturns struct {
@@ -98,17 +98,17 @@ func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3StopActor) StopApplication(appName string, spaceGUID string) (v3action.Warnings, error) {
+func (fake *FakeV3StopActor) StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error) {
 	fake.stopApplicationMutex.Lock()
 	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
-		appName   string
+		appGUID   string
 		spaceGUID string
-	}{appName, spaceGUID})
-	fake.recordInvocation("StopApplication", []interface{}{appName, spaceGUID})
+	}{appGUID, spaceGUID})
+	fake.recordInvocation("StopApplication", []interface{}{appGUID, spaceGUID})
 	fake.stopApplicationMutex.Unlock()
 	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(appName, spaceGUID)
+		return fake.StopApplicationStub(appGUID, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -125,7 +125,7 @@ func (fake *FakeV3StopActor) StopApplicationCallCount() int {
 func (fake *FakeV3StopActor) StopApplicationArgsForCall(i int) (string, string) {
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
-	return fake.stopApplicationArgsForCall[i].appName, fake.stopApplicationArgsForCall[i].spaceGUID
+	return fake.stopApplicationArgsForCall[i].appGUID, fake.stopApplicationArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeV3StopActor) StopApplicationReturns(result1 v3action.Warnings, result2 error) {
