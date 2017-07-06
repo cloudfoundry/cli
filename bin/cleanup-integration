@@ -29,11 +29,11 @@ cf auth $CF_USERNAME $CF_PASSWORD
 # failure when running commands in parallel
 set +e
 
-cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
-cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
+cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
+cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
 
-cf quotas | grep -i ^integration-quota | cut -d " " -f1 | xargs_func cf delete-quota -f
+cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func cf delete-quota -f
 
 cf create-org temp-org
 cf target -o temp-org
