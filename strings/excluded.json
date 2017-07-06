@@ -586,6 +586,11 @@
     "display changes:",
     "ignoring event",
     "staging",
+    "reading manifest:",
+    "checking manifest",
+    "reading manifest",
+    "pathToManifest",
+    "could not find",
 
     "(?i).*(?:token|password).*",
     "Host",
