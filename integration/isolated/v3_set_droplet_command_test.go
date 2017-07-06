@@ -183,7 +183,7 @@ var _ = Describe("v3-set-droplet command", func() {
 					userName, _ := helpers.GetCredentials()
 
 					Eventually(session.Out).Should(Say("Setting app %s to droplet %s in org %s / space %s as %s\\.\\.\\.", appName, invalidDropletGUID, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say("Unable to assign droplet\\. Ensure the droplet exists and belongs to this app\\."))
+					Eventually(session.Err).Should(Say("Unable to assign droplet: Unable to assign current droplet\\. Ensure the droplet exists and belongs to this app\\."))
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session).Should(Exit(1))
 				})
