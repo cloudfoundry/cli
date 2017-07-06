@@ -1680,6 +1680,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-restart APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
     "translation": ""
   },
