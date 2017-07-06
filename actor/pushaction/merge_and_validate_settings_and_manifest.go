@@ -1,30 +1,54 @@
 package pushaction
 
 import (
-	"errors"
-
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	log "github.com/sirupsen/logrus"
 )
 
-func (_ Actor) MergeAndValidateSettingsAndManifests(cmdConfig CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
-	if len(apps) != 0 {
-		return nil, errors.New("functionality still pending")
+type MissingNameError struct{}
+
+func (_ MissingNameError) Error() string {
+	return "name not specified for app"
+}
+
+func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
+	var mergedApps []manifest.Application
+
+	if len(apps) == 0 {
+		mergedApps = actor.generateAppSettingsFromCommandLineSettings(settings)
+	} else {
+		for _, app := range apps {
+			mergedApps = append(mergedApps, actor.mergeCommandLineSettingsAndManifest(settings, app))
+		}
 	}
 
-	path := cmdConfig.AppPath
-	if path == "" {
-		path = cmdConfig.CurrentDirectory
-	}
+	log.Debugf("merged app settings: %#v", mergedApps)
+	return mergedApps, actor.validateMergedSettings(mergedApps)
+}
 
-	manifests := []manifest.Application{{
-		Name:        cmdConfig.Name,
-		Path:        path,
-		DockerImage: cmdConfig.DockerImage,
+func (_ Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSettings) []manifest.Application {
+	log.Info("no manifest, generating one from command line settings")
+
+	appSettings := []manifest.Application{{
+		DockerImage: settings.DockerImage,
+		Name:        settings.Name,
+		Path:        settings.ApplicationPath(),
 	}}
 
-	//TODO Add validations
+	return appSettings
+}
 
-	log.Debugf("merged and validated manifests: %#v", manifests)
-	return manifests, nil
+func (_ Actor) mergeCommandLineSettingsAndManifest(settings CommandLineSettings, app manifest.Application) manifest.Application {
+	app.Path = settings.ApplicationPath()
+	return app
+}
+
+func (_ Actor) validateMergedSettings(apps []manifest.Application) error {
+	for i, app := range apps {
+		if app.Name == "" {
+			log.WithField("index", i).Error("does not contain an app name")
+			return MissingNameError{}
+		}
+	}
+	return nil
 }

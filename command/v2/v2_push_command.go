@@ -2,6 +2,7 @@ package v2
 
 import (
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
@@ -31,10 +32,11 @@ type V2PushActor interface {
 	Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
 	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
+	ReadManifest(pathToManifest string) ([]manifest.Application, error)
 }
 
 type V2PushCommand struct {
-	OptionalArgs flag.AppName `positional-args:"yes"`
+	OptionalArgs flag.OptionalAppName `positional-args:"yes"`
 	// BuildpackName  string       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	// StartupCommand string `short:"c" description:"Startup command, set to null to reset to default start command"`
 	// Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
@@ -111,9 +113,15 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	//TODO: Read in manifest
+	log.Info("checking manifest")
+	rawApps, err := cmd.findAndReadManifest(cliSettings)
+	if err != nil {
+		log.Errorln("reading manifest:", err)
+		return shared.HandleError(err)
+	}
+
 	log.Info("merging manifest and command flags")
-	manifestApplications, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, nil)
+	manifestApplications, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, rawApps)
 	if err != nil {
 		log.Errorln("merging manifest:", err)
 		return shared.HandleError(err)
@@ -184,7 +192,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	config := pushaction.CommandLineSettings{
 		CurrentDirectory: pwd,
-		AppPath:          string(cmd.AppPath),
+		ProvidedAppPath:  string(cmd.AppPath),
 		DockerImage:      cmd.DockerImage.Path,
 		Name:             cmd.OptionalArgs.AppName,
 	}
@@ -250,6 +258,24 @@ func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) 
 
 	cmd.UI.DisplayNewline()
 	return nil
+}
+
+func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
+	pathToManifest := filepath.Join(settings.CurrentDirectory, "manifest.yml")
+	if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
+		log.WithField("pathToManifest", pathToManifest).Debug("could not find")
+
+		// While this is unlikely to be used, it is kept for backwards
+		// compatibility.
+		pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yaml")
+		if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
+			log.WithField("pathToManifest", pathToManifest).Debug("could not find")
+			return nil, nil
+		}
+	}
+
+	log.WithField("pathToManifest", pathToManifest).Info("reading manifest")
+	return cmd.Actor.ReadManifest(pathToManifest)
 }
 
 func (cmd V2PushCommand) processApplyStreams(
