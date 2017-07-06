@@ -100,9 +100,10 @@ func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) er
 		defer request.ResetBody()
 
 		return logger.output.DisplayJSONBody(rawRequestBody)
-	} else {
+	} else if contentType != "" {
 		return logger.output.DisplayMessage(fmt.Sprintf("[%s Content Hidden]", strings.Split(contentType, ";")[0]))
 	}
+	return nil
 }
 
 func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Response) error {
