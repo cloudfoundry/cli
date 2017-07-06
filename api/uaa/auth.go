@@ -29,11 +29,11 @@ func (client Client) Authenticate(username string, password string) (string, str
 			"Content-Type": {"application/x-www-form-urlencoded"},
 		},
 		Body: strings.NewReader(requestBody.Encode()),
+		AddClientAuthorization: true,
 	})
 	if err != nil {
 		return "", "", err
 	}
-	request.SetBasicAuth(client.id, client.secret)
 
 	responseBody := AuthResponse{}
 	response := Response{

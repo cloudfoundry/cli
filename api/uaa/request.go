@@ -24,6 +24,9 @@ type requestOptions struct {
 
 	// Body is the request body
 	Body io.Reader
+
+	// AddClientAuthorization adds client ID / secret basic auth header if set
+	AddClientAuthorization bool
 }
 
 // newRequest returns a constructed http.Request with some defaults. The
@@ -49,6 +52,10 @@ func (client *Client) newRequest(passedRequest requestOptions) (*http.Request, e
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("Connection", "close")
 	request.Header.Set("User-Agent", client.userAgent)
+
+	if passedRequest.AddClientAuthorization {
+		client.addClientAuthorizationToRequest(request)
+	}
 
 	return request, nil
 }
