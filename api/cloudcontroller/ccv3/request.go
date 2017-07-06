@@ -59,8 +59,11 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 
 	request.Header = http.Header{}
 	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("User-Agent", client.userAgent)
+
+	if passedRequest.Body != nil {
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	return cloudcontroller.NewRequest(request, passedRequest.Body), nil
 }

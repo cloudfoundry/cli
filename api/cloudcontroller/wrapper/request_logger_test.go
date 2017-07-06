@@ -91,6 +91,8 @@ var _ = Describe("Request Logger", func() {
 			name, value = fakeOutput.DisplayHeaderArgsForCall(2)
 			Expect(name).To(Equal("Aghi"))
 			Expect(value).To(Equal("bar"))
+
+			Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(0))
 		})
 
 		Context("when an authorization header is in the request", func() {
