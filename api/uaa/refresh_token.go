@@ -40,6 +40,7 @@ func (client *Client) RefreshAccessToken(refreshToken string) (RefreshToken, err
 	if err != nil {
 		return RefreshToken{}, err
 	}
+	request.SetBasicAuth(client.id, client.secret)
 
 	var refreshResponse RefreshToken
 	response := Response{
