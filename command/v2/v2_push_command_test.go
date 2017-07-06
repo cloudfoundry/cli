@@ -2,7 +2,9 @@ package v2_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 
@@ -254,15 +256,106 @@ var _ = Describe("v2-push Command", func() {
 						fakeStartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("merges app manifest and flags", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+					Context("when no manifest is provided", func() {
+						It("passes through the command line flags", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
-						cmdSettings, _ := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
-						Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
-							Name:             appName,
-							CurrentDirectory: pwd,
-						}))
+							Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+							cmdSettings, _ := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+							Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+								Name:             appName,
+								CurrentDirectory: pwd,
+							}))
+						})
+					})
+
+					Context("when a manifest is provided", func() {
+						var (
+							tmpDir         string
+							pathToManifest string
+
+							originalDir string
+						)
+
+						BeforeEach(func() {
+							var err error
+							tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
+							Expect(err).ToNot(HaveOccurred())
+
+							originalDir, err = os.Getwd()
+							Expect(err).ToNot(HaveOccurred())
+
+							cmd.OptionalArgs.AppName = ""
+						})
+
+						AfterEach(func() {
+							Expect(os.Chdir(originalDir)).ToNot(HaveOccurred())
+							Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
+						})
+
+						Context("via a manfiest.yml in the current directory", func() {
+							var expectedApps []manifest.Application
+
+							BeforeEach(func() {
+								err := os.Chdir(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+
+								pathToManifest = filepath.Join(tmpDir, "manifest.yml")
+								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+
+								expectedApps = []manifest.Application{{Name: "some-app"}, {Name: "some-other-app"}}
+								fakeActor.ReadManifestReturns(expectedApps, nil)
+							})
+
+							Context("when reading the manifest file is successful", func() {
+								It("merges app manifest and flags", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+
+									Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+									cmdSettings, manifestApps := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+									Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+										CurrentDirectory: tmpDir,
+									}))
+									Expect(manifestApps).To(Equal(expectedApps))
+								})
+							})
+
+							Context("when reading manifest file errors", func() {
+								var expectedErr error
+
+								BeforeEach(func() {
+									expectedErr = errors.New("I am an error!!!")
+
+									fakeActor.ReadManifestReturns(nil, expectedErr)
+								})
+
+								It("returns the error", func() {
+									Expect(executeErr).To(MatchError(expectedErr))
+								})
+							})
+						})
+
+						Context("via a manfiest.yaml in the current directory", func() {
+							BeforeEach(func() {
+								err := os.Chdir(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+
+								pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
+								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							It("should read the manifest.yml", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+								Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+							})
+						})
 					})
 
 					It("converts the manifests to app configs and outputs config warnings", func() {
@@ -437,7 +530,6 @@ var _ = Describe("v2-push Command", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			})
 		})
-
 	})
 
 	Describe("GetCommandLineSettings", func() {
@@ -478,7 +570,7 @@ var _ = Describe("v2-push Command", func() {
 				settings, err := cmd.GetCommandLineSettings()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(settings.Name).To(Equal(appName))
-				Expect(settings.AppPath).To(Equal("some-directory-path"))
+				Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
 			})
 		})
 	})

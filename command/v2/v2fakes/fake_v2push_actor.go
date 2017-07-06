@@ -59,6 +59,19 @@ type FakeV2PushActor struct {
 		result1 []manifest.Application
 		result2 error
 	}
+	ReadManifestStub        func(pathToManifest string) ([]manifest.Application, error)
+	readManifestMutex       sync.RWMutex
+	readManifestArgsForCall []struct {
+		pathToManifest string
+	}
+	readManifestReturns struct {
+		result1 []manifest.Application
+		result2 error
+	}
+	readManifestReturnsOnCall map[int]struct {
+		result1 []manifest.Application
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -239,6 +252,57 @@ func (fake *FakeV2PushActor) MergeAndValidateSettingsAndManifestsReturnsOnCall(i
 	}{result1, result2}
 }
 
+func (fake *FakeV2PushActor) ReadManifest(pathToManifest string) ([]manifest.Application, error) {
+	fake.readManifestMutex.Lock()
+	ret, specificReturn := fake.readManifestReturnsOnCall[len(fake.readManifestArgsForCall)]
+	fake.readManifestArgsForCall = append(fake.readManifestArgsForCall, struct {
+		pathToManifest string
+	}{pathToManifest})
+	fake.recordInvocation("ReadManifest", []interface{}{pathToManifest})
+	fake.readManifestMutex.Unlock()
+	if fake.ReadManifestStub != nil {
+		return fake.ReadManifestStub(pathToManifest)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.readManifestReturns.result1, fake.readManifestReturns.result2
+}
+
+func (fake *FakeV2PushActor) ReadManifestCallCount() int {
+	fake.readManifestMutex.RLock()
+	defer fake.readManifestMutex.RUnlock()
+	return len(fake.readManifestArgsForCall)
+}
+
+func (fake *FakeV2PushActor) ReadManifestArgsForCall(i int) string {
+	fake.readManifestMutex.RLock()
+	defer fake.readManifestMutex.RUnlock()
+	return fake.readManifestArgsForCall[i].pathToManifest
+}
+
+func (fake *FakeV2PushActor) ReadManifestReturns(result1 []manifest.Application, result2 error) {
+	fake.ReadManifestStub = nil
+	fake.readManifestReturns = struct {
+		result1 []manifest.Application
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2PushActor) ReadManifestReturnsOnCall(i int, result1 []manifest.Application, result2 error) {
+	fake.ReadManifestStub = nil
+	if fake.readManifestReturnsOnCall == nil {
+		fake.readManifestReturnsOnCall = make(map[int]struct {
+			result1 []manifest.Application
+			result2 error
+		})
+	}
+	fake.readManifestReturnsOnCall[i] = struct {
+		result1 []manifest.Application
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -248,6 +312,8 @@ func (fake *FakeV2PushActor) Invocations() map[string][][]interface{} {
 	defer fake.convertToApplicationConfigsMutex.RUnlock()
 	fake.mergeAndValidateSettingsAndManifestsMutex.RLock()
 	defer fake.mergeAndValidateSettingsAndManifestsMutex.RUnlock()
+	fake.readManifestMutex.RLock()
+	defer fake.readManifestMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
