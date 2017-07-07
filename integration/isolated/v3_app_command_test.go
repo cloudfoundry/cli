@@ -1,6 +1,10 @@
 package isolated
 
 import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,9 +31,11 @@ var _ = Describe("v3-app command", func() {
 				session := helpers.CF("v3-app", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-app - Display an app"))
+				Eventually(session.Out).Should(Say("v3-app - Display health and status for app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-app APP_NAME"))
+				Eventually(session.Out).Should(Say("cf v3-app APP_NAME [--guid]"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("--guid\\s+Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -153,6 +159,32 @@ var _ = Describe("v3-app command", func() {
 					Eventually(session.Out).Should(Say("There are no running instances of this app"))
 				})
 			})
+
+			Context("when the --guid flag is given", func() {
+				var appGUID string
+
+				BeforeEach(func() {
+					session := helpers.CF("curl", fmt.Sprintf("/v3/apps?names=%s", appName))
+					Eventually(session).Should(Exit(0))
+					rawJSON := strings.TrimSpace(string(session.Out.Contents()))
+					var AppInfo struct {
+						Resources []struct {
+							GUID string `json:"guid"`
+						} `json:"resources"`
+					}
+
+					err := json.Unmarshal([]byte(rawJSON), &AppInfo)
+					Expect(err).NotTo(HaveOccurred())
+
+					appGUID = AppInfo.Resources[0].GUID
+				})
+
+				It("displays the app guid", func() {
+					session := helpers.CF("v3-app", "--guid", appName)
+					Eventually(session).Should(Say(appGUID))
+					Eventually(session).Should(Exit(0))
+				})
+			})
 		})
 
 		Context("when the app does not exist", func() {
@@ -166,6 +198,17 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session.Out).Should(Say("FAILED"))
 
 				Eventually(session).Should(Exit(1))
+			})
+
+			Context("when the --guid flag is given", func() {
+				It("tells the user that the app is not found and exits 1", func() {
+					appName := helpers.PrefixedRandomName("invalid-app")
+					session := helpers.CF("v3-app", "--guid", appName)
+
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("App %s not found", appName))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})

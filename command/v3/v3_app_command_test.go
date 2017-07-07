@@ -155,6 +155,66 @@ var _ = Describe("v3-app Command", func() {
 				v2action.Warnings{"route-warning-1", "route-warning-2"}, nil)
 		})
 
+		Context("when the --guid flag is provided", func() {
+			BeforeEach(func() {
+				cmd.GUID = true
+			})
+
+			Context("when no errors occur", func() {
+				BeforeEach(func() {
+					fakeActor.GetApplicationByNameAndSpaceReturns(
+						v3action.Application{GUID: "some-guid"},
+						v3action.Warnings{"warning-1", "warning-2"},
+						nil)
+				})
+
+				It("displays the application guid and all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("some-guid"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+				})
+			})
+
+			Context("when an error is encountered getting the app", func() {
+				Context("when the error is translatable", func() {
+					BeforeEach(func() {
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v3action.Application{},
+							v3action.Warnings{"warning-1", "warning-2"},
+							v3action.ApplicationNotFoundError{Name: "some-app"})
+					})
+
+					It("returns a translatable error and all warnings", func() {
+						Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
+
+						Expect(testUI.Err).To(Say("warning-1"))
+						Expect(testUI.Err).To(Say("warning-2"))
+					})
+				})
+
+				Context("when the error is not translatable", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("get app summary error")
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v3action.Application{},
+							v3action.Warnings{"warning-1", "warning-2"},
+							expectedErr)
+					})
+
+					It("returns the error and all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+
+						Expect(testUI.Err).To(Say("warning-1"))
+						Expect(testUI.Err).To(Say("warning-2"))
+					})
+				})
+			})
+		})
+
 		Context("when there are no instances of any process in the app", func() {
 			BeforeEach(func() {
 				summary := v3action.ApplicationSummary{

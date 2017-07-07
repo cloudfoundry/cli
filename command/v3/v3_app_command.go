@@ -19,12 +19,14 @@ type V2AppActor interface {
 //go:generate counterfeiter . V3AppActor
 
 type V3AppActor interface {
+	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 }
 
 type V3AppCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-app APP_NAME"`
+	GUID         bool         `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
+	usage        interface{}  `usage:"CF_NAME v3-app APP_NAME [--guid]"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -67,5 +69,20 @@ func (cmd V3AppCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
+	if cmd.GUID {
+		return cmd.displayAppGUID()
+	}
+
 	return cmd.AppSummaryDisplayer.DisplayAppInfo()
+}
+
+func (cmd V3AppCommand) displayAppGUID() error {
+	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	cmd.UI.DisplayText(app.GUID)
+	return nil
 }
