@@ -95,7 +95,7 @@ var _ = Describe("New Clients", func() {
 			It("returns a V3APIDoesNotExistError", func() {
 				_, _, err := NewClients(fakeConfig, testUI, true)
 				expectedErr := ccerror.V3UnexpectedResponseError{ResponseCode: http.StatusNotFound}
-				Expect(err).To(MatchError(V3APIDoesNotExistError{Message: expectedErr.Error()}))
+				Expect(err).To(MatchError(translatableerror.V3APIDoesNotExistError{Message: expectedErr.Error()}))
 			})
 		})
 

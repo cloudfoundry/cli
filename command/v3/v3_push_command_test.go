@@ -487,7 +487,7 @@ var _ = Describe("v3-push Command", func() {
 										})
 
 										It("returns the StartupTimeoutError", func() {
-											Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app"}))
+											Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{AppName: "some-app"}))
 										})
 									})
 

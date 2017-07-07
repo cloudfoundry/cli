@@ -37,12 +37,12 @@ var _ = Describe("HandleError", func() {
 
 		Entry("ccerror.UnprocessableEntityError with droplet message -> RunTaskError",
 			ccerror.UnprocessableEntityError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."},
-			RunTaskError{Message: "App is not staged."}),
+			translatableerror.RunTaskError{Message: "App is not staged."}),
 
 		// This changed in CF254
 		Entry("ccerror.UnprocessableEntityError with droplet message -> RunTaskError",
 			ccerror.UnprocessableEntityError{Message: "Task must have a droplet. Specify droplet or assign current droplet to app."},
-			RunTaskError{Message: "App is not staged."}),
+			translatableerror.RunTaskError{Message: "App is not staged."}),
 
 		Entry("ccerror.UnprocessableEntityError without droplet message -> original error",
 			unprocessableEntityError,
@@ -58,7 +58,7 @@ var _ = Describe("HandleError", func() {
 
 		Entry("v3action.TaskWorkersUnavailableError -> RunTaskError",
 			v3action.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
-			RunTaskError{Message: "Task workers are unavailable."}),
+			translatableerror.RunTaskError{Message: "Task workers are unavailable."}),
 
 		Entry("sharedaction.NotLoggedInError -> NotLoggedInError",
 			sharedaction.NotLoggedInError{BinaryName: "faceman"},
@@ -74,11 +74,11 @@ var _ = Describe("HandleError", func() {
 
 		Entry("v3action.OrganizationNotFoundError -> OrgNotFoundError",
 			v3action.OrganizationNotFoundError{Name: "some-org"},
-			OrganizationNotFoundError{Name: "some-org"}),
+			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
 		Entry("v3action.AssignDropletError -> AssignDropletError",
 			v3action.AssignDropletError{Message: "some-message"},
-			AssignDropletError{Message: "some-message"}),
+			translatableerror.AssignDropletError{Message: "some-message"}),
 
 		Entry("default case -> original error",
 			err,

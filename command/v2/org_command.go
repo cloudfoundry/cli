@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -54,7 +55,7 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
-		if _, ok := err.(sharedV3.V3APIDoesNotExistError); !ok {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); !ok {
 			return err
 		}
 	} else {

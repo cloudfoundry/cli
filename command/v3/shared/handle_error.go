@@ -19,7 +19,7 @@ func HandleError(err error) error {
 		return translatableerror.SSLCertErrorError{Message: e.Message}
 	case ccerror.UnprocessableEntityError:
 		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
-			return RunTaskError{
+			return translatableerror.RunTaskError{
 				Message: "App is not staged."}
 		}
 	case ccerror.UnverifiedServerError:
@@ -34,13 +34,13 @@ func HandleError(err error) error {
 	case v3action.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
 	case v3action.TaskWorkersUnavailableError:
-		return RunTaskError{Message: "Task workers are unavailable."}
+		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
 	case v3action.OrganizationNotFoundError:
-		return OrganizationNotFoundError{Name: e.Name}
+		return translatableerror.OrganizationNotFoundError{Name: e.Name}
 	case v3action.IsolationSegmentNotFoundError:
-		return IsolationSegmentNotFoundError{Name: e.Name}
+		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
 	case v3action.AssignDropletError:
-		return AssignDropletError{Message: e.Message}
+		return translatableerror.AssignDropletError{Message: e.Message}
 	}
 
 	return err

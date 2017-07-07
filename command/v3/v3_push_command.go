@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -174,7 +175,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(v3action.StartupTimeoutError); ok {
-			return shared.StartupTimeoutError{AppName: cmd.RequiredArgs.AppName}
+			return translatableerror.StartupTimeoutError{AppName: cmd.RequiredArgs.AppName}
 		} else {
 			return shared.HandleError(err)
 		}

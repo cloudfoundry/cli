@@ -53,7 +53,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	})
 	if err != nil {
 		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return nil, nil, V3APIDoesNotExistError{Message: err.Error()}
+			return nil, nil, translatableerror.V3APIDoesNotExistError{Message: err.Error()}
 		}
 
 		return nil, nil, HandleError(err)
