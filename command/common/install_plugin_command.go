@@ -110,7 +110,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
 		if !cmd.Force && pluginSource != PluginFromRepository {
-			return shared.PluginAlreadyInstalledError{
+			return translatableerror.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
 				Name:       plugin.Name,
 				Version:    plugin.Version.String(),
@@ -177,7 +177,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		if err != nil {
 			switch pluginErr := err.(type) {
 			case pluginaction.PluginNotFoundInAnyRepositoryError:
-				return "", 0, shared.PluginNotFoundInRepositoryError{
+				return "", 0, translatableerror.PluginNotFoundInRepositoryError{
 					BinaryName:     cmd.Config.BinaryName(),
 					PluginName:     pluginNameOrLocation,
 					RepositoryName: cmd.RegisteredRepository,
@@ -207,14 +207,14 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 	default:
 		repos := cmd.Config.PluginRepositories()
 		if len(repos) == 0 {
-			return "", 0, shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+			return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
 		}
 
 		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, repos, tempPluginDir)
 		if err != nil {
 			switch pluginErr := err.(type) {
 			case pluginaction.PluginNotFoundInAnyRepositoryError:
-				return "", 0, shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+				return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
 
 			case pluginaction.FetchingPluginInfoFromRepositoryError:
 				return "", 0, cmd.handleFetchingPluginInfoFromRepositoriesError(pluginErr)
@@ -232,19 +232,19 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 func (_ InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
 	switch clientErr := fetchErr.Err.(type) {
 	case pluginerror.RawHTTPStatusError:
-		return shared.FetchingPluginInfoFromRepositoriesError{
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
 			Message:        clientErr.Status,
 			RepositoryName: fetchErr.RepositoryName,
 		}
 
 	case pluginerror.SSLValidationHostnameError:
-		return shared.FetchingPluginInfoFromRepositoriesError{
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
 			Message:        clientErr.Error(),
 			RepositoryName: fetchErr.RepositoryName,
 		}
 
 	case pluginerror.UnverifiedServerError:
-		return shared.FetchingPluginInfoFromRepositoriesError{
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
 			Message:        clientErr.Error(),
 			RepositoryName: fetchErr.RepositoryName,
 		}

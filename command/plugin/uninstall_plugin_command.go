@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 //go:generate counterfeiter . UninstallPluginActor
@@ -34,7 +35,7 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 	pluginName := cmd.RequiredArgs.PluginName
 	plugin, exist := cmd.Config.GetPluginCaseInsensitive(pluginName)
 	if !exist {
-		return shared.PluginNotFoundError{PluginName: pluginName}
+		return translatableerror.PluginNotFoundError{PluginName: pluginName}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Uninstalling plugin {{.PluginName}}...",
@@ -51,11 +52,11 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 	if err != nil {
 		switch e := err.(type) {
 		case pluginaction.PluginBinaryRemoveFailedError:
-			return shared.PluginBinaryRemoveFailedError{
+			return translatableerror.PluginBinaryRemoveFailedError{
 				Err: e.Err,
 			}
 		case pluginaction.PluginExecuteError:
-			return shared.PluginBinaryUninstallError{
+			return translatableerror.PluginBinaryUninstallError{
 				Err: e.Err,
 			}
 		default:

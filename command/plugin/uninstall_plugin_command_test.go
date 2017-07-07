@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
-	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -86,7 +86,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 
 			It("returns a PluginBinaryRemoveFailedError", func() {
-				Expect(executeErr).To(MatchError(shared.PluginBinaryRemoveFailedError{
+				Expect(executeErr).To(MatchError(translatableerror.PluginBinaryRemoveFailedError{
 					Err: pathError,
 				}))
 			})
@@ -105,7 +105,7 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 
 			It("returns a PluginBinaryUninstallError", func() {
-				Expect(executeErr).To(MatchError(shared.PluginBinaryUninstallError{
+				Expect(executeErr).To(MatchError(translatableerror.PluginBinaryUninstallError{
 					Err: pathError,
 				}))
 			})
@@ -136,7 +136,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 		It("returns a PluginNotFoundError", func() {
 			Expect(testUI.Out).To(Say("Uninstalling plugin some-plugin..."))
-			Expect(executeErr).To(MatchError(shared.PluginNotFoundError{
+			Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundError{
 				PluginName: "some-plugin",
 			}))
 		})
