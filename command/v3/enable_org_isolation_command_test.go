@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -140,7 +139,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				It("displays all warnings and the isolation segment not found error", func() {
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
-					Expect(executeErr).To(MatchError(shared.IsolationSegmentNotFoundError{Name: "segment1"}))
+					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: "segment1"}))
 				})
 			})
 
@@ -152,7 +151,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				})
 
 				It("displays all warnings and the org not found error", func() {
-					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 				})
 			})
 

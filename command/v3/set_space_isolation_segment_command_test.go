@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -156,7 +155,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("I am also a warning"))
 					Expect(testUI.Err).To(Say("entitlement-warning"))
 					Expect(testUI.Err).To(Say("banana"))
-					Expect(executeErr).To(MatchError(shared.IsolationSegmentNotFoundError{Name: "segment1"}))
+					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: "segment1"}))
 				})
 			})
 		})
