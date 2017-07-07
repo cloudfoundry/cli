@@ -146,7 +146,6 @@ var _ = Describe("v3-stage command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("Creating container"))
 				Eventually(session.Out).Should(Say("droplet: %s", helpers.GUIDRegex))
 				Eventually(session.Out).Should(Say("OK"))
 
