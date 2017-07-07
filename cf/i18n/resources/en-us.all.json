@@ -6020,10 +6020,6 @@
     "translation": "Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "Timeout for async HTTP requests"
   },

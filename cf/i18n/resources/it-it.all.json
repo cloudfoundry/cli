@@ -6020,10 +6020,6 @@
     "translation": "Il tempo (in secondi) che può trascorrere tra l'avvio di un'applicazione e la prima risposta di integrità dall'applicazione."
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "Timeout per le richieste HTTP asincrone"
   },

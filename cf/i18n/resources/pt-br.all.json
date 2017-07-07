@@ -6020,10 +6020,6 @@
     "translation": "Decorrência de tempo (em segundos) permitida entre a inicialização de um app e a primeira resposta funcional do app"
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "Tempo limite para solicitações de HTTP assíncronas"
   },

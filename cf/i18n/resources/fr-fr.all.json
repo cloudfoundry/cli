@@ -6020,10 +6020,6 @@
     "translation": "Durée (en secondes) pouvant s'écouler entre le démarrage d'une application et la première réponse normale de l'application"
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "Dépassement du délai d'attente pour les demandes HTTP asynchrones"
   },
