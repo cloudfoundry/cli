@@ -6020,10 +6020,6 @@
     "translation": "앱 시작과 앱으로부터의 첫 번째 정상 응답 간에 허용되는 경과 시간(초)"
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "비동기 HTTP 요청의 제한시간 초과"
   },

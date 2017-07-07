@@ -6020,10 +6020,6 @@
     "translation": "从启动应用程序到收到该应用程序的第一个表示运行状况良好的响应，期间允许经过的时间（秒）"
   },
   {
-    "id": "Timed out waiting for application {{.AppName}} to start",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "异步 HTTP 请求超时"
   },
