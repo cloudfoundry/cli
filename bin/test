@@ -36,11 +36,17 @@ echo -e "\n Formatting packages..."
 go fmt ./...
 
 echo -e "\n Vetting packages for potential issues..."
-go tool vet cf/.
-for file in $(find {actor,command,cf,plugin,util} \( -name "*.go" -not -iname "*test.go" \))
-do
-  go tool vet -all -shadow=true $file
-done
+git status \
+  | grep -i -e new -e modified \
+  | grep -e api -e actor -e command -e cf -e plugin -e util \
+  | awk '{print $2}' \
+  | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
+
+git status \
+  | grep -i -e renamed \
+  | grep -e api -e actor -e command -e cf -e plugin -e util \
+  | awk '{print $4}' \
+  | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
 
 ginkgo version
 
