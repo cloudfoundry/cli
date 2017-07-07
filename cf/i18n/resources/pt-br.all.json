@@ -1668,7 +1668,7 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
-    "id": "CF_NAME v3-app APP_NAME",
+    "id": "CF_NAME v3-app APP_NAME [--guid]",
     "translation": ""
   },
   {
@@ -2390,10 +2390,6 @@
   {
     "id": "Disk limit (e.g. 256M, 1024M, 1G)",
     "translation": "Limite de disco (por exemplo, 256 M, 1024 M, 1 G)"
-  },
-  {
-    "id": "Display an app",
-    "translation": ""
   },
   {
     "id": "Display health and status for app",
