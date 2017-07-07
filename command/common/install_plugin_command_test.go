@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/commonfakes"
-	"code.cloudfoundry.org/cli/command/plugin/shared"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -74,7 +73,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("does not print installation messages and returns a FileNotFoundError", func() {
-				Expect(executeErr).To(MatchError(shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: "some-path", BinaryName: "faceman"}))
+				Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: "some-path", BinaryName: "faceman"}))
 
 				Expect(testUI.Out).ToNot(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 				Expect(testUI.Out).ToNot(Say("Installing plugin some-path\\.\\.\\."))
@@ -101,7 +100,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
 
 						Expect(testUI.Out).ToNot(Say("Installing plugin"))
 					})
@@ -116,7 +115,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(shared.PluginInvalidError{Err: wrappedErr}))
+						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{Err: wrappedErr}))
 
 						Expect(testUI.Out).ToNot(Say("Installing plugin"))
 					})
@@ -378,7 +377,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 
 						It("returns PluginAlreadyInstalledError", func() {
-							Expect(executeErr).To(MatchError(shared.PluginAlreadyInstalledError{
+							Expect(executeErr).To(MatchError(translatableerror.PluginAlreadyInstalledError{
 								BinaryName: "faceman",
 								Name:       "some-plugin",
 								Version:    "1.2.3",
@@ -455,7 +454,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
-						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: "some-status"}))
+						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: "some-status"}))
 					})
 				})
 
@@ -465,7 +464,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
-						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: "x509: certificate signed by unknown authority"}))
+						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: "x509: certificate signed by unknown authority"}))
 					})
 				})
 			})
@@ -504,7 +503,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
 
 						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(0))
 					})
@@ -699,7 +698,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns PluginAlreadyInstalledError", func() {
-						Expect(executeErr).To(MatchError(shared.PluginAlreadyInstalledError{
+						Expect(executeErr).To(MatchError(translatableerror.PluginAlreadyInstalledError{
 							BinaryName: "faceman",
 							Name:       pluginName,
 							Version:    "1.2.3",

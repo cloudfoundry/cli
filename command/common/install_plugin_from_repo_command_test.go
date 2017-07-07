@@ -16,7 +16,7 @@ import (
 	. "code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/commonfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -92,7 +92,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("returns a RepositoryNotRegisteredError", func() {
-				Expect(executeErr).To(MatchError(shared.RepositoryNotRegisteredError{Name: repoName}))
+				Expect(executeErr).To(MatchError(translatableerror.RepositoryNotRegisteredError{Name: repoName}))
 
 				Expect(fakeActor.GetPluginRepositoryCallCount()).To(Equal(1))
 				repositoryNameArg := fakeActor.GetPluginRepositoryArgsForCall(0)
@@ -117,7 +117,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns a JSONSyntaxError", func() {
-					Expect(executeErr).To(MatchError(shared.JSONSyntaxError{Err: jsonErr}))
+					Expect(executeErr).To(MatchError(translatableerror.JSONSyntaxError{Err: jsonErr}))
 				})
 			})
 
@@ -150,7 +150,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns the wrapped client(request/http status) error", func() {
-						Expect(executeErr).To(MatchError(shared.DownloadPluginHTTPError{Message: returnedErr.Status}))
+						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: returnedErr.Status}))
 					})
 				})
 			})
@@ -161,7 +161,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns the PluginNotFoundInRepositoryError", func() {
-					Expect(executeErr).To(MatchError(shared.PluginNotFoundInRepositoryError{BinaryName: binaryName, PluginName: pluginName, RepositoryName: repoName}))
+					Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundInRepositoryError{BinaryName: binaryName, PluginName: pluginName, RepositoryName: repoName}))
 
 					Expect(fakeActor.GetPlatformStringCallCount()).To(Equal(1))
 					platformGOOS, platformGOARCH := fakeActor.GetPlatformStringArgsForCall(0)
@@ -182,7 +182,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns the NoCompatibleBinaryError", func() {
-					Expect(executeErr).To(MatchError(shared.NoCompatibleBinaryError{}))
+					Expect(executeErr).To(MatchError(translatableerror.NoCompatibleBinaryError{}))
 				})
 			})
 
@@ -317,7 +317,7 @@ var _ = Describe("install-plugin command", func() {
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+											Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
@@ -483,7 +483,7 @@ var _ = Describe("install-plugin command", func() {
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(shared.PluginInvalidError{}))
+											Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 										})
 									})
@@ -732,7 +732,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("returns PluginNotFoundOnDiskOrInAnyRepositoryError", func() {
-				Expect(executeErr).To(MatchError(shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
+				Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
 			})
 		})
 
@@ -757,7 +757,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns the plugin not found error", func() {
-					Expect(executeErr).To(MatchError(shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
+					Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
 				})
 			})
 
@@ -876,7 +876,7 @@ var _ = Describe("install-plugin command", func() {
 							RepositoryName: "some-repo",
 							Err:            pluginerror.RawHTTPStatusError{Status: "some-status"},
 						},
-						shared.FetchingPluginInfoFromRepositoriesError{Message: "some-status", RepositoryName: "some-repo"},
+						translatableerror.FetchingPluginInfoFromRepositoriesError{Message: "some-status", RepositoryName: "some-repo"},
 					),
 
 					Entry("when the error is a SSLValidationHostnameError",
@@ -885,7 +885,7 @@ var _ = Describe("install-plugin command", func() {
 							Err:            pluginerror.SSLValidationHostnameError{Message: "some-status"},
 						},
 
-						shared.FetchingPluginInfoFromRepositoriesError{Message: "Hostname does not match SSL Certificate (some-status)", RepositoryName: "some-repo"},
+						translatableerror.FetchingPluginInfoFromRepositoriesError{Message: "Hostname does not match SSL Certificate (some-status)", RepositoryName: "some-repo"},
 					),
 
 					Entry("when the error is an UnverifiedServerError",
@@ -893,7 +893,7 @@ var _ = Describe("install-plugin command", func() {
 							RepositoryName: "some-repo",
 							Err:            pluginerror.UnverifiedServerError{URL: "some-url"},
 						},
-						shared.FetchingPluginInfoFromRepositoriesError{Message: "x509: certificate signed by unknown authority", RepositoryName: "some-repo"},
+						translatableerror.FetchingPluginInfoFromRepositoriesError{Message: "x509: certificate signed by unknown authority", RepositoryName: "some-repo"},
 					),
 
 					Entry("when the error is generic",
@@ -912,7 +912,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns PluginNotFoundOnDiskOrInAnyRepositoryError", func() {
-					Expect(executeErr).To(MatchError(shared.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
+					Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginName, BinaryName: binaryName}))
 				})
 			})
 
