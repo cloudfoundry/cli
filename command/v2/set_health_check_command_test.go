@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -73,8 +74,7 @@ var _ = Describe("set-health-check Command", func() {
 			Expect(targetedOrganizationRequired).To(Equal(true))
 			Expect(targetedSpaceRequired).To(Equal(true))
 
-			Expect(executeErr).To(MatchError(
-				command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 		})
 	})
 
@@ -89,7 +89,7 @@ var _ = Describe("set-health-check Command", func() {
 			})
 
 			It("returns the UnsupportedHealthCheckTypeError", func() {
-				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+				Expect(executeErr).To(MatchError(translatableerror.HealthCheckTypeUnsupportedError{
 					SupportedTypes: []string{"port", "none"},
 				}))
 			})
@@ -101,7 +101,7 @@ var _ = Describe("set-health-check Command", func() {
 			})
 
 			It("returns the UnsupportedHealthCheckTypeError", func() {
-				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+				Expect(executeErr).To(MatchError(translatableerror.HealthCheckTypeUnsupportedError{
 					SupportedTypes: []string{"port", "none"},
 				}))
 			})
@@ -129,7 +129,7 @@ var _ = Describe("set-health-check Command", func() {
 			})
 
 			It("returns the UnsupportedHealthCheckTypeError", func() {
-				Expect(executeErr).To(MatchError(command.HealthCheckTypeUnsupportedError{
+				Expect(executeErr).To(MatchError(translatableerror.HealthCheckTypeUnsupportedError{
 					SupportedTypes: []string{"port", "none", "process"},
 				}))
 			})

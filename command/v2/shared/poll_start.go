@@ -3,6 +3,7 @@ package shared
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appStarting <-chan bool, apiWarnings <-chan string, apiErrs <-chan error) error {
@@ -54,17 +55,17 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 
 			switch err := apiErr.(type) {
 			case v2action.StagingFailedError:
-				return StagingFailedError{Message: err.Error()}
+				return translatableerror.StagingFailedError{Message: err.Error()}
 			case v2action.StagingFailedNoAppDetectedError:
-				return StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
+				return translatableerror.StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
 			case v2action.StagingTimeoutError:
-				return StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
+				return translatableerror.StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
 			case v2action.ApplicationInstanceCrashedError:
-				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case v2action.ApplicationInstanceFlappingError:
-				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case v2action.StartupTimeoutError:
-				return StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
 			default:
 				return HandleError(apiErr)
 			}

@@ -3,6 +3,7 @@ package command_test
 import (
 	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/version"
 
@@ -26,7 +27,7 @@ var _ = Describe("Minimum Version Check", func() {
 			It("does return an error", func() {
 				currentVersion := "1.0.0-alpha.5"
 				err := MinimumAPIVersionCheck(currentVersion, minimumVersion)
-				Expect(err).To(MatchError(MinimumAPIVersionNotMetError{
+				Expect(err).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 					CurrentVersion: currentVersion,
 					MinimumVersion: minimumVersion,
 				}))

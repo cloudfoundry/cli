@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -35,7 +35,7 @@ var _ = Describe("New Clients", func() {
 	Context("when the api endpoint is not set", func() {
 		It("returns the NoAPISetError", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true)
-			Expect(err).To(MatchError(command.NoAPISetError{
+			Expect(err).To(MatchError(translatableerror.NoAPISetError{
 				BinaryName: binaryName,
 			}))
 		})
@@ -78,7 +78,7 @@ var _ = Describe("New Clients", func() {
 
 			It("returns a command api not found error", func() {
 				_, _, err := NewClients(fakeConfig, testUI, true)
-				Expect(err).To(MatchError(command.APINotFoundError{URL: server.URL()}))
+				Expect(err).To(MatchError(translatableerror.APINotFoundError{URL: server.URL()}))
 			})
 		})
 

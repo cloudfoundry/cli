@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
 
 	"code.cloudfoundry.org/cli/util/ui"
@@ -109,7 +110,7 @@ var _ = Describe("Poll Start", func() {
 			v2action.StagingFailedNoAppDetectedError{
 				Reason: "some staging failure reason",
 			},
-			StagingFailedNoAppDetectedError{
+			translatableerror.StagingFailedNoAppDetectedError{
 				Message:    "some staging failure reason",
 				BinaryName: "FiveThirtyEight",
 			},
@@ -119,7 +120,7 @@ var _ = Describe("Poll Start", func() {
 			v2action.StagingFailedError{
 				Reason: "some staging failure reason",
 			},
-			StagingFailedError{
+			translatableerror.StagingFailedError{
 				Message: "some staging failure reason",
 			},
 		),
@@ -129,7 +130,7 @@ var _ = Describe("Poll Start", func() {
 				Name:    "some staging timeout name",
 				Timeout: time.Second,
 			},
-			StagingTimeoutError{
+			translatableerror.StagingTimeoutError{
 				AppName: "some staging timeout name",
 				Timeout: time.Second,
 			},
@@ -139,7 +140,7 @@ var _ = Describe("Poll Start", func() {
 			v2action.ApplicationInstanceCrashedError{
 				Name: "some application crashed name",
 			},
-			UnsuccessfulStartError{
+			translatableerror.UnsuccessfulStartError{
 				AppName:    "some application crashed name",
 				BinaryName: "FiveThirtyEight",
 			},
@@ -149,7 +150,7 @@ var _ = Describe("Poll Start", func() {
 			v2action.ApplicationInstanceFlappingError{
 				Name: "some application flapping name",
 			},
-			UnsuccessfulStartError{
+			translatableerror.UnsuccessfulStartError{
 				AppName:    "some application flapping name",
 				BinaryName: "FiveThirtyEight",
 			},
@@ -159,7 +160,7 @@ var _ = Describe("Poll Start", func() {
 			v2action.StartupTimeoutError{
 				Name: "some application timeout name",
 			},
-			StartupTimeoutError{
+			translatableerror.StartupTimeoutError{
 				AppName:    "some application timeout name",
 				BinaryName: "FiveThirtyEight",
 			},
@@ -167,7 +168,7 @@ var _ = Describe("Poll Start", func() {
 
 		Entry("any other error",
 			v2action.HTTPHealthCheckInvalidError{},
-			HTTPHealthCheckInvalidError{},
+			translatableerror.HTTPHealthCheckInvalidError{},
 		),
 	)
 })

@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -78,7 +78,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: "faceman"}))
+				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -111,7 +111,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 
 			It("returns a SecurityGroupNotFoundError and displays all warnings", func() {
-				Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
+				Expect(executeErr).To(MatchError(translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 				Expect(testUI.Err).To(Say("get security group warning"))
 			})
 		})
@@ -142,7 +142,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 
 			It("returns an OrganizationNotFoundError and displays all warnings", func() {
-				Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+				Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 				Expect(testUI.Err).To(Say("get security group warning"))
 				Expect(testUI.Err).To(Say("get organization warning"))
 			})
@@ -180,7 +180,7 @@ var _ = Describe("bind-security-group Command", func() {
 				})
 
 				It("returns a SpaceNotFoundError", func() {
-					Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+					Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 					Expect(testUI.Err).To(Say("get security group warning"))
 					Expect(testUI.Err).To(Say("get org warning"))
 					Expect(testUI.Err).To(Say("get space warning"))
@@ -419,7 +419,7 @@ var _ = Describe("bind-security-group Command", func() {
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(command.LifecycleMinimumAPIVersionNotMetError{
+				Expect(executeErr).To(MatchError(translatableerror.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: "2.34.0",
 					MinimumVersion: command.MinVersionLifecyleStagingV2,
 				}))

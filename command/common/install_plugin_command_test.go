@@ -10,11 +10,11 @@ import (
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/common/commonfakes"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -396,7 +396,7 @@ var _ = Describe("install-plugin command", func() {
 		})
 
 		It("returns an error indicating an unsupported URL scheme", func() {
-			Expect(executeErr).To(MatchError(command.UnsupportedURLSchemeError{
+			Expect(executeErr).To(MatchError(translatableerror.UnsupportedURLSchemeError{
 				UnsupportedURL: string(cmd.OptionalArgs.PluginNameOrLocation),
 			}))
 		})

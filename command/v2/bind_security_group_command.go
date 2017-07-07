@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -52,8 +53,8 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
-			case command.MinimumAPIVersionNotMetError:
-				return command.LifecycleMinimumAPIVersionNotMetError{
+			case translatableerror.MinimumAPIVersionNotMetError:
+				return translatableerror.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: e.CurrentVersion,
 					MinimumVersion: e.MinimumVersion,
 				}

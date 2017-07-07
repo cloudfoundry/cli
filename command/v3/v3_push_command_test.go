@@ -10,9 +10,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
@@ -84,7 +84,7 @@ var _ = Describe("v3-push Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -516,7 +516,7 @@ var _ = Describe("v3-push Command", func() {
 											})
 
 											It("returns the error and prints warnings", func() {
-												Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+												Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
 
 												Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as banana\\.\\.\\."))
 

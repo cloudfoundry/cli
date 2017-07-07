@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
@@ -60,7 +61,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
+			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
 				MinimumVersion: command.MinVersionIsolationSegmentV3,
 			}))
@@ -73,7 +74,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)

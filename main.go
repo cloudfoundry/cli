@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
@@ -176,13 +177,13 @@ func handleError(err error, commandUI UI) error {
 	commandUI.DisplayError(err)
 
 	switch err.(type) {
-	case command.ArgumentCombinationError:
+	case translatableerror.ArgumentCombinationError:
 		return ParseErr
-	case command.ParseArgumentError:
+	case translatableerror.ParseArgumentError:
 		return ParseErr
-	case command.RequiredArgumentError:
+	case translatableerror.RequiredArgumentError:
 		return ParseErr
-	case command.ThreeRequiredArgumentsError:
+	case translatableerror.ThreeRequiredArgumentsError:
 		return ParseErr
 	}
 

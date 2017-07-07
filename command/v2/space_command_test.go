@@ -8,8 +8,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -62,8 +62,7 @@ var _ = Describe("space Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(
-				command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -114,7 +113,7 @@ var _ = Describe("space Command", func() {
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+					Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -297,7 +296,7 @@ var _ = Describe("space Command", func() {
 			})
 
 			It("returns a translatable error and outputs all warnings", func() {
-				Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+				Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))

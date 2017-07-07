@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -49,8 +50,8 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
-			case command.MinimumAPIVersionNotMetError:
-				return command.LifecycleMinimumAPIVersionNotMetError{
+			case translatableerror.MinimumAPIVersionNotMetError:
+				return translatableerror.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: e.CurrentVersion,
 					MinimumVersion: e.MinimumVersion,
 				}
@@ -98,7 +99,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	default:
-		return command.ThreeRequiredArgumentsError{
+		return translatableerror.ThreeRequiredArgumentsError{
 			ArgumentName1: "SECURITY_GROUP",
 			ArgumentName2: "ORG",
 			ArgumentName3: "SPACE"}

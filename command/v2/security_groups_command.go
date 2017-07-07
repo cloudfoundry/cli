@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -56,7 +57,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 	if err != nil {
 		switch err.(type) {
-		case command.MinimumAPIVersionNotMetError:
+		case translatableerror.MinimumAPIVersionNotMetError:
 			includeStaging = false
 
 		default:

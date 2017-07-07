@@ -9,8 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -75,7 +75,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -134,7 +134,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					It("returns a translated security group not found error", func() {
 						Expect(testUI.Err).To(Say("unbind warning"))
 
-						Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
+						Expect(executeErr).To(MatchError(translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 					})
 				})
 
@@ -192,7 +192,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 
 				It("returns an error", func() {
-					Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
+					Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -234,7 +234,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				It("returns a translated security group not found error", func() {
 					Expect(testUI.Err).To(Say("unbind warning"))
 
-					Expect(executeErr).To(MatchError(shared.SecurityGroupNotFoundError{Name: "some-security-group"}))
+					Expect(executeErr).To(MatchError(translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 				})
 			})
 
@@ -285,7 +285,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("an error is returned", func() {
-				Expect(executeErr).To(MatchError(command.ThreeRequiredArgumentsError{
+				Expect(executeErr).To(MatchError(translatableerror.ThreeRequiredArgumentsError{
 					ArgumentName1: "SECURITY_GROUP",
 					ArgumentName2: "ORG",
 					ArgumentName3: "SPACE"}))
@@ -319,7 +319,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			})
 
 			It("returns a MinimumAPIVersionNotMetError", func() {
-				Expect(executeErr).To(MatchError(command.LifecycleMinimumAPIVersionNotMetError{
+				Expect(executeErr).To(MatchError(translatableerror.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: "2.34.0",
 					MinimumVersion: command.MinVersionLifecyleStagingV2,
 				}))
