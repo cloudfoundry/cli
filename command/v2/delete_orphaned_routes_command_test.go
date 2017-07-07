@@ -5,8 +5,8 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -61,7 +61,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: "faceman"}))
+				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)

@@ -5,10 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -113,7 +112,7 @@ var _ = Describe("target Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -250,7 +249,7 @@ var _ = Describe("target Command", func() {
 							})
 
 							It("returns a SpaceNotFoundError and clears existing space", func() {
-								Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+								Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
@@ -261,7 +260,7 @@ var _ = Describe("target Command", func() {
 
 					Context("when no org is targeted", func() {
 						It("returns NoOrgTargeted error and clears existing space", func() {
-							Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
@@ -284,7 +283,7 @@ var _ = Describe("target Command", func() {
 						})
 
 						It("displays all warnings,returns an org target error, and clears existing targets", func() {
-							Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+							Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
@@ -523,7 +522,7 @@ var _ = Describe("target Command", func() {
 							})
 
 							It("returns an error and clears existing targets", func() {
-								Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+								Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
@@ -543,7 +542,7 @@ var _ = Describe("target Command", func() {
 						})
 
 						It("returns an error and clears existing targets", func() {
-							Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+							Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))

@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	uaaWrapper "code.cloudfoundry.org/cli/api/uaa/wrapper"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 // NewClients creates a new V3 Cloud Controller client and UAA client using the
@@ -40,7 +41,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	}
 
 	if config.Target() == "" {
-		return nil, nil, command.NoAPISetError{
+		return nil, nil, translatableerror.NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}

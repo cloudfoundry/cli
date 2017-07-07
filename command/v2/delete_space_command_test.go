@@ -5,10 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -67,7 +66,7 @@ var _ = Describe("delete-space Command", func() {
 				})
 
 				It("returns the NotLoggedInError", func() {
-					Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+					Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 					Expect(checkTargetedOrg).To(BeFalse())
@@ -81,7 +80,7 @@ var _ = Describe("delete-space Command", func() {
 				})
 
 				It("returns the NoOrganizationTargetedError", func() {
-					Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{}))
+					Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{}))
 
 					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 					Expect(checkTargetedOrg).To(BeTrue())
@@ -120,7 +119,7 @@ var _ = Describe("delete-space Command", func() {
 						})
 
 						It("returns the translatable error", func() {
-							Expect(executeErr).To(MatchError(shared.SpaceNotFoundError{Name: "some-space"}))
+							Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
 							Expect(testUI.Out).To(Say("Deleting space some-space in org some-org as some-user\\.\\.\\."))
 
 							Expect(testUI.Err).To(Say("warning-1"))

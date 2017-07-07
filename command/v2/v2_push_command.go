@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/progressbar"
@@ -361,7 +362,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 
 func (cmd V2PushCommand) validateArgs() error {
 	if cmd.DockerImage.Path != "" && cmd.AppPath != "" {
-		return command.ArgumentCombinationError{
+		return translatableerror.ArgumentCombinationError{
 			Arg1: "--docker-image, -o",
 			Arg2: "-p",
 		}

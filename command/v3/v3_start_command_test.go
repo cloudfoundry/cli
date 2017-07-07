@@ -5,9 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -60,7 +60,7 @@ var _ = Describe("v3-start Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NoOrganizationTargetedError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -130,7 +130,7 @@ var _ = Describe("v3-start Command", func() {
 		})
 
 		It("says that the app failed to start", func() {
-			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+			Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
 			Expect(testUI.Out).ToNot(Say("Starting"))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))
@@ -155,7 +155,7 @@ var _ = Describe("v3-start Command", func() {
 		})
 
 		It("says that the app failed to start", func() {
-			Expect(executeErr).To(Equal(command.ApplicationNotFoundError{Name: app}))
+			Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
 			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Err).To(Say("get-warning-1"))

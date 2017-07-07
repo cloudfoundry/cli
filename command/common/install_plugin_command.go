@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
@@ -201,7 +202,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		return cmd.getPluginFromURL(pluginNameOrLocation, tempPluginDir)
 
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
-		return "", 0, command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
+		return "", 0, translatableerror.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 
 	default:
 		repos := cmd.Config.PluginRepositories()
