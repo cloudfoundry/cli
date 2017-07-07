@@ -246,8 +246,6 @@ jobs:
          params:
            channel: '#cli-firehose'
            text: "windows unit tests failed :("
-    - task: lint
-      file: cli-ci/ci/cli/tasks/lint.yml
 
 - name: build-binaries
   serial: true
