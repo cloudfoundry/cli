@@ -282,6 +282,10 @@ var _ = Describe("v2-push Command", func() {
 							tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
 							Expect(err).ToNot(HaveOccurred())
 
+							// OS X uses weird symlinks that causes problems for some tests
+							tmpDir, err = filepath.EvalSymlinks(tmpDir)
+							Expect(err).ToNot(HaveOccurred())
+
 							originalDir, err = os.Getwd()
 							Expect(err).ToNot(HaveOccurred())
 
