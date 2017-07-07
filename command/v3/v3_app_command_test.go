@@ -187,7 +187,7 @@ var _ = Describe("v3-app Command", func() {
 					})
 
 					It("returns a translatable error and all warnings", func() {
-						Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
+						Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: "some-app"}))
 
 						Expect(testUI.Err).To(Say("warning-1"))
 						Expect(testUI.Err).To(Say("warning-2"))
