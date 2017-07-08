@@ -34,7 +34,7 @@ var _ = Describe("HandleError", func() {
 
 		Entry("ccerror.SSLValidationHostnameError -> SSLCertErrorError",
 			ccerror.SSLValidationHostnameError{Message: "some-message"},
-			translatableerror.SSLCertErrorError{Message: "some-message"}),
+			translatableerror.SSLCertError{Message: "some-message"}),
 
 		Entry("ccerror.APINotFoundError -> APINotFoundError",
 			ccerror.APINotFoundError{URL: "some-url"},

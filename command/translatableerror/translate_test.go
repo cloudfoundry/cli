@@ -84,7 +84,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
-		Entry("SSLCertErrorError", SSLCertErrorError{}),
+		Entry("SSLCertError", SSLCertError{}),
 		Entry("StagingFailedError", StagingFailedError{}),
 		Entry("StagingFailedNoAppDetectedError", StagingFailedNoAppDetectedError{}),
 		Entry("StagingTimeoutError", StagingTimeoutError{}),
