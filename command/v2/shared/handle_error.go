@@ -16,7 +16,7 @@ func HandleError(err error) error {
 	case ccerror.RequestError:
 		return translatableerror.APIRequestError{Err: e.Err}
 	case ccerror.SSLValidationHostnameError:
-		return translatableerror.SSLCertErrorError{Message: e.Message}
+		return translatableerror.SSLCertError{Message: e.Message}
 	case ccerror.UnverifiedServerError:
 		return translatableerror.InvalidSSLCertError{API: e.URL}
 
