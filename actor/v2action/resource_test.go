@@ -27,7 +27,7 @@ var _ = Describe("Resource Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "")
+		srcDir, err = ioutil.TempDir("", "resource-actions-test")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
