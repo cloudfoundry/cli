@@ -13,11 +13,11 @@ type UpdateServiceAuthTokenCommand struct {
 	usage        interface{}               `usage:"CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"`
 }
 
-func (_ UpdateServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
+func (UpdateServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UpdateServiceAuthTokenCommand) Execute(args []string) error {
+func (UpdateServiceAuthTokenCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

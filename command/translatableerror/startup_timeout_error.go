@@ -5,7 +5,7 @@ type StartupTimeoutError struct {
 	BinaryName string
 }
 
-func (_ StartupTimeoutError) Error() string {
+func (StartupTimeoutError) Error() string {
 	return "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.\n\nUse '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
 }
 

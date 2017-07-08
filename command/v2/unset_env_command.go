@@ -12,11 +12,11 @@ type UnsetEnvCommand struct {
 	relatedCommands interface{} `related_commands:"apps, env, restart, set-staging-environment-variable-group, set-running-environment-variable-group"`
 }
 
-func (_ UnsetEnvCommand) Setup(config command.Config, ui command.UI) error {
+func (UnsetEnvCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UnsetEnvCommand) Execute(args []string) error {
+func (UnsetEnvCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

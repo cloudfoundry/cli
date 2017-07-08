@@ -332,7 +332,7 @@ func (actor Actor) unbindSecurityGroupAndSpace(securityGroup SecurityGroup, spac
 	}
 }
 
-func (_ Actor) doUnbind(securityGroup SecurityGroup,
+func (Actor) doUnbind(securityGroup SecurityGroup,
 	spaceGUID string,
 	lifecycle ccv2.SecurityGroupLifecycle,
 	requestedPhaseSecurityGroupBoundToSpace func(string, string) (bool, Warnings, error),

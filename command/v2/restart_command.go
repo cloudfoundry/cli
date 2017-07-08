@@ -16,11 +16,11 @@ type RestartCommand struct {
 	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 }
 
-func (_ RestartCommand) Setup(config command.Config, ui command.UI) error {
+func (RestartCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RestartCommand) Execute(args []string) error {
+func (RestartCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -4,7 +4,7 @@ type IsolationSegmentNotFoundError struct {
 	Name string
 }
 
-func (_ IsolationSegmentNotFoundError) Error() string {
+func (IsolationSegmentNotFoundError) Error() string {
 	return "Isolation segment '{{.Name}}' not found."
 }
 

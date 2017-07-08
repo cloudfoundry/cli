@@ -18,11 +18,11 @@ type DeleteRouteCommand struct {
 	relatedCommands interface{} `related_commands:"delete-orphaned-routes, routes, unmap-route"`
 }
 
-func (_ DeleteRouteCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteRouteCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteRouteCommand) Execute(args []string) error {
+func (DeleteRouteCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

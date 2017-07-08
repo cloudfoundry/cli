@@ -4,7 +4,7 @@ type InvalidSSLCertError struct {
 	API string
 }
 
-func (_ InvalidSSLCertError) Error() string {
+func (InvalidSSLCertError) Error() string {
 	return "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
 }
 

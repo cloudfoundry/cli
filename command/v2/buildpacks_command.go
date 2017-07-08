@@ -12,11 +12,11 @@ type BuildpacksCommand struct {
 	relatedCommands interface{} `related_commands:"push"`
 }
 
-func (_ BuildpacksCommand) Setup(config command.Config, ui command.UI) error {
+func (BuildpacksCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ BuildpacksCommand) Execute(args []string) error {
+func (BuildpacksCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

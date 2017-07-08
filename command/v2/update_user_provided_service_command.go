@@ -17,11 +17,11 @@ type UpdateUserProvidedServiceCommand struct {
 	relatedCommands interface{}          `related_commands:"rename-service, services, update-service"`
 }
 
-func (_ UpdateUserProvidedServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (UpdateUserProvidedServiceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UpdateUserProvidedServiceCommand) Execute(args []string) error {
+func (UpdateUserProvidedServiceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

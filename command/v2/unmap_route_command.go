@@ -17,11 +17,11 @@ type UnmapRouteCommand struct {
 	relatedCommands interface{}    `related_commands:"delete-route, routes"`
 }
 
-func (_ UnmapRouteCommand) Setup(config command.Config, ui command.UI) error {
+func (UnmapRouteCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UnmapRouteCommand) Execute(args []string) error {
+func (UnmapRouteCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

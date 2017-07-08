@@ -22,11 +22,11 @@ type SSHCommand struct {
 	relatedCommands     interface{}  `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
 }
 
-func (_ SSHCommand) Setup(config command.Config, ui command.UI) error {
+func (SSHCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SSHCommand) Execute(args []string) error {
+func (SSHCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

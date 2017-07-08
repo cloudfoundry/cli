@@ -14,11 +14,11 @@ type BindRunningSecurityGroupCommand struct {
 	relatedCommands interface{}        `related_commands:"apps, bind-security-group, bind-staging-security-group, restart, running-security-groups, security-groups"`
 }
 
-func (_ BindRunningSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (BindRunningSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ BindRunningSecurityGroupCommand) Execute(args []string) error {
+func (BindRunningSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

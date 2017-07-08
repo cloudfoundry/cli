@@ -12,11 +12,11 @@ type RunningEnvironmentVariableGroupCommand struct {
 	relatedCommands interface{} `related_commands:"env, staging-environment-variable-group"`
 }
 
-func (_ RunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (RunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RunningEnvironmentVariableGroupCommand) Execute(args []string) error {
+func (RunningEnvironmentVariableGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

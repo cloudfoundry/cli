@@ -3,7 +3,7 @@ package translatableerror
 type HTTPHealthCheckInvalidError struct {
 }
 
-func (_ HTTPHealthCheckInvalidError) Error() string {
+func (HTTPHealthCheckInvalidError) Error() string {
 	return "Health check type must be 'http' to set a health check HTTP endpoint."
 }
 

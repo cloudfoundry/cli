@@ -4,7 +4,7 @@ type RunTaskError struct {
 	Message string
 }
 
-func (_ RunTaskError) Error() string {
+func (RunTaskError) Error() string {
 	return "Error running task: {{.CloudControllerMessage}}"
 }
 

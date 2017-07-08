@@ -4,7 +4,7 @@ type ServiceInstanceNotFoundError struct {
 	Name string
 }
 
-func (_ ServiceInstanceNotFoundError) Error() string {
+func (ServiceInstanceNotFoundError) Error() string {
 	return "Service instance {{.ServiceInstance}} not found"
 }
 

@@ -217,7 +217,7 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 	return job, response.Warnings, firstError
 }
 
-func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
 
@@ -262,7 +262,7 @@ func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Reso
 	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
-func (_ *Client) overallRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+func (*Client) overallRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 

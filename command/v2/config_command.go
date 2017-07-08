@@ -16,11 +16,11 @@ type ConfigCommand struct {
 	usage        interface{}       `usage:"CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"`
 }
 
-func (_ ConfigCommand) Setup(config command.Config, ui command.UI) error {
+func (ConfigCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ConfigCommand) Execute(args []string) error {
+func (ConfigCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

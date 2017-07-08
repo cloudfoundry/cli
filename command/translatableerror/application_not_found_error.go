@@ -4,7 +4,7 @@ type ApplicationNotFoundError struct {
 	Name string
 }
 
-func (_ ApplicationNotFoundError) Error() string {
+func (ApplicationNotFoundError) Error() string {
 	return "App {{.AppName}} not found"
 }
 

@@ -6,7 +6,7 @@ type RepositoryNameTakenError struct {
 	Name string
 }
 
-func (_ RepositoryNameTakenError) Error() string {
+func (RepositoryNameTakenError) Error() string {
 	return "Plugin repo named '{{.RepositoryName}}' already exists, please use another name."
 }
 

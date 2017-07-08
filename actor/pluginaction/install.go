@@ -32,7 +32,7 @@ type PluginInvalidError struct {
 	Err error
 }
 
-func (_ PluginInvalidError) Error() string {
+func (PluginInvalidError) Error() string {
 	return "File is not a valid cf CLI plugin binary."
 }
 
@@ -45,7 +45,7 @@ type PluginCommandsConflictError struct {
 	CommandNames   []string
 }
 
-func (_ PluginCommandsConflictError) Error() string {
+func (PluginCommandsConflictError) Error() string {
 	return ""
 }
 

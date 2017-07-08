@@ -5,7 +5,7 @@ type JobFailedError struct {
 	Message string
 }
 
-func (_ JobFailedError) Error() string {
+func (JobFailedError) Error() string {
 	return "Job ({{.JobGUID}}) failed: {{.Message}}"
 }
 

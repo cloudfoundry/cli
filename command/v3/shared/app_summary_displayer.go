@@ -163,7 +163,7 @@ func (cmd AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSumma
 	}
 }
 
-func (_ AppSummaryDisplayer) processesSummary(processes []v3action.Process) string {
+func (AppSummaryDisplayer) processesSummary(processes []v3action.Process) string {
 	var processesStrings []string
 	for _, process := range processes {
 		processesStrings = append(processesStrings, fmt.Sprintf("%s:%d/%d", process.Type, process.HealthyInstanceCount(), process.TotalInstanceCount()))
@@ -172,7 +172,7 @@ func (_ AppSummaryDisplayer) processesSummary(processes []v3action.Process) stri
 	return strings.Join(processesStrings, ", ")
 }
 
-func (_ AppSummaryDisplayer) routesSummary(routes []v2action.Route) string {
+func (AppSummaryDisplayer) routesSummary(routes []v2action.Route) string {
 	formattedRoutes := []string{}
 	for _, route := range routes {
 		formattedRoutes = append(formattedRoutes, route.String())
@@ -180,7 +180,7 @@ func (_ AppSummaryDisplayer) routesSummary(routes []v2action.Route) string {
 	return strings.Join(formattedRoutes, ", ")
 }
 
-func (_ AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {
+func (AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {
 	var usageStrings []string
 	for _, process := range processes {
 		if process.TotalInstanceCount() > 0 {
@@ -191,7 +191,7 @@ func (_ AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {
 	return strings.Join(usageStrings, ", ")
 }
 
-func (_ AppSummaryDisplayer) buildpackNames(buildpacks []v3action.Buildpack) string {
+func (AppSummaryDisplayer) buildpackNames(buildpacks []v3action.Buildpack) string {
 	var names []string
 	for _, buildpack := range buildpacks {
 		if buildpack.DetectOutput != "" {
@@ -204,11 +204,11 @@ func (_ AppSummaryDisplayer) buildpackNames(buildpacks []v3action.Buildpack) str
 	return strings.Join(names, ", ")
 }
 
-func (_ AppSummaryDisplayer) appInstanceDate(input time.Time) string {
+func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 	return input.Local().Format("2006-01-02 15:04:05 PM")
 }
 
-func (_ AppSummaryDisplayer) processHasAnInstance(process *v3action.Process) bool {
+func (AppSummaryDisplayer) processHasAnInstance(process *v3action.Process) bool {
 	for instanceIdx := range process.Instances {
 		if process.Instances[instanceIdx].State != "DOWN" {
 			return true
@@ -218,7 +218,7 @@ func (_ AppSummaryDisplayer) processHasAnInstance(process *v3action.Process) boo
 	return false
 }
 
-func (_ AppSummaryDisplayer) processInstancesAreAllCrashed(process *v3action.Process) bool {
+func (AppSummaryDisplayer) processInstancesAreAllCrashed(process *v3action.Process) bool {
 	if len(process.Instances) < 1 {
 		return false
 	}

@@ -7,7 +7,7 @@ type GettingPluginRepositoryError struct {
 	Message string
 }
 
-func (_ GettingPluginRepositoryError) Error() string {
+func (GettingPluginRepositoryError) Error() string {
 	return "Could not get plugin repository '{{.RepositoryName}}'\n{{.ErrorMessage}}"
 }
 

@@ -14,11 +14,11 @@ type DeleteServiceAuthTokenCommand struct {
 	usage        interface{}                     `usage:"CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"`
 }
 
-func (_ DeleteServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteServiceAuthTokenCommand) Execute(args []string) error {
+func (DeleteServiceAuthTokenCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

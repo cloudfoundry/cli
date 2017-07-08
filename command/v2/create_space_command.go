@@ -16,11 +16,11 @@ type CreateSpaceCommand struct {
 	relatedCommands interface{} `related_commands:"set-space-isolation-segment, space-quotas, spaces, target"`
 }
 
-func (_ CreateSpaceCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateSpaceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateSpaceCommand) Execute(args []string) error {
+func (CreateSpaceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

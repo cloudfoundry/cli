@@ -12,11 +12,11 @@ type RouterGroupsCommand struct {
 	relatedCommands interface{} `related_commands:"create-domain, domains"`
 }
 
-func (_ RouterGroupsCommand) Setup(config command.Config, ui command.UI) error {
+func (RouterGroupsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RouterGroupsCommand) Execute(args []string) error {
+func (RouterGroupsCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -13,11 +13,11 @@ type RepoPluginsCommand struct {
 	relatedCommands      interface{} `related_commands:"add-plugin-repo, delete-plugin-repo, install-plugin"`
 }
 
-func (_ RepoPluginsCommand) Setup(config command.Config, ui command.UI) error {
+func (RepoPluginsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RepoPluginsCommand) Execute(args []string) error {
+func (RepoPluginsCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

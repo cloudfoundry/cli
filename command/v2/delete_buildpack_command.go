@@ -15,11 +15,11 @@ type DeleteBuildpackCommand struct {
 	relatedCommands interface{}    `related_commands:"buildpacks"`
 }
 
-func (_ DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteBuildpackCommand) Execute(args []string) error {
+func (DeleteBuildpackCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

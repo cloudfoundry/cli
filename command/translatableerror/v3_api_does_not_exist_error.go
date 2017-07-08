@@ -4,7 +4,7 @@ type V3APIDoesNotExistError struct {
 	Message string
 }
 
-func (_ V3APIDoesNotExistError) Error() string {
+func (V3APIDoesNotExistError) Error() string {
 	return "{{.Message}}\nNote that this command requires CF API version 3.0.0+."
 }
 

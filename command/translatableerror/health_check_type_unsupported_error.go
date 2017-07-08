@@ -6,7 +6,7 @@ type HealthCheckTypeUnsupportedError struct {
 	SupportedTypes []string
 }
 
-func (_ HealthCheckTypeUnsupportedError) Error() string {
+func (HealthCheckTypeUnsupportedError) Error() string {
 	return "Your target CF API version only supports health check type values {{.SupportedTypes}} and {{.LastSupportedType}}."
 }
 

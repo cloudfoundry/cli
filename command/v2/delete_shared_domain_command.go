@@ -15,11 +15,11 @@ type DeleteSharedDomainCommand struct {
 	relatedCommands interface{} `related_commands:"delete-domain, domains"`
 }
 
-func (_ DeleteSharedDomainCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteSharedDomainCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteSharedDomainCommand) Execute(args []string) error {
+func (DeleteSharedDomainCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

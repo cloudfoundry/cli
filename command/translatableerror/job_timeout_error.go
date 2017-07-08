@@ -7,7 +7,7 @@ type JobTimeoutError struct {
 	Timeout time.Duration
 }
 
-func (_ JobTimeoutError) Error() string {
+func (JobTimeoutError) Error() string {
 	return "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
 }
 

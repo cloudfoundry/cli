@@ -5,7 +5,7 @@ import "fmt"
 type NoDomainsFoundError struct {
 }
 
-func (_ NoDomainsFoundError) Error() string {
+func (NoDomainsFoundError) Error() string {
 	return fmt.Sprintf("No private or shared domains found in this organization")
 }
 

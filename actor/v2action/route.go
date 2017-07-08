@@ -13,7 +13,7 @@ import (
 type OrphanedRoutesNotFoundError struct{}
 
 // Error method to display the error message.
-func (_ OrphanedRoutesNotFoundError) Error() string {
+func (OrphanedRoutesNotFoundError) Error() string {
 	return "No orphaned routes were found."
 }
 
@@ -23,7 +23,7 @@ type RouteInDifferentSpaceError struct {
 	Route string
 }
 
-func (_ RouteInDifferentSpaceError) Error() string {
+func (RouteInDifferentSpaceError) Error() string {
 	return "route registered to another space"
 }
 

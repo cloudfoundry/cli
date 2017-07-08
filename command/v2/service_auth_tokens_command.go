@@ -11,11 +11,11 @@ type ServiceAuthTokensCommand struct {
 	usage interface{} `usage:"CF_NAME service-auth-tokens"`
 }
 
-func (_ ServiceAuthTokensCommand) Setup(config command.Config, ui command.UI) error {
+func (ServiceAuthTokensCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ServiceAuthTokensCommand) Execute(args []string) error {
+func (ServiceAuthTokensCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

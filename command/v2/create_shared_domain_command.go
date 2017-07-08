@@ -15,11 +15,11 @@ type CreateSharedDomainCommand struct {
 	relatedCommands interface{} `related_commands:"create-domain, domains, router-groups"`
 }
 
-func (_ CreateSharedDomainCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateSharedDomainCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateSharedDomainCommand) Execute(args []string) error {
+func (CreateSharedDomainCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -12,11 +12,11 @@ type AppsCommand struct {
 	relatedCommands interface{} `related_commands:"events, logs, map-route, push, scale, start, stop, restart"`
 }
 
-func (_ AppsCommand) Setup(config command.Config, ui command.UI) error {
+func (AppsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ AppsCommand) Execute(args []string) error {
+func (AppsCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

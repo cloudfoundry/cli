@@ -16,11 +16,11 @@ type DeleteCommand struct {
 	relatedCommands    interface{}  `related_commands:"apps, scale, stop"`
 }
 
-func (_ DeleteCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteCommand) Execute(args []string) error {
+func (DeleteCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -4,7 +4,7 @@ type StagingFailedError struct {
 	Message string
 }
 
-func (_ StagingFailedError) Error() string {
+func (StagingFailedError) Error() string {
 	return "Error staging application: {{.Message}}"
 }
 

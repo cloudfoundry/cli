@@ -5,7 +5,7 @@ type NotLoggedInError struct {
 	BinaryName string
 }
 
-func (_ NotLoggedInError) Error() string {
+func (NotLoggedInError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -16,7 +16,7 @@ type NoOrganizationTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoOrganizationTargetedError) Error() string {
+func (NoOrganizationTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -27,7 +27,7 @@ type NoSpaceTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoSpaceTargetedError) Error() string {
+func (NoSpaceTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -35,7 +35,7 @@ func (_ NoSpaceTargetedError) Error() string {
 
 // CheckTarget confirms that the user is logged in. Optionally it will also
 // check if an organization and space are targeted.
-func (_ Actor) CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+func (Actor) CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
 	if config.AccessToken() == "" && config.RefreshToken() == "" {
 		return NotLoggedInError{
 			BinaryName: config.BinaryName(),

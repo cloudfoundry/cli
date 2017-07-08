@@ -15,11 +15,11 @@ type DeleteUserCommand struct {
 	relatedCommands interface{}   `related_commands:"org-users"`
 }
 
-func (_ DeleteUserCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteUserCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteUserCommand) Execute(args []string) error {
+func (DeleteUserCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

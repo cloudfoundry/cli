@@ -10,7 +10,7 @@ import (
 
 type EnvironmentVariable string
 
-func (_ EnvironmentVariable) Complete(prefix string) []flags.Completion {
+func (EnvironmentVariable) Complete(prefix string) []flags.Completion {
 	if prefix == "" || prefix[0] != '$' {
 		return nil
 	}

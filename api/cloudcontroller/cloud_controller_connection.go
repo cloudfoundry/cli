@@ -62,7 +62,7 @@ func (connection *CloudControllerConnection) Make(request *Request, passedRespon
 	return connection.populateResponse(response, passedResponse)
 }
 
-func (_ *CloudControllerConnection) processRequestErrors(request *http.Request, err error) error {
+func (*CloudControllerConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
 		switch urlErr := e.Err.(type) {
@@ -120,7 +120,7 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 	return nil
 }
 
-func (_ *CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
+func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
 	if response.StatusCode >= 400 {
 		return ccerror.RawHTTPStatusError{
 			StatusCode:  response.StatusCode,

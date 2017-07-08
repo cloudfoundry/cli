@@ -14,11 +14,11 @@ type StopCommand struct {
 	relatedCommands interface{}  `related_commands:"restart, scale, start"`
 }
 
-func (_ StopCommand) Setup(config command.Config, ui command.UI) error {
+func (StopCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ StopCommand) Execute(args []string) error {
+func (StopCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }
