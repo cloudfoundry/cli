@@ -7,7 +7,7 @@ type StagingFailedNoAppDetectedError struct {
 	BinaryName string
 }
 
-func (_ StagingFailedNoAppDetectedError) Error() string {
+func (StagingFailedNoAppDetectedError) Error() string {
 	return "Error staging application: {{.Message}}\n\nTIP: Use '{{.BuildpackCommand}}' to see a list of supported buildpacks."
 }
 

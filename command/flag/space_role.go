@@ -10,7 +10,7 @@ type SpaceRole struct {
 	Role string
 }
 
-func (_ SpaceRole) Complete(prefix string) []flags.Completion {
+func (SpaceRole) Complete(prefix string) []flags.Completion {
 	return completions([]string{"SpaceManager", "SpaceDeveloper", "SpaceAuditor"}, prefix, false)
 }
 

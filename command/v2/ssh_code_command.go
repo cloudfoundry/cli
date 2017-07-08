@@ -12,11 +12,11 @@ type SSHCodeCommand struct {
 	relatedCommands interface{} `related_commands:"curl, ssh"`
 }
 
-func (_ SSHCodeCommand) Setup(config command.Config, ui command.UI) error {
+func (SSHCodeCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SSHCodeCommand) Execute(args []string) error {
+func (SSHCodeCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

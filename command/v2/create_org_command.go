@@ -15,11 +15,11 @@ type CreateOrgCommand struct {
 	relatedCommands interface{}       `related_commands:"create-space, orgs, quotas, set-org-role"`
 }
 
-func (_ CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateOrgCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateOrgCommand) Execute(args []string) error {
+func (CreateOrgCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

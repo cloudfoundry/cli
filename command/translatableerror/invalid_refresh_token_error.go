@@ -3,7 +3,7 @@ package translatableerror
 type InvalidRefreshTokenError struct {
 }
 
-func (_ InvalidRefreshTokenError) Error() string {
+func (InvalidRefreshTokenError) Error() string {
 	return "The token expired, was revoked, or the token ID is incorrect. Please log back in to re-authenticate."
 }
 

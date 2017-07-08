@@ -14,11 +14,11 @@ type SetOrgRoleCommand struct {
 	relatedCommands interface{}         `related_commands:"org-users, set-space-role"`
 }
 
-func (_ SetOrgRoleCommand) Setup(config command.Config, ui command.UI) error {
+func (SetOrgRoleCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SetOrgRoleCommand) Execute(args []string) error {
+func (SetOrgRoleCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

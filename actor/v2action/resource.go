@@ -82,7 +82,7 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 }
 
 // GatherDirectoryResources returns a list of resources for a directory.
-func (_ Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
+func (Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	var resources []Resource
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -297,7 +297,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 	return zipFile.Name(), nil
 }
 
-func (_ Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
+func (Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
 	apiResources := make([]ccv2.Resource, 0, len(resources)) // Explicitly done to prevent nils
 
 	for _, resource := range resources {
@@ -307,7 +307,7 @@ func (_ Actor) actorToCCResources(resources []Resource) []ccv2.Resource {
 	return apiResources
 }
 
-func (_ Actor) addFileToZipFromFileSystem(
+func (Actor) addFileToZipFromFileSystem(
 	srcPath string, srcFile io.ReadCloser, fileInfo os.FileInfo,
 	destPath string, sha1Sum string, mode os.FileMode, zipFile *zip.Writer,
 ) error {
@@ -361,7 +361,7 @@ func (_ Actor) addFileToZipFromFileSystem(
 	return nil
 }
 
-func (_ Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
+func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
 	for _, resource := range filesToInclude {
 		if resource.Filename == filepath.ToSlash(path) {
 			log.WithField("resource", resource.Filename).Debug("found resource in files to include")
@@ -373,7 +373,7 @@ func (_ Actor) findInResources(path string, filesToInclude []Resource) (Resource
 	return Resource{}, false
 }
 
-func (_ Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
+func (Actor) newArchiveReader(archive *os.File) (*zip.Reader, error) {
 	info, err := archive.Stat()
 	if err != nil {
 		return nil, err

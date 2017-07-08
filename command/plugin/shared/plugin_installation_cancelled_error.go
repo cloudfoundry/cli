@@ -5,6 +5,6 @@ package shared
 type PluginInstallationCancelled struct {
 }
 
-func (_ PluginInstallationCancelled) Error() string {
+func (PluginInstallationCancelled) Error() string {
 	return "Plugin installation cancelled"
 }

@@ -6,7 +6,7 @@ type NotLoggedInError struct {
 	BinaryName string
 }
 
-func (_ NotLoggedInError) Error() string {
+func (NotLoggedInError) Error() string {
 	return "Not logged in. Use '{{.CFLoginCommand}}' to log in."
 }
 

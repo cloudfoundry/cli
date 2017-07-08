@@ -2,7 +2,7 @@ package translatableerror
 
 type NoPluginRepositoriesError struct{}
 
-func (_ NoPluginRepositoriesError) Error() string {
+func (NoPluginRepositoriesError) Error() string {
 	return "No plugin repositories registered to search for plugin updates."
 }
 

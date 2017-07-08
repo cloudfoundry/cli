@@ -4,7 +4,7 @@ type SecurityGroupNotFoundError struct {
 	Name string
 }
 
-func (_ SecurityGroupNotFoundError) Error() string {
+func (SecurityGroupNotFoundError) Error() string {
 	return "Security group '{{.Name}}' not found."
 }
 

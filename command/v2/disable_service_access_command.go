@@ -16,11 +16,11 @@ type DisableServiceAccessCommand struct {
 	relatedCommands interface{}  `related_commands:"marketplace, service-access, service-brokers"`
 }
 
-func (_ DisableServiceAccessCommand) Setup(config command.Config, ui command.UI) error {
+func (DisableServiceAccessCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DisableServiceAccessCommand) Execute(args []string) error {
+func (DisableServiceAccessCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

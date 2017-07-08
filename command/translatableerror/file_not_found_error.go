@@ -6,7 +6,7 @@ type FileNotFoundError struct {
 	Path string
 }
 
-func (_ FileNotFoundError) Error() string {
+func (FileNotFoundError) Error() string {
 	return "File not found locally, make sure the file exists at given path {{.FilePath}}"
 }
 

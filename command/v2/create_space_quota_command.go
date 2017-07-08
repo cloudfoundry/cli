@@ -21,11 +21,11 @@ type CreateSpaceQuotaCommand struct {
 	relatedCommands             interface{}              `related_commands:"quotas, space-quotas"`
 }
 
-func (_ CreateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateSpaceQuotaCommand) Execute(args []string) error {
+func (CreateSpaceQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

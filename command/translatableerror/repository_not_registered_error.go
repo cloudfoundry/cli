@@ -4,7 +4,7 @@ type RepositoryNotRegisteredError struct {
 	Name string
 }
 
-func (_ RepositoryNotRegisteredError) Error() string {
+func (RepositoryNotRegisteredError) Error() string {
 	return "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos."
 }
 

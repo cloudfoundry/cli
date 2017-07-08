@@ -12,11 +12,11 @@ type OauthTokenCommand struct {
 	relatedCommands interface{} `related_commands:"curl"`
 }
 
-func (_ OauthTokenCommand) Setup(config command.Config, ui command.UI) error {
+func (OauthTokenCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ OauthTokenCommand) Execute(args []string) error {
+func (OauthTokenCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

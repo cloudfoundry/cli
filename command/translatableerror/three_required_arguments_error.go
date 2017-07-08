@@ -6,7 +6,7 @@ type ThreeRequiredArgumentsError struct {
 	ArgumentName3 string
 }
 
-func (_ ThreeRequiredArgumentsError) Error() string {
+func (ThreeRequiredArgumentsError) Error() string {
 	return "Incorrect Usage: the required arguments `{{.ArgumentName1}}`, `{{.ArgumentName2}}`, and `{{.ArgumentName3}}` were not provided"
 }
 

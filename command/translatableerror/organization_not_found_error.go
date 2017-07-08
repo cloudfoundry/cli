@@ -4,7 +4,7 @@ type OrganizationNotFoundError struct {
 	Name string
 }
 
-func (_ OrganizationNotFoundError) Error() string {
+func (OrganizationNotFoundError) Error() string {
 	return "Organization '{{.Name}}' not found."
 }
 

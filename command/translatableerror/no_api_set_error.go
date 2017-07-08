@@ -6,7 +6,7 @@ type NoAPISetError struct {
 	BinaryName string
 }
 
-func (_ NoAPISetError) Error() string {
+func (NoAPISetError) Error() string {
 	return "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
 }
 

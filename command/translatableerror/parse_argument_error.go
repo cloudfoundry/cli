@@ -5,7 +5,7 @@ type ParseArgumentError struct {
 	ExpectedType string
 }
 
-func (_ ParseArgumentError) Error() string {
+func (ParseArgumentError) Error() string {
 	return "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}"
 }
 

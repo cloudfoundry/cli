@@ -15,11 +15,11 @@ type OrgUsersCommand struct {
 	relatedCommands interface{}       `related_commands:"orgs"`
 }
 
-func (_ OrgUsersCommand) Setup(config command.Config, ui command.UI) error {
+func (OrgUsersCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ OrgUsersCommand) Execute(args []string) error {
+func (OrgUsersCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

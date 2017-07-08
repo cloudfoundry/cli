@@ -4,7 +4,7 @@ type APINotFoundError struct {
 	URL string
 }
 
-func (_ APINotFoundError) Error() string {
+func (APINotFoundError) Error() string {
 	return "API endpoint not found at '{{.URL}}'"
 }
 

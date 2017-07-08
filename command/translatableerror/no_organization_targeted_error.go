@@ -6,7 +6,7 @@ type NoOrganizationTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoOrganizationTargetedError) Error() string {
+func (NoOrganizationTargetedError) Error() string {
 	return "No org targeted, use '{{.Command}}' to target an org."
 }
 

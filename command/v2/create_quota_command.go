@@ -21,11 +21,11 @@ type CreateQuotaCommand struct {
 	relatedCommands             interface{}              `related_commands:"create-org, quotas, set-quota"`
 }
 
-func (_ CreateQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateQuotaCommand) Execute(args []string) error {
+func (CreateQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

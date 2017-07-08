@@ -67,7 +67,7 @@ type EnvironmentVariable struct {
 
 // CommandInfoByName returns the help information for a particular commandName in
 // the commandList.
-func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
+func (Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
 	field, found := reflect.TypeOf(commandList).FieldByNameFunc(
 		func(fieldName string) bool {
 			field, _ := reflect.TypeOf(commandList).FieldByName(fieldName)
@@ -131,7 +131,7 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 
 // CommandInfos returns a slice of CommandInfo that only fills in
 // the Name and Description for all the commands in commandList
-func (_ Actor) CommandInfos(commandList interface{}) map[string]CommandInfo {
+func (Actor) CommandInfos(commandList interface{}) map[string]CommandInfo {
 	handler := reflect.TypeOf(commandList)
 
 	infos := make(map[string]CommandInfo, handler.NumField())

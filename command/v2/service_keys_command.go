@@ -14,11 +14,11 @@ type ServiceKeysCommand struct {
 	relatedCommands interface{}          `related_commands:"delete-service-key"`
 }
 
-func (_ ServiceKeysCommand) Setup(config command.Config, ui command.UI) error {
+func (ServiceKeysCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ServiceKeysCommand) Execute(args []string) error {
+func (ServiceKeysCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

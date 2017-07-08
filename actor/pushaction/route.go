@@ -156,7 +156,7 @@ func (actor Actor) BindRouteToApp(route v2action.Route, appGUID string) (v2actio
 	return warnings, err
 }
 
-func (_ Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
+func (Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
 	for _, r := range routes {
 		if r.GUID == route.GUID {
 			return true
@@ -166,7 +166,7 @@ func (_ Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) 
 	return false
 }
 
-func (_ Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
+func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
 	for _, r := range routes {
 		if r.Host == route.Host && r.Path == route.Path && r.Port == route.Port &&
 			r.SpaceGUID == route.SpaceGUID && r.Domain.GUID == route.Domain.GUID {

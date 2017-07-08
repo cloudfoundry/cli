@@ -4,7 +4,7 @@ type DownloadPluginHTTPError struct {
 	Message string
 }
 
-func (_ DownloadPluginHTTPError) Error() string {
+func (DownloadPluginHTTPError) Error() string {
 	return "Download attempt failed; server returned {{.ErrorMessage}}\nUnable to install; plugin is not available from the given URL."
 }
 

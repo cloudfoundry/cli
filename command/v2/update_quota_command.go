@@ -23,11 +23,11 @@ type UpdateQuotaCommand struct {
 	relatedCommands          interface{}              `related_commands:"org, quota"`
 }
 
-func (_ UpdateQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (UpdateQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UpdateQuotaCommand) Execute(args []string) error {
+func (UpdateQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

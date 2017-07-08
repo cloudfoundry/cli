@@ -35,7 +35,7 @@ func (cmd *PluginsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd PluginsCommand) Execute(_ []string) error {
+func (cmd PluginsCommand) Execute([]string) error {
 	switch {
 	case cmd.Outdated:
 		return cmd.displayOutdatedPlugins()

@@ -14,11 +14,11 @@ type EnvCommand struct {
 	relatedCommands interface{}  `related_commands:"app, apps, set-env, unset-env, running-environment-variable-group, staging-environment-variable-group"`
 }
 
-func (_ EnvCommand) Setup(config command.Config, ui command.UI) error {
+func (EnvCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ EnvCommand) Execute(args []string) error {
+func (EnvCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

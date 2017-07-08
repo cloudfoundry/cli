@@ -14,7 +14,7 @@ type UploadFailedError struct {
 	Err error
 }
 
-func (_ UploadFailedError) Error() string {
+func (UploadFailedError) Error() string {
 	return "upload failed"
 }
 

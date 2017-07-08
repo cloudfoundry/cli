@@ -7,7 +7,7 @@ type ArgumentCombinationError struct {
 	Arg2 string
 }
 
-func (_ ArgumentCombinationError) Error() string {
+func (ArgumentCombinationError) Error() string {
 	return "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together."
 }
 

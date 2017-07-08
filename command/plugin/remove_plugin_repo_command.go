@@ -14,11 +14,11 @@ type RemovePluginRepoCommand struct {
 	relatedCommands interface{}         `related_commands:"list-plugin-repos"`
 }
 
-func (_ RemovePluginRepoCommand) Setup(config command.Config, ui command.UI) error {
+func (RemovePluginRepoCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RemovePluginRepoCommand) Execute(args []string) error {
+func (RemovePluginRepoCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

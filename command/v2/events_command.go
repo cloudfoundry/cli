@@ -13,11 +13,11 @@ type EventsCommand struct {
 	usage        interface{}  `usage:"CF_NAME events APP_NAME"`
 }
 
-func (_ EventsCommand) Setup(config command.Config, ui command.UI) error {
+func (EventsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ EventsCommand) Execute(args []string) error {
+func (EventsCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

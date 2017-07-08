@@ -7,7 +7,7 @@ type StagingTimeoutError struct {
 	Timeout time.Duration
 }
 
-func (_ StagingTimeoutError) Error() string {
+func (StagingTimeoutError) Error() string {
 	return "{{.AppName}} failed to stage within {{.Timeout}} minutes"
 }
 

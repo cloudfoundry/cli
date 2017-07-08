@@ -15,11 +15,11 @@ type FilesCommand struct {
 	relatedCommands interface{}    `related_commands:"ssh"`
 }
 
-func (_ FilesCommand) Setup(config command.Config, ui command.UI) error {
+func (FilesCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ FilesCommand) Execute(args []string) error {
+func (FilesCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

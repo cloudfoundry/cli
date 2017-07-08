@@ -109,7 +109,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	return responsePackage, response.Warnings, err
 }
 
-func (_ *Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {
+func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, "", err

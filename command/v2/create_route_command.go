@@ -18,11 +18,11 @@ type CreateRouteCommand struct {
 	relatedCommands interface{}      `related_commands:"check-route, domains, map-route"`
 }
 
-func (_ CreateRouteCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateRouteCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateRouteCommand) Execute(args []string) error {
+func (CreateRouteCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

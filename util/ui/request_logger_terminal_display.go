@@ -25,7 +25,7 @@ func newRequestLoggerTerminalDisplay(ui *UI, lock *sync.Mutex) *RequestLoggerTer
 	}
 }
 
-func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
+func (display *RequestLoggerTerminalDisplay) DisplayBody([]byte) error {
 	fmt.Fprintf(display.ui.Out, "%s\n", RedactedValue)
 	return nil
 }

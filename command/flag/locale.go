@@ -32,11 +32,11 @@ func (l *Locale) UnmarshalFlag(val string) error {
 	}
 }
 
-func (_ Locale) sanitize(val string) string {
+func (Locale) sanitize(val string) string {
 	return strings.Replace(val, "_", "-", -1)
 }
 
-func (_ Locale) listLocales() []string {
+func (Locale) listLocales() []string {
 	locals := append(i18n.SupportedLocales(), "CLEAR")
 	sort.Strings(locals)
 	return locals

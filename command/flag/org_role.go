@@ -10,7 +10,7 @@ type OrgRole struct {
 	Role string
 }
 
-func (_ OrgRole) Complete(prefix string) []flags.Completion {
+func (OrgRole) Complete(prefix string) []flags.Completion {
 	return completions([]string{"OrgManager", "BillingManager", "OrgAuditor"}, prefix, false)
 }
 

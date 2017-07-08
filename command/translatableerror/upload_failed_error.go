@@ -6,7 +6,7 @@ type UploadFailedError struct {
 	Err error
 }
 
-func (_ UploadFailedError) Error() string {
+func (UploadFailedError) Error() string {
 	return "Uploading files have failed after a number of retriest due to: {{.Error}}"
 }
 

@@ -14,11 +14,11 @@ type UnbindStagingSecurityGroupCommand struct {
 	relatedCommands interface{}        `related_commands:"apps, restart, staging-security-groups"`
 }
 
-func (_ UnbindStagingSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (UnbindStagingSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UnbindStagingSecurityGroupCommand) Execute(args []string) error {
+func (UnbindStagingSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

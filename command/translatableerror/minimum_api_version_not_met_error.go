@@ -5,7 +5,7 @@ type MinimumAPIVersionNotMetError struct {
 	MinimumVersion string
 }
 
-func (_ MinimumAPIVersionNotMetError) Error() string {
+func (MinimumAPIVersionNotMetError) Error() string {
 	return "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
 }
 

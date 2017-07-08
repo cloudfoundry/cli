@@ -6,7 +6,7 @@ type AssignDropletError struct {
 	Message string
 }
 
-func (_ AssignDropletError) Error() string {
+func (AssignDropletError) Error() string {
 	return "Unable to assign droplet: {{.CloudControllerMessage}}"
 }
 

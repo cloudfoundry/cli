@@ -5,7 +5,7 @@ type FetchingPluginInfoFromRepositoriesError struct {
 	RepositoryName string
 }
 
-func (_ FetchingPluginInfoFromRepositoriesError) Error() string {
+func (FetchingPluginInfoFromRepositoriesError) Error() string {
 	return "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}."
 }
 

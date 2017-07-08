@@ -14,11 +14,11 @@ type UnbindRunningSecurityGroupCommand struct {
 	relatedCommands interface{}        `related_commands:"apps, restart, running-security-groups"`
 }
 
-func (_ UnbindRunningSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (UnbindRunningSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UnbindRunningSecurityGroupCommand) Execute(args []string) error {
+func (UnbindRunningSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

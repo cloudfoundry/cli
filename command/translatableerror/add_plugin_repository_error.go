@@ -6,7 +6,7 @@ type AddPluginRepositoryError struct {
 	Message string
 }
 
-func (_ AddPluginRepositoryError) Error() string {
+func (AddPluginRepositoryError) Error() string {
 	return "Could not add repository '{{.RepositoryName}}' from {{.RepositoryURL}}: {{.Message}}"
 }
 

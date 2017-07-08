@@ -38,7 +38,7 @@ const installConfirmationPrompt = "Do you want to install the plugin {{.Path}}?"
 type InvalidChecksumError struct {
 }
 
-func (_ InvalidChecksumError) Error() string {
+func (InvalidChecksumError) Error() string {
 	return "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author."
 }
 
@@ -73,7 +73,7 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 	return nil
 }
 
-func (cmd InstallPluginCommand) Execute(_ []string) error {
+func (cmd InstallPluginCommand) Execute([]string) error {
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
 		return shared.HandleError(err)
@@ -229,7 +229,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 // These are specific errors that we output to the user in the context of
 // installing from any repository.
-func (_ InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
+func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
 	switch clientErr := fetchErr.Err.(type) {
 	case pluginerror.RawHTTPStatusError:
 		return translatableerror.FetchingPluginInfoFromRepositoriesError{

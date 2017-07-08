@@ -8,7 +8,7 @@ type PluginAlreadyInstalledError struct {
 	Version    string
 }
 
-func (_ PluginAlreadyInstalledError) Error() string {
+func (PluginAlreadyInstalledError) Error() string {
 	return "Plugin {{.Name}} {{.Version}} could not be installed. A plugin with that name is already installed.\nTIP: Use '{{.BinaryName}} install-plugin -f' to force a reinstall."
 }
 

@@ -7,7 +7,7 @@ import (
 
 type MissingNameError struct{}
 
-func (_ MissingNameError) Error() string {
+func (MissingNameError) Error() string {
 	return "name not specified for app"
 }
 
@@ -26,7 +26,7 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	return mergedApps, actor.validateMergedSettings(mergedApps)
 }
 
-func (_ Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSettings) []manifest.Application {
+func (Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSettings) []manifest.Application {
 	log.Info("no manifest, generating one from command line settings")
 
 	appSettings := []manifest.Application{{
@@ -38,12 +38,12 @@ func (_ Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSe
 	return appSettings
 }
 
-func (_ Actor) mergeCommandLineSettingsAndManifest(settings CommandLineSettings, app manifest.Application) manifest.Application {
+func (Actor) mergeCommandLineSettingsAndManifest(settings CommandLineSettings, app manifest.Application) manifest.Application {
 	app.Path = settings.ApplicationPath()
 	return app
 }
 
-func (_ Actor) validateMergedSettings(apps []manifest.Application) error {
+func (Actor) validateMergedSettings(apps []manifest.Application) error {
 	for i, app := range apps {
 		if app.Name == "" {
 			log.WithField("index", i).Error("does not contain an app name")

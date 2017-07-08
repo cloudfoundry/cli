@@ -15,11 +15,11 @@ type CreateServiceBrokerCommand struct {
 	relatedCommands interface{}            `related_commands:"enable-service-access, service-brokers, target"`
 }
 
-func (_ CreateServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateServiceBrokerCommand) Execute(args []string) error {
+func (CreateServiceBrokerCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

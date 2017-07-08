@@ -4,7 +4,7 @@ type APIRequestError struct {
 	Err error
 }
 
-func (_ APIRequestError) Error() string {
+func (APIRequestError) Error() string {
 	return "Request error: {{.Error}}\nTIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
 }
 

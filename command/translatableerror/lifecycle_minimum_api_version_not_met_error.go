@@ -5,7 +5,7 @@ type LifecycleMinimumAPIVersionNotMetError struct {
 	MinimumVersion string
 }
 
-func (_ LifecycleMinimumAPIVersionNotMetError) Error() string {
+func (LifecycleMinimumAPIVersionNotMetError) Error() string {
 	return "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
 }
 

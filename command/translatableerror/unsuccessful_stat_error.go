@@ -5,7 +5,7 @@ type UnsuccessfulStartError struct {
 	BinaryName string
 }
 
-func (_ UnsuccessfulStartError) Error() string {
+func (UnsuccessfulStartError) Error() string {
 	return "Start unsuccessful\n\nTIP: use '{{.BinaryName}} logs {{.AppName}} --recent' for more information"
 }
 

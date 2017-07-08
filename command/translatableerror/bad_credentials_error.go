@@ -2,7 +2,7 @@ package translatableerror
 
 type BadCredentialsError struct{}
 
-func (_ BadCredentialsError) Error() string {
+func (BadCredentialsError) Error() string {
 	return "Credentials were rejected, please try again."
 }
 

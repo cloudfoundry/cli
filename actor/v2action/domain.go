@@ -15,7 +15,7 @@ type Domain ccv2.Domain
 type DomainNotFoundError struct{}
 
 // Error method to display the error message.
-func (_ DomainNotFoundError) Error() string {
+func (DomainNotFoundError) Error() string {
 	return "Domain not found."
 }
 

@@ -37,11 +37,11 @@ type PushCommand struct {
 	relatedCommands      interface{}                 `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 }
 
-func (_ PushCommand) Setup(config command.Config, ui command.UI) error {
+func (PushCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ PushCommand) Execute(args []string) error {
+func (PushCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

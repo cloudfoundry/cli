@@ -14,11 +14,11 @@ type SetQuotaCommand struct {
 	relatedCommands interface{}          `related_commands:"orgs, quotas"`
 }
 
-func (_ SetQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (SetQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SetQuotaCommand) Execute(args []string) error {
+func (SetQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

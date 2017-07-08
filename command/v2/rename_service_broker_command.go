@@ -14,11 +14,11 @@ type RenameServiceBrokerCommand struct {
 	relatedCommands interface{}                  `related_commands:"service-brokers, update-service-broker"`
 }
 
-func (_ RenameServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
+func (RenameServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RenameServiceBrokerCommand) Execute(args []string) error {
+func (RenameServiceBrokerCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

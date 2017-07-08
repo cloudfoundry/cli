@@ -4,7 +4,7 @@ type SSLCertErrorError struct {
 	Message string
 }
 
-func (_ SSLCertErrorError) Error() string {
+func (SSLCertErrorError) Error() string {
 	return "SSL Certificate Error {{.Message}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
 }
 

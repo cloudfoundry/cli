@@ -6,7 +6,7 @@ type NoSpaceTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoSpaceTargetedError) Error() string {
+func (NoSpaceTargetedError) Error() string {
 	return "No space targeted, use '{{.Command}}' to target a space."
 }
 

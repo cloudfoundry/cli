@@ -4,7 +4,7 @@ type SpaceNotFoundError struct {
 	Name string
 }
 
-func (_ SpaceNotFoundError) Error() string {
+func (SpaceNotFoundError) Error() string {
 	return "Space '{{.Name}}' not found."
 }
 

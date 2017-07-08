@@ -137,7 +137,7 @@ func (router Router) CreateRequest(name string, params Params, body io.Reader) (
 	return http.NewRequest(route.Method, url, body)
 }
 
-func (_ Router) urlFrom(resource string, uri string) (string, error) {
+func (Router) urlFrom(resource string, uri string) (string, error) {
 	u, err := url.Parse(resource)
 	if err != nil {
 		return "", err

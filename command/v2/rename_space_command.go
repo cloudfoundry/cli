@@ -13,11 +13,11 @@ type RenameSpaceCommand struct {
 	usage        interface{}          `usage:"CF_NAME rename-space SPACE NEW_SPACE"`
 }
 
-func (_ RenameSpaceCommand) Setup(config command.Config, ui command.UI) error {
+func (RenameSpaceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RenameSpaceCommand) Execute(args []string) error {
+func (RenameSpaceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }
