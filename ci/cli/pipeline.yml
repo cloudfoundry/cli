@@ -339,6 +339,8 @@ jobs:
       params:
         acquire: true
   - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: config
       file: cli-ci/ci/cli/tasks/cats-config.yml
       params:
