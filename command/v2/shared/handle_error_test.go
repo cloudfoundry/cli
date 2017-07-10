@@ -115,6 +115,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.NoDomainsFoundError{},
 		),
 
+		Entry("pushaction.MissingNameError -> RequiredNameForPushError",
+			pushaction.MissingNameError{},
+			translatableerror.RequiredNameForPushError{},
+		),
+
 		Entry("pushaction.UploadFailedError -> UploadFailedError",
 			pushaction.UploadFailedError{Err: pushaction.NoDomainsFoundError{}},
 			translatableerror.UploadFailedError{Err: translatableerror.NoDomainsFoundError{}},

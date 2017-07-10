@@ -61,6 +61,8 @@ func HandleError(err error) error {
 
 	case pushaction.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
+	case pushaction.MissingNameError:
+		return translatableerror.RequiredNameForPushError{}
 	case pushaction.UploadFailedError:
 		return translatableerror.UploadFailedError{Err: HandleError(e.Err)}
 	}

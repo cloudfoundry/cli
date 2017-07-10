@@ -17,6 +17,7 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	if len(apps) == 0 {
 		mergedApps = actor.generateAppSettingsFromCommandLineSettings(settings)
 	} else {
+		// validate premerged settings
 		for _, app := range apps {
 			mergedApps = append(mergedApps, actor.mergeCommandLineSettingsAndManifest(settings, app))
 		}
