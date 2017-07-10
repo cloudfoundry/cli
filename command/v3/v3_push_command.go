@@ -40,7 +40,7 @@ type V3PushCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
 	usage        interface{}  `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME]"`
 	NoRoute      bool         `long:"no-route" description:"Do not map a route to this app"`
-	Buildpack    string       `long:"buildpack" short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	Buildpack    string       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 
 	UI                  command.UI
 	Config              command.Config

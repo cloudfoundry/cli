@@ -53,7 +53,7 @@ var _ = Describe("v3-push command", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push", appName, "-b")
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-b, --buildpack'"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-b'"))
 			Eventually(session.Out).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
@@ -252,14 +252,14 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
-		Context("when the --buildpack flag is set", func() {
+		Context("when the -b flag is set", func() {
 			var session *Session
 
 			Context("when resetting the buildpack to default", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("v3-push", appName, "--buildpack", "java_buildpack")).Should(Exit(1))
-						session = helpers.CF("v3-push", appName, "--buildpack", "default")
+						Eventually(helpers.CF("v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
+						session = helpers.CF("v3-push", appName, "-b", "default")
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -274,7 +274,7 @@ var _ = Describe("v3-push command", func() {
 			Context("when omitting the buildpack", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("v3-push", appName, "--buildpack", "java_buildpack")).Should(Exit(1))
+						Eventually(helpers.CF("v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
 						session = helpers.CF("v3-push", appName)
 						Eventually(session).Should(Exit(1))
 					})
@@ -288,7 +288,7 @@ var _ = Describe("v3-push command", func() {
 			Context("when the buildpack is invalid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CF("v3-push", appName, "--buildpack", "wut")
+						session = helpers.CF("v3-push", appName, "-b", "wut")
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -303,7 +303,7 @@ var _ = Describe("v3-push command", func() {
 			Context("when the buildpack is valid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CF("v3-push", appName, "--buildpack", "https://github.com/cloudfoundry/staticfile-buildpack")
+						session = helpers.CF("v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
 						Eventually(session).Should(Exit(0))
 					})
 				})

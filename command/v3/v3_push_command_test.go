@@ -378,7 +378,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when --buildpack flag is set", func() {
+								Context("when -b flag is set", func() {
 									BeforeEach(func() {
 										cmd.Buildpack = "some-buildpack"
 									})
