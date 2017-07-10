@@ -4888,6 +4888,10 @@
     "translation": "앱 다시 시작"
   },
   {
+    "id": "Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "{{.Username}}(으)로 {{.AppName}} 애플리케이션의 {{.Instance}} 인스턴스 다시 시작"
   },

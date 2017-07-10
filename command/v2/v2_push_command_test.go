@@ -26,15 +26,15 @@ import (
 
 var _ = Describe("v2-push Command", func() {
 	var (
-		cmd             V2PushCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v2fakes.FakeV2PushActor
-		fakeStartActor  *v2fakes.FakeStartActor
-		fakeProgressBar *v2fakes.FakeProgressBar
-		input           *Buffer
-		binaryName      string
+		cmd              V2PushCommand
+		testUI           *ui.UI
+		fakeConfig       *commandfakes.FakeConfig
+		fakeSharedActor  *commandfakes.FakeSharedActor
+		fakeActor        *v2fakes.FakeV2PushActor
+		fakeRestartActor *v2fakes.FakeRestartActor
+		fakeProgressBar  *v2fakes.FakeProgressBar
+		input            *Buffer
+		binaryName       string
 
 		appName    string
 		executeErr error
@@ -47,16 +47,16 @@ var _ = Describe("v2-push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeV2PushActor)
-		fakeStartActor = new(v2fakes.FakeStartActor)
+		fakeRestartActor = new(v2fakes.FakeRestartActor)
 		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
 		cmd = V2PushCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			StartActor:  fakeStartActor,
-			ProgressBar: fakeProgressBar,
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
+			RestartActor: fakeRestartActor,
+			ProgressBar:  fakeProgressBar,
 		}
 
 		appName = "some-app"
@@ -198,25 +198,27 @@ var _ = Describe("v2-push Command", func() {
 							return configStream, eventStream, warningsStream, errorStream
 						}
 
-						fakeStartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+						fakeRestartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
-							appStart := make(chan bool)
+							appState := make(chan v2action.ApplicationState)
 							warnings := make(chan string)
 							errs := make(chan error)
 
 							go func() {
 								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
 								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
-								appStart <- true
+								appState <- v2action.ApplicationStateStopping
+								appState <- v2action.ApplicationStateStaging
+								appState <- v2action.ApplicationStateStarting
 								close(messages)
 								close(logErrs)
-								close(appStart)
+								close(appState)
 								close(warnings)
 								close(errs)
 							}()
 
-							return messages, logErrs, appStart, warnings, errs
+							return messages, logErrs, appState, warnings, errs
 						}
 
 						applicationSummary := v2action.ApplicationSummary{
@@ -253,7 +255,7 @@ var _ = Describe("v2-push Command", func() {
 
 						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
 
-						fakeStartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+						fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
 					Context("when no manifest is provided", func() {
@@ -411,8 +413,8 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("log message 1"))
 						Expect(testUI.Out).To(Say("log message 2"))
 
-						Expect(fakeStartActor.RestartApplicationCallCount()).To(Equal(1))
-						appConfig, _, _ := fakeStartActor.RestartApplicationArgsForCall(0)
+						Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
+						appConfig, _, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
 						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication))
 					})
 

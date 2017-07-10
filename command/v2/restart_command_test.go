@@ -7,9 +7,10 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -19,13 +20,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Start Command", func() {
+var _ = Describe("Restart Command", func() {
 	var (
-		cmd             StartCommand
+		cmd             RestartCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v2fakes.FakeStartActor
+		fakeActor       *v2fakes.FakeRestartActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,9 +35,9 @@ var _ = Describe("Start Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v2fakes.FakeStartActor)
+		fakeActor = new(v2fakes.FakeRestartActor)
 
-		cmd = StartCommand{
+		cmd = RestartCommand{
 			UI:          testUI,
 			Config:      fakeConfig,
 			SharedActor: fakeSharedActor,
@@ -52,7 +53,7 @@ var _ = Describe("Start Command", func() {
 		testUI.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
 		Expect(err).NotTo(HaveOccurred())
 
-		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+		fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 			messages := make(chan *v2action.LogMessage)
 			logErrs := make(chan error)
 			appState := make(chan v2action.ApplicationState)
@@ -60,6 +61,9 @@ var _ = Describe("Start Command", func() {
 			errs := make(chan error)
 
 			go func() {
+				appState <- v2action.ApplicationStateStopping
+				appState <- v2action.ApplicationStateStaging
+				appState <- v2action.ApplicationStateStarting
 				close(messages)
 				close(logErrs)
 				close(appState)
@@ -81,7 +85,7 @@ var _ = Describe("Start Command", func() {
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -119,11 +123,11 @@ var _ = Describe("Start Command", func() {
 		})
 
 		It("displays flavor text", func() {
-			Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user..."))
+			Expect(testUI.Out).To(Say("Restarting app some-app in org some-org / space some-space as some-user..."))
 		})
 
 		Context("when the app exists", func() {
-			Context("when the app is already started", func() {
+			Context("when the app is started", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v2action.Application{State: ccv2.ApplicationStarted},
@@ -132,15 +136,16 @@ var _ = Describe("Start Command", func() {
 					)
 				})
 
-				It("short circuits and displays message", func() {
+				It("stops and starts the app", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("App some-app is already started"))
-
+					Expect(testUI.Out).Should(Say("Stopping app..."))
+					Expect(testUI.Out).Should(Say("Staging app and tracing logs..."))
+					Expect(testUI.Out).Should(Say("Waiting for app to start..."))
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 
-					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
+					Expect(fakeActor.RestartApplicationCallCount()).To(Equal(1))
 				})
 			})
 
@@ -159,15 +164,15 @@ var _ = Describe("Start Command", func() {
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
 
-					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-					app, _, config := fakeActor.StartApplicationArgsForCall(0)
+					Expect(fakeActor.RestartApplicationCallCount()).To(Equal(1))
+					app, _, config := fakeActor.RestartApplicationArgsForCall(0)
 					Expect(app.GUID).To(Equal("app-guid"))
 					Expect(config).To(Equal(fakeConfig))
 				})
 
-				Context("when passed an ApplicationStateStarting message", func() {
+				Context("when passed an appStarting message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationState)
@@ -177,6 +182,8 @@ var _ = Describe("Start Command", func() {
 							go func() {
 								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
 								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
+								appState <- v2action.ApplicationStateStopping
+								appState <- v2action.ApplicationStateStaging
 								appState <- v2action.ApplicationStateStarting
 								close(messages)
 								close(logErrs)
@@ -199,7 +206,7 @@ var _ = Describe("Start Command", func() {
 
 				Context("when passed a log message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationState)
@@ -232,7 +239,7 @@ var _ = Describe("Start Command", func() {
 				Context("when passed an log err", func() {
 					Context("NOAA connection times out/closes", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationState)
@@ -306,7 +313,7 @@ var _ = Describe("Start Command", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("err log message")
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationState)
@@ -336,7 +343,7 @@ var _ = Describe("Start Command", func() {
 				Context("when passed a warning", func() {
 					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationState)
@@ -366,7 +373,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("while NOAA is no longer logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
 								appState := make(chan v2action.ApplicationState)
@@ -405,7 +412,7 @@ var _ = Describe("Start Command", func() {
 					var apiErr error
 
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
 							appState := make(chan v2action.ApplicationState)
@@ -441,7 +448,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns StagingFailedError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StagingFailedError{Message: "Something, but not nothing"}))
+							Expect(executeErr).To(MatchError(shared.StagingFailedError{Message: "Something, but not nothing"}))
 						})
 					})
 
@@ -451,7 +458,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns StagingTimeoutError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
+							Expect(executeErr).To(MatchError(shared.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
 						})
 					})
 
@@ -461,7 +468,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 
@@ -471,7 +478,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 
@@ -481,7 +488,7 @@ var _ = Describe("Start Command", func() {
 						})
 
 						It("stops logging and returns StartupTimeoutError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 				})
@@ -612,7 +619,7 @@ var _ = Describe("Start Command", func() {
 			})
 
 			It("returns back an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: "some-app"}))
+				Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))

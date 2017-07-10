@@ -23,7 +23,7 @@ var _ = Describe("Poll Start", func() {
 		fakeConfig  *commandfakes.FakeConfig
 		messages    chan *v2action.LogMessage
 		logErrs     chan error
-		appStarting chan bool
+		appState    chan v2action.ApplicationState
 		apiWarnings chan string
 		apiErrs     chan error
 		err         error
@@ -37,22 +37,26 @@ var _ = Describe("Poll Start", func() {
 
 		messages = make(chan *v2action.LogMessage)
 		logErrs = make(chan error)
-		appStarting = make(chan bool)
+		appState = make(chan v2action.ApplicationState)
 		apiWarnings = make(chan string)
 		apiErrs = make(chan error)
 		block = make(chan bool)
 
 		err = errors.New("This should never occur.")
+	})
 
+	JustBeforeEach(func() {
 		go func() {
-			err = PollStart(testUI, fakeConfig, messages, logErrs, appStarting, apiWarnings, apiErrs)
+			err = PollStart(testUI, fakeConfig, messages, logErrs, appState, apiWarnings, apiErrs)
 			close(block)
 		}()
 	})
 
 	Context("when no API errors appear", func() {
 		It("passes and exits with no errors", func() {
-			appStarting <- true
+			appState <- v2action.ApplicationStateStopping
+			appState <- v2action.ApplicationStateStaging
+			appState <- v2action.ApplicationStateStarting
 			logErrs <- v2action.NOAATimeoutError{}
 			apiWarnings <- "some warning"
 			logErrs <- errors.New("some logErrhea")
@@ -68,13 +72,14 @@ var _ = Describe("Poll Start", func() {
 				time.Unix(0, 0),
 				"APP",
 				"some other source instance")
-			close(appStarting)
+			close(appState)
 			apiWarnings <- "some other warning"
 			close(apiWarnings)
 			close(apiErrs)
 
+			Eventually(testUI.Out).Should(Say("\nStopping app..."))
+			Eventually(testUI.Out).Should(Say("\nStaging app and tracing logs..."))
 			Eventually(testUI.Out).Should(Say("\nWaiting for app to start..."))
-			Consistently(testUI.Out).ShouldNot(Say("\nWaiting for app to start..."))
 			Eventually(testUI.Err).Should(Say("timeout connecting to log server, no log will be shown"))
 			Eventually(testUI.Err).Should(Say("some warning"))
 			Eventually(testUI.Err).Should(Say("some logErrhea"))
@@ -85,17 +90,18 @@ var _ = Describe("Poll Start", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("passes and exits with no errors or duplicated output", func() {
-			appStarting <- true
-			appStarting <- false
-			close(appStarting)
-			close(apiWarnings)
-			close(apiErrs)
+		Context("when state channel is not set", func() {
+			BeforeEach(func() {
+				appState = nil
+			})
 
-			Eventually(testUI.Out).Should(Say("\nWaiting for app to start..."))
-			Consistently(testUI.Out).ShouldNot(Say("\nWaiting for app to start..."))
-			Eventually(block).Should(BeClosed())
-			Expect(err).ToNot(HaveOccurred())
+			It("does not wait for it", func() {
+				close(apiWarnings)
+				close(apiErrs)
+
+				Eventually(block).Should(BeClosed())
+				Expect(err).ToNot(HaveOccurred())
+			})
 		})
 	})
 

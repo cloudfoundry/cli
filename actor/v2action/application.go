@@ -8,6 +8,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
+type ApplicationState string
+
+const (
+	ApplicationStateStopping = ApplicationState("stopping")
+	ApplicationStateStaging  = ApplicationState("staging")
+	ApplicationStateStarting = ApplicationState("starting")
+)
+
 // ApplicationInstanceCrashedError is returned when an instance crashes.
 type ApplicationInstanceCrashedError struct {
 	Name string
@@ -260,26 +268,46 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 	return app, allWarnings, nil
 }
 
-// RestartApplication restarts a given application. If already stopped, no stop
+// StartApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) RestartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
-	appStarting := make(chan bool)
+	appState := make(chan ApplicationState)
 	allWarnings := make(chan string)
 	errs := make(chan error)
 	go func() {
-		defer close(appStarting)
+		defer close(appState)
+		defer close(allWarnings)
+		defer close(errs)
+		defer client.Close() // automatic close to prevent stale clients
+
+		actor.startApplication(app, client, config, appState, allWarnings, errs)
+	}()
+
+	return messages, logErrs, appState, allWarnings, errs
+}
+
+// RestartApplication restarts a given application. If already stopped, no stop
+// call will be sent.
+func (actor Actor) RestartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
+	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
+
+	appState := make(chan ApplicationState)
+	allWarnings := make(chan string)
+	errs := make(chan error)
+	go func() {
+		defer close(appState)
 		defer close(allWarnings)
 		defer close(errs)
 		defer client.Close() // automatic close to prevent stale clients
 
 		if app.Started() {
+			appState <- ApplicationStateStopping
 			_, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 				GUID:  app.GUID,
 				State: ccv2.ApplicationStopped,
 			})
-
 			for _, warning := range warnings {
 				allWarnings <- warning
 			}
@@ -289,39 +317,10 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 			}
 		}
 
-		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
-			GUID:  app.GUID,
-			State: ccv2.ApplicationStarted,
-		})
-
-		for _, warning := range warnings {
-			allWarnings <- warning
-		}
-		if err != nil {
-			errs <- err
-			return
-		}
-
-		err = actor.pollStaging(app, config, allWarnings)
-		if err != nil {
-			errs <- err
-			return
-		}
-
-		if updatedApp.Instances == 0 {
-			return
-		}
-
-		client.Close() // Explicit close to stop logs from displaying on the screen
-		appStarting <- true
-
-		err = actor.pollStartup(app, config, allWarnings)
-		if err != nil {
-			errs <- err
-		}
+		actor.startApplication(app, client, config, appState, allWarnings, errs)
 	}()
 
-	return messages, logErrs, appStarting, allWarnings, errs
+	return messages, logErrs, appState, allWarnings, errs
 }
 
 // UpdateApplication updates an application.
@@ -379,4 +378,38 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 	}
 
 	return StartupTimeoutError{Name: app.Name}
+}
+
+func (actor Actor) startApplication(app Application, client NOAAClient, config Config, appState chan ApplicationState, allWarnings chan string, errs chan error) {
+	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+		GUID:  app.GUID,
+		State: ccv2.ApplicationStarted,
+	})
+
+	for _, warning := range warnings {
+		allWarnings <- warning
+	}
+	if err != nil {
+		errs <- err
+		return
+	}
+	appState <- ApplicationStateStaging
+
+	err = actor.pollStaging(app, config, allWarnings)
+	if err != nil {
+		errs <- err
+		return
+	}
+
+	if updatedApp.Instances == 0 {
+		return
+	}
+
+	client.Close() // Explicit close to stop logs from displaying on the screen
+	appState <- ApplicationStateStarting
+
+	err = actor.pollStartup(app, config, allWarnings)
+	if err != nil {
+		errs <- err
+	}
 }
