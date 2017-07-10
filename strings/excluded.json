@@ -591,6 +591,8 @@
     "reading manifest",
     "pathToManifest",
     "could not find",
+    "using specified manifest file",
+    "searching for manifest file",
 
     "(?i).*(?:token|password).*",
     "Host",

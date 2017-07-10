@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -353,6 +354,23 @@ var _ = Describe("v2-push Command", func() {
 								pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
 								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
 								Expect(err).ToNot(HaveOccurred())
+							})
+
+							It("should read the manifest.yml", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+								Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+							})
+						})
+
+						Context("via the -f flag", func() {
+							BeforeEach(func() {
+								pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
+								err := ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+
+								cmd.PathToManifest = flag.PathWithExistenceCheck(pathToManifest)
 							})
 
 							It("should read the manifest.yml", func() {

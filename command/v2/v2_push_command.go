@@ -43,7 +43,7 @@ type V2PushCommand struct {
 	// Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage flag.DockerImage `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
 	// DockerUsername       string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
-	// PathToManifest       flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
+	PathToManifest flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	// HealthCheckType      flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	// Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
 	// NumInstances         int                         `short:"i" description:"Number of instances"`
@@ -258,16 +258,25 @@ func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) 
 }
 
 func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
-	pathToManifest := filepath.Join(settings.CurrentDirectory, "manifest.yml")
-	if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
-		log.WithField("pathToManifest", pathToManifest).Debug("could not find")
+	var pathToManifest string
 
-		// While this is unlikely to be used, it is kept for backwards
-		// compatibility.
-		pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yaml")
+	switch {
+	case cmd.PathToManifest != "":
+		log.Debug("using specified manifest file")
+		pathToManifest = string(cmd.PathToManifest)
+	default:
+		log.Debug("searching for manifest file")
+		pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yml")
 		if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
 			log.WithField("pathToManifest", pathToManifest).Debug("could not find")
-			return nil, nil
+
+			// While this is unlikely to be used, it is kept for backwards
+			// compatibility.
+			pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yaml")
+			if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
+				log.WithField("pathToManifest", pathToManifest).Debug("could not find")
+				return nil, nil
+			}
 		}
 	}
 
