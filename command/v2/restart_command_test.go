@@ -7,10 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -85,7 +84,7 @@ var _ = Describe("Restart Command", func() {
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -448,7 +447,7 @@ var _ = Describe("Restart Command", func() {
 						})
 
 						It("stops logging and returns StagingFailedError", func() {
-							Expect(executeErr).To(MatchError(shared.StagingFailedError{Message: "Something, but not nothing"}))
+							Expect(executeErr).To(MatchError(translatableerror.StagingFailedError{Message: "Something, but not nothing"}))
 						})
 					})
 
@@ -458,7 +457,7 @@ var _ = Describe("Restart Command", func() {
 						})
 
 						It("stops logging and returns StagingTimeoutError", func() {
-							Expect(executeErr).To(MatchError(shared.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
+							Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}))
 						})
 					})
 
@@ -468,7 +467,7 @@ var _ = Describe("Restart Command", func() {
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 
@@ -478,7 +477,7 @@ var _ = Describe("Restart Command", func() {
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
-							Expect(executeErr).To(MatchError(shared.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.UnsuccessfulStartError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 
@@ -488,7 +487,7 @@ var _ = Describe("Restart Command", func() {
 						})
 
 						It("stops logging and returns StartupTimeoutError", func() {
-							Expect(executeErr).To(MatchError(shared.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
+							Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{AppName: "some-app", BinaryName: "faceman"}))
 						})
 					})
 				})
@@ -619,7 +618,7 @@ var _ = Describe("Restart Command", func() {
 			})
 
 			It("returns back an error", func() {
-				Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{Name: "some-app"}))
+				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: "some-app"}))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
