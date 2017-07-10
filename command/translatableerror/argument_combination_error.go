@@ -7,6 +7,8 @@ type ArgumentCombinationError struct {
 	Arg2 string
 }
 
+func (ArgumentCombinationError) DisplayUsage() {}
+
 func (ArgumentCombinationError) Error() string {
 	return "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together."
 }

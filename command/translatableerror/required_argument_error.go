@@ -4,6 +4,8 @@ type RequiredArgumentError struct {
 	ArgumentName string
 }
 
+func (RequiredArgumentError) DisplayUsage() {}
+
 func (RequiredArgumentError) Error() string {
 	return "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided"
 }
