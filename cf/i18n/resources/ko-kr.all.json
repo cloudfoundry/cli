@@ -3564,6 +3564,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "올바르지 않은 사용법입니다: push 명령은 앱 이름이 필요합니다. 앱 이름은 인수 또는 manifest.yml 파일로 제공할 수 있습니다. "
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
