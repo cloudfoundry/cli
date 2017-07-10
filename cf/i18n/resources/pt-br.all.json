@@ -4888,6 +4888,10 @@
     "translation": "Reiniciar um app"
   },
   {
+    "id": "Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "Reiniciando a instância {{.Instance}} do aplicativo {{.AppName}} como {{.Username}}"
   },

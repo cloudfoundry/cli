@@ -4888,6 +4888,10 @@
     "translation": "重新启动应用程序"
   },
   {
+    "id": "Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "正在以 {{.Username}} 身份重新启动应用程序 {{.AppName}} 的实例 {{.Instance}}"
   },

@@ -14,7 +14,7 @@ import (
 
 type StartActor interface {
 	AppActor
-	RestartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error)
+	StartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error)
 }
 
 type StartCommand struct {
@@ -80,8 +80,8 @@ func (cmd StartCommand) Execute(args []string) error {
 		return nil
 	}
 
-	messages, logErrs, appStarting, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.NOAAClient, cmd.Config)
-	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
+	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.StartApplication(app, cmd.NOAAClient, cmd.Config)
+	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err
 	}

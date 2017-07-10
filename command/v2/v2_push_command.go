@@ -71,8 +71,8 @@ type V2PushCommand struct {
 	Actor       V2PushActor
 	ProgressBar ProgressBar
 
-	StartActor StartActor
-	NOAAClient *consumer.Consumer
+	RestartActor RestartActor
+	NOAAClient   *consumer.Consumer
 }
 
 func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -85,7 +85,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	v2Actor := v2action.NewActor(ccClient, uaaClient)
-	cmd.StartActor = v2Actor
+	cmd.RestartActor = v2Actor
 	cmd.Actor = pushaction.NewActor(v2Actor)
 
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
@@ -157,18 +157,14 @@ func (cmd V2PushCommand) Execute(args []string) error {
 			return shared.HandleError(err)
 		}
 
-		if appConfig.CurrentApplication.Started() {
-			cmd.UI.DisplayText("Stopping app...")
-		}
-
-		messages, logErrs, appStarting, apiWarnings, errs := cmd.StartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
-		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appStarting, apiWarnings, errs)
+		messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
+		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 		if err != nil {
 			return err
 		}
 
 		cmd.UI.DisplayNewline()
-		appSummary, warnings, err := cmd.StartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
+		appSummary, warnings, err := cmd.RestartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
