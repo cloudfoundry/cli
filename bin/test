@@ -39,12 +39,14 @@ echo -e "\n Vetting packages for potential issues..."
 git status \
   | grep -i -e new -e modified \
   | grep -e api -e actor -e command -e cf -e plugin -e util \
+  | grep -e .go$ \
   | awk '{print $2}' \
   | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
 
 git status \
   | grep -i -e renamed \
   | grep -e api -e actor -e command -e cf -e plugin -e util \
+  | grep -e .go$ \
   | awk '{print $4}' \
   | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
 
