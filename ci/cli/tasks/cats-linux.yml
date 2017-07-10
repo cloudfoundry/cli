@@ -48,6 +48,6 @@ run:
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
 
     ./bin/test \
-      -flakeAttempts=2 -slowSpecThreshold=120 -randomizeAllSpecs \
+      -flakeAttempts=2 -slowSpecThreshold=180 -randomizeAllSpecs \
       -nodes "${NODES}" \
       "${SKIPS}"
