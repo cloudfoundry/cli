@@ -297,7 +297,7 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 	}
 
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(pkg.GUID)
-	err, dropletGUID := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	dropletGUID, err := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return "", err
 	}
