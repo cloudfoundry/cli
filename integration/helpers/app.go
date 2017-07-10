@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -75,4 +76,11 @@ func AppGUID(appName string) string {
 	session := CF("app", appName, "--guid")
 	Eventually(session).Should(gexec.Exit(0))
 	return strings.TrimSpace(string(session.Out.Contents()))
+}
+
+func WriteManifest(path string, manifest map[string]interface{}) {
+	body, err := json.Marshal(manifest)
+	Expect(err).ToNot(HaveOccurred())
+	err = ioutil.WriteFile(path, body, 0666)
+	Expect(err).ToNot(HaveOccurred())
 }
