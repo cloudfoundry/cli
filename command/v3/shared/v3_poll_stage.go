@@ -5,8 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI) (error, string) {
-
+func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI) (string, error) {
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
 	var dropletGUID string
 	for {
@@ -42,10 +41,10 @@ func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action
 				closedErrStream = true
 				break
 			}
-			return HandleError(err), ""
+			return "", HandleError(err)
 		}
 		if closedBuildStream && closedWarningsStream && closedErrStream {
-			return nil, dropletGUID
+			return dropletGUID, nil
 		}
 	}
 }

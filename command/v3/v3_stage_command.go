@@ -90,7 +90,7 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	}
 
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
-	err, _ = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	_, err = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err == nil {
 		cmd.UI.DisplayOK()
 	}
