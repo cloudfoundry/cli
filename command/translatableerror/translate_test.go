@@ -79,6 +79,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),
 		Entry("RepositoryNameTakenError", RepositoryNameTakenError{}),
 		Entry("RequiredArgumentError", RequiredArgumentError{}),
+		Entry("RequiredNameForPushError", RequiredNameForPushError{}),
 		Entry("RouteInDifferentSpaceError", RouteInDifferentSpaceError{}),
 		Entry("RunTaskError", RunTaskError{}),
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),

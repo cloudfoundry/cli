@@ -26,6 +26,5 @@ func ReadAndMergeManifests(pathToManifest string) ([]Application, error) {
 	var manifest Manifest
 	err = yaml.Unmarshal(raw, &manifest)
 	// Merge all manifest files
-	// Validate any issues
 	return manifest.Applications, err
 }
