@@ -721,8 +721,8 @@ var _ = Describe("Application Actions", func() {
 		var ItStartsApplication = func() {
 			Context("when the app is not running", func() {
 				It("starts and polls for an app instance", func() {
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -753,8 +753,8 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("starts and only polls for staging to finish", func() {
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStarting)))
@@ -781,6 +781,7 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("sends the update error and never polls", func() {
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(errs).Should(Receive(MatchError(expectedErr)))
 
@@ -801,8 +802,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends the error and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(errs).Should(Receive(MatchError(expectedErr)))
 
@@ -827,8 +828,8 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("sends a StagingFailedNoAppDetectedError and stops polling", func() {
-							Eventually(warnings).Should(Receive(Equal("update-warning")))
 							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+							Eventually(warnings).Should(Receive(Equal("update-warning")))
 							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 							Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
 
@@ -853,8 +854,8 @@ var _ = Describe("Application Actions", func() {
 						})
 
 						It("sends a StagingFailedError and stops polling", func() {
-							Eventually(warnings).Should(Receive(Equal("update-warning")))
 							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+							Eventually(warnings).Should(Receive(Equal("update-warning")))
 							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 							Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
 
@@ -873,8 +874,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends a timeout error and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: 0})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
@@ -896,8 +897,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends the error and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -915,8 +916,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("sends a timeout error and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -938,8 +939,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns an ApplicationInstanceCrashedError and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -962,8 +963,8 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns an ApplicationInstanceFlappingError and stops polling", func() {
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("update-warning")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -999,8 +1000,8 @@ var _ = Describe("Application Actions", func() {
 				It("stops, starts and polls for an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStopping)))
 					Eventually(warnings).Should(Receive(Equal("update-warning")))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -1034,9 +1035,8 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				It("does not stop an app instance", func() {
-					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStopping)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("update-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
