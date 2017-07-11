@@ -344,6 +344,23 @@ var _ = Describe("v2-push Command", func() {
 									Expect(executeErr).To(MatchError(expectedErr))
 								})
 							})
+
+							Context("when --no-manifest is specified", func() {
+								BeforeEach(func() {
+									cmd.NoManifest = true
+								})
+
+								It("ignores the manifest file", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+									cmdSettings, manifestApps := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+									Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+										CurrentDirectory: tmpDir,
+									}))
+									Expect(manifestApps).To(BeNil())
+								})
+							})
 						})
 
 						Context("via a manfiest.yaml in the current directory", func() {
@@ -568,6 +585,21 @@ var _ = Describe("v2-push Command", func() {
 				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
 					Arg1: "--docker-image, -o",
 					Arg2: "-p",
+				}))
+			})
+		})
+
+		Context("when only -f and --no-manifest flags are passed", func() {
+			BeforeEach(func() {
+				cmd.PathToManifest = "/some/path.yml"
+				cmd.NoManifest = true
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				_, err := cmd.GetCommandLineSettings()
+				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+					Arg1: "-f",
+					Arg2: "--no-manifest",
 				}))
 			})
 		})

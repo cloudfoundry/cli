@@ -593,6 +593,7 @@
     "could not find",
     "using specified manifest file",
     "searching for manifest file",
+    "skipping reading of manifest",
 
     "(?i).*(?:token|password).*",
     "Host",
