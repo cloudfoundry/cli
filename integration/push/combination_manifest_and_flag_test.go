@@ -26,6 +26,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 		tmpFile, err := ioutil.TempFile("", "combination-manifest")
 		Expect(err).ToNot(HaveOccurred())
 		pathToManifest = tmpFile.Name()
+		Expect(tmpFile.Close()).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
