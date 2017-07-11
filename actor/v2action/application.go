@@ -381,6 +381,7 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 }
 
 func (actor Actor) startApplication(app Application, client NOAAClient, config Config, appState chan ApplicationState, allWarnings chan string, errs chan error) {
+	appState <- ApplicationStateStaging
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 		GUID:  app.GUID,
 		State: ccv2.ApplicationStarted,
@@ -393,7 +394,6 @@ func (actor Actor) startApplication(app Application, client NOAAClient, config C
 		errs <- err
 		return
 	}
-	appState <- ApplicationStateStaging
 
 	err = actor.pollStaging(app, config, allWarnings)
 	if err != nil {
