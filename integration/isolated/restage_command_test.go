@@ -121,7 +121,7 @@ var _ = Describe("restage command", func() {
 			})
 		})
 
-		FContext("when the app does exist", func() {
+		Context("when the app does exist", func() {
 			var (
 				domainName string
 				appName    string
