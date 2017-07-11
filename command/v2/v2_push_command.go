@@ -50,7 +50,7 @@ type V2PushCommand struct {
 	// DiskLimit            string                      `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	// MemoryLimit          string                      `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	// NoHostname           bool                        `long:"no-hostname" description:"Map the root domain to this app"`
-	// NoManifest           bool                        `long:"no-manifest" description:"Ignore manifest file"`
+	NoManifest bool `long:"no-manifest" description:"Ignore manifest file"`
 	// NoRoute              bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
 	// NoStart              bool                        `long:"no-start" description:"Do not start an app after pushing"`
 	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
@@ -261,6 +261,9 @@ func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSett
 	var pathToManifest string
 
 	switch {
+	case cmd.NoManifest:
+		log.Debug("skipping reading of manifest")
+		return nil, nil
 	case cmd.PathToManifest != "":
 		log.Debug("using specified manifest file")
 		pathToManifest = string(cmd.PathToManifest)
@@ -366,10 +369,16 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 }
 
 func (cmd V2PushCommand) validateArgs() error {
-	if cmd.DockerImage.Path != "" && cmd.AppPath != "" {
+	switch {
+	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{
 			Arg1: "--docker-image, -o",
 			Arg2: "-p",
+		}
+	case cmd.PathToManifest != "" && cmd.NoManifest:
+		return translatableerror.ArgumentCombinationError{
+			Arg1: "-f",
+			Arg2: "--no-manifest",
 		}
 	}
 
