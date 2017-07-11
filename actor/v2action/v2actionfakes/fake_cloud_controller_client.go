@@ -682,6 +682,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	RestageApplicationStub        func(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
+	restageApplicationMutex       sync.RWMutex
+	restageApplicationArgsForCall []struct {
+		app ccv2.Application
+	}
+	restageApplicationReturns struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
+	restageApplicationReturnsOnCall map[int]struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
 	UploadApplicationPackageStub        func(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error)
 	uploadApplicationPackageMutex       sync.RWMutex
 	uploadApplicationPackageArgsForCall []struct {
@@ -3256,6 +3271,60 @@ func (fake *FakeCloudControllerClient) UpdateApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) RestageApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error) {
+	fake.restageApplicationMutex.Lock()
+	ret, specificReturn := fake.restageApplicationReturnsOnCall[len(fake.restageApplicationArgsForCall)]
+	fake.restageApplicationArgsForCall = append(fake.restageApplicationArgsForCall, struct {
+		app ccv2.Application
+	}{app})
+	fake.recordInvocation("RestageApplication", []interface{}{app})
+	fake.restageApplicationMutex.Unlock()
+	if fake.RestageApplicationStub != nil {
+		return fake.RestageApplicationStub(app)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.restageApplicationReturns.result1, fake.restageApplicationReturns.result2, fake.restageApplicationReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) RestageApplicationCallCount() int {
+	fake.restageApplicationMutex.RLock()
+	defer fake.restageApplicationMutex.RUnlock()
+	return len(fake.restageApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) RestageApplicationArgsForCall(i int) ccv2.Application {
+	fake.restageApplicationMutex.RLock()
+	defer fake.restageApplicationMutex.RUnlock()
+	return fake.restageApplicationArgsForCall[i].app
+}
+
+func (fake *FakeCloudControllerClient) RestageApplicationReturns(result1 ccv2.Application, result2 ccv2.Warnings, result3 error) {
+	fake.RestageApplicationStub = nil
+	fake.restageApplicationReturns = struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) RestageApplicationReturnsOnCall(i int, result1 ccv2.Application, result2 ccv2.Warnings, result3 error) {
+	fake.RestageApplicationStub = nil
+	if fake.restageApplicationReturnsOnCall == nil {
+		fake.restageApplicationReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Application
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.restageApplicationReturnsOnCall[i] = struct {
+		result1 ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UploadApplicationPackage(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error) {
 	var existingResourcesCopy []ccv2.Resource
 	if existingResources != nil {
@@ -3691,6 +3760,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.targetCFMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
+	fake.restageApplicationMutex.RLock()
+	defer fake.restageApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
 	fake.aPIMutex.RLock()

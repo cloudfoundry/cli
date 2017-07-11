@@ -432,6 +432,100 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("RestageApplication", func() {
+		Context("when the restage is successful", func() {
+			BeforeEach(func() {
+				response := `{
+					"metadata": {
+						"guid": "some-app-guid",
+						"url": "/v2/apps/some-app-guid"
+					},
+					"entity": {
+						"buildpack": "ruby 1.6.29",
+						"detected_start_command": "echo 'I am a banana'",
+						"disk_quota": 586,
+						"detected_buildpack": null,
+						"docker_image": "some-docker-path",
+						"health_check_type": "some-health-check-type",
+						"health_check_http_endpoint": "/anything",
+						"instances": 13,
+						"memory": 1024,
+						"name": "app-name-1",
+						"package_updated_at": "2015-03-10T23:11:54Z",
+						"stack_guid": "some-stack-guid",
+						"state": "STARTED"
+					}
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
+						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the updated object and warnings and sends all updated field", func() {
+				app, warnings, err := client.RestageApplication(Application{
+					DockerImage:             "some-docker-path",
+					GUID:                    "some-app-guid",
+					HealthCheckType:         "some-health-check-type",
+					HealthCheckHTTPEndpoint: "/anything",
+					State: ApplicationStarted,
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(app).To(Equal(Application{
+					Buildpack:               "ruby 1.6.29",
+					DetectedBuildpack:       "",
+					DetectedStartCommand:    "echo 'I am a banana'",
+					DiskQuota:               586,
+					DockerImage:             "some-docker-path",
+					GUID:                    "some-app-guid",
+					HealthCheckType:         "some-health-check-type",
+					HealthCheckHTTPEndpoint: "/anything",
+					Instances:               13,
+					Memory:                  1024,
+					Name:                    "app-name-1",
+					PackageUpdatedAt:        updatedAt,
+					StackGUID:               "some-stack-guid",
+					State:                   ApplicationStarted,
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+
+		Context("when the restage returns an error", func() {
+			BeforeEach(func() {
+				response := `
+{
+  "code": 210002,
+  "description": "The app could not be found: some-app-guid",
+  "error_code": "CF-AppNotFound"
+}
+			`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v2/apps/some-app-guid/restage"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				_, warnings, err := client.RestageApplication(Application{
+					GUID:            "some-app-guid",
+					HealthCheckType: "some-health-check-type",
+				})
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "The app could not be found: some-app-guid"}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetRouteApplications", func() {
 		Context("when the route guid is not found", func() {
 			BeforeEach(func() {

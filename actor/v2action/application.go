@@ -282,7 +282,21 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 		defer close(errs)
 		defer client.Close() // automatic close to prevent stale clients
 
-		actor.startApplication(app, client, config, appState, allWarnings, errs)
+		appState <- ApplicationStateStaging
+		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			GUID:  app.GUID,
+			State: ccv2.ApplicationStarted,
+		})
+
+		for _, warning := range warnings {
+			allWarnings <- warning
+		}
+		if err != nil {
+			errs <- err
+			return
+		}
+
+		actor.waitForApplicationStageAndStart(Application(updatedApp), client, config, appState, allWarnings, errs)
 	}()
 
 	return messages, logErrs, appState, allWarnings, errs
@@ -317,7 +331,54 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 			}
 		}
 
-		actor.startApplication(app, client, config, appState, allWarnings, errs)
+		appState <- ApplicationStateStaging
+		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			GUID:  app.GUID,
+			State: ccv2.ApplicationStarted,
+		})
+
+		for _, warning := range warnings {
+			allWarnings <- warning
+		}
+		if err != nil {
+			errs <- err
+			return
+		}
+
+		actor.waitForApplicationStageAndStart(Application(updatedApp), client, config, appState, allWarnings, errs)
+	}()
+
+	return messages, logErrs, appState, allWarnings, errs
+}
+
+// RestageApplication restarts a given application. If already stopped, no stop
+// call will be sent.
+func (actor Actor) RestageApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
+	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
+
+	appState := make(chan ApplicationState)
+	allWarnings := make(chan string)
+	errs := make(chan error)
+	go func() {
+		defer close(appState)
+		defer close(allWarnings)
+		defer close(errs)
+		defer client.Close() // automatic close to prevent stale clients
+
+		appState <- ApplicationStateStaging
+		restagedApp, warnings, err := actor.CloudControllerClient.RestageApplication(ccv2.Application{
+			GUID: app.GUID,
+		})
+
+		for _, warning := range warnings {
+			allWarnings <- warning
+		}
+		if err != nil {
+			errs <- err
+			return
+		}
+
+		actor.waitForApplicationStageAndStart(Application(restagedApp), client, config, appState, allWarnings, errs)
 	}()
 
 	return messages, logErrs, appState, allWarnings, errs
@@ -380,28 +441,14 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 	return StartupTimeoutError{Name: app.Name}
 }
 
-func (actor Actor) startApplication(app Application, client NOAAClient, config Config, appState chan ApplicationState, allWarnings chan string, errs chan error) {
-	appState <- ApplicationStateStaging
-	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
-		GUID:  app.GUID,
-		State: ccv2.ApplicationStarted,
-	})
-
-	for _, warning := range warnings {
-		allWarnings <- warning
-	}
+func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAClient, config Config, appState chan ApplicationState, allWarnings chan string, errs chan error) {
+	err := actor.pollStaging(app, config, allWarnings)
 	if err != nil {
 		errs <- err
 		return
 	}
 
-	err = actor.pollStaging(app, config, allWarnings)
-	if err != nil {
-		errs <- err
-		return
-	}
-
-	if updatedApp.Instances == 0 {
+	if app.Instances == 0 {
 		return
 	}
 
