@@ -41,6 +41,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("APINotFoundError", APINotFoundError{}),
 		Entry("APIRequestError", APIRequestError{}),
 		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
+		Entry("AppNotFoundInManifestError", AppNotFoundInManifestError{}),
 		Entry("ArgumentCombinationError", ArgumentCombinationError{}),
 		Entry("AssignDropletError", AssignDropletError{}),
 		Entry("BadCredentialsError", BadCredentialsError{}),
