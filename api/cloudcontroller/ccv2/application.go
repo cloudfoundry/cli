@@ -235,6 +235,25 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	return updatedApp, response.Warnings, err
 }
 
+// RestageApplication restages the application with the given GUID.
+func (client *Client) RestageApplication(app Application) (Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostAppRestageRequest,
+		URIParams:   Params{"app_guid": app.GUID},
+	})
+	if err != nil {
+		return Application{}, nil, err
+	}
+
+	var restagedApp Application
+	response := cloudcontroller.Response{
+		Result: &restagedApp,
+	}
+
+	err = client.connection.Make(request, &response)
+	return restagedApp, response.Warnings, err
+}
+
 // GetRouteApplications returns a list of Applications associated with a route
 // GUID, filtered by provided queries.
 func (client *Client) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {

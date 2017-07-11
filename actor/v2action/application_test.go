@@ -648,7 +648,6 @@ var _ = Describe("Application Actions", func() {
 				GUID:      "some-app-guid",
 				Name:      "some-app",
 				Instances: 2,
-				State:     ccv2.ApplicationStopped,
 			}
 
 			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
@@ -667,11 +666,6 @@ var _ = Describe("Application Actions", func() {
 				}
 				return nil
 			}
-
-			fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-				Instances: 2,
-				Name:      "some-app",
-			}, ccv2.Warnings{"update-warning"}, nil)
 
 			appCount := 0
 			fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
@@ -718,11 +712,203 @@ var _ = Describe("Application Actions", func() {
 			Eventually(errs).Should(BeClosed())
 		})
 
+		var ItHandlesStagingIssues = func() {
+			Context("staging issues", func() {
+				Context("when polling fails", func() {
+					var expectedErr error
+					BeforeEach(func() {
+						expectedErr = errors.New("I am a banana!!!!")
+						fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+							return ccv2.Application{}, ccv2.Warnings{"app-warnings-1"}, expectedErr
+						}
+					})
+
+					It("sends the error and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(expectedErr)))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the application fails to stage", func() {
+					Context("due to a NoAppDetectedError", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+								return ccv2.Application{
+									GUID:                "some-app-guid",
+									Name:                "some-app",
+									Instances:           2,
+									PackageState:        ccv2.ApplicationPackageFailed,
+									StagingFailedReason: "NoAppDetectedError",
+								}, ccv2.Warnings{"app-warnings-1"}, nil
+							}
+						})
+
+						It("sends a StagingFailedNoAppDetectedError and stops polling", func() {
+							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+							Eventually(warnings).Should(Receive(Equal("state-warning")))
+							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+							Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
+
+							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("due to any other error", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
+								return ccv2.Application{
+									GUID:                "some-app-guid",
+									Name:                "some-app",
+									Instances:           2,
+									PackageState:        ccv2.ApplicationPackageFailed,
+									StagingFailedReason: "OhNoes",
+								}, ccv2.Warnings{"app-warnings-1"}, nil
+							}
+						})
+
+						It("sends a StagingFailedError and stops polling", func() {
+							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+							Eventually(warnings).Should(Receive(Equal("state-warning")))
+							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+							Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
+
+							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						})
+					})
+				})
+
+				Context("when the application takes too long to stage", func() {
+					BeforeEach(func() {
+						fakeConfig.StagingTimeoutReturns(0)
+						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = nil
+					})
+
+					It("sends a timeout error and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: 0})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))
+						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
+				})
+			})
+
+		}
+
+		var ItHandlesStartingIssues = func() {
+			Context("starting issues", func() {
+				Context("when polling fails", func() {
+					var expectedErr error
+					BeforeEach(func() {
+						expectedErr = errors.New("I am a banana!!!!")
+						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+							return nil, ccv2.Warnings{"app-instance-warnings-1"}, expectedErr
+						}
+					})
+
+					It("sends the error and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(expectedErr)))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+					})
+				})
+
+				Context("when the application takes too long to start", func() {
+					BeforeEach(func() {
+						fakeConfig.StartupTimeoutReturns(0)
+					})
+
+					It("sends a timeout error and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+						Eventually(errs).Should(Receive(MatchError(StartupTimeoutError{Name: "some-app"})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when the application crashes", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+							return map[int]ccv2.ApplicationInstance{
+								0: {State: ccv2.ApplicationInstanceCrashed},
+							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
+						}
+					})
+
+					It("returns an ApplicationInstanceCrashedError and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceCrashedError{Name: "some-app"})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+					})
+				})
+
+				Context("when the application flaps", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+							return map[int]ccv2.ApplicationInstance{
+								0: {State: ccv2.ApplicationInstanceFlapping},
+							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
+						}
+					})
+
+					It("returns an ApplicationInstanceFlappingError and stops polling", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceFlappingError{Name: "some-app"})))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
+						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+					})
+				})
+			})
+		}
+
 		var ItStartsApplication = func() {
 			Context("when the app is not running", func() {
 				It("starts and polls for an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -749,12 +935,12 @@ var _ = Describe("Application Actions", func() {
 					fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
 						Instances: 0,
 						Name:      "some-app",
-					}, ccv2.Warnings{"update-warning"}, nil)
+					}, ccv2.Warnings{"state-warning"}, nil)
 				})
 
 				It("starts and only polls for staging to finish", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStarting)))
@@ -777,12 +963,12 @@ var _ = Describe("Application Actions", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a banana!!!!")
-					fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"update-warning"}, expectedErr)
+					fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{}, ccv2.Warnings{"state-warning"}, expectedErr)
 				})
 
 				It("sends the update error and never polls", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(errs).Should(Receive(MatchError(expectedErr)))
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
@@ -791,195 +977,19 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("staging issues", func() {
-				Context("when polling fails", func() {
-					var expectedErr error
-					BeforeEach(func() {
-						expectedErr = errors.New("I am a banana!!!!")
-						fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
-							return ccv2.Application{}, ccv2.Warnings{"app-warnings-1"}, expectedErr
-						}
-					})
+			ItHandlesStagingIssues()
 
-					It("sends the error and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(expectedErr)))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
-					})
-				})
-
-				Context("when the application fails to stage", func() {
-					Context("due to a NoAppDetectedError", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
-								return ccv2.Application{
-									GUID:                "some-app-guid",
-									Name:                "some-app",
-									Instances:           2,
-									PackageState:        ccv2.ApplicationPackageFailed,
-									StagingFailedReason: "NoAppDetectedError",
-								}, ccv2.Warnings{"app-warnings-1"}, nil
-							}
-						})
-
-						It("sends a StagingFailedNoAppDetectedError and stops polling", func() {
-							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-							Eventually(warnings).Should(Receive(Equal("update-warning")))
-							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-							Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
-
-							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
-						})
-					})
-
-					Context("due to any other error", func() {
-						BeforeEach(func() {
-							fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
-								return ccv2.Application{
-									GUID:                "some-app-guid",
-									Name:                "some-app",
-									Instances:           2,
-									PackageState:        ccv2.ApplicationPackageFailed,
-									StagingFailedReason: "OhNoes",
-								}, ccv2.Warnings{"app-warnings-1"}, nil
-							}
-						})
-
-						It("sends a StagingFailedError and stops polling", func() {
-							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-							Eventually(warnings).Should(Receive(Equal("update-warning")))
-							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-							Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
-
-							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
-						})
-					})
-				})
-
-				Context("when the application takes too long to stage", func() {
-					BeforeEach(func() {
-						fakeConfig.StagingTimeoutReturns(0)
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = nil
-					})
-
-					It("sends a timeout error and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: 0})))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
-						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))
-						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
-					})
-				})
-			})
-
-			Context("starting issues", func() {
-				Context("when polling fails", func() {
-					var expectedErr error
-					BeforeEach(func() {
-						expectedErr = errors.New("I am a banana!!!!")
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
-							return nil, ccv2.Warnings{"app-instance-warnings-1"}, expectedErr
-						}
-					})
-
-					It("sends the error and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
-						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(expectedErr)))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
-					})
-				})
-
-				Context("when the application takes too long to start", func() {
-					BeforeEach(func() {
-						fakeConfig.StartupTimeoutReturns(0)
-					})
-
-					It("sends a timeout error and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
-						Eventually(errs).Should(Receive(MatchError(StartupTimeoutError{Name: "some-app"})))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
-					})
-				})
-
-				Context("when the application crashes", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
-							return map[int]ccv2.ApplicationInstance{
-								0: {State: ccv2.ApplicationInstanceCrashed},
-							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
-						}
-					})
-
-					It("returns an ApplicationInstanceCrashedError and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
-						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceCrashedError{Name: "some-app"})))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
-					})
-				})
-
-				Context("when the application flaps", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
-							return map[int]ccv2.ApplicationInstance{
-								0: {State: ccv2.ApplicationInstanceFlapping},
-							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
-						}
-					})
-
-					It("returns an ApplicationInstanceFlappingError and stops polling", func() {
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-						Eventually(warnings).Should(Receive(Equal("update-warning")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
-						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
-						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceFlappingError{Name: "some-app"})))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
-					})
-				})
-			})
+			ItHandlesStartingIssues()
 		}
 
 		Describe("StartApplication", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+					Instances: 2,
+					Name:      "some-app",
+				}, ccv2.Warnings{"state-warning"}, nil)
+			})
+
 			JustBeforeEach(func() {
 				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
 			})
@@ -988,6 +998,13 @@ var _ = Describe("Application Actions", func() {
 		})
 
 		Describe("RestartApplication", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+					Instances: 2,
+					Name:      "some-app",
+				}, ccv2.Warnings{"state-warning"}, nil)
+			})
+
 			JustBeforeEach(func() {
 				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient, fakeConfig)
 			})
@@ -999,9 +1016,9 @@ var _ = Describe("Application Actions", func() {
 
 				It("stops, starts and polls for an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStopping)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -1027,6 +1044,36 @@ var _ = Describe("Application Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
 					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
+
+				Context("when updating the application to stop fails", func() {
+					var expectedErr error
+					BeforeEach(func() {
+						expectedErr = errors.New("I am a banana!!!!")
+						updateApplicationCalled := false
+						fakeCloudControllerClient.UpdateApplicationStub = func(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error) {
+							if !updateApplicationCalled {
+								return ccv2.Application{}, ccv2.Warnings{"state-warning"}, expectedErr
+							}
+
+							updateApplicationCalled = true
+							return ccv2.Application{GUID: "some-app-guid",
+								Instances: 2,
+								Name:      "some-app",
+							}, ccv2.Warnings{"state-warning"}, nil
+						}
+					})
+
+					It("sends the update error and never polls", func() {
+						Eventually(appState).Should(Receive(Equal(ApplicationStateStopping)))
+						Eventually(warnings).Should(Receive(Equal("state-warning")))
+						Eventually(errs).Should(Receive(MatchError(expectedErr)))
+						Eventually(appState).ShouldNot(Receive(Equal(ApplicationStateStaging)))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					})
+				})
 			})
 
 			Context("when the app is not running", func() {
@@ -1036,7 +1083,7 @@ var _ = Describe("Application Actions", func() {
 
 				It("does not stop an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
-					Eventually(warnings).Should(Receive(Equal("update-warning")))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
@@ -1052,6 +1099,66 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			ItStartsApplication()
+		})
+
+		Describe("RestageApplication", func() {
+			JustBeforeEach(func() {
+				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient, fakeConfig)
+			})
+
+			Context("when restaging succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+						Instances: 2,
+						Name:      "some-app",
+					}, ccv2.Warnings{"state-warning"}, nil)
+				})
+
+				It("restages and polls for app instances", func() {
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+
+					Expect(fakeCloudControllerClient.RestageApplicationCallCount()).To(Equal(1))
+					app := fakeCloudControllerClient.RestageApplicationArgsForCall(0)
+					Expect(app).To(Equal(ccv2.Application{
+						GUID: "some-app-guid",
+					}))
+
+					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
+				})
+
+				ItHandlesStagingIssues()
+
+				ItHandlesStartingIssues()
+			})
+
+			Context("when restaging errors", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
+						Instances: 2,
+						Name:      "some-app",
+					}, ccv2.Warnings{"state-warning"}, errors.New("some-error"))
+				})
+
+				It("sends the restage error and never polls", func() {
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
+					Eventually(errs).Should(Receive(MatchError("some-error")))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+				})
+			})
 		})
 	})
 

@@ -54,6 +54,7 @@ const (
 	GetStackRequest                        = "GetStack"
 	GetUsersRequest                        = "GetUsers"
 	PostAppRequest                         = "PostApp"
+	PostAppRestageRequest                  = "PostAppRestage"
 	PostRouteRequest                       = "PostRoute"
 	PostServiceBindingRequest              = "PostServiceBinding"
 	PostUserRequest                        = "PostUser"
@@ -76,6 +77,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: GetAppInstancesRequest},
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
+	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},
