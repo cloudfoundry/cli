@@ -33,6 +33,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 			tempFile, err := ioutil.TempFile("", "integration-push-path")
 			Expect(err).ToNot(HaveOccurred())
 			path = tempFile.Name()
+			Expect(tempFile.Close())
 		})
 
 		AfterEach(func() {
@@ -102,6 +103,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 				tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 				Expect(err).ToNot(HaveOccurred())
 				archive = tmpfile.Name()
+				Expect(tmpFile.Close())
 
 				err = zipit(appDir, archive, "")
 				Expect(err).ToNot(HaveOccurred())
