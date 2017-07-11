@@ -142,7 +142,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	for _, appConfig := range appConfigs {
+	for appNumber, appConfig := range appConfigs {
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
 		err := cmd.displayChanges(appConfig)
 		if err != nil {
@@ -171,6 +171,10 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		}
 
 		shared.DisplayAppSummary(cmd.UI, appSummary, true)
+
+		if appNumber+1 <= len(appConfigs) {
+			cmd.UI.DisplayNewline()
+		}
 	}
 
 	return nil
