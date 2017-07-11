@@ -59,6 +59,8 @@ func HandleError(err error) error {
 	case v2action.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError{Path: e.Path}
 
+	case pushaction.AppNotFoundInManifestError:
+		return translatableerror.AppNotFoundInManifestError{Name: e.Name}
 	case pushaction.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
 	case pushaction.MissingNameError:

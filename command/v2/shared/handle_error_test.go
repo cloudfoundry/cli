@@ -110,6 +110,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.InvalidRefreshTokenError{},
 		),
 
+		Entry("pushaction.AppNotFoundInManifestError -> AppNotFoundInManifestError",
+			pushaction.AppNotFoundInManifestError{Name: "some-app"},
+			translatableerror.AppNotFoundInManifestError{Name: "some-app"},
+		),
+
 		Entry("pushaction.NoDomainsFoundError -> NoDomainsFoundError",
 			pushaction.NoDomainsFoundError{OrganizationGUID: "some-guid"},
 			translatableerror.NoDomainsFoundError{},

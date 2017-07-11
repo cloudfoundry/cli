@@ -40,7 +40,11 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	})
 
 	Context("when passed command line settings and manifests", func() {
-		var apps []manifest.Application
+		var (
+			apps       []manifest.Application
+			mergedApps []manifest.Application
+			executeErr error
+		)
 
 		BeforeEach(func() {
 			cmdSettings = CommandLineSettings{
@@ -53,11 +57,13 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}
 		})
 
-		It("merges command line settings and manifest apps", func() {
-			mergedApps, err := actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
-			Expect(err).ToNot(HaveOccurred())
+		JustBeforeEach(func() {
+			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
+		})
 
-			Expect(mergedApps).To(HaveLen(2))
+		It("merges command line settings and manifest apps", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
 			Expect(mergedApps).To(ConsistOf(
 				manifest.Application{
 					Name: "app-1",
@@ -68,6 +74,35 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 					Path: "/current/directory",
 				},
 			))
+		})
+
+		Context("when CommandLineSettings specify an app in the manifests", func() {
+			Context("when the app exists in the manifest", func() {
+				BeforeEach(func() {
+					cmdSettings.Name = "app-1"
+				})
+
+				It("returns just the specified app manifest", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(mergedApps).To(ConsistOf(
+						manifest.Application{
+							Name: "app-1",
+							Path: "/current/directory",
+						},
+					))
+				})
+			})
+
+			Context("when the app does *not* exist in the manifest", func() {
+				BeforeEach(func() {
+					cmdSettings.Name = "app-4"
+				})
+
+				It("returns just the specified app manifest", func() {
+					Expect(executeErr).To(MatchError(AppNotFoundInManifestError{Name: "app-4"}))
+				})
+			})
 		})
 	})
 
