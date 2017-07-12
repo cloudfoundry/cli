@@ -2392,8 +2392,8 @@
     "translation": "Disk limit (e.g. 256M, 1024M, 1G)"
   },
   {
-    "id": "Display health and status for app",
-    "translation": "Display health and status for app"
+    "id": "Display health and status for an app",
+    "translation": "Display health and status for an app"
   },
   {
     "id": "Do not colorize output",

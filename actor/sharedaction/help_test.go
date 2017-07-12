@@ -8,7 +8,7 @@ import (
 )
 
 type commandList struct {
-	App     appCommand     `command:"app" description:"Display health and status for app"`
+	App     appCommand     `command:"app" description:"Display health and status for an app"`
 	Restage restageCommand `command:"restage" alias:"rg" description:"Restage an app"`
 	Help    helpCommand    `command:"help" alias:"h" description:"Show help"`
 }
@@ -44,7 +44,7 @@ var _ = Describe("Help Actions", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(commandInfo.Name).To(Equal("app"))
-					Expect(commandInfo.Description).To(Equal("Display health and status for app"))
+					Expect(commandInfo.Description).To(Equal("Display health and status for an app"))
 					Expect(commandInfo.Alias).To(BeEmpty())
 					Expect(commandInfo.Usage).To(Equal("CF_NAME app APP_NAME"))
 					Expect(commandInfo.Flags).To(HaveLen(1))
@@ -124,7 +124,7 @@ var _ = Describe("Help Actions", func() {
 
 			Expect(commands["app"]).To(Equal(CommandInfo{
 				Name:        "app",
-				Description: "Display health and status for app",
+				Description: "Display health and status for an app",
 			}))
 			Expect(commands["help"]).To(Equal(CommandInfo{
 				Name:        "help",
