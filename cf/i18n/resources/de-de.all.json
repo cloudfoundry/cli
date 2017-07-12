@@ -7320,7 +7320,7 @@
     "translation": "{{.AppInstanceLimit}} - Grenzwert für App-Instanz"
   },
   {
-    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}",
     "translation": ""
   },
   {

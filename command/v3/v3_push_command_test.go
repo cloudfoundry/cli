@@ -18,6 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -28,6 +29,7 @@ var _ = Describe("v3-push Command", func() {
 		cmd             v3.V3PushCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
+		fakeClock       *fakeclock.FakeClock
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeActor       *v3fakes.FakeV3PushActor
@@ -46,6 +48,10 @@ var _ = Describe("v3-push Command", func() {
 		fakeV2PushActor = new(v3fakes.FakeV2PushActor)
 		fakeV2AppActor = new(v3fakes.FakeV2AppActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+
+		fakeClock = fakeclock.NewFakeClock(time.Now())
+		fakeActor.GetClockReturns(fakeClock)
+		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -71,7 +77,6 @@ var _ = Describe("v3-push Command", func() {
 			NOAAClient:          fakeNOAAClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
 		}
-
 	})
 
 	JustBeforeEach(func() {
@@ -233,6 +238,26 @@ var _ = Describe("v3-push Command", func() {
 
 								return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
 							}
+						})
+
+						Context("when staging times out", func() {
+							BeforeEach(func() {
+								fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+									return make(chan v3action.Build), make(chan v3action.Warnings), make(chan error)
+								}
+								go func() {
+									fakeClock.WaitForWatcherAndIncrement(10 * time.Minute)
+								}()
+							})
+
+							It("fails with a staging timeout error", func() {
+								Eventually(executeErr).Should(MatchError(translatableerror.StagingTimeoutError{
+									AppName: "some-app",
+									Timeout: 10 * time.Minute,
+								}))
+								Expect(fakeActor.GetClockCallCount()).To(Equal(1))
+								Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+							})
 						})
 
 						Context("when the staging returns an error", func() {

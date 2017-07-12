@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/clock"
 )
 
 // Application represents a V3 actor application.
@@ -52,6 +53,10 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	}
 
 	return Application(apps[0]), Warnings(warnings), nil
+}
+
+func (_ Actor) GetClock() clock.Clock {
+	return clock.NewClock()
 }
 
 type CreateApplicationInput struct {

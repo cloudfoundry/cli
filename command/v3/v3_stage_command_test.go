@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -28,10 +29,12 @@ var _ = Describe("v3-stage Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3StageActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		binaryName      string
-		executeErr      error
-		app             string
-		packageGUID     string
+		fakeClock       *fakeclock.FakeClock
+
+		binaryName  string
+		executeErr  error
+		app         string
+		packageGUID string
 	)
 
 	BeforeEach(func() {
@@ -40,6 +43,10 @@ var _ = Describe("v3-stage Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3StageActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
+
+		fakeClock = fakeclock.NewFakeClock(time.Now())
+		fakeActor.GetClockReturns(fakeClock)
+		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
@@ -110,6 +117,27 @@ var _ = Describe("v3-stage Command", func() {
 
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
 				}
+			})
+
+			Context("when staging times out", func() {
+				BeforeEach(func() {
+					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+						return make(chan v3action.Build), make(chan v3action.Warnings), make(chan error)
+					}
+
+					go func() {
+						fakeClock.WaitForWatcherAndIncrement(10 * time.Minute)
+					}()
+				})
+
+				It("fails with a staging timeout error", func() {
+					Eventually(executeErr).Should(MatchError(translatableerror.StagingTimeoutError{
+						AppName: "some-app",
+						Timeout: 10 * time.Minute,
+					}))
+					Expect(fakeActor.GetClockCallCount()).To(Equal(1))
+					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
+				})
 			})
 
 			Context("when the staging is successful", func() {

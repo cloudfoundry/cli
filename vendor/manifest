@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "code.cloudfoundry.org/clock",
+			"repository": "https://github.com/cloudfoundry/clock",
+			"vcs": "git",
+			"revision": "2269160ae1757f96bbb8c6475e6fa36c805e73e0",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "code.cloudfoundry.org/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
