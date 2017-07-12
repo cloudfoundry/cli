@@ -6,8 +6,10 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/clock/fakeclock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,6 +18,7 @@ import (
 
 var _ = Describe("V3PollStage", func() {
 	var (
+		appName             string
 		returnedDropletGUID string
 		executeErr          error
 		testUI              *ui.UI
@@ -24,25 +27,35 @@ var _ = Describe("V3PollStage", func() {
 		errStream           chan error
 		logStream           chan *v3action.LogMessage
 		logErrStream        chan error
+		fakeClock           *fakeclock.FakeClock
+		done                chan struct{}
 	)
 
 	JustBeforeEach(func() {
+		appName = "some-app"
+
 		executeErr = nil
 		returnedDropletGUID = ""
+		done = make(chan struct{}, 1)
 
 		go func() {
 			returnedDropletGUID, executeErr = PollStage(
+				appName,
 				buildStream,
 				warningsStream,
 				errStream,
 				logStream,
 				logErrStream,
-				testUI)
+				testUI,
+				fakeClock,
+				15*time.Minute)
+			done <- struct{}{}
 		}()
 	})
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		fakeClock = fakeclock.NewFakeClock(time.Now())
 
 		buildStream = make(chan v3action.Build, 1)
 		warningsStream = make(chan v3action.Warnings, 1)
@@ -105,10 +118,10 @@ var _ = Describe("V3PollStage", func() {
 			})
 
 			It("ignores the log message", func() {
-				Consistently(testUI.Out).ShouldNot(Say("some-log-message"))
 				close(buildStream)
 				close(warningsStream)
 				close(errStream)
+				Consistently(testUI.Out).ShouldNot(Say("some-log-message"))
 			})
 		})
 	})
@@ -120,11 +133,8 @@ var _ = Describe("V3PollStage", func() {
 
 		It("returns the error without waiting for streams to be closed", func() {
 			Consistently(testUI.Out).ShouldNot(Say("droplet: droplet-guid"))
-			Eventually(func() string { return returnedDropletGUID }).Should(BeEmpty())
 			Eventually(func() error { return executeErr }).Should(MatchError("some error"))
-			close(buildStream)
-			close(warningsStream)
-			close(errStream)
+			Expect(returnedDropletGUID).Should(BeEmpty())
 		})
 	})
 
@@ -140,6 +150,22 @@ var _ = Describe("V3PollStage", func() {
 			close(errStream)
 			Eventually(func() string { return returnedDropletGUID }).Should(BeEmpty())
 			Consistently(func() error { return executeErr }).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Context("when the staging timeout has expired", func() {
+		It("exits with an error", func() {
+			Consistently(done).ShouldNot(Receive())
+			fakeClock.WaitForWatcherAndIncrement(15*time.Minute - time.Nanosecond)
+			Consistently(done).ShouldNot(Receive())
+
+			fakeClock.Increment(time.Duration(time.Nanosecond))
+			Eventually(done).Should(Receive())
+
+			Expect(returnedDropletGUID).To(BeEmpty())
+			Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{
+				AppName: "some-app",
+				Timeout: 15 * time.Minute}))
 		})
 	})
 })

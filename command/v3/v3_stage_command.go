@@ -9,19 +9,22 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
-	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	GetClock() clock.Clock
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 }
 
 type V3StageCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID"`
-	PackageGUID  string       `long:"package-guid" description:"The guid of the package to stage" required:"true"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	PackageGUID         string       `long:"package-guid" description:"The guid of the package to stage" required:"true"`
+	usage               interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID"`
+	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
 	UI          command.UI
 	Config      command.Config
@@ -90,7 +93,7 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	}
 
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
-	_, err = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	_, err = shared.PollStage(cmd.RequiredArgs.AppName, buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI, cmd.Actor.GetClock(), cmd.Config.StagingTimeout())
 	if err == nil {
 		cmd.UI.DisplayOK()
 	}

@@ -7320,7 +7320,7 @@
     "translation": "{{.AppInstanceLimit}} 앱 인스턴스 한계"
   },
   {
-    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}",
     "translation": ""
   },
   {

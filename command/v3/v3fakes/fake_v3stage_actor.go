@@ -6,23 +6,18 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/v3"
+	"code.cloudfoundry.org/clock"
 )
 
 type FakeV3StageActor struct {
-	StagePackageStub        func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
-	stagePackageMutex       sync.RWMutex
-	stagePackageArgsForCall []struct {
-		packageGUID string
+	GetClockStub        func() clock.Clock
+	getClockMutex       sync.RWMutex
+	getClockArgsForCall []struct{}
+	getClockReturns     struct {
+		result1 clock.Clock
 	}
-	stagePackageReturns struct {
-		result1 <-chan v3action.Build
-		result2 <-chan v3action.Warnings
-		result3 <-chan error
-	}
-	stagePackageReturnsOnCall map[int]struct {
-		result1 <-chan v3action.Build
-		result2 <-chan v3action.Warnings
-		result3 <-chan error
+	getClockReturnsOnCall map[int]struct {
+		result1 clock.Clock
 	}
 	GetStreamingLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
@@ -43,62 +38,63 @@ type FakeV3StageActor struct {
 		result3 v3action.Warnings
 		result4 error
 	}
+	StagePackageStub        func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	stagePackageMutex       sync.RWMutex
+	stagePackageArgsForCall []struct {
+		packageGUID string
+	}
+	stagePackageReturns struct {
+		result1 <-chan v3action.Build
+		result2 <-chan v3action.Warnings
+		result3 <-chan error
+	}
+	stagePackageReturnsOnCall map[int]struct {
+		result1 <-chan v3action.Build
+		result2 <-chan v3action.Warnings
+		result3 <-chan error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3StageActor) StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-	fake.stagePackageMutex.Lock()
-	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
-	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
-		packageGUID string
-	}{packageGUID})
-	fake.recordInvocation("StagePackage", []interface{}{packageGUID})
-	fake.stagePackageMutex.Unlock()
-	if fake.StagePackageStub != nil {
-		return fake.StagePackageStub(packageGUID)
+func (fake *FakeV3StageActor) GetClock() clock.Clock {
+	fake.getClockMutex.Lock()
+	ret, specificReturn := fake.getClockReturnsOnCall[len(fake.getClockArgsForCall)]
+	fake.getClockArgsForCall = append(fake.getClockArgsForCall, struct{}{})
+	fake.recordInvocation("GetClock", []interface{}{})
+	fake.getClockMutex.Unlock()
+	if fake.GetClockStub != nil {
+		return fake.GetClockStub()
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1
 	}
-	return fake.stagePackageReturns.result1, fake.stagePackageReturns.result2, fake.stagePackageReturns.result3
+	return fake.getClockReturns.result1
 }
 
-func (fake *FakeV3StageActor) StagePackageCallCount() int {
-	fake.stagePackageMutex.RLock()
-	defer fake.stagePackageMutex.RUnlock()
-	return len(fake.stagePackageArgsForCall)
+func (fake *FakeV3StageActor) GetClockCallCount() int {
+	fake.getClockMutex.RLock()
+	defer fake.getClockMutex.RUnlock()
+	return len(fake.getClockArgsForCall)
 }
 
-func (fake *FakeV3StageActor) StagePackageArgsForCall(i int) string {
-	fake.stagePackageMutex.RLock()
-	defer fake.stagePackageMutex.RUnlock()
-	return fake.stagePackageArgsForCall[i].packageGUID
+func (fake *FakeV3StageActor) GetClockReturns(result1 clock.Clock) {
+	fake.GetClockStub = nil
+	fake.getClockReturns = struct {
+		result1 clock.Clock
+	}{result1}
 }
 
-func (fake *FakeV3StageActor) StagePackageReturns(result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
-	fake.StagePackageStub = nil
-	fake.stagePackageReturns = struct {
-		result1 <-chan v3action.Build
-		result2 <-chan v3action.Warnings
-		result3 <-chan error
-	}{result1, result2, result3}
-}
-
-func (fake *FakeV3StageActor) StagePackageReturnsOnCall(i int, result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
-	fake.StagePackageStub = nil
-	if fake.stagePackageReturnsOnCall == nil {
-		fake.stagePackageReturnsOnCall = make(map[int]struct {
-			result1 <-chan v3action.Build
-			result2 <-chan v3action.Warnings
-			result3 <-chan error
+func (fake *FakeV3StageActor) GetClockReturnsOnCall(i int, result1 clock.Clock) {
+	fake.GetClockStub = nil
+	if fake.getClockReturnsOnCall == nil {
+		fake.getClockReturnsOnCall = make(map[int]struct {
+			result1 clock.Clock
 		})
 	}
-	fake.stagePackageReturnsOnCall[i] = struct {
-		result1 <-chan v3action.Build
-		result2 <-chan v3action.Warnings
-		result3 <-chan error
-	}{result1, result2, result3}
+	fake.getClockReturnsOnCall[i] = struct {
+		result1 clock.Clock
+	}{result1}
 }
 
 func (fake *FakeV3StageActor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
@@ -160,13 +156,69 @@ func (fake *FakeV3StageActor) GetStreamingLogsForApplicationByNameAndSpaceReturn
 	}{result1, result2, result3, result4}
 }
 
+func (fake *FakeV3StageActor) StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+	fake.stagePackageMutex.Lock()
+	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
+	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
+		packageGUID string
+	}{packageGUID})
+	fake.recordInvocation("StagePackage", []interface{}{packageGUID})
+	fake.stagePackageMutex.Unlock()
+	if fake.StagePackageStub != nil {
+		return fake.StagePackageStub(packageGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.stagePackageReturns.result1, fake.stagePackageReturns.result2, fake.stagePackageReturns.result3
+}
+
+func (fake *FakeV3StageActor) StagePackageCallCount() int {
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
+	return len(fake.stagePackageArgsForCall)
+}
+
+func (fake *FakeV3StageActor) StagePackageArgsForCall(i int) string {
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
+	return fake.stagePackageArgsForCall[i].packageGUID
+}
+
+func (fake *FakeV3StageActor) StagePackageReturns(result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
+	fake.StagePackageStub = nil
+	fake.stagePackageReturns = struct {
+		result1 <-chan v3action.Build
+		result2 <-chan v3action.Warnings
+		result3 <-chan error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3StageActor) StagePackageReturnsOnCall(i int, result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
+	fake.StagePackageStub = nil
+	if fake.stagePackageReturnsOnCall == nil {
+		fake.stagePackageReturnsOnCall = make(map[int]struct {
+			result1 <-chan v3action.Build
+			result2 <-chan v3action.Warnings
+			result3 <-chan error
+		})
+	}
+	fake.stagePackageReturnsOnCall[i] = struct {
+		result1 <-chan v3action.Build
+		result2 <-chan v3action.Warnings
+		result3 <-chan error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV3StageActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.stagePackageMutex.RLock()
-	defer fake.stagePackageMutex.RUnlock()
+	fake.getClockMutex.RLock()
+	defer fake.getClockMutex.RUnlock()
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
+	fake.stagePackageMutex.RLock()
+	defer fake.stagePackageMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

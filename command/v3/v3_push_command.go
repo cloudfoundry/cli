@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . V2PushActor
@@ -23,24 +24,26 @@ type V2PushActor interface {
 //go:generate counterfeiter . V3PushActor
 
 type V3PushActor interface {
-	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 	CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
-	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
-	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
+	GetClock() clock.Clock
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
+	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
+	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3PushCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME]"`
-	NoRoute      bool         `long:"no-route" description:"Do not map a route to this app"`
-	Buildpack    string       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	NoRoute             bool         `long:"no-route" description:"Do not map a route to this app"`
+	Buildpack           string       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	usage               interface{}  `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME]"`
+	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -297,7 +300,7 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 	}
 
 	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(pkg.GUID)
-	dropletGUID, err := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	dropletGUID, err := shared.PollStage(cmd.RequiredArgs.AppName, buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI, cmd.Actor.GetClock(), cmd.Config.StagingTimeout())
 	if err != nil {
 		return "", err
 	}
