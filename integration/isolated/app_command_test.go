@@ -20,7 +20,7 @@ var _ = Describe("app command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("app", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("app - Display health and status for app"))
+				Eventually(session).Should(Say("app - Display health and status for an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf app APP_NAME"))
 				Eventually(session).Should(Say("OPTIONS:"))

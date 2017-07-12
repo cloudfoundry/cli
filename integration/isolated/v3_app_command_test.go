@@ -31,7 +31,7 @@ var _ = Describe("v3-app command", func() {
 				session := helpers.CF("v3-app", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-app - Display health and status for app"))
+				Eventually(session.Out).Should(Say("v3-app - Display health and status for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-app APP_NAME [--guid]"))
 				Eventually(session).Should(Say("OPTIONS:"))
