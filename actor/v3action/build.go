@@ -1,6 +1,7 @@
 package v3action
 
 import (
+	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -35,6 +36,11 @@ func (actor Actor) StagePackage(packageGUID string) (<-chan Build, <-chan Warnin
 			warningsStream <- Warnings(warnings)
 			if err != nil {
 				errorStream <- err
+				return
+			}
+
+			if build.State == ccv3.BuildStateFailed {
+				errorStream <- errors.New(build.Error)
 				return
 			}
 		}
