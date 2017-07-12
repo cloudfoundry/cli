@@ -12,6 +12,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/ykk"
+	ignore "github.com/sabhiram/go-gitignore"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -39,7 +40,7 @@ func (e EmptyDirectoryError) Error() string {
 
 type Resource ccv2.Resource
 
-// GatherArchiveResources returns a list of resources for a directory.
+// GatherArchiveResources returns a list of resources for an archive.
 func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error) {
 	var resources []Resource
 
@@ -83,10 +84,30 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 
 // GatherDirectoryResources returns a list of resources for a directory.
 func (Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
-	var resources []Resource
+	var (
+		resources []Resource
+		gitIgnore *ignore.GitIgnore
+	)
+
+	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
+	var gitIgnoreErr error
+	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
+		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore")
+	} else {
+		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreLines("")
+	}
+	if gitIgnoreErr != nil {
+		return nil, gitIgnoreErr
+	}
+
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
+		}
+
+		// if file ignored contine to the next file
+		if gitIgnore.MatchesPath(path) {
+			return nil
 		}
 
 		relPath, err := filepath.Rel(sourceDir, path)
