@@ -91,11 +91,19 @@ var _ = Describe("Resource Actions", func() {
 
 	Describe("GatherDirectoryResources", func() {
 		Context("when files exist in the directory", func() {
-			It("gathers a list of all directories files in a source directory", func() {
-				resources, err := actor.GatherDirectoryResources(srcDir)
-				Expect(err).ToNot(HaveOccurred())
+			var (
+				gatheredResources []Resource
+				executeErr        error
+			)
 
-				Expect(resources).To(Equal(
+			JustBeforeEach(func() {
+				gatheredResources, executeErr = actor.GatherDirectoryResources(srcDir)
+			})
+
+			It("gathers a list of all directories files in a source directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(gatheredResources).To(Equal(
 					[]Resource{
 						{Filename: "level1", Mode: DefaultFolderPermissions},
 						{Filename: "level1/level2", Mode: DefaultFolderPermissions},
@@ -103,6 +111,24 @@ var _ = Describe("Resource Actions", func() {
 						{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
 						{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
 					}))
+			})
+
+			Context("when a .cfignore file exists in the sourceDir", func() {
+				BeforeEach(func() {
+					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("excludes all patterns of files mentioned in .cfignore", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(gatheredResources).To(Equal(
+						[]Resource{
+							{Filename: "level1", Mode: DefaultFolderPermissions},
+							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
+							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
+						}))
+				})
 			})
 		})
 
