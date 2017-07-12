@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"net/url"
-	"path/filepath"
+	"path"
 	"strings"
 )
 
@@ -32,7 +32,7 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 
 	parsedURL.Path = strings.TrimSuffix(parsedURL.Path, "/")
 	if !strings.HasSuffix(parsedURL.Path, "/list") {
-		parsedURL.Path = filepath.Join(parsedURL.Path, "list")
+		parsedURL.Path = path.Join(parsedURL.Path, "list")
 	}
 
 	request, err := client.newGETRequest(parsedURL.String())
