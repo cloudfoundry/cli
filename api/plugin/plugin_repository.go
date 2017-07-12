@@ -1,6 +1,10 @@
 package plugin
 
-import "net/url"
+import (
+	"net/url"
+	"path/filepath"
+	"strings"
+)
 
 // PluginRepository represents a plugin repository
 type PluginRepository struct {
@@ -25,7 +29,11 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 	if err != nil {
 		return PluginRepository{}, err
 	}
-	parsedURL.Path = "/list"
+
+	parsedURL.Path = strings.TrimSuffix(parsedURL.Path, "/")
+	if !strings.HasSuffix(parsedURL.Path, "/list") {
+		parsedURL.Path = filepath.Join(parsedURL.Path, "list")
+	}
 
 	request, err := client.newGETRequest(parsedURL.String())
 	if err != nil {
