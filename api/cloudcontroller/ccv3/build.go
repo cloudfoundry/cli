@@ -18,6 +18,7 @@ const (
 
 type Build struct {
 	GUID    string     `json:"guid,omitempty"`
+	Error   string     `json:"error"`
 	Package Package    `json:"package"`
 	State   BuildState `json:"state,omitempty"`
 	Droplet Droplet    `json:"droplet"`

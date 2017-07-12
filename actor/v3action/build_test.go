@@ -86,6 +86,34 @@ var _ = Describe("Build Actions", func() {
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
 				})
+
+				Context("when polling returns a failed build", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetBuildReturnsOnCall(
+							1,
+							ccv3.Build{
+								GUID:  buildGUID,
+								State: ccv3.BuildStateFailed,
+								Error: "some staging error",
+							},
+							ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
+					})
+
+					It("returns an error and all warnings", func() {
+						Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+						stagingErr := errors.New("some staging error")
+						Eventually(errorStream).Should(Receive(&stagingErr))
+						Eventually(buildStream).ShouldNot(Receive())
+
+						Expect(fakeCloudControllerClient.GetBuildCallCount()).To(Equal(2))
+						Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
+						Expect(fakeCloudControllerClient.GetBuildArgsForCall(1)).To(Equal(buildGUID))
+
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+					})
+				})
 			})
 
 			Context("when the polling errors", func() {
@@ -105,7 +133,7 @@ var _ = Describe("Build Actions", func() {
 			})
 		})
 
-		Context("when the creation is error", func() {
+		Context("when creation errors", func() {
 			var expectedErr error
 			BeforeEach(func() {
 				expectedErr = errors.New("I am a banana")
