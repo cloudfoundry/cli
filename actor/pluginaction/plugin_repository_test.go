@@ -48,14 +48,6 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 		})
 
-		Context("when url ends with a trailing slash", func() {
-			It("removes the trailing slash", func() {
-				_ = actor.AddPluginRepository("some-repo2", "some-URL/")
-				url := fakePluginClient.GetPluginRepositoryArgsForCall(1)
-				Expect(strings.HasSuffix(url, "/")).To(BeFalse())
-			})
-		})
-
 		Context("when the repository name is taken", func() {
 			BeforeEach(func() {
 				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
@@ -91,23 +83,42 @@ var _ = Describe("Plugin Repository Actions", func() {
 				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
 				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
 			})
+		})
 
-			Context("when the repository name is the same except for case sensitivity", func() {
-				BeforeEach(func() {
-					fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
-						{
-							Name: "sOmE-rEpO",
-							URL:  "https://some-URL",
-						},
-					})
+		Context("when the repository name is the same except for case sensitivity", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+					{
+						Name: "sOmE-rEpO",
+						URL:  "https://some-URL",
+					},
 				})
+			})
 
-				It("returns a RepositoryAlreadyExistsError", func() {
-					Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "sOmE-rEpO", URL: "https://some-URL"}))
+			It("returns a RepositoryAlreadyExistsError", func() {
+				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "sOmE-rEpO", URL: "https://some-URL"}))
 
-					Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
-					Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
+				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
+				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
+			})
+		})
+
+		Context("when the repository name is the same and repostiroy URL is the same except for trailing slash", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginRepositoriesReturns([]configv3.PluginRepository{
+					{
+						Name: "some-repo",
+						URL:  "https://some-URL",
+					},
 				})
+			})
+
+			It("returns a RepositoryAlreadyExistsError", func() {
+				err = actor.AddPluginRepository("some-repo", "some-URL/")
+				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
+
+				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
+				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
 			})
 		})
 

@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -66,14 +67,16 @@ var _ = Describe("add-plugin-repo command", func() {
 
 	Context("when the provided URL is a valid plugin repository", func() {
 		var (
-			server    *Server
-			serverURL string
+			server     *Server
+			serverURL  string
+			pluginRepo helpers.PluginRepository
 		)
 
 		BeforeEach(func() {
-			server = helpers.NewPluginRepositoryTLSServer(helpers.PluginRepository{
+			pluginRepo = helpers.PluginRepository{
 				Plugins: []helpers.Plugin{},
-			})
+			}
+			server = helpers.NewPluginRepositoryTLSServer(pluginRepo)
 			serverURL = server.URL()
 		})
 
@@ -125,7 +128,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			})
 
 			Context("when the URL is the same", func() {
-				It("succeeds and exists 0", func() {
+				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", serverURL, "-k")
 
 					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
@@ -133,11 +136,53 @@ var _ = Describe("add-plugin-repo command", func() {
 				})
 			})
 
-			Context("when the URL is the same except for a trainling '/'", func() {
-				It("succeeds and exists 0", func() {
+			Context("when the URL is the same except for a trailing '/'", func() {
+				It("succeeds and exits 0", func() {
 					session := helpers.CF("add-plugin-repo", "repo1", fmt.Sprintf("%s/", serverURL), "-k")
 
 					Eventually(session.Out).Should(Say("%s already registered as repo1", serverURL))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		Context("when the repo URL contains a path", func() {
+			BeforeEach(func() {
+				jsonBytes, err := json.Marshal(pluginRepo)
+				Expect(err).ToNot(HaveOccurred())
+
+				server.SetHandler(
+					0,
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/some-path/list"),
+						RespondWith(http.StatusOK, jsonBytes),
+					),
+				)
+			})
+
+			Context("when the repo URL ends with /list", func() {
+				It("succeeds and exits 0", func() {
+					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/list", serverURL), "-k")
+
+					Eventually(session.Out).Should(Say("%s/some-path/list added as some-repo", serverURL))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the repo URL does not end with /list", func() {
+				It("succeeds and exits 0", func() {
+					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path", serverURL), "-k")
+
+					Eventually(session.Out).Should(Say("%s/some-path added as some-repo", serverURL))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the repo URL ends with trailing /", func() {
+				It("succeeds and exits 0", func() {
+					session := helpers.CF("add-plugin-repo", "some-repo", fmt.Sprintf("%s/some-path/", serverURL), "-k")
+
+					Eventually(session.Out).Should(Say("%s/some-path/ added as some-repo", serverURL))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -161,7 +206,7 @@ var _ = Describe("add-plugin-repo command", func() {
 			It("reports an appropriate error", func() {
 				session := helpers.CF("add-plugin-repo", "repo1", "ftp://example.com/repo", "-k")
 
-				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from ftp://example\\.com/repo: Get ftp://example\\.com/list: unsupported protocol scheme \"ftp\""))
+				Eventually(session.Err).Should(Say("Could not add repository 'repo1' from ftp://example\\.com/repo: Get ftp://example\\.com/repo/list: unsupported protocol scheme \"ftp\""))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
