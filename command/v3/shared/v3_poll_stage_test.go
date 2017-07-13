@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("V3PollStage", func() {
+var _ = XDescribe("V3PollStage", func() {
 	var (
 		appName             string
 		returnedDropletGUID string

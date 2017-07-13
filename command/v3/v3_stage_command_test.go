@@ -130,7 +130,7 @@ var _ = Describe("v3-stage Command", func() {
 					}()
 				})
 
-				It("fails with a staging timeout error", func() {
+				XIt("fails with a staging timeout error", func() {
 					Eventually(executeErr).Should(MatchError(translatableerror.StagingTimeoutError{
 						AppName: "some-app",
 						Timeout: 10 * time.Minute,
