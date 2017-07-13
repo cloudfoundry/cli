@@ -332,6 +332,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/sabhiram/go-gitignore",
+			"repository": "https://github.com/sabhiram/go-gitignore",
+			"vcs": "git",
+			"revision": "730f0220149475811d197e7905f73b3eadd28f4b",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/sajari/fuzzy",
 			"repository": "https://github.com/sajari/fuzzy",
 			"vcs": "git",
