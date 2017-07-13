@@ -202,3 +202,10 @@ func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegment
 	allWarnings = append(allWarnings, apiWarnings...)
 	return allWarnings, err
 }
+
+// SetOrganizationDefaultIsolationSegment sets a default isolation segment on
+// an organization.
+func (actor Actor) SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
+	apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, isoSegGUID)
+	return Warnings(apiWarnings), err
+}

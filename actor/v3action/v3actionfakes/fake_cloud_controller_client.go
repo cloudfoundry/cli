@@ -366,6 +366,20 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	PatchOrganizationDefaultIsolationSegmentStub        func(orgGUID string, isolationSegmentGUID string) (ccv3.Warnings, error)
+	patchOrganizationDefaultIsolationSegmentMutex       sync.RWMutex
+	patchOrganizationDefaultIsolationSegmentArgsForCall []struct {
+		orgGUID              string
+		isolationSegmentGUID string
+	}
+	patchOrganizationDefaultIsolationSegmentReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	patchOrganizationDefaultIsolationSegmentReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	StartApplicationStub        func(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
@@ -1731,6 +1745,58 @@ func (fake *FakeCloudControllerClient) SetApplicationDropletReturnsOnCall(i int,
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegment(orgGUID string, isolationSegmentGUID string) (ccv3.Warnings, error) {
+	fake.patchOrganizationDefaultIsolationSegmentMutex.Lock()
+	ret, specificReturn := fake.patchOrganizationDefaultIsolationSegmentReturnsOnCall[len(fake.patchOrganizationDefaultIsolationSegmentArgsForCall)]
+	fake.patchOrganizationDefaultIsolationSegmentArgsForCall = append(fake.patchOrganizationDefaultIsolationSegmentArgsForCall, struct {
+		orgGUID              string
+		isolationSegmentGUID string
+	}{orgGUID, isolationSegmentGUID})
+	fake.recordInvocation("PatchOrganizationDefaultIsolationSegment", []interface{}{orgGUID, isolationSegmentGUID})
+	fake.patchOrganizationDefaultIsolationSegmentMutex.Unlock()
+	if fake.PatchOrganizationDefaultIsolationSegmentStub != nil {
+		return fake.PatchOrganizationDefaultIsolationSegmentStub(orgGUID, isolationSegmentGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.patchOrganizationDefaultIsolationSegmentReturns.result1, fake.patchOrganizationDefaultIsolationSegmentReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegmentCallCount() int {
+	fake.patchOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.patchOrganizationDefaultIsolationSegmentMutex.RUnlock()
+	return len(fake.patchOrganizationDefaultIsolationSegmentArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegmentArgsForCall(i int) (string, string) {
+	fake.patchOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.patchOrganizationDefaultIsolationSegmentMutex.RUnlock()
+	return fake.patchOrganizationDefaultIsolationSegmentArgsForCall[i].orgGUID, fake.patchOrganizationDefaultIsolationSegmentArgsForCall[i].isolationSegmentGUID
+}
+
+func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegmentReturns(result1 ccv3.Warnings, result2 error) {
+	fake.PatchOrganizationDefaultIsolationSegmentStub = nil
+	fake.patchOrganizationDefaultIsolationSegmentReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) PatchOrganizationDefaultIsolationSegmentReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.PatchOrganizationDefaultIsolationSegmentStub = nil
+	if fake.patchOrganizationDefaultIsolationSegmentReturnsOnCall == nil {
+		fake.patchOrganizationDefaultIsolationSegmentReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.patchOrganizationDefaultIsolationSegmentReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeCloudControllerClient) StartApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
@@ -2050,6 +2116,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.revokeIsolationSegmentFromOrganizationMutex.RUnlock()
 	fake.setApplicationDropletMutex.RLock()
 	defer fake.setApplicationDropletMutex.RUnlock()
+	fake.patchOrganizationDefaultIsolationSegmentMutex.RLock()
+	defer fake.patchOrganizationDefaultIsolationSegmentMutex.RUnlock()
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
 	fake.stopApplicationMutex.RLock()

@@ -122,3 +122,25 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 	err = client.connection.Make(request, &response)
 	return relationship, response.Warnings, err
 }
+
+// PatchOrganizationDefaultIsolationSegment sets the default isolation segment
+// for an organization on the controller.
+func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
+	body, err := json.Marshal(Relationship{GUID: isoSegGUID})
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PatchOrganizationDefaultIsolationSegmentRequest,
+		Body:        bytes.NewReader(body),
+		URIParams:   internal.Params{"guid": orgGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
+}
