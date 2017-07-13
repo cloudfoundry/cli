@@ -18,82 +18,79 @@ import (
 
 var _ = FDescribe("V3PollStage", func() {
 	var (
-		appName             string
-		returnedDropletGUID string
-		executeErr          error
-		testUI              *ui.UI
-		buildStream         chan v3action.Build
-		warningsStream      chan v3action.Warnings
-		errStream           chan error
-		logStream           chan *v3action.LogMessage
-		logErrStream        chan error
-		fakeClock           *fakeclock.FakeClock
-		// done                chan struct{}
-		closeStreams     func()
-		executePollStage func(func())
-		blockOnExecute   chan bool
-		blockOnChannels  chan bool
+		appName               string
+		returnedDropletGUID   string
+		executeErr            error
+		testUI                *ui.UI
+		buildStream           chan v3action.Build
+		warningsStream        chan v3action.Warnings
+		errStream             chan error
+		logStream             chan *v3action.LogMessage
+		logErrStream          chan error
+		fakeClock             *fakeclock.FakeClock
+		closeStreams          func()
+		executePollStage      func(func())
+		finishedWritingEvents chan bool
+		finishedClosing       chan bool
 	)
 
+	closeStreams = func() {
+		close(errStream)
+		close(warningsStream)
+		close(buildStream)
+		finishedClosing <- true
+	}
+
+	executePollStage = func(codeAssertions func()) {
+		returnedDropletGUID, executeErr = PollStage(
+			appName,
+			buildStream,
+			warningsStream,
+			errStream,
+			logStream,
+			logErrStream,
+			testUI,
+			fakeClock,
+			15*time.Minute)
+		codeAssertions()
+		Eventually(finishedClosing).Should(Receive(Equal(true)))
+	}
+
 	BeforeEach(func() {
+		// reset assertion variables
 		executeErr = nil
 		returnedDropletGUID = ""
 
+		// create new channels
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeClock = fakeclock.NewFakeClock(time.Now())
-		buildStream = make(chan v3action.Build, 1)
-		warningsStream = make(chan v3action.Warnings, 1)
-		errStream = make(chan error, 1)
-		logStream = make(chan *v3action.LogMessage, 1)
-		logErrStream = make(chan error, 1)
+		buildStream = make(chan v3action.Build)
+		warningsStream = make(chan v3action.Warnings)
+		errStream = make(chan error)
+		logStream = make(chan *v3action.LogMessage)
+		logErrStream = make(chan error)
 		appName = "some-app"
-		blockOnExecute = make(chan bool)
-		blockOnChannels = make(chan bool)
 
-		closeStreams = func() {
-			close(buildStream)
-			close(warningsStream)
-			close(errStream)
-			close(logStream)
-			close(logErrStream)
-		}
+		finishedWritingEvents = make(chan bool)
+		finishedClosing = make(chan bool)
 
-		executePollStage = func(codeAssertions func()) {
-			// done = make(chan struct{}, 1)
-
-			go func() {
-				returnedDropletGUID, executeErr = PollStage(
-					appName,
-					buildStream,
-					warningsStream,
-					errStream,
-					logStream,
-					logErrStream,
-					testUI,
-					fakeClock,
-					15*time.Minute)
-				codeAssertions()
-				close(blockOnExecute)
-				// done <- struct{}{}
-			}()
-		}
-	})
-
-	JustBeforeEach(func() {
+		// wait for all events to be written before closing channels
 		go func() {
-			closeStreams()
-			close(blockOnChannels)
-		}()
-	})
+			defer GinkgoRecover()
 
-	AfterEach(func() {
-		Eventually(blockOnExecute).Should(BeClosed())
-		Eventually(blockOnChannels).Should(BeClosed())
+			Eventually(finishedWritingEvents).Should(Receive(Equal(true)))
+			closeStreams()
+		}()
 	})
 
 	Context("when the build stream contains a droplet GUID", func() {
 		BeforeEach(func() {
-			buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "droplet-guid"}}
+			go func() {
+				defer GinkgoRecover()
+
+				buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "droplet-guid"}}
+				finishedWritingEvents <- true
+			}()
 		})
 
 		It("returns the droplet GUID", func() {
@@ -108,7 +105,12 @@ var _ = FDescribe("V3PollStage", func() {
 
 	Context("when the warnings stream contains warnings", func() {
 		BeforeEach(func() {
-			warningsStream <- v3action.Warnings{"warning-1", "warning-2"}
+			go func() {
+				defer GinkgoRecover()
+
+				warningsStream <- v3action.Warnings{"warning-1", "warning-2"}
+				finishedWritingEvents <- true
+			}()
 		})
 
 		It("displays the warnings", func() {
@@ -125,7 +127,12 @@ var _ = FDescribe("V3PollStage", func() {
 	Context("when the log stream contains a log message", func() {
 		Context("and the message is a staging message", func() {
 			BeforeEach(func() {
-				logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), v3action.StagingLog, "1")
+				go func() {
+					defer GinkgoRecover()
+
+					logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), v3action.StagingLog, "1")
+					finishedWritingEvents <- true
+				}()
 			})
 
 			It("prints the log message", func() {
@@ -139,7 +146,12 @@ var _ = FDescribe("V3PollStage", func() {
 
 		Context("and the message is not a staging message", func() {
 			BeforeEach(func() {
-				logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), "RUN", "1")
+				go func() {
+					defer GinkgoRecover()
+
+					logStream <- v3action.NewLogMessage("some-log-message", 1, time.Now(), "RUN", "1")
+					finishedWritingEvents <- true
+				}()
 			})
 
 			It("ignores the log message", func() {
@@ -154,7 +166,12 @@ var _ = FDescribe("V3PollStage", func() {
 
 	Context("when the error stream contains an error", func() {
 		BeforeEach(func() {
-			errStream <- errors.New("some error")
+			go func() {
+				defer GinkgoRecover()
+
+				errStream <- errors.New("some error")
+				finishedWritingEvents <- true
+			}()
 		})
 
 		It("returns the error without waiting for streams to be closed", func() {
@@ -168,7 +185,12 @@ var _ = FDescribe("V3PollStage", func() {
 
 	Context("when the log error stream contains errors", func() {
 		BeforeEach(func() {
-			logErrStream <- errors.New("some-log-error")
+			go func() {
+				defer GinkgoRecover()
+
+				logErrStream <- errors.New("some-log-error")
+				finishedWritingEvents <- true
+			}()
 		})
 
 		It("displays the log errors as warnings", func() {
