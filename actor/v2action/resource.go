@@ -92,10 +92,11 @@ func (Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
 	var gitIgnoreErr error
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
-		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore", os.Getenv("CF_TRACE"))
+		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore")
 	} else {
-		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreLines(os.Getenv("CF_TRACE"))
+		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreLines()
 	}
+
 	if gitIgnoreErr != nil {
 		log.Errorln("reading .cfignore file:", gitIgnoreErr)
 		return nil, gitIgnoreErr
@@ -108,6 +109,10 @@ func (Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 
 		// if file ignored contine to the next file
 		if gitIgnore.MatchesPath(path) {
+			return nil
+		}
+
+		if path == os.Getenv("CF_TRACE") {
 			return nil
 		}
 
