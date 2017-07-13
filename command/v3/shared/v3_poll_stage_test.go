@@ -16,7 +16,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = XDescribe("V3PollStage", func() {
+var _ = FDescribe("V3PollStage", func() {
 	var (
 		appName             string
 		returnedDropletGUID string
@@ -28,71 +28,97 @@ var _ = XDescribe("V3PollStage", func() {
 		logStream           chan *v3action.LogMessage
 		logErrStream        chan error
 		fakeClock           *fakeclock.FakeClock
-		done                chan struct{}
+		// done                chan struct{}
+		closeStreams     func()
+		executePollStage func(func())
+		blockOnExecute   chan bool
+		blockOnChannels  chan bool
 	)
 
-	JustBeforeEach(func() {
-		appName = "some-app"
-
+	BeforeEach(func() {
 		executeErr = nil
 		returnedDropletGUID = ""
-		done = make(chan struct{}, 1)
 
-		go func() {
-			returnedDropletGUID, executeErr = PollStage(
-				appName,
-				buildStream,
-				warningsStream,
-				errStream,
-				logStream,
-				logErrStream,
-				testUI,
-				fakeClock,
-				15*time.Minute)
-			done <- struct{}{}
-		}()
-	})
-
-	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeClock = fakeclock.NewFakeClock(time.Now())
-
 		buildStream = make(chan v3action.Build, 1)
 		warningsStream = make(chan v3action.Warnings, 1)
 		errStream = make(chan error, 1)
 		logStream = make(chan *v3action.LogMessage, 1)
 		logErrStream = make(chan error, 1)
+		appName = "some-app"
+		blockOnExecute = make(chan bool)
+		blockOnChannels = make(chan bool)
+
+		closeStreams = func() {
+			close(buildStream)
+			close(warningsStream)
+			close(errStream)
+			close(logStream)
+			close(logErrStream)
+		}
+
+		executePollStage = func(codeAssertions func()) {
+			// done = make(chan struct{}, 1)
+
+			go func() {
+				returnedDropletGUID, executeErr = PollStage(
+					appName,
+					buildStream,
+					warningsStream,
+					errStream,
+					logStream,
+					logErrStream,
+					testUI,
+					fakeClock,
+					15*time.Minute)
+				codeAssertions()
+				close(blockOnExecute)
+				// done <- struct{}{}
+			}()
+		}
+	})
+
+	JustBeforeEach(func() {
+		go func() {
+			closeStreams()
+			close(blockOnChannels)
+		}()
+	})
+
+	AfterEach(func() {
+		Eventually(blockOnExecute).Should(BeClosed())
+		Eventually(blockOnChannels).Should(BeClosed())
 	})
 
 	Context("when the build stream contains a droplet GUID", func() {
 		BeforeEach(func() {
-			build := v3action.Build{Droplet: ccv3.Droplet{GUID: "droplet-guid"}}
-			buildStream <- build
-			close(buildStream)
-			close(warningsStream)
-			close(errStream)
+			buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "droplet-guid"}}
 		})
 
 		It("returns the droplet GUID", func() {
+			executePollStage(func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(returnedDropletGUID).To(Equal("droplet-guid"))
+			})
+
 			Eventually(testUI.Out).Should(Say("droplet: droplet-guid"))
-			Eventually(func() string { return returnedDropletGUID }).Should(Equal("droplet-guid"))
-			Consistently(func() error { return executeErr }).ShouldNot(HaveOccurred())
 		})
 	})
 
 	Context("when the warnings stream contains warnings", func() {
 		BeforeEach(func() {
 			warningsStream <- v3action.Warnings{"warning-1", "warning-2"}
-			close(buildStream)
-			close(warningsStream)
-			close(errStream)
 		})
 
 		It("displays the warnings", func() {
+			executePollStage(func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(returnedDropletGUID).To(BeEmpty())
+			})
+
 			Eventually(testUI.Err).Should(Say("warning-1"))
 			Eventually(testUI.Err).Should(Say("warning-2"))
-			Eventually(func() string { return returnedDropletGUID }).Should(BeEmpty())
-			Consistently(func() error { return executeErr }).ShouldNot(HaveOccurred())
 		})
 	})
 
@@ -103,12 +129,11 @@ var _ = XDescribe("V3PollStage", func() {
 			})
 
 			It("prints the log message", func() {
+				executePollStage(func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(returnedDropletGUID).To(BeEmpty())
+				})
 				Eventually(testUI.Out).Should(Say("some-log-message"))
-				close(buildStream)
-				close(warningsStream)
-				close(errStream)
-				Eventually(func() string { return returnedDropletGUID }).Should(BeEmpty())
-				Consistently(func() error { return executeErr }).ShouldNot(HaveOccurred())
 			})
 		})
 
@@ -118,9 +143,10 @@ var _ = XDescribe("V3PollStage", func() {
 			})
 
 			It("ignores the log message", func() {
-				close(buildStream)
-				close(warningsStream)
-				close(errStream)
+				executePollStage(func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(returnedDropletGUID).To(BeEmpty())
+				})
 				Consistently(testUI.Out).ShouldNot(Say("some-log-message"))
 			})
 		})
@@ -132,9 +158,11 @@ var _ = XDescribe("V3PollStage", func() {
 		})
 
 		It("returns the error without waiting for streams to be closed", func() {
+			executePollStage(func() {
+				Expect(executeErr).To(MatchError("some error"))
+				Expect(returnedDropletGUID).To(BeEmpty())
+			})
 			Consistently(testUI.Out).ShouldNot(Say("droplet: droplet-guid"))
-			Eventually(func() error { return executeErr }).Should(MatchError("some error"))
-			Expect(returnedDropletGUID).Should(BeEmpty())
 		})
 	})
 
@@ -144,28 +172,29 @@ var _ = XDescribe("V3PollStage", func() {
 		})
 
 		It("displays the log errors as warnings", func() {
+			executePollStage(func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(returnedDropletGUID).To(BeEmpty())
+			})
 			Eventually(testUI.Err).Should(Say("some-log-error"))
-			close(buildStream)
-			close(warningsStream)
-			close(errStream)
-			Eventually(func() string { return returnedDropletGUID }).Should(BeEmpty())
-			Consistently(func() error { return executeErr }).ShouldNot(HaveOccurred())
 		})
 	})
 
-	Context("when the staging timeout has expired", func() {
+	XContext("when the staging timeout has expired", func() {
 		It("exits with an error", func() {
-			Consistently(done).ShouldNot(Receive())
+			// Consistently(done).ShouldNot(Receive())
 			fakeClock.WaitForWatcherAndIncrement(15*time.Minute - time.Nanosecond)
-			Consistently(done).ShouldNot(Receive())
+			// Consistently(done).ShouldNot(Receive())
 
 			fakeClock.Increment(time.Duration(time.Nanosecond))
-			Eventually(done).Should(Receive())
+			// Eventually(done).Should(Receive())
 
-			Expect(returnedDropletGUID).To(BeEmpty())
-			Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{
-				AppName: "some-app",
-				Timeout: 15 * time.Minute}))
+			executePollStage(func() {
+				Expect(executeErr).To(MatchError(translatableerror.StagingTimeoutError{
+					AppName: "some-app",
+					Timeout: 15 * time.Minute}))
+				Expect(returnedDropletGUID).To(BeEmpty())
+			})
 		})
 	})
 })
