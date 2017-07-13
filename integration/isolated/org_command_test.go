@@ -132,11 +132,7 @@ var _ = Describe("org command", func() {
 					isolationSegmentsSorted := []string{isolationSegmentName1, isolationSegmentName2}
 					sort.Strings(isolationSegmentsSorted)
 
-					// TODO:  Replace the following curl with `cf set-org-default-isolation-segment`
-					defaultIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(isolationSegmentsSorted[0])
-					Eventually(helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
-						"-X", "PATCH", "-d", fmt.Sprintf("'{\"data\":{\"guid\":\"%s\"}}'", defaultIsolationSegmentGUID))).Should(Exit(0))
-					// Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
+					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
 				})
 
 				// @TODO remove and add to cleanup script

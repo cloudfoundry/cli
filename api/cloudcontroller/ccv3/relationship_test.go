@@ -156,7 +156,7 @@ var _ = Describe("Relationship", func() {
 			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 				ResponseCode: http.StatusTeapot,
 				V3ErrorResponse: ccerror.V3ErrorResponse{
-					[]ccerror.V3Error{
+					Errors: []ccerror.V3Error{
 						{
 							Code:   10008,
 							Detail: "The request is semantically invalid: command presence",
@@ -166,8 +166,6 @@ var _ = Describe("Relationship", func() {
 				},
 			}))
 			Expect(warnings).To(ConsistOf("this is a warning"))
-
-			Expect(server.ReceivedRequests()).To(HaveLen(3))
 		})
 	})
 
@@ -217,8 +215,68 @@ var _ = Describe("Relationship", func() {
 				)
 			})
 
-			It("returns the relationship and warnings", func() {
+			It("returns an error and warnings", func() {
 				_, warnings, err := client.GetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "Organization not found",
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("PatchOrganizationDefaultIsolationSegment", func() {
+		var expectedBody string
+
+		BeforeEach(func() {
+			expectedBody = `{
+				"data": {
+					"guid": "some-isolation-segment-guid"
+				}
+			}`
+		})
+
+		Context("when patching the isolation segment succeeds", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("patches the organization's default isolation segment", func() {
+				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when patching the isolation segment fails with an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"detail": "Organization not found",
+							"title": "CF-ResourceNotFound",
+							"code": 10010
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Organization not found",
 				}))

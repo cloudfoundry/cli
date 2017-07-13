@@ -26,7 +26,7 @@ var _ = Describe("enable-org-isolation command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf enable-org-isolation ORG_NAME SEGMENT_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("create-isolation-segment, isolation-segments, set-space-isolation-segment"))
+				Eventually(session).Should(Say("create-isolation-segment, isolation-segments, set-org-default-isolation-segment, set-space-isolation-segment"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
