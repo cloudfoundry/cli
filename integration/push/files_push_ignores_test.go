@@ -40,7 +40,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
 
-					Eventually(session).Should(Say("502 B / 502 B"))
+					Eventually(session).Should(Say("50[0-9] B / 50[0-9] B"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -63,7 +63,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
 
-					Eventually(session).Should(Say("288 B / 288 B"))
+					Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -90,7 +90,7 @@ var _ = Describe("ignoring files while gathering resources", func() {
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
 
-				Eventually(session).Should(Say("288 B / 288 B"))
+				Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
