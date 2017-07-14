@@ -6444,6 +6444,10 @@
     "translation": ""
   },
   {
+    "id": "Using manifest file {{.Path}}",
+    "translation": "File manifest mancante {{.Path}}"
+  },
+  {
     "id": "Using manifest file {{.Path}}\n",
     "translation": "File manifest mancante {{.Path}}\n"
   },
