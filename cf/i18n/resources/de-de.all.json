@@ -6444,6 +6444,10 @@
     "translation": ""
   },
   {
+    "id": "Using manifest file {{.Path}}",
+    "translation": "Verwenden von Manifestdatei {{.Path}}"
+  },
+  {
     "id": "Using manifest file {{.Path}}\n",
     "translation": "Verwenden von Manifestdatei {{.Path}}\n"
   },

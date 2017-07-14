@@ -288,6 +288,9 @@ func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSett
 	}
 
 	log.WithField("pathToManifest", pathToManifest).Info("reading manifest")
+	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{
+		"Path": pathToManifest,
+	})
 	return cmd.Actor.ReadManifest(pathToManifest)
 }
 
