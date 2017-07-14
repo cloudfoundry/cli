@@ -19,7 +19,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
 	Describe("GetServiceInstancesBySpace", func() {

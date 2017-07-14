@@ -20,7 +20,7 @@ var _ = Describe("Domain Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
 	Describe("GetDomain", func() {

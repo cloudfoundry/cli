@@ -39,7 +39,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil)
 			app = ccv2.Application{
 				GUID: "some-app-guid",
 				Name: "some-app",

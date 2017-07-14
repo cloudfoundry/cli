@@ -38,11 +38,11 @@ func (cmd *BindSecurityGroupCommand) Setup(config command.Config, ui command.UI)
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, _, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, nil)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }

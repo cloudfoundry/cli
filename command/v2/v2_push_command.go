@@ -84,7 +84,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	v2Actor := v2action.NewActor(ccClient, uaaClient)
+	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
 	cmd.RestartActor = v2Actor
 	cmd.Actor = pushaction.NewActor(v2Actor)
 

@@ -22,7 +22,7 @@ var _ = Describe("Space Summary Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil)
 		})
 
 		Context("when space staging security groups are requested", func() {

@@ -20,7 +20,7 @@ var _ = Describe("Security Group Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
 	Describe("GetSecurityGroupsWithOrganizationSpaceAndLifecycle", func() {
@@ -1186,7 +1186,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning"}))
-				Expect(err).To(MatchError(SecurityGroupNotFoundError{"some-security-group"}))
+				Expect(err).To(MatchError(SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
 		})
 
@@ -1719,7 +1719,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning"}))
-				Expect(err).To(MatchError(SecurityGroupNotFoundError{"some-security-group"}))
+				Expect(err).To(MatchError(SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
 		})
 

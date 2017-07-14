@@ -21,7 +21,7 @@ var _ = Describe("User Actions", func() {
 	BeforeEach(func() {
 		fakeUAAClient = new(v2actionfakes.FakeUAAClient)
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, fakeUAAClient)
+		actor = NewActor(fakeCloudControllerClient, fakeUAAClient, nil)
 	})
 
 	Describe("CreateUser", func() {

@@ -23,7 +23,7 @@ var _ = Describe("Resource Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 
 		var err error
 		srcDir, err = ioutil.TempDir("", "v2-resource-actions")

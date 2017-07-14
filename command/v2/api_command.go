@@ -35,7 +35,7 @@ func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil
