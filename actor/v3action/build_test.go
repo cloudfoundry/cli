@@ -116,8 +116,8 @@ var _ = Describe("Build Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}
-					fakeConfig.StagingTimeoutReturns(time.Nanosecond)
+					expectedErr = StagingTimeoutError{AppName: "some-app", Timeout: 0}
+					fakeConfig.StagingTimeoutReturns(0)
 				})
 
 				It("returns the error and warnings", func() {
@@ -128,6 +128,7 @@ var _ = Describe("Build Actions", func() {
 
 			Context("when the polling errors", func() {
 				var expectedErr error
+
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a banana")
 					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
