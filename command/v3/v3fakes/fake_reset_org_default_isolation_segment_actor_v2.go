@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
-type FakeSetOrgDefaultIsolationSegmentActorV2 struct {
+type FakeResetOrgDefaultIsolationSegmentActorV2 struct {
 	GetOrganizationByNameStub        func(orgName string) (v2action.Organization, v2action.Warnings, error)
 	getOrganizationByNameMutex       sync.RWMutex
 	getOrganizationByNameArgsForCall []struct {
@@ -28,7 +28,7 @@ type FakeSetOrgDefaultIsolationSegmentActorV2 struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error) {
 	fake.getOrganizationByNameMutex.Lock()
 	ret, specificReturn := fake.getOrganizationByNameReturnsOnCall[len(fake.getOrganizationByNameArgsForCall)]
 	fake.getOrganizationByNameArgsForCall = append(fake.getOrganizationByNameArgsForCall, struct {
@@ -45,19 +45,19 @@ func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByName(orgN
 	return fake.getOrganizationByNameReturns.result1, fake.getOrganizationByNameReturns.result2, fake.getOrganizationByNameReturns.result3
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameCallCount() int {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameCallCount() int {
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	return len(fake.getOrganizationByNameArgsForCall)
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameArgsForCall(i int) string {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameArgsForCall(i int) string {
 	fake.getOrganizationByNameMutex.RLock()
 	defer fake.getOrganizationByNameMutex.RUnlock()
 	return fake.getOrganizationByNameArgsForCall[i].orgName
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturns(result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
 	fake.GetOrganizationByNameStub = nil
 	fake.getOrganizationByNameReturns = struct {
 		result1 v2action.Organization
@@ -66,7 +66,7 @@ func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameRetur
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameReturnsOnCall(i int, result1 v2action.Organization, result2 v2action.Warnings, result3 error) {
 	fake.GetOrganizationByNameStub = nil
 	if fake.getOrganizationByNameReturnsOnCall == nil {
 		fake.getOrganizationByNameReturnsOnCall = make(map[int]struct {
@@ -82,7 +82,7 @@ func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) GetOrganizationByNameRetur
 	}{result1, result2, result3}
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) Invocations() map[string][][]interface{} {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getOrganizationByNameMutex.RLock()
@@ -94,7 +94,7 @@ func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) Invocations() map[string][
 	return copiedInvocations
 }
 
-func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) recordInvocation(key string, args []interface{}) {
+func (fake *FakeResetOrgDefaultIsolationSegmentActorV2) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -106,4 +106,4 @@ func (fake *FakeSetOrgDefaultIsolationSegmentActorV2) recordInvocation(key strin
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v3.SetOrgDefaultIsolationSegmentActorV2 = new(FakeSetOrgDefaultIsolationSegmentActorV2)
+var _ v3.ResetOrgDefaultIsolationSegmentActorV2 = new(FakeResetOrgDefaultIsolationSegmentActorV2)

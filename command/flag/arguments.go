@@ -309,3 +309,7 @@ type SpaceIsolationArgs struct {
 type ResetSpaceIsolationArgs struct {
 	SpaceName string `positional-arg-name:"SPACE_NAME" required:"true" description:"The space name"`
 }
+
+type ResetOrgDefaultIsolationArgs struct {
+	OrgName string `positional-arg-name:"ORG_NAME" required:"true" description:"The organization name"`
+}

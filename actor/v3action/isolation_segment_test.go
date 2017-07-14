@@ -720,4 +720,43 @@ var _ = Describe("Isolation Segment Actions", func() {
 			})
 		})
 	})
+
+	Describe("ResetOrganizationDefaultIsolationSegment", func() {
+		Context("when the assignment is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns all warnings", func() {
+				warnings, err := actor.ResetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentCallCount()).To(Equal(1))
+				orgGUID, isoSegGUID := fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentArgsForCall(0)
+				Expect(orgGUID).To(Equal("some-org-guid"))
+				Expect(isoSegGUID).To(BeEmpty())
+			})
+		})
+
+		Context("when the assignment fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Warnings{"warning-1", "warning-2"},
+					errors.New("some-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				warnings, err := actor.ResetOrganizationDefaultIsolationSegment("some-org-guid")
+				Expect(err).To(MatchError("some-error"))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
 })

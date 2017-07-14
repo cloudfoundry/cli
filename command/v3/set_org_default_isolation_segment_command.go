@@ -21,7 +21,6 @@ type SetOrgDefaultIsolationSegmentActor interface {
 //go:generate counterfeiter . SetOrgDefaultIsolationSegmentActorV2
 
 type SetOrgDefaultIsolationSegmentActorV2 interface {
-	CloudControllerAPIVersion() string
 	GetOrganizationByName(orgName string) (v2action.Organization, v2action.Warnings, error)
 }
 

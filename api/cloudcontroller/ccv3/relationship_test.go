@@ -226,18 +226,13 @@ var _ = Describe("Relationship", func() {
 	})
 
 	Describe("PatchOrganizationDefaultIsolationSegment", func() {
-		var expectedBody string
-
-		BeforeEach(func() {
-			expectedBody = `{
-				"data": {
-					"guid": "some-isolation-segment-guid"
-				}
-			}`
-		})
-
-		Context("when patching the isolation segment succeeds", func() {
+		Context("when patching the default organization isolation segment with non-empty isolation segment guid", func() {
 			BeforeEach(func() {
+				expectedBody := `{
+					"data": {
+						"guid": "some-isolation-segment-guid"
+					}
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
@@ -249,6 +244,29 @@ var _ = Describe("Relationship", func() {
 
 			It("patches the organization's default isolation segment", func() {
 				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when patching the default organization isolation segment with empty isolation segment guid", func() {
+			BeforeEach(func() {
+				expectedBody := `{
+					"data": {
+						"guid": null
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("patches the organization's default isolation segment with nil guid", func() {
+				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -269,7 +287,6 @@ var _ = Describe("Relationship", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
-						VerifyJSON(expectedBody),
 						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

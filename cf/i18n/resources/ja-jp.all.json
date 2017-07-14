@@ -408,6 +408,10 @@
     "translation": "アプリケーション {{.AppName}} は、'routes' と 'no-hostname' の両方で構成されてはなりません"
   },
   {
+    "id": "Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment.",
+    "translation": ""
+  },
+  {
     "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
     "translation": ""
   },
@@ -1250,6 +1254,10 @@
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nEXAMPLES:\\n   CF_NAME repo-plugins -r PrivateRepo",
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\n例:\\n   CF_NAME repo-plugins -r PrivateRepo"
+  },
+  {
+    "id": "CF_NAME reset-org-default-isolation-segment ORG_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME reset-space-isolation-segment SPACE_NAME",
@@ -4868,7 +4876,15 @@
     "translation": "予約された経路ポート"
   },
   {
+    "id": "Reset the default isolation segment used for apps in spaces of an org",
+    "translation": ""
+  },
+  {
     "id": "Reset the isolation segment assignment of a space to the org's default",
+    "translation": ""
+  },
+  {
+    "id": "Resetting default isolation segment of org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -7038,6 +7054,10 @@
   {
     "id": "reserved route ports",
     "translation": "予約された経路ポート"
+  },
+  {
+    "id": "reset-org-default-isolation-segment",
+    "translation": ""
   },
   {
     "id": "reset-space-isolation-segment",
