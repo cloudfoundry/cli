@@ -73,7 +73,7 @@ func (cmd SetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Setting default isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"IsolationSegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		"OrgName":              cmd.RequiredArgs.OrganizationName,
 		"CurrentUser":          user.Name,
