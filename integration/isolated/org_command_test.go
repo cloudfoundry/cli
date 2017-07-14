@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"fmt"
 	"sort"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -135,12 +134,8 @@ var _ = Describe("org command", func() {
 					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentsSorted[0])).Should(Exit(0))
 				})
 
-				// @TODO remove and add to cleanup script
 				AfterEach(func() {
-					// TODO:  Replace the following curl with `cf set-org-default-isolation-segment`
-					Eventually(helpers.CF("curl", fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
-						"-X", "PATCH", "-d", "'{\"data\":{\"guid\":null}}'")).Should(Exit(0))
-					// Eventually(helpers.CF("reset-org-default-isolation-segment", orgName)).Should(Exit(0))
+					Eventually(helpers.CF("reset-org-default-isolation-segment", orgName)).Should(Exit(0))
 
 					Eventually(helpers.CF("delete-org", "-f", orgName))
 					Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName1))

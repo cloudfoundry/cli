@@ -125,6 +125,7 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 
 // PatchOrganizationDefaultIsolationSegment sets the default isolation segment
 // for an organization on the controller.
+// If isoSegGuid is empty it will reset the default isolation segment.
 func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
 	body, err := json.Marshal(Relationship{GUID: isoSegGUID})
 	if err != nil {

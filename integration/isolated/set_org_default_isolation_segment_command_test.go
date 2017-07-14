@@ -78,7 +78,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			})
 		})
 
-		Context("when the space exists", func() {
+		Context("when the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
 			})

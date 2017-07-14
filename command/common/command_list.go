@@ -120,6 +120,7 @@ type commandList struct {
 	RenameSpace                        v2.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
 	Rename                             v2.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
+	ResetOrgDefaultIsolationSegment    v3.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the isolation segment assignment of a space to the org's default"`
 	Restage                            v2.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v2.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
