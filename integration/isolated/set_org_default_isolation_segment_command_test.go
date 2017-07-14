@@ -71,7 +71,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 		Context("when the org does not exist", func() {
 			It("fails with org not found message", func() {
 				session := helpers.CF("set-org-default-isolation-segment", orgName, isoSegName)
-				Eventually(session).Should(Say("Setting default isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
+				Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Organization '%s' not found\\.", orgName))
 				Eventually(session).Should(Exit(1))
@@ -86,7 +86,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 			Context("when the isolation segment does not exist", func() {
 				It("fails with isolation segment not found message", func() {
 					session := helpers.CF("set-org-default-isolation-segment", orgName, isoSegName)
-					Eventually(session).Should(Say("Setting default isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
+					Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Isolation segment '%s' not found\\.", isoSegName))
 					Eventually(session).Should(Exit(1))
@@ -105,7 +105,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 
 					It("displays OK", func() {
 						session := helpers.CF("set-org-default-isolation-segment", orgName, isoSegName)
-						Eventually(session).Should(Say("Setting default isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
+						Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted\\."))
 						Eventually(session).Should(Exit(0))
@@ -118,7 +118,7 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 
 						It("displays OK", func() {
 							session := helpers.CF("set-org-default-isolation-segment", orgName, isoSegName)
-							Eventually(session).Should(Say("Setting default isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
+							Eventually(session).Should(Say("Setting isolation segment %s to default on org %s as %s\\.\\.\\.", isoSegName, orgName, userName))
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Say("In order to move running applications to this isolation segment, they must be restarted\\."))
 							Eventually(session).Should(Exit(0))

@@ -148,7 +148,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 				It("Displays the header and okay", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Setting default isolation segment %s to default on org %s as banana\\.\\.\\.", isolationSegment, org))
+					Expect(testUI.Out).To(Say("Setting isolation segment %s to default on org %s as banana\\.\\.\\.", isolationSegment, org))
 					Expect(testUI.Out).To(Say("OK"))
 
 					Expect(testUI.Err).To(Say("org-warning-1"))
@@ -172,7 +172,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 					})
 
 					It("returns the warnings and error", func() {
-						Expect(testUI.Out).To(Say("Setting default isolation segment %s to default on org %s as banana\\.\\.\\.", isolationSegment, org))
+						Expect(testUI.Out).To(Say("Setting isolation segment %s to default on org %s as banana\\.\\.\\.", isolationSegment, org))
 						Expect(testUI.Err).To(Say("org-warning-1"))
 						Expect(testUI.Err).To(Say("org-warning-2"))
 						Expect(testUI.Err).To(Say("iso-seg-warning-1"))

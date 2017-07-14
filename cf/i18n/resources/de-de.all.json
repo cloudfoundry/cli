@@ -5296,12 +5296,12 @@
     "translation": ""
   },
   {
-    "id": "Setting default isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Festlegen von Umgebungsvariable '{{.VarName}}' auf '{{.VarValue}}' für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
+  },
+  {
+    "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
