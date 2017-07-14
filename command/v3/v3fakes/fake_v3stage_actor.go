@@ -38,10 +38,11 @@ type FakeV3StageActor struct {
 		result3 v3action.Warnings
 		result4 error
 	}
-	StagePackageStub        func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	StagePackageStub        func(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 	stagePackageMutex       sync.RWMutex
 	stagePackageArgsForCall []struct {
 		packageGUID string
+		appName     string
 	}
 	stagePackageReturns struct {
 		result1 <-chan v3action.Build
@@ -156,16 +157,17 @@ func (fake *FakeV3StageActor) GetStreamingLogsForApplicationByNameAndSpaceReturn
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3StageActor) StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+func (fake *FakeV3StageActor) StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 	fake.stagePackageMutex.Lock()
 	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
 	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
 		packageGUID string
-	}{packageGUID})
-	fake.recordInvocation("StagePackage", []interface{}{packageGUID})
+		appName     string
+	}{packageGUID, appName})
+	fake.recordInvocation("StagePackage", []interface{}{packageGUID, appName})
 	fake.stagePackageMutex.Unlock()
 	if fake.StagePackageStub != nil {
-		return fake.StagePackageStub(packageGUID)
+		return fake.StagePackageStub(packageGUID, appName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -179,10 +181,10 @@ func (fake *FakeV3StageActor) StagePackageCallCount() int {
 	return len(fake.stagePackageArgsForCall)
 }
 
-func (fake *FakeV3StageActor) StagePackageArgsForCall(i int) string {
+func (fake *FakeV3StageActor) StagePackageArgsForCall(i int) (string, string) {
 	fake.stagePackageMutex.RLock()
 	defer fake.stagePackageMutex.RUnlock()
-	return fake.stagePackageArgsForCall[i].packageGUID
+	return fake.stagePackageArgsForCall[i].packageGUID, fake.stagePackageArgsForCall[i].appName
 }
 
 func (fake *FakeV3StageActor) StagePackageReturns(result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {

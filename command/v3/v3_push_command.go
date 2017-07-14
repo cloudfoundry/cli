@@ -32,7 +32,7 @@ type V3PushActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
-	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
 	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
@@ -299,8 +299,8 @@ func (cmd V3PushCommand) stagePackage(pkg v3action.Package, userName string) (st
 		return "", logErr
 	}
 
-	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(pkg.GUID)
-	dropletGUID, err := shared.PollStage(cmd.RequiredArgs.AppName, buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI, cmd.Actor.GetClock(), cmd.Config.StagingTimeout())
+	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(pkg.GUID, cmd.RequiredArgs.AppName)
+	dropletGUID, err := shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err != nil {
 		return "", err
 	}

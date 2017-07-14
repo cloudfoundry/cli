@@ -27,6 +27,15 @@ type FakeConfig struct {
 	startupTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
 	}
+	StagingTimeoutStub        func() time.Duration
+	stagingTimeoutMutex       sync.RWMutex
+	stagingTimeoutArgsForCall []struct{}
+	stagingTimeoutReturns     struct {
+		result1 time.Duration
+	}
+	stagingTimeoutReturnsOnCall map[int]struct {
+		result1 time.Duration
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -111,6 +120,46 @@ func (fake *FakeConfig) StartupTimeoutReturnsOnCall(i int, result1 time.Duration
 	}{result1}
 }
 
+func (fake *FakeConfig) StagingTimeout() time.Duration {
+	fake.stagingTimeoutMutex.Lock()
+	ret, specificReturn := fake.stagingTimeoutReturnsOnCall[len(fake.stagingTimeoutArgsForCall)]
+	fake.stagingTimeoutArgsForCall = append(fake.stagingTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("StagingTimeout", []interface{}{})
+	fake.stagingTimeoutMutex.Unlock()
+	if fake.StagingTimeoutStub != nil {
+		return fake.StagingTimeoutStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.stagingTimeoutReturns.result1
+}
+
+func (fake *FakeConfig) StagingTimeoutCallCount() int {
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
+	return len(fake.stagingTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) StagingTimeoutReturns(result1 time.Duration) {
+	fake.StagingTimeoutStub = nil
+	fake.stagingTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) StagingTimeoutReturnsOnCall(i int, result1 time.Duration) {
+	fake.StagingTimeoutStub = nil
+	if fake.stagingTimeoutReturnsOnCall == nil {
+		fake.stagingTimeoutReturnsOnCall = make(map[int]struct {
+			result1 time.Duration
+		})
+	}
+	fake.stagingTimeoutReturnsOnCall[i] = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -118,6 +167,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.pollingIntervalMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
 	defer fake.startupTimeoutMutex.RUnlock()
+	fake.stagingTimeoutMutex.RLock()
+	defer fake.stagingTimeoutMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

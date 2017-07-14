@@ -15,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/clock/fakeclock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -29,7 +28,6 @@ var _ = Describe("v3-stage Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3StageActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		fakeClock       *fakeclock.FakeClock
 
 		binaryName  string
 		executeErr  error
@@ -44,8 +42,6 @@ var _ = Describe("v3-stage Command", func() {
 		fakeActor = new(v3fakes.FakeV3StageActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
-		fakeClock = fakeclock.NewFakeClock(time.Now())
-		fakeActor.GetClockReturns(fakeClock)
 		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
 
 		binaryName = "faceman"
@@ -119,30 +115,9 @@ var _ = Describe("v3-stage Command", func() {
 				}
 			})
 
-			Context("when staging times out", func() {
-				BeforeEach(func() {
-					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-						return make(chan v3action.Build), make(chan v3action.Warnings), make(chan error)
-					}
-
-					go func() {
-						fakeClock.WaitForWatcherAndIncrement(10 * time.Minute)
-					}()
-				})
-
-				XIt("fails with a staging timeout error", func() {
-					Eventually(executeErr).Should(MatchError(translatableerror.StagingTimeoutError{
-						AppName: "some-app",
-						Timeout: 10 * time.Minute,
-					}))
-					Expect(fakeActor.GetClockCallCount()).To(Equal(1))
-					Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
-				})
-			})
-
 			Context("when the staging is successful", func() {
 				BeforeEach(func() {
-					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 						buildStream := make(chan v3action.Build)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
@@ -174,7 +149,8 @@ var _ = Describe("v3-stage Command", func() {
 				It("stages the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					Expect(fakeActor.StagePackageArgsForCall(0)).To(Equal(packageGUID))
+					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					Expect(guidArg).To(Equal(packageGUID))
 				})
 
 				It("displays staging logs and their warnings", func() {
@@ -190,7 +166,8 @@ var _ = Describe("v3-stage Command", func() {
 					Expect(noaaClient).To(Equal(fakeNOAAClient))
 
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					Expect(fakeActor.StagePackageArgsForCall(0)).To(Equal(packageGUID))
+					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					Expect(guidArg).To(Equal(packageGUID))
 				})
 			})
 
@@ -199,7 +176,7 @@ var _ = Describe("v3-stage Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("any gibberish")
-					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 						buildStream := make(chan v3action.Build)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
@@ -251,7 +228,7 @@ var _ = Describe("v3-stage Command", func() {
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
 				}
 
-				fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+				fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 					buildStream := make(chan v3action.Build)
 					warningsStream := make(chan v3action.Warnings)
 					errorStream := make(chan error)
