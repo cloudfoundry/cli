@@ -18,12 +18,14 @@ var _ = Describe("Resource Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeConfig                *v2actionfakes.FakeConfig
 		srcDir                    string
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 
 		var err error
 		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
@@ -131,25 +133,16 @@ var _ = Describe("Resource Actions", func() {
 				})
 			})
 
-			Context("when CF_TRACE refers to a file in the source directory", func() {
-				var previousEnv string
-
+			Context("when trace files are in the source directory", func() {
 				BeforeEach(func() {
 					traceFilePath := filepath.Join(srcDir, "i-am-trace.txt")
 					err := ioutil.WriteFile(traceFilePath, nil, 0655)
 					Expect(err).ToNot(HaveOccurred())
 
-					previousEnv = os.Getenv("CF_TRACE")
-					err = os.Setenv("CF_TRACE", traceFilePath)
-					Expect(err).ToNot(HaveOccurred())
+					fakeConfig.VerboseReturns(false, []string{traceFilePath, "/some-other-path"})
 				})
 
-				AfterEach(func() {
-					err := os.Setenv("CF_TRACE", previousEnv)
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				It("excludes the CF_TRACE file", func() {
+				It("excludes all of the trace files", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(gatheredResources).To(Equal(

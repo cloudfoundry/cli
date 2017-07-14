@@ -105,10 +105,6 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 			return nil
 		}
 
-		if path == os.Getenv("CF_TRACE") {
-			return nil
-		}
-
 		relPath, err := filepath.Rel(sourceDir, path)
 		if err != nil {
 			return err
@@ -381,13 +377,21 @@ func (Actor) addFileToZipFromFileSystem(
 	return nil
 }
 
-func (Actor) extractCFIgnore(sourceDir string) (*ignore.GitIgnore, error) {
+func (actor Actor) extractCFIgnore(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
 
+	additionalIgnoreLines := []string{".cfignore"}
+	_, traceFiles := actor.Config.Verbose()
+	for _, traceFilePath := range traceFiles {
+		if relPath, err := filepath.Rel(sourceDir, traceFilePath); err == nil {
+			additionalIgnoreLines = append(additionalIgnoreLines, relPath)
+		}
+	}
+
 	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
-		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore")
+		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, additionalIgnoreLines...)
 	} else {
-		return ignore.CompileIgnoreLines()
+		return ignore.CompileIgnoreLines(additionalIgnoreLines...)
 	}
 }
 
