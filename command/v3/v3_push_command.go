@@ -70,9 +70,9 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2)
+	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.V2PushActor = pushaction.NewActor(v2Actor)
-	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2)
+	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 
 	dopplerURL, err := hackDopplerURLFromUAA(ccClient.UAA())
 	if err != nil {

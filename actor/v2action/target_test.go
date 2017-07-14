@@ -21,7 +21,7 @@ var _ = Describe("Targeting", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v2actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 
 		settings = TargetSettings{
 			SkipSSLValidation: skipSSLValidation,

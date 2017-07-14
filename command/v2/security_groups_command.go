@@ -36,7 +36,7 @@ func (cmd *SecurityGroupsCommand) Setup(config command.Config, ui command.UI) er
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }
