@@ -123,6 +123,21 @@ Origin: wss://doppler.bosh-lite.com:443`
 				Expect(string(out.Contents())).To(Equal("\n"))
 			})
 		})
+
+		Context("when provided malformed JSON", func() {
+			It("displays the raw body", func() {
+				raw := `[{"data":1, "banana": 2}]`
+				err := display.DisplayJSONBody([]byte(raw))
+				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				buff, ok := testUI.Out.(*Buffer)
+				Expect(ok).To(BeTrue())
+				Expect(string(buff.Contents())).To(Equal(raw + "\n\n"))
+			})
+		})
 	})
 
 	Describe("DisplayMessage", func() {

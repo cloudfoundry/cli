@@ -54,6 +54,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error 
 	sanitized, err := SanitizeJSON(body)
 	if err != nil {
 		fmt.Fprintf(display.ui.Out, "%s\n", string(body))
+		return nil
 	}
 
 	buff := new(bytes.Buffer)
