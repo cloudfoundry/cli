@@ -141,6 +141,11 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		config.Flags = flags[0]
 	}
 
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
 	// Developer Note: The following is untested! Change at your own risk.
 	isTTY := terminal.IsTerminal(int(os.Stdout.Fd()))
 	terminalWidth := math.MaxInt32
@@ -154,8 +159,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	config.detectedSettings = detectedSettings{
-		tty:           isTTY,
-		terminalWidth: terminalWidth,
+		currentDirectory: pwd,
+		terminalWidth:    terminalWidth,
+		tty:              isTTY,
 	}
 
 	return &config, nil
@@ -274,8 +280,9 @@ type FlagOverride struct {
 
 // detectedSettings are automatically detected settings determined by the CLI.
 type detectedSettings struct {
-	tty           bool
-	terminalWidth int
+	currentDirectory string
+	terminalWidth    int
+	tty              bool
 }
 
 // Target returns the CC API URL
@@ -407,8 +414,9 @@ func (config *Config) Experimental() bool {
 	return false
 }
 
-// Verbose returns true if verbose should be displayed to terminal and a
-// location to log to. This is based off of:
+// Verbose returns true if verbose should be displayed to terminal, in addition
+// a slice of full paths in which verbose text will appear. This is based off
+// of:
 //   - The config file's trace value (true/false/file path)
 //   - The $CF_TRACE enviroment variable if set (true/false/file path)
 //   - The '-v/--verbose' global flag
@@ -438,6 +446,12 @@ func (config *Config) Verbose() (bool, []string) {
 		}
 	}
 	verbose = config.Flags.Verbose || verbose
+
+	for i, path := range filePath {
+		if !filepath.IsAbs(path) {
+			filePath[i] = filepath.Join(config.detectedSettings.currentDirectory, path)
+		}
+	}
 
 	return verbose, filePath
 }

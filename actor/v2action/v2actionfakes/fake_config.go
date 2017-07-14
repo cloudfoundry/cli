@@ -79,8 +79,19 @@ type FakeConfig struct {
 	UnsetSpaceInformationStub               func()
 	unsetSpaceInformationMutex              sync.RWMutex
 	unsetSpaceInformationArgsForCall        []struct{}
-	invocations                             map[string][][]interface{}
-	invocationsMutex                        sync.RWMutex
+	VerboseStub                             func() (bool, []string)
+	verboseMutex                            sync.RWMutex
+	verboseArgsForCall                      []struct{}
+	verboseReturns                          struct {
+		result1 bool
+		result2 []string
+	}
+	verboseReturnsOnCall map[int]struct {
+		result1 bool
+		result2 []string
+	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeConfig) PollingInterval() time.Duration {
@@ -372,6 +383,49 @@ func (fake *FakeConfig) UnsetSpaceInformationCallCount() int {
 	return len(fake.unsetSpaceInformationArgsForCall)
 }
 
+func (fake *FakeConfig) Verbose() (bool, []string) {
+	fake.verboseMutex.Lock()
+	ret, specificReturn := fake.verboseReturnsOnCall[len(fake.verboseArgsForCall)]
+	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct{}{})
+	fake.recordInvocation("Verbose", []interface{}{})
+	fake.verboseMutex.Unlock()
+	if fake.VerboseStub != nil {
+		return fake.VerboseStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.verboseReturns.result1, fake.verboseReturns.result2
+}
+
+func (fake *FakeConfig) VerboseCallCount() int {
+	fake.verboseMutex.RLock()
+	defer fake.verboseMutex.RUnlock()
+	return len(fake.verboseArgsForCall)
+}
+
+func (fake *FakeConfig) VerboseReturns(result1 bool, result2 []string) {
+	fake.VerboseStub = nil
+	fake.verboseReturns = struct {
+		result1 bool
+		result2 []string
+	}{result1, result2}
+}
+
+func (fake *FakeConfig) VerboseReturnsOnCall(i int, result1 bool, result2 []string) {
+	fake.VerboseStub = nil
+	if fake.verboseReturnsOnCall == nil {
+		fake.verboseReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 []string
+		})
+	}
+	fake.verboseReturnsOnCall[i] = struct {
+		result1 bool
+		result2 []string
+	}{result1, result2}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -393,6 +447,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.unsetOrganizationInformationMutex.RUnlock()
 	fake.unsetSpaceInformationMutex.RLock()
 	defer fake.unsetSpaceInformationMutex.RUnlock()
+	fake.verboseMutex.RLock()
+	defer fake.verboseMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
