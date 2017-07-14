@@ -1,6 +1,7 @@
 package ccv2_test
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -35,6 +36,7 @@ var _ = Describe("Resource", func() {
 						}
 					]`
 
+				// Note: ordering matters with VerifyBody
 				expectedRequestBody := []map[string]interface{}{
 					map[string]interface{}{
 						"fn":   "some-file-1",
@@ -55,10 +57,14 @@ var _ = Describe("Resource", func() {
 						"size": 3,
 					},
 				}
+				body, err := json.Marshal(expectedRequestBody)
+				Expect(err).ToNot(HaveOccurred())
+
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPut, "/v2/resource_match"),
-						VerifyJSONRepresenting(expectedRequestBody),
+						VerifyBody(body),
+						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 						RespondWith(http.StatusCreated, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

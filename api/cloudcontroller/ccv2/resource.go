@@ -12,17 +12,17 @@ import (
 
 type Resource struct {
 	Filename string      `json:"fn"`
-	Size     int64       `json:"size"`
-	SHA1     string      `json:"sha1"`
 	Mode     os.FileMode `json:"mode"`
+	SHA1     string      `json:"sha1"`
+	Size     int64       `json:"size"`
 }
 
 func (r *Resource) UnmarshalJSON(rawJSON []byte) error {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
-		Size     int64  `json:"size"`
-		SHA1     string `json:"sha1"`
 		Mode     string `json:"mode,omitempty"`
+		SHA1     string `json:"sha1"`
+		Size     int64  `json:"size"`
 	}
 
 	err := json.Unmarshal(rawJSON, &ccResource)
@@ -45,9 +45,9 @@ func (r *Resource) UnmarshalJSON(rawJSON []byte) error {
 func (r Resource) MarshalJSON() ([]byte, error) {
 	var ccResource struct {
 		Filename string `json:"fn,omitempty"`
-		Size     int64  `json:"size"`
-		SHA1     string `json:"sha1"`
 		Mode     string `json:"mode,omitempty"`
+		SHA1     string `json:"sha1"`
+		Size     int64  `json:"size"`
 	}
 
 	ccResource.Filename = r.Filename
@@ -72,6 +72,8 @@ func (client *Client) ResourceMatch(resourcesToMatch []Resource) ([]Resource, Wa
 	if err != nil {
 		return nil, nil, err
 	}
+
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	var matchedResources []Resource
 	response := cloudcontroller.Response{
