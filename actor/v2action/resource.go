@@ -83,23 +83,16 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 }
 
 // GatherDirectoryResources returns a list of resources for a directory.
-func (Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
+func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error) {
 	var (
 		resources []Resource
 		gitIgnore *ignore.GitIgnore
 	)
 
-	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
-	var gitIgnoreErr error
-	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
-		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore")
-	} else {
-		gitIgnore, gitIgnoreErr = ignore.CompileIgnoreLines()
-	}
-
-	if gitIgnoreErr != nil {
-		log.Errorln("reading .cfignore file:", gitIgnoreErr)
-		return nil, gitIgnoreErr
+	gitIgnore, err := actor.extractCFIgnore(sourceDir)
+	if err != nil {
+		log.Errorln("reading .cfignore file:", err)
+		return nil, err
 	}
 
 	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
@@ -386,6 +379,16 @@ func (Actor) addFileToZipFromFileSystem(
 	}
 
 	return nil
+}
+
+func (Actor) extractCFIgnore(sourceDir string) (*ignore.GitIgnore, error) {
+	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
+
+	if _, err := os.Stat(pathToCFIgnore); !os.IsNotExist(err) {
+		return ignore.CompileIgnoreFileAndLines(pathToCFIgnore, ".cfignore")
+	} else {
+		return ignore.CompileIgnoreLines()
+	}
 }
 
 func (Actor) findInResources(path string, filesToInclude []Resource) (Resource, bool) {
