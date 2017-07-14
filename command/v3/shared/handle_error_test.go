@@ -2,6 +2,7 @@ package shared_test
 
 import (
 	"errors"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -72,13 +73,17 @@ var _ = Describe("HandleError", func() {
 			sharedaction.NoSpaceTargetedError{BinaryName: "faceman"},
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
+		Entry("v3action.AssignDropletError -> AssignDropletError",
+			v3action.AssignDropletError{Message: "some-message"},
+			translatableerror.AssignDropletError{Message: "some-message"}),
+
 		Entry("v3action.OrganizationNotFoundError -> OrgNotFoundError",
 			v3action.OrganizationNotFoundError{Name: "some-org"},
 			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
-		Entry("v3action.AssignDropletError -> AssignDropletError",
-			v3action.AssignDropletError{Message: "some-message"},
-			translatableerror.AssignDropletError{Message: "some-message"}),
+		Entry("v3action.StagingTimeoutError -> StagingTimeoutError",
+			v3action.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
+			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
 		Entry("default case -> original error",
 			err,

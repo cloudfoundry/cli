@@ -37,6 +37,8 @@ func HandleError(err error) error {
 		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
 	case v3action.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError{Name: e.Name}
+	case v3action.StagingTimeoutError:
+		return translatableerror.StagingTimeoutError{AppName: e.AppName, Timeout: e.Timeout}
 	case v3action.IsolationSegmentNotFoundError:
 		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
 	case v3action.AssignDropletError:

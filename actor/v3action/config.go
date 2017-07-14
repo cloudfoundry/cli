@@ -7,4 +7,5 @@ import "time"
 type Config interface {
 	PollingInterval() time.Duration
 	StartupTimeout() time.Duration
+	StagingTimeout() time.Duration
 }

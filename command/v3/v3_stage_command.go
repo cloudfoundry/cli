@@ -17,7 +17,7 @@ import (
 type V3StageActor interface {
 	GetClock() clock.Clock
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
-	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 }
 
 type V3StageCommand struct {
@@ -92,8 +92,8 @@ func (cmd V3StageCommand) Execute(args []string) error {
 		return shared.HandleError(logErr)
 	}
 
-	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
-	_, err = shared.PollStage(cmd.RequiredArgs.AppName, buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI, cmd.Actor.GetClock(), cmd.Config.StagingTimeout())
+	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
+	_, err = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
 	if err == nil {
 		cmd.UI.DisplayOK()
 	}

@@ -1,19 +1,13 @@
 package shared
 
 import (
-	"time"
-
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/clock"
 )
 
-func PollStage(appName string, buildStream <-chan v3action.Build, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI, clock clock.Clock, stagingTimeout time.Duration) (string, error) {
+func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI) (string, error) {
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
 	var dropletGUID string
-
-	timer := clock.NewTimer(stagingTimeout)
 
 	for {
 		select {
@@ -49,11 +43,6 @@ func PollStage(appName string, buildStream <-chan v3action.Build, warningsStream
 				break
 			}
 			return "", HandleError(err)
-		case <-timer.C():
-			return "", translatableerror.StagingTimeoutError{
-				AppName: appName,
-				Timeout: stagingTimeout,
-			}
 		}
 		if closedBuildStream && closedWarningsStream && closedErrStream {
 			return dropletGUID, nil

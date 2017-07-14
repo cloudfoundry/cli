@@ -2,6 +2,7 @@ package v3action_test
 
 import (
 	"errors"
+	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -25,18 +26,12 @@ var _ = Describe("Build Actions", func() {
 
 	Describe("StagePackage", func() {
 		var (
-			packageGUID string
-
 			buildStream    <-chan Build
 			warningsStream <-chan Warnings
 			errorStream    <-chan error
 
 			buildGUID string
 		)
-
-		BeforeEach(func() {
-			packageGUID = "some-package-guid"
-		})
 
 		AfterEach(func() {
 			Eventually(errorStream).Should(BeClosed())
@@ -45,13 +40,14 @@ var _ = Describe("Build Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			buildStream, warningsStream, errorStream = actor.StagePackage(packageGUID)
+			buildStream, warningsStream, errorStream = actor.StagePackage("some-package-guid", "some-app")
 		})
 
 		Context("when the creation is successful", func() {
 			BeforeEach(func() {
 				buildGUID = "some-build-guid"
 				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, nil)
+				fakeConfig.StagingTimeoutReturns(time.Minute)
 			})
 
 			Context("when the polling is successful", func() {
@@ -69,7 +65,7 @@ var _ = Describe("Build Actions", func() {
 					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.CreateBuildArgsForCall(0)).To(Equal(ccv3.Build{
 						Package: ccv3.Package{
-							GUID: packageGUID,
+							GUID: "some-package-guid",
 						},
 					}))
 				})
@@ -84,7 +80,7 @@ var _ = Describe("Build Actions", func() {
 					Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
 					Expect(fakeCloudControllerClient.GetBuildArgsForCall(1)).To(Equal(buildGUID))
 
-					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 				})
 
 				Context("when polling returns a failed build", func() {
@@ -111,8 +107,22 @@ var _ = Describe("Build Actions", func() {
 						Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
 						Expect(fakeCloudControllerClient.GetBuildArgsForCall(1)).To(Equal(buildGUID))
 
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 					})
+				})
+			})
+
+			Context("when polling times out", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}
+					fakeConfig.StagingTimeoutReturns(time.Nanosecond)
+				})
+
+				It("returns the error and warnings", func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 				})
 			})
 
