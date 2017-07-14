@@ -186,12 +186,30 @@ Origin: wss://doppler.bosh-lite.com:443`
 
 					contents, err := ioutil.ReadFile(logFile1)
 					Expect(err).ToNot(HaveOccurred())
-					// display.Stop() writes "\n" to the file
 					Expect(string(contents)).To(Equal("\n"))
 
 					contents, err = ioutil.ReadFile(logFile2)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(contents)).To(Equal("\n"))
+				})
+			})
+
+			Context("when provided malformed JSON", func() {
+				It("displays the raw body", func() {
+					raw := `[{"data":1, "banana": 2}]`
+					err := display.DisplayJSONBody([]byte(raw))
+					Expect(err).ToNot(HaveOccurred())
+
+					err = display.Stop()
+					Expect(err).ToNot(HaveOccurred())
+
+					contents, err := ioutil.ReadFile(logFile1)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(contents)).To(Equal(raw + "\n\n"))
+
+					contents, err = ioutil.ReadFile(logFile2)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(contents)).To(Equal(raw + "\n\n"))
 				})
 			})
 		})

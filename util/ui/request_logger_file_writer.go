@@ -65,7 +65,7 @@ func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
 
 	sanitized, err := SanitizeJSON(body)
 	if err != nil {
-		return err
+		return display.DisplayMessage(string(body))
 	}
 
 	buff := new(bytes.Buffer)
