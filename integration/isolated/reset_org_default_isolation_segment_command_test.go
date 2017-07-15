@@ -66,7 +66,7 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 			userName, _ = helpers.GetCredentials()
-			userOrgName := "some-user-org-name"
+			userOrgName := helpers.NewOrgName()
 			helpers.CreateOrg(userOrgName)
 			helpers.TargetOrg(userOrgName)
 		})
