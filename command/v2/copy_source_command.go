@@ -19,11 +19,11 @@ type CopySourceCommand struct {
 	envCFStartupTimeout interface{}         `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 }
 
-func (_ CopySourceCommand) Setup(config command.Config, ui command.UI) error {
+func (CopySourceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CopySourceCommand) Execute(args []string) error {
+func (CopySourceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

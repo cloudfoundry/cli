@@ -12,11 +12,11 @@ type ServicesCommand struct {
 	relatedCommands interface{} `related_commands:"create-service, marketplace"`
 }
 
-func (_ ServicesCommand) Setup(config command.Config, ui command.UI) error {
+func (ServicesCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ServicesCommand) Execute(args []string) error {
+func (ServicesCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -1,6 +1,10 @@
 package plugin
 
-import "net/url"
+import (
+	"net/url"
+	"path"
+	"strings"
+)
 
 // PluginRepository represents a plugin repository
 type PluginRepository struct {
@@ -25,7 +29,11 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 	if err != nil {
 		return PluginRepository{}, err
 	}
-	parsedURL.Path = "/list"
+
+	parsedURL.Path = strings.TrimSuffix(parsedURL.Path, "/")
+	if !strings.HasSuffix(parsedURL.Path, "/list") {
+		parsedURL.Path = path.Join(parsedURL.Path, "list")
+	}
 
 	request, err := client.newGETRequest(parsedURL.String())
 	if err != nil {
@@ -36,7 +44,7 @@ func (client *Client) GetPluginRepository(repositoryURL string) (PluginRepositor
 	response := Response{
 		Result: &pluginRepository,
 	}
-	err = client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response, nil)
 	if err != nil {
 		return PluginRepository{}, err
 	}

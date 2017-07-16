@@ -14,11 +14,11 @@ type RenameBuildpackCommand struct {
 	relatedCommands interface{}              `related_commands:"update-buildpack"`
 }
 
-func (_ RenameBuildpackCommand) Setup(config command.Config, ui command.UI) error {
+func (RenameBuildpackCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RenameBuildpackCommand) Execute(args []string) error {
+func (RenameBuildpackCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

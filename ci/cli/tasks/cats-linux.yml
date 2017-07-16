@@ -1,6 +1,10 @@
 ---
 platform: linux
-rootfs_uri: docker:///cloudfoundry/cli-ci
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
 
 inputs:
 - name: cf-acceptance-tests
@@ -18,7 +22,7 @@ run:
   args:
   - -c
   - |
-    set -eux
+    set -eu
 
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
@@ -37,23 +41,13 @@ run:
     # Redact passwords in output
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
 
-    if [[ "$BACKEND" = "diego" ]]; then
-      api=$(jq .api -r < $CONFIG)
-      user=$(jq .admin_user -r < $CONFIG)
-      password=$(jq .admin_password -r < $CONFIG)
-      cf api ${api} --skip-ssl-validation
-      cf auth ${user} ${password}
-      cf enable-feature-flag diego_docker
-    fi
-
     SKIPS="-skip="
-    [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     SKIPS="${SKIPS}transparently proxies both reserved|"
 
     # Remove trailing |
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
 
     ./bin/test \
-      -flakeAttempts=2 -slowSpecThreshold=120 -randomizeAllSpecs \
+      -flakeAttempts=2 -slowSpecThreshold=180 -randomizeAllSpecs \
       -nodes "${NODES}" \
       "${SKIPS}"

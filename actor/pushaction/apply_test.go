@@ -82,10 +82,12 @@ var _ = Describe("Apply", func() {
 		var createdApp v2action.Application
 
 		BeforeEach(func() {
-			createdApp = config.DesiredApplication
-			createdApp.GUID = "some-app-guid"
+			fakeV2Actor.CreateApplicationStub = func(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
+				createdApp = application
+				createdApp.GUID = "some-app-guid"
 
-			fakeV2Actor.CreateApplicationReturns(createdApp, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, nil)
+				return createdApp, v2action.Warnings{"create-application-warnings-1", "create-application-warnings-2"}, nil
+			}
 		})
 
 		JustBeforeEach(func() {
@@ -118,104 +120,128 @@ var _ = Describe("Apply", func() {
 					Eventually(eventStream).Should(Receive(Equal(BoundRoutes)))
 				})
 
-				Context("when the archive creation is successful", func() {
-					var archivePath string
-
+				Context("when resource matching happens", func() {
 					BeforeEach(func() {
-						tmpfile, err := ioutil.TempFile("", "fake-archive")
-						Expect(err).ToNot(HaveOccurred())
-						_, err = tmpfile.Write([]byte("123456"))
-						Expect(err).ToNot(HaveOccurred())
-						Expect(tmpfile.Close()).ToNot(HaveOccurred())
-
-						archivePath = tmpfile.Name()
-						fakeV2Actor.ZipResourcesReturns(archivePath, nil)
+						fakeV2Actor.ResourceMatchReturns(nil, nil, v2action.Warnings{"resource-warnings-1", "resource-warnings-2"}, nil)
 					})
 
 					JustBeforeEach(func() {
-						Eventually(eventStream).Should(Receive(Equal(CreatingArchive)))
+						Eventually(eventStream).Should(Receive(Equal(ResourceMatching)))
+						Eventually(warningsStream).Should(Receive(ConsistOf("resource-warnings-1", "resource-warnings-2")))
 					})
 
-					Context("when the upload is successful", func() {
+					Context("when the archive creation is successful", func() {
+						var archivePath string
+
 						BeforeEach(func() {
-							fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
+							tmpfile, err := ioutil.TempFile("", "fake-archive")
+							Expect(err).ToNot(HaveOccurred())
+							_, err = tmpfile.Write([]byte("123456"))
+							Expect(err).ToNot(HaveOccurred())
+							Expect(tmpfile.Close()).ToNot(HaveOccurred())
+
+							archivePath = tmpfile.Name()
+							fakeV2Actor.ZipDirectoryResourcesReturns(archivePath, nil)
 						})
 
 						JustBeforeEach(func() {
-							Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-							Eventually(eventStream).Should(Receive(Equal(UploadComplete)))
-							Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+							Eventually(eventStream).Should(Receive(Equal(CreatingArchive)))
 						})
 
-						It("sends the updated config and a complete event", func() {
-							Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
-								CurrentApplication: createdApp,
-								DesiredApplication: createdApp,
-								CurrentRoutes:      createdRoutes,
-								DesiredRoutes:      createdRoutes,
-								Path:               "some-path",
-							})))
-							Eventually(eventStream).Should(Receive(Equal(Complete)))
+						Context("when the upload is successful", func() {
+							BeforeEach(func() {
+								fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, nil)
+							})
 
-							Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
+							JustBeforeEach(func() {
+								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+								Eventually(eventStream).Should(Receive(Equal(UploadComplete)))
+								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+							})
+
+							It("sends the updated config and a complete event", func() {
+								Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
+									CurrentApplication: createdApp,
+									DesiredApplication: createdApp,
+									CurrentRoutes:      createdRoutes,
+									DesiredRoutes:      createdRoutes,
+									Path:               "some-path",
+								})))
+								Eventually(eventStream).Should(Receive(Equal(Complete)))
+
+								Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
+							})
+						})
+
+						Context("when the upload errors", func() {
+							Context("with a retryable error", func() {
+								BeforeEach(func() {
+									fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
+								})
+
+								It("retries the download up to three times", func() {
+									Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(1))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(2))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+									Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(3))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
+
+									Eventually(errorStream).Should(Receive(Equal(UploadFailedError{})))
+								})
+							})
+
+							Context("with a generic error", func() {
+								var expectedErr error
+
+								BeforeEach(func() {
+									expectedErr = errors.New("dios mio")
+									fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
+								})
+
+								It("sends warnings and errors, then stops", func() {
+									Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+									Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
+									Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+									Consistently(eventStream).ShouldNot(Receive())
+								})
+							})
 						})
 					})
 
-					Context("when the upload errors", func() {
-						Context("with a retryable error", func() {
-							BeforeEach(func() {
-								fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, ccerror.PipeSeekError{})
-							})
+					Context("when the archive creation errors", func() {
+						var expectedErr error
 
-							It("retries the download up to three times", func() {
-								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(1))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
-
-								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(2))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
-
-								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-								Eventually(fakeProgressBar.NewProgressBarWrapperCallCount).Should(Equal(3))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
-
-								Eventually(errorStream).Should(Receive(Equal(UploadFailedError{})))
-							})
+						BeforeEach(func() {
+							expectedErr = errors.New("dios mio")
+							fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
 						})
 
-						Context("with a generic error", func() {
-							var expectedErr error
-
-							BeforeEach(func() {
-								expectedErr = errors.New("dios mio")
-								fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warnings-1", "upload-warnings-2"}, expectedErr)
-							})
-
-							It("sends warnings and errors, then stops", func() {
-								Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-								Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
-								Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-								Consistently(eventStream).ShouldNot(Receive())
-							})
+						It("sends warnings and errors, then stops", func() {
+							Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
+							Consistently(eventStream).ShouldNot(Receive())
 						})
 					})
 				})
 
-				Context("when the archive creation errors", func() {
-					var expectedErr error
-
+				Context("when a docker image is provided", func() {
 					BeforeEach(func() {
-						expectedErr = errors.New("dios mio")
-						fakeV2Actor.ZipResourcesReturns("", expectedErr)
+						config.DesiredApplication.DockerImage = "some-docker-image-path"
 					})
 
-					It("sends warnings and errors, then stops", func() {
-						Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
-						Consistently(eventStream).ShouldNot(Receive())
+					It("skips achiving and uploading", func() {
+						Eventually(configStream).Should(Receive())
+						Eventually(eventStream).Should(Receive(Equal(Complete)))
+
+						Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(0))
 					})
 				})
 			})

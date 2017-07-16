@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
@@ -38,7 +39,7 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }
@@ -169,7 +170,7 @@ func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 // setSpace sets space
 func (cmd *TargetCommand) setSpace() error {
 	if !cmd.Config.HasTargetedOrganization() {
-		return shared.NoOrganizationTargetedError{}
+		return translatableerror.NoOrganizationTargetedError{BinaryName: cmd.Config.BinaryName()}
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.Space)

@@ -14,11 +14,11 @@ type SetRunningEnvironmentVariableGroupCommand struct {
 	relatedCommands interface{}       `related_commands:"set-env, running-environment-variable-group"`
 }
 
-func (_ SetRunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (SetRunningEnvironmentVariableGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SetRunningEnvironmentVariableGroupCommand) Execute(args []string) error {
+func (SetRunningEnvironmentVariableGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

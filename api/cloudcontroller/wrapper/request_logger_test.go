@@ -91,6 +91,8 @@ var _ = Describe("Request Logger", func() {
 			name, value = fakeOutput.DisplayHeaderArgsForCall(2)
 			Expect(name).To(Equal("Aghi"))
 			Expect(value).To(Equal("bar"))
+
+			Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(0))
 		})
 
 		Context("when an authorization header is in the request", func() {
@@ -127,11 +129,13 @@ var _ = Describe("Request Logger", func() {
 
 			Context("when request's Content-Type is anything else", func() {
 				BeforeEach(func() {
-					request.Header.Set("Content-Type", "banana")
+					request.Header.Set("Content-Type", "banana;rama")
 				})
 
 				It("does not display the body", func() {
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(1)) // Once for response body only
+					Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(1))
+					Expect(fakeOutput.DisplayMessageArgsForCall(0)).To(Equal("[banana Content Hidden]"))
 				})
 			})
 		})

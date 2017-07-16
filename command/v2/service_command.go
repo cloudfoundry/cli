@@ -15,11 +15,11 @@ type ServiceCommand struct {
 	relatedCommands interface{}          `related_commands:"bind-service, rename-service, update-service"`
 }
 
-func (_ ServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (ServiceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ServiceCommand) Execute(args []string) error {
+func (ServiceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

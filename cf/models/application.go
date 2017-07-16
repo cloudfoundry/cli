@@ -96,6 +96,8 @@ type AppParams struct {
 	HealthCheckHTTPEndpoint *string
 	HealthCheckTimeout      *int
 	DockerImage             *string
+	DockerUsername          *string
+	DockerPassword          *string
 	Diego                   *bool
 	EnableSSH               *bool
 	Hosts                   []string
@@ -133,6 +135,12 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.DockerImage != nil {
 		app.DockerImage = other.DockerImage
+	}
+	if other.DockerUsername != nil {
+		app.DockerUsername = other.DockerUsername
+	}
+	if other.DockerPassword != nil {
+		app.DockerPassword = other.DockerPassword
 	}
 	if other.Domains != nil {
 		app.Domains = other.Domains

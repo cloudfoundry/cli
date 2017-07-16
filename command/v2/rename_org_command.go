@@ -13,11 +13,11 @@ type RenameOrgCommand struct {
 	usage        interface{}        `usage:"CF_NAME rename-org ORG NEW_ORG"`
 }
 
-func (_ RenameOrgCommand) Setup(config command.Config, ui command.UI) error {
+func (RenameOrgCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ RenameOrgCommand) Execute(args []string) error {
+func (RenameOrgCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

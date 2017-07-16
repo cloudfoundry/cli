@@ -3,12 +3,16 @@ package common
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
@@ -17,10 +21,11 @@ import (
 
 type InstallPluginActor interface {
 	CreateExecutableCopy(path string, tempPluginDir string) (string, error)
-	DownloadExecutableBinaryFromURL(url string, tempPluginDir string) (string, int64, error)
+	DownloadExecutableBinaryFromURL(url string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error)
 	FileExists(path string) bool
 	GetAndValidatePlugin(metadata pluginaction.PluginMetadata, commands pluginaction.CommandList, path string) (configv3.Plugin, error)
-	GetPluginInfoFromRepository(pluginName string, pluginRepo configv3.PluginRepository) (pluginaction.PluginInfo, error)
+	GetPlatformString(runtimeGOOS string, runtimeGOARCH string) string
+	GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error)
 	GetPluginRepository(repositoryName string) (configv3.PluginRepository, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
 	IsPluginInstalled(pluginName string) bool
@@ -33,7 +38,7 @@ const installConfirmationPrompt = "Do you want to install the plugin {{.Path}}?"
 type InvalidChecksumError struct {
 }
 
-func (_ InvalidChecksumError) Error() string {
+func (InvalidChecksumError) Error() string {
 	return "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author."
 }
 
@@ -47,29 +52,28 @@ const (
 
 type InstallPluginCommand struct {
 	OptionalArgs         flag.InstallPluginArgs `positional-args:"yes"`
-	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
 	SkipSSLValidation    bool                   `short:"k" hidden:"true" description:"Skip SSL certificate validation"`
-	RegisteredRepository string                 `short:"r" description:"Name of a registered repository where the specified plugin is located"`
-	usage                interface{}            `usage:"CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
+	Force                bool                   `short:"f" description:"Force install of plugin without confirmation"`
+	RegisteredRepository string                 `short:"r" description:"Restrict search for plugin to this registered repository"`
+	usage                interface{}            `usage:"CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
 	relatedCommands      interface{}            `related_commands:"add-plugin-repo, list-plugin-repos, plugins"`
 	UI                   command.UI
 	Config               command.Config
 	Actor                InstallPluginActor
+	ProgressBar          plugin.ProxyReader
 }
 
 func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.Actor = pluginaction.NewActor(config, shared.NewClient(config, ui, cmd.SkipSSLValidation))
+
+	cmd.ProgressBar = shared.NewProgressBarProxyReader(cmd.UI.Writer())
+
 	return nil
 }
 
-func (cmd InstallPluginCommand) Execute(_ []string) error {
-	if !cmd.Config.Experimental() {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-
+func (cmd InstallPluginCommand) Execute([]string) error {
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
 		return shared.HandleError(err)
@@ -106,7 +110,7 @@ func (cmd InstallPluginCommand) Execute(_ []string) error {
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
 		if !cmd.Force && pluginSource != PluginFromRepository {
-			return shared.PluginAlreadyInstalledError{
+			return translatableerror.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
 				Name:       plugin.Name,
 				Version:    plugin.Version.String(),
@@ -164,7 +168,32 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 	switch {
 	case cmd.RegisteredRepository != "":
-		return cmd.getPluginFromRepository(pluginNameOrLocation, tempPluginDir)
+		pluginRepository, err := cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
+		if err != nil {
+			return "", 0, err
+		}
+		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, []configv3.PluginRepository{pluginRepository}, tempPluginDir)
+
+		if err != nil {
+			switch pluginErr := err.(type) {
+			case pluginaction.PluginNotFoundInAnyRepositoryError:
+				return "", 0, translatableerror.PluginNotFoundInRepositoryError{
+					BinaryName:     cmd.Config.BinaryName(),
+					PluginName:     pluginNameOrLocation,
+					RepositoryName: cmd.RegisteredRepository,
+				}
+
+			case pluginaction.FetchingPluginInfoFromRepositoryError:
+				// The error wrapped inside pluginErr is handled differently in the case of
+				// a specified repo from that of searching through all repos.  pluginErr.Err
+				// is then processed by shared.HandleError by this function's caller.
+				return "", 0, pluginErr.Err
+
+			default:
+				return "", 0, err
+			}
+		}
+		return path, pluginSource, nil
 
 	case cmd.Actor.FileExists(pluginNameOrLocation):
 		return cmd.getPluginFromLocalFile(pluginNameOrLocation)
@@ -173,10 +202,55 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		return cmd.getPluginFromURL(pluginNameOrLocation, tempPluginDir)
 
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
-		return "", 0, command.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
+		return "", 0, translatableerror.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 
 	default:
-		return "", 0, shared.FileNotFoundError{Path: pluginNameOrLocation}
+		repos := cmd.Config.PluginRepositories()
+		if len(repos) == 0 {
+			return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+		}
+
+		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, repos, tempPluginDir)
+		if err != nil {
+			switch pluginErr := err.(type) {
+			case pluginaction.PluginNotFoundInAnyRepositoryError:
+				return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
+
+			case pluginaction.FetchingPluginInfoFromRepositoryError:
+				return "", 0, cmd.handleFetchingPluginInfoFromRepositoriesError(pluginErr)
+
+			default:
+				return "", 0, err
+			}
+		}
+		return path, pluginSource, nil
+	}
+}
+
+// These are specific errors that we output to the user in the context of
+// installing from any repository.
+func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
+	switch clientErr := fetchErr.Err.(type) {
+	case pluginerror.RawHTTPStatusError:
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
+			Message:        clientErr.Status,
+			RepositoryName: fetchErr.RepositoryName,
+		}
+
+	case pluginerror.SSLValidationHostnameError:
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
+			Message:        clientErr.Error(),
+			RepositoryName: fetchErr.RepositoryName,
+		}
+
+	case pluginerror.UnverifiedServerError:
+		return translatableerror.FetchingPluginInfoFromRepositoriesError{
+			Message:        clientErr.Error(),
+			RepositoryName: fetchErr.RepositoryName,
+		}
+
+	default:
+		return clientErr
 	}
 }
 
@@ -192,7 +266,9 @@ func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (s
 }
 
 func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPluginDir string) (string, PluginSource, error) {
-	err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	var err error
+
+	err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
 	if err != nil {
@@ -201,52 +277,36 @@ func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPlug
 
 	cmd.UI.DisplayText("Starting download of plugin binary from URL...")
 
-	var size int64
-	tempPath, size, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir)
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginLocation, tempPluginDir, cmd.ProgressBar)
 	if err != nil {
 		return "", 0, err
 	}
-
-	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
-		"Bytes": size,
-	})
 
 	return tempPath, PluginFromURL, err
 }
 
-func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempPluginDir string) (string, PluginSource, error) {
-	var (
-		pluginRepository configv3.PluginRepository
-		pluginInfo       pluginaction.PluginInfo
-		err              error
-		tempPath         string
-	)
-
-	pluginRepository, err = cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
-	if err != nil {
-		return "", 0, err
+func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, repos []configv3.PluginRepository, tempPluginDir string) (string, PluginSource, error) {
+	var repoNames []string
+	for _, repo := range repos {
+		repoNames = append(repoNames, repo.Name)
 	}
 
-	cmd.UI.DisplayText("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
-		"RepositoryName": cmd.RegisteredRepository,
+	cmd.UI.DisplayTextWithFlavor("Searching {{.RepositoryName}} for plugin {{.PluginName}}...", map[string]interface{}{
+		"RepositoryName": strings.Join(repoNames, ", "),
 		"PluginName":     pluginName,
 	})
 
-	pluginInfo, err = cmd.Actor.GetPluginInfoFromRepository(pluginName, pluginRepository)
+	currentPlatform := cmd.Actor.GetPlatformString(runtime.GOOS, runtime.GOARCH)
+	pluginInfo, repoList, err := cmd.Actor.GetPluginInfoFromRepositoriesForPlatform(pluginName, repos, currentPlatform)
+
 	if err != nil {
-		if _, ok := err.(pluginaction.PluginNotFoundInRepositoryError); ok {
-			return "", 0, shared.PluginNotFoundInRepositoryError{
-				BinaryName:     cmd.Config.BinaryName(),
-				PluginName:     pluginName,
-				RepositoryName: cmd.RegisteredRepository,
-			}
-		}
 		return "", 0, err
 	}
-	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.", map[string]interface{}{
+
+	cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}", map[string]interface{}{
 		"PluginName":     pluginName,
 		"PluginVersion":  pluginInfo.Version,
-		"RepositoryName": cmd.RegisteredRepository,
+		"RepositoryName": strings.Join(repoList, ", "),
 	})
 
 	installedPlugin, exist := cmd.Config.GetPlugin(pluginName)
@@ -271,18 +331,13 @@ func (cmd InstallPluginCommand) getPluginFromRepository(pluginName string, tempP
 	}
 
 	cmd.UI.DisplayText("Starting download of plugin binary from repository {{.RepositoryName}}...", map[string]interface{}{
-		"RepositoryName": cmd.RegisteredRepository,
+		"RepositoryName": repoList[0],
 	})
 
-	var size int64
-	tempPath, size, err = cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir)
+	tempPath, err := cmd.Actor.DownloadExecutableBinaryFromURL(pluginInfo.URL, tempPluginDir, cmd.ProgressBar)
 	if err != nil {
 		return "", 0, err
 	}
-
-	cmd.UI.DisplayText("{{.Bytes}} bytes downloaded...", map[string]interface{}{
-		"Bytes": size,
-	})
 
 	if !cmd.Actor.ValidateFileChecksum(tempPath, pluginInfo.Checksum) {
 		return "", 0, InvalidChecksumError{}

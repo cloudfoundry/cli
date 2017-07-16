@@ -4,6 +4,10 @@ type AppName struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 }
 
+type OptionalAppName struct {
+	AppName string `positional-arg-name:"APP_NAME" description:"The application name"`
+}
+
 type Buildpack struct {
 	Buildpack string `positional-arg-name:"BUILDPACK" required:"true" description:"The buildpack"`
 }
@@ -304,4 +308,8 @@ type SpaceIsolationArgs struct {
 
 type ResetSpaceIsolationArgs struct {
 	SpaceName string `positional-arg-name:"SPACE_NAME" required:"true" description:"The space name"`
+}
+
+type ResetOrgDefaultIsolationArgs struct {
+	OrgName string `positional-arg-name:"ORG_NAME" required:"true" description:"The organization name"`
 }

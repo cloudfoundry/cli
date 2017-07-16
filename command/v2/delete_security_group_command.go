@@ -15,11 +15,11 @@ type DeleteSecurityGroupCommand struct {
 	relatedCommands interface{}        `related_commands:"security-groups"`
 }
 
-func (_ DeleteSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteSecurityGroupCommand) Execute(args []string) error {
+func (DeleteSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

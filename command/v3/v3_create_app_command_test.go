@@ -5,8 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -34,16 +35,17 @@ var _ = Describe("v3-create-app Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3CreateAppActor)
 
-		cmd = v3.V3CreateAppCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-		}
-
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
+
+		cmd = v3.V3CreateAppCommand{
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
+			RequiredArgs: flag.AppName{AppName: app},
+		}
 	})
 
 	JustBeforeEach(func() {
@@ -56,7 +58,7 @@ var _ = Describe("v3-create-app Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -70,8 +72,6 @@ var _ = Describe("v3-create-app Command", func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
-
-			cmd.AppName = app
 		})
 
 		Context("when the create is successful", func() {
@@ -90,9 +90,11 @@ var _ = Describe("v3-create-app Command", func() {
 
 				Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(1))
 
-				appName, spaceGUID := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
-				Expect(appName).To(Equal(app))
-				Expect(spaceGUID).To(Equal("some-space-guid"))
+				createAppInput := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
+				Expect(createAppInput).To(Equal(v3action.CreateApplicationInput{
+					AppName:   app,
+					SpaceGUID: "some-space-guid",
+				}))
 			})
 		})
 

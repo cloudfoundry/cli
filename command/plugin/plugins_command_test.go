@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
-	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -176,7 +176,7 @@ var _ = Describe("plugins Command", func() {
 				})
 
 				It("returns the 'No plugin repositories added' error", func() {
-					Expect(executeErr).To(MatchError(shared.NoPluginRepositoriesError{}))
+					Expect(executeErr).To(MatchError(translatableerror.NoPluginRepositoriesError{}))
 					Expect(testUI.Out).NotTo(Say("Searching"))
 				})
 			})
@@ -197,7 +197,7 @@ var _ = Describe("plugins Command", func() {
 						})
 					})
 					It("displays the repository and the error", func() {
-						Expect(executeErr).To(MatchError(shared.GettingPluginRepositoryError{
+						Expect(executeErr).To(MatchError(translatableerror.GettingPluginRepositoryError{
 							Name:    "repo-1",
 							Message: "404",
 						}))

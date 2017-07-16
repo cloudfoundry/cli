@@ -44,7 +44,7 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// error parsing json
 	if err != nil {
 		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
-			return ccerror.NotFoundError{string(rawHTTPStatusErr.RawResponse)}
+			return ccerror.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
 		}
 		return rawHTTPStatusErr
 	}
@@ -72,7 +72,7 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	case http.StatusNotFound: // 404
 		return ccerror.ResourceNotFoundError{Message: firstErr.Detail}
 	case http.StatusUnprocessableEntity: // 422
-		return ccerror.UnprocessableEntityError{Message: firstErr.Detail}
+		return handleUnprocessableEntity(firstErr)
 	case http.StatusServiceUnavailable: // 503
 		if firstErr.Title == "CF-TaskWorkersUnavailable" {
 			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
@@ -85,5 +85,15 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 			V3ErrorResponse: errorResponse,
 		}
 	}
-	return nil
+}
+
+func handleUnprocessableEntity(errorResponse ccerror.V3Error) error {
+	switch errorResponse.Detail {
+	case "name must be unique in space":
+		return ccerror.NameNotUniqueInSpaceError{}
+	case "Buildpack must be an existing admin buildpack or a valid git URI":
+		return ccerror.InvalidBuildpackError{}
+	default:
+		return ccerror.UnprocessableEntityError{Message: errorResponse.Detail}
+	}
 }

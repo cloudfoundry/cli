@@ -79,8 +79,10 @@ func (actor Actor) AddPluginRepository(repoName string, repoURL string) error {
 }
 
 func (actor Actor) GetPluginRepository(repositoryName string) (configv3.PluginRepository, error) {
+	repositoryNameLowered := strings.ToLower(repositoryName)
+
 	for _, repository := range actor.config.PluginRepositories() {
-		if repositoryName == repository.Name {
+		if repositoryNameLowered == strings.ToLower(repository.Name) {
 			return repository, nil
 		}
 	}

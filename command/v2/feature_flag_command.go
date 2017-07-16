@@ -14,11 +14,11 @@ type FeatureFlagCommand struct {
 	relatedCommands interface{}  `related_commands:"disable-feature-flag, enable-feature-flag, feature-flags"`
 }
 
-func (_ FeatureFlagCommand) Setup(config command.Config, ui command.UI) error {
+func (FeatureFlagCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ FeatureFlagCommand) Execute(args []string) error {
+func (FeatureFlagCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

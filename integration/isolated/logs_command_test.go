@@ -136,7 +136,7 @@ var _ = Describe("Logs Command", func() {
 			Context("without the --recent flag", func() {
 				It("streams logs out to the screen", func() {
 					session := helpers.CF("logs", appName)
-					defer session.Kill()
+					defer session.Terminate()
 
 					userName, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Retrieving logs for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))

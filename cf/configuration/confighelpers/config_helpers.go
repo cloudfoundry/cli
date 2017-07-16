@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-func DefaultFilePath() (string, error) {
+func homeDir() (string, error) {
 	var homeDir string
 
 	if os.Getenv("CF_HOME") != "" {
@@ -18,6 +18,16 @@ func DefaultFilePath() (string, error) {
 		}
 	} else {
 		homeDir = userHomeDir()
+	}
+
+	return homeDir, nil
+}
+
+func DefaultFilePath() (string, error) {
+	homeDir, err := homeDir()
+
+	if err != nil {
+		return "", err
 	}
 
 	return filepath.Join(homeDir, ".cf", "config.json"), nil
@@ -43,5 +53,10 @@ var PluginRepoDir = func() string {
 		return os.Getenv("CF_PLUGIN_HOME")
 	}
 
-	return userHomeDir()
+	// Ignore the error here because we expect that the directory which is
+	// ostensibly created in this call shall have already been created by
+	// DefaultFilePath().
+	pluginDir, _ := homeDir()
+
+	return pluginDir
 }

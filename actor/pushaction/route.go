@@ -2,7 +2,7 @@ package pushaction
 
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
@@ -14,7 +14,7 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 	for _, route := range config.DesiredRoutes {
 		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
 			log.Debugf("binding route: %#v", route)
-			warnings, err := actor.bindRouteToApp(route, config.DesiredApplication.GUID)
+			warnings, err := actor.BindRouteToApp(route, config.DesiredApplication.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				log.Errorln("binding route:", err)
@@ -29,6 +29,66 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 	config.CurrentRoutes = config.DesiredRoutes
 
 	return config, boundRoutes, allWarnings, nil
+}
+
+func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName string) (v2action.Route, Warnings, error) {
+	defaultDomain, domainWarnings, err := actor.DefaultDomain(orgGUID)
+	if err != nil {
+		return v2action.Route{}, domainWarnings, err
+	}
+
+	return v2action.Route{
+		Host:      appName,
+		Domain:    defaultDomain,
+		SpaceGUID: spaceGUID,
+	}, domainWarnings, nil
+
+}
+
+func (actor Actor) CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
+	var warnings Warnings
+	defaultRoute, domainWarnings, err := actor.getDefaultRoute(orgGUID, spaceGUID, app.Name)
+	warnings = append(warnings, domainWarnings...)
+	if err != nil {
+		return warnings, err
+	}
+
+	boundRoutes, appRouteWarnings, err := actor.V2Actor.GetApplicationRoutes(app.GUID)
+	warnings = append(warnings, appRouteWarnings...)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	_, routeAlreadyBound := actor.routeInListBySettings(defaultRoute, boundRoutes)
+	if routeAlreadyBound {
+		return Warnings(warnings), nil
+	}
+
+	spaceRoute, spaceRouteWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
+	warnings = append(warnings, spaceRouteWarnings...)
+	routeAlreadyExists := true
+	if _, ok := err.(v2action.RouteNotFoundError); ok {
+		routeAlreadyExists = false
+	} else if err != nil {
+		return Warnings(warnings), err
+	}
+
+	if !routeAlreadyExists {
+		var createRouteWarning v2action.Warnings
+		spaceRoute, createRouteWarning, err = actor.V2Actor.CreateRoute(defaultRoute, false)
+		warnings = append(warnings, createRouteWarning...)
+		if err != nil {
+			return Warnings(warnings), err
+		}
+	}
+
+	bindWarnings, err := actor.V2Actor.BindRouteToApplication(spaceRoute.GUID, app.GUID)
+	warnings = append(warnings, bindWarnings...)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	return Warnings(warnings), nil
 }
 
 func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
@@ -88,7 +148,7 @@ func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceG
 	}
 }
 
-func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
+func (actor Actor) BindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
 	warnings, err := actor.V2Actor.BindRouteToApplication(route.GUID, appGUID)
 	if _, ok := err.(v2action.RouteInDifferentSpaceError); ok {
 		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
@@ -96,7 +156,7 @@ func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2actio
 	return warnings, err
 }
 
-func (_ Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
+func (Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
 	for _, r := range routes {
 		if r.GUID == route.GUID {
 			return true
@@ -106,7 +166,7 @@ func (_ Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) 
 	return false
 }
 
-func (_ Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
+func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
 	for _, r := range routes {
 		if r.Host == route.Host && r.Path == route.Path && r.Port == route.Port &&
 			r.SpaceGUID == route.SpaceGUID && r.Domain.GUID == route.Domain.GUID {

@@ -9,5 +9,5 @@ import (
 
 func TestUIHelpers(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "UIHelpers Suite")
+	RunSpecs(t, "UI Helpers Suite")
 }

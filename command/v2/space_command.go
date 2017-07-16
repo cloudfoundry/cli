@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -47,15 +48,15 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, _, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, nil)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
-		if _, ok := err.(sharedV3.V3APIDoesNotExistError); !ok {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); !ok {
 			return err
 		}
 	} else {
@@ -104,7 +105,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "2.74.0")
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
 	includeStagingSecurityGroupsRules := err == nil
 
 	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
@@ -131,7 +132,9 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	table = append(table,
 		[]string{cmd.UI.TranslateText("space quota:"), spaceSummary.SpaceQuotaName})
 	table = append(table,
-		[]string{cmd.UI.TranslateText("security groups:"), strings.Join(spaceSummary.SecurityGroupNames, ", ")})
+		[]string{cmd.UI.TranslateText("running security groups:"), strings.Join(spaceSummary.RunningSecurityGroupNames, ", ")})
+	table = append(table,
+		[]string{cmd.UI.TranslateText("staging security groups:"), strings.Join(spaceSummary.StagingSecurityGroupNames, ", ")})
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 
@@ -165,7 +168,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 				securityGroupRule.Destination,
 				securityGroupRule.Ports,
 				securityGroupRule.Protocol,
-				securityGroupRule.Lifecycle,
+				string(securityGroupRule.Lifecycle),
 				securityGroupRule.Description,
 			})
 		}
@@ -182,7 +185,7 @@ func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) 
 		return nil, nil
 	}
 
-	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
 	if apiCheck != nil {
 		return nil, nil
 	}

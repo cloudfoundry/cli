@@ -32,13 +32,13 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 }
 
 // ClearTarget clears target information from the actor.
-func (_ Actor) ClearTarget(config Config) {
+func (Actor) ClearTarget(config Config) {
 	config.SetTargetInformation("", "", "", "", "", "", "", false)
 	config.SetTokenInformation("", "", "")
 }
 
 // ClearTarget clears the targeted org and space in the config.
-func (_ Actor) ClearOrganizationAndSpace(config Config) {
+func (Actor) ClearOrganizationAndSpace(config Config) {
 	config.UnsetOrganizationInformation()
 	config.UnsetSpaceInformation()
 }

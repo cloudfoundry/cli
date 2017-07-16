@@ -15,11 +15,11 @@ type CheckRouteCommand struct {
 	relatedCommands interface{}     `related_commands:"create-route, delete-route, routes"`
 }
 
-func (_ CheckRouteCommand) Setup(config command.Config, ui command.UI) error {
+func (CheckRouteCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CheckRouteCommand) Execute(args []string) error {
+func (CheckRouteCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

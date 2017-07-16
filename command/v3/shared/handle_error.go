@@ -6,40 +6,43 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
 	case ccerror.APINotFoundError:
-		return command.APINotFoundError{URL: e.URL}
+		return translatableerror.APINotFoundError{URL: e.URL}
 	case ccerror.RequestError:
-		return command.APIRequestError{Err: e.Err}
+		return translatableerror.APIRequestError{Err: e.Err}
 	case ccerror.SSLValidationHostnameError:
-		return command.SSLCertErrorError{Message: e.Message}
+		return translatableerror.SSLCertError{Message: e.Message}
 	case ccerror.UnprocessableEntityError:
 		if strings.Contains(e.Message, "Task must have a droplet. Specify droplet or assign current droplet to app.") {
-			return RunTaskError{
+			return translatableerror.RunTaskError{
 				Message: "App is not staged."}
 		}
 	case ccerror.UnverifiedServerError:
-		return command.InvalidSSLCertError{API: e.URL}
+		return translatableerror.InvalidSSLCertError{API: e.URL}
 
 	case sharedaction.NotLoggedInError:
-		return command.NotLoggedInError{BinaryName: e.BinaryName}
-	case sharedaction.NoTargetedOrganizationError:
-		return command.NoTargetedOrganizationError{BinaryName: e.BinaryName}
-	case sharedaction.NoTargetedSpaceError:
-		return command.NoTargetedSpaceError{BinaryName: e.BinaryName}
-
+		return translatableerror.NotLoggedInError{BinaryName: e.BinaryName}
+	case sharedaction.NoOrganizationTargetedError:
+		return translatableerror.NoOrganizationTargetedError{BinaryName: e.BinaryName}
+	case sharedaction.NoSpaceTargetedError:
+		return translatableerror.NoSpaceTargetedError{BinaryName: e.BinaryName}
 	case v3action.ApplicationNotFoundError:
-		return command.ApplicationNotFoundError{Name: e.Name}
+		return translatableerror.ApplicationNotFoundError{Name: e.Name}
 	case v3action.TaskWorkersUnavailableError:
-		return RunTaskError{Message: "Task workers are unavailable."}
+		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
 	case v3action.OrganizationNotFoundError:
-		return OrganizationNotFoundError{Name: e.Name}
+		return translatableerror.OrganizationNotFoundError{Name: e.Name}
+	case v3action.StagingTimeoutError:
+		return translatableerror.StagingTimeoutError{AppName: e.AppName, Timeout: e.Timeout}
 	case v3action.IsolationSegmentNotFoundError:
-		return IsolationSegmentNotFoundError{Name: e.Name}
+		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
+	case v3action.AssignDropletError:
+		return translatableerror.AssignDropletError{Message: e.Message}
 	}
 
 	return err

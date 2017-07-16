@@ -9,11 +9,10 @@ import (
 )
 
 type FakeV3CreateAppActor struct {
-	CreateApplicationByNameAndSpaceStub        func(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	CreateApplicationByNameAndSpaceStub        func(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 	createApplicationByNameAndSpaceMutex       sync.RWMutex
 	createApplicationByNameAndSpaceArgsForCall []struct {
-		name      string
-		spaceGUID string
+		createApplicationInput v3action.CreateApplicationInput
 	}
 	createApplicationByNameAndSpaceReturns struct {
 		result1 v3action.Application
@@ -29,17 +28,16 @@ type FakeV3CreateAppActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error) {
 	fake.createApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.createApplicationByNameAndSpaceReturnsOnCall[len(fake.createApplicationByNameAndSpaceArgsForCall)]
 	fake.createApplicationByNameAndSpaceArgsForCall = append(fake.createApplicationByNameAndSpaceArgsForCall, struct {
-		name      string
-		spaceGUID string
-	}{name, spaceGUID})
-	fake.recordInvocation("CreateApplicationByNameAndSpace", []interface{}{name, spaceGUID})
+		createApplicationInput v3action.CreateApplicationInput
+	}{createApplicationInput})
+	fake.recordInvocation("CreateApplicationByNameAndSpace", []interface{}{createApplicationInput})
 	fake.createApplicationByNameAndSpaceMutex.Unlock()
 	if fake.CreateApplicationByNameAndSpaceStub != nil {
-		return fake.CreateApplicationByNameAndSpaceStub(name, spaceGUID)
+		return fake.CreateApplicationByNameAndSpaceStub(createApplicationInput)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -53,10 +51,10 @@ func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpaceCallCount() int
 	return len(fake.createApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpaceArgsForCall(i int) (string, string) {
+func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpaceArgsForCall(i int) v3action.CreateApplicationInput {
 	fake.createApplicationByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.createApplicationByNameAndSpaceArgsForCall[i].name, fake.createApplicationByNameAndSpaceArgsForCall[i].spaceGUID
+	return fake.createApplicationByNameAndSpaceArgsForCall[i].createApplicationInput
 }
 
 func (fake *FakeV3CreateAppActor) CreateApplicationByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {

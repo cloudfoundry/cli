@@ -14,11 +14,11 @@ type AllowSpaceSSHCommand struct {
 	relatedCommands interface{} `related_commands:"enable-ssh, space-ssh-allowed, ssh, ssh-enabled"`
 }
 
-func (_ AllowSpaceSSHCommand) Setup(config command.Config, ui command.UI) error {
+func (AllowSpaceSSHCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ AllowSpaceSSHCommand) Execute(args []string) error {
+func (AllowSpaceSSHCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

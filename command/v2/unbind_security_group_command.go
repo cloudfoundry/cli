@@ -1,26 +1,27 @@
 package v2
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . UnbindSecurityGroupActor
 
 type UnbindSecurityGroupActor interface {
-	UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string) (v2action.Warnings, error)
-	UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string) (v2action.Warnings, error)
+	CloudControllerAPIVersion() string
+	UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
+	UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle ccv2.SecurityGroupLifecycle) (v2action.Warnings, error)
 }
 
 type UnbindSecurityGroupCommand struct {
 	RequiredArgs    flag.UnbindSecurityGroupArgs `positional-args:"yes"`
-	usage           interface{}                  `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+	Lifecycle       flag.SecurityGroupLifecycle  `long:"lifecycle" choice:"running" choice:"staging" default:"running" description:"Lifecycle phase the group applies to"`
+	usage           interface{}                  `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\n\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications."`
 	relatedCommands interface{}                  `related_commands:"apps, restart, security-groups"`
 
 	UI          command.UI
@@ -34,31 +35,38 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
 
-	ccClient, _, err := shared.NewClients(config, ui, true)
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, nil)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }
 
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
+	var err error
+	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
+		if err != nil {
+			switch e := err.(type) {
+			case translatableerror.MinimumAPIVersionNotMetError:
+				return translatableerror.LifecycleMinimumAPIVersionNotMetError{
+					CurrentVersion: e.CurrentVersion,
+					MinimumVersion: e.MinimumVersion,
+				}
+			default:
+				return err
+			}
+		}
 	}
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
-	var (
-		warnings v2action.Warnings
-	)
+	var warnings v2action.Warnings
 
 	switch {
 	case cmd.RequiredArgs.OrganizationName == "" && cmd.RequiredArgs.SpaceName == "":
@@ -74,7 +82,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         space.Name,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID)
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	case cmd.RequiredArgs.OrganizationName != "" && cmd.RequiredArgs.SpaceName != "":
 		err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
@@ -88,10 +96,10 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			"SpaceName":         cmd.RequiredArgs.SpaceName,
 			"Username":          user.Name,
 		})
-		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName)
+		warnings, err = cmd.Actor.UnbindSecurityGroupByNameOrganizationNameAndSpaceName(cmd.RequiredArgs.SecurityGroupName, cmd.RequiredArgs.OrganizationName, cmd.RequiredArgs.SpaceName, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	default:
-		return command.ThreeRequiredArgumentsError{
+		return translatableerror.ThreeRequiredArgumentsError{
 			ArgumentName1: "SECURITY_GROUP",
 			ArgumentName2: "ORG",
 			ArgumentName3: "SPACE"}
@@ -99,12 +107,23 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		switch e := err.(type) {
+		case v2action.SecurityGroupNotBoundError:
+			cmd.UI.DisplayWarning("Security group {{.Name}} not bound to this space for lifecycle phase '{{.Lifecycle}}'.",
+				map[string]interface{}{
+					"Name":      e.Name,
+					"Lifecycle": e.Lifecycle,
+				})
+			cmd.UI.DisplayOK()
+			return nil
+		default:
+			return shared.HandleError(err)
+		}
 	}
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("TIP: Changes will not apply to existing running applications until they are restarted.")
+	cmd.UI.DisplayText("TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.")
 
 	return nil
 }

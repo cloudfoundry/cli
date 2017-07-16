@@ -14,11 +14,11 @@ type UnsharePrivateDomainCommand struct {
 	relatedCommands interface{}    `related_commands:"delete-domain, domains"`
 }
 
-func (_ UnsharePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {
+func (UnsharePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UnsharePrivateDomainCommand) Execute(args []string) error {
+func (UnsharePrivateDomainCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -1,6 +1,10 @@
 ---
 platform: linux
-rootfs_uri: docker:///cloudfoundry/cli-ci
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
 
 inputs:
 - name: cli-ci
@@ -18,7 +22,9 @@ run:
   - |
     set -e
 
-    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+
+    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
     # output password into a temp file for consumption by Windows
     echo $CF_PASSWORD > cleanup-integration-outputs/cf-password
 

@@ -8,9 +8,6 @@ go get -u github.com/onsi/ginkgo/ginkgo
 echo "Installing golint..."
 go get -u github.com/golang/lint/golint
 
-echo "Installing go-i18n..."
-go get -u github.com/nicksnyder/go-i18n/goi18n
-
 echo "Installing i18n4go..."
 go get -u github.com/XenoPhex/i18n4go/i18n4go
 

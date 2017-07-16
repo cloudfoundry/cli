@@ -14,4 +14,5 @@ type Config interface {
 	Target() string
 	UnsetOrganizationInformation()
 	UnsetSpaceInformation()
+	Verbose() (bool, []string)
 }

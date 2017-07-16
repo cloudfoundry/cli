@@ -17,11 +17,11 @@ type CreateUserProvidedServiceCommand struct {
 	relatedCommands interface{}          `related_commands:"bind-service, services"`
 }
 
-func (_ CreateUserProvidedServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateUserProvidedServiceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateUserProvidedServiceCommand) Execute(args []string) error {
+func (CreateUserProvidedServiceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

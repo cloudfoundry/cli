@@ -7,10 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -69,8 +68,7 @@ var _ = Describe("org Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(
-				command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -116,7 +114,7 @@ var _ = Describe("org Command", func() {
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -158,6 +156,7 @@ var _ = Describe("org Command", func() {
 						Organization: v2action.Organization{
 							Name: "some-org",
 							GUID: "some-org-guid",
+							DefaultIsolationSegmentGUID: "default-isolation-segment-guid",
 						},
 						DomainNames: []string{
 							"a-shared.com",
@@ -174,6 +173,7 @@ var _ = Describe("org Command", func() {
 					v2action.Warnings{"warning-1", "warning-2"},
 					nil)
 			})
+
 			Context("when the v3 actor is nil", func() {
 				BeforeEach(func() {
 					cmd.ActorV3 = nil
@@ -188,8 +188,13 @@ var _ = Describe("org Command", func() {
 				BeforeEach(func() {
 					fakeActorV3.GetIsolationSegmentsByOrganizationReturns(
 						[]v3action.IsolationSegment{
-							{Name: "isolation-segment-1"},
-							{Name: "isolation-segment-2"},
+							{
+								Name: "isolation-segment-1",
+								GUID: "default-isolation-segment-guid",
+							}, {
+								Name: "isolation-segment-2",
+								GUID: "some-other-isolation-segment-guid",
+							},
 						},
 						v3action.Warnings{"warning-3", "warning-4"},
 						nil)
@@ -206,14 +211,10 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-4"))
 
 					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
-
 					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
-
 					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
-
 					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
-
-					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1, isolation-segment-2"))
+					Expect(testUI.Out).To(Say("isolation segments:\\s+isolation-segment-1 \\(default\\), isolation-segment-2"))
 
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
 
@@ -240,13 +241,9 @@ var _ = Describe("org Command", func() {
 					Expect(testUI.Err).To(Say("warning-2"))
 
 					Expect(testUI.Out).To(Say("name:\\s+%s", cmd.RequiredArgs.Organization))
-
 					Expect(testUI.Out).To(Say("domains:\\s+a-shared.com, b-private.com, c-shared.com, d-private.com"))
-
 					Expect(testUI.Out).To(Say("quota:\\s+some-quota"))
-
 					Expect(testUI.Out).To(Say("spaces:\\s+space1, space2"))
-
 					Expect(testUI.Out).ToNot(Say("isolation segments:"))
 
 					Expect(fakeConfig.CurrentUserCallCount()).To(Equal(1))
@@ -283,7 +280,7 @@ var _ = Describe("org Command", func() {
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))

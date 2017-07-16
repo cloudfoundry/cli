@@ -37,6 +37,9 @@ func (org *Organization) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Organization codetemplates/delete_async_by_guid.go.template delete_organization.go
+//go:generate go run $GOPATH/src/code.cloudfoundry.org/cli/util/codegen/generate.go Organization codetemplates/delete_async_by_guid_test.go.template delete_organization_test.go
+
 // GetOrganization returns an Organization associated with the provided guid.
 func (client *Client) GetOrganization(guid string) (Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
@@ -53,7 +56,7 @@ func (client *Client) GetOrganization(guid string) (Organization, Warnings, erro
 	}
 
 	err = client.connection.Make(request, &response)
-	return Organization(org), response.Warnings, err
+	return org, response.Warnings, err
 }
 
 // GetOrganizations returns back a list of Organizations based off of the

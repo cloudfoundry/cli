@@ -18,11 +18,11 @@ type ScaleCommand struct {
 	relatedCommands interface{}  `related_commands:"push"`
 }
 
-func (_ ScaleCommand) Setup(config command.Config, ui command.UI) error {
+func (ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ScaleCommand) Execute(args []string) error {
+func (ScaleCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

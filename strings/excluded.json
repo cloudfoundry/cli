@@ -1,5 +1,7 @@
 {
   "excludedStrings": [
+    "docker-username",
+    "CF_DOCKER_PASSWORD",
     ".",
     "\\",
     "help",
@@ -573,6 +575,7 @@
     "processing error stream closed",
     "processing event stream closed",
     "processing warnings stream closed",
+    "process apply stream:",
     "starting progress bar",
     "starting create/update:",
     "merging manifest:",
@@ -582,11 +585,23 @@
     "Packaging files to upload...",
     "display changes:",
     "ignoring event",
+    "staging",
+    "reading manifest:",
+    "checking manifest",
+    "reading manifest",
+    "pathToManifest",
+    "could not find",
+    "using specified manifest file",
+    "searching for manifest file",
+    "skipping reading of manifest",
 
     "(?i).*(?:token|password).*",
     "Host",
     "{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}",
-    "temp"
+    "temp",
+    "CRASHED",
+    "DOWN",
+    "\\n"
   ],
   "excludedRegexps": [
     "^(?:\\s*{{.\\w+}}[^\\w{]*)+$",

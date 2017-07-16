@@ -20,7 +20,7 @@ var _ = Describe("app command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("app", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("app - Display health and status for app"))
+				Eventually(session).Should(Say("app - Display health and status for an app"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf app APP_NAME"))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -102,6 +102,16 @@ var _ = Describe("app command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		Context("when the app name is not provided", func() {
+			It("tells the user that the app name is required, prints help text, and exits 1", func() {
+				session := helpers.CF("app")
+
+				Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+				Eventually(session.Out).Should(Say("NAME:"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		Context("when the app does not exist", func() {
 			Context("when no flags are given", func() {
 				It("tells the user that the app is not found and exits 1", func() {
@@ -175,7 +185,7 @@ applications:
 					Eventually(session).Should(Say("instances:\\s+2/2"))
 					Eventually(session).Should(Say("isolation segment:\\s+%s", RealIsolationSegment))
 					Eventually(session).Should(Say("usage:\\s+128M x 2 instances"))
-					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("routes:\\s+[a-z-]+\\.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
@@ -219,7 +229,7 @@ applications:
 					Eventually(session).Should(Say("requested state:\\s+started"))
 					Eventually(session).Should(Say("instances:\\s+0/0"))
 					Eventually(session).Should(Say("usage:\\s+128M x 0 instances"))
-					Eventually(session).Should(Say("routes:\\s+[a-z-]+.%s, %s:\\d+", domainName, tcpDomain.Name))
+					Eventually(session).Should(Say("routes:\\s+[a-z-]+\\.%s, %s:\\d+", domainName, tcpDomain.Name))
 					Eventually(session).Should(Say("last uploaded:"))
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))

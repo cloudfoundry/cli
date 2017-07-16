@@ -5,11 +5,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/api/plugin"
+	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	. "github.com/onsi/ginkgo"
@@ -81,13 +81,14 @@ var _ = Describe("install actions", func() {
 
 	Describe("DownloadExecutableBinaryFromURL", func() {
 		var (
-			path        string
-			size        int64
-			downloadErr error
+			path            string
+			downloadErr     error
+			fakeProxyReader *pluginfakes.FakeProxyReader
 		)
 
 		JustBeforeEach(func() {
-			path, size, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir)
+			fakeProxyReader = new(pluginfakes.FakeProxyReader)
+			path, downloadErr = actor.DownloadExecutableBinaryFromURL("some-plugin-url.com", tempPluginDir, fakeProxyReader)
 		})
 
 		Context("when the downloaded is successful", func() {
@@ -97,7 +98,7 @@ var _ = Describe("install actions", func() {
 
 			BeforeEach(func() {
 				data = []byte("some test data")
-				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
+				fakeClient.DownloadPluginStub = func(_ string, path string, _ plugin.ProxyReader) error {
 					err := ioutil.WriteFile(path, data, 0700)
 					Expect(err).ToNot(HaveOccurred())
 					return nil
@@ -108,12 +109,12 @@ var _ = Describe("install actions", func() {
 				fileData, err := ioutil.ReadFile(path)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fileData).To(Equal(data))
-				Expect(size).To(BeEquivalentTo(len(data)))
 
 				Expect(fakeClient.DownloadPluginCallCount()).To(Equal(1))
-				pluginURL, downloadPath := fakeClient.DownloadPluginArgsForCall(0)
+				pluginURL, downloadPath, proxyReader := fakeClient.DownloadPluginArgsForCall(0)
 				Expect(pluginURL).To(Equal("some-plugin-url.com"))
 				Expect(downloadPath).To(Equal(path))
+				Expect(proxyReader).To(Equal(fakeProxyReader))
 			})
 		})
 
@@ -127,21 +128,6 @@ var _ = Describe("install actions", func() {
 
 			It("returns the error", func() {
 				Expect(downloadErr).To(MatchError(expectedErr))
-			})
-		})
-
-		Context("when there is an error getting the file size", func() {
-			BeforeEach(func() {
-				fakeClient.DownloadPluginStub = func(pluginURL string, path string) error {
-					err := os.Remove(path)
-					Expect(err).ToNot(HaveOccurred())
-					return nil
-				}
-			})
-
-			It("returns the error", func() {
-				_, isPathError := downloadErr.(*os.PathError)
-				Expect(isPathError).To(BeTrue())
 			})
 		})
 	})
@@ -172,85 +158,6 @@ var _ = Describe("install actions", func() {
 		Context("when the file does not exist", func() {
 			It("returns false", func() {
 				Expect(actor.FileExists("/some/path/that/does/not/exist")).To(BeFalse())
-			})
-		})
-	})
-
-	Describe("GetPluginInfoFromRepository", func() {
-		BeforeEach(func() {
-		})
-		Context("When getting the plugin repository errors", func() {
-			BeforeEach(func() {
-				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{}, errors.New("some-error"))
-			})
-
-			It("returns the error", func() {
-				_, err := actor.GetPluginInfoFromRepository("some-plugin", configv3.PluginRepository{Name: "some-repository", URL: "some-url"})
-				Expect(err).To(MatchError(errors.New("some-error")))
-			})
-		})
-
-		Context("when getting the plugin repository succeeds", func() {
-			BeforeEach(func() {
-				fakeClient.GetPluginRepositoryReturns(plugin.PluginRepository{
-					Plugins: []plugin.Plugin{
-						{
-							Name:    "some-plugin",
-							Version: "1.2.3",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-darwin-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://some-windows-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://some-linux-url", Checksum: "lastchecksum"},
-							},
-						},
-						{
-							Name:    "linux-plugin",
-							Version: "1.5.0",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://another-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://last-url", Checksum: "lastchecksum"},
-							},
-						},
-						{
-							Name:    "osx-plugin",
-							Version: "3.0.0",
-							Binaries: []plugin.PluginBinary{
-								{Platform: "osx", URL: "http://some-url", Checksum: "somechecksum"},
-								{Platform: "win64", URL: "http://another-url", Checksum: "anotherchecksum"},
-								{Platform: "linux64", URL: "http://last-url", Checksum: "lastchecksum"},
-							},
-						},
-					},
-				}, nil)
-			})
-
-			Context("when the specified plugin does not exist in the repository", func() {
-				It("returns a PluginNotFoundInRepositoryError", func() {
-					_, err := actor.GetPluginInfoFromRepository("plugin-i-dont-exist", configv3.PluginRepository{Name: "some-repo", URL: "some-url"})
-					Expect(err).To(MatchError(PluginNotFoundInRepositoryError{
-						PluginName:     "plugin-i-dont-exist",
-						RepositoryName: "some-repo",
-					}))
-				})
-			})
-
-			Context("when the specified plugin exists", func() {
-				It("returns the plugin info", func() {
-					pluginInfo, err := actor.GetPluginInfoFromRepository("some-plugin", configv3.PluginRepository{Name: "some-repo", URL: "some-url"})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(pluginInfo.Name).To(Equal("some-plugin"))
-					Expect(pluginInfo.Version).To(Equal("1.2.3"))
-
-					switch runtime.GOOS {
-					case "linux":
-						Expect(pluginInfo.URL).To(Equal("http://some-linux-url"))
-					case "darwin":
-						Expect(pluginInfo.URL).To(Equal("http://some-darwin-url"))
-					case "windows":
-						Expect(pluginInfo.URL).To(Equal("http://some-windows-url"))
-					}
-				})
 			})
 		})
 	})
@@ -299,7 +206,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{}))
+				Expect(validateErr).To(MatchError(PluginInvalidError{Err: expectedErr}))
 			})
 		})
 

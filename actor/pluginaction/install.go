@@ -1,14 +1,13 @@
 package pluginaction
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
 	"code.cloudfoundry.org/gofileutils/fileutils"
@@ -27,19 +26,13 @@ type CommandList interface {
 	HasAlias(string) bool
 }
 
-type PluginInfo struct {
-	Name     string
-	Version  string
-	URL      string
-	Checksum string
-}
-
 // PluginInvalidError is returned with a plugin is invalid because it is
 // missing a name or has 0 commands.
 type PluginInvalidError struct {
+	Err error
 }
 
-func (_ PluginInvalidError) Error() string {
+func (PluginInvalidError) Error() string {
 	return "File is not a valid cf CLI plugin binary."
 }
 
@@ -52,19 +45,8 @@ type PluginCommandsConflictError struct {
 	CommandNames   []string
 }
 
-func (_ PluginCommandsConflictError) Error() string {
+func (PluginCommandsConflictError) Error() string {
 	return ""
-}
-
-// PluginNotFoundError is an error returned when a plugin is not found.
-type PluginNotFoundInRepositoryError struct {
-	PluginName     string
-	RepositoryName string
-}
-
-// Error outputs a plugin not found error message.
-func (e PluginNotFoundInRepositoryError) Error() string {
-	return fmt.Sprintf("Plugin %s not found in repository %s", e.PluginName, e.RepositoryName)
 }
 
 // CreateExecutableCopy makes a temporary copy of a plugin binary and makes it
@@ -100,23 +82,18 @@ func (actor Actor) CreateExecutableCopy(path string, tempPluginDir string) (stri
 
 // DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
 // it exists.
-func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string) (string, int64, error) {
+func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error) {
 	tempFile, err := makeTempFile(tempPluginDir)
 	if err != nil {
-		return "", 0, err
+		return "", err
 	}
 
-	err = actor.client.DownloadPlugin(pluginURL, tempFile.Name())
+	err = actor.client.DownloadPlugin(pluginURL, tempFile.Name(), proxyReader)
 	if err != nil {
-		return "", 0, err
+		return "", err
 	}
 
-	stat, err := os.Stat(tempFile.Name())
-	if err != nil {
-		return "", 0, err
-	}
-
-	return tempFile.Name(), stat.Size(), nil
+	return tempFile.Name(), nil
 }
 
 // FileExists returns true if the file exists. It returns false if the file
@@ -129,7 +106,7 @@ func (actor Actor) FileExists(path string) bool {
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
 	plugin, err := pluginMetadata.GetMetadata(path)
 	if err != nil || plugin.Name == "" || len(plugin.Commands) == 0 {
-		return configv3.Plugin{}, PluginInvalidError{}
+		return configv3.Plugin{}, PluginInvalidError{Err: err}
 	}
 
 	installedPlugins := actor.config.Plugins()
@@ -166,15 +143,15 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 		}
 	}
 
-	sort.Slice(conflictingNames, func(i, j int) bool {
-		return strings.ToLower(conflictingNames[i]) < strings.ToLower(conflictingNames[j])
-	})
-
-	sort.Slice(conflictingAliases, func(i, j int) bool {
-		return strings.ToLower(conflictingAliases[i]) < strings.ToLower(conflictingAliases[j])
-	})
-
 	if len(conflictingNames) > 0 || len(conflictingAliases) > 0 {
+		sort.Slice(conflictingNames, func(i, j int) bool {
+			return strings.ToLower(conflictingNames[i]) < strings.ToLower(conflictingNames[j])
+		})
+
+		sort.Slice(conflictingAliases, func(i, j int) bool {
+			return strings.ToLower(conflictingAliases[i]) < strings.ToLower(conflictingAliases[j])
+		})
+
 		return configv3.Plugin{}, PluginCommandsConflictError{
 			PluginName:     plugin.Name,
 			PluginVersion:  plugin.Version.String(),
@@ -184,26 +161,6 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 	}
 
 	return plugin, nil
-}
-
-func (actor Actor) GetPluginInfoFromRepository(pluginName string, pluginRepo configv3.PluginRepository) (PluginInfo, error) {
-	pluginRepository, err := actor.client.GetPluginRepository(pluginRepo.URL)
-	if err != nil {
-		return PluginInfo{}, err
-	}
-
-	currentPlatform := generic.GeneratePlatform(runtime.GOOS, runtime.GOARCH)
-	for _, plugin := range pluginRepository.Plugins {
-		if plugin.Name == pluginName {
-			for _, pluginBinary := range plugin.Binaries {
-				if pluginBinary.Platform == currentPlatform {
-					return PluginInfo{Name: plugin.Name, Version: plugin.Version, URL: pluginBinary.URL, Checksum: pluginBinary.Checksum}, nil
-				}
-			}
-		}
-	}
-
-	return PluginInfo{}, PluginNotFoundInRepositoryError{PluginName: pluginName, RepositoryName: pluginRepo.Name}
 }
 
 func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) error {

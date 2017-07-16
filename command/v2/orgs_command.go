@@ -11,11 +11,11 @@ type OrgsCommand struct {
 	usage interface{} `usage:"CF_NAME orgs"`
 }
 
-func (_ OrgsCommand) Setup(config command.Config, ui command.UI) error {
+func (OrgsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ OrgsCommand) Execute(args []string) error {
+func (OrgsCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

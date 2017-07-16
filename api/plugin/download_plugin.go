@@ -2,14 +2,14 @@ package plugin
 
 import "io/ioutil"
 
-func (client *Client) DownloadPlugin(pluginURL string, path string) error {
+func (client *Client) DownloadPlugin(pluginURL string, path string, proxyReader ProxyReader) error {
 	request, err := client.newGETRequest(pluginURL)
 	if err != nil {
 		return err
 	}
 
 	response := Response{}
-	err = client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response, proxyReader)
 	if err != nil {
 		return err
 	}

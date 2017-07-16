@@ -3,11 +3,11 @@ package shared
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appStarting <-chan bool, apiWarnings <-chan string, apiErrs <-chan error) error {
-	ui.DisplayText("Staging app and tracing logs...")
-	var breakAppStart, breakWarnings, breakAPIErrs bool
+func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationState, apiWarnings <-chan string, apiErrs <-chan error) error {
+	var breakAppState, breakWarnings, breakAPIErrs bool
 	for {
 		select {
 		case message, ok := <-messages:
@@ -18,13 +18,22 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			if message.Staging() {
 				ui.DisplayLogMessage(message, false)
 			}
-		case appStart, ok := <-appStarting:
+		case state, ok := <-appState:
 			if !ok {
-				breakAppStart = true
+				breakAppState = true
 				break
 			}
 
-			if appStart {
+			switch state {
+			case v2action.ApplicationStateStopping:
+				ui.DisplayNewline()
+				ui.DisplayText("Stopping app...")
+
+			case v2action.ApplicationStateStaging:
+				ui.DisplayNewline()
+				ui.DisplayText("Staging app and tracing logs...")
+
+			case v2action.ApplicationStateStarting:
 				ui.DisplayNewline()
 				ui.DisplayText("Waiting for app to start...")
 			}
@@ -54,23 +63,26 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 
 			switch err := apiErr.(type) {
 			case v2action.StagingFailedError:
-				return StagingFailedError{Message: err.Error()}
+				return translatableerror.StagingFailedError{Message: err.Error()}
 			case v2action.StagingFailedNoAppDetectedError:
-				return StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
+				return translatableerror.StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
 			case v2action.StagingTimeoutError:
-				return StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
+				return translatableerror.StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
 			case v2action.ApplicationInstanceCrashedError:
-				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case v2action.ApplicationInstanceFlappingError:
-				return UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case v2action.StartupTimeoutError:
-				return StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
+				return translatableerror.StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
 			default:
 				return HandleError(apiErr)
 			}
 		}
 
-		if breakAppStart && breakWarnings && breakAPIErrs {
+		// only wait for non-nil channels to be closed
+		if (appState == nil || breakAppState) &&
+			(apiWarnings == nil || breakWarnings) &&
+			(apiErrs == nil || breakAPIErrs) {
 			return nil
 		}
 	}

@@ -152,16 +152,16 @@
     "translation": "' ist kein registrierter Befehl. Siehe 'cf help'"
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes' muss eine Liste sein"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "'{{.VersionShort}}' und '{{.VersionLong}}' werden auch akzeptiert."
-  },
-  {
-    "id": "(process | port | http)",
-    "translation": "(Prozess | Port | HTTP)"
   },
   {
     "id": ") already exists.",
@@ -181,6 +181,14 @@
   },
   {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
+    "id": "2006-01-02 15:04:05 PM",
+    "translation": ""
+  },
+  {
+    "id": "\u003call\u003e",
     "translation": ""
   },
   {
@@ -356,6 +364,14 @@
     "translation": ""
   },
   {
+    "id": "App {{.AppName}} is already started.",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} is already stopped",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -390,6 +406,10 @@
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
     "translation": "Anwendung {{.AppName}} darf nicht mit 'routes' and 'no-hostname' zusammen konfiguriert werden"
+  },
+  {
+    "id": "Applications in spaces of this org that have no isolation segment assigned will be placed in the platform default isolation segment.",
+    "translation": ""
   },
   {
     "id": "Applications in this space will be placed in isolation segment {{.orgIsolationSegment}}.",
@@ -490,10 +510,6 @@
   {
     "id": "BUILDPACKS:",
     "translation": ""
-  },
-  {
-    "id": "BUILDPACK_NAME",
-    "translation": "BUILDPACKNAME"
   },
   {
     "id": "Basic ",
@@ -652,7 +668,7 @@
     "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]"
   },
   {
-    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]\\n\\nTIP: Changes will not apply to existing running applications until they are restarted.",
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE] [--lifecycle (running | staging)]\\n\\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]\\n\\nTIPP: Änderungen gelten erst dann für vorhandene aktive Anwendungen, wenn diese erneut gestartet wurden."
   },
   {
@@ -1044,12 +1060,12 @@
     "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Fordert zur Bestätigung auf, es sei denn, '-f' wird angegeben."
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME install-plugin -r My-Repo plugin-echo",
     "translation": "CF_NAME install-plugin -r My-Repo plugin-echo"
+  },
+  {
+    "id": "CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": ""
   },
   {
     "id": "CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64",
@@ -1184,10 +1200,6 @@
     "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\\n\\nWARNUNG: Bei dieser Operation wird davon ausgegangen, dass der für dieses Serviceangebot verantwortliche Service-Broker nicht mehr verfügbar ist. Ferner wird angenommen, dass alle Serviceinstanzen gelöscht wurden und verwaiste Datensätze in der Cloud Foundry-Datenbank hinterlassen haben. Das gesamte Wissen des Service einschließen Serviceinstanzen und Servicebindungen wird aus Cloud Foundry entfernt. Es wird kein Versuch unternommen, den Service-Broker zu kontaktieren; die Ausführung dieses Befehls ohne Löschen des Service-Brokers führt zu verwaisten Serviceinstanzen. Nach der Ausführung dieses Befehls möchten Sie möglicherweise delete-service-auth-token oder delete-service-broker ausführen, um die Bereinigung abzuschließen."
   },
   {
-    "id": "CF_NAME push ",
-    "translation": "CF_NAME push "
-  },
-  {
     "id": "CF_NAME quota QUOTA",
     "translation": "CF_NAME quota QUOTA"
   },
@@ -1242,6 +1254,10 @@
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nEXAMPLES:\\n   CF_NAME repo-plugins -r PrivateRepo",
     "translation": "CF_NAME repo-plugins [-r REPO_NAME]\\n\\nBEISPIELE:\\n   CF_NAME repo-plugins -r PrivateRepo"
+  },
+  {
+    "id": "CF_NAME reset-org-default-isolation-segment ORG_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME reset-space-isolation-segment SPACE_NAME",
@@ -1346,6 +1362,10 @@
   {
     "id": "CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\\n\\nTIP: 'none' has been deprecated but is accepted for 'process'.\\n\\nEXAMPLES:\\n   cf set-health-check worker-app process\\n   cf set-health-check my-web-app http --endpoint /foo",
     "translation": "CF_NAME set-health-check APP_NAME (process | port | http [--endpoint PATH])\\n\\nTIPP: 'none' wird nicht mehr verwendet, aber für 'process' akzeptiert.\\n\\nBEISPIELE:\\n   cf set-health-check worker-app process\\n   cf set-health-check my-web-app http --endpoint /foo"
+  },
+  {
+    "id": "CF_NAME set-org-default-isolation-segment ORG_NAME SEGMENT_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
@@ -1504,7 +1524,7 @@
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
-    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\nTIP: Changes will not apply to existing running applications until they are restarted.",
+    "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE [--lifecycle (running | staging)]\\n\\nTIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\\n\\nTIPP: Änderungen gelten erst dann für vorhandene aktive Anwendungen, wenn diese erneut gestartet wurden."
   },
   {
@@ -1660,15 +1680,35 @@
     "translation": "CF_NAME update-user-provided-service my-route-service -r https://example.com"
   },
   {
-    "id": "CF_NAME v3-create-app --name [name]",
+    "id": "CF_NAME v3-app APP_NAME [--guid]",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-package --name [name]",
+    "id": "CF_NAME v3-create-app APP_NAME",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
+    "id": "CF_NAME v3-create-package APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-restart APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-start APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-stop APP_NAME",
     "translation": ""
   },
   {
@@ -1690,10 +1730,6 @@
   {
     "id": "COLOR must be \"true\" or \"false\"",
     "translation": ""
-  },
-  {
-    "id": "COMMAND",
-    "translation": "BEFEHL"
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1762,6 +1798,10 @@
   {
     "id": "Changing password...",
     "translation": "Ändern des Kennworts..."
+  },
+  {
+    "id": "Checking for existing files on server...",
+    "translation": ""
   },
   {
     "id": "Checking for route...",
@@ -2004,6 +2044,10 @@
     "translation": ""
   },
   {
+    "id": "Creating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Erstellen von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
@@ -2110,14 +2154,6 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden"
-  },
-  {
-    "id": "DISK",
-    "translation": "PLATTE"
-  },
-  {
-    "id": "DOCKER_IMAGE",
-    "translation": "DOCKER-IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -2368,7 +2404,7 @@
     "translation": "Grenzwert für Platte (z.B. 256M, 1024M, 1G)"
   },
   {
-    "id": "Display health and status for app",
+    "id": "Display health and status for an app",
     "translation": "Zustand und Status für App anzeigen"
   },
   {
@@ -2378,6 +2414,10 @@
   {
     "id": "Do not execute a remote command",
     "translation": "Fernbefehl nicht ausführen"
+  },
+  {
+    "id": "Do not map a route to this app",
+    "translation": ""
   },
   {
     "id": "Do not map a route to this app and remove routes from previous pushes of this app",
@@ -2393,6 +2433,10 @@
   },
   {
     "id": "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?",
+    "translation": ""
+  },
+  {
+    "id": "Docker password",
     "translation": ""
   },
   {
@@ -2526,6 +2570,10 @@
   {
     "id": "Env variable {{.VarName}} was not set.",
     "translation": "Umgebungsvariable {{.VarName}} wurde nicht festgelegt."
+  },
+  {
+    "id": "Environment variable CF_DOCKER_PASSWORD not set.",
+    "translation": ""
   },
   {
     "id": "Error accessing org {{.OrgName}} for GUID': ",
@@ -3232,10 +3280,6 @@
     "translation": "HEALTH_CHECK_TYPE muss \"port\", \"process\" oder \"http\" sein"
   },
   {
-    "id": "HOST",
-    "translation": "HOST"
-  },
-  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -3512,6 +3556,10 @@
     "translation": "Falsche Verwendung:"
   },
   {
+    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together.",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
@@ -3526,6 +3574,10 @@
   {
     "id": "Incorrect usage: --sso-passcode flag cannot be used with --sso",
     "translation": ""
+  },
+  {
+    "id": "Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "Falsche Verwendung: Für den Push-Befehl ist ein App-Name erforderlich. Der App-Name kann als Argument oder mit einer 'manifest.yml'-Datei angegeben werden."
   },
   {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
@@ -3562,6 +3614,10 @@
   {
     "id": "Instance must be a non-negative integer",
     "translation": "Instanz muss eine positive ganze Zahl sein"
+  },
+  {
+    "id": "Invalid JSON content from server: {{.Err}}",
+    "translation": ""
   },
   {
     "id": "Invalid JSON response from server",
@@ -3698,6 +3754,14 @@
   {
     "id": "Last Operation",
     "translation": "Letzte Operation"
+  },
+  {
+    "id": "Lifecycle phase the group applies to",
+    "translation": ""
+  },
+  {
+    "id": "Lifecycle value 'staging' requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -3844,10 +3908,6 @@
     "translation": "Im Repository '{{.repoName}}' nach '{{.filePath}}' suchen"
   },
   {
-    "id": "MANIFEST_PATH",
-    "translation": "MANIFEST_PATH (MANIFESTPFAD)"
-  },
-  {
     "id": "MEMORY",
     "translation": "HAUPTSPEICHER"
   },
@@ -3938,10 +3998,6 @@
   {
     "id": "NEW_NAME",
     "translation": "NEUER NAME"
-  },
-  {
-    "id": "NUM_INSTANCES",
-    "translation": "ANZAHL INSTANZEN"
   },
   {
     "id": "Name",
@@ -4308,6 +4364,10 @@
     "translation": "Kennwort"
   },
   {
+    "id": "Password used for private docker repository",
+    "translation": ""
+  },
+  {
     "id": "Password verification does not match",
     "translation": "Kennwortüberprüfung stellt keine Übereinstimmung fest"
   },
@@ -4392,6 +4452,10 @@
     "translation": "Bitte melden Sie sich erneut an"
   },
   {
+    "id": "Please provide a password.",
+    "translation": ""
+  },
+  {
     "id": "Please provide the space within the organization containing the target application",
     "translation": "Bitte stellen Sie einen Bereich innerhalb der Organisation zur Verfügung, der die Zielanwendung enthält"
   },
@@ -4405,6 +4469,10 @@
   },
   {
     "id": "Plugin installation cancelled.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}.",
     "translation": ""
   },
   {
@@ -4424,12 +4492,16 @@
     "translation": ""
   },
   {
-    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos.",
     "translation": ""
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
     "translation": "Das angeforderte Plug-in verfügt über keine Binärdatei für Ihr Betriebssystem: "
+  },
+  {
+    "id": "Plugin requested has no binary available for your platform.",
+    "translation": ""
   },
   {
     "id": "Plugin {{.Name}} successfully uninstalled.",
@@ -4453,6 +4525,10 @@
   },
   {
     "id": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}.\nUse '{{.BinaryName}} repo-plugins -r {{.RepositoryName}}' to list plugins available in the repo.",
+    "translation": ""
+  },
+  {
+    "id": "Plugin {{.PluginName}} not found on disk or in any registered repo.\nUse '{{.BinaryName}} repo-plugins' to list plugins available in the repos.",
     "translation": ""
   },
   {
@@ -4480,7 +4556,7 @@
     "translation": "Plug-in {{.PluginName}} V{{.Version}} wurde erfolgreich installiert."
   },
   {
-    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}",
     "translation": ""
   },
   {
@@ -4524,10 +4600,6 @@
     "translation": "Der Prozess wurde durch das folgende Signal beendet: {{.Signal}}. Beendet mit {{.ExitCode}}"
   },
   {
-    "id": "Processing files...",
-    "translation": ""
-  },
-  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },
@@ -4550,22 +4622,6 @@
   {
     "id": "Push a new app or sync changes to an existing app",
     "translation": "Neue App oder Synchronisationsänderungen mit einer Push-Operation an eine vorhandene App übertragen"
-  },
-  {
-    "id": "Push a single app (with or without a manifest)",
-    "translation": "Eine einzelne App mit einer Push-Operation übertragen (mit oder ohne Manifest):"
-  },
-  {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf push [-f MANIFEST_PATH]",
-    "translation": "Für eine einzelne App eine Push-Operation durchführen (mit oder ohne Manifest):\\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:\\n   cf push [-f MANIFEST_PATH]"
-  },
-  {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
-    "translation": ""
-  },
-  {
-    "id": "Push multiple apps with a manifest",
-    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:"
   },
   {
     "id": "QUOTA",
@@ -4620,10 +4676,6 @@
     "translation": ""
   },
   {
-    "id": "ROUTE_PATH",
-    "translation": "ROUTENPFAD"
-  },
-  {
     "id": "RUNNING",
     "translation": ""
   },
@@ -4645,6 +4697,10 @@
   },
   {
     "id": "Really delete the org {{.OrgName}}, including its spaces, apps, service instances, routes, private domains and space-scoped service brokers?",
+    "translation": ""
+  },
+  {
+    "id": "Really delete the space {{.SpaceName}}?",
     "translation": ""
   },
   {
@@ -4792,6 +4848,10 @@
     "translation": "Berichtet, ob SSH für eine Anwendungscontainerinstanz aktiviert ist"
   },
   {
+    "id": "Repository username; used with password from environment variable CF_DOCKER_PASSWORD",
+    "translation": ""
+  },
+  {
     "id": "Repository: ",
     "translation": "Repository: "
   },
@@ -4816,7 +4876,15 @@
     "translation": "Reservierte Routenports"
   },
   {
+    "id": "Reset the default isolation segment used for apps in spaces of an org",
+    "translation": ""
+  },
+  {
     "id": "Reset the isolation segment assignment of a space to the org's default",
+    "translation": ""
+  },
+  {
+    "id": "Resetting default isolation segment of org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -4840,8 +4908,16 @@
     "translation": "Eine App erneut starten"
   },
   {
+    "id": "Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
     "translation": "Erneutes Starten von Instanz {{.Instance}} der Anwendung {{.AppName}} als {{.Username}}"
+  },
+  {
+    "id": "Restrict search for plugin to this registered repository",
+    "translation": ""
   },
   {
     "id": "Retrieve an individual feature flag with status",
@@ -5060,10 +5136,6 @@
     "translation": ""
   },
   {
-    "id": "STACK",
-    "translation": "STACK"
-  },
-  {
     "id": "SUCCEEDED",
     "translation": ""
   },
@@ -5089,6 +5161,10 @@
   },
   {
     "id": "Security group '{{.Name}}' not found.",
+    "translation": ""
+  },
+  {
+    "id": "Security group {{.Name}} not bound to this space for lifecycle phase '{{.Lifecycle}}'.",
     "translation": ""
   },
   {
@@ -5216,6 +5292,14 @@
     "translation": "Zielorganisation oder Zielbereich festlegen oder anzeigen"
   },
   {
+    "id": "Set the default isolation segment used for apps in spaces in an org",
+    "translation": ""
+  },
+  {
+    "id": "Set the droplet used to run an app",
+    "translation": ""
+  },
+  {
     "id": "Set to 'port' or 'none'",
     "translation": ""
   },
@@ -5224,8 +5308,16 @@
     "translation": "Festlegen von API-Endpunkt auf {{.Endpoint}}..."
   },
   {
+    "id": "Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Festlegen von Umgebungsvariable '{{.VarName}}' auf '{{.VarValue}}' für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
+  },
+  {
+    "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
@@ -5384,6 +5476,10 @@
     "translation": ""
   },
   {
+    "id": "Staging package for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
@@ -5416,6 +5512,10 @@
     "translation": "Starten der App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
@@ -5444,8 +5544,20 @@
     "translation": "Eine App stoppen"
   },
   {
+    "id": "Stopping app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Stoppen der App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
+  },
+  {
+    "id": "Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
+    "id": "Stopping app...",
+    "translation": ""
   },
   {
     "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
@@ -5458,10 +5570,6 @@
   {
     "id": "TASK_ID",
     "translation": ""
-  },
-  {
-    "id": "TIMEOUT",
-    "translation": "ZEITLIMIT"
   },
   {
     "id": "TIP:\n",
@@ -5477,6 +5585,10 @@
   },
   {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
+    "id": "TIP: Changes require an app restart (for running) or restage (for staging) to apply to existing applications.",
     "translation": ""
   },
   {
@@ -5596,10 +5708,6 @@
     "translation": ""
   },
   {
-    "id": "The desired application name",
-    "translation": ""
-  },
-  {
     "id": "The domain",
     "translation": "Die Domäne"
   },
@@ -5626,6 +5734,10 @@
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "Die Datei {{.PluginExecutableName}} ist bereits im Plug-in-Verzeichnis vorhanden.\n"
+  },
+  {
+    "id": "The guid of the droplet to use",
+    "translation": ""
   },
   {
     "id": "The guid of the package to stage",
@@ -5744,12 +5856,20 @@
     "translation": "Der Pfad zur Buildpackdatei"
   },
   {
+    "id": "The plugin has been uninstalled but removing the plugin binary failed.\nRemove it manually or subsequent installations of the plugin may fail\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "The plugin name",
     "translation": "Der Plug-in-Name"
   },
   {
     "id": "The plugin repo name",
     "translation": "Der Name des Plug-in-Repositorys"
+  },
+  {
+    "id": "The plugin's uninstall method returned an unexpected error.\nThe plugin uninstall will proceed. Contact the plugin author if you need help.\n{{.Err}}",
+    "translation": ""
   },
   {
     "id": "The position that sets priority",
@@ -5904,7 +6024,7 @@
     "translation": ""
   },
   {
-    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
     "translation": ""
   },
   {
@@ -6010,6 +6130,10 @@
   {
     "id": "Unable to acquire one time code from authorization response",
     "translation": "Es konnte kein Zeitcode aus der Autorisierungsantwort bezogen werden"
+  },
+  {
+    "id": "Unable to assign droplet: {{.CloudControllerMessage}}",
+    "translation": ""
   },
   {
     "id": "Unable to authenticate.",
@@ -6188,6 +6312,10 @@
     "translation": ""
   },
   {
+    "id": "Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Aktualisieren von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
@@ -6242,6 +6370,10 @@
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "Hochladen von App-Dateien von: {{.Path}}"
+  },
+  {
+    "id": "Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
@@ -6308,6 +6440,14 @@
     "translation": "Benutzername"
   },
   {
+    "id": "Using docker repository password from environment variable CF_DOCKER_PASSWORD.",
+    "translation": ""
+  },
+  {
+    "id": "Using manifest file {{.Path}}",
+    "translation": "Verwenden von Manifestdatei {{.Path}}"
+  },
+  {
     "id": "Using manifest file {{.Path}}\n",
     "translation": "Verwenden von Manifestdatei {{.Path}}\n"
   },
@@ -6364,6 +6504,10 @@
     "translation": "WARNUNG: Diese Operation ist eine interne Operation in Cloud Foundry; Service-Broker werden nicht kontaktiert und Ressourcen für Serviceinstanzen werden nicht geändert. Der wichtigste Anwendungsfall für diese Operation ist das Ersetzen eines Service-Brokers, wobei die V1 Service Broker-API auf einem Broker implementiert wird, der die V2 API durch eine erneute Zuordnung von Serviceinstanzen von V1-Plänen auf V2-Pläne implementiert.  Wir empfehlen den V1-Plan privat zu erstellen oder den V1-Broker zu beenden, um zu verhindern, dass weitere Instanzen erstellt werden. Sobald die Serviceinstanzen migriert wurden, können die V1-Services und -Pläne aus Cloud Foundry entfernt werden."
   },
   {
+    "id": "Waiting for API to complete processing files...",
+    "translation": ""
+  },
+  {
     "id": "Waiting for app to start...",
     "translation": ""
   },
@@ -6414,10 +6558,6 @@
   {
     "id": "[--allow-paid-service-plans] ",
     "translation": "[--allow-paid-service-plans] "
-  },
-  {
-    "id": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
-    "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
@@ -6512,6 +6652,10 @@
     "translation": "Buildpack:"
   },
   {
+    "id": "buildpacks:",
+    "translation": ""
+  },
+  {
     "id": "bytes downloaded",
     "translation": "Heruntergeladene Byte"
   },
@@ -6524,12 +6668,24 @@
     "translation": "cf -v"
   },
   {
+    "id": "cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]",
+    "translation": ""
+  },
+  {
     "id": "cf services",
     "translation": "cf services"
   },
   {
     "id": "cf target -s",
     "translation": "cf target -s"
+  },
+  {
+    "id": "cf v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf v2-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf v2-push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]",
+    "translation": ""
+  },
+  {
+    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME]",
+    "translation": ""
   },
   {
     "id": "command help",
@@ -6586,6 +6742,10 @@
   {
     "id": "disk:",
     "translation": "Platte:"
+  },
+  {
+    "id": "docker image:",
+    "translation": ""
   },
   {
     "id": "does exist",
@@ -6760,6 +6920,10 @@
     "translation": "Speicher"
   },
   {
+    "id": "memory usage:",
+    "translation": ""
+  },
+  {
     "id": "memory:",
     "translation": "Speicher:"
   },
@@ -6848,6 +7012,10 @@
     "translation": "Position"
   },
   {
+    "id": "processes:",
+    "translation": ""
+  },
+  {
     "id": "protocol",
     "translation": ""
   },
@@ -6892,6 +7060,10 @@
     "translation": "Reservierte Routenports"
   },
   {
+    "id": "reset-org-default-isolation-segment",
+    "translation": ""
+  },
+  {
     "id": "reset-space-isolation-segment",
     "translation": ""
   },
@@ -6916,12 +7088,12 @@
     "translation": "aktiv"
   },
   {
-    "id": "security group",
-    "translation": "Sicherheitsgruppe"
+    "id": "running security groups:",
+    "translation": ""
   },
   {
-    "id": "security groups:",
-    "translation": ""
+    "id": "security group",
+    "translation": "Sicherheitsgruppe"
   },
   {
     "id": "service",
@@ -6965,6 +7137,10 @@
   },
   {
     "id": "services:",
+    "translation": ""
+  },
+  {
+    "id": "set-org-default-isolation-segment",
     "translation": ""
   },
   {
@@ -7046,6 +7222,10 @@
   {
     "id": "stack:",
     "translation": "Stack:"
+  },
+  {
+    "id": "staging security groups:",
+    "translation": ""
   },
   {
     "id": "start command:",
@@ -7180,24 +7360,12 @@
     "translation": "{{.AppInstanceLimit}} - Grenzwert für App-Instanz"
   },
   {
-    "id": "{{.AppName}} failed to stage within {{.Timeout}} minutes",
+    "id": "{{.AppName}} failed to stage within {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}",
     "translation": ""
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
-  },
-  {
-    "id": "{{.Bytes}} bytes downloaded...",
-    "translation": ""
-  },
-  {
-    "id": "{{.CFName}} api",
-    "translation": "{{.CFName}}-API"
-  },
-  {
-    "id": "{{.CFName}} login",
-    "translation": "{{.CFName}}-Anmeldung"
   },
   {
     "id": "{{.CountOfServices}} migrated.",
@@ -7232,7 +7400,7 @@
     "translation": "{{.Feature}} funktioniert nur bis CF-API-Version {{.MaximumVersion}}. Ihr Ziel ist {{.APIVersion}}."
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}} or higher. Your target is {{.APIVersion}}.",
     "translation": "Für {{.Feature}} ist CF-API-Version {{.RequiredVersion}}+ erforderlich. Ihr Ziel ist {{.APIVersion}}."
   },
   {

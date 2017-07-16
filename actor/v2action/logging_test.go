@@ -25,7 +25,7 @@ var _ = Describe("Logging Actions", func() {
 		fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
 		fakeConfig = new(v2actionfakes.FakeConfig)
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
 	Describe("LogMessage", func() {

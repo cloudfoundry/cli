@@ -6,9 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -53,7 +52,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		org = "some-org"
 		isolationSegment = "segment1"
 
-		fakeActor.CloudControllerAPIVersionReturns("3.11.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -66,9 +65,9 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
+			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.11.0",
+				MinimumVersion: command.MinVersionIsolationSegmentV3,
 			}))
 		})
 	})
@@ -79,7 +78,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -106,7 +105,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				Expect(executeErr).To(MatchError(sharedV2.SpaceNotFoundError{Name: space}))
+				Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: space}))
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 			})
@@ -156,7 +155,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 					Expect(testUI.Err).To(Say("I am also a warning"))
 					Expect(testUI.Err).To(Say("entitlement-warning"))
 					Expect(testUI.Err).To(Say("banana"))
-					Expect(executeErr).To(MatchError(shared.IsolationSegmentNotFoundError{Name: "segment1"}))
+					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: "segment1"}))
 				})
 			})
 		})

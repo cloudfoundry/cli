@@ -2,7 +2,9 @@ package v2_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 
@@ -10,8 +12,10 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -23,15 +27,15 @@ import (
 
 var _ = Describe("v2-push Command", func() {
 	var (
-		cmd             V2PushCommand
-		testUI          *ui.UI
-		fakeConfig      *commandfakes.FakeConfig
-		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v2fakes.FakeV2PushActor
-		fakeStartActor  *v2fakes.FakeStartActor
-		fakeProgressBar *v2fakes.FakeProgressBar
-		input           *Buffer
-		binaryName      string
+		cmd              V2PushCommand
+		testUI           *ui.UI
+		fakeConfig       *commandfakes.FakeConfig
+		fakeSharedActor  *commandfakes.FakeSharedActor
+		fakeActor        *v2fakes.FakeV2PushActor
+		fakeRestartActor *v2fakes.FakeRestartActor
+		fakeProgressBar  *v2fakes.FakeProgressBar
+		input            *Buffer
+		binaryName       string
 
 		appName    string
 		executeErr error
@@ -44,16 +48,16 @@ var _ = Describe("v2-push Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v2fakes.FakeV2PushActor)
-		fakeStartActor = new(v2fakes.FakeStartActor)
+		fakeRestartActor = new(v2fakes.FakeRestartActor)
 		fakeProgressBar = new(v2fakes.FakeProgressBar)
 
 		cmd = V2PushCommand{
-			UI:          testUI,
-			Config:      fakeConfig,
-			SharedActor: fakeSharedActor,
-			Actor:       fakeActor,
-			StartActor:  fakeStartActor,
-			ProgressBar: fakeProgressBar,
+			UI:           testUI,
+			Config:       fakeConfig,
+			SharedActor:  fakeSharedActor,
+			Actor:        fakeActor,
+			RestartActor: fakeRestartActor,
+			ProgressBar:  fakeProgressBar,
 		}
 
 		appName = "some-app"
@@ -76,7 +80,7 @@ var _ = Describe("v2-push Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -113,6 +117,7 @@ var _ = Describe("v2-push Command", func() {
 				BeforeEach(func() {
 					appConfigs = []pushaction.ApplicationConfig{
 						{
+							CurrentApplication: v2action.Application{Name: appName, State: ccv2.ApplicationStarted},
 							DesiredApplication: v2action.Application{Name: appName},
 							CurrentRoutes: []v2action.Route{
 								{
@@ -175,6 +180,7 @@ var _ = Describe("v2-push Command", func() {
 								Eventually(eventStream).Should(BeSent(pushaction.ConfiguringRoutes))
 								Eventually(eventStream).Should(BeSent(pushaction.CreatedRoutes))
 								Eventually(eventStream).Should(BeSent(pushaction.BoundRoutes))
+								Eventually(eventStream).Should(BeSent(pushaction.ResourceMatching))
 								Eventually(eventStream).Should(BeSent(pushaction.CreatingArchive))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
 								Eventually(fakeProgressBar.ReadyCallCount).Should(Equal(1))
@@ -193,26 +199,29 @@ var _ = Describe("v2-push Command", func() {
 							return configStream, eventStream, warningsStream, errorStream
 						}
 
-						fakeStartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan bool, <-chan string, <-chan error) {
+						fakeRestartActor.RestartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
-							appStart := make(chan bool)
+							appState := make(chan v2action.ApplicationState)
 							warnings := make(chan string)
 							errs := make(chan error)
 
 							go func() {
 								messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
 								messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
-								appStart <- true
+								appState <- v2action.ApplicationStateStopping
+								appState <- v2action.ApplicationStateStaging
+								appState <- v2action.ApplicationStateStarting
 								close(messages)
 								close(logErrs)
-								close(appStart)
+								close(appState)
 								close(warnings)
 								close(errs)
 							}()
 
-							return messages, logErrs, appStart, warnings, errs
+							return messages, logErrs, appState, warnings, errs
 						}
+
 						applicationSummary := v2action.ApplicationSummary{
 							Application: v2action.Application{
 								Name:                 appName,
@@ -247,18 +256,147 @@ var _ = Describe("v2-push Command", func() {
 
 						applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
 
-						fakeStartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+						fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 					})
 
-					It("merges app manifest and flags", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+					Context("when no manifest is provided", func() {
+						It("passes through the command line flags", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
-						cmdSettings, _ := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
-						Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
-							Name:             appName,
-							CurrentDirectory: pwd,
-						}))
+							Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+							cmdSettings, _ := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+							Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+								Name:             appName,
+								CurrentDirectory: pwd,
+							}))
+						})
+					})
+
+					Context("when a manifest is provided", func() {
+						var (
+							tmpDir         string
+							pathToManifest string
+
+							originalDir string
+						)
+
+						BeforeEach(func() {
+							var err error
+							tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
+							Expect(err).ToNot(HaveOccurred())
+
+							// OS X uses weird symlinks that causes problems for some tests
+							tmpDir, err = filepath.EvalSymlinks(tmpDir)
+							Expect(err).ToNot(HaveOccurred())
+
+							originalDir, err = os.Getwd()
+							Expect(err).ToNot(HaveOccurred())
+
+							cmd.OptionalArgs.AppName = ""
+						})
+
+						AfterEach(func() {
+							Expect(os.Chdir(originalDir)).ToNot(HaveOccurred())
+							Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
+						})
+
+						Context("via a manfiest.yml in the current directory", func() {
+							var expectedApps []manifest.Application
+
+							BeforeEach(func() {
+								err := os.Chdir(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+
+								pathToManifest = filepath.Join(tmpDir, "manifest.yml")
+								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+
+								expectedApps = []manifest.Application{{Name: "some-app"}, {Name: "some-other-app"}}
+								fakeActor.ReadManifestReturns(expectedApps, nil)
+							})
+
+							Context("when reading the manifest file is successful", func() {
+								It("merges app manifest and flags", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+
+									Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+									cmdSettings, manifestApps := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+									Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+										CurrentDirectory: tmpDir,
+									}))
+									Expect(manifestApps).To(Equal(expectedApps))
+								})
+							})
+
+							Context("when reading manifest file errors", func() {
+								var expectedErr error
+
+								BeforeEach(func() {
+									expectedErr = errors.New("I am an error!!!")
+
+									fakeActor.ReadManifestReturns(nil, expectedErr)
+								})
+
+								It("returns the error", func() {
+									Expect(executeErr).To(MatchError(expectedErr))
+								})
+							})
+
+							Context("when --no-manifest is specified", func() {
+								BeforeEach(func() {
+									cmd.NoManifest = true
+								})
+
+								It("ignores the manifest file", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
+									cmdSettings, manifestApps := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
+									Expect(cmdSettings).To(Equal(pushaction.CommandLineSettings{
+										CurrentDirectory: tmpDir,
+									}))
+									Expect(manifestApps).To(BeNil())
+								})
+							})
+						})
+
+						Context("via a manfiest.yaml in the current directory", func() {
+							BeforeEach(func() {
+								err := os.Chdir(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+
+								pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
+								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							It("should read the manifest.yml", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+								Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+							})
+						})
+
+						Context("via the -f flag", func() {
+							BeforeEach(func() {
+								pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
+								err := ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+
+								cmd.PathToManifest = flag.PathWithExistenceCheck(pathToManifest)
+							})
+
+							It("should read the manifest.yml", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+								Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+							})
+						})
 					})
 
 					It("converts the manifests to app configs and outputs config warnings", func() {
@@ -275,7 +413,7 @@ var _ = Describe("v2-push Command", func() {
 
 					It("outputs flavor text prior to generating app configuration", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("Getting app info..."))
+						Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
 					})
 
 					It("applies each of the application configurations", func() {
@@ -287,29 +425,17 @@ var _ = Describe("v2-push Command", func() {
 						Expect(progressBar).To(Equal(fakeProgressBar))
 					})
 
-					It("display diff of changes", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("\\+\\s+name:\\s+%s", appName))
-						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
-						Expect(testUI.Out).To(Say("\\s+routes:"))
-						for _, route := range appConfigs[0].CurrentRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
-						for _, route := range appConfigs[0].DesiredRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
-					})
-
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Creating app with these attributes..."))
-						Expect(testUI.Out).To(Say("Mapping routes..."))
-						Expect(testUI.Out).To(Say("Packaging files to upload..."))
-						Expect(testUI.Out).To(Say("Uploading files..."))
-						Expect(testUI.Out).To(Say("Retrying upload due to an error..."))
-						Expect(testUI.Out).To(Say("Processing files..."))
+						Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Checking for existing files on server\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
 
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 						Expect(testUI.Err).To(Say("apply-1"))
@@ -322,8 +448,8 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("log message 1"))
 						Expect(testUI.Out).To(Say("log message 2"))
 
-						Expect(fakeStartActor.RestartApplicationCallCount()).To(Equal(1))
-						appConfig, _, _ := fakeStartActor.RestartApplicationArgsForCall(0)
+						Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
+						appConfig, _, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
 						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication))
 					})
 
@@ -340,6 +466,44 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
 
 						Expect(testUI.Err).To(Say("app-summary-warning"))
+					})
+
+					Context("when pushing app bits", func() {
+						It("display diff of changes with path", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
+							Expect(testUI.Out).To(Say("\\s+routes:"))
+							for _, route := range appConfigs[0].CurrentRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+							for _, route := range appConfigs[0].DesiredRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+						})
+					})
+
+					Context("when pushing a docker image", func() {
+						var docker string
+						BeforeEach(func() {
+							docker = "some-path"
+							appConfigs[0].DesiredApplication.DockerImage = docker
+						})
+
+						It("display diff of changes with docker image", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("\\s+docker image:\\s+%s", docker))
+							Expect(testUI.Out).To(Say("\\s+routes:"))
+							for _, route := range appConfigs[0].CurrentRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+							for _, route := range appConfigs[0].DesiredRoutes {
+								Expect(testUI.Out).To(Say(route.String()))
+							}
+						})
 					})
 				})
 
@@ -405,6 +569,64 @@ var _ = Describe("v2-push Command", func() {
 
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
+			})
+		})
+	})
+
+	Describe("GetCommandLineSettings", func() {
+		Context("when the -o and -p flags are both given", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.AppPath = "some-directory-path"
+			})
+
+			It("returns an error", func() {
+				_, err := cmd.GetCommandLineSettings()
+				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+					Arg1: "--docker-image, -o",
+					Arg2: "-p",
+				}))
+			})
+		})
+
+		Context("when only -f and --no-manifest flags are passed", func() {
+			BeforeEach(func() {
+				cmd.PathToManifest = "/some/path.yml"
+				cmd.NoManifest = true
+			})
+
+			It("returns an ArgumentCombinationError", func() {
+				_, err := cmd.GetCommandLineSettings()
+				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+					Arg1: "-f",
+					Arg2: "--no-manifest",
+				}))
+			})
+		})
+
+		Context("when only -o flag is passed", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image-path"
+			})
+
+			It("creates command line setting from command line arguments", func() {
+				settings, err := cmd.GetCommandLineSettings()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(settings.Name).To(Equal(appName))
+				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+			})
+		})
+
+		Context("when only -p flag is passed", func() {
+			BeforeEach(func() {
+				cmd.AppPath = "some-directory-path"
+			})
+
+			It("creates command line setting from command line arguments", func() {
+				settings, err := cmd.GetCommandLineSettings()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(settings.Name).To(Equal(appName))
+				Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
 			})
 		})
 	})

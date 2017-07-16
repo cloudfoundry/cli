@@ -117,114 +117,26 @@ var _ = Describe("space command", func() {
 				})
 			})
 
-			Context("when no flags are used", func() {
+			Context("when the --guid flag is not used", func() {
 				var (
-					appName              string
-					spaceQuotaName       string
-					serviceInstance      string
-					isolationSegmentName string
-					securityGroupName    string
-					securityGroupRules   *os.File
-					err                  error
-				)
-
-				BeforeEach(func() {
-					appName = helpers.PrefixedRandomName("app")
-					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
-					})
-					serviceInstance = helpers.PrefixedRandomName("si")
-					Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
-					Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
-					spaceQuotaName = helpers.PrefixedRandomName("space-quota")
-					Eventually(helpers.CF("create-space-quota", spaceQuotaName)).Should(Exit(0))
-					Eventually(helpers.CF("set-space-quota", spaceName, spaceQuotaName)).Should(Exit(0))
-					isolationSegmentName = helpers.IsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
-					Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
-
-					securityGroupName = helpers.PrefixedRandomName("aaaaaaaaaaa")
-					securityGroupRules, err = ioutil.TempFile("", "security-group-rules")
-					Expect(err).ToNot(HaveOccurred())
-
-					securityGroupRules.Write([]byte(`[]`))
-
-					Eventually(helpers.CF("create-security-group", securityGroupName, securityGroupRules.Name())).Should(Exit(0))
-					Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
-				})
-
-				AfterEach(func() {
-					Eventually(helpers.CF("delete-security-group", securityGroupName, "-f")).Should(Exit(0))
-					os.Remove(securityGroupRules.Name())
-				})
-
-				It("displays a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
-					session := helpers.CF("space", spaceName)
-					userName, _ := helpers.GetCredentials()
-					Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
-
-					Eventually(session.Out).Should(Say("name:\\s+%s", spaceName))
-					Eventually(session.Out).Should(Say("org:\\s+%s", orgName))
-					Eventually(session.Out).Should(Say("apps:\\s+%s", appName))
-					Eventually(session.Out).Should(Say("services:\\s+%s", serviceInstance))
-					Eventually(session.Out).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
-					Eventually(session.Out).Should(Say("space quota:\\s+%s", spaceQuotaName))
-					Eventually(session.Out).Should(Say("security groups:\\s+.*%s", securityGroupName))
-				})
-			})
-
-			Context("when the space does not have an isolation segment and its org has a default isolation segment", func() {
-				var orgIsolationSegmentName string
-
-				BeforeEach(func() {
-					orgIsolationSegmentName = helpers.IsolationSegmentName()
-					Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))
-					orgIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)
-					orgGUID := helpers.GetOrgGUID(orgName)
-
-					Eventually(helpers.CF("curl", "-X", "PATCH",
-						fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
-						"-d", fmt.Sprintf(`{"data":{"guid":"%s"}`, orgIsolationSegmentGUID))).Should(Exit(0))
-				})
-
-				It("shows the org default isolation segment", func() {
-					session := helpers.CF("space", spaceName)
-					Eventually(session.Out).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
-					Eventually(session).Should(Exit(0))
-				})
-			})
-
-			Context("when the security group rules flag is used", func() {
-				var (
-					securityGroupName   string
-					securityGroupRules  *os.File
+					securityGroup0 helpers.SecurityGroup
+					securityGroup1 helpers.SecurityGroup
+					// securityGroup2      helpers.SecurityGroup
 					securityGroupName2  string
 					securityGroupRules2 *os.File
 					err                 error
 				)
 
 				BeforeEach(func() {
-					securityGroupName = helpers.PrefixedRandomName("aaaaaaaaaaa")
-					securityGroupRules, err = ioutil.TempFile("", "security-group-rules")
-					Expect(err).ToNot(HaveOccurred())
+					securityGroup0 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-0"), "tcp", "4.3.2.1/24", "80,443", "foo security group")
+					securityGroup0.Create()
+					Eventually(helpers.CF("bind-security-group", securityGroup0.Name, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 
-					securityGroupRules.Write([]byte(`
-						[
-							{
-								"protocol": "tcp",
-								"destination": "1.2.3.4/24",
-								"ports": "80,443",
-								"description": "some security group"
-							}
-						]
-					`))
+					securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "1.2.3.4/24", "80,443", "some security group")
+					securityGroup1.Create()
+					Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 
-					Eventually(helpers.CF("create-security-group", securityGroupName, securityGroupRules.Name())).Should(Exit(0))
-					Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
-
-					securityGroupName2 = helpers.PrefixedRandomName("aaaaaaaaaaz")
+					securityGroupName2 = helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-2")
 					securityGroupRules2, err = ioutil.TempFile("", "security-group-rules")
 					Expect(err).ToNot(HaveOccurred())
 
@@ -247,33 +159,104 @@ var _ = Describe("space command", func() {
 
 					Eventually(helpers.CF("create-security-group", securityGroupName2, securityGroupRules2.Name())).Should(Exit(0))
 					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName)).Should(Exit(0))
+					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 				})
 
 				AfterEach(func() {
-					Eventually(helpers.CF("delete-security-group", securityGroupName, "-f")).Should(Exit(0))
-					os.Remove(securityGroupRules.Name())
+					securityGroup1.Delete()
 					Eventually(helpers.CF("delete-security-group", securityGroupName2, "-f")).Should(Exit(0))
 					os.Remove(securityGroupRules2.Name())
 				})
 
-				It("displays the space information as well as all security group rules", func() {
-					session := helpers.CF("space", "--security-group-rules", spaceName)
-					userName, _ := helpers.GetCredentials()
-					Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
+				Context("when no flags are used", func() {
+					var (
+						appName              string
+						spaceQuotaName       string
+						serviceInstance      string
+						isolationSegmentName string
+					)
 
-					Eventually(session.Out).Should(Say("name:"))
-					Eventually(session.Out).Should(Say("org:"))
-					Eventually(session.Out).Should(Say("apps:"))
-					Eventually(session.Out).Should(Say("services:"))
-					Eventually(session.Out).Should(Say("isolation segment:"))
-					Eventually(session.Out).Should(Say("space quota:"))
-					Eventually(session.Out).Should(Say("security groups:"))
-					Eventually(session.Out).Should(Say("\n\n"))
+					BeforeEach(func() {
+						appName = helpers.PrefixedRandomName("app")
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+						})
+						serviceInstance = helpers.PrefixedRandomName("si")
+						Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
+						Eventually(helpers.CF("bind-service", appName, serviceInstance)).Should(Exit(0))
+						spaceQuotaName = helpers.PrefixedRandomName("space-quota")
+						Eventually(helpers.CF("create-space-quota", spaceQuotaName)).Should(Exit(0))
+						Eventually(helpers.CF("set-space-quota", spaceName, spaceQuotaName)).Should(Exit(0))
+						isolationSegmentName = helpers.IsolationSegmentName()
+						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
+						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
+						Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
 
-					Eventually(session.Out).Should(Say("security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description"))
-					Eventually(session.Out).Should(Say("#0\\s+%s\\s+1.2.3.4/24\\s+80,443\\s+tcp\\s+running\\s+some security group", securityGroupName))
-					Eventually(session.Out).Should(Say("#1\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+running\\s+some other security group", securityGroupName2))
-					Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+running\\s+some other other security group", securityGroupName2))
+						Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
+					})
+
+					It("displays a table with space name, org, apps, services, isolation segment, space quota and security groups", func() {
+						session := helpers.CF("space", spaceName)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
+
+						Eventually(session.Out).Should(Say("name:\\s+%s", spaceName))
+						Eventually(session.Out).Should(Say("org:\\s+%s", orgName))
+						Eventually(session.Out).Should(Say("apps:\\s+%s", appName))
+						Eventually(session.Out).Should(Say("services:\\s+%s", serviceInstance))
+						Eventually(session.Out).Should(Say("isolation segment:\\s+%s", isolationSegmentName))
+						Eventually(session.Out).Should(Say("space quota:\\s+%s", spaceQuotaName))
+						Eventually(session.Out).Should(Say("running security groups:\\s+.*%s,.* %s", securityGroup1.Name, securityGroupName2))
+						Eventually(session.Out).Should(Say("staging security groups:\\s+.*%s,.* %s", securityGroup0.Name, securityGroupName2))
+					})
+				})
+
+				Context("when the space does not have an isolation segment and its org has a default isolation segment", func() {
+					var orgIsolationSegmentName string
+
+					BeforeEach(func() {
+						orgIsolationSegmentName = helpers.IsolationSegmentName()
+						Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
+						Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))
+						orgIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)
+						orgGUID := helpers.GetOrgGUID(orgName)
+
+						Eventually(helpers.CF("curl", "-X", "PATCH",
+							fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
+							"-d", fmt.Sprintf(`{"data":{"guid":"%s"}`, orgIsolationSegmentGUID))).Should(Exit(0))
+					})
+
+					It("shows the org default isolation segment", func() {
+						session := helpers.CF("space", spaceName)
+						Eventually(session.Out).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when the security group rules flag is used", func() {
+					It("displays the space information as well as all security group rules", func() {
+						session := helpers.CF("space", "--security-group-rules", spaceName)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session.Out).Should(Say("Getting info for space %s in org %s as %s...", spaceName, orgName, userName))
+
+						Eventually(session.Out).Should(Say("name:"))
+						Eventually(session.Out).Should(Say("org:"))
+						Eventually(session.Out).Should(Say("apps:"))
+						Eventually(session.Out).Should(Say("services:"))
+						Eventually(session.Out).Should(Say("isolation segment:"))
+						Eventually(session.Out).Should(Say("space quota:"))
+						Eventually(session.Out).Should(Say("running security groups:"))
+						Eventually(session.Out).Should(Say("staging security groups:"))
+						Eventually(session.Out).Should(Say("\n\n"))
+
+						Eventually(session.Out).Should(Say("security group\\s+destination\\s+ports\\s+protocol\\s+lifecycle\\s+description"))
+						Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+4.3.2.1/24\\s+80,443\\s+tcp\\s+staging\\s+foo security group", securityGroup0.Name))
+						Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+1.2.3.4/24\\s+80,443\\s+tcp\\s+running\\s+some security group", securityGroup1.Name))
+						Eventually(session.Out).Should(Say("#\\d+\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+running\\s+some other security group", securityGroupName2))
+						Eventually(session.Out).Should(Say("\\s+%s\\s+5.7.9.11/24\\s+80,443\\s+tcp\\s+staging\\s+some other security group", securityGroupName2))
+						Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+running\\s+some other other security group", securityGroupName2))
+						Eventually(session.Out).Should(Say("\\s+%s\\s+92.0.0.1/24\\s+80,443\\s+udp\\s+staging\\s+some other other security group", securityGroupName2))
+					})
 				})
 			})
 		})

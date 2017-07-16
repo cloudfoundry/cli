@@ -70,16 +70,29 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GatherResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
-	gatherResourcesMutex       sync.RWMutex
-	gatherResourcesArgsForCall []struct {
-		sourceDir string
+	GatherArchiveResourcesStub        func(archivePath string) ([]v2action.Resource, error)
+	gatherArchiveResourcesMutex       sync.RWMutex
+	gatherArchiveResourcesArgsForCall []struct {
+		archivePath string
 	}
-	gatherResourcesReturns struct {
+	gatherArchiveResourcesReturns struct {
 		result1 []v2action.Resource
 		result2 error
 	}
-	gatherResourcesReturnsOnCall map[int]struct {
+	gatherArchiveResourcesReturnsOnCall map[int]struct {
+		result1 []v2action.Resource
+		result2 error
+	}
+	GatherDirectoryResourcesStub        func(sourceDir string) ([]v2action.Resource, error)
+	gatherDirectoryResourcesMutex       sync.RWMutex
+	gatherDirectoryResourcesArgsForCall []struct {
+		sourceDir string
+	}
+	gatherDirectoryResourcesReturns struct {
+		result1 []v2action.Resource
+		result2 error
+	}
+	gatherDirectoryResourcesReturnsOnCall map[int]struct {
 		result1 []v2action.Resource
 		result2 error
 	}
@@ -129,6 +142,23 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	ResourceMatchStub        func(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error)
+	resourceMatchMutex       sync.RWMutex
+	resourceMatchArgsForCall []struct {
+		allResources []v2action.Resource
+	}
+	resourceMatchReturns struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}
+	resourceMatchReturnsOnCall map[int]struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}
 	PollJobStub        func(job v2action.Job) (v2action.Warnings, error)
 	pollJobMutex       sync.RWMutex
 	pollJobArgsForCall []struct {
@@ -175,17 +205,31 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	ZipResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
-	zipResourcesMutex       sync.RWMutex
-	zipResourcesArgsForCall []struct {
-		sourceDir      string
-		filesToInclude []v2action.Resource
+	ZipArchiveResourcesStub        func(sourceArchivePath string, filesToInclude []v2action.Resource) (string, error)
+	zipArchiveResourcesMutex       sync.RWMutex
+	zipArchiveResourcesArgsForCall []struct {
+		sourceArchivePath string
+		filesToInclude    []v2action.Resource
 	}
-	zipResourcesReturns struct {
+	zipArchiveResourcesReturns struct {
 		result1 string
 		result2 error
 	}
-	zipResourcesReturnsOnCall map[int]struct {
+	zipArchiveResourcesReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
+	ZipDirectoryResourcesStub        func(sourceDir string, filesToInclude []v2action.Resource) (string, error)
+	zipDirectoryResourcesMutex       sync.RWMutex
+	zipDirectoryResourcesArgsForCall []struct {
+		sourceDir      string
+		filesToInclude []v2action.Resource
+	}
+	zipDirectoryResourcesReturns struct {
+		result1 string
+		result2 error
+	}
+	zipDirectoryResourcesReturnsOnCall map[int]struct {
 		result1 string
 		result2 error
 	}
@@ -408,52 +452,103 @@ func (fake *FakeV2Actor) FindRouteBoundToSpaceWithSettingsReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) GatherResources(sourceDir string) ([]v2action.Resource, error) {
-	fake.gatherResourcesMutex.Lock()
-	ret, specificReturn := fake.gatherResourcesReturnsOnCall[len(fake.gatherResourcesArgsForCall)]
-	fake.gatherResourcesArgsForCall = append(fake.gatherResourcesArgsForCall, struct {
-		sourceDir string
-	}{sourceDir})
-	fake.recordInvocation("GatherResources", []interface{}{sourceDir})
-	fake.gatherResourcesMutex.Unlock()
-	if fake.GatherResourcesStub != nil {
-		return fake.GatherResourcesStub(sourceDir)
+func (fake *FakeV2Actor) GatherArchiveResources(archivePath string) ([]v2action.Resource, error) {
+	fake.gatherArchiveResourcesMutex.Lock()
+	ret, specificReturn := fake.gatherArchiveResourcesReturnsOnCall[len(fake.gatherArchiveResourcesArgsForCall)]
+	fake.gatherArchiveResourcesArgsForCall = append(fake.gatherArchiveResourcesArgsForCall, struct {
+		archivePath string
+	}{archivePath})
+	fake.recordInvocation("GatherArchiveResources", []interface{}{archivePath})
+	fake.gatherArchiveResourcesMutex.Unlock()
+	if fake.GatherArchiveResourcesStub != nil {
+		return fake.GatherArchiveResourcesStub(archivePath)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.gatherResourcesReturns.result1, fake.gatherResourcesReturns.result2
+	return fake.gatherArchiveResourcesReturns.result1, fake.gatherArchiveResourcesReturns.result2
 }
 
-func (fake *FakeV2Actor) GatherResourcesCallCount() int {
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
-	return len(fake.gatherResourcesArgsForCall)
+func (fake *FakeV2Actor) GatherArchiveResourcesCallCount() int {
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
+	return len(fake.gatherArchiveResourcesArgsForCall)
 }
 
-func (fake *FakeV2Actor) GatherResourcesArgsForCall(i int) string {
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
-	return fake.gatherResourcesArgsForCall[i].sourceDir
+func (fake *FakeV2Actor) GatherArchiveResourcesArgsForCall(i int) string {
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
+	return fake.gatherArchiveResourcesArgsForCall[i].archivePath
 }
 
-func (fake *FakeV2Actor) GatherResourcesReturns(result1 []v2action.Resource, result2 error) {
-	fake.GatherResourcesStub = nil
-	fake.gatherResourcesReturns = struct {
+func (fake *FakeV2Actor) GatherArchiveResourcesReturns(result1 []v2action.Resource, result2 error) {
+	fake.GatherArchiveResourcesStub = nil
+	fake.gatherArchiveResourcesReturns = struct {
 		result1 []v2action.Resource
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeV2Actor) GatherResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
-	fake.GatherResourcesStub = nil
-	if fake.gatherResourcesReturnsOnCall == nil {
-		fake.gatherResourcesReturnsOnCall = make(map[int]struct {
+func (fake *FakeV2Actor) GatherArchiveResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
+	fake.GatherArchiveResourcesStub = nil
+	if fake.gatherArchiveResourcesReturnsOnCall == nil {
+		fake.gatherArchiveResourcesReturnsOnCall = make(map[int]struct {
 			result1 []v2action.Resource
 			result2 error
 		})
 	}
-	fake.gatherResourcesReturnsOnCall[i] = struct {
+	fake.gatherArchiveResourcesReturnsOnCall[i] = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error) {
+	fake.gatherDirectoryResourcesMutex.Lock()
+	ret, specificReturn := fake.gatherDirectoryResourcesReturnsOnCall[len(fake.gatherDirectoryResourcesArgsForCall)]
+	fake.gatherDirectoryResourcesArgsForCall = append(fake.gatherDirectoryResourcesArgsForCall, struct {
+		sourceDir string
+	}{sourceDir})
+	fake.recordInvocation("GatherDirectoryResources", []interface{}{sourceDir})
+	fake.gatherDirectoryResourcesMutex.Unlock()
+	if fake.GatherDirectoryResourcesStub != nil {
+		return fake.GatherDirectoryResourcesStub(sourceDir)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.gatherDirectoryResourcesReturns.result1, fake.gatherDirectoryResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) GatherDirectoryResourcesCallCount() int {
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
+	return len(fake.gatherDirectoryResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) GatherDirectoryResourcesArgsForCall(i int) string {
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
+	return fake.gatherDirectoryResourcesArgsForCall[i].sourceDir
+}
+
+func (fake *FakeV2Actor) GatherDirectoryResourcesReturns(result1 []v2action.Resource, result2 error) {
+	fake.GatherDirectoryResourcesStub = nil
+	fake.gatherDirectoryResourcesReturns = struct {
+		result1 []v2action.Resource
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) GatherDirectoryResourcesReturnsOnCall(i int, result1 []v2action.Resource, result2 error) {
+	fake.GatherDirectoryResourcesStub = nil
+	if fake.gatherDirectoryResourcesReturnsOnCall == nil {
+		fake.gatherDirectoryResourcesReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Resource
+			result2 error
+		})
+	}
+	fake.gatherDirectoryResourcesReturnsOnCall[i] = struct {
 		result1 []v2action.Resource
 		result2 error
 	}{result1, result2}
@@ -620,6 +715,68 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) ResourceMatch(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error) {
+	var allResourcesCopy []v2action.Resource
+	if allResources != nil {
+		allResourcesCopy = make([]v2action.Resource, len(allResources))
+		copy(allResourcesCopy, allResources)
+	}
+	fake.resourceMatchMutex.Lock()
+	ret, specificReturn := fake.resourceMatchReturnsOnCall[len(fake.resourceMatchArgsForCall)]
+	fake.resourceMatchArgsForCall = append(fake.resourceMatchArgsForCall, struct {
+		allResources []v2action.Resource
+	}{allResourcesCopy})
+	fake.recordInvocation("ResourceMatch", []interface{}{allResourcesCopy})
+	fake.resourceMatchMutex.Unlock()
+	if fake.ResourceMatchStub != nil {
+		return fake.ResourceMatchStub(allResources)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3, ret.result4
+	}
+	return fake.resourceMatchReturns.result1, fake.resourceMatchReturns.result2, fake.resourceMatchReturns.result3, fake.resourceMatchReturns.result4
+}
+
+func (fake *FakeV2Actor) ResourceMatchCallCount() int {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return len(fake.resourceMatchArgsForCall)
+}
+
+func (fake *FakeV2Actor) ResourceMatchArgsForCall(i int) []v2action.Resource {
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
+	return fake.resourceMatchArgsForCall[i].allResources
+}
+
+func (fake *FakeV2Actor) ResourceMatchReturns(result1 []v2action.Resource, result2 []v2action.Resource, result3 v2action.Warnings, result4 error) {
+	fake.ResourceMatchStub = nil
+	fake.resourceMatchReturns = struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
+}
+
+func (fake *FakeV2Actor) ResourceMatchReturnsOnCall(i int, result1 []v2action.Resource, result2 []v2action.Resource, result3 v2action.Warnings, result4 error) {
+	fake.ResourceMatchStub = nil
+	if fake.resourceMatchReturnsOnCall == nil {
+		fake.resourceMatchReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Resource
+			result2 []v2action.Resource
+			result3 v2action.Warnings
+			result4 error
+		})
+	}
+	fake.resourceMatchReturnsOnCall[i] = struct {
+		result1 []v2action.Resource
+		result2 []v2action.Resource
+		result3 v2action.Warnings
+		result4 error
+	}{result1, result2, result3, result4}
 }
 
 func (fake *FakeV2Actor) PollJob(job v2action.Job) (v2action.Warnings, error) {
@@ -789,58 +946,115 @@ func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2Actor) ZipResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
+func (fake *FakeV2Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude []v2action.Resource) (string, error) {
 	var filesToIncludeCopy []v2action.Resource
 	if filesToInclude != nil {
 		filesToIncludeCopy = make([]v2action.Resource, len(filesToInclude))
 		copy(filesToIncludeCopy, filesToInclude)
 	}
-	fake.zipResourcesMutex.Lock()
-	ret, specificReturn := fake.zipResourcesReturnsOnCall[len(fake.zipResourcesArgsForCall)]
-	fake.zipResourcesArgsForCall = append(fake.zipResourcesArgsForCall, struct {
-		sourceDir      string
-		filesToInclude []v2action.Resource
-	}{sourceDir, filesToIncludeCopy})
-	fake.recordInvocation("ZipResources", []interface{}{sourceDir, filesToIncludeCopy})
-	fake.zipResourcesMutex.Unlock()
-	if fake.ZipResourcesStub != nil {
-		return fake.ZipResourcesStub(sourceDir, filesToInclude)
+	fake.zipArchiveResourcesMutex.Lock()
+	ret, specificReturn := fake.zipArchiveResourcesReturnsOnCall[len(fake.zipArchiveResourcesArgsForCall)]
+	fake.zipArchiveResourcesArgsForCall = append(fake.zipArchiveResourcesArgsForCall, struct {
+		sourceArchivePath string
+		filesToInclude    []v2action.Resource
+	}{sourceArchivePath, filesToIncludeCopy})
+	fake.recordInvocation("ZipArchiveResources", []interface{}{sourceArchivePath, filesToIncludeCopy})
+	fake.zipArchiveResourcesMutex.Unlock()
+	if fake.ZipArchiveResourcesStub != nil {
+		return fake.ZipArchiveResourcesStub(sourceArchivePath, filesToInclude)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.zipResourcesReturns.result1, fake.zipResourcesReturns.result2
+	return fake.zipArchiveResourcesReturns.result1, fake.zipArchiveResourcesReturns.result2
 }
 
-func (fake *FakeV2Actor) ZipResourcesCallCount() int {
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
-	return len(fake.zipResourcesArgsForCall)
+func (fake *FakeV2Actor) ZipArchiveResourcesCallCount() int {
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
+	return len(fake.zipArchiveResourcesArgsForCall)
 }
 
-func (fake *FakeV2Actor) ZipResourcesArgsForCall(i int) (string, []v2action.Resource) {
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
-	return fake.zipResourcesArgsForCall[i].sourceDir, fake.zipResourcesArgsForCall[i].filesToInclude
+func (fake *FakeV2Actor) ZipArchiveResourcesArgsForCall(i int) (string, []v2action.Resource) {
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
+	return fake.zipArchiveResourcesArgsForCall[i].sourceArchivePath, fake.zipArchiveResourcesArgsForCall[i].filesToInclude
 }
 
-func (fake *FakeV2Actor) ZipResourcesReturns(result1 string, result2 error) {
-	fake.ZipResourcesStub = nil
-	fake.zipResourcesReturns = struct {
+func (fake *FakeV2Actor) ZipArchiveResourcesReturns(result1 string, result2 error) {
+	fake.ZipArchiveResourcesStub = nil
+	fake.zipArchiveResourcesReturns = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeV2Actor) ZipResourcesReturnsOnCall(i int, result1 string, result2 error) {
-	fake.ZipResourcesStub = nil
-	if fake.zipResourcesReturnsOnCall == nil {
-		fake.zipResourcesReturnsOnCall = make(map[int]struct {
+func (fake *FakeV2Actor) ZipArchiveResourcesReturnsOnCall(i int, result1 string, result2 error) {
+	fake.ZipArchiveResourcesStub = nil
+	if fake.zipArchiveResourcesReturnsOnCall == nil {
+		fake.zipArchiveResourcesReturnsOnCall = make(map[int]struct {
 			result1 string
 			result2 error
 		})
 	}
-	fake.zipResourcesReturnsOnCall[i] = struct {
+	fake.zipArchiveResourcesReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) ZipDirectoryResources(sourceDir string, filesToInclude []v2action.Resource) (string, error) {
+	var filesToIncludeCopy []v2action.Resource
+	if filesToInclude != nil {
+		filesToIncludeCopy = make([]v2action.Resource, len(filesToInclude))
+		copy(filesToIncludeCopy, filesToInclude)
+	}
+	fake.zipDirectoryResourcesMutex.Lock()
+	ret, specificReturn := fake.zipDirectoryResourcesReturnsOnCall[len(fake.zipDirectoryResourcesArgsForCall)]
+	fake.zipDirectoryResourcesArgsForCall = append(fake.zipDirectoryResourcesArgsForCall, struct {
+		sourceDir      string
+		filesToInclude []v2action.Resource
+	}{sourceDir, filesToIncludeCopy})
+	fake.recordInvocation("ZipDirectoryResources", []interface{}{sourceDir, filesToIncludeCopy})
+	fake.zipDirectoryResourcesMutex.Unlock()
+	if fake.ZipDirectoryResourcesStub != nil {
+		return fake.ZipDirectoryResourcesStub(sourceDir, filesToInclude)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.zipDirectoryResourcesReturns.result1, fake.zipDirectoryResourcesReturns.result2
+}
+
+func (fake *FakeV2Actor) ZipDirectoryResourcesCallCount() int {
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
+	return len(fake.zipDirectoryResourcesArgsForCall)
+}
+
+func (fake *FakeV2Actor) ZipDirectoryResourcesArgsForCall(i int) (string, []v2action.Resource) {
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
+	return fake.zipDirectoryResourcesArgsForCall[i].sourceDir, fake.zipDirectoryResourcesArgsForCall[i].filesToInclude
+}
+
+func (fake *FakeV2Actor) ZipDirectoryResourcesReturns(result1 string, result2 error) {
+	fake.ZipDirectoryResourcesStub = nil
+	fake.zipDirectoryResourcesReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) ZipDirectoryResourcesReturnsOnCall(i int, result1 string, result2 error) {
+	fake.ZipDirectoryResourcesStub = nil
+	if fake.zipDirectoryResourcesReturnsOnCall == nil {
+		fake.zipDirectoryResourcesReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.zipDirectoryResourcesReturnsOnCall[i] = struct {
 		result1 string
 		result2 error
 	}{result1, result2}
@@ -857,22 +1071,28 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.createRouteMutex.RUnlock()
 	fake.findRouteBoundToSpaceWithSettingsMutex.RLock()
 	defer fake.findRouteBoundToSpaceWithSettingsMutex.RUnlock()
-	fake.gatherResourcesMutex.RLock()
-	defer fake.gatherResourcesMutex.RUnlock()
+	fake.gatherArchiveResourcesMutex.RLock()
+	defer fake.gatherArchiveResourcesMutex.RUnlock()
+	fake.gatherDirectoryResourcesMutex.RLock()
+	defer fake.gatherDirectoryResourcesMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()
 	defer fake.uploadApplicationPackageMutex.RUnlock()
-	fake.zipResourcesMutex.RLock()
-	defer fake.zipResourcesMutex.RUnlock()
+	fake.zipArchiveResourcesMutex.RLock()
+	defer fake.zipArchiveResourcesMutex.RUnlock()
+	fake.zipDirectoryResourcesMutex.RLock()
+	defer fake.zipDirectoryResourcesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

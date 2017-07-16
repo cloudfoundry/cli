@@ -17,7 +17,7 @@ var _ = Describe("Security Groups", func() {
 		client = NewTestClient()
 	})
 
-	Describe("AssociateSpaceWithSecurityGroup", func() {
+	Describe("AssociateSpaceWithRunningSecurityGroup", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{}`
@@ -29,7 +29,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns all warnings", func() {
-				warnings, err := client.AssociateSpaceWithSecurityGroup("security-group-guid", "space-guid")
+				warnings, err := client.AssociateSpaceWithRunningSecurityGroup("security-group-guid", "space-guid")
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("warning-1"))
@@ -51,7 +51,56 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				warnings, err := client.AssociateSpaceWithSecurityGroup("security-group-guid", "space-guid")
+				warnings, err := client.AssociateSpaceWithRunningSecurityGroup("security-group-guid", "space-guid")
+
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
+
+	Describe("AssociateSpaceWithStagingSecurityGroup", func() {
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				response := `{}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/security_groups/security-group-guid/staging_spaces/space-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns all warnings", func() {
+				warnings, err := client.AssociateSpaceWithStagingSecurityGroup("security-group-guid", "space-guid")
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			BeforeEach(func() {
+				response := `{
+  "code": 10001,
+  "description": "Some Error",
+  "error_code": "CF-SomeError"
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v2/security_groups/security-group-guid/staging_spaces/space-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
+					))
+			})
+
+			It("returns an error and all warnings", func() {
+				warnings, err := client.AssociateSpaceWithStagingSecurityGroup("security-group-guid", "space-guid")
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
@@ -83,7 +132,7 @@ var _ = Describe("Security Groups", func() {
 									"rules": [
 									],
 									"running_default": false,
-									"staging_default": false,
+									"staging_default": true,
 									"spaces_url": "/v2/security_groups/security-group-guid-1/spaces"
 								}
 							}
@@ -101,7 +150,7 @@ var _ = Describe("Security Groups", func() {
 									"name": "security-group-2",
 									"rules": [
 									],
-									"running_default": false,
+									"running_default": true,
 									"staging_default": false,
 									"spaces_url": "/v2/security_groups/security-group-guid-2/spaces"
 								}
@@ -130,14 +179,18 @@ var _ = Describe("Security Groups", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(securityGroups).To(Equal([]SecurityGroup{
 						{
-							GUID:  "security-group-guid-1",
-							Name:  "security-group-1",
-							Rules: []SecurityGroupRule{},
+							GUID:           "security-group-guid-1",
+							Name:           "security-group-1",
+							Rules:          []SecurityGroupRule{},
+							RunningDefault: false,
+							StagingDefault: true,
 						},
 						{
-							GUID:  "security-group-guid-2",
-							Name:  "security-group-2",
-							Rules: []SecurityGroupRule{},
+							GUID:           "security-group-guid-2",
+							Name:           "security-group-2",
+							Rules:          []SecurityGroupRule{},
+							RunningDefault: true,
+							StagingDefault: false,
 						},
 					}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -179,7 +232,7 @@ var _ = Describe("Security Groups", func() {
 		Context("when the space exists", func() {
 			BeforeEach(func() {
 				response1 := `{
-					"next_url": "/v2/spaces/some-space-guid/security_groups?page=2",
+					"next_url": "/v2/spaces/some-space-guid/security_groups?q=some-query:some-value&page=2",
 					"resources": [
 						{
 							"metadata": {
@@ -259,20 +312,24 @@ var _ = Describe("Security Groups", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups", "q=some-query:some-value"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups", "page=2"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/security_groups", "q=some-query:some-value&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
 			It("returns the running security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", []Query{{
+					Filter:   "some-query",
+					Operator: EqualOperator,
+					Value:    "some-value",
+				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
@@ -350,7 +407,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", nil)
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
@@ -364,7 +421,7 @@ var _ = Describe("Security Groups", func() {
 		Context("when the space exists", func() {
 			BeforeEach(func() {
 				response1 := `{
-					"next_url": "/v2/spaces/some-space-guid/staging_security_groups?page=2",
+					"next_url": "/v2/spaces/some-space-guid/staging_security_groups?q=some-query:some-value&page=2",
 					"resources": [
 						{
 							"metadata": {
@@ -444,20 +501,24 @@ var _ = Describe("Security Groups", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups", "q=some-query:some-value"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups", "page=2"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/staging_security_groups", "q=some-query:some-value&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
 			It("returns the staging security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", []Query{{
+					Filter:   "some-query",
+					Operator: EqualOperator,
+					Value:    "some-value",
+				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
@@ -535,7 +596,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", nil)
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
@@ -545,14 +606,14 @@ var _ = Describe("Security Groups", func() {
 		})
 	})
 
-	Describe("RemoveSpaceFromSecurityGroup", func() {
+	Describe("RemoveSpaceFromRunningSecurityGroup", func() {
 		var (
 			warnings Warnings
 			err      error
 		)
 
 		JustBeforeEach(func() {
-			warnings, err = client.RemoveSpaceFromSecurityGroup("security-group-guid", "space-guid")
+			warnings, err = client.RemoveSpaceFromRunningSecurityGroup("security-group-guid", "space-guid")
 		})
 
 		Context("when the client call is successful", func() {
@@ -580,6 +641,59 @@ var _ = Describe("Security Groups", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v2/security_groups/security-group-guid/spaces/space-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
+
+	Describe("RemoveSpaceFromStagingSecurityGroup", func() {
+		var (
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = client.RemoveSpaceFromStagingSecurityGroup("security-group-guid", "space-guid")
+		})
+
+		Context("when the client call is successful", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/security_groups/security-group-guid/staging_spaces/space-guid"),
+						RespondWith(http.StatusOK, nil, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					))
+			})
+
+			It("returns all warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf(Warnings{"warning-1"}))
+			})
+		})
+
+		Context("when the client call is unsuccessful", func() {
+			BeforeEach(func() {
+				response := `{
+  "code": 10001,
+  "description": "Some Error",
+  "error_code": "CF-SomeError"
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/security_groups/security-group-guid/staging_spaces/space-guid"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					))
 			})

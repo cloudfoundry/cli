@@ -29,7 +29,7 @@ func (retry *RetryRequest) Wrap(innerconnection plugin.Connection) plugin.Connec
 }
 
 // Make retries the request if it comes back with a 5XX status code.
-func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Response) error {
+func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 	var err error
 	var rawRequestBody []byte
 
@@ -45,7 +45,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *plugin.Re
 		if rawRequestBody != nil {
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 		}
-		err = retry.connection.Make(request, passedResponse)
+		err = retry.connection.Make(request, passedResponse, proxyReader)
 		if err == nil {
 			return nil
 		}

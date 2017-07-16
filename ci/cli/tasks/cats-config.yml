@@ -1,16 +1,20 @@
-
 ---
 platform: linux
-rootfs_uri: docker:///cloudfoundry/cli-ci
+
+image_resource:
+  type: docker-image
+  source:
+    repository: relintdockerhubpushbot/cf-deployment-concourse-tasks
 
 inputs:
   - name: bosh-lite-lock
+  - name: cf-cli-binaries
+  - name: vars-store
 
 outputs:
   - name: cats-config
 
 params:
-  BACKEND:
   INCLUDE_V3:
   BROKER_START_TIMEOUT:
   CF_PUSH_TIMEOUT:
@@ -22,34 +26,33 @@ run:
   args:
   - -c
   - |
-    set -eux
+    set -eu
 
-    export DOMAIN=`cat bosh-lite-lock/name`
+    DOMAIN=`cat bosh-lite-lock/name`
+    API="api.${DOMAIN}"
+    CF_USER="admin"
 
-    if [[ $BACKEND == "diego" ]]; then
-      export IS_DIEGO_ENABLED=true
-    else
-      export IS_DIEGO_ENABLED=false
-    fi
+    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     cat << EOF | jq -S . > cats-config/integration_config.json
     {
-      "admin_password": "admin",
-      "admin_user": "admin",
-      "api": "api.$DOMAIN",
+      "admin_password": "${CF_PASSWORD}",
+      "admin_user": "${CF_USER}",
+      "api": "${API}",
       "apps_domain": "$DOMAIN",
-      "backend" : "$BACKEND",
-      "broker_start_timeout": $BROKER_START_TIMEOUT,
-      "cf_push_timeout": $CF_PUSH_TIMEOUT,
-      "default_timeout": $DEFAULT_TIMEOUT,
-      "long_curl_timeout": $LONG_CURL_TIMEOUT,
+      "backend" : "diego",
+      "broker_start_timeout": ${BROKER_START_TIMEOUT},
+      "cf_push_timeout": ${CF_PUSH_TIMEOUT},
+      "default_timeout": ${DEFAULT_TIMEOUT},
+      "long_curl_timeout": ${LONG_CURL_TIMEOUT},
       "skip_ssl_validation": true,
       "use_http": false,
-      "include_v3": $INCLUDE_V3,
+      "include_v3": ${INCLUDE_V3},
       "include_apps": true,
-      "include_backend_compatibility": true,
+      "include_backend_compatibility": false,
       "include_detect": true,
-      "include_docker": $IS_DIEGO_ENABLED,
+      "include_docker": true,
       "include_internet_dependent": true,
       "include_privileged_container_support": false,
       "include_route_services": true,
@@ -57,8 +60,22 @@ run:
       "include_zipkin": false,
       "include_security_groups": true,
       "include_services": true,
-      "include_ssh": $IS_DIEGO_ENABLED,
+      "include_ssh": true,
       "include_sso": false,
       "include_tasks": false
     }
     EOF
+
+    bindir=${PWD}/bin
+    mkdir -p ${bindir}
+    export PATH=${bindir}:$PATH
+
+    pushd cf-cli-binaries
+      tar xvf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      ln -s ${PWD}/cf-cli_linux_x86-64 ${bindir}/cf
+    popd
+
+    cf api ${API} --skip-ssl-validation
+    cf auth ${CF_USER} ${CF_PASSWORD}
+    cf enable-feature-flag diego_docker

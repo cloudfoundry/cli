@@ -41,7 +41,7 @@ func (cmd *CreateIsolationSegmentCommand) Setup(config command.Config, ui comman
 }
 
 func (cmd CreateIsolationSegmentCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.11.0")
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
 	if err != nil {
 		return err
 	}

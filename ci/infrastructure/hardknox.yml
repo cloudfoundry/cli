@@ -68,7 +68,7 @@ jobs:
       BBL_GCP_ZONE: us-central1-f
       BBL_LB_CERT: {{hardknox_cf_ssl_cert}}
       BBL_LB_KEY: {{hardknox_cf_ssl_cert_private_key}}
-      LB_DOMAIN: hardknox.cli.ci.cf-app.com
+      LB_DOMAIN: hardknox.cli.fun
       BBL_ENV_NAME: hardknox
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
@@ -103,7 +103,7 @@ jobs:
       input1: ops-files
       input2: cli-ci
     params:
-      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/tcp-routing-gcp.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml"
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/tcp-routing-gcp.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
@@ -112,8 +112,8 @@ jobs:
       vars-files: cf-state
       ops-files: combine_inputs_output
     params:
-      SYSTEM_DOMAIN: hardknox.cli.ci.cf-app.com
-      OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml"
+      SYSTEM_DOMAIN: hardknox.cli.fun
+      OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:

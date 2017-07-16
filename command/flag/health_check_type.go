@@ -10,7 +10,7 @@ type HealthCheckType struct {
 	Type string
 }
 
-func (_ HealthCheckType) Complete(prefix string) []flags.Completion {
+func (HealthCheckType) Complete(prefix string) []flags.Completion {
 	return completions([]string{"http", "port", "process"}, prefix, false)
 }
 

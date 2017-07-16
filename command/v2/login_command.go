@@ -20,11 +20,11 @@ type LoginCommand struct {
 	relatedCommands   interface{} `related_commands:"api, auth, target"`
 }
 
-func (_ LoginCommand) Setup(config command.Config, ui command.UI) error {
+func (LoginCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ LoginCommand) Execute(args []string) error {
+func (LoginCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

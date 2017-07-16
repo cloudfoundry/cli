@@ -15,11 +15,11 @@ type CreateAppManifestCommand struct {
 	relatedCommands interface{}  `related_commands:"apps, push"`
 }
 
-func (_ CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateAppManifestCommand) Execute(args []string) error {
+func (CreateAppManifestCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

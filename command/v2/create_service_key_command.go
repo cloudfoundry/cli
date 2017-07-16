@@ -15,11 +15,11 @@ type CreateServiceKeyCommand struct {
 	relatedCommands  interface{}             `related_commands:"service-key"`
 }
 
-func (_ CreateServiceKeyCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateServiceKeyCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateServiceKeyCommand) Execute(args []string) error {
+func (CreateServiceKeyCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

@@ -6,8 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -58,7 +58,7 @@ var _ = Describe("create-user Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -79,7 +79,7 @@ var _ = Describe("create-user Command", func() {
 				})
 
 				It("returns the RequiredArgumentError", func() {
-					Expect(executeErr).To(MatchError(command.RequiredArgumentError{ArgumentName: "PASSWORD"}))
+					Expect(executeErr).To(MatchError(translatableerror.RequiredArgumentError{ArgumentName: "PASSWORD"}))
 				})
 			})
 
@@ -89,7 +89,7 @@ var _ = Describe("create-user Command", func() {
 				})
 
 				It("returns the RequiredArgumentError", func() {
-					Expect(executeErr).To(MatchError(command.RequiredArgumentError{ArgumentName: "PASSWORD"}))
+					Expect(executeErr).To(MatchError(translatableerror.RequiredArgumentError{ArgumentName: "PASSWORD"}))
 				})
 			})
 

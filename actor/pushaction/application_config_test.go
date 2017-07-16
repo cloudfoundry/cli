@@ -2,6 +2,8 @@ package pushaction_test
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
@@ -64,6 +66,7 @@ var _ = Describe("Application Config", func() {
 			spaceGUID    string
 			domain       v2action.Domain
 			manifestApps []manifest.Application
+			filesPath    string
 
 			configs    []ApplicationConfig
 			warnings   Warnings
@@ -76,9 +79,14 @@ var _ = Describe("Application Config", func() {
 			appName = "some-app"
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
+
+			var err error
+			filesPath, err = ioutil.TempDir("", "convert-to-application-configs")
+			Expect(err).ToNot(HaveOccurred())
+
 			manifestApps = []manifest.Application{{
 				Name: appName,
-				Path: "some-path",
+				Path: filesPath,
 			}}
 
 			domain = v2action.Domain{
@@ -98,6 +106,10 @@ var _ = Describe("Application Config", func() {
 			if len(configs) > 0 {
 				firstConfig = configs[0]
 			}
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(filesPath)).ToNot(HaveOccurred())
 		})
 
 		Context("when the application exists", func() {
@@ -129,12 +141,10 @@ var _ = Describe("Application Config", func() {
 					fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{route}, v2action.Warnings{"app-route-warnings"}, nil)
 				})
 
-				It("sets the current and desired application to the current", func() {
+				It("sets the current application to the existing application", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
 					Expect(firstConfig.CurrentApplication).To(Equal(app))
-					Expect(firstConfig.DesiredApplication).To(Equal(app))
-					Expect(firstConfig.Path).To(Equal("some-path"))
 					Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 
 					Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -181,7 +191,6 @@ var _ = Describe("Application Config", func() {
 					Name:      "some-app",
 					SpaceGUID: spaceGUID,
 				}))
-				Expect(firstConfig.Path).To(Equal("some-path"))
 				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 			})
 		})
@@ -231,40 +240,125 @@ var _ = Describe("Application Config", func() {
 			})
 		})
 
-		Context("when given a directory", func() {
-			Context("when scanning is successful", func() {
-				var resources []v2action.Resource
+		Context("when scanning for files", func() {
+			Context("given a directory", func() {
+				Context("when scanning is successful", func() {
+					var resources []v2action.Resource
 
-				BeforeEach(func() {
-					resources = []v2action.Resource{
-						{Filename: "I am a file!"},
-						{Filename: "I am not a file"},
-					}
-					fakeV2Actor.GatherResourcesReturns(resources, nil)
+					BeforeEach(func() {
+						resources = []v2action.Resource{
+							{Filename: "I am a file!"},
+							{Filename: "I am not a file"},
+						}
+						fakeV2Actor.GatherDirectoryResourcesReturns(resources, nil)
+					})
+
+					It("sets the full resource list on the config", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+						Expect(firstConfig.AllResources).To(Equal(resources))
+						Expect(firstConfig.Path).To(Equal(filesPath))
+						Expect(firstConfig.Archive).To(BeFalse())
+
+						Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(filesPath))
+					})
 				})
 
-				It("sets the full resource list on the config", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
-					Expect(firstConfig.AllResources).To(Equal(resources))
+				Context("when scanning errors", func() {
+					var expectedErr error
 
-					Expect(fakeV2Actor.GatherResourcesCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.GatherResourcesArgsForCall(0)).To(Equal("some-path"))
+					BeforeEach(func() {
+						expectedErr = errors.New("dios mio")
+						fakeV2Actor.GatherDirectoryResourcesReturns(nil, expectedErr)
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+					})
 				})
 			})
 
-			Context("when scanning errors", func() {
-				var expectedErr error
+			Context("given archive", func() {
+				var archive string
 
 				BeforeEach(func() {
-					expectedErr = errors.New("dios mio")
-					fakeV2Actor.GatherResourcesReturns(nil, expectedErr)
+					f, err := ioutil.TempFile("", "convert-to-application-configs-archive")
+					Expect(err).ToNot(HaveOccurred())
+					archive = f.Name()
+					Expect(f.Close()).ToNot(HaveOccurred())
+
+					manifestApps[0].Path = archive
 				})
 
-				It("returns the error and warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+				AfterEach(func() {
+					Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
 				})
+
+				Context("when scanning is successful", func() {
+					var resources []v2action.Resource
+
+					BeforeEach(func() {
+						resources = []v2action.Resource{
+							{Filename: "I am a file!"},
+							{Filename: "I am not a file"},
+						}
+						fakeV2Actor.GatherArchiveResourcesReturns(resources, nil)
+					})
+
+					It("sets the full resource list on the config", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+						Expect(firstConfig.AllResources).To(Equal(resources))
+						Expect(firstConfig.Path).To(Equal(archive))
+						Expect(firstConfig.Archive).To(BeTrue())
+
+						Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archive))
+					})
+				})
+
+				Context("when scanning errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("dios mio")
+						fakeV2Actor.GatherArchiveResourcesReturns(nil, expectedErr)
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+					})
+				})
+			})
+
+			Context("given a path that does not exist", func() {
+				BeforeEach(func() {
+					manifestApps[0].Path = "/i/will/fight/you/if/this/exists"
+				})
+
+				It("returns errors and warnings", func() {
+					Expect(os.IsNotExist(executeErr)).To(BeTrue())
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+
+					Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
+					Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(0))
+				})
+			})
+		})
+
+		Context("when a docker image is configured", func() {
+			BeforeEach(func() {
+				manifestApps[0].DockerImage = "some-docker-image-path"
+			})
+
+			It("sets the docker image on DesiredApplication and does not gather resources", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image-path"))
+
+				Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
 			})
 		})
 	})

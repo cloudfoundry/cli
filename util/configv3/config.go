@@ -17,22 +17,25 @@ import (
 )
 
 const (
-	// DefaultStagingTimeout is the default timeout for application staging.
-	DefaultStagingTimeout = 15 * time.Minute
-
-	// DefaultStartupTimeout is the default timeout for application starting.
-	DefaultStartupTimeout = 5 * time.Minute
-	// DefaultPingerThrottle = 5 * time.Second
-
 	// DefaultDialTimeout is the default timeout for the dail.
 	DefaultDialTimeout = 5 * time.Second
 
 	// DefaultOverallPollingTimeout is the default maximum time that the CLI will
 	// poll a job running on the Cloud Controller. By default it's infinit, which
 	// is represented by MaxInt64.
-	DefaultOverallPollingTimeout = time.Duration(1<<63 - 1) // math.MaxInt64
-	// Developer note about constant above ^^^ do not replace with math.MaxInt64
-	// This will require the math package which is a dynamically linked library.
+	DefaultOverallPollingTimeout = time.Duration(1 << 62)
+	// Developer Note: Due to bugs in using MaxInt64 during comparison, the above
+	// was chosen as a replacement.
+
+	// DefaultPollingInterval is the time between consecutive polls of a status.
+	DefaultPollingInterval = 3 * time.Second
+
+	// DefaultStagingTimeout is the default timeout for application staging.
+	DefaultStagingTimeout = 15 * time.Minute
+
+	// DefaultStartupTimeout is the default timeout for application starting.
+	DefaultStartupTimeout = 5 * time.Minute
+	// DefaultPingerThrottle = 5 * time.Second
 
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
@@ -138,6 +141,11 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		config.Flags = flags[0]
 	}
 
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
 	// Developer Note: The following is untested! Change at your own risk.
 	isTTY := terminal.IsTerminal(int(os.Stdout.Fd()))
 	terminalWidth := math.MaxInt32
@@ -151,8 +159,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	config.detectedSettings = detectedSettings{
-		tty:           isTTY,
-		terminalWidth: terminalWidth,
+		currentDirectory: pwd,
+		terminalWidth:    terminalWidth,
+		tty:              isTTY,
 	}
 
 	return &config, nil
@@ -271,8 +280,9 @@ type FlagOverride struct {
 
 // detectedSettings are automatically detected settings determined by the CLI.
 type detectedSettings struct {
-	tty           bool
-	terminalWidth int
+	currentDirectory string
+	terminalWidth    int
+	tty              bool
 }
 
 // Target returns the CC API URL
@@ -282,7 +292,7 @@ func (config *Config) Target() string {
 
 // PollingInterval returns the time between polls.
 func (config *Config) PollingInterval() time.Duration {
-	return 5 * time.Second
+	return DefaultPollingInterval
 }
 
 // OverallPollingTimeout returns the overall polling timeout for async
@@ -404,8 +414,9 @@ func (config *Config) Experimental() bool {
 	return false
 }
 
-// Verbose returns true if verbose should be displayed to terminal and a
-// location to log to. This is based off of:
+// Verbose returns true if verbose should be displayed to terminal, in addition
+// a slice of full paths in which verbose text will appear. This is based off
+// of:
 //   - The config file's trace value (true/false/file path)
 //   - The $CF_TRACE enviroment variable if set (true/false/file path)
 //   - The '-v/--verbose' global flag
@@ -435,6 +446,12 @@ func (config *Config) Verbose() (bool, []string) {
 		}
 	}
 	verbose = config.Flags.Verbose || verbose
+
+	for i, path := range filePath {
+		if !filepath.IsAbs(path) {
+			filePath[i] = filepath.Join(config.detectedSettings.currentDirectory, path)
+		}
+	}
 
 	return verbose, filePath
 }

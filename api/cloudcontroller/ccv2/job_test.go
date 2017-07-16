@@ -155,18 +155,25 @@ var _ = Describe("Job", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/jobs/some-job-guid"),
-						RespondWith(http.StatusAccepted, fmt.Sprintf(`{
-							"metadata": {
-								"guid": "some-job-guid",
-								"created_at": "2016-06-08T16:41:29Z",
-								"url": "/v2/jobs/some-job-guid"
-							},
-							"entity": {
-								"error": "%s",
-								"guid": "job-guid",
-								"status": "failed"
+						RespondWith(http.StatusOK, fmt.Sprintf(`
+							{
+								"metadata": {
+									"guid": "some-job-guid",
+									"created_at": "2016-06-08T16:41:29Z",
+									"url": "/v2/jobs/some-job-guid"
+								},
+								"entity": {
+									"error": "Use of entity>error is deprecated in favor of entity>error_details.",
+									"error_details": {
+										"code": 160001,
+										"description": "%s",
+										"error_code": "CF-AppBitsUploadInvalid"
+									},
+									"guid": "job-guid",
+									"status": "failed"
+								}
 							}
-						}`, jobFailureMessage), http.Header{"X-Cf-Warnings": {"warning-4"}}),
+							`, jobFailureMessage), http.Header{"X-Cf-Warnings": {"warning-4"}}),
 					))
 			})
 
@@ -269,15 +276,16 @@ var _ = Describe("Job", func() {
 
 				// Fuzzy test to ensure that the overall function time isn't [far]
 				// greater than the OverallPollingTimeout. Since this is partially
-				// dependant on the speed of the system, the expectation is that the
-				// function *should* never exceed twice the timeout.
+				// dependent on the speed of the system, the expectation is that the
+				// function *should* never exceed three times the timeout.
 				It("does not run [too much] longer than the timeout", func() {
 					startTime := time.Now()
-					client.PollJob(Job{GUID: "some-job-guid"})
+					_, err := client.PollJob(Job{GUID: "some-job-guid"})
 					endTime := time.Now()
+					Expect(err).To(HaveOccurred())
 
 					// If the jobPollingTimeout is less than the PollingInterval,
-					// then the margin may be too small, we should install not allow the
+					// then the margin may be too small, we should not allow the
 					// jobPollingTimeout to be set to less than the PollingInterval
 					Expect(endTime).To(BeTemporally("~", startTime, 3*jobPollingTimeout))
 				})
@@ -323,19 +331,25 @@ var _ = Describe("Job", func() {
 
 		Context("when the job fails", func() {
 			BeforeEach(func() {
-				jsonResponse := `{
-					"metadata": {
-						"guid": "job-guid",
-						"created_at": "2016-06-08T16:41:27Z",
-						"url": "/v2/jobs/job-guid"
-					},
-					"entity": {
-						"error": "some-error",
-						"guid": "job-guid",
-						"status": "failed"
+				jsonResponse := `
+					{
+						"metadata": {
+							"guid": "some-job-guid",
+							"created_at": "2016-06-08T16:41:29Z",
+							"url": "/v2/jobs/some-job-guid"
+						},
+						"entity": {
+							"error": "Use of entity>error is deprecated in favor of entity>error_details.",
+							"error_details": {
+								"code": 160001,
+								"description": "some-error",
+								"error_code": "CF-AppBitsUploadInvalid"
+							},
+							"guid": "job-guid",
+							"status": "failed"
+						}
 					}
-				}`
-
+					`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/jobs/job-guid"),
@@ -350,68 +364,8 @@ var _ = Describe("Job", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
 				Expect(job.Status).To(Equal(JobStatusFailed))
-				Expect(job.Error).To(Equal("some-error"))
-			})
-		})
-	})
-
-	Describe("DeleteOrganization", func() {
-		BeforeEach(func() {
-			client = NewTestClient()
-		})
-
-		Context("when no errors are encountered", func() {
-			BeforeEach(func() {
-				jsonResponse := `{
-					"metadata": {
-						"guid": "job-guid",
-						"created_at": "2016-06-08T16:41:27Z",
-						"url": "/v2/jobs/job-guid"
-					},
-					"entity": {
-						"guid": "job-guid",
-						"status": "queued"
-					}
-				}`
-
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
-						RespondWith(http.StatusAccepted, jsonResponse, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("deletes the org and returns all warnings", func() {
-				job, warnings, err := client.DeleteOrganization("some-org-guid")
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
-				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.Status).To(Equal(JobStatusQueued))
-			})
-		})
-
-		Context("when an error is encountered", func() {
-			BeforeEach(func() {
-				response := `{
-  "code": 30003,
-  "description": "The organization could not be found: some-org-guid",
-  "error_code": "CF-OrganizationNotFound"
-}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("returns an error and all warnings", func() {
-				_, warnings, err := client.DeleteOrganization("some-org-guid")
-
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "The organization could not be found: some-org-guid",
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
+				Expect(job.Error).To(Equal("Use of entity>error is deprecated in favor of entity>error_details."))
+				Expect(job.ErrorDetails.Description).To(Equal("some-error"))
 			})
 		})
 	})
@@ -591,7 +545,8 @@ var _ = Describe("Job", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
 							defer request.Body.Close()
-							request.Body.Read(make([]byte, 32*1024))
+							_, err := request.Body.Read(make([]byte, 32*1024))
+							Expect(err).ToNot(HaveOccurred())
 							return expectedErr
 						}
 						return connection.Make(request, response)

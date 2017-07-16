@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "code.cloudfoundry.org/clock",
+			"repository": "https://github.com/cloudfoundry/clock",
+			"vcs": "git",
+			"revision": "2269160ae1757f96bbb8c6475e6fa36c805e73e0",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "code.cloudfoundry.org/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
@@ -32,7 +40,7 @@
 			"importpath": "code.cloudfoundry.org/lager",
 			"repository": "https://github.com/cloudfoundry/lager",
 			"vcs": "git",
-			"revision": "6cfe365fb6bb84343f0034b4a53cd250d173b61f",
+			"revision": "b4f07fd10491fae0d6d9a0d07145e9f90935ac50",
 			"branch": "master",
 			"notests": true
 		},
@@ -61,18 +69,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/Sirupsen/logrus",
-			"repository": "https://github.com/Sirupsen/logrus",
-			"vcs": "git",
-			"revision": "61e43dc76f7ee59a82bdf3d71033dc12bea4c77d",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
-			"revision": "3a37c301dda64cbe17f16f661b4c976803c0e2d2",
+			"revision": "4a1e882c79dcf4ec00d2e29fac74b9c8938d5052",
 			"branch": "master",
 			"notests": true
 		},
@@ -97,7 +97,7 @@
 			"importpath": "github.com/cloudfoundry/bytefmt",
 			"repository": "https://github.com/cloudfoundry/bytefmt",
 			"vcs": "git",
-			"revision": "b12c1522f4cbb5f35861bd5dd2c39a4fa996441a",
+			"revision": "f4415fafc5619dd75599a54a7c91fb3948ad58bd",
 			"branch": "master",
 			"notests": true
 		},
@@ -105,7 +105,7 @@
 			"importpath": "github.com/cloudfoundry/dropsonde",
 			"repository": "https://github.com/cloudfoundry/dropsonde",
 			"vcs": "git",
-			"revision": "01bc88882911289a6eaa67311ac0d06f77196c4f",
+			"revision": "566965a4f337c6c72c0bc7f0854c564001bab69e",
 			"branch": "master",
 			"notests": true
 		},
@@ -121,7 +121,7 @@
 			"importpath": "github.com/cloudfoundry/noaa",
 			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
-			"revision": "dd6ec6bd0a0182d44fbd738bcb044adeed8171bb",
+			"revision": "ea8759ba3628ce69b0c332ccea75ac6e373a938b",
 			"branch": "master",
 			"notests": true
 		},
@@ -129,18 +129,81 @@
 			"importpath": "github.com/cloudfoundry/sonde-go/events",
 			"repository": "https://github.com/cloudfoundry/sonde-go",
 			"vcs": "git",
-			"revision": "64ff74a60c9558e7fcb55c9d22eff49412ec5826",
+			"revision": "5f5bca3bcb61dbf9371b8db82497c6396cc0ea9b",
 			"branch": "master",
 			"path": "/events",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/distribution/digestset",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "digestset",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/distribution/reference",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "/reference",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/distribution/vendor/github.com/opencontainers/go-digest",
+			"repository": "https://github.com/docker/distribution",
+			"vcs": "git",
+			"revision": "1e2f10eb65743fed02f573d31a4587de09afb20e",
+			"branch": "master",
+			"path": "vendor/github.com/opencontainers/go-digest",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "a7c3389a8223449ed72d796b33a667e603811db8",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
 			"branch": "master",
 			"path": "/pkg/term",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/github.com/Azure/go-ansiterm",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/github.com/sirupsen/logrus",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/github.com/sirupsen/logrus",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/golang.org/x/sys/unix",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/golang.org/x/sys/unix",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/docker/vendor/golang.org/x/sys/windows",
+			"repository": "https://github.com/docker/docker",
+			"vcs": "git",
+			"revision": "c9f26eaaf8b9f7977319d6d596f8701bbc58a108",
+			"branch": "master",
+			"path": "vendor/golang.org/x/sys/windows",
 			"notests": true
 		},
 		{
@@ -245,15 +308,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/nicksnyder/go-i18n/i18n",
-			"repository": "https://github.com/nicksnyder/go-i18n",
-			"vcs": "git",
-			"revision": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb",
-			"branch": "master",
-			"path": "/i18n",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/nu7hatch/gouuid",
 			"repository": "https://github.com/nu7hatch/gouuid",
 			"vcs": "git",
@@ -265,7 +319,7 @@
 			"importpath": "github.com/onsi/ginkgo",
 			"repository": "https://github.com/onsi/ginkgo",
 			"vcs": "git",
-			"revision": "83438ca4278f2f56757b9ab2cb15dd4f596d84e8",
+			"revision": "a1f616c97771e46da1722d3aa9dcde0a43f55682",
 			"branch": "master",
 			"notests": true
 		},
@@ -273,7 +327,15 @@
 			"importpath": "github.com/onsi/gomega",
 			"repository": "https://github.com/onsi/gomega",
 			"vcs": "git",
-			"revision": "da367351331c75190afec7ed3a0c61e0016942ed",
+			"revision": "39a54bd3c3bbfe1c331a9b3207e92134c77ed812",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sabhiram/go-gitignore",
+			"repository": "https://github.com/sabhiram/go-gitignore",
+			"vcs": "git",
+			"revision": "730f0220149475811d197e7905f73b3eadd28f4b",
 			"branch": "master",
 			"notests": true
 		},
@@ -282,6 +344,14 @@
 			"repository": "https://github.com/sajari/fuzzy",
 			"vcs": "git",
 			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/sirupsen/logrus",
+			"repository": "https://github.com/sirupsen/logrus",
+			"vcs": "git",
+			"revision": "85b1699d505667d13f8ac4478c1debbf85d6c5de",
 			"branch": "master",
 			"notests": true
 		},
@@ -297,7 +367,7 @@
 			"importpath": "github.com/vito/go-interact",
 			"repository": "https://github.com/vito/go-interact",
 			"vcs": "git",
-			"revision": "e3c86ac934ea9d6f1c6ad6e42e316a6e8fe6a807",
+			"revision": "c5a3f51ad50e34ec101050f69383caa75082f233",
 			"branch": "master",
 			"notests": true
 		},
@@ -305,7 +375,7 @@
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/curve25519",
 			"notests": true
@@ -314,7 +384,7 @@
 			"importpath": "golang.org/x/crypto/ed25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/ed25519",
 			"notests": true
@@ -323,16 +393,25 @@
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "459e26527287adbc2adcc5d0d49abff9a5f315a7",
+			"revision": "e7ba82683099cae71475961448ab8f903ea77c26",
 			"branch": "master",
 			"path": "/ssh",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/net/html",
+			"repository": "https://go.googlesource.com/net",
+			"vcs": "git",
+			"revision": "59a0b19b5533c7977ddeb86b017bf507ed407b12",
+			"branch": "master",
+			"path": "html",
 			"notests": true
 		},
 		{
 			"importpath": "golang.org/x/net/websocket",
 			"repository": "https://go.googlesource.com/net",
 			"vcs": "git",
-			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d",
+			"revision": "59a0b19b5533c7977ddeb86b017bf507ed407b12",
 			"branch": "master",
 			"path": "/websocket",
 			"notests": true
@@ -341,9 +420,81 @@
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
-			"revision": "d75a52659825e75fff6158388dddc6a5b04f9ba5",
+			"revision": "0b25a408a50076fbbcae6b7ac0ea5fbb0b085e79",
 			"branch": "master",
 			"path": "/unix",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/encoding",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "/encoding",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/internal/gen",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "internal/gen",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/internal/tag",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "internal/tag",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/internal/utf8internal",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "internal/utf8internal",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/language",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "language",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/runes",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "runes",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/transform",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "transform",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/text/unicode/cldr",
+			"repository": "https://go.googlesource.com/text",
+			"vcs": "git",
+			"revision": "210eee5cf7323015d097341bcf7166130d001cd8",
+			"branch": "master",
+			"path": "unicode/cldr",
 			"notests": true
 		},
 		{

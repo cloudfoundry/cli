@@ -15,11 +15,11 @@ type DeleteServiceCommand struct {
 	relatedCommands interface{}          `related_commands:"unbind-service, services"`
 }
 
-func (_ DeleteServiceCommand) Setup(config command.Config, ui command.UI) error {
+func (DeleteServiceCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ DeleteServiceCommand) Execute(args []string) error {
+func (DeleteServiceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

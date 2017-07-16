@@ -7,20 +7,24 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
-	StagePackage(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	GetClock() clock.Clock
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
+	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 }
 
 type V3StageCommand struct {
-	usage       interface{} `usage:"CF_NAME v3-stage --name [name] --package-guid [guid]"`
-	AppName     string      `short:"n" long:"name" description:"The desired application name" required:"true"`
-	PackageGUID string      `long:"package-guid" description:"The guid of the package to stage" required:"true"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	PackageGUID         string       `long:"package-guid" description:"The guid of the package to stage" required:"true"`
+	usage               interface{}  `usage:"CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID"`
+	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
 	UI          command.UI
 	Config      command.Config
@@ -76,58 +80,23 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Staging package for {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
+		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
 
-	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
+	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
 		return shared.HandleError(logErr)
 	}
 
-	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID)
-
-	var closedBuildStream, closedWarningsStream, closedErrStream bool
-	for {
-		select {
-		case build, ok := <-buildStream:
-			if !ok {
-				closedBuildStream = true
-				break
-			}
-			cmd.UI.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": build.Droplet.GUID})
-		case log, ok := <-logStream:
-			if !ok {
-				break
-			}
-			cmd.UI.DisplayLogMessage(log, false)
-		case warnings, ok := <-warningsStream:
-			if !ok {
-				closedWarningsStream = true
-				break
-			}
-			cmd.UI.DisplayWarnings(warnings)
-		case logErr, ok := <-logErrStream:
-			if !ok {
-				break
-			}
-			cmd.UI.DisplayWarning(logErr.Error())
-		case err, ok := <-errStream:
-			if !ok {
-				closedErrStream = true
-				break
-			}
-			return shared.HandleError(err)
-		}
-		if closedBuildStream && closedWarningsStream && closedErrStream {
-			break
-		}
+	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
+	_, err = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	if err == nil {
+		cmd.UI.DisplayOK()
 	}
 
-	cmd.UI.DisplayOK()
-
-	return nil
+	return err
 }

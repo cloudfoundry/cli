@@ -11,11 +11,11 @@ type QuotasCommand struct {
 	usage interface{} `usage:"CF_NAME quotas"`
 }
 
-func (_ QuotasCommand) Setup(config command.Config, ui command.UI) error {
+func (QuotasCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ QuotasCommand) Execute(args []string) error {
+func (QuotasCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

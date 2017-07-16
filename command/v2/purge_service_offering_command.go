@@ -16,11 +16,11 @@ type PurgeServiceOfferingCommand struct {
 	relatedCommands interface{}  `related_commands:"marketplace, purge-service-instance, service-brokers"`
 }
 
-func (_ PurgeServiceOfferingCommand) Setup(config command.Config, ui command.UI) error {
+func (PurgeServiceOfferingCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ PurgeServiceOfferingCommand) Execute(args []string) error {
+func (PurgeServiceOfferingCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

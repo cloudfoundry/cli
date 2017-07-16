@@ -8,8 +8,9 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -27,10 +28,11 @@ var _ = Describe("v3-stage Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3StageActor
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
-		binaryName      string
-		executeErr      error
-		app             string
-		packageGUID     string
+
+		binaryName  string
+		executeErr  error
+		app         string
+		packageGUID string
 	)
 
 	BeforeEach(func() {
@@ -40,14 +42,16 @@ var _ = Describe("v3-stage Command", func() {
 		fakeActor = new(v3fakes.FakeV3StageActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
+		fakeConfig.StagingTimeoutReturns(10 * time.Minute)
+
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 		packageGUID = "some-package-guid"
 
 		cmd = v3.V3StageCommand{
-			AppName:     app,
-			PackageGUID: packageGUID,
+			RequiredArgs: flag.AppName{AppName: app},
+			PackageGUID:  packageGUID,
 
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -68,7 +72,7 @@ var _ = Describe("v3-stage Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -93,16 +97,18 @@ var _ = Describe("v3-stage Command", func() {
 		})
 
 		Context("when the logging does not error", func() {
+			var allLogsWritten chan bool
+
 			BeforeEach(func() {
+				allLogsWritten = make(chan bool)
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
 					logStream := make(chan *v3action.LogMessage)
 					errorStream := make(chan error)
 
 					go func() {
-						// defer close(logStream)
-						// defer close(errorStream)
 						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
 						logStream <- v3action.NewLogMessage("Here are some other staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
+						allLogsWritten <- true
 					}()
 
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
@@ -111,12 +117,13 @@ var _ = Describe("v3-stage Command", func() {
 
 			Context("when the staging is successful", func() {
 				BeforeEach(func() {
-					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 						buildStream := make(chan v3action.Build)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
 
 						go func() {
+							<-allLogsWritten
 							defer close(buildStream)
 							defer close(warningsStream)
 							defer close(errorStream)
@@ -142,7 +149,8 @@ var _ = Describe("v3-stage Command", func() {
 				It("stages the package", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					Expect(fakeActor.StagePackageArgsForCall(0)).To(Equal(packageGUID))
+					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					Expect(guidArg).To(Equal(packageGUID))
 				})
 
 				It("displays staging logs and their warnings", func() {
@@ -158,7 +166,8 @@ var _ = Describe("v3-stage Command", func() {
 					Expect(noaaClient).To(Equal(fakeNOAAClient))
 
 					Expect(fakeActor.StagePackageCallCount()).To(Equal(1))
-					Expect(fakeActor.StagePackageArgsForCall(0)).To(Equal(packageGUID))
+					guidArg, _ := fakeActor.StagePackageArgsForCall(0)
+					Expect(guidArg).To(Equal(packageGUID))
 				})
 			})
 
@@ -167,12 +176,13 @@ var _ = Describe("v3-stage Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("any gibberish")
-					fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 						buildStream := make(chan v3action.Build)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
 
 						go func() {
+							<-allLogsWritten
 							defer close(buildStream)
 							defer close(warningsStream)
 							defer close(errorStream)
@@ -194,9 +204,13 @@ var _ = Describe("v3-stage Command", func() {
 		})
 
 		Context("when the logging stream has errors", func() {
-			var expectedErr error
+			var (
+				expectedErr    error
+				allLogsWritten chan bool
+			)
 
 			BeforeEach(func() {
+				allLogsWritten = make(chan bool)
 				expectedErr = errors.New("banana")
 
 				fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
@@ -208,17 +222,19 @@ var _ = Describe("v3-stage Command", func() {
 						defer close(errorStream)
 						logStream <- v3action.NewLogMessage("Here are some staging logs!", 1, time.Now(), v3action.StagingLog, "sourceInstance")
 						errorStream <- expectedErr
+						allLogsWritten <- true
 					}()
 
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
 				}
 
-				fakeActor.StagePackageStub = func(packageGUID string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+				fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
 					buildStream := make(chan v3action.Build)
 					warningsStream := make(chan v3action.Warnings)
 					errorStream := make(chan error)
 
 					go func() {
+						<-allLogsWritten
 						defer close(buildStream)
 						defer close(warningsStream)
 						defer close(errorStream)
@@ -230,21 +246,18 @@ var _ = Describe("v3-stage Command", func() {
 				}
 			})
 
-			It("displays the error and continues staging", func() {
+			It("displays the errors and continues staging", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				stdErr, ok := testUI.Err.(*Buffer)
-				Expect(ok).To(BeTrue())
-				stdErrString := string(stdErr.Contents())
-
-				Expect(stdErrString).To(ContainSubstring("banana"))
-				Expect(stdErrString).To(ContainSubstring("some-warning"))
-				Expect(stdErrString).To(ContainSubstring("some-other-warning"))
+				Expect(testUI.Err).To(Say("banana"))
+				Expect(testUI.Err).To(Say("some-warning"))
+				Expect(testUI.Err).To(Say("some-other-warning"))
 			})
 		})
 
 		Context("when the logging returns an error due to an API error", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
 				expectedErr = errors.New("something is wrong!")
 				logStream := make(chan *v3action.LogMessage)

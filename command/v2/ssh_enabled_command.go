@@ -14,11 +14,11 @@ type SSHEnabledCommand struct {
 	relatedCommands interface{}  `related_commands:"enable-ssh, space-ssh-allowed, ssh"`
 }
 
-func (_ SSHEnabledCommand) Setup(config command.Config, ui command.UI) error {
+func (SSHEnabledCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SSHEnabledCommand) Execute(args []string) error {
+func (SSHEnabledCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

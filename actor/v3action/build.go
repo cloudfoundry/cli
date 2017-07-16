@@ -1,6 +1,7 @@
 package v3action
 
 import (
+	"errors"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -8,7 +9,16 @@ import (
 
 type Build ccv3.Build
 
-func (actor Actor) StagePackage(packageGUID string) (<-chan Build, <-chan Warnings, <-chan error) {
+type StagingTimeoutError struct {
+	AppName string
+	Timeout time.Duration
+}
+
+func (StagingTimeoutError) Error() string {
+	return "Timed out waiting for package to stage"
+}
+
+func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Build, <-chan Warnings, <-chan error) {
 	buildStream := make(chan Build)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)
@@ -27,9 +37,9 @@ func (actor Actor) StagePackage(packageGUID string) (<-chan Build, <-chan Warnin
 			return
 		}
 
-		for build.State == ccv3.BuildStateStaging {
-			time.Sleep(actor.Config.PollingInterval())
+		timeout := time.Now().Add(actor.Config.StagingTimeout())
 
+		for time.Now().Before(timeout) {
 			var warnings ccv3.Warnings
 			build, warnings, err = actor.CloudControllerClient.GetBuild(build.GUID)
 			warningsStream <- Warnings(warnings)
@@ -37,8 +47,20 @@ func (actor Actor) StagePackage(packageGUID string) (<-chan Build, <-chan Warnin
 				errorStream <- err
 				return
 			}
+
+			switch build.State {
+			case ccv3.BuildStateFailed:
+				errorStream <- errors.New(build.Error)
+				return
+			case ccv3.BuildStateStaging:
+				time.Sleep(actor.Config.PollingInterval())
+			default:
+				buildStream <- Build(build)
+				return
+			}
 		}
-		buildStream <- Build(build)
+
+		errorStream <- StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 	}()
 
 	return buildStream, warningsStream, errorStream

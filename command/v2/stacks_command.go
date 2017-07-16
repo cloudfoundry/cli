@@ -12,11 +12,11 @@ type StacksCommand struct {
 	relatedCommands interface{} `related_commands:"app, push"`
 }
 
-func (_ StacksCommand) Setup(config command.Config, ui command.UI) error {
+func (StacksCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ StacksCommand) Execute(args []string) error {
+func (StacksCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

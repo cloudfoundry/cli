@@ -17,11 +17,11 @@ type SetEnvCommand struct {
 	relatedCommands interface{}             `related_commands:"apps, env, restart, set-staging-environment-variable-group, set-running-environment-variable-group"`
 }
 
-func (_ SetEnvCommand) Setup(config command.Config, ui command.UI) error {
+func (SetEnvCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SetEnvCommand) Execute(args []string) error {
+func (SetEnvCommand) Execute(args []string) error {
 	//TODO: Be sure to sanitize the WorkAroundPrefix
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil

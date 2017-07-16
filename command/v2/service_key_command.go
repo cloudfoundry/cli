@@ -14,11 +14,11 @@ type ServiceKeyCommand struct {
 	usage        interface{}             `usage:"CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLES:\n   CF_NAME service-key mydb mykey"`
 }
 
-func (_ ServiceKeyCommand) Setup(config command.Config, ui command.UI) error {
+func (ServiceKeyCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ ServiceKeyCommand) Execute(args []string) error {
+func (ServiceKeyCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

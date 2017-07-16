@@ -2,12 +2,13 @@ package plugin_test
 
 import (
 	"errors"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
-	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -70,7 +71,47 @@ var _ = Describe("uninstall-plugin command", func() {
 			})
 		})
 
-		Context("when uninstalling the plugin encounters an error", func() {
+		Context("when uninstalling the plugin returns a plugin binary remove failed error", func() {
+			var pathError error
+
+			BeforeEach(func() {
+				pathError = &os.PathError{
+					Op:  "some-op",
+					Err: errors.New("some error"),
+				}
+
+				fakeActor.UninstallPluginReturns(pluginaction.PluginBinaryRemoveFailedError{
+					Err: pathError,
+				})
+			})
+
+			It("returns a PluginBinaryRemoveFailedError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.PluginBinaryRemoveFailedError{
+					Err: pathError,
+				}))
+			})
+		})
+
+		Context("when uninstalling the plugin returns a plugin execute error", func() {
+			var pathError error
+
+			BeforeEach(func() {
+				pathError = &os.PathError{
+					Op:  "some-op",
+					Err: errors.New("some error"),
+				}
+
+				fakeActor.UninstallPluginReturns(pluginaction.PluginExecuteError{Err: pathError})
+			})
+
+			It("returns a PluginBinaryUninstallError", func() {
+				Expect(executeErr).To(MatchError(translatableerror.PluginBinaryUninstallError{
+					Err: pathError,
+				}))
+			})
+		})
+
+		Context("when uninstalling the plugin encounters any other error", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
@@ -95,7 +136,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 		It("returns a PluginNotFoundError", func() {
 			Expect(testUI.Out).To(Say("Uninstalling plugin some-plugin..."))
-			Expect(executeErr).To(MatchError(shared.PluginNotFoundError{
+			Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundError{
 				PluginName: "some-plugin",
 			}))
 		})

@@ -7,8 +7,8 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -47,7 +47,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		org = "some-org"
 		isolationSegment = "segment1"
-		fakeActor.CloudControllerAPIVersionReturns("3.11.0")
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -60,9 +60,9 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 
 		It("returns a MinimumAPIVersionNotMetError", func() {
-			Expect(executeErr).To(MatchError(command.MinimumAPIVersionNotMetError{
+			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: "3.11.0",
+				MinimumVersion: command.MinVersionIsolationSegmentV3,
 			}))
 		})
 	})
@@ -73,7 +73,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(command.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -139,7 +139,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				It("displays all warnings and the isolation segment not found error", func() {
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
-					Expect(executeErr).To(MatchError(shared.IsolationSegmentNotFoundError{Name: "segment1"}))
+					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: "segment1"}))
 				})
 			})
 
@@ -151,7 +151,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				})
 
 				It("displays all warnings and the org not found error", func() {
-					Expect(executeErr).To(MatchError(shared.OrganizationNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
 				})
 			})
 

@@ -220,12 +220,14 @@ var _ = Describe("Push Command", func() {
 			executeErr     error
 			args           []string
 			uiWithContents terminal.UI
+			input          *gbytes.Buffer
 			output         *gbytes.Buffer
 		)
 
 		BeforeEach(func() {
+			input = gbytes.NewBuffer()
 			output = gbytes.NewBuffer()
-			uiWithContents = terminal.NewUI(gbytes.NewBuffer(), output, terminal.NewTeePrinter(output), trace.NewWriterPrinter(output, false))
+			uiWithContents = terminal.NewUI(input, output, terminal.NewTeePrinter(output), trace.NewWriterPrinter(output, false))
 
 			domainRepo.FirstOrDefaultStub = func(orgGUID string, name *string) (models.DomainFields, error) {
 				if name == nil {
@@ -847,6 +849,92 @@ var _ = Describe("Push Command", func() {
 							params := appRepo.CreateArgsForCall(0)
 							Expect(*params.DockerImage).To(Equal("sample/dockerImage"))
 						})
+					})
+
+					Context("when using --docker-username", func() {
+						BeforeEach(func() {
+							args = append(args, "--docker-username", "some-docker-username")
+						})
+
+						Context("when CF_DOCKER_PASSWORD is set", func() {
+							BeforeEach(func() {
+								err := os.Setenv("CF_DOCKER_PASSWORD", "some-docker-pass")
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							AfterEach(func() {
+								err := os.Unsetenv("CF_DOCKER_PASSWORD")
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							It("it passes the credentials to create call", func() {
+								Expect(executeErr).NotTo(HaveOccurred())
+
+								Expect(output).To(gbytes.Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+								Expect(appRepo.CreateCallCount()).To(Equal(1))
+								params := appRepo.CreateArgsForCall(0)
+								Expect(*params.DockerUsername).To(Equal("some-docker-username"))
+								Expect(*params.DockerPassword).To(Equal("some-docker-pass"))
+							})
+						})
+
+						Context("when CF_DOCKER_PASSWORD is not set", func() {
+							BeforeEach(func() {
+								Skip("these [mostly] worked prior to the revert in 1d94b2df98b")
+							})
+
+							Context("when the user gets prompted for the docker password", func() {
+								Context("when the user inputs the password on the first attempt", func() {
+									BeforeEach(func() {
+										_, err := input.Write([]byte("some-docker-pass\n"))
+										Expect(err).NotTo(HaveOccurred())
+									})
+
+									It("it passes the credentials to create call", func() {
+										Expect(executeErr).NotTo(HaveOccurred())
+
+										Expect(output).To(gbytes.Say("Environment variable CF_DOCKER_PASSWORD not set."))
+										Expect(output).To(gbytes.Say("Docker password"))
+										Expect(output).ToNot(gbytes.Say("Docker password")) // Only prompt once
+
+										Expect(appRepo.CreateCallCount()).To(Equal(1))
+										params := appRepo.CreateArgsForCall(0)
+										Expect(*params.DockerUsername).To(Equal("some-docker-username"))
+										Expect(*params.DockerPassword).To(Equal("some-docker-pass"))
+									})
+								})
+
+								Context("when the user fails to input the password 3 times", func() {
+									BeforeEach(func() {
+										_, err := input.Write([]byte("\n\n\n"))
+										Expect(err).NotTo(HaveOccurred())
+									})
+
+									It("returns an error", func() {
+										Expect(executeErr).To(MatchError("Please provide a password"))
+
+										Expect(output).To(gbytes.Say("Docker password"))
+										Expect(output).To(gbytes.Say("Docker password"))
+										Expect(output).To(gbytes.Say("Docker password"))
+										Expect(output).ToNot(gbytes.Say("Docker password"))
+
+										Expect(appRepo.CreateCallCount()).To(Equal(0))
+									})
+								})
+							})
+						})
+					})
+				})
+
+				Context("when pushing with --docker-username and not --docker-image", func() {
+					BeforeEach(func() {
+						deps.UI = uiWithContents
+						args = []string{"testApp", "--docker-username", "some-docker-username"}
+					})
+
+					It("it returns an error", func() {
+						Expect(executeErr).To(MatchError("'--docker-username' requires '--docker-image' to be specified"))
 					})
 				})
 

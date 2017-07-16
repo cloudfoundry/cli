@@ -39,7 +39,10 @@ const (
 
 // Job represents a Cloud Controller Job.
 type Job struct {
-	Error  string
+	Error        string
+	ErrorDetails struct {
+		Description string
+	}
 	GUID   string
 	Status JobStatus
 }
@@ -48,7 +51,10 @@ type Job struct {
 func (job *Job) UnmarshalJSON(data []byte) error {
 	var ccJob struct {
 		Entity struct {
-			Error  string `json:"error"`
+			Error        string `json:"error"`
+			ErrorDetails struct {
+				Description string `json:"description"`
+			} `json:"error_details"`
 			GUID   string `json:"guid"`
 			Status string `json:"status"`
 		} `json:"entity"`
@@ -59,6 +65,7 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	}
 
 	job.Error = ccJob.Entity.Error
+	job.ErrorDetails.Description = ccJob.Entity.ErrorDetails.Description
 	job.GUID = ccJob.Entity.GUID
 	job.Status = JobStatus(ccJob.Entity.Status)
 	return nil
@@ -116,7 +123,7 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		if job.Failed() {
 			return allWarnings, ccerror.JobFailedError{
 				JobGUID: originalJobGUID,
-				Message: job.Error,
+				Message: job.ErrorDetails.Description,
 			}
 		}
 
@@ -131,31 +138,6 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 		JobGUID: originalJobGUID,
 		Timeout: client.jobPollingTimeout,
 	}
-}
-
-// DeleteOrganization deletes the Organization associated with the provided
-// GUID. It will return the Cloud Controller job that is assigned to the
-// organization deletion.
-func (client *Client) DeleteOrganization(orgGUID string) (Job, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteOrganizationRequest,
-		URIParams:   Params{"organization_guid": orgGUID},
-		Query: url.Values{
-			"recursive": {"true"},
-			"async":     {"true"},
-		},
-	})
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	var job Job
-	response := cloudcontroller.Response{
-		Result: &job,
-	}
-
-	err = client.connection.Make(request, &response)
-	return job, response.Warnings, err
 }
 
 // UploadApplicationPackage uploads the newResources and a list of existing
@@ -235,7 +217,7 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 	return job, response.Warnings, firstError
 }
 
-func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
+func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
 
@@ -280,7 +262,7 @@ func (_ *Client) createMultipartBodyAndHeaderForAppBits(existingResources []Reso
 	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
-func (_ *Client) overallRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+func (*Client) overallRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 

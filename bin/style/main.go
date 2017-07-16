@@ -134,6 +134,9 @@ func (v *visitor) checkFunc(node *ast.FuncDecl) {
 		v.checkFuncWithReceiver(node)
 	} else {
 		funcName := node.Name.Name
+		if funcName == "Execute" || strings.HasPrefix(funcName, "New") {
+			return
+		}
 
 		if strings.Compare(funcName, v.lastFuncDecl) == -1 {
 			v.addWarning(node.Pos(), "function %s defined after function %s", funcName, v.lastFuncDecl)
@@ -263,6 +266,11 @@ func checkFile(fileSet *token.FileSet, path string) ([]warning, error) {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s [--] [FILE or DIRECTORY]...\n", os.Args[0])
+		os.Exit(1)
+	}
+
 	var allWarnings []warning
 
 	args := os.Args[1:]

@@ -5,29 +5,29 @@ type NotLoggedInError struct {
 	BinaryName string
 }
 
-func (_ NotLoggedInError) Error() string {
+func (NotLoggedInError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
 }
 
-// NoTargetedOrganizationError represents the scenario when an org is not targeted.
-type NoTargetedOrganizationError struct {
+// NoOrganizationTargetedError represents the scenario when an org is not targeted.
+type NoOrganizationTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedOrganizationError) Error() string {
+func (NoOrganizationTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
 }
 
-// NoTargetedSpaceError represents the scenario when a space is not targeted.
-type NoTargetedSpaceError struct {
+// NoSpaceTargetedError represents the scenario when a space is not targeted.
+type NoSpaceTargetedError struct {
 	BinaryName string
 }
 
-func (_ NoTargetedSpaceError) Error() string {
+func (NoSpaceTargetedError) Error() string {
 	// The error message will be replaced by a translated message, returning the
 	// empty string does not add to the translation files.
 	return ""
@@ -35,7 +35,7 @@ func (_ NoTargetedSpaceError) Error() string {
 
 // CheckTarget confirms that the user is logged in. Optionally it will also
 // check if an organization and space are targeted.
-func (_ Actor) CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+func (Actor) CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
 	if config.AccessToken() == "" && config.RefreshToken() == "" {
 		return NotLoggedInError{
 			BinaryName: config.BinaryName(),
@@ -44,14 +44,14 @@ func (_ Actor) CheckTarget(config Config, targetedOrganizationRequired bool, tar
 
 	if targetedOrganizationRequired {
 		if !config.HasTargetedOrganization() {
-			return NoTargetedOrganizationError{
+			return NoOrganizationTargetedError{
 				BinaryName: config.BinaryName(),
 			}
 		}
 
 		if targetedSpaceRequired {
 			if !config.HasTargetedSpace() {
-				return NoTargetedSpaceError{
+				return NoSpaceTargetedError{
 					BinaryName: config.BinaryName(),
 				}
 			}

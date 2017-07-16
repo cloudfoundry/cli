@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -28,6 +29,16 @@ func WithHelloWorldApp(f func(dir string)) {
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
+	prevDir, err := os.Getwd()
+	Expect(err).ToNot(HaveOccurred())
+
+	err = os.Chdir(dir)
+	Expect(err).ToNot(HaveOccurred())
+	defer func() {
+		err = os.Chdir(prevDir)
+		Expect(err).ToNot(HaveOccurred())
+	}()
+
 	f(dir)
 }
 
@@ -47,6 +58,16 @@ func WithBananaPantsApp(f func(dir string)) {
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
+	prevDir, err := os.Getwd()
+	Expect(err).ToNot(HaveOccurred())
+
+	err = os.Chdir(dir)
+	Expect(err).ToNot(HaveOccurred())
+	defer func() {
+		err = os.Chdir(prevDir)
+		Expect(err).ToNot(HaveOccurred())
+	}()
+
 	f(dir)
 }
 
@@ -55,4 +76,11 @@ func AppGUID(appName string) string {
 	session := CF("app", appName, "--guid")
 	Eventually(session).Should(gexec.Exit(0))
 	return strings.TrimSpace(string(session.Out.Contents()))
+}
+
+func WriteManifest(path string, manifest map[string]interface{}) {
+	body, err := json.Marshal(manifest)
+	Expect(err).ToNot(HaveOccurred())
+	err = ioutil.WriteFile(path, body, 0666)
+	Expect(err).ToNot(HaveOccurred())
 }

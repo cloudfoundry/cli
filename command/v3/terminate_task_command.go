@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -45,13 +46,13 @@ func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) err
 func (cmd TerminateTaskCommand) Execute(args []string) error {
 	sequenceId, err := flag.ParseStringToInt(cmd.RequiredArgs.SequenceID)
 	if err != nil {
-		return command.ParseArgumentError{
+		return translatableerror.ParseArgumentError{
 			ArgumentName: "TASK_ID",
 			ExpectedType: "integer",
 		}
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionRunTaskV3)
 	if err != nil {
 		return err
 	}

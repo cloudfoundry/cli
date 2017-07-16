@@ -1,6 +1,10 @@
 ---
 platform: linux
-rootfs_uri: docker:///cloudfoundry/cli-ci
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
 
 inputs:
 - name: cli-integration
@@ -19,7 +23,8 @@ run:
   - |
     set -e
 
-    export CF_PASSWORD=$(bosh2 int vars-store/ci/infrastructure/hardknox/deployment-vars.yml --path /uaa_scim_users_admin_password)
+    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
 
     set -x
 
@@ -39,5 +44,5 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global

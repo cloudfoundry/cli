@@ -18,15 +18,17 @@ var _ = Describe("Resource Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeConfig                *v2actionfakes.FakeConfig
 		srcDir                    string
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 
 		var err error
-		srcDir, err = ioutil.TempDir("", "")
+		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())
 
 		subDir := filepath.Join(srcDir, "level1", "level2")
@@ -43,23 +45,139 @@ var _ = Describe("Resource Actions", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	Describe("GatherResources", func() {
-		It("gathers a list of all directories files in a source directory", func() {
-			resources, err := actor.GatherResources(srcDir)
-			Expect(err).ToNot(HaveOccurred())
+	AfterEach(func() {
+		Expect(os.RemoveAll(srcDir)).ToNot(HaveOccurred())
+	})
 
-			Expect(resources).To(Equal(
-				[]Resource{
-					{Filename: "level1"},
-					{Filename: "level1/level2"},
-					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
-					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
-					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
-				}))
+	Describe("GatherArchiveResources", func() {
+		Context("when the archive exists", func() {
+			var archive string
+
+			BeforeEach(func() {
+				tmpfile, err := ioutil.TempFile("", "example")
+				Expect(err).ToNot(HaveOccurred())
+				defer tmpfile.Close()
+				archive = tmpfile.Name()
+
+				err = zipit(srcDir, archive, "")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+			})
+
+			It("gathers a list of all files in a source archive", func() {
+				resources, err := actor.GatherArchiveResources(archive)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(resources).To(Equal(
+					[]Resource{
+						{Filename: "/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/level2/", Mode: DefaultFolderPermissions},
+						{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: DefaultArchiveFilePermissions},
+						{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
+						{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
+					}))
+			})
+		})
+
+		Context("when the archive does not exist", func() {
+			It("returns an error if the file is problematic", func() {
+				_, err := actor.GatherArchiveResources("/does/not/exist")
+				Expect(os.IsNotExist(err)).To(BeTrue())
+			})
 		})
 	})
 
-	Describe("ZipResources", func() {
+	Describe("GatherDirectoryResources", func() {
+		Context("when files exist in the directory", func() {
+			var (
+				gatheredResources []Resource
+				executeErr        error
+			)
+
+			JustBeforeEach(func() {
+				gatheredResources, executeErr = actor.GatherDirectoryResources(srcDir)
+			})
+
+			It("gathers a list of all directories files in a source directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(gatheredResources).To(Equal(
+					[]Resource{
+						{Filename: "level1", Mode: DefaultFolderPermissions},
+						{Filename: "level1/level2", Mode: DefaultFolderPermissions},
+						{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
+						{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
+						{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
+					}))
+			})
+
+			Context("when a .cfignore file exists in the sourceDir", func() {
+				BeforeEach(func() {
+					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("excludes all patterns of files mentioned in .cfignore", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(gatheredResources).To(Equal(
+						[]Resource{
+							{Filename: "level1", Mode: DefaultFolderPermissions},
+							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
+							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
+						}))
+				})
+			})
+
+			Context("when trace files are in the source directory", func() {
+				BeforeEach(func() {
+					traceFilePath := filepath.Join(srcDir, "i-am-trace.txt")
+					err := ioutil.WriteFile(traceFilePath, nil, 0655)
+					Expect(err).ToNot(HaveOccurred())
+
+					fakeConfig.VerboseReturns(false, []string{traceFilePath, "/some-other-path"})
+				})
+
+				It("excludes all of the trace files", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(gatheredResources).To(Equal(
+						[]Resource{
+							{Filename: "level1", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0644},
+							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0751},
+							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0655},
+						}))
+				})
+			})
+		})
+
+		Context("when the directory is empty", func() {
+			var emptyDir string
+
+			BeforeEach(func() {
+				var err error
+				emptyDir, err = ioutil.TempDir("", "v2-resource-actions-empty")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
+			})
+
+			It("returns an EmptyDirectoryError", func() {
+				_, err := actor.GatherDirectoryResources(emptyDir)
+				Expect(err).To(MatchError(EmptyDirectoryError{Path: emptyDir}))
+			})
+		})
+	})
+
+	Describe("ZipDirectoryResources", func() {
 		var (
 			resultZip  string
 			resources  []Resource
@@ -77,7 +195,7 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			resultZip, executeErr = actor.ZipResources(srcDir, resources)
+			resultZip, executeErr = actor.ZipDirectoryResources(srcDir, resources)
 		})
 
 		AfterEach(func() {

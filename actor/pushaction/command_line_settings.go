@@ -1,6 +1,15 @@
 package pushaction
 
 type CommandLineSettings struct {
-	Name             string
 	CurrentDirectory string
+	ProvidedAppPath  string
+	DockerImage      string
+	Name             string
+}
+
+func (settings CommandLineSettings) ApplicationPath() string {
+	if settings.ProvidedAppPath == "" {
+		return settings.CurrentDirectory
+	}
+	return settings.ProvidedAppPath
 }

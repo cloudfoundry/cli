@@ -10,13 +10,15 @@ broker_name ||= 'async-broker'
 env = ARGV[1]
 env ||= 'bosh-lite'
 
-puts "Setting up broker `#{broker_name}` on #{env}"
-
 env_to_domain_mapping = {
   'bosh-lite' => 'bosh-lite.com',
   'a1' => 'a1-app.cf-app.com',
   'tabasco' => 'tabasco-app.cf-app.com'
 }
+
+domain = env_to_domain_mapping[env] || env
+
+puts "Setting up broker `#{broker_name}` on #{domain}"
 
 $service_name = nil
 
@@ -62,9 +64,9 @@ def uniquify_config
   end
 end
 
-def push_broker(broker_name)
+def push_broker(broker_name, domain)
   puts "Pushing the broker"
-  IO.popen("cf push #{broker_name}") do |cmd_output|
+  IO.popen("cf push #{broker_name} -d #{domain}") do |cmd_output|
     cmd_output.each { |line| puts line }
   end
   puts
@@ -102,9 +104,9 @@ def enable_service_access
 end
 
 uniquify_config
-push_broker(broker_name)
+push_broker(broker_name, domain)
 
-url = "http://#{broker_name}.#{env_to_domain_mapping[env]}"
+url = "http://#{broker_name}.#{domain}"
 
 output = create_service_broker(broker_name, url)
 if broker_already_exists?(output)

@@ -21,10 +21,6 @@ import (
 var _ = Describe("install-plugin command", func() {
 	var buffer *Buffer
 
-	BeforeEach(func() {
-		helpers.RunIfExperimental("experimental until all install-plugin refactor stories are finished")
-	})
-
 	AfterEach(func() {
 		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
 		if os.IsNotExist(err) {
@@ -46,14 +42,15 @@ var _ = Describe("install-plugin command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("install-plugin - Install CLI plugin"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf install-plugin \\(LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME\\) \\[-f\\]"))
+				Eventually(session.Out).Should(Say("cf install-plugin PLUGIN_NAME \\[-r REPO_NAME\\] \\[-f\\]"))
+				Eventually(session.Out).Should(Say("cf install-plugin LOCAL-PATH/TO/PLUGIN | URL \\[-f\\]"))
 				Eventually(session.Out).Should(Say("EXAMPLES:"))
 				Eventually(session.Out).Should(Say("cf install-plugin ~/Downloads/plugin-foobar"))
 				Eventually(session.Out).Should(Say("cf install-plugin https://example.com/plugin-foobar_linux_amd64"))
 				Eventually(session.Out).Should(Say("cf install-plugin -r My-Repo plugin-echo"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("-f      Force install of plugin without confirmation"))
-				Eventually(session.Out).Should(Say("-r      Name of a registered repository where the specified plugin is located"))
+				Eventually(session.Out).Should(Say("-f\\s+Force install of plugin without confirmation"))
+				Eventually(session.Out).Should(Say("-r\\s+Restrict search for plugin to this registered repository"))
 				Eventually(session.Out).Should(Say("SEE ALSO:"))
 				Eventually(session.Out).Should(Say("add-plugin-repo, list-plugin-repos, plugins"))
 
@@ -80,8 +77,10 @@ var _ = Describe("install-plugin command", func() {
 				goos := os.Getenv("GOOS")
 				goarch := os.Getenv("GOARCH")
 
-				os.Setenv("GOOS", "openbsd")
-				os.Setenv("GOARCH", "amd64")
+				err := os.Setenv("GOOS", "openbsd")
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Setenv("GOARCH", "amd64")
+				Expect(err).ToNot(HaveOccurred())
 
 				pluginPath = helpers.BuildConfigurablePlugin("configurable_plugin", "some-plugin", "1.0.0",
 					[]helpers.PluginCommand{
@@ -89,8 +88,10 @@ var _ = Describe("install-plugin command", func() {
 					},
 				)
 
-				os.Setenv("GOOS", goos)
-				os.Setenv("GOARCH", goarch)
+				err = os.Setenv("GOOS", goos)
+				Expect(err).ToNot(HaveOccurred())
+				err = os.Setenv("GOARCH", goarch)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("fails and reports the file is not a valid CLI plugin", func() {
@@ -173,8 +174,8 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the file does not exist", func() {
 					It("tells the user that the file was not found and fails", func() {
 						session := helpers.CF("install-plugin", "some/path/that/does/not/exist", "-f")
-
-						Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path some/path/that/does/not/exist"))
+						Eventually(session.Err).Should(Say("Plugin some/path/that/does/not/exist not found on disk or in any registered repo\\."))
+						Eventually(session.Err).Should(Say("Use 'cf repo-plugins' to list plugins available in the repos\\."))
 
 						Consistently(session.Out).ShouldNot(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 						Consistently(session.Out).ShouldNot(Say("Install and use plugins at your own risk\\."))
@@ -188,7 +189,8 @@ var _ = Describe("install-plugin command", func() {
 						badPlugin, err := ioutil.TempFile("", "")
 						Expect(err).ToNot(HaveOccurred())
 						pluginPath = badPlugin.Name()
-						badPlugin.Close()
+						err = badPlugin.Close()
+						Expect(err).ToNot(HaveOccurred())
 					})
 
 					AfterEach(func() {
@@ -219,7 +221,23 @@ var _ = Describe("install-plugin command", func() {
 					})
 				})
 
-				Context("command conflict", func() {
+				Context("when getting metadata from the plugin errors", func() {
+					BeforeEach(func() {
+						var err error
+						pluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_fails_metadata")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("displays the error to stderr", func() {
+						session := helpers.CF("install-plugin", pluginPath, "-f")
+						Eventually(session.Err).Should(Say("exit status 51"))
+						Eventually(session.Err).Should(Say("File is not a valid cf CLI plugin binary\\."))
+
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when there is a command conflict", func() {
 					Context("when the plugin has a command that is the same as a built-in command", func() {
 						var pluginPath string
 
@@ -457,7 +475,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user says yes", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("y\n"))
+						_, _ = buffer.Write([]byte("y\n"))
 					})
 
 					It("installs the plugin", func() {
@@ -505,7 +523,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user says no", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("n\n"))
+						_, _ = buffer.Write([]byte("n\n"))
 					})
 
 					It("does not install the plugin", func() {
@@ -541,7 +559,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the user interrupts with control-c", func() {
 					BeforeEach(func() {
 						buffer = NewBuffer()
-						buffer.Write([]byte("y")) // but not enter
+						_, _ = buffer.Write([]byte("y")) // but not enter
 					})
 
 					It("does not install the plugin and does not create a bad state", func() {
@@ -622,7 +640,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("OK"))
@@ -668,7 +686,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Out).Should(Say("Install and use plugins at your own risk\\."))
 
 						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 						Eventually(session.Out).Should(Say("Plugin some-plugin 1\\.0\\.0 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
 						Eventually(session.Out).Should(Say("CLI-MESSAGE-UNINSTALL"))
@@ -766,7 +784,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user says yes", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("y\n"))
+					_, _ = buffer.Write([]byte("y\n"))
 				})
 
 				It("installs the plugin", func() {
@@ -777,7 +795,7 @@ var _ = Describe("install-plugin command", func() {
 					Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
 					Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-					Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+					Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 					Eventually(session.Out).Should(Say("Installing plugin some-plugin\\.\\.\\."))
 					Eventually(session.Out).Should(Say("OK"))
@@ -799,7 +817,7 @@ var _ = Describe("install-plugin command", func() {
 						Eventually(session.Out).Should(Say("Do you want to install the plugin %s\\? \\[yN\\]: y", server.URL()))
 
 						Eventually(session.Out).Should(Say("Starting download of plugin binary from URL\\.\\.\\."))
-						Eventually(session.Out).Should(Say("%d bytes downloaded\\.\\.\\.", len(pluginData)))
+						Eventually(session.Out).Should(Say("\\d.* .*B / ?"))
 
 						Eventually(session.Out).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Plugin some-plugin 1\\.0\\.0 could not be installed\\. A plugin with that name is already installed\\."))
@@ -812,7 +830,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user says no", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("n\n"))
+					_, _ = buffer.Write([]byte("n\n"))
 				})
 
 				It("does not install the plugin", func() {
@@ -832,7 +850,7 @@ var _ = Describe("install-plugin command", func() {
 			Context("when the user interrupts with control-c", func() {
 				BeforeEach(func() {
 					buffer = NewBuffer()
-					buffer.Write([]byte("y")) // but not enter
+					_, _ = buffer.Write([]byte("y")) // but not enter
 				})
 
 				It("does not install the plugin and does not create a bad state", func() {

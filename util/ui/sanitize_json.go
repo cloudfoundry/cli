@@ -6,9 +6,9 @@ import (
 	"regexp"
 )
 
-const RedactedValue = "[PRIVATE DATA HIDDEN]"
-
 var keysToSanitize = regexp.MustCompile("(?i).*(?:token|password).*")
+
+const tokenEndpoint = "token_endpoint"
 
 func SanitizeJSON(raw []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
@@ -26,7 +26,7 @@ func iterateAndRedact(blob map[string]interface{}) map[string]interface{} {
 	for key, value := range blob {
 		switch v := value.(type) {
 		case string:
-			if keysToSanitize.Match([]byte(key)) {
+			if keysToSanitize.Match([]byte(key)) && key != tokenEndpoint {
 				blob[key] = RedactedValue
 			}
 		case map[string]interface{}:

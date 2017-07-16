@@ -4,6 +4,10 @@
     "translation": ""
   },
   {
+    "id": "'--docker-username' requires '--docker-image' to be specified",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },
@@ -13,6 +17,10 @@
   },
   {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
+    "translation": ""
+  },
+  {
+    "id": "2006-01-02 15:04:05 PM",
     "translation": ""
   },
   {
@@ -116,8 +124,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
-    "translation": ""
+    "id": "CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo",
+    "translation": "CF_NAME install-plugin PLUGIN_NAME [-r REPO_NAME] [-f]\\n   CF_NAME install-plugin LOCAL-PATH/TO/PLUGIN | URL [-f]\\n\\nEXAMPLES:\\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\\n   CF_NAME install-plugin -r My-Repo plugin-echo"
   },
   {
     "id": "CF_NAME isolation-segments",
@@ -152,6 +160,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-app -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-create-app --name [name]",
     "translation": ""
   },
@@ -160,7 +172,15 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-set-droplet -n APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-stage --name [name] --package-guid [guid]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-start -n APP_NAME",
     "translation": ""
   },
   {
@@ -244,6 +264,10 @@
     "translation": ""
   },
   {
+    "id": "Display an app",
+    "translation": ""
+  },
+  {
     "id": "Do not colorize output",
     "translation": ""
   },
@@ -285,6 +309,10 @@
   },
   {
     "id": "Entitle an organization to an isolation segment",
+    "translation": ""
+  },
+  {
+    "id": "Environment variable CF_DOCKER_PASSWORD not set.",
     "translation": ""
   },
   {
@@ -364,6 +392,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together.",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
@@ -385,6 +417,10 @@
   },
   {
     "id": "Installing plugin {{.Name}}...",
+    "translation": ""
+  },
+  {
+    "id": "Invalid JSON content from server: {{.Err}}",
     "translation": ""
   },
   {
@@ -484,6 +520,10 @@
     "translation": ""
   },
   {
+    "id": "Password used for private docker repository",
+    "translation": ""
+  },
+  {
     "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
     "translation": ""
   },
@@ -496,11 +536,19 @@
     "translation": ""
   },
   {
+    "id": "Plugin list download failed; repository {{.RepositoryName}} returned {{.ErrorMessage}}.",
+    "translation": ""
+  },
+  {
     "id": "Plugin repo named '{{.RepositoryName}}' already exists, please use another name.",
     "translation": ""
   },
   {
-    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repositories.",
+    "id": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos.",
+    "translation": "Plugin repository {{.Name}} not found.\nUse 'cf list-plugin-repos' to list registered repos."
+  },
+  {
+    "id": "Plugin requested has no binary available for your platform.",
     "translation": ""
   },
   {
@@ -528,6 +576,10 @@
     "translation": "Plugin {{.PluginName}} not found in repository {{.RepositoryName}}.\nUse '{{.BinaryName}} repo-plugins -r {{.RepositoryName}}' to list plugins available in the repo."
   },
   {
+    "id": "Plugin {{.PluginName}} not found on disk or in any registered repo.\nUse '{{.BinaryName}} repo-plugins' to list plugins available in the repos.",
+    "translation": ""
+  },
+  {
     "id": "Plugin {{.PluginName}} v{{.PluginVersion}} could not be installed as it contains commands with aliases that are already used: {{.CommandAliases}}.",
     "translation": ""
   },
@@ -544,8 +596,8 @@
     "translation": ""
   },
   {
-    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}.",
-    "translation": ""
+    "id": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}",
+    "translation": "Plugin {{.PluginName}} {{.PluginVersion}} found in: {{.RepositoryName}}"
   },
   {
     "id": "Plugin {{.PluginName}} {{.PluginVersion}} is already installed.",
@@ -560,15 +612,7 @@
     "translation": ""
   },
   {
-    "id": "Processing files...",
-    "translation": "Processing files..."
-  },
-  {
     "id": "Prompt for a one-time passcode to login",
-    "translation": ""
-  },
-  {
-    "id": "Push a single app (with or without a manifest):\\n   CF_NAME v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u (process | port | http)] [--route-path ROUTE_PATH]\\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\\n\\n   Push multiple apps with a manifest:\\n   cf v2-push [-f MANIFEST_PATH]",
     "translation": ""
   },
   {
@@ -604,6 +648,10 @@
     "translation": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Repository username; used with password from environment variable CF_DOCKER_PASSWORD",
+    "translation": ""
+  },
+  {
     "id": "Reset the isolation segment assignment of a space to the org's default",
     "translation": ""
   },
@@ -613,6 +661,10 @@
   },
   {
     "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
+    "id": "Restrict search for plugin to this registered repository",
     "translation": ""
   },
   {
@@ -712,7 +764,15 @@
     "translation": ""
   },
   {
+    "id": "Set the droplet used to run an app",
+    "translation": ""
+  },
+  {
     "id": "Set to 'port' or 'none'",
+    "translation": ""
+  },
+  {
+    "id": "Setting app {{.AppName}} to droplet {{.DropletGUID}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
@@ -748,6 +808,10 @@
     "translation": ""
   },
   {
+    "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Starting download of plugin binary from URL...",
     "translation": ""
   },
@@ -757,6 +821,10 @@
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
+  },
+  {
+    "id": "Stopping app...",
     "translation": ""
   },
   {
@@ -796,11 +864,31 @@
     "translation": ""
   },
   {
+    "id": "The application name to display",
+    "translation": ""
+  },
+  {
+    "id": "The application name to push",
+    "translation": ""
+  },
+  {
+    "id": "The application name to start",
+    "translation": ""
+  },
+  {
+    "id": "The application name to which to assign the droplet",
+    "translation": ""
+  },
+  {
     "id": "The command to execute",
     "translation": ""
   },
   {
     "id": "The desired application name",
+    "translation": ""
+  },
+  {
+    "id": "The guid of the droplet to use",
     "translation": ""
   },
   {
@@ -816,11 +904,23 @@
     "translation": ""
   },
   {
+    "id": "The plugin has been uninstalled but removing the plugin binary failed.\nRemove it manually or subsequent installations of the plugin may fail\n{{.Err}}",
+    "translation": ""
+  },
+  {
+    "id": "The plugin's uninstall method returned an unexpected error.\nThe plugin uninstall will proceed. Contact the plugin author if you need help.\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "The specified application instance does not exist",
     "translation": ""
   },
   {
     "id": "The task's unique sequence ID",
+    "translation": ""
+  },
+  {
+    "id": "There are no running instances of this process.",
     "translation": ""
   },
   {
@@ -848,7 +948,15 @@
     "translation": ""
   },
   {
+    "id": "Timed out waiting for application {{.AppName}} to start",
+    "translation": ""
+  },
+  {
     "id": "USER ADMIN:",
+    "translation": ""
+  },
+  {
+    "id": "Unable to assign droplet. Ensure the droplet exists and belongs to this app.",
     "translation": ""
   },
   {
@@ -857,6 +965,10 @@
   },
   {
     "id": "Uninstall CLI plugin",
+    "translation": ""
+  },
+  {
+    "id": "Updating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -892,8 +1004,16 @@
     "translation": ""
   },
   {
+    "id": "Using docker repository password from environment variable CF_DOCKER_PASSWORD.",
+    "translation": ""
+  },
+  {
     "id": "VERSION:",
     "translation": ""
+  },
+  {
+    "id": "Waiting for API to complete processing files...",
+    "translation": "Waiting for API to complete processing files..."
   },
   {
     "id": "Waiting for app to start...",
@@ -932,6 +1052,22 @@
     "translation": ""
   },
   {
+    "id": "buildpacks:",
+    "translation": ""
+  },
+  {
+    "id": "cf push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]",
+    "translation": ""
+  },
+  {
+    "id": "cf v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf v2-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\\n\\n   cf v2-push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]",
+    "translation": ""
+  },
+  {
+    "id": "cf v3-push -n APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "command help",
     "translation": ""
   },
@@ -953,6 +1089,10 @@
   },
   {
     "id": "disable-org-isolation",
+    "translation": ""
+  },
+  {
+    "id": "docker image:",
     "translation": ""
   },
   {
@@ -996,6 +1136,10 @@
     "translation": ""
   },
   {
+    "id": "memory usage:",
+    "translation": ""
+  },
+  {
     "id": "organization",
     "translation": ""
   },
@@ -1013,6 +1157,10 @@
   },
   {
     "id": "ports",
+    "translation": ""
+  },
+  {
+    "id": "processes:",
     "translation": ""
   },
   {
@@ -1093,10 +1241,6 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
-    "translation": ""
-  },
-  {
-    "id": "{{.Bytes}} bytes downloaded...",
     "translation": ""
   },
   {

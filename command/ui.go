@@ -16,6 +16,7 @@ type UI interface {
 	DisplayInstancesTableForApp(table [][]string)
 	DisplayKeyValueTable(prefix string, table [][]string, padding int)
 	DisplayKeyValueTableForApp(table [][]string)
+	DisplayKeyValueTableForV3App(table [][]string, crashedProcesses []string)
 	DisplayLogMessage(message ui.LogMessage, displayHeader bool)
 	DisplayNewline()
 	DisplayNonWrappingTable(prefix string, table [][]string, padding int)
@@ -23,6 +24,7 @@ type UI interface {
 	DisplayTableWithHeader(prefix string, table [][]string, padding int)
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithFlavor(text string, keys ...map[string]interface{})
+	DisplayTextWithBold(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
 	RequestLoggerFileWriter(filePaths []string) *ui.RequestLoggerFileWriter

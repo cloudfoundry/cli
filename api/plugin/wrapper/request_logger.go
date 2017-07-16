@@ -47,13 +47,13 @@ func (logger *RequestLogger) Wrap(innerconnection plugin.Connection) plugin.Conn
 }
 
 // Make records the request and the response to UI
-func (logger *RequestLogger) Make(request *http.Request, passedResponse *plugin.Response) error {
+func (logger *RequestLogger) Make(request *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 	err := logger.displayRequest(request)
 	if err != nil {
 		logger.output.HandleInternalError(err)
 	}
 
-	err = logger.connection.Make(request, passedResponse)
+	err = logger.connection.Make(request, passedResponse, proxyReader)
 
 	if passedResponse.HTTPResponse != nil {
 		displayErr := logger.displayResponse(passedResponse)

@@ -18,12 +18,18 @@ type commandList struct {
 	V3CreateApp     v3.V3CreateAppCommand     `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
 	V3CreatePackage v3.V3CreatePackageCommand `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 	V3Stage         v3.V3StageCommand         `command:"v3-stage" description:"**EXPERIMENTAL** Create a new droplet for an app"`
+	V3SetDroplet    v3.V3SetDropletCommand    `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3Start         v3.V3StartCommand         `command:"v3-start" description:"Start an app"`
+	V3Stop          v3.V3StopCommand          `command:"v3-stop" description:"Stop an app"`
+	V3Push          v3.V3PushCommand          `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
+	V3App           v3.V3AppCommand           `command:"v3-app" description:"Display health and status for an app"`
+	V3Restart       v3.V3RestartCommand       `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
-	App                                v2.AppCommand                                `command:"app" description:"Display health and status for app"`
+	App                                v2.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate user non-interactively"`
 	BindRouteService                   v2.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
 	BindRunningSecurityGroup           v2.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
@@ -114,6 +120,7 @@ type commandList struct {
 	RenameSpace                        v2.RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
 	Rename                             v2.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
+	ResetOrgDefaultIsolationSegment    v3.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
 	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the isolation segment assignment of a space to the org's default"`
 	Restage                            v2.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v2.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
@@ -135,6 +142,7 @@ type commandList struct {
 	Service                            v2.ServiceCommand                            `command:"service" description:"Show service instance info"`
 	SetEnv                             v2.SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
 	SetHealthCheck                     v2.SetHealthCheckCommand                     `command:"set-health-check" description:"Change type of health check performed on an app"`
+	SetOrgDefaultIsolationSegment      v3.SetOrgDefaultIsolationSegmentCommand      `command:"set-org-default-isolation-segment" description:"Set the default isolation segment used for apps in spaces in an org"`
 	SetOrgRole                         v2.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetQuota                           v2.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
 	SetRunningEnvironmentVariableGroup v2.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`

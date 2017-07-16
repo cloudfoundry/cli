@@ -14,11 +14,11 @@ type CreateSecurityGroupCommand struct {
 	relatedCommands interface{}            `related_commands:"bind-security-group, bind-running-security-group, bind-staging-security-group, security-groups"`
 }
 
-func (_ CreateSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
+func (CreateSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ CreateSecurityGroupCommand) Execute(args []string) error {
+func (CreateSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

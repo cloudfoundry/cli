@@ -14,7 +14,7 @@ type Pipebomb struct {
 
 // Seek returns a PipeSeekError; allowing the top level calling function to
 // handle the retry instead of seeking back to the beginning of the Reader.
-func (_ *Pipebomb) Seek(offset int64, whence int) (int64, error) {
+func (*Pipebomb) Seek(offset int64, whence int) (int64, error) {
 	return 0, ccerror.PipeSeekError{}
 }
 

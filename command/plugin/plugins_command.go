@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/plugin/shared"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 )
 
@@ -34,7 +35,7 @@ func (cmd *PluginsCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd PluginsCommand) Execute(_ []string) error {
+func (cmd PluginsCommand) Execute([]string) error {
 	switch {
 	case cmd.Outdated:
 		return cmd.displayOutdatedPlugins()
@@ -60,7 +61,7 @@ func (cmd PluginsCommand) displayPluginChecksums(plugins []configv3.Plugin) erro
 func (cmd PluginsCommand) displayOutdatedPlugins() error {
 	repos := cmd.Config.PluginRepositories()
 	if len(repos) == 0 {
-		return shared.NoPluginRepositoriesError{}
+		return translatableerror.NoPluginRepositoriesError{}
 	}
 	repoNames := make([]string, len(repos))
 	for i := range repos {

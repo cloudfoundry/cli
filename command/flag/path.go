@@ -17,13 +17,13 @@ func (p Path) String() string {
 	return string(p)
 }
 
-func (_ Path) Complete(prefix string) []flags.Completion {
+func (Path) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
 
 type PathWithExistenceCheck string
 
-func (_ PathWithExistenceCheck) Complete(prefix string) []flags.Completion {
+func (PathWithExistenceCheck) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
 
@@ -45,7 +45,7 @@ func (p *PathWithExistenceCheck) UnmarshalFlag(path string) error {
 
 type JSONOrFileWithValidation map[string]interface{}
 
-func (_ JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
+func (JSONOrFileWithValidation) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
 
@@ -79,7 +79,7 @@ func (p *JSONOrFileWithValidation) UnmarshalFlag(pathOrJSON string) error {
 
 type PathWithExistenceCheckOrURL string
 
-func (_ PathWithExistenceCheckOrURL) Complete(prefix string) []flags.Completion {
+func (PathWithExistenceCheckOrURL) Complete(prefix string) []flags.Completion {
 	return completeWithTilde(prefix)
 }
 
@@ -103,7 +103,7 @@ func (p *PathWithExistenceCheckOrURL) UnmarshalFlag(path string) error {
 
 type PathWithAt string
 
-func (_ PathWithAt) Complete(prefix string) []flags.Completion {
+func (PathWithAt) Complete(prefix string) []flags.Completion {
 	if prefix == "" || prefix[0] != '@' {
 		return nil
 	}
@@ -132,7 +132,7 @@ func (_ PathWithAt) Complete(prefix string) []flags.Completion {
 
 type PathWithBool string
 
-func (_ PathWithBool) Complete(prefix string) []flags.Completion {
+func (PathWithBool) Complete(prefix string) []flags.Completion {
 	return append(
 		completions([]string{"true", "false"}, prefix, false),
 		completeWithTilde(prefix)...,

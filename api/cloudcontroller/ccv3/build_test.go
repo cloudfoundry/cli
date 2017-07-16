@@ -110,7 +110,8 @@ var _ = Describe("Build", func() {
 			BeforeEach(func() {
 				response := `{
 					"guid": "some-build-guid",
-					"state": "STAGING",
+					"state": "FAILED",
+					"error": "some error",
 					"droplet": {
 						"guid": "some-droplet-guid"
 					}
@@ -129,7 +130,8 @@ var _ = Describe("Build", func() {
 
 				expectedBuild := Build{
 					GUID:  "some-build-guid",
-					State: BuildStateStaging,
+					State: BuildStateFailed,
+					Error: "some error",
 					Droplet: Droplet{
 						GUID: "some-droplet-guid",
 					},

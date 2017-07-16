@@ -23,11 +23,11 @@ type UpdateSpaceQuotaCommand struct {
 	relatedCommands          interface{}              `related_commands:"space-quota, space-quotas"`
 }
 
-func (_ UpdateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (UpdateSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ UpdateSpaceQuotaCommand) Execute(args []string) error {
+func (UpdateSpaceQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

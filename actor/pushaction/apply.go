@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const PushRetries = 3
@@ -14,7 +14,7 @@ type UploadFailedError struct {
 	Err error
 }
 
-func (_ UploadFailedError) Error() string {
+func (UploadFailedError) Error() string {
 	return "upload failed"
 }
 
@@ -71,30 +71,38 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			eventStream <- BoundRoutes
 		}
 
-		archivePath, err := actor.CreateArchive(config)
-		if err != nil {
-			errorStream <- err
-			return
-		}
-		eventStream <- CreatingArchive
-		defer os.Remove(archivePath)
-
-		for count := 0; count < PushRetries; count++ {
-			warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
+		if config.DesiredApplication.DockerImage == "" {
+			eventStream <- ResourceMatching
+			config, warnings = actor.SetMatchedResources(config)
 			warningsStream <- warnings
-			if _, ok := err.(ccerror.PipeSeekError); !ok {
-				break
-			}
-			eventStream <- RetryUpload
-		}
 
-		if err != nil {
-			if _, ok := err.(ccerror.PipeSeekError); ok {
-				errorStream <- UploadFailedError{}
+			archivePath, err := actor.CreateArchive(config)
+			if err != nil {
+				errorStream <- err
 				return
 			}
-			errorStream <- err
-			return
+			eventStream <- CreatingArchive
+			defer os.Remove(archivePath)
+
+			for count := 0; count < PushRetries; count++ {
+				warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
+				warningsStream <- warnings
+				if _, ok := err.(ccerror.PipeSeekError); !ok {
+					break
+				}
+				eventStream <- RetryUpload
+			}
+
+			if err != nil {
+				if _, ok := err.(ccerror.PipeSeekError); ok {
+					errorStream <- UploadFailedError{}
+					return
+				}
+				errorStream <- err
+				return
+			}
+		} else {
+			log.WithField("docker_image", config.DesiredApplication.DockerImage).Debug("skipping file upload")
 		}
 
 		configStream <- config

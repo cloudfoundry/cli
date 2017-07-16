@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
@@ -38,7 +39,7 @@ func (cmd *CreateUserCommand) Setup(config command.Config, ui command.UI) error 
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }
@@ -50,7 +51,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	var password string
 
 	if (cmd.Origin == "" || strings.ToLower(cmd.Origin) == "uaa") && cmd.Args.Password == nil {
-		return command.RequiredArgumentError{
+		return translatableerror.RequiredArgumentError{
 			ArgumentName: "PASSWORD",
 		}
 	}

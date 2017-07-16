@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -32,7 +32,7 @@ var _ = Describe("New Clients", func() {
 	Context("when the api endpoint is not set", func() {
 		It("returns an error", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true)
-			Expect(err).To(MatchError(command.NoAPISetError{
+			Expect(err).To(MatchError(translatableerror.NoAPISetError{
 				BinaryName: binaryName,
 			}))
 		})

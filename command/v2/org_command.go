@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -49,11 +51,11 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(ccClient, uaaClient)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	ccClientV3, _, err := sharedV3.NewClients(config, ui, true)
 	if err != nil {
-		if _, ok := err.(sharedV3.V3APIDoesNotExistError); !ok {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); !ok {
 			return err
 		}
 	} else {
@@ -116,7 +118,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	if cmd.ActorV3 != nil {
-		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), "3.11.0")
+		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
 		if apiCheck == nil {
 			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
 			cmd.UI.DisplayWarnings(v3Warnings)
@@ -126,7 +128,11 @@ func (cmd OrgCommand) displayOrgSummary() error {
 
 			isolationSegmentNames := []string{}
 			for _, iso := range isolationSegments {
-				isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+				if iso.GUID == orgSummary.DefaultIsolationSegmentGUID {
+					isolationSegmentNames = append(isolationSegmentNames, fmt.Sprintf("%s (%s)", iso.Name, cmd.UI.TranslateText("default")))
+				} else {
+					isolationSegmentNames = append(isolationSegmentNames, iso.Name)
+				}
 			}
 
 			sort.Strings(isolationSegmentNames)

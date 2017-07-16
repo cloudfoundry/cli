@@ -21,8 +21,10 @@ var _ = Describe("PluginRepository", func() {
 
 	Describe("GetPluginRepository", func() {
 		Context("when the url points to a valid CF CLI plugin repo", func() {
+			var response string
+
 			BeforeEach(func() {
-				response := `{
+				response = `{
 					"plugins": [
 						{
 							"name": "plugin-1",
@@ -79,6 +81,29 @@ var _ = Describe("PluginRepository", func() {
 			Context("when the URL has a trailing '/list'", func() {
 				It("still hits the /list endpoint on the URL", func() {
 					_, err := client.GetPluginRepository(fmt.Sprintf("%s/list", server.URL()))
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when the URL has a trailing '/list/'", func() {
+				It("still hits the /list endpoint on the URL", func() {
+					_, err := client.GetPluginRepository(fmt.Sprintf("%s/list/", server.URL()))
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when the URL has path different from /list", func() {
+				BeforeEach(func() {
+					server.SetHandler(0,
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/cli/list"),
+							RespondWith(http.StatusOK, response),
+						),
+					)
+				})
+
+				It("appends /list to the path", func() {
+					_, err := client.GetPluginRepository(fmt.Sprintf("%s/cli", server.URL()))
 					Expect(err).ToNot(HaveOccurred())
 				})
 			})

@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // OrphanedRoutesNotFoundError is an error wrapper that represents the case
@@ -13,7 +13,7 @@ import (
 type OrphanedRoutesNotFoundError struct{}
 
 // Error method to display the error message.
-func (_ OrphanedRoutesNotFoundError) Error() string {
+func (OrphanedRoutesNotFoundError) Error() string {
 	return "No orphaned routes were found."
 }
 
@@ -23,7 +23,7 @@ type RouteInDifferentSpaceError struct {
 	Route string
 }
 
-func (_ RouteInDifferentSpaceError) Error() string {
+func (RouteInDifferentSpaceError) Error() string {
 	return "route registered to another space"
 }
 

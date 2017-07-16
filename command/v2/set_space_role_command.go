@@ -14,11 +14,11 @@ type SetSpaceRoleCommand struct {
 	relatedCommands interface{}           `related_commands:"space-users"`
 }
 
-func (_ SetSpaceRoleCommand) Setup(config command.Config, ui command.UI) error {
+func (SetSpaceRoleCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SetSpaceRoleCommand) Execute(args []string) error {
+func (SetSpaceRoleCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

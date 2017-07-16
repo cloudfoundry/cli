@@ -22,7 +22,7 @@ var _ = Describe("Space Summary Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(fakeCloudControllerClient, nil, nil)
 		})
 
 		Context("when space staging security groups are requested", func() {
@@ -128,23 +128,6 @@ var _ = Describe("Space Summary Actions", func() {
 					fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceReturns(
 						[]ccv2.SecurityGroup{
 							{
-								Name: "some-shared-security-group",
-								Rules: []ccv2.SecurityGroupRule{
-									{
-										Description: "Some shared cinematic group",
-										Destination: "0.0.0.0-5.6.7.8",
-										Ports:       "80,443",
-										Protocol:    "tcp",
-									},
-									{
-										Description: "Some shared cinematic group too",
-										Destination: "127.10.10.10-127.10.10.255",
-										Ports:       "80,4443",
-										Protocol:    "udp",
-									},
-								},
-							},
-							{
 								Name: "some-staging-security-group",
 								Rules: []ccv2.SecurityGroupRule{
 									{
@@ -157,6 +140,23 @@ var _ = Describe("Space Summary Actions", func() {
 										Description: "Some staging cinematic group too",
 										Destination: "127.25.20.20-127.25.20.25",
 										Ports:       "80,9999",
+										Protocol:    "udp",
+									},
+								},
+							},
+							{
+								Name: "some-shared-security-group",
+								Rules: []ccv2.SecurityGroupRule{
+									{
+										Description: "Some shared cinematic group",
+										Destination: "0.0.0.0-5.6.7.8",
+										Ports:       "80,443",
+										Protocol:    "tcp",
+									},
+									{
+										Description: "Some shared cinematic group too",
+										Destination: "127.10.10.10-127.10.10.255",
+										Ports:       "80,4443",
 										Protocol:    "udp",
 									},
 								},
@@ -192,11 +192,12 @@ var _ = Describe("Space Summary Actions", func() {
 							GUID: "some-space-guid",
 							SpaceQuotaDefinitionGUID: "some-space-quota-guid",
 						},
-						OrgName:              "some-org",
-						AppNames:             []string{"some-app-1", "some-app-2"},
-						ServiceInstanceNames: []string{"some-service-instance-1", "some-service-instance-2"},
-						SpaceQuotaName:       "some-space-quota",
-						SecurityGroupNames:   []string{"some-running-security-group", "some-shared-security-group"},
+						OrgName:                   "some-org",
+						AppNames:                  []string{"some-app-1", "some-app-2"},
+						ServiceInstanceNames:      []string{"some-service-instance-1", "some-service-instance-2"},
+						SpaceQuotaName:            "some-space-quota",
+						RunningSecurityGroupNames: []string{"some-running-security-group", "some-shared-security-group"},
+						StagingSecurityGroupNames: []string{"some-shared-security-group", "some-staging-security-group"},
 						SecurityGroupRules: []SecurityGroupRule{
 							{
 								Name:        "some-running-security-group",
@@ -304,12 +305,14 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					spaceGUIDRunning, queriesRunning := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					Expect(spaceGUIDRunning).To(Equal("some-space-guid"))
+					Expect(queriesRunning).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+					spaceGUIDStaging, queriesStaging := fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceArgsForCall(0)
+					Expect(spaceGUIDStaging).To(Equal("some-space-guid"))
+					Expect(queriesStaging).To(BeNil())
 				})
 
 				Context("when no space quota is assigned", func() {
@@ -806,7 +809,8 @@ var _ = Describe("Space Summary Actions", func() {
 						AppNames:                       []string{"some-app-1", "some-app-2"},
 						ServiceInstanceNames:           []string{"some-service-instance-1", "some-service-instance-2"},
 						SpaceQuotaName:                 "some-space-quota",
-						SecurityGroupNames:             []string{"some-running-security-group", "some-shared-security-group"},
+						RunningSecurityGroupNames:      []string{"some-running-security-group", "some-shared-security-group"},
+						StagingSecurityGroupNames:      nil,
 						SecurityGroupRules: []SecurityGroupRule{
 							{
 								Name:        "some-running-security-group",
@@ -882,8 +886,9 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(queries).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
 				})

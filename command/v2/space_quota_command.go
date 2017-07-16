@@ -13,11 +13,11 @@ type SpaceQuotaCommand struct {
 	usage        interface{}     `usage:"CF_NAME space-quota SPACE_QUOTA_NAME"`
 }
 
-func (_ SpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
+func (SpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (_ SpaceQuotaCommand) Execute(args []string) error {
+func (SpaceQuotaCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }

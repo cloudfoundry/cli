@@ -390,6 +390,59 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("DisplayTextWithBold", func() {
+		It("displays the template to ui.Out", func() {
+			ui.DisplayTextWithBold("some-template")
+			Expect(ui.Out).To(Say("some-template"))
+		})
+
+		Context("when an optional map is passed in", func() {
+			It("displays the template with map values bolded and substituted in to ui.Out", func() {
+				ui.DisplayTextWithBold(
+					"template with {{.SomeMapValue}}",
+					map[string]interface{}{
+						"SomeMapValue": "map-value",
+					})
+				Expect(ui.Out).To(Say("template with \x1b\\[1mmap-value\x1b\\[0m"))
+			})
+		})
+
+		Context("when multiple optional maps are passed in", func() {
+			It("displays the template with only the first map values bolded and substituted in to ui.Out", func() {
+				ui.DisplayTextWithBold(
+					"template with {{.SomeMapValue}} and {{.SomeOtherMapValue}}",
+					map[string]interface{}{
+						"SomeMapValue": "map-value",
+					},
+					map[string]interface{}{
+						"SomeOtherMapValue": "other-map-value",
+					})
+				Expect(ui.Out).To(Say("template with \x1b\\[1mmap-value\x1b\\[0m and <no value>"))
+			})
+		})
+
+		Context("when the locale is not set to english", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = NewBuffer()
+			})
+
+			It("displays the translated template with map values bolded and substituted in to ui.Out", func() {
+				ui.DisplayTextWithBold(
+					"App {{.AppName}} does not exist.",
+					map[string]interface{}{
+						"AppName": "some-app-name",
+					})
+				Expect(ui.Out).To(Say("L'application \x1b\\[1msome-app-name\x1b\\[0m n'existe pas.\n"))
+			})
+		})
+	})
+
 	// Covers the happy paths, additional cases are tested in TranslateText
 	Describe("DisplayWarning", func() {
 		It("displays the warning to ui.Err", func() {

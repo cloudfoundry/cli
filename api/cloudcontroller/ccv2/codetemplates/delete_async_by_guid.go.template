@@ -1,0 +1,33 @@
+package ccv2
+
+import (
+	"net/url"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+)
+
+// Delete{{.EntityName}} deletes the {{.EntityName}} associated with the provided
+// GUID. It will return the Cloud Controller job that is assigned to the
+// {{.EntityName}} deletion.
+func (client *Client) Delete{{.EntityName}}(guid string) (Job, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.Delete{{.EntityName}}Request,
+		URIParams:   Params{"{{.EntityNameSnake}}_guid": guid},
+		Query: url.Values{
+			"recursive": {"true"},
+			"async":     {"true"},
+		},
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	var job Job
+	response := cloudcontroller.Response{
+		Result: &job,
+	}
+
+	err = client.connection.Make(request, &response)
+	return job, response.Warnings, err
+}
