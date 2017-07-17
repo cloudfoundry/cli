@@ -224,6 +224,7 @@ jobs:
     - get: cli
       trigger: true
     - get: cli-ci
+    - get: cli-integration
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
@@ -255,6 +256,8 @@ jobs:
       trigger: true
       passed: [units]
     - get: cli-ci
+    - get: cli-integration
+      passed: [units]
   - aggregate:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
@@ -287,6 +290,7 @@ jobs:
       trigger: true
     - get: cli-ci
     - get: cli-integration
+      passed: [build-binaries]
     - get: vars-store
     - put: bosh-lite-lock
       resource: gcp-bosh-pool
