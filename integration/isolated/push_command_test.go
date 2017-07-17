@@ -26,7 +26,6 @@ var _ = Describe("Push", func() {
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-
 			setupCF(orgName, spaceName)
 		})
 

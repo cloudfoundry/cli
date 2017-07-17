@@ -15,7 +15,6 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 	ccWrappers := []ccv2.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
-
 	if verbose {
 		ccWrappers = append(ccWrappers, ccWrapper.NewRequestLogger(ui.RequestLoggerTerminalDisplay()))
 	}
