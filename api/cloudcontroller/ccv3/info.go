@@ -16,17 +16,25 @@ type APIInfo struct {
 		// CCV3 is the link to the Cloud Controller V3 API
 		CCV3 APILink `json:"cloud_controller_v3"`
 
+		// Logging is the link to the Logging API
+		Logging APILink `json:"logging"`
+
 		// UAA is the link to the UAA API
 		UAA APILink `json:"uaa"`
 	} `json:"links"`
 }
 
-// UAA return the HREF for the UAA.
+// Logging returns the HREF for Logging.
+func (info APIInfo) Logging() string {
+	return info.Links.Logging.HREF
+}
+
+// UAA returns the HREF for the UAA.
 func (info APIInfo) UAA() string {
 	return info.Links.UAA.HREF
 }
 
-// CloudControllerAPIVersion return the version for the CloudController.
+// CloudControllerAPIVersion returns the version for the CloudController.
 func (info APIInfo) CloudControllerAPIVersion() string {
 	return info.Links.CCV3.Meta.Version
 }
