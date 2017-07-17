@@ -1,9 +1,6 @@
 package v3
 
 import (
-	"net/url"
-	"strings"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -42,30 +39,11 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3action.NewActor(ccClient, config)
 
-	dopplerURL, err := hackDopplerURLFromUAA(ccClient.UAA())
-	if err != nil {
-		return err
-	}
-	cmd.NOAAClient = shared.NewNOAAClient(dopplerURL, config, uaaClient, ui)
+	cmd.Actor = v3action.NewActor(ccClient, config)
+	cmd.NOAAClient = shared.NewNOAAClient(ccClient.APIInfo.Logging(), config, uaaClient, ui)
 
 	return nil
-}
-
-func hackDopplerURLFromUAA(uaaURL string) (string, error) {
-	parsedUAAURL, err := url.Parse(uaaURL)
-
-	if err != nil {
-		return "", err
-	}
-	parsedUAAURL.Scheme = "wss"
-	oldHost := parsedUAAURL.Host
-	newHost := strings.Replace(oldHost, "uaa", "doppler", 1) + ":443"
-	parsedUAAURL.Host = newHost
-
-	dopplerURL := parsedUAAURL.String()
-	return dopplerURL, nil
 }
 
 func (cmd V3StageCommand) Execute(args []string) error {

@@ -56,6 +56,9 @@ var _ = Describe("Info", func() {
 					},
 					"uaa": {
 						"href": "https://uaa.bosh-lite.com"
+					},
+					"logging": {
+						"href": "wss://doppler.bosh-lite.com:443"
 					}
 				}
 			}`, "SERVER_URL", server.URL(), -1)
@@ -85,10 +88,11 @@ var _ = Describe("Info", func() {
 				http.Header{"X-Cf-Warnings": {"warning 2"}})
 		})
 
-		It("returns back the CC Information", func() {
+		It("returns the CC Information", func() {
 			apis, _, _, err := client.Info()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
+			Expect(apis.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
 		})
 
 		It("returns back the resource links", func() {
@@ -156,6 +160,9 @@ var _ = Describe("Info", func() {
 						},
 						"uaa": {
 							"href": "https://uaa.bosh-lite.com"
+						},
+						"logging": {
+							"href": "wss://doppler.bosh-lite.com:443"
 						}
 					}
 				}
