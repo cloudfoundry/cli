@@ -36,6 +36,8 @@ run:
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
 
+    cf install-plugin -f -r CF-Community "network-policy"
+
     cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
     # Redact passwords in output

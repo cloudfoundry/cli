@@ -18,6 +18,8 @@ pushd %CD%\cf-cli-binaries
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 
+.\cf install-plugin -f -r CF-Community "network-policy"
+
 mkdir %CATSPATH%
 xcopy /e /s cf-acceptance-tests %CATSPATH%
 
