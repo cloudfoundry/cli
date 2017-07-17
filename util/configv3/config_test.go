@@ -35,8 +35,8 @@ var _ = Describe("Config", func() {
 		BeforeEach(func() {
 			oldLang = os.Getenv("LANG")
 			oldLCAll = os.Getenv("LC_ALL")
-			os.Unsetenv("LANG")
-			os.Unsetenv("LC_ALL")
+			Expect(os.Unsetenv("LANG")).ToNot(HaveOccurred())
+			Expect(os.Unsetenv("LC_ALL")).ToNot(HaveOccurred())
 		})
 
 		It("returns a default config", func() {
@@ -47,13 +47,13 @@ var _ = Describe("Config", func() {
 			// we save and unset this variable in case it's present
 			// since we want to load a default config
 			envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
-			os.Unsetenv("CF_CLI_EXPERIMENTAL")
+			Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
 
 			config, err := LoadConfig()
+			Expect(err).ToNot(HaveOccurred())
 
 			// then we reset the env variable
-			os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
-
+			err = os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(config).ToNot(BeNil())
@@ -309,9 +309,9 @@ var _ = Describe("Config", func() {
 
 				defer os.Unsetenv("CF_CLI_EXPERIMENTAL")
 				if envVal == "" {
-					os.Unsetenv("CF_CLI_EXPERIMENTAL")
+					Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
 				} else {
-					os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
+					Expect(os.Setenv("CF_CLI_EXPERIMENTAL", envVal)).ToNot(HaveOccurred())
 				}
 
 				config, err := LoadConfig()
@@ -353,10 +353,10 @@ var _ = Describe("Config", func() {
 				originalCFStartupTimeout = os.Getenv("CF_STARTUP_TIMEOUT")
 				originalHTTPSProxy = os.Getenv("https_proxy")
 				originalForceTTY = os.Getenv("FORCE_TTY")
-				os.Setenv("CF_STAGING_TIMEOUT", "8675")
-				os.Setenv("CF_STARTUP_TIMEOUT", "309")
-				os.Setenv("https_proxy", "proxy.com")
-				os.Setenv("FORCE_TTY", "true")
+				Expect(os.Setenv("CF_STAGING_TIMEOUT", "8675")).ToNot(HaveOccurred())
+				Expect(os.Setenv("CF_STARTUP_TIMEOUT", "309")).ToNot(HaveOccurred())
+				Expect(os.Setenv("https_proxy", "proxy.com")).ToNot(HaveOccurred())
+				Expect(os.Setenv("FORCE_TTY", "true")).ToNot(HaveOccurred())
 
 				var err error
 				config, err = LoadConfig()
@@ -365,10 +365,10 @@ var _ = Describe("Config", func() {
 			})
 
 			AfterEach(func() {
-				os.Setenv("CF_STAGING_TIMEOUT", originalCFStagingTimeout)
-				os.Setenv("CF_STARTUP_TIMEOUT", originalCFStartupTimeout)
-				os.Setenv("https_proxy", originalHTTPSProxy)
-				os.Setenv("FORCE_TTY", originalForceTTY)
+				Expect(os.Setenv("CF_STAGING_TIMEOUT", originalCFStagingTimeout)).ToNot(HaveOccurred())
+				Expect(os.Setenv("CF_STARTUP_TIMEOUT", originalCFStartupTimeout)).ToNot(HaveOccurred())
+				Expect(os.Setenv("https_proxy", originalHTTPSProxy)).ToNot(HaveOccurred())
+				Expect(os.Setenv("FORCE_TTY", originalForceTTY)).ToNot(HaveOccurred())
 			})
 
 			It("overrides specific config values", func() {
@@ -435,76 +435,6 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Describe("Verbose", func() {
-			DescribeTable("absolute paths",
-				func(env string, configTrace string, flag bool, expected bool, location []string) {
-					rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, configTrace)
-					setConfig(homeDir, rawConfig)
-
-					defer os.Unsetenv("CF_TRACE")
-					if env == "" {
-						os.Unsetenv("CF_TRACE")
-					} else {
-						os.Setenv("CF_TRACE", env)
-					}
-
-					config, err := LoadConfig(FlagOverride{
-						Verbose: flag,
-					})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(config).ToNot(BeNil())
-
-					verbose, parsedLocation := config.Verbose()
-					Expect(verbose).To(Equal(expected))
-					Expect(parsedLocation).To(Equal(location))
-				},
-
-				Entry("CF_TRACE true: enables verbose", "true", "", false, true, nil),
-				Entry("CF_TRACE true, config trace false: enables verbose", "true", "false", false, true, nil),
-				Entry("CF_TRACE true, config trace file path: enables verbose AND logging to file", "true", "/foo/bar", false, true, []string{"/foo/bar"}),
-
-				Entry("CF_TRACE false: disables verbose", "false", "", false, false, nil),
-				Entry("CF_TRACE false, '-v': enables verbose", "false", "", true, true, nil),
-				Entry("CF_TRACE false, config trace true: disables verbose", "false", "true", false, false, nil),
-				Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo/bar", false, false, []string{"/foo/bar"}),
-				Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true, true, []string{"/foo/bar"}),
-
-				Entry("CF_TRACE empty: disables verbose", "", "", false, false, nil),
-				Entry("CF_TRACE empty:, '-v': enables verbose", "", "", true, true, nil),
-				Entry("CF_TRACE empty, config trace true: enables verbose", "", "true", false, true, nil),
-				Entry("CF_TRACE empty, config trace file path: enables logging to file", "", "/foo/bar", false, false, []string{"/foo/bar"}),
-				Entry("CF_TRACE empty, config trace file path, '-v': enables verbose AND logging to file", "", "/foo/bar", true, true, []string{"/foo/bar"}),
-
-				Entry("CF_TRACE filepath: enables logging to file", "/foo/bar", "", false, false, []string{"/foo/bar"}),
-				Entry("CF_TRACE filepath, '-v': enables logging to file", "/foo/bar", "", true, true, []string{"/foo/bar"}),
-				Entry("CF_TRACE filepath, config trace true: enables verbose AND logging to file", "/foo/bar", "true", false, true, []string{"/foo/bar"}),
-				Entry("CF_TRACE filepath, config trace filepath: enables logging to file for BOTH paths", "/foo/bar", "/baz", false, false, []string{"/foo/bar", "/baz"}),
-				Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true, true, []string{"/foo/bar", "/baz"}),
-			)
-
-			Context("relative paths (cannot be tested in DescribeTable)", func() {
-				It("resolves relative paths into absolute paths", func() {
-					configTrace := "foo/bar"
-
-					rawConfig := fmt.Sprintf(`{ "Trace":"%s" }`, configTrace)
-					setConfig(homeDir, rawConfig)
-
-					cfTrace := "foo2/bar2"
-					os.Setenv("CF_TRACE", cfTrace)
-					defer os.Unsetenv("CF_TRACE")
-
-					config, err := LoadConfig(FlagOverride{})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(config).ToNot(BeNil())
-
-					cwd, err := os.Getwd()
-					Expect(err).ToNot(HaveOccurred())
-					_, parsedLocation := config.Verbose()
-					Expect(parsedLocation).To(Equal([]string{filepath.Join(cwd, cfTrace), filepath.Join(cwd, configTrace)}))
-				})
-			})
-		})
-
 		Describe("DialTimeout", func() {
 			var (
 				originalDialTimeout string
@@ -514,7 +444,7 @@ var _ = Describe("Config", func() {
 
 			BeforeEach(func() {
 				originalDialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
-				os.Setenv("CF_DIAL_TIMEOUT", "1234")
+				Expect(os.Setenv("CF_DIAL_TIMEOUT", "1234")).ToNot(HaveOccurred())
 
 				var err error
 				config, err = LoadConfig()
@@ -523,7 +453,7 @@ var _ = Describe("Config", func() {
 			})
 
 			AfterEach(func() {
-				os.Setenv("CF_DIAL_TIMEOUT", originalDialTimeout)
+				Expect(os.Setenv("CF_DIAL_TIMEOUT", originalDialTimeout)).ToNot(HaveOccurred())
 			})
 
 			It("returns the dial timeout", func() {
