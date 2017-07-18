@@ -63,6 +63,8 @@ func HandleError(err error) error {
 		return translatableerror.AppNotFoundInManifestError{Name: e.Name}
 	case pushaction.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
+	case pushaction.NonexistentAppPathError:
+		return translatableerror.FileNotFoundError{Path: e.Path}
 	case pushaction.MissingNameError:
 		return translatableerror.RequiredNameForPushError{}
 	case pushaction.UploadFailedError:

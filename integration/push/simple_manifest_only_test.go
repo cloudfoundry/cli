@@ -30,6 +30,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 							"applications": []map[string]string{
 								{
 									"name": appName,
+									"path": dir,
 								},
 							},
 						})
@@ -72,6 +73,25 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
 						Eventually(session.Err).Should(Say("Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the app does not exist", func() {
+				It("returns an error", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+							"applications": []map[string]string{
+								{
+									"name": "some-name",
+									"path": "does-not-exist",
+								},
+							},
+						})
+
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+						Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path .*/does-not-exist"))
 						Eventually(session).Should(Exit(1))
 					})
 				})

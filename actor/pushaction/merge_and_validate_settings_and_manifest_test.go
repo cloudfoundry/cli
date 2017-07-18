@@ -13,16 +13,19 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	var (
 		actor       *Actor
 		cmdSettings CommandLineSettings
+
+		currentDirectory string
 	)
 
 	BeforeEach(func() {
 		actor = NewActor(nil)
+		currentDirectory = getCurrentDir()
 	})
 
 	Context("when only passed command line settings", func() {
 		BeforeEach(func() {
 			cmdSettings = CommandLineSettings{
-				CurrentDirectory: "/current/directory",
+				CurrentDirectory: currentDirectory,
 				DockerImage:      "some-image",
 				Name:             "some-app",
 			}
@@ -34,7 +37,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(manifests).To(Equal([]manifest.Application{{
 				DockerImage: "some-image",
 				Name:        "some-app",
-				Path:        "/current/directory",
+				Path:        currentDirectory,
 			}}))
 		})
 	})
@@ -48,7 +51,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 
 		BeforeEach(func() {
 			cmdSettings = CommandLineSettings{
-				CurrentDirectory: "/current/directory",
+				CurrentDirectory: currentDirectory,
 			}
 
 			apps = []manifest.Application{
@@ -67,11 +70,11 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(mergedApps).To(ConsistOf(
 				manifest.Application{
 					Name: "app-1",
-					Path: "/current/directory",
+					Path: currentDirectory,
 				},
 				manifest.Application{
 					Name: "app-2",
-					Path: "/current/directory",
+					Path: currentDirectory,
 				},
 			))
 		})
@@ -88,7 +91,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 					Expect(mergedApps).To(ConsistOf(
 						manifest.Application{
 							Name: "app-1",
-							Path: "/current/directory",
+							Path: currentDirectory,
 						},
 					))
 				})
@@ -114,5 +117,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 
 		Entry("MissingNameError", CommandLineSettings{}, nil, MissingNameError{}),
 		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, MissingNameError{}),
+		Entry("NonexistentAppPathError", CommandLineSettings{Name: "some-name", ProvidedAppPath: "does-not-exist"}, nil, NonexistentAppPathError{Path: "does-not-exist"}),
+		Entry("NonexistentAppPathError", CommandLineSettings{}, []manifest.Application{{Name: "some-name", Path: "does-not-exist"}}, NonexistentAppPathError{Path: "does-not-exist"}),
 	)
 })

@@ -2,6 +2,7 @@ package pushaction
 
 import (
 	"fmt"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	log "github.com/sirupsen/logrus"
@@ -11,6 +12,14 @@ type MissingNameError struct{}
 
 func (MissingNameError) Error() string {
 	return "name not specified for app"
+}
+
+type NonexistentAppPathError struct {
+	Path string
+}
+
+func (e NonexistentAppPathError) Error() string {
+	return fmt.Sprint("app path not found:", e.Path)
 }
 
 type AppNotFoundInManifestError struct {
@@ -29,7 +38,7 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	} else {
 		// validate premerged settings
 		for _, app := range apps {
-			mergedApps = append(mergedApps, actor.mergeCommandLineSettingsAndManifest(settings, app))
+			mergedApps = append(mergedApps, settings.OverrideManifestSettings(app))
 		}
 
 		if settings.Name != "" {
@@ -57,11 +66,6 @@ func (Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSett
 	return appSettings
 }
 
-func (Actor) mergeCommandLineSettingsAndManifest(settings CommandLineSettings, app manifest.Application) manifest.Application {
-	app.Path = settings.ApplicationPath()
-	return app
-}
-
 func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.Application, error) {
 	var returnedApps []manifest.Application
 	for _, app := range apps {
@@ -81,6 +85,11 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 		if app.Name == "" {
 			log.WithField("index", i).Error("does not contain an app name")
 			return MissingNameError{}
+		}
+		_, err := os.Stat(app.Path)
+		if os.IsNotExist(err) {
+			log.WithField("path", app.Path).Error("app path does not exist")
+			return NonexistentAppPathError{Path: app.Path}
 		}
 	}
 	return nil

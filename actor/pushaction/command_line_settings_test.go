@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
+var _ = Describe("CommandLineSettings", func() {
 	var (
 		settings CommandLineSettings
 	)
@@ -17,15 +17,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 	})
 
 	Describe("ApplicationPath", func() {
-		Context("when ProvidedAppPath is set", func() {
-			BeforeEach(func() {
-				settings.ProvidedAppPath = "some-path"
-			})
-
-			It("returns the ProvidedAppPath", func() {
-				Expect(settings.ApplicationPath()).To(Equal("some-path"))
-			})
-		})
+		// more tests under command_line_settings_*OS*_test.go
 
 		Context("when ProvidedAppPath is *not* set", func() {
 			BeforeEach(func() {

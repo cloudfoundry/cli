@@ -71,6 +71,31 @@ var _ = Describe("push with a simple manifest and flags", func() {
 			})
 		})
 
+		Context("manifest contains a path and a '-p' is provided", func() {
+			It("overrides the manifest path with the '-p' path", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]string{
+							{
+								"name": appName,
+								"path": "does-not-exist",
+							},
+						},
+					})
+
+					session := helpers.CF(PushCommandName, "-p", dir)
+					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("when the --no-manifest flag is passed", func() {
 			It("does not use the provided manifest", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
