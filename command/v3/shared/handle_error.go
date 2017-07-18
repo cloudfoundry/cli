@@ -43,6 +43,8 @@ func HandleError(err error) error {
 		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
 	case v3action.AssignDropletError:
 		return translatableerror.AssignDropletError{Message: e.Message}
+	case v3action.EmptyDirectoryError:
+		return translatableerror.EmptyDirectoryError{Path: e.Path}
 	}
 
 	return err

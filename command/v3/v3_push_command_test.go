@@ -189,6 +189,18 @@ var _ = Describe("v3-push Command", func() {
 						fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
 					})
 
+					Context("when the -p flag is provided", func() {
+						BeforeEach(func() {
+							cmd.AppPath = "some-app-path"
+						})
+
+						It("creates the package with the provided path", func() {
+							_, _, appPath := fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceArgsForCall(0)
+
+							Expect(appPath).To(Equal("some-app-path"))
+						})
+					})
+
 					It("displays the header and OK", func() {
 						Expect(testUI.Out).To(Say("Uploading app some-app in org some-org / space some-space as banana..."))
 

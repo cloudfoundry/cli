@@ -1,6 +1,10 @@
 package isolated
 
 import (
+	"io/ioutil"
+	"os"
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,9 +34,10 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("v3-push - Push a new app or sync changes to an existing app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK_NAME\\]"))
+				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK_NAME\\] \\[-p APP_PATH\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
+				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -54,6 +59,26 @@ var _ = Describe("v3-push command", func() {
 			session := helpers.CF("v3-push", appName, "-b")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-b'"))
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when the -p flag is not given an arg", func() {
+		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+			session := helpers.CF("v3-push", appName, "-p")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-p'"))
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when the -p flag path does not exist", func() {
+		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+			session := helpers.CF("v3-push", appName, "-p", "path/that/does/not/exist")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'path/that/does/not/exist' does not exist."))
 			Eventually(session.Out).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
@@ -223,6 +248,100 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("web:1/1"))
 				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			})
+		})
+
+		Context("when the -p flag is provided", func() {
+			Context("when the path is a directory", func() {
+				Context("when the directory contains files", func() {
+					It("pushes the app from the directory", func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							session := helpers.CF("v3-push", appName, "-p", appDir)
+
+							Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
+							Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say(""))
+							Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+							Eventually(session.Out).Should(Say("requested state:\\s+started"))
+							Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+							Eventually(session.Out).Should(Say("memory usage:\\s+32M x 1"))
+							Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+							Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+							Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+							Eventually(session.Out).Should(Say(""))
+							Eventually(session.Out).Should(Say("web:1/1"))
+							Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+							Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				Context("when the directory is empty", func() {
+					var emptyDir string
+
+					BeforeEach(func() {
+						var err error
+						emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
+					})
+
+					It("returns an error", func() {
+						session := helpers.CF("v3-push", appName, "-p", emptyDir)
+						Eventually(session.Err).Should(Say("No app files found in '%s'", regexp.QuoteMeta(emptyDir)))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the path is a zip file", func() {
+				Context("pushing a zip file", func() {
+					var archive string
+
+					BeforeEach(func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+							Expect(err).ToNot(HaveOccurred())
+							archive = tmpfile.Name()
+							Expect(tmpfile.Close())
+
+							err = helpers.Zipit(appDir, archive, "")
+							Expect(err).ToNot(HaveOccurred())
+						})
+					})
+
+					AfterEach(func() {
+						Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+					})
+
+					It("pushes the app from the zip file", func() {
+						session := helpers.CF("v3-push", appName, "-p", archive)
+
+						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
+						Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say(""))
+						Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+						Eventually(session.Out).Should(Say("requested state:\\s+started"))
+						Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+						Eventually(session.Out).Should(Say("memory usage:\\s+32M x 1"))
+						Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+						Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+						Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+						Eventually(session.Out).Should(Say(""))
+						Eventually(session.Out).Should(Say("web:1/1"))
+						Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+						Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 

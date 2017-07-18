@@ -11,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/ykk"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -53,6 +54,28 @@ var _ = Describe("Package Actions", func() {
 					ccv3.Warnings{"some-app-warning"},
 					nil,
 				)
+			})
+
+			Context("when the provided path is an empty directory", func() {
+				var (
+					bitsPath string
+					err      error
+				)
+				BeforeEach(func() {
+					bitsPath, err = ioutil.TempDir("", "example")
+					Expect(err).ToNot(HaveOccurred())
+				})
+				AfterEach(func() {
+					if bitsPath != "" {
+						err = os.RemoveAll(bitsPath)
+						Expect(err).ToNot(HaveOccurred())
+					}
+				})
+
+				It("returns an empty-directory error", func() {
+					_, _, err = actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+					Expect(err).To(Equal(EmptyDirectoryError{Path: bitsPath}))
+				})
 			})
 
 			Context("when the zip can be created", func() {
@@ -107,6 +130,70 @@ var _ = Describe("Package Actions", func() {
 							ccv3.Warnings{"some-pkg-warning"},
 							nil,
 						)
+					})
+
+					Context("when the bitsPath is an archive", func() {
+						var archivePath string
+
+						BeforeEach(func() {
+							tmpfile, err := ioutil.TempFile("", "zip-archive-resources")
+							Expect(err).ToNot(HaveOccurred())
+							defer tmpfile.Close()
+							archivePath = tmpfile.Name()
+
+							err = zipit(bitsPath, archivePath, "")
+							Expect(err).ToNot(HaveOccurred())
+
+							fakeCloudControllerClient.GetPackageReturns(
+								ccv3.Package{GUID: "some-pkg-guid", State: ccv3.PackageStateReady},
+								ccv3.Warnings{"some-get-pkg-warning"},
+								nil,
+							)
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
+						})
+
+						It("creates a new archive with correct permissions", func() {
+							fakeCloudControllerClient.UploadPackageStub = func(pkg ccv3.Package, zipFilePart string) (ccv3.Package, ccv3.Warnings, error) {
+
+								Expect(zipFilePart).ToNot(BeEmpty())
+								zipFile, err := os.Open(zipFilePart)
+								Expect(err).ToNot(HaveOccurred())
+								defer zipFile.Close()
+
+								zipInfo, err := zipFile.Stat()
+								Expect(err).ToNot(HaveOccurred())
+
+								reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+								Expect(err).ToNot(HaveOccurred())
+
+								Expect(reader.File).To(HaveLen(4))
+								Expect(reader.File[0].Name).To(Equal("/"))
+								Expect(reader.File[1].Name).To(Equal("/folder1/"))
+								Expect(reader.File[2].Name).To(Equal("/folder1/tmpfile"))
+								Expect(reader.File[3].Name).To(Equal("/tmpfile"))
+								Expect(int(reader.File[0].Mode().Perm())).To(Equal(DefaultFolderPermissions))
+								Expect(int(reader.File[1].Mode().Perm())).To(Equal(DefaultFolderPermissions))
+								Expect(int(reader.File[2].Mode().Perm())).To(Equal(DefaultArchiveFilePermissions))
+								Expect(int(reader.File[3].Mode().Perm())).To(Equal(DefaultArchiveFilePermissions))
+
+								expectFileContentsToEqual(reader.File[2], "some-contents")
+								expectFileContentsToEqual(reader.File[3], "some-contents")
+
+								for _, file := range reader.File {
+									Expect(file.Method).To(Equal(zip.Deflate))
+								}
+
+								return ccv3.Package{}, nil, nil
+							}
+
+							_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", archivePath)
+
+							Expect(err).NotTo(HaveOccurred())
+							Expect(fakeCloudControllerClient.UploadPackageCallCount()).To(Equal(1))
+						})
 					})
 
 					Context("when the file uploading is successful", func() {
@@ -282,7 +369,7 @@ var _ = Describe("Package Actions", func() {
 				It("returns the warnings and the error", func() {
 					_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "/banana")
 					// Windows returns back a different error message
-					Expect(err.Error()).To(MatchRegexp("open /banana: no such file or directory|The system cannot find the file specified"))
+					Expect(err.Error()).To(MatchRegexp("stat /banana: no such file or directory|The system cannot find the file specified"))
 					Expect(warnings).To(ConsistOf("some-app-warning"))
 				})
 			})
@@ -307,3 +394,14 @@ var _ = Describe("Package Actions", func() {
 		})
 	})
 })
+
+func expectFileContentsToEqual(file *zip.File, expectedContents string) {
+	reader, err := file.Open()
+	Expect(err).ToNot(HaveOccurred())
+	defer reader.Close()
+
+	body, err := ioutil.ReadAll(reader)
+	Expect(err).ToNot(HaveOccurred())
+
+	Expect(string(body)).To(Equal(expectedContents))
+}

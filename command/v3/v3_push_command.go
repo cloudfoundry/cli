@@ -39,11 +39,12 @@ type V3PushActor interface {
 }
 
 type V3PushCommand struct {
-	RequiredArgs        flag.AppName `positional-args:"yes"`
-	NoRoute             bool         `long:"no-route" description:"Do not map a route to this app"`
-	Buildpack           string       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	usage               interface{}  `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME]"`
-	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	RequiredArgs        flag.AppName                `positional-args:"yes"`
+	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
+	Buildpack           string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME] [-p APP_PATH]"`
+	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -264,12 +265,19 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 		"CurrentUser":  userName,
 	})
 
-	pwd, err := os.Getwd()
-	if err != nil {
-		return v3action.Package{}, err
+	var appPath string
+
+	if cmd.AppPath != "" {
+		appPath = string(cmd.AppPath)
+	} else {
+		var err error
+		appPath, err = os.Getwd()
+		if err != nil {
+			return v3action.Package{}, err
+		}
 	}
 
-	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
+	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, appPath)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err

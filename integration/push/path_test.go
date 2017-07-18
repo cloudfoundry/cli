@@ -1,13 +1,9 @@
 package push
 
 import (
-	"archive/zip"
-	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"regexp"
-	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -105,7 +101,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 				archive = tmpfile.Name()
 				Expect(tmpfile.Close())
 
-				err = zipit(appDir, archive, "")
+				err = helpers.Zipit(appDir, archive, "")
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -132,68 +128,3 @@ var _ = Describe("pushing a path with the -p flag", func() {
 		})
 	})
 })
-
-// Thanks to Svett Ralchev
-// http://blog.ralch.com/tutorial/golang-working-with-zip/
-func zipit(source, target, prefix string) error {
-	zipfile, err := os.Create(target)
-	if err != nil {
-		return err
-	}
-	defer zipfile.Close()
-
-	if prefix != "" {
-		_, err = io.WriteString(zipfile, prefix)
-		if err != nil {
-			return err
-		}
-	}
-
-	archive := zip.NewWriter(zipfile)
-	defer archive.Close()
-
-	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if path == source {
-			return nil
-		}
-
-		header, err := zip.FileInfoHeader(info)
-		if err != nil {
-			return err
-		}
-
-		header.Name = strings.TrimPrefix(path, source+string(filepath.Separator))
-
-		if info.IsDir() {
-			header.Name += string(os.PathSeparator)
-			header.SetMode(0755)
-		} else {
-			header.Method = zip.Deflate
-			header.SetMode(0744)
-		}
-
-		writer, err := archive.CreateHeader(header)
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		_, err = io.Copy(writer, file)
-		return err
-	})
-
-	return err
-}
