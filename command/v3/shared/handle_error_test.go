@@ -85,6 +85,10 @@ var _ = Describe("HandleError", func() {
 			v3action.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
+		Entry("v3action.EmptyDirectoryError -> EmptyDirectoryError",
+			v3action.EmptyDirectoryError{Path: "some-path"},
+			translatableerror.EmptyDirectoryError{Path: "some-path"}),
+
 		Entry("default case -> original error",
 			err,
 			err),

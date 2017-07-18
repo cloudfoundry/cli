@@ -6696,8 +6696,8 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME]",
-    "translation": "cf v3-push APP_NAME [-b BUILDPACK_NAME]"
+    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME] [-p APP_PATH]",
+    "translation": "cf v3-push APP_NAME [-b BUILDPACK_NAME] [-p APP_PATH]"
   },
   {
     "id": "command help",
