@@ -39,9 +39,7 @@ var _ = Describe("Relationship", func() {
 			It("contains null in the marshaled JSON", func() {
 				body, err := json.Marshal(Relationship{GUID: ""})
 				expectedJSON := `{
-					"data": {
-						"guid": null
-					}
+					"data": null
 				}`
 
 				Expect(err).NotTo(HaveOccurred())
@@ -110,7 +108,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Describe("RevokeIsolationSegmentFromOrganization ", func() {
+	Describe("RevokeIsolationSegmentFromOrganization", func() {
 		Context("when relationship exists", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
@@ -131,7 +129,7 @@ var _ = Describe("Relationship", func() {
 		})
 	})
 
-	Context("when relationship exists", func() {
+	Context("when an error occurs", func() {
 		BeforeEach(func() {
 			response := `{
 					"errors": [
@@ -151,7 +149,7 @@ var _ = Describe("Relationship", func() {
 			)
 		})
 
-		It("revoke the relationship", func() {
+		It("returns the error and warnings", func() {
 			warnings, err := client.RevokeIsolationSegmentFromOrganization("segment-guid", "org-guid")
 			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 				ResponseCode: http.StatusTeapot,
@@ -252,9 +250,7 @@ var _ = Describe("Relationship", func() {
 		Context("when patching the default organization isolation segment with empty isolation segment guid", func() {
 			BeforeEach(func() {
 				expectedBody := `{
-					"data": {
-						"guid": null
-					}
+					"data": null
 				}`
 				server.AppendHandlers(
 					CombineHandlers(

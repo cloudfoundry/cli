@@ -15,15 +15,20 @@ type Relationship struct {
 }
 
 func (r Relationship) MarshalJSON() ([]byte, error) {
+	if r.GUID == "" {
+		var emptyCCRelationship struct {
+			Data interface{} `json:"data"`
+		}
+		return json.Marshal(emptyCCRelationship)
+	}
+
 	var ccRelationship struct {
 		Data struct {
-			GUID *string `json:"guid"`
+			GUID string `json:"guid"`
 		} `json:"data"`
 	}
 
-	if r.GUID != "" {
-		ccRelationship.Data.GUID = &r.GUID
-	}
+	ccRelationship.Data.GUID = r.GUID
 	return json.Marshal(ccRelationship)
 }
 
