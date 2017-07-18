@@ -68,7 +68,7 @@ func (actor Actor) CreateAndUploadPackageByApplicationNameAndSpace(appName strin
 	}
 
 	if fileInfo.IsDir() {
-		err = writeZipFile(bitsPath, tmpZipFilepath)
+		err = zipDirToFile(bitsPath, tmpZipFilepath)
 	} else {
 		err = copyZipArchive(bitsPath, tmpZipFilepath)
 	}
@@ -176,7 +176,7 @@ func addFileToZipFromFileSystem(srcFile io.ReadCloser, fileInfo os.FileInfo, des
 	return nil
 }
 
-func writeZipFile(dir string, targetFile *os.File) error {
+func zipDirToFile(dir string, targetFile *os.File) error {
 	isEmpty, err := fileutils.IsDirEmpty(dir)
 	if err != nil {
 		return err
