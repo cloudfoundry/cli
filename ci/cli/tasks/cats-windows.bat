@@ -18,7 +18,9 @@ pushd %CD%\cf-cli-binaries
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 
-.\cf install-plugin -f -r CF-Community "network-policy"
+.\cf add-plugin-repo CATS-Test-CF-Community https://plugins.cloudfoundry.org
+.\cf install-plugin -f -r CATS-Test-CF-Community "network-policy"
+.\cf remove-plugin-repo CATS-Test-CF-Community https://plugins.cloudfoundry.org
 
 mkdir %CATSPATH%
 xcopy /e /s cf-acceptance-tests %CATSPATH%
