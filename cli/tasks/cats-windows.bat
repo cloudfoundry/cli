@@ -20,7 +20,7 @@ popd
 
 .\cf add-plugin-repo CATS-Test-CF-Community https://plugins.cloudfoundry.org
 .\cf install-plugin -f -r CATS-Test-CF-Community "network-policy"
-.\cf remove-plugin-repo CATS-Test-CF-Community https://plugins.cloudfoundry.org
+.\cf remove-plugin-repo CATS-Test-CF-Community
 
 mkdir %CATSPATH%
 xcopy /e /s cf-acceptance-tests %CATSPATH%
