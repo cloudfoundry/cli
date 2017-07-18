@@ -91,7 +91,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
-						Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path .*/does-not-exist"))
+						Eventually(session.Err).Should(Say("File not found locally, make sure the file exists at given path .*does-not-exist"))
 						Eventually(session).Should(Exit(1))
 					})
 				})
