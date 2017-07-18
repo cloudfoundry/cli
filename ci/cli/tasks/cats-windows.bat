@@ -18,6 +18,7 @@ pushd %CD%\cf-cli-binaries
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 
+SET CF_PLUGIN_HOME=%CD%
 .\cf add-plugin-repo CATS-Test-CF-Community https://plugins.cloudfoundry.org
 .\cf install-plugin -f -r CATS-Test-CF-Community "network-policy"
 .\cf remove-plugin-repo CATS-Test-CF-Community
