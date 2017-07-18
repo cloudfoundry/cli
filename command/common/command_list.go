@@ -121,7 +121,7 @@ type commandList struct {
 	Rename                             v2.RenameCommand                             `command:"rename" description:"Rename an app"`
 	RepoPlugins                        plugin.RepoPluginsCommand                    `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
 	ResetOrgDefaultIsolationSegment    v3.ResetOrgDefaultIsolationSegmentCommand    `command:"reset-org-default-isolation-segment" description:"Reset the default isolation segment used for apps in spaces of an org"`
-	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the isolation segment assignment of a space to the org's default"`
+	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v2.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v2.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
 	Restart                            v2.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This may cause downtime."`
@@ -146,7 +146,7 @@ type commandList struct {
 	SetOrgRole                         v2.SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
 	SetQuota                           v2.SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
 	SetRunningEnvironmentVariableGroup v2.SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
-	SetSpaceIsolationSegment           v3.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment that apps in a space are started in"`
+	SetSpaceIsolationSegment           v3.SetSpaceIsolationSegmentCommand           `command:"set-space-isolation-segment" description:"Assign the isolation segment for a space"`
 	SetSpaceQuota                      v2.SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a space quota definition to a space"`
 	SetSpaceRole                       v2.SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
 	SetStagingEnvironmentVariableGroup v2.SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
