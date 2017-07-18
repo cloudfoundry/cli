@@ -125,6 +125,10 @@ func (c *cmd) GetMetadata() plugin.PluginMetadata {
 }
 ```
 
+### Debugging plugin code
+
+The recommended approach to debugging plugin code is to print to stdout, or set CF_TRACE to /dev/stderr or a file.
+
 ## Compiling Plugin Source Code
 
 The cf CLI requires an executable file to install the plugin. You must compile the source code with the `go build` command before distributing the plugin, or instruct your users to compile the plugin source code before installing the plugin. For information about compiling Go source code, see [Compile packages and dependencies](https://golang.org/cmd/go/).
