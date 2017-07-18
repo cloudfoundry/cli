@@ -316,6 +316,10 @@
     "translation": "Allow SSH access for the space"
   },
   {
+    "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "Also delete any mapped routes"
   },
@@ -4582,6 +4586,10 @@
   {
     "id": "Port used to identify the TCP route",
     "translation": "Port used to identify the TCP route"
+  },
+  {
+    "id": "Prevent use of a feature",
+    "translation": ""
   },
   {
     "id": "Print API request diagnostics to stdout",

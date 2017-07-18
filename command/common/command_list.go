@@ -75,13 +75,13 @@ type commandList struct {
 	DeleteSpace                        v2.DeleteSpaceCommand                        `command:"delete-space" description:"Delete a space"`
 	DeleteUser                         v2.DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
 	Delete                             v2.DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`
-	DisableFeatureFlag                 v2.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Disable the use of a feature so that users have access to and can use the feature"`
+	DisableFeatureFlag                 v2.DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Prevent use of a feature"`
 	DisableOrgIsolation                v3.DisableOrgIsolationCommand                `command:"disable-org-isolation" description:"Revoke an organization's entitlement to an isolation segment"`
 	DisableServiceAccess               v2.DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
 	DisableSSH                         v2.DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	DisallowSpaceSSH                   v2.DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
 	Domains                            v2.DomainsCommand                            `command:"domains" description:"List domains in the target org"`
-	EnableFeatureFlag                  v2.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Enable the use of a feature so that users have access to and can use the feature"`
+	EnableFeatureFlag                  v2.EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Allow use of a feature"`
 	EnableOrgIsolation                 v3.EnableOrgIsolationCommand                 `command:"enable-org-isolation" description:"Entitle an organization to an isolation segment"`
 	EnableServiceAccess                v2.EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
 	EnableSSH                          v2.EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`

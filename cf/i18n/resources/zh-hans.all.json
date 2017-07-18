@@ -316,6 +316,10 @@
     "translation": "允许对空间进行 SSH 访问"
   },
   {
+    "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "同时删除所有映射的路径"
   },
@@ -4582,6 +4586,10 @@
   {
     "id": "Port used to identify the TCP route",
     "translation": "用于识别 TCP 路径的端口"
+  },
+  {
+    "id": "Prevent use of a feature",
+    "translation": ""
   },
   {
     "id": "Print API request diagnostics to stdout",
