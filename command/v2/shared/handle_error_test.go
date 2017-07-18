@@ -130,6 +130,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.UploadFailedError{Err: translatableerror.NoDomainsFoundError{}},
 		),
 
+		Entry("pushaction.NonexistentAppPathError -> FileNotFoundError",
+			pushaction.NonexistentAppPathError{Path: "some-path"},
+			translatableerror.FileNotFoundError{Path: "some-path"},
+		),
+
 		Entry("default case -> original error",
 			err,
 			err),

@@ -1,6 +1,7 @@
 package pushaction_test
 
 import (
+	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -20,3 +21,9 @@ var _ = BeforeEach(func() {
 	SetDefaultEventuallyTimeout(3 * time.Second)
 	log.SetLevel(log.PanicLevel)
 })
+
+func getCurrentDir() string {
+	pwd, err := os.Getwd()
+	Expect(err).NotTo(HaveOccurred())
+	return pwd
+}

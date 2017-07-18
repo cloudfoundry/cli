@@ -1,8 +1,11 @@
+// +build windows
+
 package manifest_test
 
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction/manifest"
 
@@ -10,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Manifest", func() {
+var _ = Describe("Manifest with paths", func() {
 	var (
 		pathToManifest string
 		manifest       string
@@ -44,17 +47,22 @@ var _ = Describe("Manifest", func() {
 			manifest = `---
 applications:
 - name: "app-1"
+  path: C:\foo
 - name: "app-2"
+  path: bar
 - name: "app-3"
+  path: ..\baz
 `
 		})
 
 		It("reads the manifest file", func() {
+			tempDir := filepath.Dir(pathToManifest)
+			parentTempDir := filepath.Dir(tempDir)
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(apps).To(ConsistOf(
-				Application{Name: "app-1"},
-				Application{Name: "app-2"},
-				Application{Name: "app-3"},
+				Application{Name: "app-1", Path: "C:\\foo"},
+				Application{Name: "app-2", Path: filepath.Join(tempDir, "bar")},
+				Application{Name: "app-3", Path: filepath.Join(parentTempDir, "baz")},
 			))
 		})
 	})
