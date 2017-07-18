@@ -135,6 +135,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.FileNotFoundError{Path: "some-path"},
 		),
 
+		Entry("pushaction.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
+			pushaction.CommandLineOptionsWithMultipleAppsError{},
+			translatableerror.CommandLineArgsWithMultipleAppsError{},
+		),
+
 		Entry("default case -> original error",
 			err,
 			err),

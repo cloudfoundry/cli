@@ -137,6 +137,39 @@ var _ = Describe("push with a simple manifest and flags", func() {
 			})
 		})
 
+		Context("manifest contains multiple apps and a '-p' is provided", func() {
+			var tempDir string
+
+			BeforeEach(func() {
+				var err error
+				tempDir, err = ioutil.TempDir("", "combination-manifest-with-p")
+				Expect(err).ToNot(HaveOccurred())
+
+				helpers.WriteManifest(filepath.Join(tempDir, "manifest.yml"), map[string]interface{}{
+					"applications": []map[string]string{
+						{
+							"name": "name-1",
+						},
+						{
+							"name": "name-2",
+						},
+					},
+				})
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, PushCommandName, "-p", dir)
+					Eventually(session.Err).Should(Say("Incorrect Usage: Command line flags \\(except -f\\) cannot be applied when pushing multiple apps from a manifest file\\."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
 		Context("when the --no-manifest flag is passed", func() {
 			It("does not use the provided manifest", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
