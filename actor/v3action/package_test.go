@@ -56,28 +56,6 @@ var _ = Describe("Package Actions", func() {
 				)
 			})
 
-			Context("when the provided path is an empty directory", func() {
-				var (
-					bitsPath string
-					err      error
-				)
-				BeforeEach(func() {
-					bitsPath, err = ioutil.TempDir("", "example")
-					Expect(err).ToNot(HaveOccurred())
-				})
-				AfterEach(func() {
-					if bitsPath != "" {
-						err = os.RemoveAll(bitsPath)
-						Expect(err).ToNot(HaveOccurred())
-					}
-				})
-
-				It("returns an empty-directory error", func() {
-					_, _, err = actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
-					Expect(err).To(Equal(EmptyDirectoryError{Path: bitsPath}))
-				})
-			})
-
 			Context("when the zip can be created", func() {
 				var (
 					bitsPath           string
@@ -149,13 +127,7 @@ var _ = Describe("Package Actions", func() {
 								ccv3.Warnings{"some-get-pkg-warning"},
 								nil,
 							)
-						})
 
-						AfterEach(func() {
-							Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
-						})
-
-						It("creates a new archive with correct permissions", func() {
 							fakeCloudControllerClient.UploadPackageStub = func(pkg ccv3.Package, zipFilePart string) (ccv3.Package, ccv3.Warnings, error) {
 
 								Expect(zipFilePart).ToNot(BeEmpty())
@@ -189,6 +161,13 @@ var _ = Describe("Package Actions", func() {
 								return ccv3.Package{}, nil, nil
 							}
 
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(archivePath)).ToNot(HaveOccurred())
+						})
+
+						It("creates a new archive with correct permissions", func() {
 							_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", archivePath)
 
 							Expect(err).NotTo(HaveOccurred())
@@ -198,7 +177,19 @@ var _ = Describe("Package Actions", func() {
 
 					Context("when the file uploading is successful", func() {
 						BeforeEach(func() {
-							fakeCloudControllerClient.UploadPackageReturns(ccv3.Package{}, ccv3.Warnings{"some-upload-pkg-warning"}, nil)
+							fakeCloudControllerClient.UploadPackageStub = func(pkg ccv3.Package, zipFilePart string) (ccv3.Package, ccv3.Warnings, error) {
+								filestats := map[string]int64{}
+								reader, err := zip.OpenReader(zipFilePart)
+								Expect(err).ToNot(HaveOccurred())
+
+								for _, file := range reader.File {
+									filestats[file.Name] = file.FileInfo().Size()
+								}
+
+								Expect(filestats).To(Equal(expectedFilesInZip))
+
+								return ccv3.Package{}, ccv3.Warnings{"some-upload-pkg-warning"}, nil
+							}
 						})
 
 						Context("when the polling is successful", func() {
@@ -211,19 +202,6 @@ var _ = Describe("Package Actions", func() {
 							})
 
 							It("correctly constructs the zip", func() {
-								fakeCloudControllerClient.UploadPackageStub = func(pkg ccv3.Package, zipFilePart string) (ccv3.Package, ccv3.Warnings, error) {
-									filestats := map[string]int64{}
-									reader, err := zip.OpenReader(zipFilePart)
-									Expect(err).ToNot(HaveOccurred())
-
-									for _, file := range reader.File {
-										filestats[file.Name] = file.FileInfo().Size()
-									}
-
-									Expect(filestats).To(Equal(expectedFilesInZip))
-
-									return ccv3.Package{}, nil, nil
-								}
 								_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).NotTo(HaveOccurred())
 								Expect(fakeCloudControllerClient.UploadPackageCallCount()).To(Equal(1))
@@ -312,6 +290,7 @@ var _ = Describe("Package Actions", func() {
 
 						Context("when the polling errors", func() {
 							var expectedErr error
+
 							BeforeEach(func() {
 								expectedErr = errors.New("Fake error during polling")
 								fakeCloudControllerClient.GetPackageReturns(
@@ -366,11 +345,46 @@ var _ = Describe("Package Actions", func() {
 			})
 
 			Context("when creating the zip errors", func() {
-				It("returns the warnings and the error", func() {
-					_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "/banana")
-					// Windows returns back a different error message
-					Expect(err.Error()).To(MatchRegexp("stat /banana: no such file or directory|The system cannot find the file specified"))
-					Expect(warnings).To(ConsistOf("some-app-warning"))
+				var (
+					appPath    string
+					warnings   Warnings
+					executeErr error
+				)
+
+				JustBeforeEach(func() {
+					_, warnings, executeErr = actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", appPath)
+				})
+
+				Context("when the provided path is an empty directory", func() {
+					BeforeEach(func() {
+						var err error
+						appPath, err = ioutil.TempDir("", "example")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						if appPath != "" {
+							err := os.RemoveAll(appPath)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					})
+
+					It("returns an empty-directory error", func() {
+						Expect(executeErr).To(Equal(EmptyDirectoryError{Path: appPath}))
+						Expect(warnings).To(ConsistOf("some-app-warning"))
+					})
+				})
+
+				Context("when the directory does not exist", func() {
+					BeforeEach(func() {
+						appPath = "/banana"
+					})
+
+					It("returns the warnings and the error", func() {
+						// Windows returns back a different error message
+						Expect(executeErr.Error()).To(MatchRegexp("stat /banana: no such file or directory|The system cannot find the file specified"))
+						Expect(warnings).To(ConsistOf("some-app-warning"))
+					})
 				})
 			})
 		})
