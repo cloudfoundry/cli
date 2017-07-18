@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	CFEventuallyTimeout   = 30 * time.Second
+	CFEventuallyTimeout   = 180 * time.Second
 	CFConsistentlyTimeout = 500 * time.Millisecond
 )
 

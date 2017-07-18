@@ -29,16 +29,6 @@ func WithHelloWorldApp(f func(dir string)) {
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
 
-	prevDir, err := os.Getwd()
-	Expect(err).ToNot(HaveOccurred())
-
-	err = os.Chdir(dir)
-	Expect(err).ToNot(HaveOccurred())
-	defer func() {
-		err = os.Chdir(prevDir)
-		Expect(err).ToNot(HaveOccurred())
-	}()
-
 	f(dir)
 }
 
@@ -57,16 +47,6 @@ func WithBananaPantsApp(f func(dir string)) {
 
 	err = ioutil.WriteFile(filepath.Join(dir, "Staticfile"), nil, 0666)
 	Expect(err).ToNot(HaveOccurred())
-
-	prevDir, err := os.Getwd()
-	Expect(err).ToNot(HaveOccurred())
-
-	err = os.Chdir(dir)
-	Expect(err).ToNot(HaveOccurred())
-	defer func() {
-		err = os.Chdir(prevDir)
-		Expect(err).ToNot(HaveOccurred())
-	}()
 
 	f(dir)
 }

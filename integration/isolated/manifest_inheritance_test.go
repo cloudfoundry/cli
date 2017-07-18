@@ -26,7 +26,7 @@ func pushHelloWorldAppWithManifests(manifests []string) {
 			err := ioutil.WriteFile(manifestPath, []byte(manifest), 0666)
 			Expect(err).ToNot(HaveOccurred())
 		}
-		Eventually(helpers.CF("push", "-f", pushPath)).Should(Exit(0))
+		Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", "-f", pushPath)).Should(Exit(0))
 	})
 }
 
