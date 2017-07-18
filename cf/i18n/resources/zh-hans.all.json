@@ -3560,6 +3560,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
+    "translation": "用法不正确: 从清单文件推送多个应用程序时，无法应用命令行标志（-f 除外）。"
+  },
+  {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
     "translation": ""
   },
