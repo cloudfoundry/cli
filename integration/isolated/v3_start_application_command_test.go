@@ -115,8 +115,8 @@ var _ = Describe("v3-start-application command", func() {
 				var packageGUID string
 				Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
 
-				helpers.WithHelloWorldApp(func(_ string) {
-					pkgSession := helpers.CF("v3-create-package", appName)
+				helpers.WithHelloWorldApp(func(dir string) {
+					pkgSession := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, "v3-create-package", appName)
 					Eventually(pkgSession).Should(Exit(0))
 					regex, err := regexp.Compile(`package guid: (.+)`)
 					Expect(err).ToNot(HaveOccurred())

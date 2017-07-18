@@ -72,18 +72,30 @@ var _ = Describe("push with a simple manifest and flags", func() {
 		})
 
 		Context("manifest contains a path and a '-p' is provided", func() {
+			var tempDir string
+
+			BeforeEach(func() {
+				var err error
+				tempDir, err = ioutil.TempDir("", "combination-manifest-with-p")
+				Expect(err).ToNot(HaveOccurred())
+
+				helpers.WriteManifest(filepath.Join(tempDir, "manifest.yml"), map[string]interface{}{
+					"applications": []map[string]string{
+						{
+							"name": appName,
+							"path": "does-not-exist",
+						},
+					},
+				})
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+			})
+
 			It("overrides the manifest path with the '-p' path", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
-					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
-						"applications": []map[string]string{
-							{
-								"name": appName,
-								"path": "does-not-exist",
-							},
-						},
-					})
-
-					session := helpers.CF(PushCommandName, "-p", dir)
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, PushCommandName, "-p", dir)
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("requested state:\\s+started"))

@@ -129,11 +129,11 @@ var _ = Describe("v3-push command", func() {
 			var session *Session
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("v3-push", appName)).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 
 				helpers.WithHelloWorldApp(func(appDir string) {
-					session = helpers.CF("v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -183,7 +183,7 @@ var _ = Describe("v3-push command", func() {
 
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					session = helpers.CF("v3-push", appName)
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -231,7 +231,7 @@ var _ = Describe("v3-push command", func() {
 
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					session = helpers.CF("v3-push", appName, "--no-route")
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "--no-route")
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -258,8 +258,8 @@ var _ = Describe("v3-push command", func() {
 			Context("when resetting the buildpack to default", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
-						session = helpers.CF("v3-push", appName, "-b", "default")
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "default")
 						Eventually(session).Should(Exit(0))
 					})
 				})
@@ -274,8 +274,8 @@ var _ = Describe("v3-push command", func() {
 			Context("when omitting the buildpack", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CF("v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
-						session = helpers.CF("v3-push", appName)
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "java_buildpack")).Should(Exit(1))
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -288,7 +288,7 @@ var _ = Describe("v3-push command", func() {
 			Context("when the buildpack is invalid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CF("v3-push", appName, "-b", "wut")
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "wut")
 						Eventually(session).Should(Exit(1))
 					})
 				})
@@ -303,7 +303,7 @@ var _ = Describe("v3-push command", func() {
 			Context("when the buildpack is valid", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						session = helpers.CF("v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "https://github.com/cloudfoundry/staticfile-buildpack")
 						Eventually(session).Should(Exit(0))
 					})
 				})

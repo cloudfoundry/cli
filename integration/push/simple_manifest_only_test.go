@@ -78,7 +78,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 				})
 			})
 
-			Context("when the app does not exist", func() {
+			Context("when the app path does not exist", func() {
 				It("returns an error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
