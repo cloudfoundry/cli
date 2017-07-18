@@ -27,27 +27,28 @@ run:
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
     export CF_DIAL_TIMEOUT=15
-    export CONFIG=$PWD/cats-config/integration_config.json
+    export CONFIG=${PWD}/cats-config/integration_config.json
 
-    mkdir -p $GOPATH/bin
+    mkdir -p ${GOPATH}/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
       chmod +x cf-cli_linux_x86-64
-      ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
+      ln -s ${PWD}/cf-cli_linux_x86-64 ${GOPATH}/bin/cf
     popd
 
+    export CF_PLUGIN_HOME=${PWD}
     cf install-plugin -f -r CF-Community "network-policy"
 
     cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
     # Redact passwords in output
-    sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
+    sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' ${CONFIG}
 
     SKIPS="-skip="
     SKIPS="${SKIPS}transparently proxies both reserved|"
 
     # Remove trailing |
-    SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
+    SKIPS=$(echo ${SKIPS} | sed -E 's/(.*)(\|)/\1/')
 
     ./bin/test \
       -flakeAttempts=2 -slowSpecThreshold=180 -randomizeAllSpecs \
