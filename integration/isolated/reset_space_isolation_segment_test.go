@@ -24,7 +24,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("reset-space-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("reset-space-isolation-segment - Reset the isolation segment assignment of a space to the org's default"))
+				Eventually(session).Should(Say("reset-space-isolation-segment - Reset the space's isolation segment to the org default"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf reset-space-isolation-segment SPACE_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))

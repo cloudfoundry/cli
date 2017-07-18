@@ -440,7 +440,7 @@
     "translation": "Asignar un rol de organización a un usuario"
   },
   {
-    "id": "Assign the isolation segment that apps in a space are started in",
+    "id": "Assign the isolation segment for a space",
     "translation": ""
   },
   {
@@ -4884,7 +4884,7 @@
     "translation": ""
   },
   {
-    "id": "Reset the isolation segment assignment of a space to the org's default",
+    "id": "Reset the space's isolation segment to the org default",
     "translation": ""
   },
   {

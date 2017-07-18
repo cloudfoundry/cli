@@ -24,7 +24,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("set-space-isolation-segment", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("set-space-isolation-segment - Assign the isolation segment that apps in a space are started in"))
+				Eventually(session).Should(Say("set-space-isolation-segment - Assign the isolation segment for a space"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf set-space-isolation-segment SPACE_NAME SEGMENT_NAME"))
 				Eventually(session).Should(Say("SEE ALSO:"))
