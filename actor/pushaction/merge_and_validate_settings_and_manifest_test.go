@@ -119,5 +119,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, MissingNameError{}),
 		Entry("NonexistentAppPathError", CommandLineSettings{Name: "some-name", ProvidedAppPath: "does-not-exist"}, nil, NonexistentAppPathError{Path: "does-not-exist"}),
 		Entry("NonexistentAppPathError", CommandLineSettings{}, []manifest.Application{{Name: "some-name", Path: "does-not-exist"}}, NonexistentAppPathError{Path: "does-not-exist"}),
+		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{ProvidedAppPath: "some-path"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 	)
 })

@@ -61,6 +61,8 @@ func HandleError(err error) error {
 
 	case pushaction.AppNotFoundInManifestError:
 		return translatableerror.AppNotFoundInManifestError{Name: e.Name}
+	case pushaction.CommandLineOptionsWithMultipleAppsError:
+		return translatableerror.CommandLineArgsWithMultipleAppsError{}
 	case pushaction.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
 	case pushaction.NonexistentAppPathError:

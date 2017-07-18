@@ -22,6 +22,12 @@ func (e NonexistentAppPathError) Error() string {
 	return fmt.Sprint("app path not found:", e.Path)
 }
 
+type CommandLineOptionsWithMultipleAppsError struct{}
+
+func (CommandLineOptionsWithMultipleAppsError) Error() string {
+	return "cannot use command line flag with multiple apps"
+}
+
 type AppNotFoundInManifestError struct {
 	Name string
 }
@@ -36,13 +42,16 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	if len(apps) == 0 {
 		mergedApps = actor.generateAppSettingsFromCommandLineSettings(settings)
 	} else {
-		// validate premerged settings
+		err := actor.validatePremergedSettings(settings, apps)
+		if err != nil {
+			return nil, err
+		}
+
 		for _, app := range apps {
 			mergedApps = append(mergedApps, settings.OverrideManifestSettings(app))
 		}
 
 		if settings.Name != "" {
-			var err error
 			mergedApps, err = actor.selectApp(settings.Name, mergedApps)
 			if err != nil {
 				return nil, err
@@ -78,6 +87,14 @@ func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.
 	}
 
 	return returnedApps, nil
+}
+
+func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {
+	if settings.ProvidedAppPath != "" && len(apps) > 1 {
+		log.Error("cannot use -p with multiple apps")
+		return CommandLineOptionsWithMultipleAppsError{}
+	}
+	return nil
 }
 
 func (Actor) validateMergedSettings(apps []manifest.Application) error {

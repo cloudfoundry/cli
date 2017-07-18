@@ -45,6 +45,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ArgumentCombinationError", ArgumentCombinationError{}),
 		Entry("AssignDropletError", AssignDropletError{}),
 		Entry("BadCredentialsError", BadCredentialsError{}),
+		Entry("CommandLineArgsWithMultipleAppsError", CommandLineArgsWithMultipleAppsError{}),
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),
 		Entry("EmptyDirectoryError", EmptyDirectoryError{}),
 		Entry("FetchingPluginInfoFromRepositoriesError", FetchingPluginInfoFromRepositoriesError{}),
