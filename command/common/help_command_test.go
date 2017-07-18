@@ -573,7 +573,7 @@ var _ = Describe("help Command", func() {
 
 				Expect(testUI.Out).To(Say("FEATURE FLAGS:"))
 				Expect(testUI.Out).To(Say("   feature-flags\\s+Retrieve list of feature flags with status of each flag-able feature"))
-				Expect(testUI.Out).To(Say("   disable-feature-flag\\s+Disable the use of a feature so that users have access to and can use the feature"))
+				Expect(testUI.Out).To(Say("   disable-feature-flag"))
 
 				Expect(testUI.Out).To(Say("ADVANCED:"))
 				Expect(testUI.Out).To(Say("   curl\\s+Executes a request to the targeted API endpoint"))

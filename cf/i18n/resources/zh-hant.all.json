@@ -316,6 +316,10 @@
     "translation": "容許空間的 SSH 存取權"
   },
   {
+    "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "也會一併刪除任何對映的路徑"
   },
@@ -4582,6 +4586,10 @@
   {
     "id": "Port used to identify the TCP route",
     "translation": "用來識別 TCP 路徑 (route) 的埠"
+  },
+  {
+    "id": "Prevent use of a feature",
+    "translation": ""
   },
   {
     "id": "Print API request diagnostics to stdout",

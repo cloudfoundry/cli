@@ -316,6 +316,10 @@
     "translation": "Autoriser l'accès SSH pour l'espace"
   },
   {
+    "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
     "id": "Also delete any mapped routes",
     "translation": "Supprimer aussi les routes mappées"
   },
@@ -4582,6 +4586,10 @@
   {
     "id": "Port used to identify the TCP route",
     "translation": "Port utilisé pour identifier la route TCP"
+  },
+  {
+    "id": "Prevent use of a feature",
+    "translation": ""
   },
   {
     "id": "Print API request diagnostics to stdout",
