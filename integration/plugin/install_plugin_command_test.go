@@ -864,7 +864,9 @@ var _ = Describe("install-plugin command", func() {
 
 					Eventually(session.Out).Should(Say("FAILED"))
 
-					Eventually(session).Should(Exit(1))
+					// There is a timing issue -- the exit code may be either 1 (processed error) or 130 (Ctrl-C)
+					Eventually(session).Should(SatisfyAny(Exit(1), Exit(130)))
+
 					Expect(server.ReceivedRequests()).To(HaveLen(0))
 
 					// make sure cf plugins did not break
