@@ -151,6 +151,16 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			StagingDefault: s.StagingDefault,
 		}
 
+		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+				allWarnings = append(allWarnings, err.Error())
+				continue
+			}
+			return nil, Warnings(allWarnings), err
+		}
+
 		if securityGroup.RunningDefault {
 			secGroupOrgSpaces = append(secGroupOrgSpaces,
 				SecurityGroupWithOrganizationSpaceAndLifecycle{
@@ -169,12 +179,6 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 					Space:         &Space{},
 					Lifecycle:     ccv2.SecurityGroupLifecycleStaging,
 				})
-		}
-
-		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
-		allWarnings = append(allWarnings, warnings...)
-		if err != nil {
-			return nil, Warnings(allWarnings), err
 		}
 
 		if len(spaces) == 0 {

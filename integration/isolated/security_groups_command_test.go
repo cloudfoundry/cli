@@ -1,4 +1,4 @@
-package global
+package isolated
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -16,7 +16,7 @@ var _ = Describe("security-groups command", func() {
 	Describe("help", func() {
 		Context("when --help flag is provided", func() {
 			It("displays command usage to output", func() {
-				session := helpers.CF("security-groups", "--help")
+				session = helpers.CF("security-groups", "--help")
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("security-groups - List all security groups"))
 				Eventually(session.Out).Should(Say("USAGE:"))
@@ -44,7 +44,7 @@ var _ = Describe("security-groups command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -55,7 +55,7 @@ var _ = Describe("security-groups command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("security-groups")
+				session = helpers.CF("security-groups")
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
@@ -64,7 +64,7 @@ var _ = Describe("security-groups command", func() {
 
 		Context("when too many arguments are provided", func() {
 			It("succeeds and ignores the additional arguments", func() {
-				session := helpers.CF("security-groups", "foooo")
+				session = helpers.CF("security-groups", "foooo")
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
