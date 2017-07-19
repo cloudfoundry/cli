@@ -994,6 +994,28 @@ var _ = Describe("Application Actions", func() {
 				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
 			})
 
+			Context("when the app is already staged", func() {
+				BeforeEach(func() {
+					app.PackageState = ccv2.ApplicationPackageStaged
+				})
+
+				It("does not send ApplicationStateStaging", func() {
+					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(app).To(Equal(ccv2.Application{
+						GUID:  "some-app-guid",
+						State: ccv2.ApplicationStarted,
+					}))
+				})
+			})
+
 			ItStartsApplication()
 		})
 
@@ -1083,6 +1105,28 @@ var _ = Describe("Application Actions", func() {
 
 				It("does not stop an app instance", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
+					Eventually(warnings).Should(Receive(Equal("state-warning")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
+					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
+					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
+					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(app).To(Equal(ccv2.Application{
+						GUID:  "some-app-guid",
+						State: ccv2.ApplicationStarted,
+					}))
+				})
+			})
+
+			Context("when the app is already staged", func() {
+				BeforeEach(func() {
+					app.PackageState = ccv2.ApplicationPackageStaged
+				})
+
+				It("does not send ApplicationStateStaging", func() {
+					Consistently(appState).ShouldNot(Receive(Equal(ApplicationStateStaging)))
 					Eventually(warnings).Should(Receive(Equal("state-warning")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-warnings-2")))

@@ -141,7 +141,7 @@ var _ = Describe("restage command", func() {
 				It("fails and displays the staging failure message", func() {
 					userName, _ := helpers.GetCredentials()
 					session := helpers.CF("restage", appName)
-					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 					// The staticfile_buildback does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
 					Eventually(session.Err).Should(Say("Error staging application: An app was not successfully detected by any available buildpack"))
@@ -161,7 +161,7 @@ var _ = Describe("restage command", func() {
 				It("fails and displays the start failure message", func() {
 					userName, _ := helpers.GetCredentials()
 					session := helpers.CF("restage", appName)
-					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 					Eventually(session.Err).Should(Say("Start unsuccessful"))
 					Eventually(session.Err).Should(Say("TIP: use 'cf logs .* --recent' for more information"))
@@ -199,12 +199,12 @@ applications:
 				It("displays the staging and app logs and information with instances table", func() {
 					userName, _ := helpers.GetCredentials()
 					session := helpers.CF("restage", appName, "-v")
-					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Restaging app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 					// Display Staging Logs
-					Eventually(session).Should(Say("Staging app and tracing logs..."))
-					Eventually(session).Should(Say("Uploading droplet..."))
-					Eventually(session).Should(Say("Waiting for app to start..."))
+					Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
+					Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
+					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Eventually(session).Should(Say("requested state:\\s+started"))

@@ -139,10 +139,10 @@ var _ = Describe("restart command", func() {
 				It("stops the app and starts it again", func() {
 					userName, _ := helpers.GetCredentials()
 					session := helpers.CF("restart", appName)
-					Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("Stopping app..."))
-					Eventually(session).Should(Say("Staging app and tracing logs..."))
-					Eventually(session).Should(Say("Waiting for app to start..."))
+					Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("Stopping app\\.\\.\\."))
+					Consistently(session).ShouldNot(Say("Staging app and tracing logs\\.\\.\\."))
+					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -175,10 +175,10 @@ applications:
 					It("displays the app information with instances table", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CF("restart", appName)
-						Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-						Consistently(session).ShouldNot(Say("Stopping app..."))
-						Eventually(session).Should(Say("Staging app and tracing logs..."))
-						Eventually(session).Should(Say("Waiting for app to start..."))
+						Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Consistently(session).ShouldNot(Say("Stopping app\\.\\.\\."))
+						Consistently(session).ShouldNot(Say("Staging app and tracing logs\\.\\.\\."))
+						Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 
 						Eventually(session).Should(Say("name:\\s+%s", appName))
 						Eventually(session).Should(Say("requested state:\\s+started"))
@@ -211,7 +211,8 @@ applications:
 					It("fails and displays the staging failure message", func() {
 						userName, _ := helpers.GetCredentials()
 						session := helpers.CF("restart", appName)
-						Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
 
 						// The staticfile_buildback does compile an index.html file. However, it requires a "Staticfile" during buildpack detection.
 						Eventually(session.Err).Should(Say("Error staging application: An app was not successfully detected by any available buildpack"))
@@ -232,7 +233,7 @@ applications:
 						It("fails and displays the start failure message", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("restart", appName)
-							Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 
 							Eventually(session.Err).Should(Say("Start unsuccessful"))
 							Eventually(session.Err).Should(Say("TIP: use 'cf logs .* --recent' for more information"))
@@ -270,13 +271,13 @@ applications:
 						It("displays the app logs and information with instances table", func() {
 							userName, _ := helpers.GetCredentials()
 							session := helpers.CF("restart", appName)
-							Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
-							Consistently(session).ShouldNot(Say("Stopping app..."))
+							Eventually(session).Should(Say("Restarting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Consistently(session).ShouldNot(Say("Stopping app\\.\\.\\."))
 
 							// Display Staging Logs
-							Eventually(session).Should(Say("Staging app and tracing logs..."))
-							Eventually(session).Should(Say("Uploading droplet..."))
-							Eventually(session).Should(Say("Waiting for app to start..."))
+							Eventually(session).Should(Say("Staging app and tracing logs\\.\\.\\."))
+							Eventually(session).Should(Say("Uploading droplet\\.\\.\\."))
+							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 
 							Eventually(session).Should(Say("name:\\s+%s", appName))
 							Eventually(session).Should(Say("requested state:\\s+started"))
