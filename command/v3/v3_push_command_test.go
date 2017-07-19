@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/command/v3/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -32,7 +33,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeNOAAClient  *v3actionfakes.FakeNOAAClient
 		fakeActor       *v3fakes.FakeV3PushActor
 		fakeV2PushActor *v3fakes.FakeV2PushActor
-		fakeV2AppActor  *v3fakes.FakeV2AppActor
+		fakeV2AppActor  *sharedfakes.FakeV2AppRouteActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -44,7 +45,7 @@ var _ = Describe("v3-push Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3PushActor)
 		fakeV2PushActor = new(v3fakes.FakeV2PushActor)
-		fakeV2AppActor = new(v3fakes.FakeV2AppActor)
+		fakeV2AppActor = new(sharedfakes.FakeV2AppRouteActor)
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 
 		fakeConfig.StagingTimeoutReturns(10 * time.Minute)

@@ -1,0 +1,111 @@
+package v3
+
+import (
+	"strings"
+
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/command"
+	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/command/v3/shared"
+)
+
+//go:generate counterfeiter . V3AppsActor
+
+type V3AppsActor interface {
+	GetApplicationSummariesBySpace(spaceGUID string) ([]v3action.ApplicationSummary, v3action.Warnings, error)
+}
+
+type V3AppsCommand struct {
+	usage interface{} `usage:"CF_NAME v3-apps"`
+
+	UI              command.UI
+	Config          command.Config
+	Actor           V3AppsActor
+	V2AppRouteActor shared.V2AppRouteActor
+	SharedActor     command.SharedActor
+}
+
+func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
+
+	ccClient, _, err := shared.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v3action.NewActor(ccClient, config)
+
+	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+
+	cmd.V2AppRouteActor = v2action.NewActor(ccClientV2, uaaClientV2, config)
+
+	return nil
+}
+
+func (cmd V3AppsCommand) Execute(args []string) error {
+	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	})
+	cmd.UI.DisplayNewline()
+
+	summaries, warnings, err := cmd.Actor.GetApplicationSummariesBySpace(cmd.Config.TargetedSpace().GUID)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	if len(summaries) == 0 {
+		cmd.UI.DisplayText("No apps found")
+		return nil
+	}
+
+	table := [][]string{
+		{
+			cmd.UI.TranslateText("name"),
+			cmd.UI.TranslateText("requested state"),
+			cmd.UI.TranslateText("processes"),
+			cmd.UI.TranslateText("routes"),
+		},
+	}
+
+	for _, summary := range summaries {
+		var routesList string
+		if len(summary.Processes) > 0 {
+			routes, warnings, err := cmd.V2AppRouteActor.GetApplicationRoutes(summary.GUID)
+			cmd.UI.DisplayWarnings(warnings)
+			if err != nil {
+				return shared.HandleError(err)
+			}
+			routesList = routes.Summary()
+		}
+
+		table = append(table, []string{
+			summary.Name,
+			cmd.UI.TranslateText(strings.ToLower(string(summary.State))),
+			summary.Processes.Summary(),
+			routesList,
+		})
+	}
+
+	cmd.UI.DisplayTableWithHeader("", table, 3)
+
+	return nil
+}

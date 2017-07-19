@@ -1688,6 +1688,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-apps",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-create-app APP_NAME",
     "translation": ""
   },
@@ -7022,6 +7026,10 @@
   {
     "id": "position",
     "translation": "位置"
+  },
+  {
+    "id": "processes",
+    "translation": ""
   },
   {
     "id": "processes:",

@@ -1,6 +1,9 @@
 package v3action
 
 import (
+	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -35,4 +38,44 @@ func (p Process) HealthyInstanceCount() int {
 		}
 	}
 	return count
+}
+
+type Processes []Process
+
+func (ps Processes) Sort() {
+	sort.Slice(ps, func(i int, j int) bool {
+		var iScore int
+		var jScore int
+
+		switch ps[i].Type {
+		case "web":
+			iScore = 0
+		default:
+			iScore = 1
+		}
+
+		switch ps[j].Type {
+		case "web":
+			jScore = 0
+		default:
+			jScore = 1
+		}
+
+		if iScore == 1 && jScore == 1 {
+			return ps[i].Type < ps[j].Type
+		}
+		return iScore < jScore
+	})
+
+}
+
+func (ps Processes) Summary() string {
+	ps.Sort()
+
+	var summaries []string
+	for _, p := range ps {
+		summaries = append(summaries, fmt.Sprintf("%s:%d/%d", p.Type, p.HealthyInstanceCount(), p.TotalInstanceCount()))
+	}
+
+	return strings.Join(summaries, ", ")
 }

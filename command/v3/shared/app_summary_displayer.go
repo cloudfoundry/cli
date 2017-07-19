@@ -2,7 +2,6 @@ package shared
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
@@ -24,7 +23,7 @@ type AppSummaryDisplayer struct {
 //go:generate counterfeiter . V2AppRouteActor
 
 type V2AppRouteActor interface {
-	GetApplicationRoutes(appGUID string) ([]v2action.Route, v2action.Warnings, error)
+	GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error)
 }
 
 //go:generate counterfeiter . V3AppSummaryActor
@@ -65,37 +64,15 @@ func (cmd AppSummaryDisplayer) DisplayAppInfo() error {
 }
 
 // Sort processes alphabetically and put web first.
-func (cmd AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes []v2action.Route) {
-	sort.Slice(summary.Processes, func(i int, j int) bool {
-		var iScore int
-		var jScore int
-
-		switch summary.Processes[i].Type {
-		case "web":
-			iScore = 0
-		default:
-			iScore = 1
-		}
-
-		switch summary.Processes[j].Type {
-		case "web":
-			jScore = 0
-		default:
-			jScore = 1
-		}
-
-		if iScore == 1 && jScore == 1 {
-			return summary.Processes[i].Type < summary.Processes[j].Type
-		}
-		return iScore < jScore
-	})
+func (cmd AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
+	summary.Processes.Sort()
 
 	keyValueTable := [][]string{
 		{cmd.UI.TranslateText("name:"), summary.Application.Name},
 		{cmd.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
 		{cmd.UI.TranslateText("processes:"), cmd.processesSummary(summary.Processes)},
 		{cmd.UI.TranslateText("memory usage:"), cmd.usageSummary(summary.Processes)},
-		{cmd.UI.TranslateText("routes:"), cmd.routesSummary(routes)},
+		{cmd.UI.TranslateText("routes:"), routes.Summary()},
 		{cmd.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		{cmd.UI.TranslateText("buildpacks:"), cmd.buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
@@ -170,14 +147,6 @@ func (AppSummaryDisplayer) processesSummary(processes []v3action.Process) string
 	}
 
 	return strings.Join(processesStrings, ", ")
-}
-
-func (AppSummaryDisplayer) routesSummary(routes []v2action.Route) string {
-	formattedRoutes := []string{}
-	for _, route := range routes {
-		formattedRoutes = append(formattedRoutes, route.String())
-	}
-	return strings.Join(formattedRoutes, ", ")
 }
 
 func (AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {

@@ -16,7 +16,7 @@ type V2Actor interface {
 	GatherArchiveResources(archivePath string) ([]v2action.Resource, error)
 	GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error)
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
-	GetApplicationRoutes(applicationGUID string) ([]v2action.Route, v2action.Warnings, error)
+	GetApplicationRoutes(applicationGUID string) (v2action.Routes, v2action.Warnings, error)
 	GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
 	ResourceMatch(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error)
 	PollJob(job v2action.Job) (v2action.Warnings, error)

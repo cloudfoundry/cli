@@ -4,23 +4,12 @@ import (
 	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Process Actions", func() {
-	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
-	)
-
-	BeforeEach(func() {
-		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
-	})
-
 	Describe("Instance", func() {
 		Describe("StartTime", func() {
 			It("returns the time that the instance started", func() {
@@ -51,6 +40,51 @@ var _ = Describe("Process Actions", func() {
 		Describe("HealthyInstanceCount", func() {
 			It("returns the total number of RUNNING instances", func() {
 				Expect(process.HealthyInstanceCount()).To(Equal(2))
+			})
+		})
+	})
+
+	Describe("Processes", func() {
+		var processes Processes
+
+		BeforeEach(func() {
+			processes = Processes{
+				{
+					Type: "worker",
+					Instances: []Instance{
+						{State: "RUNNING"},
+						{State: "STOPPED"},
+					},
+				},
+				{
+					Type: "console",
+					Instances: []Instance{
+						{State: "RUNNING"},
+					},
+				},
+				{
+					Type: "web",
+					Instances: []Instance{
+						{State: "RUNNING"},
+						{State: "RUNNING"},
+						{State: "STOPPED"},
+					},
+				},
+			}
+		})
+
+		Describe("Sort", func() {
+			It("sorts processes with web first and then alphabetically sorted", func() {
+				processes.Sort()
+				Expect(processes[0].Type).To(Equal("web"))
+				Expect(processes[1].Type).To(Equal("console"))
+				Expect(processes[2].Type).To(Equal("worker"))
+			})
+		})
+
+		Describe("Summary", func() {
+			It("returns all processes and their instance count ", func() {
+				Expect(processes.Summary()).To(Equal("web:2/3, console:1/1, worker:1/2"))
 			})
 		})
 	})

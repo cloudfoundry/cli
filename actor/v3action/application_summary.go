@@ -3,7 +3,7 @@ package v3action
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {
 	Application
-	Processes      []Process
+	Processes      Processes
 	CurrentDroplet Droplet
 }
 
@@ -28,19 +28,36 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 		droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
 	}
 
-	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(app.GUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
+	processes, processWarnings, err := actor.getProcessesForApp(app.GUID)
+	allWarnings = append(allWarnings, processWarnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	var processes []Process
+	summary := ApplicationSummary{
+		Application:    app,
+		Processes:      processes,
+		CurrentDroplet: droplet,
+	}
+	return summary, allWarnings, nil
+}
+
+func (actor Actor) getProcessesForApp(appGUID string) (Processes, Warnings, error) {
+	var allWarnings Warnings
+
+	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
+	allWarnings = Warnings(warnings)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	var processes Processes
 	for _, ccv3Process := range ccv3Processes {
 		processGUID := ccv3Process.GUID
 		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
 		allWarnings = append(allWarnings, Warnings(warnings)...)
 		if err != nil {
-			return ApplicationSummary{}, allWarnings, err
+			return nil, allWarnings, err
 		}
 
 		process := Process{
@@ -55,10 +72,5 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 		processes = append(processes, process)
 	}
 
-	summary := ApplicationSummary{
-		Application:    app,
-		Processes:      processes,
-		CurrentDroplet: droplet,
-	}
-	return summary, allWarnings, nil
+	return processes, allWarnings, nil
 }

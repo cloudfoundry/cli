@@ -9,18 +9,18 @@ import (
 )
 
 type FakeV2AppRouteActor struct {
-	GetApplicationRoutesStub        func(appGUID string) ([]v2action.Route, v2action.Warnings, error)
+	GetApplicationRoutesStub        func(appGUID string) (v2action.Routes, v2action.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
 		appGUID string
 	}
 	getApplicationRoutesReturns struct {
-		result1 []v2action.Route
+		result1 v2action.Routes
 		result2 v2action.Warnings
 		result3 error
 	}
 	getApplicationRoutesReturnsOnCall map[int]struct {
-		result1 []v2action.Route
+		result1 v2action.Routes
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -28,7 +28,7 @@ type FakeV2AppRouteActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV2AppRouteActor) GetApplicationRoutes(appGUID string) ([]v2action.Route, v2action.Warnings, error) {
+func (fake *FakeV2AppRouteActor) GetApplicationRoutes(appGUID string) (v2action.Routes, v2action.Warnings, error) {
 	fake.getApplicationRoutesMutex.Lock()
 	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
@@ -57,26 +57,26 @@ func (fake *FakeV2AppRouteActor) GetApplicationRoutesArgsForCall(i int) string {
 	return fake.getApplicationRoutesArgsForCall[i].appGUID
 }
 
-func (fake *FakeV2AppRouteActor) GetApplicationRoutesReturns(result1 []v2action.Route, result2 v2action.Warnings, result3 error) {
+func (fake *FakeV2AppRouteActor) GetApplicationRoutesReturns(result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
 	fake.GetApplicationRoutesStub = nil
 	fake.getApplicationRoutesReturns = struct {
-		result1 []v2action.Route
+		result1 v2action.Routes
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV2AppRouteActor) GetApplicationRoutesReturnsOnCall(i int, result1 []v2action.Route, result2 v2action.Warnings, result3 error) {
+func (fake *FakeV2AppRouteActor) GetApplicationRoutesReturnsOnCall(i int, result1 v2action.Routes, result2 v2action.Warnings, result3 error) {
 	fake.GetApplicationRoutesStub = nil
 	if fake.getApplicationRoutesReturnsOnCall == nil {
 		fake.getApplicationRoutesReturnsOnCall = make(map[int]struct {
-			result1 []v2action.Route
+			result1 v2action.Routes
 			result2 v2action.Warnings
 			result3 error
 		})
 	}
 	fake.getApplicationRoutesReturnsOnCall[i] = struct {
-		result1 []v2action.Route
+		result1 v2action.Routes
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
