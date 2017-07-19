@@ -130,7 +130,7 @@ func copyZipArchive(sourceArchivePath string, destZipFile *os.File) error {
 			return openErr
 		}
 
-		err = addFileToZipFromFileSystem(reader, archiveFile.FileInfo(), archiveFile.Name, writer)
+		err = addFileToZipFromFileSystem(reader, archiveFile.FileInfo(), filepath.ToSlash(archiveFile.Name), writer)
 		if err != nil {
 			return err
 		}
