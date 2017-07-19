@@ -23,6 +23,7 @@ type commandList struct {
 	V3Stop          v3.V3StopCommand          `command:"v3-stop" description:"Stop an app"`
 	V3Push          v3.V3PushCommand          `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3App           v3.V3AppCommand           `command:"v3-app" description:"Display health and status for an app"`
+	V3Apps          v3.V3AppsCommand          `command:"v3-apps" description:"List all apps in the target space"`
 	V3Restart       v3.V3RestartCommand       `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`

@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/command/v3/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -28,7 +29,7 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v3fakes.FakeV3AppActor
-		fakeV2Actor     *v3fakes.FakeV2AppActor
+		fakeV2Actor     *sharedfakes.FakeV2AppRouteActor
 		binaryName      string
 		executeErr      error
 		app             string
@@ -39,7 +40,7 @@ var _ = Describe("v3-app Command", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3AppActor)
-		fakeV2Actor = new(v3fakes.FakeV2AppActor)
+		fakeV2Actor = new(sharedfakes.FakeV2AppRouteActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)

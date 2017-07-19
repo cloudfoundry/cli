@@ -10,12 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . V2AppActor
-
-type V2AppActor interface {
-	GetApplicationRoutes(appGUID string) ([]v2action.Route, v2action.Warnings, error)
-}
-
 //go:generate counterfeiter . V3AppActor
 
 type V3AppActor interface {

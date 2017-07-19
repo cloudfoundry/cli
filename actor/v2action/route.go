@@ -2,6 +2,7 @@ package v2action
 
 import (
 	"fmt"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -35,6 +36,16 @@ type RouteNotFoundError struct {
 
 func (e RouteNotFoundError) Error() string {
 	return fmt.Sprintf("Route with host %s and domain guid %s not found", e.Host, e.DomainGUID)
+}
+
+type Routes []Route
+
+func (rs Routes) Summary() string {
+	formattedRoutes := []string{}
+	for _, route := range rs {
+		formattedRoutes = append(formattedRoutes, route.String())
+	}
+	return strings.Join(formattedRoutes, ", ")
 }
 
 // Route represents a CLI Route.
@@ -115,7 +126,7 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 
 // GetApplicationRoutes returns a list of routes associated with the provided
 // Application GUID.
-func (actor Actor) GetApplicationRoutes(applicationGUID string) ([]Route, Warnings, error) {
+func (actor Actor) GetApplicationRoutes(applicationGUID string) (Routes, Warnings, error) {
 	var allWarnings Warnings
 	ccv2Routes, warnings, err := actor.CloudControllerClient.GetApplicationRoutes(applicationGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
@@ -241,8 +252,8 @@ func CCToActorRoute(ccv2Route ccv2.Route, domain Domain) Route {
 	}
 }
 
-func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) ([]Route, Warnings, error) {
-	var routes []Route
+func (actor Actor) applyDomain(ccv2Routes []ccv2.Route) (Routes, Warnings, error) {
+	var routes Routes
 	var allWarnings Warnings
 
 	for _, ccv2Route := range ccv2Routes {
