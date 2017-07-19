@@ -21,9 +21,9 @@ var _ = Describe("delete-user command", func() {
 			var newUser string
 
 			BeforeEach(func() {
-				newUser = helpers.RandomUsername()
+				newUser = helpers.NewUsername()
 				Eventually(helpers.CF("create-user", newUser, "--origin", "ldap")).Should(Exit(0))
-				Eventually(helpers.CF("create-user", newUser, helpers.RandomPassword())).Should(Exit(0))
+				Eventually(helpers.CF("create-user", newUser, helpers.NewPassword())).Should(Exit(0))
 			})
 
 			AfterEach(func() {

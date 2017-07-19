@@ -119,24 +119,23 @@ var _ = Describe("space command", func() {
 
 			Context("when the --guid flag is not used", func() {
 				var (
-					securityGroup0 helpers.SecurityGroup
-					securityGroup1 helpers.SecurityGroup
-					// securityGroup2      helpers.SecurityGroup
+					securityGroup0      helpers.SecurityGroup
+					securityGroup1      helpers.SecurityGroup
 					securityGroupName2  string
 					securityGroupRules2 *os.File
 					err                 error
 				)
 
 				BeforeEach(func() {
-					securityGroup0 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-0"), "tcp", "4.3.2.1/24", "80,443", "foo security group")
+					securityGroup0 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("0"), "tcp", "4.3.2.1/24", "80,443", "foo security group")
 					securityGroup0.Create()
 					Eventually(helpers.CF("bind-security-group", securityGroup0.Name, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 
-					securityGroup1 = helpers.NewSecurityGroup(helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-1"), "tcp", "1.2.3.4/24", "80,443", "some security group")
+					securityGroup1 = helpers.NewSecurityGroup(helpers.NewSecurityGroupName("1"), "tcp", "1.2.3.4/24", "80,443", "some security group")
 					securityGroup1.Create()
 					Eventually(helpers.CF("bind-security-group", securityGroup1.Name, orgName, spaceName)).Should(Exit(0))
 
-					securityGroupName2 = helpers.PrefixedRandomName("INTEGRATION-SEC-GROUP-2")
+					securityGroupName2 = helpers.NewSecurityGroupName("2")
 					securityGroupRules2, err = ioutil.TempFile("", "security-group-rules")
 					Expect(err).ToNot(HaveOccurred())
 
@@ -158,14 +157,10 @@ var _ = Describe("space command", func() {
 					`))
 
 					Eventually(helpers.CF("create-security-group", securityGroupName2, securityGroupRules2.Name())).Should(Exit(0))
+					os.Remove(securityGroupRules2.Name())
+
 					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName)).Should(Exit(0))
 					Eventually(helpers.CF("bind-security-group", securityGroupName2, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
-				})
-
-				AfterEach(func() {
-					securityGroup1.Delete()
-					Eventually(helpers.CF("delete-security-group", securityGroupName2, "-f")).Should(Exit(0))
-					os.Remove(securityGroupRules2.Name())
 				})
 
 				Context("when no flags are used", func() {
@@ -187,7 +182,7 @@ var _ = Describe("space command", func() {
 						spaceQuotaName = helpers.PrefixedRandomName("space-quota")
 						Eventually(helpers.CF("create-space-quota", spaceQuotaName)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-quota", spaceName, spaceQuotaName)).Should(Exit(0))
-						isolationSegmentName = helpers.IsolationSegmentName()
+						isolationSegmentName = helpers.NewIsolationSegmentName()
 						Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
@@ -215,7 +210,7 @@ var _ = Describe("space command", func() {
 					var orgIsolationSegmentName string
 
 					BeforeEach(func() {
-						orgIsolationSegmentName = helpers.IsolationSegmentName()
+						orgIsolationSegmentName = helpers.NewIsolationSegmentName()
 						Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
 						Eventually(helpers.CF("enable-org-isolation", orgName, orgIsolationSegmentName)).Should(Exit(0))
 						orgIsolationSegmentGUID := helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)

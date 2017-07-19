@@ -8,13 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func IsolationSegmentName(name ...string) string {
-	if len(name) > 0 {
-		return PrefixedRandomName("INTEGRATION-ISOLATION-SEGMENT-" + name[0])
-	}
-	return PrefixedRandomName("INTEGRATION-ISOLATION-SEGMENT")
-}
-
 func GetIsolationSegmentGUID(name string) string {
 	session := CF("curl", fmt.Sprintf("/v3/isolation_segments?names=%s", name))
 	bytes := session.Wait("15s").Out.Contents()

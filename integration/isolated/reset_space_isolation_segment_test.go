@@ -98,7 +98,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 		Context("when the space exists", func() {
 			BeforeEach(func() {
 				helpers.CreateSpace(spaceName)
-				isolationSegmentName := helpers.IsolationSegmentName()
+				isolationSegmentName := helpers.NewIsolationSegmentName()
 				Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
 				Eventually(helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)).Should(Exit(0))
 				Eventually(helpers.CF("set-space-isolation-segment", spaceName, isolationSegmentName)).Should(Exit(0))
@@ -124,7 +124,7 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 				var orgIsolationSegmentGUID string
 
 				BeforeEach(func() {
-					orgIsolationSegmentName = helpers.IsolationSegmentName()
+					orgIsolationSegmentName = helpers.NewIsolationSegmentName()
 					Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
 					Eventually(helpers.CF("enable-org-isolation", organizationName, orgIsolationSegmentName)).Should(Exit(0))
 					orgIsolationSegmentGUID = helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)

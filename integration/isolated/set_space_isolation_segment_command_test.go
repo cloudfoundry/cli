@@ -15,7 +15,7 @@ var _ = Describe("set-space-isolation-segment command", func() {
 
 	BeforeEach(func() {
 		organizationName = helpers.NewOrgName()
-		isolationSegmentName = helpers.IsolationSegmentName()
+		isolationSegmentName = helpers.NewIsolationSegmentName()
 		spaceName = helpers.NewSpaceName()
 	})
 

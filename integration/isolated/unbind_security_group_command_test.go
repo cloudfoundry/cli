@@ -14,14 +14,13 @@ import (
 var _ = Describe("unbind-security-group command", func() {
 	var (
 		orgName           string
-		secGroupName      string
-		someSecurityGroup helpers.SecurityGroup
+		securityGroupName string
 		spaceName         string
 	)
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		secGroupName = helpers.NewSecGroupName()
+		securityGroupName = helpers.NewSecurityGroupName()
 		spaceName = helpers.NewSpaceName()
 
 		helpers.LoginCF()
@@ -47,7 +46,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 	Context("when the lifecycle flag is invalid", func() {
 		It("outputs a message and usage", func() {
-			session := helpers.CF("unbind-security-group", secGroupName, "some-org", "--lifecycle", "invalid")
+			session := helpers.CF("unbind-security-group", securityGroupName, "some-org", "--lifecycle", "invalid")
 			Eventually(session.Err).Should(Say("Incorrect Usage: Invalid value `invalid' for option `--lifecycle'. Allowed values are: running or staging"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session).Should(Exit(1))
@@ -56,7 +55,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 	Context("when the lifecycle flag has no argument", func() {
 		It("outputs a message and usage", func() {
-			session := helpers.CF("unbind-security-group", secGroupName, "some-org", "--lifecycle")
+			session := helpers.CF("unbind-security-group", securityGroupName, "some-org", "--lifecycle")
 			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `--lifecycle'"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session).Should(Exit(1))
@@ -70,7 +69,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("unbind-security-group", secGroupName)
+				session := helpers.CF("unbind-security-group", securityGroupName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
@@ -83,7 +82,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("unbind-security-group", secGroupName)
+				session := helpers.CF("unbind-security-group", securityGroupName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
@@ -96,7 +95,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 
 			It("fails with no org targeted error", func() {
-				session := helpers.CF("unbind-security-group", secGroupName)
+				session := helpers.CF("unbind-security-group", securityGroupName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
@@ -111,7 +110,7 @@ var _ = Describe("unbind-security-group command", func() {
 			})
 
 			It("fails with no space targeted error", func() {
-				session := helpers.CF("unbind-security-group", secGroupName)
+				session := helpers.CF("unbind-security-group", securityGroupName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
@@ -142,7 +141,7 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 
 		It("reports an error with a minimum-version message", func() {
-			session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")
+			session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")
 
 			Eventually(session.Err).Should(Say("Lifecycle value 'staging' requires CF API version 2\\.68\\.0\\ or higher. Your target is 2\\.34\\.0\\."))
 			Eventually(session).Should(Exit(1))
@@ -161,7 +160,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 		Context("when the space is not provided", func() {
 			It("fails with an incorrect usage message and displays help", func() {
-				session := helpers.CF("unbind-security-group", secGroupName, "some-org")
+				session := helpers.CF("unbind-security-group", securityGroupName, "some-org")
 				Eventually(session.Err).Should(Say("Incorrect Usage: the required arguments `SECURITY_GROUP`, `ORG`, and `SPACE` were not provided"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session).Should(Exit(1))
@@ -184,17 +183,13 @@ var _ = Describe("unbind-security-group command", func() {
 
 	Context("when the security group exists", func() {
 		BeforeEach(func() {
-			someSecurityGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "127.0.0.1", "8443", "some-description")
+			someSecurityGroup := helpers.NewSecurityGroup(securityGroupName, "tcp", "127.0.0.1", "8443", "some-description")
 			someSecurityGroup.Create()
-		})
-
-		AfterEach(func() {
-			someSecurityGroup.Delete()
 		})
 
 		Context("when the org doesn't exist", func() {
 			It("fails with an 'org not found' message", func() {
-				session := helpers.CF("unbind-security-group", secGroupName, "some-other-org", "some-other-space")
+				session := helpers.CF("unbind-security-group", securityGroupName, "some-other-org", "some-other-space")
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Organization 'some-other-org' not found\\."))
 				Eventually(session).Should(Exit(1))
@@ -213,7 +208,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 			Context("when the space doesn't exist", func() {
 				It("fails with a 'space not found' message", func() {
-					session := helpers.CF("unbind-security-group", secGroupName, orgName, "some-other-space")
+					session := helpers.CF("unbind-security-group", securityGroupName, orgName, "some-other-space")
 					Eventually(session.Out).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Space 'some-other-space' not found\\."))
 					Eventually(session).Should(Exit(1))
@@ -227,8 +222,8 @@ var _ = Describe("unbind-security-group command", func() {
 
 				Context("when the space isn't bound to the security group in any lifecycle", func() {
 					It("successfully runs the command", func() {
-						session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
-						Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+						session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName)
+						Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 						Eventually(session.Out).Should(Say("OK"))
 						Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 						Eventually(session).Should(Exit(0))
@@ -237,7 +232,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 				Context("when a space is bound to a security group in the running lifecycle", func() {
 					BeforeEach(func() {
-						Eventually(helpers.CF("bind-security-group", secGroupName, orgName, spaceName)).Should(Exit(0))
+						Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName)).Should(Exit(0))
 					})
 
 					Context("when the lifecycle flag is not set", func() {
@@ -247,8 +242,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName)
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName)
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
@@ -261,8 +256,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName)
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
@@ -277,8 +272,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "running")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, "--lifecycle", "running")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
@@ -291,8 +286,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "running")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "running")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
@@ -307,10 +302,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "staging")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, "--lifecycle", "staging")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -321,10 +316,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'staging'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -333,7 +328,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 				Context("when a space is bound to a security group in the staging lifecycle", func() {
 					BeforeEach(func() {
-						Eventually(helpers.CF("bind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
+						Eventually(helpers.CF("bind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")).Should(Exit(0))
 					})
 
 					Context("when the lifecycle flag is not set", func() {
@@ -343,10 +338,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName)
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName)
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -357,10 +352,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName)
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName)
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -373,10 +368,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "running")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, "--lifecycle", "running")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -387,10 +382,10 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("displays an error and exits 1", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "running")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "running")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
-								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", secGroupName))
+								Eventually(session.Err).Should(Say("Security group %s not bound to this space for lifecycle phase 'running'\\.", securityGroupName))
 								Eventually(session).Should(Exit(0))
 							})
 						})
@@ -403,8 +398,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, "--lifecycle", "staging")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, "--lifecycle", "staging")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
@@ -417,8 +412,8 @@ var _ = Describe("unbind-security-group command", func() {
 							})
 
 							It("successfully unbinds the space from the security group", func() {
-								session := helpers.CF("unbind-security-group", secGroupName, orgName, spaceName, "--lifecycle", "staging")
-								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", secGroupName, orgName, spaceName, username))
+								session := helpers.CF("unbind-security-group", securityGroupName, orgName, spaceName, "--lifecycle", "staging")
+								Eventually(session.Out).Should(Say("Unbinding security group %s from org %s / space %s as %s\\.\\.\\.", securityGroupName, orgName, spaceName, username))
 								Eventually(session.Out).Should(Say("OK"))
 								Eventually(session.Out).Should(Say("TIP: Changes require an app restart \\(for running\\) or restage \\(for staging\\) to apply to existing applications\\."))
 								Eventually(session).Should(Exit(0))
