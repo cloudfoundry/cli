@@ -282,7 +282,10 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 		defer close(errs)
 		defer client.Close() // automatic close to prevent stale clients
 
-		appState <- ApplicationStateStaging
+		if app.PackageState != ccv2.ApplicationPackageStaged {
+			appState <- ApplicationStateStaging
+		}
+
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
 			State: ccv2.ApplicationStarted,
@@ -318,7 +321,7 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 
 		if app.Started() {
 			appState <- ApplicationStateStopping
-			_, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
+			updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 				GUID:  app.GUID,
 				State: ccv2.ApplicationStopped,
 			})
@@ -329,9 +332,12 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 				errs <- err
 				return
 			}
+			app = Application(updatedApp)
 		}
 
-		appState <- ApplicationStateStaging
+		if app.PackageState != ccv2.ApplicationPackageStaged {
+			appState <- ApplicationStateStaging
+		}
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
 			State: ccv2.ApplicationStarted,
