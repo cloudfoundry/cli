@@ -35,7 +35,7 @@ var _ = Describe("Token Refreshing", func() {
 		Context("when the UAA client encounters an invalid token response", func() {
 			It("refreshes the token", func() {
 				username, _ := helpers.GetCredentials()
-				session := helpers.CF("create-user", username, helpers.RandomPassword())
+				session := helpers.CF("create-user", username, helpers.NewPassword())
 				Eventually(session.Err).Should(Say(fmt.Sprintf("user %s already exists", username)))
 				Eventually(session).Should(Exit(0))
 			})

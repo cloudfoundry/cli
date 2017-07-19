@@ -144,8 +144,8 @@ id   name   state   start time   command
 					var user string
 
 					BeforeEach(func() {
-						user = helpers.RandomUsername()
-						password := helpers.RandomPassword()
+						user = helpers.NewUsername()
+						password := helpers.NewPassword()
 						Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-role", user, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
 						Eventually(helpers.CF("auth", user, password)).Should(Exit(0))

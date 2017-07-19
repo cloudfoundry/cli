@@ -20,7 +20,7 @@ var _ = Describe("target command", func() {
 		helpers.LoginCF()
 
 		orgName = helpers.NewOrgName()
-		spaceName = helpers.RandomName()
+		spaceName = helpers.NewSpaceName()
 	})
 
 	Context("help", func() {
@@ -186,7 +186,7 @@ var _ = Describe("target command", func() {
 			Context("when there are multiple spaces in the org", func() {
 				BeforeEach(func() {
 					helpers.CreateSpace(spaceName)
-					helpers.CreateSpace(helpers.RandomName())
+					helpers.CreateSpace(helpers.NewSpaceName())
 					helpers.ClearTarget()
 				})
 

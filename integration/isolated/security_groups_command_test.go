@@ -160,27 +160,6 @@ var _ = Describe("security-groups command", func() {
 				Eventually(helpers.CF("bind-staging-security-group", securityGroup7.Name)).Should(Exit(0))
 			})
 
-			AfterEach(func() {
-				// Delete Security Groups, Organizations, and Spaces with predictable and unique names for testing sorting
-				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org11, space11)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org11, space22, "--lifecycle", "staging")).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup4.Name, org11, space32)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org12, space12, "--lifecycle", "staging")).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup1.Name, org13, space13)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org21, space21)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup2.Name, org23, space23)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup4.Name, org23, space31)).Should(Exit(0))
-				Eventually(helpers.CF("unbind-security-group", securityGroup4.Name, org33, space33)).Should(Exit(0))
-
-				securityGroup1.Delete()
-				securityGroup2.Delete()
-				securityGroup3.Delete()
-				securityGroup4.Delete()
-				securityGroup5.Delete()
-				securityGroup6.Delete()
-				securityGroup7.Delete()
-			})
-
 			It("lists the security groups", func() {
 				Eventually(session.Out).Should(Say("Getting security groups as admin"))
 				Eventually(session.Out).Should(Say("OK\\n\\n"))

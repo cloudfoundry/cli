@@ -12,7 +12,7 @@ var _ = Describe("delete-isolation-segment command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
-		isolationSegmentName = helpers.IsolationSegmentName()
+		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
 
 	Describe("help", func() {

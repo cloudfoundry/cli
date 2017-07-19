@@ -41,7 +41,3 @@ func (s SecurityGroup) Create() {
 	err = ioutil.WriteFile(tempfile, securityGroup, 0666)
 	Eventually(CF("create-security-group", s.Name, tempfile)).Should(Exit(0))
 }
-
-func (s SecurityGroup) Delete() {
-	Eventually(CF("delete-security-group", s.Name, "-f")).Should(Exit(0))
-}

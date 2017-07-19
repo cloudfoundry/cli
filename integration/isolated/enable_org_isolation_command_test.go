@@ -14,7 +14,7 @@ var _ = Describe("enable-org-isolation command", func() {
 
 	BeforeEach(func() {
 		organizationName = helpers.NewOrgName()
-		isolationSegmentName = helpers.IsolationSegmentName()
+		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
 
 	Describe("help", func() {

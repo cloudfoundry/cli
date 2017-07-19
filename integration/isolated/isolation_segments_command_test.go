@@ -12,7 +12,7 @@ var _ = Describe("isolation-segments command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
-		isolationSegmentName = helpers.IsolationSegmentName()
+		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
 
 	Describe("help", func() {
@@ -76,9 +76,9 @@ var _ = Describe("isolation-segments command", func() {
 				helpers.CreateOrg(org1)
 				helpers.CreateOrg(org2)
 
-				isolationSegment1 = helpers.IsolationSegmentName()
-				isolationSegment2 = helpers.IsolationSegmentName()
-				isolationSegment3 = helpers.IsolationSegmentName()
+				isolationSegment1 = helpers.NewIsolationSegmentName()
+				isolationSegment2 = helpers.NewIsolationSegmentName()
+				isolationSegment3 = helpers.NewIsolationSegmentName()
 
 				Eventually(helpers.CF("create-isolation-segment", isolationSegment1)).Should(Exit(0))
 				Eventually(helpers.CF("create-isolation-segment", isolationSegment2)).Should(Exit(0))

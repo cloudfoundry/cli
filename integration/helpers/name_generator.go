@@ -4,28 +4,36 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+func NewAppName() string {
+	return PrefixedRandomName("INTEGRATION-APP")
+}
+
+func NewIsolationSegmentName(infix ...string) string {
+	return PrefixedRandomName("INTEGRATION-ISOLATION-SEGMENT")
+}
+
 func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
+}
+
+func NewPassword() string {
+	return PrefixedRandomName("password")
+}
+
+func NewSecurityGroupName(infix ...string) string {
+	if len(infix) > 0 {
+		return PrefixedRandomName("INTEGRATION-SEC-GROUP-" + infix[0])
+	}
+
+	return PrefixedRandomName("INTEGRATION-SEC-GROUP")
 }
 
 func NewSpaceName() string {
 	return PrefixedRandomName("INTEGRATION-SPACE")
 }
 
-func NewAppName() string {
-	return PrefixedRandomName("INTEGRATION-APP")
-}
-
-func NewSecGroupName() string {
-	return PrefixedRandomName("INTEGRATION-SEC-GROUP")
-}
-
-func RandomUsername() string {
+func NewUsername() string {
 	return PrefixedRandomName("integration-user")
-}
-
-func RandomPassword() string {
-	return PrefixedRandomName("password")
 }
 
 func PrefixedRandomName(namePrefix string) string {

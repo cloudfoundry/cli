@@ -10,11 +10,9 @@ import (
 
 var _ = Describe("reset-org-default-isolation-segment command", func() {
 	var orgName string
-	var isoSegName string
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		isoSegName = helpers.IsolationSegmentName()
 	})
 
 	Describe("help", func() {
@@ -88,9 +86,10 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 
 			Context("when the isolation segment is set as the org's default", func() {
 				BeforeEach(func() {
-					Eventually(helpers.CF("create-isolation-segment", isoSegName)).Should(Exit(0))
-					Eventually(helpers.CF("enable-org-isolation", orgName, isoSegName)).Should(Exit(0))
-					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isoSegName)).Should(Exit(0))
+					isolationSegmentName := helpers.NewIsolationSegmentName()
+					Eventually(helpers.CF("create-isolation-segment", isolationSegmentName)).Should(Exit(0))
+					Eventually(helpers.CF("enable-org-isolation", orgName, isolationSegmentName)).Should(Exit(0))
+					Eventually(helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)).Should(Exit(0))
 				})
 
 				It("displays OK", func() {

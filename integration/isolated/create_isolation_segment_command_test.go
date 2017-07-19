@@ -12,7 +12,7 @@ var _ = Describe("create-isolation-segment command", func() {
 	var isolationSegmentName string
 
 	BeforeEach(func() {
-		isolationSegmentName = helpers.IsolationSegmentName()
+		isolationSegmentName = helpers.NewIsolationSegmentName()
 	})
 
 	Describe("help", func() {
@@ -63,11 +63,6 @@ var _ = Describe("create-isolation-segment command", func() {
 	Context("when the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
-		})
-
-		// TODO: Delete this and add it to cleanup script after #138303919
-		AfterEach(func() {
-			Eventually(helpers.CF("delete-isolation-segment", "-f", isolationSegmentName)).Should(Exit(0))
 		})
 
 		Context("when the isolation segment does not exist", func() {

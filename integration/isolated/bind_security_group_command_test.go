@@ -22,7 +22,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	BeforeEach(func() {
 		orgName = helpers.NewOrgName()
-		secGroupName = helpers.NewSecGroupName()
+		secGroupName = helpers.NewSecurityGroupName()
 		someOrgName = helpers.NewOrgName()
 		spaceName1 = helpers.NewSpaceName()
 		spaceName2 = helpers.NewSpaceName()
@@ -159,10 +159,6 @@ var _ = Describe("bind-security-group command", func() {
 		BeforeEach(func() {
 			someSecurityGroup = helpers.NewSecurityGroup(secGroupName, "tcp", "0.0.0.0/0", "53", "")
 			someSecurityGroup.Create()
-		})
-
-		AfterEach(func() {
-			someSecurityGroup.Delete()
 		})
 
 		Context("when the org doesn't exist", func() {
