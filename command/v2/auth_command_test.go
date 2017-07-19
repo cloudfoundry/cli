@@ -50,8 +50,8 @@ var _ = Describe("auth Command", func() {
 		)
 
 		BeforeEach(func() {
-			testUsername = helpers.RandomUsername()
-			testPassword = helpers.RandomPassword()
+			testUsername = helpers.NewUsername()
+			testPassword = helpers.NewPassword()
 			cmd.RequiredArgs.Username = testUsername
 			cmd.RequiredArgs.Password = testPassword
 

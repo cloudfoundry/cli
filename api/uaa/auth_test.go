@@ -32,8 +32,8 @@ var _ = Describe("Auth", func() {
 						"access_token":"some-access-token",
 						"refresh_token":"some-refresh-token"
 					}`
-				username = helpers.RandomUsername()
-				password = helpers.RandomPassword()
+				username = helpers.NewUsername()
+				password = helpers.NewPassword()
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/oauth/token"),
