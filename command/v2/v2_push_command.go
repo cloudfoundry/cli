@@ -142,12 +142,29 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	for appNumber, appConfig := range appConfigs {
+	for _, appConfig := range appConfigs {
+		if appConfig.CreatingApplication() {
+			cmd.UI.DisplayText("Creating app with these attributes...")
+		} else {
+			cmd.UI.DisplayText("Updating app with these attributes...")
+		}
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
 		err := cmd.displayChanges(appConfig)
 		if err != nil {
 			log.Errorln("display changes:", err)
 			return shared.HandleError(err)
+		}
+	}
+
+	for appNumber, appConfig := range appConfigs {
+		if appConfig.CreatingApplication() {
+			cmd.UI.DisplayTextWithFlavor("Creating app {{.AppName}}...", map[string]interface{}{
+				"AppName": appConfig.DesiredApplication.Name,
+			})
+		} else {
+			cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}}...", map[string]interface{}{
+				"AppName": appConfig.DesiredApplication.Name,
+			})
 		}
 
 		configStream, eventStream, warningsStream, errorStream := cmd.Actor.Apply(appConfig, cmd.ProgressBar)
@@ -203,12 +220,6 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 }
 
 func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) error {
-	if appConfig.CreatingApplication() {
-		cmd.UI.DisplayText("Creating app with these attributes...")
-	} else {
-		cmd.UI.DisplayText("Updating app with these attributes...")
-	}
-
 	var currentRoutes []string
 	for _, route := range appConfig.CurrentRoutes {
 		currentRoutes = append(currentRoutes, route.String())
