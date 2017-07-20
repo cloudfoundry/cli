@@ -2060,6 +2060,10 @@
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 {{.AppName}} 앱 작성 중..."
   },
   {
+    "id": "Creating app {{.AppName}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "{{.BuildpackName}} 빌드팩 작성 중..."
   },
@@ -6334,6 +6338,10 @@
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 업데이트 중..."
+  },
+  {
+    "id": "Updating app {{.AppName}}...",
+    "translation": ""
   },
   {
     "id": "Updating buildpack {{.BuildpackName}}...",
