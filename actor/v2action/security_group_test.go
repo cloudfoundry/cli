@@ -221,25 +221,61 @@ var _ = Describe("Security Group Actions", func() {
 					ccv2.Warnings{"warning-5", "warning-6"},
 					nil,
 				)
-				returnedError = errors.New("get-org-error")
-				fakeCloudControllerClient.GetOrganizationReturns(
-					ccv2.Organization{},
-					ccv2.Warnings{"warning-7", "warning-8"},
-					returnedError,
-				)
 			})
 
-			It("returns the error and all warnings", func() {
-				Expect(err).To(MatchError(returnedError))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
-				Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-				Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
-				Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-11"))
+			Context("when the error is generic", func() {
+				BeforeEach(func() {
+					returnedError = errors.New("get-org-error")
+					fakeCloudControllerClient.GetOrganizationReturns(
+						ccv2.Organization{},
+						ccv2.Warnings{"warning-7", "warning-8"},
+						returnedError,
+					)
+				})
+
+				It("returns the error and all warnings", func() {
+					Expect(err).To(MatchError(returnedError))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
+					Expect(fakeCloudControllerClient.GetSecurityGroupsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(BeNil())
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetRunningSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetStagingSpacesBySecurityGroupArgsForCall(0)).To(Equal("security-group-guid-1"))
+					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-11"))
+				})
+			})
+
+			Context("when the error is a resource not found error", func() {
+				BeforeEach(func() {
+					returnedError = ccerror.ResourceNotFoundError{Message: "could not find the org"}
+					fakeCloudControllerClient.GetOrganizationReturnsOnCall(0,
+						ccv2.Organization{},
+						ccv2.Warnings{"warning-7", "warning-8"},
+						returnedError,
+					)
+					fakeCloudControllerClient.GetOrganizationReturnsOnCall(1,
+						ccv2.Organization{},
+						ccv2.Warnings{"warning-9", "warning-10"},
+						nil,
+					)
+				})
+
+				It("returns all warnings and continues", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(BeEquivalentTo(Warnings{
+						"warning-1", "warning-2",
+						"warning-3", "warning-4",
+						"warning-5", "warning-6",
+						"warning-7", "warning-8",
+						returnedError.Error(),
+						"warning-9", "warning-10",
+					}))
+					Expect(fakeCloudControllerClient.GetOrganizationCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("org-guid-11"))
+					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(1)).To(Equal("org-guid-12"))
+				})
 			})
 		})
 
