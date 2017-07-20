@@ -183,8 +183,8 @@ var _ = Describe("Application Config", func() {
 					Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 
 					Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal(app.Name))
+					passedName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(passedName).To(Equal(app.Name))
 					Expect(passedSpaceGUID).To(Equal(spaceGUID))
 				})
 
