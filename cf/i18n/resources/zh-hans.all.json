@@ -2060,6 +2060,10 @@
     "translation": "正在以 {{.Username}} 身份在组织 {{.OrgName}}/空间 {{.SpaceName}} 中创建应用程序 {{.AppName}}..."
   },
   {
+    "id": "Creating app {{.AppName}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "正在创建 buildpack {{.BuildpackName}}..."
   },
@@ -6334,6 +6338,10 @@
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份更新组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
+  },
+  {
+    "id": "Updating app {{.AppName}}...",
+    "translation": ""
   },
   {
     "id": "Updating buildpack {{.BuildpackName}}...",

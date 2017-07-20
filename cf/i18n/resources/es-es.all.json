@@ -2060,6 +2060,10 @@
     "translation": "Creando la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Creating app {{.AppName}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "Creando el paquete de compilación {{.BuildpackName}}..."
   },
@@ -6334,6 +6338,10 @@
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Actualizando la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
+  },
+  {
+    "id": "Updating app {{.AppName}}...",
+    "translation": ""
   },
   {
     "id": "Updating buildpack {{.BuildpackName}}...",

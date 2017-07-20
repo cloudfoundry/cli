@@ -2060,6 +2060,10 @@
     "translation": "Creazione dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
   {
+    "id": "Creating app {{.AppName}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "Creazione del pacchetto di build {{.BuildpackName}} in corso..."
   },
@@ -6334,6 +6338,10 @@
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Aggiornamento dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
+  },
+  {
+    "id": "Updating app {{.AppName}}...",
+    "translation": ""
   },
   {
     "id": "Updating buildpack {{.BuildpackName}}...",
