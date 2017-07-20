@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("push with symlink path", func() {
+var _ = Describe("push with symlink path", func() {
 	var (
 		appName       string
 		runningDir    string
