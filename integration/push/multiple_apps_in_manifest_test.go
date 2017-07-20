@@ -47,6 +47,15 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, defaultSharedDomain()))
+
+					// secondApp
+					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", secondApp))
+					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
+					Eventually(session).Should(Say("\\s+routes:"))
+					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", secondApp, defaultSharedDomain()))
+
+					Eventually(session).Should(Say("Creating app %s\\.\\.\\.", firstApp))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
 					Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
 					Eventually(session).Should(Say("Uploading files\\.\\.\\."))
@@ -56,12 +65,7 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 					Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 					Eventually(session).Should(Say("requested state:\\s+started"))
 
-					// secondApp
-					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", secondApp))
-					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
-					Eventually(session).Should(Say("\\s+routes:"))
-					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", secondApp, defaultSharedDomain()))
+					Eventually(session).Should(Say("Creating app %s\\.\\.\\.", secondApp))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
 					Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
 					Eventually(session).Should(Say("Uploading files\\.\\.\\."))
