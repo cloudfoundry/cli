@@ -1,5 +1,7 @@
 package v3action
 
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {
 	Application
@@ -16,22 +18,27 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	ccv3Droplet, warnings, err := actor.CloudControllerClient.GetApplicationCurrentDroplet(app.GUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return ApplicationSummary{}, allWarnings, err
-	}
-	droplet := Droplet{
-		Stack: ccv3Droplet.Stack,
-	}
-	for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
-		droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
-	}
-
 	processes, processWarnings, err := actor.getProcessesForApp(app.GUID)
 	allWarnings = append(allWarnings, processWarnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
+	}
+
+	var droplet Droplet
+	ccv3Droplet, warnings, err := actor.CloudControllerClient.GetApplicationCurrentDroplet(app.GUID)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+			// If application fails staging it is not going to have current droplet
+			return ApplicationSummary{}, allWarnings, err
+		}
+	} else {
+		droplet = Droplet{
+			Stack: ccv3Droplet.Stack,
+		}
+		for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
+			droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
+		}
 	}
 
 	summary := ApplicationSummary{
