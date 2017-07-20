@@ -153,6 +153,7 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 
 		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
 		allWarnings = append(allWarnings, warnings...)
+
 		if err != nil {
 			if _, ok := err.(ccerror.ResourceNotFoundError); ok {
 				allWarnings = append(allWarnings, err.Error())
@@ -207,7 +208,12 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			} else {
 				o, warnings, err := actor.CloudControllerClient.GetOrganization(sp.OrganizationGUID)
 				allWarnings = append(allWarnings, warnings...)
+
 				if err != nil {
+					if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+						allWarnings = append(allWarnings, err.Error())
+						continue
+					}
 					return nil, Warnings(allWarnings), err
 				}
 
