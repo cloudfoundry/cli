@@ -225,6 +225,7 @@ jobs:
       trigger: true
     - get: cli-ci
     - get: cli-integration
+      trigger: true
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
@@ -258,6 +259,7 @@ jobs:
     - get: cli-ci
     - get: cli-integration
       passed: [units]
+      trigger: true
   - aggregate:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
