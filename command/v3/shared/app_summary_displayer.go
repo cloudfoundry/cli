@@ -52,10 +52,14 @@ func (cmd AppSummaryDisplayer) DisplayAppInfo() error {
 		return HandleError(err)
 	}
 
-	routes, routeWarnings, err := cmd.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
-	cmd.UI.DisplayWarnings(routeWarnings)
-	if err != nil {
-		return sharedV2.HandleError(err)
+	var routes v2action.Routes
+	if len(summary.Processes) > 0 {
+		var routeWarnings v2action.Warnings
+		routes, routeWarnings, err = cmd.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
+		cmd.UI.DisplayWarnings(routeWarnings)
+		if err != nil {
+			return sharedV2.HandleError(err)
+		}
 	}
 
 	cmd.displayAppTable(summary, routes)
