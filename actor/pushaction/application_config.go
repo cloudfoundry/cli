@@ -2,6 +2,7 @@ package pushaction
 
 import (
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -38,9 +39,14 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 
 	log.Infof("iterating through %d app configuration(s)", len(apps))
 	for _, app := range apps {
+		absPath, err := filepath.EvalSymlinks(app.Path)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		config := ApplicationConfig{
 			TargetedSpaceGUID: spaceGUID,
-			Path:              app.Path,
+			Path:              absPath,
 		}
 
 		log.Infoln("searching for app", app.Name)
@@ -75,7 +81,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		// TODO: when working with all of routes, append to current route
 		config.DesiredRoutes = []v2action.Route{defaultRoute}
 
-		config, err = actor.configureResources(config, app)
+		config, err = actor.configureResources(config, app.DockerImage)
 		if err != nil {
 			log.Errorln("configuring resources", err)
 			return nil, warnings, err
@@ -111,21 +117,21 @@ func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.A
 	return config, warnings, nil
 }
 
-func (actor Actor) configureResources(config ApplicationConfig, app manifest.Application) (ApplicationConfig, error) {
-	if app.DockerImage == "" {
-		info, err := os.Stat(app.Path)
+func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath string) (ApplicationConfig, error) {
+	if dockerImagePath == "" {
+		info, err := os.Stat(config.Path)
 		if err != nil {
 			return config, err
 		}
 
 		var resources []v2action.Resource
 		if info.IsDir() {
-			log.WithField("path_to_resources", app.Path).Info("determine directory resources to zip")
-			resources, err = actor.V2Actor.GatherDirectoryResources(app.Path)
+			log.WithField("path_to_resources", config.Path).Info("determine directory resources to zip")
+			resources, err = actor.V2Actor.GatherDirectoryResources(config.Path)
 		} else {
 			config.Archive = true
-			log.WithField("path_to_resources", app.Path).Info("determine archive resources to zip")
-			resources, err = actor.V2Actor.GatherArchiveResources(app.Path)
+			log.WithField("path_to_resources", config.Path).Info("determine archive resources to zip")
+			resources, err = actor.V2Actor.GatherArchiveResources(config.Path)
 		}
 		if err != nil {
 			return config, err
@@ -133,7 +139,7 @@ func (actor Actor) configureResources(config ApplicationConfig, app manifest.App
 		config.AllResources = resources
 		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
 	} else {
-		config.DesiredApplication.DockerImage = app.DockerImage
+		config.DesiredApplication.DockerImage = dockerImagePath
 	}
 
 	return config, nil

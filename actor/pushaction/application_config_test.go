@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
@@ -110,6 +111,40 @@ var _ = Describe("Application Config", func() {
 
 		AfterEach(func() {
 			Expect(os.RemoveAll(filesPath)).ToNot(HaveOccurred())
+		})
+
+		Context("when the path is a symlink", func() {
+			var target string
+
+			BeforeEach(func() {
+				parentDir := filepath.Dir(filesPath)
+				target = filepath.Join(parentDir, "i-r-symlink")
+				Expect(os.Symlink(filesPath, target)).ToNot(HaveOccurred())
+				manifestApps[0].Path = target
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(target)).ToNot(HaveOccurred())
+			})
+
+			It("evaluates the symlink into an absolute path", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(firstConfig.Path).To(Equal(filesPath))
+			})
+
+			Context("given a path that does not exist", func() {
+				BeforeEach(func() {
+					manifestApps[0].Path = "/i/will/fight/you/if/this/exists"
+				})
+
+				It("returns errors and warnings", func() {
+					Expect(os.IsNotExist(executeErr)).To(BeTrue())
+
+					Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
+					Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(0))
+				})
+			})
 		})
 
 		Context("when the application exists", func() {
@@ -334,19 +369,6 @@ var _ = Describe("Application Config", func() {
 				})
 			})
 
-			Context("given a path that does not exist", func() {
-				BeforeEach(func() {
-					manifestApps[0].Path = "/i/will/fight/you/if/this/exists"
-				})
-
-				It("returns errors and warnings", func() {
-					Expect(os.IsNotExist(executeErr)).To(BeTrue())
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
-
-					Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
-					Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(0))
-				})
-			})
 		})
 
 		Context("when a docker image is configured", func() {

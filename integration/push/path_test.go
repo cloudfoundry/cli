@@ -99,7 +99,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 				tmpfile, err := ioutil.TempFile("", "push-archive-integration")
 				Expect(err).ToNot(HaveOccurred())
 				archive = tmpfile.Name()
-				Expect(tmpfile.Close())
+				Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 				err = helpers.Zipit(appDir, archive, "")
 				Expect(err).ToNot(HaveOccurred())
