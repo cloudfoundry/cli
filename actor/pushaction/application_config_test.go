@@ -85,6 +85,10 @@ var _ = Describe("Application Config", func() {
 			filesPath, err = ioutil.TempDir("", "convert-to-application-configs")
 			Expect(err).ToNot(HaveOccurred())
 
+			// The temp directory created on OSX contains a symlink and needs to be evaluated.
+			filesPath, err = filepath.EvalSymlinks(filesPath)
+			Expect(err).ToNot(HaveOccurred())
+
 			manifestApps = []manifest.Application{{
 				Name: appName,
 				Path: filesPath,
@@ -315,7 +319,7 @@ var _ = Describe("Application Config", func() {
 				})
 			})
 
-			Context("given archive", func() {
+			Context("given an archive", func() {
 				var archive string
 
 				BeforeEach(func() {
@@ -323,6 +327,10 @@ var _ = Describe("Application Config", func() {
 					Expect(err).ToNot(HaveOccurred())
 					archive = f.Name()
 					Expect(f.Close()).ToNot(HaveOccurred())
+
+					// The temp file created on OSX contains a symlink and needs to be evaluated.
+					archive, err = filepath.EvalSymlinks(archive)
+					Expect(err).ToNot(HaveOccurred())
 
 					manifestApps[0].Path = archive
 				})
