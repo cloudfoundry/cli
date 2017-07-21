@@ -33,6 +33,9 @@ type Application struct {
 	// Buildpack is the buildpack set by the user.
 	Buildpack string `json:"buildpack,omitempty"`
 
+	// Command is the user specified start command.
+	Command string `json:"command,omitempty"`
+
 	// DetectedBuildpack is the buildpack automatically detected.
 	DetectedBuildpack string `json:"-"`
 
@@ -40,13 +43,17 @@ type Application struct {
 	DetectedStartCommand string `json:"-"`
 
 	// DiskQuota is the disk given to each instance, in megabytes.
-	DiskQuota int `json:"-"`
+	DiskQuota uint64 `json:"-"`
 
 	// DockerImage is the docker image location.
 	DockerImage string `json:"docker_image,omitempty"`
 
 	// GUID is the unique application identifier.
 	GUID string `json:"guid,omitempty"`
+
+	// HealthCheckTimeout is the number of seconds for health checking of an
+	// staged app when starting up.
+	HealthCheckTimeout int `json:"health_check_timeout,omitempty"`
 
 	// HealthCheckType is the type of health check that will be done to the app.
 	HealthCheckType string `json:"health_check_type,omitempty"`
@@ -58,7 +65,7 @@ type Application struct {
 	Instances int `json:"-"`
 
 	// Memory is the memory given to each instance, in megabytes.
-	Memory int `json:"-"`
+	Memory uint64 `json:"-"`
 
 	// Name is the name given to the application.
 	Name string `json:"name,omitempty"`
@@ -92,14 +99,16 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
 			Buildpack                string     `json:"buildpack"`
+			Command                  string     `json:"command"`
 			DetectedBuildpack        string     `json:"detected_buildpack"`
 			DetectedStartCommand     string     `json:"detected_start_command"`
-			DiskQuota                int        `json:"disk_quota"`
+			DiskQuota                uint64     `json:"disk_quota"`
 			DockerImage              string     `json:"docker_image"`
-			HealthCheckType          string     `json:"health_check_type"`
 			HealthCheckHTTPEndpoint  string     `json:"health_check_http_endpoint"`
+			HealthCheckTimeout       int        `json:"health_check_timeout"`
+			HealthCheckType          string     `json:"health_check_type"`
 			Instances                int        `json:"instances"`
-			Memory                   int        `json:"memory"`
+			Memory                   uint64     `json:"memory"`
 			Name                     string     `json:"name"`
 			PackageState             string     `json:"package_state"`
 			PackageUpdatedAt         *time.Time `json:"package_updated_at"`
@@ -113,14 +122,16 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	application.GUID = ccApp.Metadata.GUID
 	application.Buildpack = ccApp.Entity.Buildpack
+	application.Command = ccApp.Entity.Command
 	application.DetectedBuildpack = ccApp.Entity.DetectedBuildpack
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
 	application.DockerImage = ccApp.Entity.DockerImage
-	application.HealthCheckType = ccApp.Entity.HealthCheckType
+	application.GUID = ccApp.Metadata.GUID
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
+	application.HealthCheckTimeout = ccApp.Entity.HealthCheckTimeout
+	application.HealthCheckType = ccApp.Entity.HealthCheckType
 	application.Instances = ccApp.Entity.Instances
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name
