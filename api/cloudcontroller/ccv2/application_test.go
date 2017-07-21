@@ -95,10 +95,12 @@ var _ = Describe("Application", func() {
 						},
 						"entity": {
 							"buildpack": "ruby 1.6.29",
+							"command": "some-command",
 							"detected_start_command": "echo 'I am a banana'",
 							"disk_quota": 586,
 							"detected_buildpack": null,
 							"docker_image": "some-docker-path",
+							"health_check_timeout": 120,
 							"health_check_type": "port",
 							"health_check_http_endpoint": "/",
 							"instances": 13,
@@ -130,11 +132,13 @@ var _ = Describe("Application", func() {
 
 				Expect(app).To(Equal(Application{
 					Buildpack:                "ruby 1.6.29",
+					Command:                  "some-command",
 					DetectedBuildpack:        "",
 					DetectedStartCommand:     "echo 'I am a banana'",
 					DiskQuota:                586,
 					DockerImage:              "some-docker-path",
 					GUID:                     "app-guid-1",
+					HealthCheckTimeout:       120,
 					HealthCheckType:          "port",
 					HealthCheckHTTPEndpoint:  "/",
 					Instances:                13,
@@ -279,10 +283,12 @@ var _ = Describe("Application", func() {
 				},
 				"entity": {
 					"buildpack": "ruby 1.6.29",
+					"command": "some-command",
 					"detected_start_command": "echo 'I am a banana'",
 					"disk_quota": 586,
 					"detected_buildpack": null,
 					"docker_image": "some-docker-path",
+					"health_check_timeout": 120,
 					"health_check_type": "some-health-check-type",
 					"health_check_http_endpoint": "/anything",
 					"instances": 13,
@@ -324,11 +330,13 @@ var _ = Describe("Application", func() {
 
 					Expect(app).To(Equal(Application{
 						Buildpack:               "ruby 1.6.29",
+						Command:                 "some-command",
 						DetectedBuildpack:       "",
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
 						DockerImage:             "some-docker-path",
 						GUID:                    "some-app-guid",
+						HealthCheckTimeout:      120,
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/anything",
 						Instances:               13,
