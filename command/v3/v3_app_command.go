@@ -13,8 +13,8 @@ import (
 //go:generate counterfeiter . V3AppActor
 
 type V3AppActor interface {
+	shared.V3AppSummaryActor
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 }
 
 type V3AppCommand struct {

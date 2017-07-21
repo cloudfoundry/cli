@@ -180,6 +180,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
     "translation": ""
   },
@@ -334,6 +338,10 @@
   {
     "id": "App ",
     "translation": "Application "
+  },
+  {
+    "id": "App has no processes",
+    "translation": ""
   },
   {
     "id": "App instance limit",
@@ -1697,6 +1705,10 @@
   },
   {
     "id": "CF_NAME v3-create-package APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-get-health-check APP_NAME",
     "translation": ""
   },
   {
@@ -3154,6 +3166,10 @@
   {
     "id": "Getting plugins from repository '",
     "translation": "Obtention des plug-in depuis le référentiel"
+  },
+  {
+    "id": "Getting process health check types for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
@@ -6824,6 +6840,10 @@
     "translation": ""
   },
   {
+    "id": "endpoint (for http)",
+    "translation": ""
+  },
+  {
     "id": "env var '{{.PropertyName}}' should not be null",
     "translation": "La variable d'environnement '{{.PropertyName}}' ne doit pas avoir la valeur NULL"
   },
@@ -6842,6 +6862,10 @@
   {
     "id": "free or paid",
     "translation": "gratuit ou payant"
+  },
+  {
+    "id": "health check",
+    "translation": ""
   },
   {
     "id": "health check type:",
