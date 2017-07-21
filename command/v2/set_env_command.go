@@ -14,7 +14,7 @@ const WorkAroundPrefix = "\U000026f3"
 type SetEnvCommand struct {
 	RequiredArgs    flag.SetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}             `usage:"CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`
-	relatedCommands interface{}             `related_commands:"apps, env, restart, set-staging-environment-variable-group, set-running-environment-variable-group"`
+	relatedCommands interface{}             `related_commands:"apps, env, restart, set-staging-environment-variable-group, set-running-environment-variable-group, unset-env"`
 }
 
 func (SetEnvCommand) Setup(config command.Config, ui command.UI) error {
