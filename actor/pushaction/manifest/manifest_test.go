@@ -44,7 +44,18 @@ var _ = Describe("Manifest", func() {
 			manifest = `---
 applications:
 - name: "app-1"
+  buildpack: "some-buildpack"
+  command: "some-command"
+  health-check-http-endpoint: "\\some-endpoint"
+  health-check-type: "http"
+  instances: 10
+  disk_quota: 100M
+  memory: 200M
+  stack: "some-stack"
+  timeout: 120
 - name: "app-2"
+  disk_quota: 1G
+  memory: 2G
 - name: "app-3"
 `
 		})
@@ -52,8 +63,23 @@ applications:
 		It("reads the manifest file", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(apps).To(ConsistOf(
-				Application{Name: "app-1"},
-				Application{Name: "app-2"},
+				Application{
+					Name:                    "app-1",
+					Buildpack:               "some-buildpack",
+					Command:                 "some-command",
+					HealthCheckHTTPEndpoint: "\\some-endpoint",
+					HealthCheckType:         "http",
+					Instances:               10,
+					DiskQuota:               100,
+					Memory:                  200,
+					StackName:               "some-stack",
+					Timeout:                 120,
+				},
+				Application{
+					Name:      "app-2",
+					DiskQuota: 1024,
+					Memory:    2048,
+				},
 				Application{Name: "app-3"},
 			))
 		})
