@@ -32,12 +32,26 @@ var _ = Describe("Process", func() {
 							{
 								"guid": "process-1-guid",
 								"type": "web",
-								"memory_in_mb": 32
+								"memory_in_mb": 32,
+								"health_check": {
+                  "type": "port",
+                  "data": {
+                    "timeout": null,
+                    "endpoint": null
+                  }
+                }
 							},
 							{
 								"guid": "process-2-guid",
 								"type": "worker",
-								"memory_in_mb": 64
+								"memory_in_mb": 64,
+								"health_check": {
+                  "type": "http",
+                  "data": {
+                    "timeout": 60,
+                    "endpoint": "/health"
+                  }
+                }
 							}
 						]
 					}`, server.URL())
@@ -50,7 +64,14 @@ var _ = Describe("Process", func() {
 							{
 								"guid": "process-3-guid",
 								"type": "console",
-								"memory_in_mb": 128
+								"memory_in_mb": 128,
+								"health_check": {
+                  "type": "process",
+                  "data": {
+                    "timeout": 90,
+                    "endpoint": null
+                  }
+                }
 							}
 						]
 					}`
@@ -74,19 +95,25 @@ var _ = Describe("Process", func() {
 
 				Expect(processes).To(ConsistOf(
 					Process{
-						GUID:       "process-1-guid",
-						Type:       "web",
-						MemoryInMB: 32,
+						GUID:        "process-1-guid",
+						Type:        "web",
+						MemoryInMB:  32,
+						HealthCheck: ProcessHealthCheck{Type: "port"},
 					},
 					Process{
 						GUID:       "process-2-guid",
 						Type:       "worker",
 						MemoryInMB: 64,
+						HealthCheck: ProcessHealthCheck{
+							Type: "http",
+							Data: ProcessHealthCheckData{Endpoint: "/health"},
+						},
 					},
 					Process{
-						GUID:       "process-3-guid",
-						Type:       "console",
-						MemoryInMB: 128,
+						GUID:        "process-3-guid",
+						Type:        "console",
+						MemoryInMB:  128,
+						HealthCheck: ProcessHealthCheck{Type: "process"},
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
