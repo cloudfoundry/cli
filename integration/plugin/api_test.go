@@ -139,36 +139,7 @@ var _ = Describe("plugin API", func() {
 		})
 	})
 
-	Describe("GetService", func() {
-		var (
-			serviceInstance string
-			broker          helpers.ServiceBroker
-		)
-		BeforeEach(func() {
-			createTargetedOrgAndSpace()
-			domain := defaultSharedDomain()
-			service := helpers.PrefixedRandomName("SERVICE")
-			servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
-			serviceInstance = helpers.PrefixedRandomName("SI")
-			broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
-			broker.Push()
-			broker.Configure()
-			broker.Create()
-
-			Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
-			Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			broker.Destroy()
-		})
-
-		It("gets the given service instance", func() {
-			confirmTestPluginOutputWithArg("GetService", serviceInstance, serviceInstance)
-		})
-	})
-
-	Describe("GetServices", func() {
+	Describe("GetService and GetServices", func() {
 		var (
 			serviceInstance1 string
 			serviceInstance2 string
@@ -195,7 +166,9 @@ var _ = Describe("plugin API", func() {
 			broker.Destroy()
 		})
 
-		It("returns a list of services instances", func() {
+		It("GetService gets the given service instance and GetServices returns a list of services instances", func() {
+			confirmTestPluginOutputWithArg("GetService", serviceInstance1, serviceInstance1)
+
 			servicesNameRegexp := fmt.Sprintf("(?:%s|%s)", serviceInstance1, serviceInstance2)
 			confirmTestPluginOutput("GetServices", servicesNameRegexp, servicesNameRegexp)
 		})
