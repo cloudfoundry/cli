@@ -52,6 +52,7 @@ const (
 	GetSpacesRequest                       = "GetSpaces"
 	GetSpaceStagingSecurityGroupsRequest   = "GetSpaceStagingSecurityGroups"
 	GetStackRequest                        = "GetStack"
+	GetStacksRequest                       = "GetStacks"
 	GetUsersRequest                        = "GetUsers"
 	PostAppRequest                         = "PostApp"
 	PostAppRestageRequest                  = "PostAppRestage"
@@ -75,9 +76,9 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: PutAppRequest},
 	{Path: "/v2/apps/:app_guid/bits", Method: http.MethodPut, Name: PutAppBitsRequest},
 	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: GetAppInstancesRequest},
+	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
-	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},
@@ -114,6 +115,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: GetSpaceRoutesRequest},
 	{Path: "/v2/spaces/:space_guid/security_groups", Method: http.MethodGet, Name: GetSpaceRunningSecurityGroupsRequest},
 	{Path: "/v2/spaces/:space_guid/staging_security_groups", Method: http.MethodGet, Name: GetSpaceStagingSecurityGroupsRequest},
+	{Path: "/v2/stacks", Method: http.MethodGet, Name: GetStacksRequest},
 	{Path: "/v2/stacks/:stack_guid", Method: http.MethodGet, Name: GetStackRequest},
 	{Path: "/v2/users", Method: http.MethodPost, Name: PostUserRequest},
 }

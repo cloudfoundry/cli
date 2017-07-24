@@ -44,6 +44,7 @@ type CloudControllerClient interface {
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetStack(guid string) (ccv2.Stack, ccv2.Warnings, error)
+	GetStacks(queries []ccv2.Query) ([]ccv2.Stack, ccv2.Warnings, error)
 	GetStagingSpacesBySecurityGroup(securityGroupGUID string) ([]ccv2.Space, ccv2.Warnings, error)
 	PollJob(job ccv2.Job) (ccv2.Warnings, error)
 	RemoveSpaceFromRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)

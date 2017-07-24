@@ -250,6 +250,103 @@ var _ = Describe("Application Config", func() {
 			})
 		})
 
+		Context("when overriding application properties", func() {
+			var stack v2action.Stack
+
+			Context("when the manifest contains all the properties", func() {
+				BeforeEach(func() {
+					manifestApps[0].Buildpack = "some-buildpack"
+					manifestApps[0].Command = "some-buildpack"
+					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
+					manifestApps[0].HealthCheckTimeout = 5
+					manifestApps[0].HealthCheckType = "some-buildpack"
+					manifestApps[0].Instances = 1
+					manifestApps[0].DiskQuota = 2
+					manifestApps[0].Memory = 3
+					manifestApps[0].StackName = "some-stack"
+
+					stack = v2action.Stack{
+						Name: "some-stack",
+						GUID: "some-stack-guid",
+					}
+
+					fakeV2Actor.GetStackByNameReturns(stack, v2action.Warnings{"some-stack-warning"}, nil)
+				})
+
+				It("overrides the current application properties", func() {
+					Expect(warnings).To(ConsistOf("some-stack-warning", "private-domain-warnings", "shared-domain-warnings"))
+
+					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
+					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.Instances).To(Equal(1))
+					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
+					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
+					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))
+					Expect(firstConfig.DesiredApplication.Stack).To(Equal(stack))
+
+					Expect(fakeV2Actor.GetStackByNameCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GetStackByNameArgsForCall(0)).To(Equal("some-stack"))
+				})
+			})
+
+			Context("when the manifest does not contain any properties", func() {
+				BeforeEach(func() {
+					stack = v2action.Stack{
+						Name: "some-stack",
+						GUID: "some-stack-guid",
+					}
+					fakeV2Actor.GetStackReturns(stack, nil, nil)
+
+					app := v2action.Application{
+						Buildpack: "some-buildpack",
+						Command:   "some-buildpack",
+						DiskQuota: 2,
+						GUID:      "some-app-guid",
+						HealthCheckHTTPEndpoint: "some-buildpack",
+						HealthCheckTimeout:      5,
+						HealthCheckType:         "some-buildpack",
+						Instances:               1,
+						Memory:                  3,
+						Name:                    appName,
+						StackGUID:               stack.GUID,
+					}
+					fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, nil, nil)
+				})
+
+				It("keeps the original app properties", func() {
+					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
+					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.Instances).To(Equal(1))
+					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
+					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
+					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))
+					Expect(firstConfig.DesiredApplication.Stack).To(Equal(stack))
+				})
+			})
+
+			Context("when retrieving the stack errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					manifestApps[0].StackName = "some-stack"
+
+					expectedErr = errors.New("potattototototototootot")
+					fakeV2Actor.GetStackByNameReturns(v2action.Stack{}, v2action.Warnings{"some-stack-warning"}, expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("some-stack-warning"))
+				})
+			})
+		})
+
 		Context("when retrieving the default route is successful", func() {
 			BeforeEach(func() {
 				// Assumes new route

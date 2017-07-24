@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -50,4 +51,30 @@ func (client *Client) GetStack(guid string) (Stack, Warnings, error) {
 
 	err = client.connection.Make(request, &response)
 	return stack, response.Warnings, err
+}
+
+// GetStacks returns a list of Stacks based off of the provided queries.
+func (client *Client) GetStacks(queries []Query) ([]Stack, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetStacksRequest,
+		Query:       FormatQueryParameters(queries),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullStacksList []Stack
+	warnings, err := client.paginate(request, Stack{}, func(item interface{}) error {
+		if space, ok := item.(Stack); ok {
+			fullStacksList = append(fullStacksList, space)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Stack{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullStacksList, warnings, err
 }
