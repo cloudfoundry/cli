@@ -73,7 +73,7 @@ applications:
 					DiskQuota:               100,
 					Memory:                  200,
 					StackName:               "some-stack",
-					Timeout:                 120,
+					HealthCheckTimeout:      120,
 				},
 				Application{
 					Name:      "app-2",

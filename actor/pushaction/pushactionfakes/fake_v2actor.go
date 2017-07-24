@@ -142,6 +142,49 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	GetStackStub        func(guid string) (v2action.Stack, v2action.Warnings, error)
+	getStackMutex       sync.RWMutex
+	getStackArgsForCall []struct {
+		guid string
+	}
+	getStackReturns struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}
+	getStackReturnsOnCall map[int]struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}
+	GetStackByNameStub        func(stackName string) (v2action.Stack, v2action.Warnings, error)
+	getStackByNameMutex       sync.RWMutex
+	getStackByNameArgsForCall []struct {
+		stackName string
+	}
+	getStackByNameReturns struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}
+	getStackByNameReturnsOnCall map[int]struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}
+	PollJobStub        func(job v2action.Job) (v2action.Warnings, error)
+	pollJobMutex       sync.RWMutex
+	pollJobArgsForCall []struct {
+		job v2action.Job
+	}
+	pollJobReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	pollJobReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	ResourceMatchStub        func(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error)
 	resourceMatchMutex       sync.RWMutex
 	resourceMatchArgsForCall []struct {
@@ -158,19 +201,6 @@ type FakeV2Actor struct {
 		result2 []v2action.Resource
 		result3 v2action.Warnings
 		result4 error
-	}
-	PollJobStub        func(job v2action.Job) (v2action.Warnings, error)
-	pollJobMutex       sync.RWMutex
-	pollJobArgsForCall []struct {
-		job v2action.Job
-	}
-	pollJobReturns struct {
-		result1 v2action.Warnings
-		result2 error
-	}
-	pollJobReturnsOnCall map[int]struct {
-		result1 v2action.Warnings
-		result2 error
 	}
 	UpdateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	updateApplicationMutex       sync.RWMutex
@@ -717,6 +747,165 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) GetStack(guid string) (v2action.Stack, v2action.Warnings, error) {
+	fake.getStackMutex.Lock()
+	ret, specificReturn := fake.getStackReturnsOnCall[len(fake.getStackArgsForCall)]
+	fake.getStackArgsForCall = append(fake.getStackArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("GetStack", []interface{}{guid})
+	fake.getStackMutex.Unlock()
+	if fake.GetStackStub != nil {
+		return fake.GetStackStub(guid)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getStackReturns.result1, fake.getStackReturns.result2, fake.getStackReturns.result3
+}
+
+func (fake *FakeV2Actor) GetStackCallCount() int {
+	fake.getStackMutex.RLock()
+	defer fake.getStackMutex.RUnlock()
+	return len(fake.getStackArgsForCall)
+}
+
+func (fake *FakeV2Actor) GetStackArgsForCall(i int) string {
+	fake.getStackMutex.RLock()
+	defer fake.getStackMutex.RUnlock()
+	return fake.getStackArgsForCall[i].guid
+}
+
+func (fake *FakeV2Actor) GetStackReturns(result1 v2action.Stack, result2 v2action.Warnings, result3 error) {
+	fake.GetStackStub = nil
+	fake.getStackReturns = struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetStackReturnsOnCall(i int, result1 v2action.Stack, result2 v2action.Warnings, result3 error) {
+	fake.GetStackStub = nil
+	if fake.getStackReturnsOnCall == nil {
+		fake.getStackReturnsOnCall = make(map[int]struct {
+			result1 v2action.Stack
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getStackReturnsOnCall[i] = struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetStackByName(stackName string) (v2action.Stack, v2action.Warnings, error) {
+	fake.getStackByNameMutex.Lock()
+	ret, specificReturn := fake.getStackByNameReturnsOnCall[len(fake.getStackByNameArgsForCall)]
+	fake.getStackByNameArgsForCall = append(fake.getStackByNameArgsForCall, struct {
+		stackName string
+	}{stackName})
+	fake.recordInvocation("GetStackByName", []interface{}{stackName})
+	fake.getStackByNameMutex.Unlock()
+	if fake.GetStackByNameStub != nil {
+		return fake.GetStackByNameStub(stackName)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getStackByNameReturns.result1, fake.getStackByNameReturns.result2, fake.getStackByNameReturns.result3
+}
+
+func (fake *FakeV2Actor) GetStackByNameCallCount() int {
+	fake.getStackByNameMutex.RLock()
+	defer fake.getStackByNameMutex.RUnlock()
+	return len(fake.getStackByNameArgsForCall)
+}
+
+func (fake *FakeV2Actor) GetStackByNameArgsForCall(i int) string {
+	fake.getStackByNameMutex.RLock()
+	defer fake.getStackByNameMutex.RUnlock()
+	return fake.getStackByNameArgsForCall[i].stackName
+}
+
+func (fake *FakeV2Actor) GetStackByNameReturns(result1 v2action.Stack, result2 v2action.Warnings, result3 error) {
+	fake.GetStackByNameStub = nil
+	fake.getStackByNameReturns = struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetStackByNameReturnsOnCall(i int, result1 v2action.Stack, result2 v2action.Warnings, result3 error) {
+	fake.GetStackByNameStub = nil
+	if fake.getStackByNameReturnsOnCall == nil {
+		fake.getStackByNameReturnsOnCall = make(map[int]struct {
+			result1 v2action.Stack
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getStackByNameReturnsOnCall[i] = struct {
+		result1 v2action.Stack
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) PollJob(job v2action.Job) (v2action.Warnings, error) {
+	fake.pollJobMutex.Lock()
+	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
+	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
+		job v2action.Job
+	}{job})
+	fake.recordInvocation("PollJob", []interface{}{job})
+	fake.pollJobMutex.Unlock()
+	if fake.PollJobStub != nil {
+		return fake.PollJobStub(job)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.pollJobReturns.result1, fake.pollJobReturns.result2
+}
+
+func (fake *FakeV2Actor) PollJobCallCount() int {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return len(fake.pollJobArgsForCall)
+}
+
+func (fake *FakeV2Actor) PollJobArgsForCall(i int) v2action.Job {
+	fake.pollJobMutex.RLock()
+	defer fake.pollJobMutex.RUnlock()
+	return fake.pollJobArgsForCall[i].job
+}
+
+func (fake *FakeV2Actor) PollJobReturns(result1 v2action.Warnings, result2 error) {
+	fake.PollJobStub = nil
+	fake.pollJobReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) PollJobReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.PollJobStub = nil
+	if fake.pollJobReturnsOnCall == nil {
+		fake.pollJobReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.pollJobReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeV2Actor) ResourceMatch(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error) {
 	var allResourcesCopy []v2action.Resource
 	if allResources != nil {
@@ -777,57 +966,6 @@ func (fake *FakeV2Actor) ResourceMatchReturnsOnCall(i int, result1 []v2action.Re
 		result3 v2action.Warnings
 		result4 error
 	}{result1, result2, result3, result4}
-}
-
-func (fake *FakeV2Actor) PollJob(job v2action.Job) (v2action.Warnings, error) {
-	fake.pollJobMutex.Lock()
-	ret, specificReturn := fake.pollJobReturnsOnCall[len(fake.pollJobArgsForCall)]
-	fake.pollJobArgsForCall = append(fake.pollJobArgsForCall, struct {
-		job v2action.Job
-	}{job})
-	fake.recordInvocation("PollJob", []interface{}{job})
-	fake.pollJobMutex.Unlock()
-	if fake.PollJobStub != nil {
-		return fake.PollJobStub(job)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.pollJobReturns.result1, fake.pollJobReturns.result2
-}
-
-func (fake *FakeV2Actor) PollJobCallCount() int {
-	fake.pollJobMutex.RLock()
-	defer fake.pollJobMutex.RUnlock()
-	return len(fake.pollJobArgsForCall)
-}
-
-func (fake *FakeV2Actor) PollJobArgsForCall(i int) v2action.Job {
-	fake.pollJobMutex.RLock()
-	defer fake.pollJobMutex.RUnlock()
-	return fake.pollJobArgsForCall[i].job
-}
-
-func (fake *FakeV2Actor) PollJobReturns(result1 v2action.Warnings, result2 error) {
-	fake.PollJobStub = nil
-	fake.pollJobReturns = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeV2Actor) PollJobReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
-	fake.PollJobStub = nil
-	if fake.pollJobReturnsOnCall == nil {
-		fake.pollJobReturnsOnCall = make(map[int]struct {
-			result1 v2action.Warnings
-			result2 error
-		})
-	}
-	fake.pollJobReturnsOnCall[i] = struct {
-		result1 v2action.Warnings
-		result2 error
-	}{result1, result2}
 }
 
 func (fake *FakeV2Actor) UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error) {
@@ -1081,10 +1219,14 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
-	fake.resourceMatchMutex.RLock()
-	defer fake.resourceMatchMutex.RUnlock()
+	fake.getStackMutex.RLock()
+	defer fake.getStackMutex.RUnlock()
+	fake.getStackByNameMutex.RLock()
+	defer fake.getStackByNameMutex.RUnlock()
 	fake.pollJobMutex.RLock()
 	defer fake.pollJobMutex.RUnlock()
+	fake.resourceMatchMutex.RLock()
+	defer fake.resourceMatchMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()

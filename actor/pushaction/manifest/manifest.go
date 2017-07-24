@@ -27,9 +27,9 @@ type Application struct {
 	Name      string
 	Path      string
 	StackName string
-	// Timeout attribute defines the number of seconds that is allocated for
-	// starting an application.
-	Timeout int
+	// HealthCheckType attribute defines the number of seconds that is allocated
+	// for starting an application.
+	HealthCheckTimeout int
 }
 
 func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {
@@ -60,7 +60,7 @@ func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error 
 	a.Name = manifestApp.Name
 	a.Path = manifestApp.Path
 	a.StackName = manifestApp.StackName
-	a.Timeout = manifestApp.Timeout
+	a.HealthCheckTimeout = manifestApp.Timeout
 
 	if manifestApp.DiskQuota != "" {
 		disk, err := bytefmt.ToMegabytes(manifestApp.DiskQuota)

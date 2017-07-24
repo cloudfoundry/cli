@@ -165,4 +165,96 @@ var _ = Describe("Applications", func() {
 			})
 		})
 	})
+
+	Describe("FindOrReturnPartialApp", func() {
+		var expectedStack v2action.Stack
+		var expectedApp v2action.Application
+
+		Context("when the app exists", func() {
+			Context("when retrieving the stack is successful", func() {
+				BeforeEach(func() {
+					expectedStack = v2action.Stack{
+						Name: "some-stack",
+						GUID: "some-stack-guid",
+					}
+					fakeV2Actor.GetStackReturns(expectedStack, v2action.Warnings{"stack-warnings"}, nil)
+
+					expectedApp = v2action.Application{
+						GUID:      "some-app-guid",
+						Name:      "some-app",
+						StackGUID: expectedStack.GUID,
+					}
+					fakeV2Actor.GetApplicationByNameAndSpaceReturns(expectedApp, v2action.Warnings{"app-warnings"}, nil)
+				})
+
+				It("fills in the stack", func() {
+					found, app, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("app-warnings", "stack-warnings"))
+					Expect(found).To(BeTrue())
+					Expect(app).To(Equal(Application{
+						Application: expectedApp,
+						Stack:       expectedStack,
+					}))
+				})
+			})
+
+			Context("when retrieving the stack errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("stack stack stack em up")
+					fakeV2Actor.GetStackReturns(v2action.Stack{}, v2action.Warnings{"stack-warnings"}, expectedErr)
+
+					expectedApp = v2action.Application{
+						GUID:      "some-app-guid",
+						Name:      "some-app",
+						StackGUID: "some-stack-guid",
+					}
+					fakeV2Actor.GetApplicationByNameAndSpaceReturns(expectedApp, v2action.Warnings{"app-warnings"}, nil)
+				})
+
+				It("returns error and warnings", func() {
+					found, _, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
+					Expect(err).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("app-warnings", "stack-warnings"))
+					Expect(found).To(BeFalse())
+				})
+			})
+		})
+
+		Context("when the app does not exist", func() {
+			BeforeEach(func() {
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, v2action.ApplicationNotFoundError{})
+			})
+
+			It("returns a partial app and warnings", func() {
+				found, app, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
+				Expect(found).To(BeFalse())
+				Expect(app).To(Equal(Application{
+					Application: v2action.Application{
+						Name:      "some-app",
+						SpaceGUID: "some-space-guid",
+					},
+				}))
+			})
+		})
+
+		Context("when retrieving the app errors", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("dios mio")
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, expectedErr)
+			})
+
+			It("returns a errors and warnings", func() {
+				found, _, warnings, err := actor.FindOrReturnPartialApp("some-app", "some-space-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2"))
+				Expect(found).To(BeFalse())
+			})
+		})
+	})
 })

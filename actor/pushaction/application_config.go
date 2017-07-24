@@ -50,16 +50,16 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		}
 
 		log.Infoln("searching for app", app.Name)
-		appExists, foundApp, v2Warnings, err := actor.FindOrReturnPartialApp(app.Name, spaceGUID)
+		found, constructedApp, v2Warnings, err := actor.FindOrReturnPartialApp(app.Name, spaceGUID)
 		warnings = append(warnings, v2Warnings...)
 		if err != nil {
 			log.Errorln("app lookup:", err)
 			return nil, warnings, err
 		}
 
-		if appExists {
+		if found {
 			var configWarnings v2action.Warnings
-			config, configWarnings, err = actor.configureExistingApp(config, app, foundApp)
+			config, configWarnings, err = actor.configureExistingApp(config, app, constructedApp)
 			warnings = append(warnings, configWarnings...)
 			if err != nil {
 				log.Errorln("configuring existing app:", err)
@@ -67,8 +67,16 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			}
 		} else {
 			log.Debug("using empty app as base")
-			config.DesiredApplication.Name = app.Name
-			config.DesiredApplication.SpaceGUID = spaceGUID
+			config.DesiredApplication = constructedApp
+		}
+
+		config.DesiredApplication = actor.overrideApplicationProperties(config.DesiredApplication, app)
+
+		var stackWarnings Warnings
+		config.DesiredApplication, stackWarnings, err = actor.overrideStack(config.DesiredApplication, app)
+		warnings = append(warnings, stackWarnings...)
+		if err != nil {
+			return nil, warnings, err
 		}
 
 		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID, spaceGUID, config.CurrentRoutes)
@@ -134,4 +142,42 @@ func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath 
 	}
 
 	return config, nil
+}
+
+func (Actor) overrideApplicationProperties(application Application, manifest manifest.Application) Application {
+	if manifest.Buildpack != "" {
+		application.Buildpack = manifest.Buildpack
+	}
+	if manifest.Command != "" {
+		application.Command = manifest.Command
+	}
+	if manifest.DiskQuota != 0 {
+		application.DiskQuota = manifest.DiskQuota
+	}
+	if manifest.HealthCheckHTTPEndpoint != "" {
+		application.HealthCheckHTTPEndpoint = manifest.HealthCheckHTTPEndpoint
+	}
+	if manifest.HealthCheckTimeout != 0 {
+		application.HealthCheckTimeout = manifest.HealthCheckTimeout
+	}
+	if manifest.HealthCheckType != "" {
+		application.HealthCheckType = manifest.HealthCheckType
+	}
+	if manifest.Instances != 0 {
+		application.Instances = manifest.Instances
+	}
+	if manifest.Memory != 0 {
+		application.Memory = manifest.Memory
+	}
+
+	return application
+}
+
+func (actor Actor) overrideStack(application Application, manifest manifest.Application) (Application, Warnings, error) {
+	if manifest.StackName == "" {
+		return application, nil, nil
+	}
+	stack, warnings, err := actor.V2Actor.GetStackByName(manifest.StackName)
+	application.SetStack(stack)
+	return application, Warnings(warnings), err
 }
