@@ -117,8 +117,8 @@ var _ = Describe("v2-push Command", func() {
 				BeforeEach(func() {
 					appConfigs = []pushaction.ApplicationConfig{
 						{
-							CurrentApplication: v2action.Application{Name: appName, State: ccv2.ApplicationStarted},
-							DesiredApplication: v2action.Application{Name: appName},
+							CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, State: ccv2.ApplicationStarted}},
+							DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName}},
 							CurrentRoutes: []v2action.Route{
 								{
 									Host: "route1",
@@ -165,8 +165,8 @@ var _ = Describe("v2-push Command", func() {
 							errorStream := make(chan error)
 
 							updatedConfig = pushaction.ApplicationConfig{
-								CurrentApplication: v2action.Application{Name: appName, GUID: "some-app-guid"},
-								DesiredApplication: v2action.Application{Name: appName, GUID: "some-app-guid"},
+								CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
+								DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName, GUID: "some-app-guid"}},
 								TargetedSpaceGUID:  "some-space-guid",
 								Path:               pwd,
 							}
@@ -224,14 +224,14 @@ var _ = Describe("v2-push Command", func() {
 
 						applicationSummary := v2action.ApplicationSummary{
 							Application: v2action.Application{
-								Name:                 appName,
+								DetectedBuildpack:    "some-buildpack",
+								DetectedStartCommand: "some start command",
 								GUID:                 "some-app-guid",
 								Instances:            3,
 								Memory:               128,
+								Name:                 appName,
 								PackageUpdatedAt:     time.Unix(0, 0),
-								DetectedBuildpack:    "some-buildpack",
 								State:                "STARTED",
-								DetectedStartCommand: "some start command",
 							},
 							Stack: v2action.Stack{
 								Name: "potatos",
@@ -450,7 +450,7 @@ var _ = Describe("v2-push Command", func() {
 
 						Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
 						appConfig, _, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
-						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication))
+						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
 					})
 
 					It("displays the app summary with isolation segments as well as warnings", func() {
@@ -468,42 +468,18 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})
 
-					Context("when pushing app bits", func() {
-						It("display diff of changes with path", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
+					It("display diff of changes", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
-							Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
-							Expect(testUI.Out).To(Say("\\s+routes:"))
-							for _, route := range appConfigs[0].CurrentRoutes {
-								Expect(testUI.Out).To(Say(route.String()))
-							}
-							for _, route := range appConfigs[0].DesiredRoutes {
-								Expect(testUI.Out).To(Say(route.String()))
-							}
-						})
-					})
-
-					Context("when pushing a docker image", func() {
-						var docker string
-						BeforeEach(func() {
-							docker = "some-path"
-							appConfigs[0].DesiredApplication.DockerImage = docker
-						})
-
-						It("display diff of changes with docker image", func() {
-							Expect(executeErr).ToNot(HaveOccurred())
-
-							Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
-							Expect(testUI.Out).To(Say("\\s+docker image:\\s+%s", docker))
-							Expect(testUI.Out).To(Say("\\s+routes:"))
-							for _, route := range appConfigs[0].CurrentRoutes {
-								Expect(testUI.Out).To(Say(route.String()))
-							}
-							for _, route := range appConfigs[0].DesiredRoutes {
-								Expect(testUI.Out).To(Say(route.String()))
-							}
-						})
+						Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
+						Expect(testUI.Out).To(Say("\\s+routes:"))
+						for _, route := range appConfigs[0].CurrentRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
+						for _, route := range appConfigs[0].DesiredRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
 					})
 				})
 

@@ -116,9 +116,10 @@ var _ = Describe("Routes", func() {
 
 		BeforeEach(func() {
 			config = ApplicationConfig{
-				DesiredApplication: v2action.Application{
-					GUID: "some-app-guid",
-				},
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						GUID: "some-app-guid",
+					}},
 			}
 		})
 

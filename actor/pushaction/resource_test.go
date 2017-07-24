@@ -39,9 +39,10 @@ var _ = Describe("Resources", func() {
 		BeforeEach(func() {
 			config = ApplicationConfig{
 				Path: "some-path",
-				DesiredApplication: v2action.Application{
-					GUID: "some-app-guid",
-				},
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						GUID: "some-app-guid",
+					}},
 			}
 
 			resourcesToArchive = []v2action.Resource{{Filename: "file1"}, {Filename: "file2"}}
@@ -192,9 +193,10 @@ var _ = Describe("Resources", func() {
 			}
 
 			config = ApplicationConfig{
-				DesiredApplication: v2action.Application{
-					GUID: "some-app-guid",
-				},
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						GUID: "some-app-guid",
+					}},
 				MatchedResources: resources,
 			}
 			fakeProgressBar = new(pushactionfakes.FakeProgressBar)
