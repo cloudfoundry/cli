@@ -34,9 +34,11 @@ var _ = Describe("Applications", func() {
 
 		BeforeEach(func() {
 			config = ApplicationConfig{
-				DesiredApplication: v2action.Application{
-					Name:      "some-app-name",
-					SpaceGUID: "some-space-guid",
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						Name:      "some-app-name",
+						SpaceGUID: "some-space-guid",
+					},
 				},
 				Path: "some-path",
 			}
@@ -48,17 +50,21 @@ var _ = Describe("Applications", func() {
 
 		Context("when the app exists", func() {
 			BeforeEach(func() {
-				config.CurrentApplication = v2action.Application{
-					Name:      "some-app-name",
-					GUID:      "some-app-guid",
-					SpaceGUID: "some-space-guid",
-					Buildpack: "java",
+				config.CurrentApplication = Application{
+					Application: v2action.Application{
+						Name:      "some-app-name",
+						GUID:      "some-app-guid",
+						SpaceGUID: "some-space-guid",
+						Buildpack: "java",
+					},
 				}
-				config.DesiredApplication = v2action.Application{
-					Name:      "some-app-name",
-					GUID:      "some-app-guid",
-					SpaceGUID: "some-space-guid",
-					Buildpack: "ruby",
+				config.DesiredApplication = Application{
+					Application: v2action.Application{
+						Name:      "some-app-name",
+						GUID:      "some-app-guid",
+						SpaceGUID: "some-space-guid",
+						Buildpack: "ruby",
+					},
 				}
 			})
 
@@ -77,12 +83,13 @@ var _ = Describe("Applications", func() {
 					Expect(warnings).To(ConsistOf("update-warning"))
 					Expect(event).To(Equal(UpdatedApplication))
 
-					Expect(returnedConfig.DesiredApplication).To(Equal(v2action.Application{
-						Name:      "some-app-name",
-						GUID:      "some-app-guid",
-						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
-					}))
+					Expect(returnedConfig.DesiredApplication).To(Equal(Application{
+						Application: v2action.Application{
+							Name:      "some-app-name",
+							GUID:      "some-app-guid",
+							SpaceGUID: "some-space-guid",
+							Buildpack: "ruby",
+						}}))
 					Expect(returnedConfig.CurrentApplication).To(Equal(returnedConfig.DesiredApplication))
 
 					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
@@ -126,12 +133,13 @@ var _ = Describe("Applications", func() {
 					Expect(warnings).To(ConsistOf("create-warning"))
 					Expect(event).To(Equal(CreatedApplication))
 
-					Expect(returnedConfig.DesiredApplication).To(Equal(v2action.Application{
-						Name:      "some-app-name",
-						GUID:      "some-app-guid",
-						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
-					}))
+					Expect(returnedConfig.DesiredApplication).To(Equal(Application{
+						Application: v2action.Application{
+							Name:      "some-app-name",
+							GUID:      "some-app-guid",
+							SpaceGUID: "some-space-guid",
+							Buildpack: "ruby",
+						}}))
 					Expect(returnedConfig.CurrentApplication).To(Equal(returnedConfig.DesiredApplication))
 
 					Expect(fakeV2Actor.CreateApplicationCallCount()).To(Equal(1))

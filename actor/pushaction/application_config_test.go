@@ -37,7 +37,7 @@ var _ = Describe("Application Config", func() {
 
 			Context("when the app exists", func() {
 				It("returns false", func() {
-					config := ApplicationConfig{CurrentApplication: v2action.Application{GUID: "some-app-guid"}}
+					config := ApplicationConfig{CurrentApplication: Application{Application: v2action.Application{GUID: "some-app-guid"}}}
 					Expect(config.CreatingApplication()).To(BeFalse())
 				})
 			})
@@ -53,7 +53,7 @@ var _ = Describe("Application Config", func() {
 
 			Context("when the app exists", func() {
 				It("returns true", func() {
-					config := ApplicationConfig{CurrentApplication: v2action.Application{GUID: "some-app-guid"}}
+					config := ApplicationConfig{CurrentApplication: Application{Application: v2action.Application{GUID: "some-app-guid"}}}
 					Expect(config.UpdatingApplication()).To(BeTrue())
 				})
 			})
@@ -152,15 +152,16 @@ var _ = Describe("Application Config", func() {
 		})
 
 		Context("when the application exists", func() {
-			var app v2action.Application
+			var app Application
 			var route v2action.Route
 
 			BeforeEach(func() {
-				app = v2action.Application{
-					Name:      appName,
-					GUID:      "some-app-guid",
-					SpaceGUID: spaceGUID,
-				}
+				app = Application{
+					Application: v2action.Application{
+						Name:      appName,
+						GUID:      "some-app-guid",
+						SpaceGUID: spaceGUID,
+					}}
 
 				route = v2action.Route{
 					Domain: v2action.Domain{
@@ -172,7 +173,7 @@ var _ = Describe("Application Config", func() {
 					SpaceGUID: spaceGUID,
 				}
 
-				fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(app.Application, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
 			})
 
 			Context("when retrieving the application's routes is successful", func() {
@@ -225,11 +226,12 @@ var _ = Describe("Application Config", func() {
 			It("creates a new application and sets it to the desired application", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "private-domain-warnings", "shared-domain-warnings"))
-				Expect(firstConfig.CurrentApplication).To(Equal(v2action.Application{}))
-				Expect(firstConfig.DesiredApplication).To(Equal(v2action.Application{
-					Name:      "some-app",
-					SpaceGUID: spaceGUID,
-				}))
+				Expect(firstConfig.CurrentApplication).To(Equal(Application{Application: v2action.Application{}}))
+				Expect(firstConfig.DesiredApplication).To(Equal(Application{
+					Application: v2action.Application{
+						Name:      "some-app",
+						SpaceGUID: spaceGUID,
+					}}))
 				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
 			})
 		})

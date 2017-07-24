@@ -174,7 +174,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 			return shared.HandleError(err)
 		}
 
-		messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication, cmd.NOAAClient, cmd.Config)
+		messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application, cmd.NOAAClient, cmd.Config)
 		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 		if err != nil {
 			return err

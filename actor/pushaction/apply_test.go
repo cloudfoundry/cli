@@ -60,10 +60,11 @@ var _ = Describe("Apply", func() {
 		actor = NewActor(fakeV2Actor)
 
 		config = ApplicationConfig{
-			DesiredApplication: v2action.Application{
-				Name:      "some-app-name",
-				SpaceGUID: "some-space-guid",
-			},
+			DesiredApplication: Application{
+				Application: v2action.Application{
+					Name:      "some-app-name",
+					SpaceGUID: "some-space-guid",
+				}},
 			DesiredRoutes: []v2action.Route{{Host: "banana"}},
 			Path:          "some-path",
 		}
@@ -161,8 +162,8 @@ var _ = Describe("Apply", func() {
 
 							It("sends the updated config and a complete event", func() {
 								Eventually(configStream).Should(Receive(Equal(ApplicationConfig{
-									CurrentApplication: createdApp,
-									DesiredApplication: createdApp,
+									CurrentApplication: Application{Application: createdApp},
+									DesiredApplication: Application{Application: createdApp},
 									CurrentRoutes:      createdRoutes,
 									DesiredRoutes:      createdRoutes,
 									Path:               "some-path",
