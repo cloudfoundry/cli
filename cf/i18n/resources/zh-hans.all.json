@@ -2852,6 +2852,10 @@
     "translation": "保存清单时出错: {{.Error}}"
   },
   {
+    "id": "Error staging application {{.AppName}}: timed out after {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}",
+    "translation": ""
+  },
+  {
     "id": "Error staging application: {{.Message}}",
     "translation": ""
   },
@@ -7410,10 +7414,6 @@
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
     "translation": "{{.AppInstanceLimit}} 应用程序实例限制"
-  },
-  {
-    "id": "{{.AppName}} failed to stage within {{.Timeout}} {{if eq .Timeout 1.0}}minute{{else}}minutes{{end}}",
-    "translation": ""
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
