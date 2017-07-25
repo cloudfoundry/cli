@@ -415,7 +415,7 @@ var _ = Describe("v3-push command", func() {
 				It("errors and does not push the app", func() {
 					Consistently(session.Out).ShouldNot(Say("Creating app"))
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Buildpack must be an existing admin buildpack or a valid git URI"))
+					Eventually(session.Err).Should(Say(`Buildpack "wut" must be an existing admin buildpack or a valid git URI`))
 				})
 			})
 

@@ -550,7 +550,7 @@ var _ = Describe("Application", func() {
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPut, "/v3/apps/some-app-guid/stop"),
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/stop"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -582,7 +582,7 @@ var _ = Describe("Application", func() {
 }`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest(http.MethodPut, "/v3/apps/no-such-app-guid/stop"),
+					VerifyRequest(http.MethodPost, "/v3/apps/no-such-app-guid/actions/stop"),
 					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)
@@ -622,7 +622,7 @@ var _ = Describe("Application", func() {
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodPut, "/v3/apps/some-app-guid/start"),
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/actions/start"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -654,7 +654,7 @@ var _ = Describe("Application", func() {
 }`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest(http.MethodPut, "/v3/apps/no-such-app-guid/start"),
+					VerifyRequest(http.MethodPost, "/v3/apps/no-such-app-guid/actions/start"),
 					RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)

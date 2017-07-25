@@ -177,7 +177,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 
 func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutApplicationStopRequest,
+		RequestName: internal.PostApplicationStopRequest,
 		URIParams:   map[string]string{"guid": appGUID},
 	})
 
@@ -189,7 +189,7 @@ func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 
 func (client *Client) StartApplication(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutApplicationStartRequest,
+		RequestName: internal.PostApplicationStartRequest,
 		URIParams:   map[string]string{"guid": appGUID},
 	})
 
