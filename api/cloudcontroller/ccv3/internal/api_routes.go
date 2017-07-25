@@ -13,12 +13,13 @@ import "net/http"
 const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
-	GetAppsRequest                                        = "GetApps"
+	GetAppDropletCurrent                                  = "GetAppDropletCurrent"
 	GetAppProcessesRequest                                = "GetAppProcesses"
 	GetAppTasksRequest                                    = "GetAppTasks"
-	GetAppDropletCurrent                                  = "GetAppDropletCurrent"
-	GetProcessInstancesRequest                            = "GetProcessInstances"
+	GetApplicationProcessByTypeRequest                    = "GetApplicationProcessByType"
+	GetAppsRequest                                        = "GetApps"
 	GetBuildRequest                                       = "GetBuild"
+	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
@@ -28,6 +29,7 @@ const (
 	GetSpaceRelationshipIsolationSegmentRequest           = "GetSpaceRelationshipIsolationSegmentRequest"
 	PatchApplicationRequest                               = "PatchApplicationRequest"
 	PatchApplicationCurrentDropletRequest                 = "PatchApplicationCurrentDroplet"
+	PatchApplicationProcessHealthCheckRequest             = "PatchApplicationProcessHealthCheck"
 	PatchOrganizationDefaultIsolationSegmentRequest       = "PatchOrganizationDefaultIsolationSegmentRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest         = "PatchSpaceRelationshipIsolationSegmentRequest"
 	PostApplicationRequest                                = "PostApplicationRequest"
@@ -66,10 +68,12 @@ var APIRoutes = []Route{
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:guid", Method: http.MethodPatch, Name: PatchApplicationRequest, Resource: AppsResource},
+	{Path: "/:guid", Method: http.MethodPatch, Name: PatchApplicationProcessHealthCheckRequest, Resource: ProcessesResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
 	{Path: "/:guid/droplets/current", Method: http.MethodGet, Name: GetAppDropletCurrent, Resource: AppsResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
+	{Path: "/:guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessByTypeRequest, Resource: AppsResource},
 	{Path: "/:guid/stats", Method: http.MethodGet, Name: GetProcessInstancesRequest, Resource: ProcessesResource},
 	{Path: "/:guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationDefaultIsolationSegmentRequest, Resource: OrgsResource},
 	{Path: "/:guid/relationships/default_isolation_segment", Method: http.MethodPatch, Name: PatchOrganizationDefaultIsolationSegmentRequest, Resource: OrgsResource},

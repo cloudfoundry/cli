@@ -145,4 +145,266 @@ var _ = Describe("Process", func() {
 			})
 		})
 	})
+
+	Describe("GetApplicationProcessByType", func() {
+		var (
+			process  Process
+			warnings []string
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			process, warnings, err = client.GetApplicationProcessByType("some-app-guid", "some-type")
+		})
+
+		Context("when the process exists", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "process-1-guid",
+					"type": "some-type",
+					"memory_in_mb": 32,
+					"health_check": {
+						"type": "http",
+						"data": {
+							"timeout": 90,
+							"endpoint": "/health"
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the process and all warnings", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(process).To(Equal(Process{
+					GUID:       "process-1-guid",
+					Type:       "some-type",
+					MemoryInMB: 32,
+					HealthCheck: ProcessHealthCheck{
+						Type: "http",
+						Data: ProcessHealthCheckData{Endpoint: "/health"}},
+				}))
+			})
+		})
+
+		Context("when the application does not exist", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"detail": "Application not found",
+							"title": "CF-ResourceNotFound",
+							"code": 10010
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns a ResourceNotFoundError", func() {
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Application not found"}))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10009,
+							"detail": "Some CC Error",
+							"title": "CF-SomeNewError"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/processes/some-type"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10009,
+								Detail: "Some CC Error",
+								Title:  "CF-SomeNewError",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
+	Describe("PatchApplicationProcessHealthCheck", func() {
+		var (
+			endpoint string
+
+			warnings []string
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint)
+		})
+
+		Context("when patching the process succeeds", func() {
+			Context("and the endpoint is non-empty", func() {
+				BeforeEach(func() {
+					endpoint = "some-endpoint"
+					expectedBody := `{
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": "some-endpoint"
+						}
+					}
+				}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+							VerifyJSON(expectedBody),
+							RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("patches this process's health check", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+
+			Context("and the endpoint is empty", func() {
+				BeforeEach(func() {
+					endpoint = ""
+					expectedBody := `{
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": null
+						}
+					}
+				}`
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+							VerifyJSON(expectedBody),
+							RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("patches this process's health check", func() {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+				})
+			})
+		})
+
+		Context("when the process does not exist", func() {
+			BeforeEach(func() {
+				endpoint = "some-endpoint"
+				response := `{
+					"errors": [
+						{
+							"detail": "Process not found",
+							"title": "CF-ResourceNotFound",
+							"code": 10010
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+					Message: "Process not found",
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				endpoint = "some-endpoint"
+				response := `{
+						"errors": [
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
+							},
+							{
+								"code": 10009,
+								"detail": "Some CC Error",
+								"title": "CF-SomeNewError"
+							}
+						]
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10009,
+								Detail: "Some CC Error",
+								Title:  "CF-SomeNewError",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

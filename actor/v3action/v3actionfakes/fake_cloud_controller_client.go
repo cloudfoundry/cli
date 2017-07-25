@@ -185,6 +185,37 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetApplicationProcessByTypeStub        func(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
+	getApplicationProcessByTypeMutex       sync.RWMutex
+	getApplicationProcessByTypeArgsForCall []struct {
+		appGUID     string
+		processType string
+	}
+	getApplicationProcessByTypeReturns struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getApplicationProcessByTypeReturnsOnCall map[int]struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}
+	PatchApplicationProcessHealthCheckStub        func(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Warnings, error)
+	patchApplicationProcessHealthCheckMutex       sync.RWMutex
+	patchApplicationProcessHealthCheckArgsForCall []struct {
+		processGUID                string
+		processHealthCheckType     string
+		processHealthCheckEndpoint string
+	}
+	patchApplicationProcessHealthCheckReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	patchApplicationProcessHealthCheckReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	GetProcessInstancesStub        func(processGUID string) ([]ccv3.Instance, ccv3.Warnings, error)
 	getProcessInstancesMutex       sync.RWMutex
 	getProcessInstancesArgsForCall []struct {
@@ -1095,6 +1126,114 @@ func (fake *FakeCloudControllerClient) GetApplicationProcessesReturnsOnCall(i in
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error) {
+	fake.getApplicationProcessByTypeMutex.Lock()
+	ret, specificReturn := fake.getApplicationProcessByTypeReturnsOnCall[len(fake.getApplicationProcessByTypeArgsForCall)]
+	fake.getApplicationProcessByTypeArgsForCall = append(fake.getApplicationProcessByTypeArgsForCall, struct {
+		appGUID     string
+		processType string
+	}{appGUID, processType})
+	fake.recordInvocation("GetApplicationProcessByType", []interface{}{appGUID, processType})
+	fake.getApplicationProcessByTypeMutex.Unlock()
+	if fake.GetApplicationProcessByTypeStub != nil {
+		return fake.GetApplicationProcessByTypeStub(appGUID, processType)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getApplicationProcessByTypeReturns.result1, fake.getApplicationProcessByTypeReturns.result2, fake.getApplicationProcessByTypeReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationProcessByTypeCallCount() int {
+	fake.getApplicationProcessByTypeMutex.RLock()
+	defer fake.getApplicationProcessByTypeMutex.RUnlock()
+	return len(fake.getApplicationProcessByTypeArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationProcessByTypeArgsForCall(i int) (string, string) {
+	fake.getApplicationProcessByTypeMutex.RLock()
+	defer fake.getApplicationProcessByTypeMutex.RUnlock()
+	return fake.getApplicationProcessByTypeArgsForCall[i].appGUID, fake.getApplicationProcessByTypeArgsForCall[i].processType
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationProcessByTypeReturns(result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+	fake.GetApplicationProcessByTypeStub = nil
+	fake.getApplicationProcessByTypeReturns = struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetApplicationProcessByTypeReturnsOnCall(i int, result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+	fake.GetApplicationProcessByTypeStub = nil
+	if fake.getApplicationProcessByTypeReturnsOnCall == nil {
+		fake.getApplicationProcessByTypeReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Process
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getApplicationProcessByTypeReturnsOnCall[i] = struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (ccv3.Warnings, error) {
+	fake.patchApplicationProcessHealthCheckMutex.Lock()
+	ret, specificReturn := fake.patchApplicationProcessHealthCheckReturnsOnCall[len(fake.patchApplicationProcessHealthCheckArgsForCall)]
+	fake.patchApplicationProcessHealthCheckArgsForCall = append(fake.patchApplicationProcessHealthCheckArgsForCall, struct {
+		processGUID                string
+		processHealthCheckType     string
+		processHealthCheckEndpoint string
+	}{processGUID, processHealthCheckType, processHealthCheckEndpoint})
+	fake.recordInvocation("PatchApplicationProcessHealthCheck", []interface{}{processGUID, processHealthCheckType, processHealthCheckEndpoint})
+	fake.patchApplicationProcessHealthCheckMutex.Unlock()
+	if fake.PatchApplicationProcessHealthCheckStub != nil {
+		return fake.PatchApplicationProcessHealthCheckStub(processGUID, processHealthCheckType, processHealthCheckEndpoint)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.patchApplicationProcessHealthCheckReturns.result1, fake.patchApplicationProcessHealthCheckReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckCallCount() int {
+	fake.patchApplicationProcessHealthCheckMutex.RLock()
+	defer fake.patchApplicationProcessHealthCheckMutex.RUnlock()
+	return len(fake.patchApplicationProcessHealthCheckArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckArgsForCall(i int) (string, string, string) {
+	fake.patchApplicationProcessHealthCheckMutex.RLock()
+	defer fake.patchApplicationProcessHealthCheckMutex.RUnlock()
+	return fake.patchApplicationProcessHealthCheckArgsForCall[i].processGUID, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckType, fake.patchApplicationProcessHealthCheckArgsForCall[i].processHealthCheckEndpoint
+}
+
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckReturns(result1 ccv3.Warnings, result2 error) {
+	fake.PatchApplicationProcessHealthCheckStub = nil
+	fake.patchApplicationProcessHealthCheckReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) PatchApplicationProcessHealthCheckReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.PatchApplicationProcessHealthCheckStub = nil
+	if fake.patchApplicationProcessHealthCheckReturnsOnCall == nil {
+		fake.patchApplicationProcessHealthCheckReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.patchApplicationProcessHealthCheckReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) GetProcessInstances(processGUID string) ([]ccv3.Instance, ccv3.Warnings, error) {
@@ -2092,6 +2231,10 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationCurrentDropletMutex.RUnlock()
 	fake.getApplicationProcessesMutex.RLock()
 	defer fake.getApplicationProcessesMutex.RUnlock()
+	fake.getApplicationProcessByTypeMutex.RLock()
+	defer fake.getApplicationProcessByTypeMutex.RUnlock()
+	fake.patchApplicationProcessHealthCheckMutex.RLock()
+	defer fake.patchApplicationProcessHealthCheckMutex.RUnlock()
 	fake.getProcessInstancesMutex.RLock()
 	defer fake.getProcessInstancesMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()

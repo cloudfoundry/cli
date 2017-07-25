@@ -172,6 +172,10 @@
     "translation": "**Atención: Los plugins son binarios grabados por autores potencialmente no de confianza. Instale y utilice los plugins a su cuenta y riesgo.**\n\n¿Desea instalar el plugin {{.Plugin}}?"
   },
   {
+    "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },
@@ -354,6 +358,10 @@
   {
     "id": "App name is a required field",
     "translation": "Nombre de app es un campo obligatorio"
+  },
+  {
+    "id": "App process to update",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} already exists.",
@@ -1717,6 +1725,10 @@
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS_NAME]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo",
     "translation": ""
   },
   {
@@ -5624,6 +5636,10 @@
     "translation": "CONSEJO: es necesario reiniciar la app para que el cambio sea efectivo."
   },
   {
+    "id": "TIP: An app restart is required for the change to take effect.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
     "translation": ""
   },
@@ -6370,6 +6386,10 @@
   {
     "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Actualizando el tipo de comprobación de estado para la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
+  },
+  {
+    "id": "Updating health check type for app {{.AppName}} process {{.ProcessType}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",

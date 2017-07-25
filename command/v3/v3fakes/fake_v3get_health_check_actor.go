@@ -9,11 +9,11 @@ import (
 )
 
 type FakeV3GetHealthCheckActor struct {
-	GetApplicationProcessHealthChecksByNameAndSpaceStub        func(appName string, spaceName string) ([]v3action.ProcessHealthCheck, v3action.Warnings, error)
+	GetApplicationProcessHealthChecksByNameAndSpaceStub        func(appName string, spaceGUID string) ([]v3action.ProcessHealthCheck, v3action.Warnings, error)
 	getApplicationProcessHealthChecksByNameAndSpaceMutex       sync.RWMutex
 	getApplicationProcessHealthChecksByNameAndSpaceArgsForCall []struct {
 		appName   string
-		spaceName string
+		spaceGUID string
 	}
 	getApplicationProcessHealthChecksByNameAndSpaceReturns struct {
 		result1 []v3action.ProcessHealthCheck
@@ -29,17 +29,17 @@ type FakeV3GetHealthCheckActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3GetHealthCheckActor) GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceName string) ([]v3action.ProcessHealthCheck, v3action.Warnings, error) {
+func (fake *FakeV3GetHealthCheckActor) GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]v3action.ProcessHealthCheck, v3action.Warnings, error) {
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getApplicationProcessHealthChecksByNameAndSpaceReturnsOnCall[len(fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall)]
 	fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall = append(fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall, struct {
 		appName   string
-		spaceName string
-	}{appName, spaceName})
-	fake.recordInvocation("GetApplicationProcessHealthChecksByNameAndSpace", []interface{}{appName, spaceName})
+		spaceGUID string
+	}{appName, spaceGUID})
+	fake.recordInvocation("GetApplicationProcessHealthChecksByNameAndSpace", []interface{}{appName, spaceGUID})
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.Unlock()
 	if fake.GetApplicationProcessHealthChecksByNameAndSpaceStub != nil {
-		return fake.GetApplicationProcessHealthChecksByNameAndSpaceStub(appName, spaceName)
+		return fake.GetApplicationProcessHealthChecksByNameAndSpaceStub(appName, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -56,7 +56,7 @@ func (fake *FakeV3GetHealthCheckActor) GetApplicationProcessHealthChecksByNameAn
 func (fake *FakeV3GetHealthCheckActor) GetApplicationProcessHealthChecksByNameAndSpaceArgsForCall(i int) (string, string) {
 	fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationProcessHealthChecksByNameAndSpaceMutex.RUnlock()
-	return fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall[i].appName, fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall[i].spaceName
+	return fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall[i].appName, fake.getApplicationProcessHealthChecksByNameAndSpaceArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeV3GetHealthCheckActor) GetApplicationProcessHealthChecksByNameAndSpaceReturns(result1 []v3action.ProcessHealthCheck, result2 v3action.Warnings, result3 error) {

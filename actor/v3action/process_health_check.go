@@ -6,6 +6,15 @@ type ProcessHealthCheck struct {
 	Endpoint        string
 }
 
+// HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a
+// health check type that is not HTTP.
+type HTTPHealthCheckInvalidError struct {
+}
+
+func (e HTTPHealthCheckInvalidError) Error() string {
+	return "Health check type must be 'http' to set a health check HTTP endpoint"
+}
+
 func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]ProcessHealthCheck, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
@@ -29,4 +38,37 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	}
 
 	return processHealthChecks, allWarnings, nil
+}
+
+func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName string, spaceGUID string, healthCheckType string, httpEndpoint string, processType string) (Application, Warnings, error) {
+	if healthCheckType != "http" {
+		if httpEndpoint == "/" {
+			httpEndpoint = ""
+		} else {
+			return Application{}, nil, HTTPHealthCheckInvalidError{}
+		}
+	}
+
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+
+	process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(app.GUID, processType)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+
+	warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
+		process.GUID,
+		healthCheckType,
+		httpEndpoint,
+	)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return Application{}, allWarnings, err
+	}
+
+	return app, allWarnings, nil
 }
