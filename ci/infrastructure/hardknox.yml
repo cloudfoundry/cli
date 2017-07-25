@@ -21,6 +21,12 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     path: ci
+- name: capi-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/capi-ci
+    branch: master
+    path: ci
 - name: cf-deployment
   type: git
   source:
@@ -90,6 +96,7 @@ jobs:
     - get: cf-deployment
     - get: ops-files
     - get: cli-ci
+    - get: capi-ci
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
@@ -102,8 +109,9 @@ jobs:
     input_mapping:
       input1: ops-files
       input2: cli-ci
+      input3: capi-ci
     params:
-      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/tcp-routing-gcp.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml"
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/tcp-routing-gcp.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input3/cf-deployment-operations/use-latest-capi.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
@@ -113,7 +121,7 @@ jobs:
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: hardknox.cli.fun
-      OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml"
+      OPS_FILES: "tcp-routing-gcp.yml add-persistent-isolation-segment-diego-cell.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml use-latest-capi.yml"
       VARS_STORE_FILE: ci/infrastructure/hardknox/deployment-vars.yml
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:
