@@ -190,7 +190,7 @@ var _ = Describe("set-health-check command", func() {
 			Context("when an endpoint is given with a non-http health check type", func() {
 				It("outputs an error and exits 1", func() {
 					session := helpers.CF("set-health-check", appName, "port", "--endpoint", "/foo")
-					Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint."))
+					Eventually(session.Err).Should(Say("Health check type must be 'http' to set a health check HTTP endpoint\\."))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -205,7 +205,7 @@ var _ = Describe("set-health-check command", func() {
 
 				It("displays tip to restart the app", func() {
 					session := helpers.CF("set-health-check", appName, "port")
-					Eventually(session).Should(Say("TIP: An app restart is required for the change to take affect."))
+					Eventually(session).Should(Say("TIP: An app restart is required for the change to take effect\\."))
 					Eventually(session).Should(Exit(0))
 				})
 			})

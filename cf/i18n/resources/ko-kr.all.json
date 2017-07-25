@@ -172,6 +172,10 @@
     "translation": "**주의: 플러그인은 잠재적으로 신뢰할 수 없는 작성자가 쓴 바이너리입니다. 플러그인 설치와 사용에 따른 위험은 사용자의 몫입니다.**\n\n{{.Plugin}} 플러그인을 설치하시겠습니까? "
   },
   {
+    "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },
@@ -354,6 +358,10 @@
   {
     "id": "App name is a required field",
     "translation": "앱 이름은 필수 필드임"
+  },
+  {
+    "id": "App process to update",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} already exists.",
@@ -1717,6 +1725,10 @@
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS_NAME]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo",
     "translation": ""
   },
   {
@@ -5624,6 +5636,10 @@
     "translation": "팁: 변경사항을 적용하려면 앱을 다시 시작해야 합니다. "
   },
   {
+    "id": "TIP: An app restart is required for the change to take effect.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
     "translation": ""
   },
@@ -6370,6 +6386,10 @@
   {
     "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에 대한 상태 검사 유형 업데이트 중..."
+  },
+  {
+    "id": "Updating health check type for app {{.AppName}} process {{.ProcessType}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",

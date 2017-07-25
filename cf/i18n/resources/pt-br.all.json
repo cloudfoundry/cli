@@ -172,6 +172,10 @@
     "translation": "**Atenção: Plug-ins são binários gravados por autores potencialmente não confiáveis. Instale e use plug-ins por sua conta e risco.**\n\nDeseja instalar o plug-in {{.Plugin}}?"
   },
   {
+    "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Create a V3 App",
     "translation": ""
   },
@@ -354,6 +358,10 @@
   {
     "id": "App name is a required field",
     "translation": "Nome do app é um campo obrigatório"
+  },
+  {
+    "id": "App process to update",
+    "translation": ""
   },
   {
     "id": "App {{.AppName}} already exists.",
@@ -1717,6 +1725,10 @@
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS_NAME]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo",
     "translation": ""
   },
   {
@@ -5624,6 +5636,10 @@
     "translation": "DICA: é necessária uma reinicialização do app para que a mudança entre em vigor."
   },
   {
+    "id": "TIP: An app restart is required for the change to take effect.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
     "translation": ""
   },
@@ -6370,6 +6386,10 @@
   {
     "id": "Updating health check type for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Atualizando o tipo de verificação de funcionamento para o app {{.AppName}} na organização {{.OrgName}}/espaço {{.SpaceName}} como {{.Username}}..."
+  },
+  {
+    "id": "Updating health check type for app {{.AppName}} process {{.ProcessType}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Updating isolation segment of space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
