@@ -14,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/progressbar"
-	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/cloudfoundry/noaa/consumer"
 	log "github.com/sirupsen/logrus"
 )
@@ -149,11 +148,13 @@ func (cmd V2PushCommand) Execute(args []string) error {
 			cmd.UI.DisplayText("Updating app with these attributes...")
 		}
 		log.Infoln("starting create/update:", appConfig.DesiredApplication.Name)
-		err := cmd.displayChanges(appConfig)
+		changes := shared.GetApplicationChanges(appConfig)
+		err := cmd.UI.DisplayChangesForPush(changes)
 		if err != nil {
 			log.Errorln("display changes:", err)
 			return shared.HandleError(err)
 		}
+		cmd.UI.DisplayNewline()
 	}
 
 	for appNumber, appConfig := range appConfigs {
@@ -217,59 +218,6 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	log.Debugf("%#v", config)
 	return config, nil
-}
-
-func (cmd V2PushCommand) displayChanges(appConfig pushaction.ApplicationConfig) error {
-	var currentRoutes []string
-	for _, route := range appConfig.CurrentRoutes {
-		currentRoutes = append(currentRoutes, route.String())
-	}
-
-	var desiredRotues []string
-	for _, route := range appConfig.DesiredRoutes {
-		desiredRotues = append(desiredRotues, route.String())
-	}
-
-	changes := []ui.Change{
-		{
-			Header:       "name:",
-			CurrentValue: appConfig.CurrentApplication.Name,
-			NewValue:     appConfig.DesiredApplication.Name,
-		},
-	}
-
-	if appConfig.DesiredApplication.DockerImage != "" {
-		changes = append(changes,
-			ui.Change{
-				Header:       "docker image:",
-				CurrentValue: appConfig.CurrentApplication.DockerImage,
-				NewValue:     appConfig.DesiredApplication.DockerImage,
-			})
-	} else {
-		changes = append(changes,
-			ui.Change{
-				Header:       "path:",
-				CurrentValue: appConfig.Path,
-				NewValue:     appConfig.Path,
-			})
-	}
-
-	changes = append(changes,
-		ui.Change{
-			Header:       "routes:",
-			CurrentValue: currentRoutes,
-			NewValue:     desiredRotues,
-		})
-
-	err := cmd.UI.DisplayChangesForPush(changes)
-
-	if err != nil {
-		log.Errorln("display changes:", err)
-		return shared.HandleError(err)
-	}
-
-	cmd.UI.DisplayNewline()
-	return nil
 }
 
 func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {

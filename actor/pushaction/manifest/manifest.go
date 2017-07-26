@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -20,16 +21,34 @@ type Application struct {
 	DiskQuota               uint64
 	DockerImage             string
 	HealthCheckHTTPEndpoint string
-	HealthCheckType         string
-	Instances               int
+	// HealthCheckType attribute defines the number of seconds that is allocated
+	// for starting an application.
+	HealthCheckTimeout int
+	HealthCheckType    string
+	Instances          int
 	// Memory is the amount of memory in megabytes.
 	Memory    uint64
 	Name      string
 	Path      string
 	StackName string
-	// HealthCheckType attribute defines the number of seconds that is allocated
-	// for starting an application.
-	HealthCheckTimeout int
+}
+
+func (app Application) String() string {
+	return fmt.Sprintf(
+		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Path: '%s', Stack Name: '%s'",
+		app.Name,
+		app.Buildpack,
+		app.Command,
+		app.DiskQuota,
+		app.DockerImage,
+		app.HealthCheckHTTPEndpoint,
+		app.HealthCheckTimeout,
+		app.HealthCheckType,
+		app.Instances,
+		app.Memory,
+		app.Path,
+		app.StackName,
+	)
 }
 
 func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {

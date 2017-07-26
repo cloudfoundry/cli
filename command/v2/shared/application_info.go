@@ -40,7 +40,11 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 	}
 
 	if displayStartCommand {
-		table = append(table, []string{ui.TranslateText("start command:"), appSummary.Application.DetectedStartCommand})
+		startCommand := appSummary.Application.Command
+		if startCommand == "" {
+			startCommand = appSummary.Application.DetectedStartCommand
+		}
+		table = append(table, []string{ui.TranslateText("start command:"), startCommand})
 	}
 
 	if appSummary.IsolationSegment != "" {
