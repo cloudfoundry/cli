@@ -48,14 +48,13 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
+	offset := strings.Repeat(" ", stringTypePadding)
 	switch oVal := originalValue.(type) {
 	case string:
 		nVal, ok := newValue.(string)
 		if !ok {
 			return ErrValueMissmatch
 		}
-
-		offset := strings.Repeat(" ", stringTypePadding)
 
 		if oVal != nVal {
 			formattedOld := fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
@@ -91,6 +90,25 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 				fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 			}
 		}
+	case int:
+		nVal, ok := newValue.(int)
+		if !ok {
+			return ErrValueMissmatch
+		}
+
+		if oVal != nVal {
+			formattedOld := fmt.Sprintf("- %s%s%d", ui.TranslateText(header), offset, oVal)
+			formattedNew := fmt.Sprintf("+ %s%s%d", ui.TranslateText(header), offset, nVal)
+
+			if oVal != 0 {
+				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+			}
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		} else {
+			fmt.Fprintf(ui.Out, "  %s%s%d\n", ui.TranslateText(header), offset, oVal)
+		}
+	default:
+		panic(fmt.Sprintf("diff display does not have case for '%s'", header))
 	}
 	return nil
 }

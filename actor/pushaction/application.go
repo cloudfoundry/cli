@@ -1,6 +1,8 @@
 package pushaction
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/actor/v2action"
 	log "github.com/sirupsen/logrus"
 )
@@ -8,6 +10,10 @@ import (
 type Application struct {
 	v2action.Application
 	Stack v2action.Stack
+}
+
+func (app Application) String() string {
+	return fmt.Sprintf("%s, Stack Name: '%s'", app.Application, app.Stack.Name)
 }
 
 func (app *Application) SetStack(stack v2action.Stack) {

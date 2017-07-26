@@ -78,6 +78,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		if err != nil {
 			return nil, warnings, err
 		}
+		log.Debugln("post overriding config:", config.DesiredApplication)
 
 		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID, spaceGUID, config.CurrentRoutes)
 		warnings = append(warnings, routeWarnings...)

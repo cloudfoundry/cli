@@ -120,32 +120,12 @@ var _ = Describe("v2-push Command", func() {
 							CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, State: ccv2.ApplicationStarted}},
 							DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName}},
 							CurrentRoutes: []v2action.Route{
-								{
-									Host: "route1",
-									Domain: v2action.Domain{
-										Name: "example.com",
-									},
-								},
-								{
-									Host: "route2",
-									Domain: v2action.Domain{
-										Name: "example.com",
-									},
-								},
+								{Host: "route1", Domain: v2action.Domain{Name: "example.com"}},
+								{Host: "route2", Domain: v2action.Domain{Name: "example.com"}},
 							},
 							DesiredRoutes: []v2action.Route{
-								{
-									Host: "route3",
-									Domain: v2action.Domain{
-										Name: "example.com",
-									},
-								},
-								{
-									Host: "route4",
-									Domain: v2action.Domain{
-										Name: "example.com",
-									},
-								},
+								{Host: "route3", Domain: v2action.Domain{Name: "example.com"}},
+								{Host: "route4", Domain: v2action.Domain{Name: "example.com"}},
 							},
 							TargetedSpaceGUID: "some-space-guid",
 							Path:              pwd,
@@ -425,6 +405,20 @@ var _ = Describe("v2-push Command", func() {
 						Expect(progressBar).To(Equal(fakeProgressBar))
 					})
 
+					It("display diff of changes", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
+						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
+						Expect(testUI.Out).To(Say("\\s+routes:"))
+						for _, route := range appConfigs[0].CurrentRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
+						for _, route := range appConfigs[0].DesiredRoutes {
+							Expect(testUI.Out).To(Say(route.String()))
+						}
+					})
+
 					It("displays app events and warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
@@ -468,18 +462,50 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Err).To(Say("app-summary-warning"))
 					})
 
-					It("display diff of changes", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+					Context("when the start command is explicitly set", func() {
+						BeforeEach(func() {
+							applicationSummary := v2action.ApplicationSummary{
+								Application: v2action.Application{
+									Command:              "a-different-start-command",
+									DetectedBuildpack:    "some-buildpack",
+									DetectedStartCommand: "some start command",
+									GUID:                 "some-app-guid",
+									Instances:            3,
+									Memory:               128,
+									Name:                 appName,
+									PackageUpdatedAt:     time.Unix(0, 0),
+									State:                "STARTED",
+								},
+								Stack: v2action.Stack{
+									Name: "potatos",
+								},
+								Routes: []v2action.Route{
+									{
+										Host: "banana",
+										Domain: v2action.Domain{
+											Name: "fruit.com",
+										},
+										Path: "/hi",
+									},
+									{
+										Domain: v2action.Domain{
+											Name: "foobar.com",
+										},
+										Port: 13,
+									},
+								},
+							}
+							warnings := []string{"app-summary-warning"}
 
-						Expect(testUI.Out).To(Say("\\s+name:\\s+%s", appName))
-						Expect(testUI.Out).To(Say("\\s+path:\\s+%s", regexp.QuoteMeta(appConfigs[0].Path)))
-						Expect(testUI.Out).To(Say("\\s+routes:"))
-						for _, route := range appConfigs[0].CurrentRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
-						for _, route := range appConfigs[0].DesiredRoutes {
-							Expect(testUI.Out).To(Say(route.String()))
-						}
+							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
+
+							fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+						})
+
+						It("displays the correct start command", func() {
+							Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("start command:\\s+a-different-start-command"))
+						})
 					})
 				})
 

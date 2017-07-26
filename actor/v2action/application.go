@@ -150,6 +150,27 @@ func (application Application) Started() bool {
 	return application.State == ccv2.ApplicationStarted
 }
 
+func (app Application) String() string {
+	return fmt.Sprintf(
+		"App Name: '%s', Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
+		app.Name,
+		app.Buildpack,
+		app.Command,
+		app.DetectedBuildpack,
+		app.DetectedStartCommand,
+		app.DiskQuota,
+		app.DockerImage,
+		app.HealthCheckHTTPEndpoint,
+		app.HealthCheckTimeout,
+		app.HealthCheckType,
+		app.Instances,
+		app.Memory,
+		app.SpaceGUID,
+		app.StackGUID,
+		app.State,
+	)
+}
+
 // CreateApplication creates an application.
 func (actor Actor) CreateApplication(application Application) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.CreateApplication(ccv2.Application(application))
