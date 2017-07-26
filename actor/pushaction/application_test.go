@@ -99,7 +99,25 @@ var _ = Describe("Applications", func() {
 						SpaceGUID: "some-space-guid",
 						Buildpack: "ruby",
 					}))
+				})
 
+				Context("when the stack guid is not being updated", func() {
+					BeforeEach(func() {
+						config.CurrentApplication.StackGUID = "some-stack-guid"
+						config.DesiredApplication.StackGUID = "some-stack-guid"
+					})
+
+					It("does not send the stack guid on update", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.UpdateApplicationArgsForCall(0)).To(Equal(v2action.Application{
+							Name:      "some-app-name",
+							GUID:      "some-app-guid",
+							SpaceGUID: "some-space-guid",
+							Buildpack: "ruby",
+						}))
+					})
 				})
 			})
 
