@@ -43,7 +43,7 @@ type Application struct {
 	DetectedStartCommand string `json:"-"`
 
 	// DiskQuota is the disk given to each instance, in megabytes.
-	DiskQuota uint64 `json:"-"`
+	DiskQuota uint64 `json:"disk_quota,omitempty"`
 
 	// DockerImage is the docker image location.
 	DockerImage string `json:"docker_image,omitempty"`
@@ -62,10 +62,10 @@ type Application struct {
 	HealthCheckHTTPEndpoint string `json:"health_check_http_endpoint,omitempty"`
 
 	// Instances is the total number of app instances.
-	Instances int `json:"-"`
+	Instances int `json:"instances,omitempty"`
 
 	// Memory is the memory given to each instance, in megabytes.
-	Memory uint64 `json:"-"`
+	Memory uint64 `json:"memory,omitempty"`
 
 	// Name is the name given to the application.
 	Name string `json:"name,omitempty"`
@@ -80,7 +80,7 @@ type Application struct {
 	SpaceGUID string `json:"space_guid,omitempty"`
 
 	// StackGUID is the GUID for the Stack the application is running on.
-	StackGUID string `json:"-"`
+	StackGUID string `json:"stack_guid,omitempty"`
 
 	// StagingFailedDescription is the verbose description of why the package
 	// failed to stage.

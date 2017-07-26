@@ -299,11 +299,17 @@ var _ = Describe("Application", func() {
 					"state": "STARTED"
 				}
 			}`
-					expectedBody := map[string]string{
+					expectedBody := map[string]interface{}{
+						"buildpack":                  "ruby 1.6.29",
+						"command":                    "some-command",
+						"disk_quota":                 586,
+						"docker_image":               "some-docker-path",
 						"health_check_http_endpoint": "/anything",
 						"health_check_type":          "some-health-check-type",
+						"instances":                  13,
+						"memory":                     1024,
+						"stack_guid":                 "some-stack-guid",
 						"state":                      "STARTED",
-						"docker_image":               "some-docker-path",
 					}
 
 					server.AppendHandlers(
@@ -317,11 +323,17 @@ var _ = Describe("Application", func() {
 
 				It("returns the updated object and warnings and sends all updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
-						DockerImage:             "some-docker-path",
-						GUID:                    "some-app-guid",
-						HealthCheckType:         "some-health-check-type",
+						Buildpack:   "ruby 1.6.29",
+						Command:     "some-command",
+						DiskQuota:   586,
+						DockerImage: "some-docker-path",
+						GUID:        "some-app-guid",
 						HealthCheckHTTPEndpoint: "/anything",
-						State: ApplicationStarted,
+						HealthCheckType:         "some-health-check-type",
+						Instances:               13,
+						Memory:                  1024,
+						StackGUID:               "some-stack-guid",
+						State:                   ApplicationStarted,
 					})
 					Expect(err).NotTo(HaveOccurred())
 
