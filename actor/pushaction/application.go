@@ -24,8 +24,15 @@ func (app *Application) SetStack(stack v2action.Stack) {
 func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfig, Event, Warnings, error) {
 	log.Debugf("creating or updating application")
 	if config.UpdatingApplication() {
-		log.Debugf("updating application: %#v", config.DesiredApplication)
-		app, warnings, err := actor.V2Actor.UpdateApplication(config.DesiredApplication.Application)
+		app := config.DesiredApplication.Application
+
+		// Apps updates with both docker image and stack guids fail. So do not send
+		// StackGUID unless it is necessary.
+		if config.CurrentApplication.StackGUID == config.DesiredApplication.StackGUID {
+			app.StackGUID = ""
+		}
+		log.Debugf("updating application: %#v", app)
+		app, warnings, err := actor.V2Actor.UpdateApplication(app)
 		if err != nil {
 			log.Errorln("updating application:", err)
 			return ApplicationConfig{}, "", Warnings(warnings), err

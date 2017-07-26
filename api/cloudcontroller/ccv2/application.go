@@ -218,7 +218,8 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 	return fullAppsList, warnings, err
 }
 
-// UpdateApplication updates the application with the given GUID.
+// UpdateApplication updates the application with the given GUID. Note: Sending
+// DockerImage and StackGUID at the same time will result in an API error.
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
 	appGUID := app.GUID
 	app.GUID = ""
