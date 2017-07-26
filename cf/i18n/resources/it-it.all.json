@@ -6760,6 +6760,10 @@
     "translation": ""
   },
   {
+    "id": "command:",
+    "translation": ""
+  },
+  {
     "id": "cpu",
     "translation": "cpu"
   },
@@ -6802,6 +6806,10 @@
   {
     "id": "disk",
     "translation": "disco"
+  },
+  {
+    "id": "disk quota:",
+    "translation": ""
   },
   {
     "id": "disk:",
@@ -6889,6 +6897,14 @@
   },
   {
     "id": "health check",
+    "translation": ""
+  },
+  {
+    "id": "health check http endpoint:",
+    "translation": ""
+  },
+  {
+    "id": "health check timeout:",
     "translation": ""
   },
   {
