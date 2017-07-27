@@ -424,8 +424,8 @@ var _ = Describe("v2-push Command", func() {
 
 						Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Checking for existing files on server\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
+						Expect(testUI.Out).To(Say("Optimizing package size\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
 						Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
