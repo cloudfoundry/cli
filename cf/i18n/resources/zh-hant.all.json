@@ -280,6 +280,10 @@
     "translation": "APP_NAME"
   },
   {
+    "id": "Aborting push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
+    "translation": ""
+  },
+  {
     "id": "Access for plans of a particular broker",
     "translation": "特定分配管理系統之方案的存取權"
   },
@@ -5613,10 +5617,6 @@
   },
   {
     "id": "Stopping app...",
-    "translation": ""
-  },
-  {
-    "id": "Stopping push: File {{.Filename}} has been modified since the start of push. Validate the correct state of the file and try again.",
     "translation": ""
   },
   {
