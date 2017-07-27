@@ -127,6 +127,22 @@ var _ = Describe("Request Logger", func() {
 				})
 			})
 
+			Context("when the request's Content-Type is application/x-www-form-urlencoded", func() {
+				BeforeEach(func() {
+					request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				})
+
+				It("outputs the body", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					bytes, err := ioutil.ReadAll(request.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(bytes).To(Equal([]byte("foo")))
+					Expect(fakeOutput.DisplayMessageCallCount()).To(Equal(1))
+					Expect(fakeOutput.DisplayMessageArgsForCall(0)).To(Equal("[application/x-www-form-urlencoded foo]"))
+				})
+			})
+
 			Context("when request's Content-Type is anything else", func() {
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "banana;rama")
