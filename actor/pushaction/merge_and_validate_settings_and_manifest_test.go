@@ -42,7 +42,41 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
-	Context("when passed command line settings and manifests", func() {
+	Context("when passed command line settings and a single manifest application", func() {
+		var (
+			apps       []manifest.Application
+			mergedApps []manifest.Application
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			cmdSettings = CommandLineSettings{
+				CurrentDirectory: currentDirectory,
+				Name:             "steve",
+			}
+
+			apps = []manifest.Application{
+				{Name: "app-1"},
+			}
+		})
+
+		JustBeforeEach(func() {
+			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
+		})
+
+		It("merges command line settings and manifest apps", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(mergedApps).To(ConsistOf(
+				manifest.Application{
+					Name: "steve",
+					Path: currentDirectory,
+				},
+			))
+		})
+	})
+
+	Context("when passed command line settings and multiple manifest applications", func() {
 		var (
 			apps       []manifest.Application
 			mergedApps []manifest.Application

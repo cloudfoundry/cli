@@ -42,6 +42,14 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	if len(apps) == 0 {
 		mergedApps = actor.generateAppSettingsFromCommandLineSettings(settings)
 	} else {
+		if settings.Name != "" && len(apps) > 1 {
+			var err error
+			apps, err = actor.selectApp(settings.Name, apps)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		err := actor.validatePremergedSettings(settings, apps)
 		if err != nil {
 			return nil, err
@@ -49,13 +57,6 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 
 		for _, app := range apps {
 			mergedApps = append(mergedApps, settings.OverrideManifestSettings(app))
-		}
-
-		if settings.Name != "" {
-			mergedApps, err = actor.selectApp(settings.Name, mergedApps)
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
 
