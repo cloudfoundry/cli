@@ -73,7 +73,7 @@ func (client *Client) ResourceMatch(resourcesToMatch []Resource) ([]Resource, Wa
 		return nil, nil, err
 	}
 
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("Content-Type", "application/json")
 
 	var matchedResources []Resource
 	response := cloudcontroller.Response{
