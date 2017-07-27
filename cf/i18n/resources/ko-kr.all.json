@@ -1832,10 +1832,6 @@
     "translation": "비밀번호 변경 중..."
   },
   {
-    "id": "Checking for existing files on server...",
-    "translation": ""
-  },
-  {
     "id": "Checking for route...",
     "translation": "라우트 확인 중..."
   },
@@ -1877,6 +1873,10 @@
   },
   {
     "id": "Commands offered by installed plugins:",
+    "translation": ""
+  },
+  {
+    "id": "Comparing local files to remote cache...",
     "translation": ""
   },
   {
@@ -4277,6 +4277,10 @@
   },
   {
     "id": "One-time passcode",
+    "translation": ""
+  },
+  {
+    "id": "Optimizing package size...",
     "translation": ""
   },
   {

@@ -1832,10 +1832,6 @@
     "translation": "Modifica della password in corso..."
   },
   {
-    "id": "Checking for existing files on server...",
-    "translation": ""
-  },
-  {
     "id": "Checking for route...",
     "translation": "Controllo della rotta in corso..."
   },
@@ -1877,6 +1873,10 @@
   },
   {
     "id": "Commands offered by installed plugins:",
+    "translation": ""
+  },
+  {
+    "id": "Comparing local files to remote cache...",
     "translation": ""
   },
   {
@@ -4277,6 +4277,10 @@
   },
   {
     "id": "One-time passcode",
+    "translation": ""
+  },
+  {
+    "id": "Optimizing package size...",
     "translation": ""
   },
   {
