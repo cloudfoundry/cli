@@ -57,7 +57,6 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 
 					Eventually(session).Should(Say("Creating app %s\\.\\.\\.", firstApp))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-					Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
 					Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 					Eventually(session).Should(Say("100.00%"))
 					Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
@@ -67,7 +66,6 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 
 					Eventually(session).Should(Say("Creating app %s\\.\\.\\.", secondApp))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-					Eventually(session).Should(Say("Packaging files to upload\\.\\.\\."))
 					Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 					Eventually(session).Should(Say("100.00%"))
 					Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
