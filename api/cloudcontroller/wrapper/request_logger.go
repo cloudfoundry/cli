@@ -91,16 +91,28 @@ func (logger *RequestLogger) displayRequest(request *cloudcontroller.Request) er
 	}
 
 	contentType := request.Header.Get("Content-Type")
-	if request.Body != nil && strings.Contains(contentType, "json") {
-		rawRequestBody, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			return err
+	if request.Body != nil {
+		if strings.Contains(contentType, "json") {
+			rawRequestBody, err := ioutil.ReadAll(request.Body)
+			if err != nil {
+				return err
+			}
+
+			defer request.ResetBody()
+
+			return logger.output.DisplayJSONBody(rawRequestBody)
+		} else if strings.Contains(contentType, "x-www-form-urlencoded") {
+			rawRequestBody, err := ioutil.ReadAll(request.Body)
+			if err != nil {
+				return err
+			}
+
+			defer request.ResetBody()
+
+			return logger.output.DisplayMessage(fmt.Sprintf("[application/x-www-form-urlencoded %s]", rawRequestBody))
 		}
-
-		defer request.ResetBody()
-
-		return logger.output.DisplayJSONBody(rawRequestBody)
-	} else if contentType != "" {
+	}
+	if contentType != "" {
 		return logger.output.DisplayMessage(fmt.Sprintf("[%s Content Hidden]", strings.Split(contentType, ";")[0]))
 	}
 	return nil
