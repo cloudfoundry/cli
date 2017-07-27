@@ -131,6 +131,33 @@ var _ = Describe("Resource Actions", func() {
 				})
 			})
 
+			Context("when default ignored files exist in the app dir", func() {
+				BeforeEach(func() {
+					for _, filename := range DefaultIgnoreLines {
+						err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
+						Expect(err).ToNot(HaveOccurred())
+					}
+
+					for _, filename := range DefaultIgnoreLines {
+						err := ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
+						Expect(err).ToNot(HaveOccurred())
+					}
+				})
+
+				It("excludes all default files", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(gatheredResources).To(Equal(
+						[]Resource{
+							{Filename: "level1", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0766},
+							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
+							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
+						}))
+				})
+			})
+
 			Context("when trace files are in the source directory", func() {
 				BeforeEach(func() {
 					traceFilePath := filepath.Join(srcDir, "i-am-trace.txt")
