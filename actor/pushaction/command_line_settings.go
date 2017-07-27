@@ -8,9 +8,9 @@ import (
 
 type CommandLineSettings struct {
 	CurrentDirectory string
-	ProvidedAppPath  string
 	DockerImage      string
 	Name             string
+	ProvidedAppPath  string
 }
 
 func (settings CommandLineSettings) ApplicationPath() string {
@@ -21,6 +21,10 @@ func (settings CommandLineSettings) ApplicationPath() string {
 }
 
 func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Application) manifest.Application {
+	if settings.Name != "" {
+		app.Name = settings.Name
+	}
+
 	if settings.ProvidedAppPath != "" {
 		app.Path = settings.absoluteProvidedAppPath()
 	}

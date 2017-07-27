@@ -136,6 +136,29 @@ var _ = Describe("push with a simple manifest and flags", func() {
 			})
 		})
 
+		Context("manifest contains a name and a name is provided", func() {
+			It("overrides the manifest name", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]string{
+							{
+								"name": "earle",
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+					Eventually(session).Should(Say("requested state:\\s+started"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("app", appName)
+				Eventually(session).Should(Say("name:\\s+%s", appName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("manifest contains multiple apps and a '-p' is provided", func() {
 			var tempDir string
 
