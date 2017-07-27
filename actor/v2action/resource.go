@@ -22,6 +22,18 @@ const (
 	MaxResourceMatchChunkSize     = 1000
 )
 
+var DefaultIgnoreLines = []string{
+	".cfignore",
+	".DS_Store",
+	".git",
+	".gitignore",
+	".hg",
+	".svn",
+	"_darcs",
+	"manifest.yaml",
+	"manifest.yml",
+}
+
 type FileChangedError struct {
 	Filename string
 }
@@ -380,7 +392,7 @@ func (Actor) addFileToZipFromFileSystem(
 func (actor Actor) extractCFIgnore(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
 
-	additionalIgnoreLines := []string{".cfignore"}
+	additionalIgnoreLines := DefaultIgnoreLines
 	_, traceFiles := actor.Config.Verbose()
 	for _, traceFilePath := range traceFiles {
 		if relPath, err := filepath.Rel(sourceDir, traceFilePath); err == nil {
