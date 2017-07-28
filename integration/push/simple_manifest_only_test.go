@@ -80,6 +80,36 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 					Eventually(session).Should(Say("#0.* of 70M"))
 					Eventually(session).Should(Exit(0))
 				})
+
+				Context("when health-check-type is http and no endpoint is provided", func() {
+					It("defaults health-check-http-endpoint to '/'", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":              appName,
+										"path":              dir,
+										"health-check-type": "http",
+									},
+								},
+							})
+
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+							Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
+							Eventually(session).Should(Say("\\s+health check type:\\s+http"))
+							Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+							Eventually(session).Should(Say("requested state:\\s+started"))
+							Eventually(session).Should(Exit(0))
+						})
+
+						session := helpers.CF("app", appName)
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 
 			Context("when the app has no name", func() {
