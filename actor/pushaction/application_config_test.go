@@ -255,7 +255,7 @@ var _ = Describe("Application Config", func() {
 
 			Context("when the manifest contains all the properties", func() {
 				BeforeEach(func() {
-					manifestApps[0].Buildpack = "some-buildpack"
+					manifestApps[0].BuildpackName = "some-buildpack"
 					manifestApps[0].Command = "some-buildpack"
 					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
 					manifestApps[0].HealthCheckTimeout = 5

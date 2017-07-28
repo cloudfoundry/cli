@@ -146,8 +146,8 @@ func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath 
 }
 
 func (Actor) overrideApplicationProperties(application Application, manifest manifest.Application) Application {
-	if manifest.Buildpack != "" {
-		application.Buildpack = manifest.Buildpack
+	if manifest.BuildpackName != "" {
+		application.Buildpack = manifest.BuildpackName
 	}
 	if manifest.Command != "" {
 		application.Command = manifest.Command

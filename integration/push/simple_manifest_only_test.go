@@ -29,14 +29,17 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 							"applications": []map[string]interface{}{
 								{
-									"name":       appName,
-									"path":       dir,
-									"command":    "echo 'hi' && $HOME/boot.sh",
-									"buildpack":  "staticfile_buildpack",
-									"disk_quota": "300M",
-									"instances":  2,
-									"memory":     "70M",
-									"stack":      "cflinuxfs2",
+									"name":                       appName,
+									"path":                       dir,
+									"command":                    "echo 'hi' && $HOME/boot.sh",
+									"buildpack":                  "staticfile_buildpack",
+									"disk_quota":                 "300M",
+									"instances":                  2,
+									"memory":                     "70M",
+									"stack":                      "cflinuxfs2",
+									"health-check-type":          "http",
+									"health-check-http-endpoint": "/",
+									"timeout":                    180,
 								},
 							},
 						})
@@ -49,6 +52,9 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
 						Eventually(session).Should(Say("\\s+command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
 						Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
+						Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
+						Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
+						Eventually(session).Should(Say("\\s+health check type:\\s+http"))
 						Eventually(session).Should(Say("\\s+instances:\\s+2"))
 						Eventually(session).Should(Say("\\s+memory:\\s+70M"))
 						Eventually(session).Should(Say("\\s+stack:\\s+cflinuxfs2"))

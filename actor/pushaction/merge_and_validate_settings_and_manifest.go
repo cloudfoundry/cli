@@ -40,7 +40,8 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	var mergedApps []manifest.Application
 
 	if len(apps) == 0 {
-		mergedApps = actor.generateAppSettingsFromCommandLineSettings(settings)
+		log.Info("no manifest, generating one from command line settings")
+		mergedApps = append(mergedApps, settings.OverrideManifestSettings(manifest.Application{}))
 	} else {
 		if settings.Name != "" && len(apps) > 1 {
 			var err error
@@ -64,18 +65,6 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 	return mergedApps, actor.validateMergedSettings(mergedApps)
 }
 
-func (Actor) generateAppSettingsFromCommandLineSettings(settings CommandLineSettings) []manifest.Application {
-	log.Info("no manifest, generating one from command line settings")
-
-	appSettings := []manifest.Application{{
-		DockerImage: settings.DockerImage,
-		Name:        settings.Name,
-		Path:        settings.ApplicationPath(),
-	}}
-
-	return appSettings
-}
-
 func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.Application, error) {
 	var returnedApps []manifest.Application
 	for _, app := range apps {
@@ -91,9 +80,21 @@ func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.
 }
 
 func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {
-	if settings.ProvidedAppPath != "" && len(apps) > 1 {
-		log.Error("cannot use -p with multiple apps")
-		return CommandLineOptionsWithMultipleAppsError{}
+	if len(apps) > 1 {
+		switch {
+		case settings.BuildpackName != "",
+			settings.Command != "",
+			settings.DiskQuota != 0,
+			settings.DockerImage != "",
+			settings.HealthCheckTimeout != 0,
+			settings.HealthCheckType != "",
+			settings.Instances != 0,
+			settings.Memory != 0,
+			settings.ProvidedAppPath != "",
+			settings.StackName != "":
+			log.Error("cannot use some parameters with multiple apps")
+			return CommandLineOptionsWithMultipleAppsError{}
+		}
 	}
 	return nil
 }

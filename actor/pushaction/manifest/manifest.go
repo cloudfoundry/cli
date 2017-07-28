@@ -15,8 +15,8 @@ type Manifest struct {
 }
 
 type Application struct {
-	Buildpack string
-	Command   string
+	BuildpackName string
+	Command       string
 	// DiskQuota is the disk size in megabytes.
 	DiskQuota               uint64
 	DockerImage             string
@@ -37,7 +37,7 @@ func (app Application) String() string {
 	return fmt.Sprintf(
 		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Path: '%s', Stack Name: '%s'",
 		app.Name,
-		app.Buildpack,
+		app.BuildpackName,
 		app.Command,
 		app.DiskQuota,
 		app.DockerImage,
@@ -71,7 +71,7 @@ func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error 
 		return err
 	}
 
-	a.Buildpack = manifestApp.Buildpack
+	a.BuildpackName = manifestApp.Buildpack
 	a.Command = manifestApp.Command
 	a.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
 	a.HealthCheckType = manifestApp.HealthCheckType
