@@ -323,7 +323,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	case pushaction.ResourceMatching:
 		cmd.UI.DisplayText("Comparing local files to remote cache...")
 	case pushaction.CreatingArchive:
-		cmd.UI.DisplayText("Optimizing package size...")
+		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
 		cmd.UI.DisplayText("Uploading files...")
 		log.Debug("starting progress bar")
