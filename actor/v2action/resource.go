@@ -67,8 +67,19 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 		return nil, err
 	}
 
+	gitIgnore, err := actor.generateArchiveCFIgnoreMatcher(reader.File)
+	if err != nil {
+		log.Errorln("reading .cfignore file:", err)
+		return nil, err
+	}
+
 	for _, archivedFile := range reader.File {
-		resource := Resource{Filename: filepath.ToSlash(archivedFile.Name)}
+		filename := filepath.ToSlash(archivedFile.Name)
+		if gitIgnore.MatchesPath(filename) {
+			continue
+		}
+
+		resource := Resource{Filename: filename}
 		if archivedFile.FileInfo().IsDir() {
 			resource.Mode = DefaultFolderPermissions
 		} else {
@@ -101,7 +112,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 		gitIgnore *ignore.GitIgnore
 	)
 
-	gitIgnore, err := actor.extractCFIgnore(sourceDir)
+	gitIgnore, err := actor.generateDirectoryCFIgnoreMatcher(sourceDir)
 	if err != nil {
 		log.Errorln("reading .cfignore file:", err)
 		return nil, err
@@ -389,10 +400,32 @@ func (Actor) addFileToZipFromFileSystem(
 	return nil
 }
 
-func (actor Actor) extractCFIgnore(sourceDir string) (*ignore.GitIgnore, error) {
+func (Actor) generateArchiveCFIgnoreMatcher(files []*zip.File) (*ignore.GitIgnore, error) {
+	for _, item := range files {
+		if strings.HasSuffix(item.Name, ".cfignore") {
+			fileReader, err := item.Open()
+			if err != nil {
+				return nil, err
+			}
+			defer fileReader.Close()
+
+			raw, err := ioutil.ReadAll(fileReader)
+			if err != nil {
+				return nil, err
+			}
+			s := append(DefaultIgnoreLines, strings.Split(string(raw), "\n")...)
+			return ignore.CompileIgnoreLines(s...)
+		}
+	}
+	return ignore.CompileIgnoreLines(DefaultIgnoreLines...)
+}
+
+func (actor Actor) generateDirectoryCFIgnoreMatcher(sourceDir string) (*ignore.GitIgnore, error) {
 	pathToCFIgnore := filepath.Join(sourceDir, ".cfignore")
 
 	additionalIgnoreLines := DefaultIgnoreLines
+
+	// If verbose logging has files in the current dir, ignore them
 	_, traceFiles := actor.Config.Verbose()
 	for _, traceFilePath := range traceFiles {
 		if relPath, err := filepath.Rel(sourceDir, traceFilePath); err == nil {

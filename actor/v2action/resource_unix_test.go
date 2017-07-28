@@ -51,16 +51,25 @@ var _ = Describe("Resource Actions", func() {
 
 	Describe("GatherArchiveResources", func() {
 		Context("when the archive exists", func() {
-			var archive string
+			var (
+				archive string
+
+				resources  []Resource
+				executeErr error
+			)
 
 			BeforeEach(func() {
 				tmpfile, err := ioutil.TempFile("", "example")
 				Expect(err).ToNot(HaveOccurred())
-				defer tmpfile.Close()
 				archive = tmpfile.Name()
+				Expect(tmpfile.Close()).ToNot(HaveOccurred())
+			})
 
-				err = zipit(srcDir, archive, "")
+			JustBeforeEach(func() {
+				err := zipit(srcDir, archive, "")
 				Expect(err).ToNot(HaveOccurred())
+
+				resources, executeErr = actor.GatherArchiveResources(archive)
 			})
 
 			AfterEach(func() {
@@ -68,8 +77,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 
 			It("gathers a list of all files in a source archive", func() {
-				resources, err := actor.GatherArchiveResources(archive)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(resources).To(Equal(
 					[]Resource{
@@ -80,6 +88,52 @@ var _ = Describe("Resource Actions", func() {
 						{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
 						{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
 					}))
+			})
+
+			Context("when a .cfignore file exists in the archive", func() {
+				BeforeEach(func() {
+					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("excludes all patterns of files mentioned in .cfignore", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(resources).To(Equal(
+						[]Resource{
+							{Filename: "/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/", Mode: DefaultFolderPermissions},
+							{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
+							{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
+						}))
+				})
+			})
+
+			Context("when default ignored files exist in the archive", func() {
+				BeforeEach(func() {
+					for _, filename := range DefaultIgnoreLines {
+						if filename != ".cfignore" {
+							err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
+							Expect(err).ToNot(HaveOccurred())
+							err = ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
+							Expect(err).ToNot(HaveOccurred())
+						}
+					}
+				})
+
+				It("excludes all default files", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(resources).To(Equal(
+						[]Resource{
+							{Filename: "/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/level2/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: DefaultArchiveFilePermissions},
+							{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
+							{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
+						}))
+				})
 			})
 		})
 
@@ -136,13 +190,12 @@ var _ = Describe("Resource Actions", func() {
 			Context("when default ignored files exist in the app dir", func() {
 				BeforeEach(func() {
 					for _, filename := range DefaultIgnoreLines {
-						err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
-						Expect(err).ToNot(HaveOccurred())
-					}
-
-					for _, filename := range DefaultIgnoreLines {
-						err := ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
-						Expect(err).ToNot(HaveOccurred())
+						if filename != ".cfignore" {
+							err := ioutil.WriteFile(filepath.Join(srcDir, filename), nil, 0655)
+							Expect(err).ToNot(HaveOccurred())
+							err = ioutil.WriteFile(filepath.Join(srcDir, "level1", filename), nil, 0655)
+							Expect(err).ToNot(HaveOccurred())
+						}
 					}
 				})
 
