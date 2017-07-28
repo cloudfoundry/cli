@@ -65,7 +65,7 @@ applications:
 			Expect(apps).To(ConsistOf(
 				Application{
 					Name:                    "app-1",
-					Buildpack:               "some-buildpack",
+					BuildpackName:           "some-buildpack",
 					Command:                 "some-command",
 					HealthCheckHTTPEndpoint: "\\some-endpoint",
 					HealthCheckType:         "http",

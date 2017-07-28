@@ -576,6 +576,32 @@ var _ = Describe("v2-push Command", func() {
 	})
 
 	Describe("GetCommandLineSettings", func() {
+		Context("when passed app related flags", func() {
+			BeforeEach(func() {
+				cmd.BuildpackName = "some-buildpack"
+				cmd.DiskQuota = flag.Megabytes{Size: 1024}
+				cmd.HealthCheckTimeout = 14
+				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
+				cmd.Instances = 12
+				cmd.Memory = flag.Megabytes{Size: 100}
+				cmd.StackName = "some-stack"
+				cmd.Command = "echo foo bar baz"
+			})
+
+			It("sets them on the command line settings", func() {
+				settings, err := cmd.GetCommandLineSettings()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(settings.BuildpackName).To(Equal("some-buildpack"))
+				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
+				Expect(settings.HealthCheckTimeout).To(Equal(14))
+				Expect(settings.HealthCheckType).To(Equal("http"))
+				Expect(settings.Instances).To(Equal(12))
+				Expect(settings.Memory).To(Equal(uint64(100)))
+				Expect(settings.StackName).To(Equal("some-stack"))
+				Expect(settings.Command).To(Equal("echo foo bar baz"))
+			})
+		})
+
 		Context("when the -o and -p flags are both given", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
