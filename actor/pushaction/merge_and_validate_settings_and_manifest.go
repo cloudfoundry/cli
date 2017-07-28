@@ -61,6 +61,8 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 		}
 	}
 
+	mergedApps = actor.setSaneDefaults(mergedApps)
+
 	log.Debugf("merged app settings: %#v", mergedApps)
 	return mergedApps, actor.validateMergedSettings(mergedApps)
 }
@@ -77,6 +79,16 @@ func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.
 	}
 
 	return returnedApps, nil
+}
+
+func (Actor) setSaneDefaults(apps []manifest.Application) []manifest.Application {
+	for i, app := range apps {
+		if app.HealthCheckType == "http" && app.HealthCheckHTTPEndpoint == "" {
+			apps[i].HealthCheckHTTPEndpoint = "/"
+		}
+	}
+
+	return apps
 }
 
 func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {

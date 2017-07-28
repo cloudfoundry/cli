@@ -52,9 +52,6 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 	if settings.HealthCheckType != "" {
 		app.HealthCheckType = settings.HealthCheckType
-		if settings.HealthCheckType == "http" {
-			app.HealthCheckHTTPEndpoint = "/"
-		}
 	}
 
 	if settings.Instances != 0 {

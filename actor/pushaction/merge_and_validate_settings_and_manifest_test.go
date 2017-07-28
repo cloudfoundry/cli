@@ -143,6 +143,43 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
+	Describe("defaulting values", func() {
+		var (
+			apps       []manifest.Application
+			mergedApps []manifest.Application
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			cmdSettings = CommandLineSettings{
+				CurrentDirectory: currentDirectory,
+			}
+
+			apps = []manifest.Application{
+				{Name: "app-1"},
+				{Name: "app-2"},
+			}
+		})
+
+		JustBeforeEach(func() {
+			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
+		})
+
+		Context("when HealthCheckType is set to http and no endpoint is set", func() {
+			BeforeEach(func() {
+				apps[0].HealthCheckType = "http"
+				apps[1].HealthCheckType = "http"
+				apps[1].HealthCheckHTTPEndpoint = "/banana"
+			})
+
+			It("sets health-check-http-endpoint to '/'", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(mergedApps[0].HealthCheckHTTPEndpoint).To(Equal("/"))
+				Expect(mergedApps[1].HealthCheckHTTPEndpoint).To(Equal("/banana"))
+			})
+		})
+	})
+
 	DescribeTable("validation errors",
 		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
 			_, err := actor.MergeAndValidateSettingsAndManifests(settings, apps)
