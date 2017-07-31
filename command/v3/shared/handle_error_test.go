@@ -81,6 +81,10 @@ var _ = Describe("HandleError", func() {
 			v3action.OrganizationNotFoundError{Name: "some-org"},
 			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
+		Entry("v3action.ProcessNotFoundError -> ProcessNotFoundError",
+			v3action.ProcessNotFoundError{ProcessType: "some-process-type"},
+			translatableerror.ProcessNotFoundError{ProcessType: "some-process-type"}),
+
 		Entry("v3action.StagingTimeoutError -> StagingTimeoutError",
 			v3action.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),

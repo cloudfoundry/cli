@@ -4656,6 +4656,10 @@
     "translation": "因信號 {{.Signal}} 而終止處理程序。結束碼 {{.ExitCode}}"
   },
   {
+    "id": "Process {{.ProcessType}} not found",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },

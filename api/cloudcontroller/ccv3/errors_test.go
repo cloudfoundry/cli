@@ -142,10 +142,31 @@ var _ = Describe("Error Wrapper", func() {
 					serverResponseCode = http.StatusNotFound
 				})
 
-				It("returns a ResourceNotFoundError", func() {
-					Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+				Context("when a process is not found", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10010,
+      "detail": "Process not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					})
+
+					It("returns a ProcessNotFoundError", func() {
+						Expect(makeError).To(MatchError(ccerror.ProcessNotFoundError{}))
+					})
 				})
 
+				Context("generic not found", func() {
+
+					It("returns a ResourceNotFoundError", func() {
+						Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+					})
+				})
 			})
 
 			Context("(422) Unprocessable Entity", func() {

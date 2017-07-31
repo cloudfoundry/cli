@@ -4656,6 +4656,10 @@
     "translation": "다음 신호로 프로세스가 종료됨: {{.Signal}}. {{.ExitCode}}(으)로 종료됨"
   },
   {
+    "id": "Process {{.ProcessType}} not found",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },

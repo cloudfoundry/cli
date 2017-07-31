@@ -353,9 +353,7 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns an error and warnings", func() {
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
-					Message: "Process not found",
-				}))
+				Expect(err).To(MatchError(ccerror.ProcessNotFoundError{}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
