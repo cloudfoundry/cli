@@ -11,12 +11,16 @@ type Stack ccv2.Stack
 
 // StackNotFoundError is returned when a requested stack is not found.
 type StackNotFoundError struct {
-	Name string
 	GUID string
+	Name string
 }
 
 func (e StackNotFoundError) Error() string {
-	return fmt.Sprintf("Stack with GUID '%s' not found.", e.GUID)
+	if e.Name == "" {
+		return fmt.Sprintf("Stack with GUID '%s' not found.", e.GUID)
+	}
+
+	return fmt.Sprintf("Stack '%s' not found.", e.Name)
 }
 
 // GetStack returns the stack information associated with the provided stack GUID.
