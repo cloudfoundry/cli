@@ -152,6 +152,24 @@ var _ = Describe("v3-set-health-check command", func() {
 
 				Eventually(session).Should(Exit(0))
 			})
+
+			Context("when the process type does not exist", func() {
+				BeforeEach(func() {
+					helpers.WithProcfileApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
+					})
+				})
+
+				It("returns a process not found error", func() {
+					userName, _ := helpers.GetCredentials()
+
+					session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "nonexistant-type")
+					Eventually(session.Out).Should(Say("Updating health check type for app %s process nonexistant-type in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Err).Should(Say("Process nonexistant-type not found"))
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 
 		Context("when the app does not exist", func() {

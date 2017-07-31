@@ -31,20 +31,23 @@ func HandleError(err error) error {
 		return translatableerror.NoOrganizationTargetedError{BinaryName: e.BinaryName}
 	case sharedaction.NoSpaceTargetedError:
 		return translatableerror.NoSpaceTargetedError{BinaryName: e.BinaryName}
+
 	case v3action.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
-	case v3action.TaskWorkersUnavailableError:
-		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
-	case v3action.OrganizationNotFoundError:
-		return translatableerror.OrganizationNotFoundError{Name: e.Name}
-	case v3action.StagingTimeoutError:
-		return translatableerror.StagingTimeoutError{AppName: e.AppName, Timeout: e.Timeout}
-	case v3action.IsolationSegmentNotFoundError:
-		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
 	case v3action.AssignDropletError:
 		return translatableerror.AssignDropletError{Message: e.Message}
 	case v3action.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError{Path: e.Path}
+	case v3action.IsolationSegmentNotFoundError:
+		return translatableerror.IsolationSegmentNotFoundError{Name: e.Name}
+	case v3action.OrganizationNotFoundError:
+		return translatableerror.OrganizationNotFoundError{Name: e.Name}
+	case v3action.ProcessNotFoundError:
+		return translatableerror.ProcessNotFoundError{ProcessType: e.ProcessType}
+	case v3action.StagingTimeoutError:
+		return translatableerror.StagingTimeoutError{AppName: e.AppName, Timeout: e.Timeout}
+	case v3action.TaskWorkersUnavailableError:
+		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
 	}
 
 	return err

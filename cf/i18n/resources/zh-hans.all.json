@@ -4656,6 +4656,10 @@
     "translation": "进程被以下信号终止: {{.Signal}}。已退出，并带有 {{.ExitCode}}"
   },
   {
+    "id": "Process {{.ProcessType}} not found",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },

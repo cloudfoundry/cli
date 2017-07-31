@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -195,22 +196,41 @@ var _ = Describe("Process Health Check Actions", func() {
 					nil,
 				)
 			})
+
 			Context("when getting application process by type returns an error", func() {
 				var expectedErr error
 
-				BeforeEach(func() {
-					expectedErr = errors.New("some-error")
-					fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
-						ccv3.Process{},
-						ccv3.Warnings{"some-process-warning"},
-						expectedErr,
-					)
+				Context("when the api returns a ProcessNotFoundError", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+							ccv3.Process{},
+							ccv3.Warnings{"some-process-warning"},
+							ccerror.ProcessNotFoundError{},
+						)
+					})
+
+					It("returns a ProcessNotFoundError and all warnings", func() {
+						_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "http", "some-http-endpoint", "some-process-type")
+						Expect(err).To(Equal(ProcessNotFoundError{ProcessType: "some-process-type"}))
+						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+					})
 				})
 
-				It("returns the error and warnings", func() {
-					_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "http", "some-http-endpoint", "some-process-type")
-					Expect(err).To(Equal(expectedErr))
-					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+				Context("generic error", func() {
+					BeforeEach(func() {
+						expectedErr = errors.New("some-error")
+						fakeCloudControllerClient.GetApplicationProcessByTypeReturns(
+							ccv3.Process{},
+							ccv3.Warnings{"some-process-warning"},
+							expectedErr,
+						)
+					})
+
+					It("returns the error and warnings", func() {
+						_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "http", "some-http-endpoint", "some-process-type")
+						Expect(err).To(Equal(expectedErr))
+						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
+					})
 				})
 			})
 

@@ -70,7 +70,7 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	case http.StatusForbidden: // 403
 		return ccerror.ForbiddenError{Message: firstErr.Detail}
 	case http.StatusNotFound: // 404
-		return ccerror.ResourceNotFoundError{Message: firstErr.Detail}
+		return handleNotFound(firstErr)
 	case http.StatusUnprocessableEntity: // 422
 		return handleUnprocessableEntity(firstErr)
 	case http.StatusServiceUnavailable: // 503
@@ -84,6 +84,15 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 			RequestIDs:      rawHTTPStatusErr.RequestIDs,
 			V3ErrorResponse: errorResponse,
 		}
+	}
+}
+
+func handleNotFound(errorResponse ccerror.V3Error) error {
+	switch errorResponse.Detail {
+	case "Process not found":
+		return ccerror.ProcessNotFoundError{}
+	default:
+		return ccerror.ResourceNotFoundError{Message: errorResponse.Detail}
 	}
 }
 

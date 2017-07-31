@@ -4656,6 +4656,10 @@
     "translation": "Processus terminé par un signal : {{.Signal}}. Sortie avec {{.ExitCode}}"
   },
   {
+    "id": "Process {{.ProcessType}} not found",
+    "translation": ""
+  },
+  {
     "id": "Prompt for a one-time passcode to login",
     "translation": ""
   },

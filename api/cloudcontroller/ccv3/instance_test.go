@@ -108,7 +108,7 @@ var _ = Describe("Instance", func() {
 
 			It("returns the error", func() {
 				_, _, err := client.GetProcessInstances("some-process-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "Process not found"}))
+				Expect(err).To(MatchError(ccerror.ProcessNotFoundError{}))
 			})
 		})
 	})
