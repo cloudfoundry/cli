@@ -12,19 +12,16 @@ import (
 func HandleError(err error) error {
 	switch e := err.(type) {
 	case ccerror.APINotFoundError:
-		return translatableerror.APINotFoundError{URL: e.URL}
+		return translatableerror.APINotFoundError(e)
 	case ccerror.RequestError:
-		return translatableerror.APIRequestError{Err: e.Err}
+		return translatableerror.APIRequestError(e)
 	case ccerror.SSLValidationHostnameError:
-		return translatableerror.SSLCertError{Message: e.Message}
+		return translatableerror.SSLCertError(e)
 	case ccerror.UnverifiedServerError:
 		return translatableerror.InvalidSSLCertError{API: e.URL}
 
 	case ccerror.JobFailedError:
-		return translatableerror.JobFailedError{
-			JobGUID: e.JobGUID,
-			Message: e.Message,
-		}
+		return translatableerror.JobFailedError(e)
 	case ccerror.JobTimeoutError:
 		return translatableerror.JobTimeoutError{JobGUID: e.JobGUID}
 
@@ -34,41 +31,41 @@ func HandleError(err error) error {
 		return translatableerror.InvalidRefreshTokenError{}
 
 	case sharedaction.NotLoggedInError:
-		return translatableerror.NotLoggedInError{BinaryName: e.BinaryName}
+		return translatableerror.NotLoggedInError(e)
 	case sharedaction.NoOrganizationTargetedError:
-		return translatableerror.NoOrganizationTargetedError{BinaryName: e.BinaryName}
+		return translatableerror.NoOrganizationTargetedError(e)
 	case sharedaction.NoSpaceTargetedError:
-		return translatableerror.NoSpaceTargetedError{BinaryName: e.BinaryName}
+		return translatableerror.NoSpaceTargetedError(e)
 
 	case v2action.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
 	case v2action.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError{Name: e.Name}
 	case v2action.SecurityGroupNotFoundError:
-		return translatableerror.SecurityGroupNotFoundError{Name: e.Name}
+		return translatableerror.SecurityGroupNotFoundError(e)
 	case v2action.ServiceInstanceNotFoundError:
-		return translatableerror.ServiceInstanceNotFoundError{Name: e.Name}
+		return translatableerror.ServiceInstanceNotFoundError(e)
 	case v2action.SpaceNotFoundError:
 		return translatableerror.SpaceNotFoundError{Name: e.Name}
 	case v2action.StackNotFoundError:
-		return translatableerror.StackNotFoundError{Name: e.Name, GUID: e.GUID}
+		return translatableerror.StackNotFoundError(e)
 	case v2action.HTTPHealthCheckInvalidError:
 		return translatableerror.HTTPHealthCheckInvalidError{}
 	case v2action.RouteInDifferentSpaceError:
-		return translatableerror.RouteInDifferentSpaceError{Route: e.Route}
+		return translatableerror.RouteInDifferentSpaceError(e)
 	case v2action.FileChangedError:
-		return translatableerror.FileChangedError{Filename: e.Filename}
+		return translatableerror.FileChangedError(e)
 	case v2action.EmptyDirectoryError:
-		return translatableerror.EmptyDirectoryError{Path: e.Path}
+		return translatableerror.EmptyDirectoryError(e)
 
 	case pushaction.AppNotFoundInManifestError:
-		return translatableerror.AppNotFoundInManifestError{Name: e.Name}
+		return translatableerror.AppNotFoundInManifestError(e)
 	case pushaction.CommandLineOptionsWithMultipleAppsError:
 		return translatableerror.CommandLineArgsWithMultipleAppsError{}
 	case pushaction.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
 	case pushaction.NonexistentAppPathError:
-		return translatableerror.FileNotFoundError{Path: e.Path}
+		return translatableerror.FileNotFoundError(e)
 	case pushaction.MissingNameError:
 		return translatableerror.RequiredNameForPushError{}
 	case pushaction.UploadFailedError:
