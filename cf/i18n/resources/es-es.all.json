@@ -5528,6 +5528,14 @@
     "translation": "Pila a utilizar (una pila es un sistema de archivos preconfigurado, incluido un sistema operativo, que puede ejecutar apps)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Grupos de variable de entorno de transferencia:"
   },

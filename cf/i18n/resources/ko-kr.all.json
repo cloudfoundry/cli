@@ -5528,6 +5528,14 @@
     "translation": "사용할 스택(스택은 앱을 실행할 수 있는 운영 체제를 비롯한 사전 빌드된 파일 시스템)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "스테이징 환경 변수 그룹:"
   },

@@ -5528,6 +5528,14 @@
     "translation": "要使用的堆栈（堆栈是一种可以运行应用程序的预构建文件系统，包括操作系统）"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "编译打包环境变量组: "
   },

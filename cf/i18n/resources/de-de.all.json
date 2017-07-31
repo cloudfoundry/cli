@@ -5528,6 +5528,14 @@
     "translation": "Zu verwendender Stack (ein Stack ist ein vordefiniertes Dateisystem einschließlich Betriebssystem, das Apps ausführen kann)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Staging-Umgebungsvariablengruppen:"
   },

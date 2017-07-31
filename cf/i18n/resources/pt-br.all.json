@@ -5528,6 +5528,14 @@
     "translation": "Pilha a ser usada (uma pilha é um sistema de arquivos pré-construído, incluindo um sistema operacional, que pode executar apps)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Grupos de variáveis de ambiente temporárias:"
   },

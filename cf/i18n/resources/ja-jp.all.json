@@ -5528,6 +5528,14 @@
     "translation": "使用するスタック (スタックはオペレーティング・システムを含む事前ビルドされたファイル・システムであり、このファイル・システムはアプリを実行できます)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "ステージング環境変数グループ:"
   },

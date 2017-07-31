@@ -5528,6 +5528,14 @@
     "translation": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Staging Environment Variable Groups:"
   },
