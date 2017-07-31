@@ -5528,6 +5528,14 @@
     "translation": "Stack da utilizzare (uno stack è un file system precostruito, incluso un sistema operativo, che può eseguire le applicazioni)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Gruppi di variabili di ambiente in fase di preparazione:"
   },

@@ -5528,6 +5528,14 @@
     "translation": "要使用的堆疊（堆疊是可執行應用程式的預先建置檔案系統（包括作業系統））"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "編譯打包環境變數群組: "
   },

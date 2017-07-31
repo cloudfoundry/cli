@@ -5528,6 +5528,14 @@
     "translation": "Pile à utiliser (une pile est un système de fichiers prégénérés incluant un système d'exploitation, qui peut exécuter des applications)"
   },
   {
+    "id": "Stack with GUID {{.GUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Stack {{.Name}} not found",
+    "translation": ""
+  },
+  {
     "id": "Staging Environment Variable Groups:",
     "translation": "Groupes de variables d'environnement de constitution :"
   },
