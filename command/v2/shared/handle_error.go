@@ -50,6 +50,8 @@ func HandleError(err error) error {
 		return translatableerror.ServiceInstanceNotFoundError{Name: e.Name}
 	case v2action.SpaceNotFoundError:
 		return translatableerror.SpaceNotFoundError{Name: e.Name}
+	case v2action.StackNotFoundError:
+		return translatableerror.StackNotFoundError{Name: e.Name, GUID: e.GUID}
 	case v2action.HTTPHealthCheckInvalidError:
 		return translatableerror.HTTPHealthCheckInvalidError{}
 	case v2action.RouteInDifferentSpaceError:

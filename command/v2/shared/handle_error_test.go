@@ -52,6 +52,10 @@ var _ = Describe("HandleError", func() {
 			v2action.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			translatableerror.ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
+		Entry("v2action.StackNotFoundError -> StackNotFoundError",
+			v2action.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"},
+			translatableerror.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"}),
+
 		Entry("ccerror.JobFailedError -> JobFailedError",
 			ccerror.JobFailedError{JobGUID: "some-job-guid", Message: "some-message"},
 			translatableerror.JobFailedError{JobGUID: "some-job-guid", Message: "some-message"}),

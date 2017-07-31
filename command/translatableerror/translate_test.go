@@ -88,6 +88,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
 		Entry("SSLCertError", SSLCertError{}),
+		Entry("StackNotFoundError with name", SpaceNotFoundError{Name: "steve"}),
+		Entry("StackNotFoundError without name", SpaceNotFoundError{}),
 		Entry("StagingFailedError", StagingFailedError{}),
 		Entry("StagingFailedNoAppDetectedError", StagingFailedNoAppDetectedError{}),
 		Entry("StagingTimeoutError", StagingTimeoutError{}),
