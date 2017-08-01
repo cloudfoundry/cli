@@ -82,6 +82,7 @@ var _ = Describe("Application Config", func() {
 			appName = "some-app"
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
+			noStart = false
 
 			var err error
 			filesPath, err = ioutil.TempDir("", "convert-to-application-configs")
