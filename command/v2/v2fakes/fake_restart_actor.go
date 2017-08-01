@@ -41,7 +41,7 @@ type FakeRestartActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	RestartApplicationStub        func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error)
+	RestartApplicationStub        func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 	restartApplicationMutex       sync.RWMutex
 	restartApplicationArgsForCall []struct {
 		app    v2action.Application
@@ -51,14 +51,14 @@ type FakeRestartActor struct {
 	restartApplicationReturns struct {
 		result1 <-chan *v2action.LogMessage
 		result2 <-chan error
-		result3 <-chan v2action.ApplicationState
+		result3 <-chan v2action.ApplicationStateChange
 		result4 <-chan string
 		result5 <-chan error
 	}
 	restartApplicationReturnsOnCall map[int]struct {
 		result1 <-chan *v2action.LogMessage
 		result2 <-chan error
-		result3 <-chan v2action.ApplicationState
+		result3 <-chan v2action.ApplicationStateChange
 		result4 <-chan string
 		result5 <-chan error
 	}
@@ -176,7 +176,7 @@ func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestartActor) RestartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+func (fake *FakeRestartActor) RestartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 	fake.restartApplicationMutex.Lock()
 	ret, specificReturn := fake.restartApplicationReturnsOnCall[len(fake.restartApplicationArgsForCall)]
 	fake.restartApplicationArgsForCall = append(fake.restartApplicationArgsForCall, struct {
@@ -207,24 +207,24 @@ func (fake *FakeRestartActor) RestartApplicationArgsForCall(i int) (v2action.App
 	return fake.restartApplicationArgsForCall[i].app, fake.restartApplicationArgsForCall[i].client, fake.restartApplicationArgsForCall[i].config
 }
 
-func (fake *FakeRestartActor) RestartApplicationReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationState, result4 <-chan string, result5 <-chan error) {
+func (fake *FakeRestartActor) RestartApplicationReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {
 	fake.RestartApplicationStub = nil
 	fake.restartApplicationReturns = struct {
 		result1 <-chan *v2action.LogMessage
 		result2 <-chan error
-		result3 <-chan v2action.ApplicationState
+		result3 <-chan v2action.ApplicationStateChange
 		result4 <-chan string
 		result5 <-chan error
 	}{result1, result2, result3, result4, result5}
 }
 
-func (fake *FakeRestartActor) RestartApplicationReturnsOnCall(i int, result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationState, result4 <-chan string, result5 <-chan error) {
+func (fake *FakeRestartActor) RestartApplicationReturnsOnCall(i int, result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {
 	fake.RestartApplicationStub = nil
 	if fake.restartApplicationReturnsOnCall == nil {
 		fake.restartApplicationReturnsOnCall = make(map[int]struct {
 			result1 <-chan *v2action.LogMessage
 			result2 <-chan error
-			result3 <-chan v2action.ApplicationState
+			result3 <-chan v2action.ApplicationStateChange
 			result4 <-chan string
 			result5 <-chan error
 		})
@@ -232,7 +232,7 @@ func (fake *FakeRestartActor) RestartApplicationReturnsOnCall(i int, result1 <-c
 	fake.restartApplicationReturnsOnCall[i] = struct {
 		result1 <-chan *v2action.LogMessage
 		result2 <-chan error
-		result3 <-chan v2action.ApplicationState
+		result3 <-chan v2action.ApplicationStateChange
 		result4 <-chan string
 		result5 <-chan error
 	}{result1, result2, result3, result4, result5}

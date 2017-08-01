@@ -8,12 +8,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-type ApplicationState string
+type ApplicationStateChange string
 
 const (
-	ApplicationStateStopping = ApplicationState("stopping")
-	ApplicationStateStaging  = ApplicationState("staging")
-	ApplicationStateStarting = ApplicationState("starting")
+	ApplicationStateStopping ApplicationStateChange = "stopping"
+	ApplicationStateStaging  ApplicationStateChange = "staging"
+	ApplicationStateStarting ApplicationStateChange = "starting"
 )
 
 // ApplicationInstanceCrashedError is returned when an instance crashes.
@@ -296,10 +296,10 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 
 // StartApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
+func (actor Actor) StartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
-	appState := make(chan ApplicationState)
+	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
 	errs := make(chan error)
 	go func() {
@@ -333,10 +333,10 @@ func (actor Actor) StartApplication(app Application, client NOAAClient, config C
 
 // RestartApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) RestartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
+func (actor Actor) RestartApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
-	appState := make(chan ApplicationState)
+	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
 	errs := make(chan error)
 	go func() {
@@ -385,10 +385,10 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient, config
 
 // RestageApplication restarts a given application. If already stopped, no stop
 // call will be sent.
-func (actor Actor) RestageApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationState, <-chan string, <-chan error) {
+func (actor Actor) RestageApplication(app Application, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, <-chan ApplicationStateChange, <-chan string, <-chan error) {
 	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
 
-	appState := make(chan ApplicationState)
+	appState := make(chan ApplicationStateChange)
 	allWarnings := make(chan string)
 	errs := make(chan error)
 	go func() {
@@ -473,7 +473,7 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 	return StartupTimeoutError{Name: app.Name}
 }
 
-func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAClient, config Config, appState chan ApplicationState, allWarnings chan string, errs chan error) {
+func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAClient, config Config, appState chan ApplicationStateChange, allWarnings chan string, errs chan error) {
 	err := actor.pollStaging(app, config, allWarnings)
 	if err != nil {
 		errs <- err
