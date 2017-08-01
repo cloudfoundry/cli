@@ -150,6 +150,11 @@ func (application Application) Started() bool {
 	return application.State == ccv2.ApplicationStarted
 }
 
+// Stopped returns true when the application is stopped.
+func (application Application) Stopped() bool {
+	return application.State == ccv2.ApplicationStopped
+}
+
 func (app Application) String() string {
 	return fmt.Sprintf(
 		"App Name: '%s', Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",

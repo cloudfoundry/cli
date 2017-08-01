@@ -30,7 +30,7 @@ type ProgressBar interface {
 
 type V2PushActor interface {
 	Apply(config pushaction.ApplicationConfig, progressBar pushaction.ProgressBar) (<-chan pushaction.ApplicationConfig, <-chan pushaction.Event, <-chan pushaction.Warnings, <-chan error)
-	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
+	ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	MergeAndValidateSettingsAndManifests(cmdSettings pushaction.CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error)
 	ReadManifest(pathToManifest string) ([]manifest.Application, error)
 }
@@ -51,7 +51,7 @@ type V2PushCommand struct {
 	// NoHostname           bool                        `long:"no-hostname" description:"Map the root domain to this app"`
 	NoManifest bool `long:"no-manifest" description:"Ignore manifest file"`
 	// NoRoute              bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
-	// NoStart              bool                        `long:"no-start" description:"Do not start an app after pushing"`
+	NoStart bool                        `long:"no-start" description:"Do not start an app after pushing"`
 	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
 	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
@@ -133,6 +133,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	appConfigs, warnings, err := cmd.Actor.ConvertToApplicationConfigs(
 		cmd.Config.TargetedOrganization().GUID,
 		cmd.Config.TargetedSpace().GUID,
+		cmd.NoStart,
 		manifestApplications,
 	)
 	cmd.UI.DisplayWarnings(warnings)
@@ -175,10 +176,12 @@ func (cmd V2PushCommand) Execute(args []string) error {
 			return shared.HandleError(err)
 		}
 
-		messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application, cmd.NOAAClient, cmd.Config)
-		err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
-		if err != nil {
-			return err
+		if !cmd.NoStart {
+			messages, logErrs, appState, apiWarnings, errs := cmd.RestartActor.RestartApplication(updatedConfig.CurrentApplication.Application, cmd.NOAAClient, cmd.Config)
+			err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
+			if err != nil {
+				return err
+			}
 		}
 
 		cmd.UI.DisplayNewline()
@@ -211,6 +214,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	config := pushaction.CommandLineSettings{
 		BuildpackName:      cmd.BuildpackName,
+		Command:            cmd.Command,
 		CurrentDirectory:   pwd,
 		DiskQuota:          cmd.DiskQuota.Size,
 		DockerImage:        cmd.DockerImage.Path,
@@ -221,7 +225,6 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		Name:               cmd.OptionalArgs.AppName,
 		ProvidedAppPath:    string(cmd.AppPath),
 		StackName:          cmd.StackName,
-		Command:            cmd.Command,
 	}
 
 	log.Debugln("Command Line Settings:", config)

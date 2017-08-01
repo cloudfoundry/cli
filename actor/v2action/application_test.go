@@ -168,6 +168,20 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 		})
+
+		Describe("Stopped", func() {
+			Context("when app is started", func() {
+				It("returns true", func() {
+					Expect(Application{State: ccv2.ApplicationStopped}.Stopped()).To(BeTrue())
+				})
+			})
+
+			Context("when app is stopped", func() {
+				It("returns false", func() {
+					Expect(Application{State: ccv2.ApplicationStarted}.Stopped()).To(BeFalse())
+				})
+			})
+		})
 	})
 
 	Describe("CreateApplication", func() {

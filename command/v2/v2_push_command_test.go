@@ -385,9 +385,10 @@ var _ = Describe("v2-push Command", func() {
 						Expect(testUI.Err).To(Say("some-config-warnings"))
 
 						Expect(fakeActor.ConvertToApplicationConfigsCallCount()).To(Equal(1))
-						orgGUID, spaceGUID, manifests := fakeActor.ConvertToApplicationConfigsArgsForCall(0)
+						orgGUID, spaceGUID, noStart, manifests := fakeActor.ConvertToApplicationConfigsArgsForCall(0)
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(noStart).To(BeFalse())
 						Expect(manifests).To(Equal(appManifests))
 					})
 
@@ -419,51 +420,102 @@ var _ = Describe("v2-push Command", func() {
 						}
 					})
 
-					It("displays app events and warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+					Context("when the app starts", func() {
+						It("displays app events and warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
-						Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Retrying upload due to an error\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Stopping app\\.\\.\\."))
 
-						Expect(testUI.Err).To(Say("some-config-warnings"))
-						Expect(testUI.Err).To(Say("apply-1"))
-						Expect(testUI.Err).To(Say("apply-2"))
+							Expect(testUI.Err).To(Say("some-config-warnings"))
+							Expect(testUI.Err).To(Say("apply-1"))
+							Expect(testUI.Err).To(Say("apply-2"))
+						})
+
+						It("displays app staging logs", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("log message 1"))
+							Expect(testUI.Out).To(Say("log message 2"))
+
+							Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
+							appConfig, _, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
+							Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
+						})
+
+						It("displays the app summary with isolation segments as well as warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+							Expect(testUI.Out).To(Say("requested state:\\s+started"))
+							Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
+							Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
+							Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
+							Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
+							Expect(testUI.Out).To(Say("stack:\\s+potatos"))
+							Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
+							Expect(testUI.Out).To(Say("start command:\\s+some start command"))
+
+							Expect(testUI.Err).To(Say("app-summary-warning"))
+						})
+
+						Context("when the start command is explicitly set", func() {
+							BeforeEach(func() {
+								applicationSummary := v2action.ApplicationSummary{
+									Application: v2action.Application{
+										Command:              "a-different-start-command",
+										DetectedBuildpack:    "some-buildpack",
+										DetectedStartCommand: "some start command",
+										GUID:                 "some-app-guid",
+										Instances:            3,
+										Memory:               128,
+										Name:                 appName,
+										PackageUpdatedAt:     time.Unix(0, 0),
+										State:                "STARTED",
+									},
+									Stack: v2action.Stack{
+										Name: "potatos",
+									},
+									Routes: []v2action.Route{
+										{
+											Host: "banana",
+											Domain: v2action.Domain{
+												Name: "fruit.com",
+											},
+											Path: "/hi",
+										},
+										{
+											Domain: v2action.Domain{
+												Name: "foobar.com",
+											},
+											Port: 13,
+										},
+									},
+								}
+								warnings := []string{"app-summary-warning"}
+
+								applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
+
+								fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
+							})
+
+							It("displays the correct start command", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+								Expect(testUI.Out).To(Say("start command:\\s+a-different-start-command"))
+							})
+						})
 					})
 
-					It("displays app staging logs", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).To(Say("log message 1"))
-						Expect(testUI.Out).To(Say("log message 2"))
-
-						Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(1))
-						appConfig, _, _ := fakeRestartActor.RestartApplicationArgsForCall(0)
-						Expect(appConfig).To(Equal(updatedConfig.CurrentApplication.Application))
-					})
-
-					It("displays the app summary with isolation segments as well as warnings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-						Expect(testUI.Out).To(Say("requested state:\\s+started"))
-						Expect(testUI.Out).To(Say("instances:\\s+1\\/3"))
-						Expect(testUI.Out).To(Say("usage:\\s+128M x 3 instances"))
-						Expect(testUI.Out).To(Say("routes:\\s+banana.fruit.com/hi, foobar.com:13"))
-						Expect(testUI.Out).To(Say("last uploaded:\\s+\\w{3} [0-3]\\d \\w{3} [0-2]\\d:[0-5]\\d:[0-5]\\d \\w+ \\d{4}"))
-						Expect(testUI.Out).To(Say("stack:\\s+potatos"))
-						Expect(testUI.Out).To(Say("buildpack:\\s+some-buildpack"))
-						Expect(testUI.Out).To(Say("start command:\\s+some start command"))
-
-						Expect(testUI.Err).To(Say("app-summary-warning"))
-					})
-
-					Context("when the start command is explicitly set", func() {
+					Context("when no-start is set", func() {
 						BeforeEach(func() {
+							cmd.NoStart = true
+
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
 									Command:              "a-different-start-command",
@@ -474,7 +526,7 @@ var _ = Describe("v2-push Command", func() {
 									Memory:               128,
 									Name:                 appName,
 									PackageUpdatedAt:     time.Unix(0, 0),
-									State:                "STARTED",
+									State:                "STOPPED",
 								},
 								Stack: v2action.Stack{
 									Name: "potatos",
@@ -497,14 +549,18 @@ var _ = Describe("v2-push Command", func() {
 							}
 							warnings := []string{"app-summary-warning"}
 
-							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{{State: "RUNNING"}}
-
 							fakeRestartActor.GetApplicationSummaryByNameAndSpaceReturns(applicationSummary, warnings, nil)
 						})
 
-						It("displays the correct start command", func() {
-							Expect(testUI.Out).To(Say("name:\\s+%s", appName))
-							Expect(testUI.Out).To(Say("start command:\\s+a-different-start-command"))
+						Context("when the app is not running", func() {
+							It("does not start the app", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+								Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
+								Expect(testUI.Out).To(Say("name:\\s+%s", appName))
+								Expect(testUI.Out).To(Say("requested state:\\s+stopped"))
+
+								Expect(fakeRestartActor.RestartApplicationCallCount()).To(Equal(0))
+							})
 						})
 					})
 				})
@@ -579,26 +635,26 @@ var _ = Describe("v2-push Command", func() {
 		Context("when passed app related flags", func() {
 			BeforeEach(func() {
 				cmd.BuildpackName = "some-buildpack"
+				cmd.Command = "echo foo bar baz"
 				cmd.DiskQuota = flag.Megabytes{Size: 1024}
 				cmd.HealthCheckTimeout = 14
 				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
 				cmd.Instances = 12
 				cmd.Memory = flag.Megabytes{Size: 100}
 				cmd.StackName = "some-stack"
-				cmd.Command = "echo foo bar baz"
 			})
 
 			It("sets them on the command line settings", func() {
 				settings, err := cmd.GetCommandLineSettings()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(settings.BuildpackName).To(Equal("some-buildpack"))
+				Expect(settings.Command).To(Equal("echo foo bar baz"))
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 				Expect(settings.HealthCheckTimeout).To(Equal(14))
 				Expect(settings.HealthCheckType).To(Equal("http"))
 				Expect(settings.Instances).To(Equal(12))
 				Expect(settings.Memory).To(Equal(uint64(100)))
 				Expect(settings.StackName).To(Equal("some-stack"))
-				Expect(settings.Command).To(Equal("echo foo bar baz"))
 			})
 		})
 

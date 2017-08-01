@@ -62,12 +62,14 @@ var _ = Describe("Application Config", func() {
 
 	Describe("ConvertToApplicationConfigs", func() {
 		var (
-			appName      string
+			appName   string
+			domain    v2action.Domain
+			filesPath string
+
 			orgGUID      string
 			spaceGUID    string
-			domain       v2action.Domain
+			noStart      bool
 			manifestApps []manifest.Application
-			filesPath    string
 
 			configs    []ApplicationConfig
 			warnings   Warnings
@@ -107,7 +109,7 @@ var _ = Describe("Application Config", func() {
 		})
 
 		JustBeforeEach(func() {
-			configs, warnings, executeErr = actor.ConvertToApplicationConfigs(orgGUID, spaceGUID, manifestApps)
+			configs, warnings, executeErr = actor.ConvertToApplicationConfigs(orgGUID, spaceGUID, noStart, manifestApps)
 			if len(configs) > 0 {
 				firstConfig = configs[0]
 			}
@@ -343,6 +345,17 @@ var _ = Describe("Application Config", func() {
 				It("returns the error and warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
+				})
+			})
+
+			Context("when no-start is set to true", func() {
+				BeforeEach(func() {
+					noStart = true
+				})
+
+				It("sets the desired app state to stopped", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(firstConfig.DesiredApplication.Stopped()).To(BeTrue())
 				})
 			})
 		})
