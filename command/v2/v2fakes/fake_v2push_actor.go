@@ -28,11 +28,12 @@ type FakeV2PushActor struct {
 		result3 <-chan pushaction.Warnings
 		result4 <-chan error
 	}
-	ConvertToApplicationConfigsStub        func(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
+	ConvertToApplicationConfigsStub        func(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error)
 	convertToApplicationConfigsMutex       sync.RWMutex
 	convertToApplicationConfigsArgsForCall []struct {
 		orgGUID   string
 		spaceGUID string
+		noStart   bool
 		apps      []manifest.Application
 	}
 	convertToApplicationConfigsReturns struct {
@@ -134,7 +135,7 @@ func (fake *FakeV2PushActor) ApplyReturnsOnCall(i int, result1 <-chan pushaction
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV2PushActor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error) {
+func (fake *FakeV2PushActor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]pushaction.ApplicationConfig, pushaction.Warnings, error) {
 	var appsCopy []manifest.Application
 	if apps != nil {
 		appsCopy = make([]manifest.Application, len(apps))
@@ -145,12 +146,13 @@ func (fake *FakeV2PushActor) ConvertToApplicationConfigs(orgGUID string, spaceGU
 	fake.convertToApplicationConfigsArgsForCall = append(fake.convertToApplicationConfigsArgsForCall, struct {
 		orgGUID   string
 		spaceGUID string
+		noStart   bool
 		apps      []manifest.Application
-	}{orgGUID, spaceGUID, appsCopy})
-	fake.recordInvocation("ConvertToApplicationConfigs", []interface{}{orgGUID, spaceGUID, appsCopy})
+	}{orgGUID, spaceGUID, noStart, appsCopy})
+	fake.recordInvocation("ConvertToApplicationConfigs", []interface{}{orgGUID, spaceGUID, noStart, appsCopy})
 	fake.convertToApplicationConfigsMutex.Unlock()
 	if fake.ConvertToApplicationConfigsStub != nil {
-		return fake.ConvertToApplicationConfigsStub(orgGUID, spaceGUID, apps)
+		return fake.ConvertToApplicationConfigsStub(orgGUID, spaceGUID, noStart, apps)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -164,10 +166,10 @@ func (fake *FakeV2PushActor) ConvertToApplicationConfigsCallCount() int {
 	return len(fake.convertToApplicationConfigsArgsForCall)
 }
 
-func (fake *FakeV2PushActor) ConvertToApplicationConfigsArgsForCall(i int) (string, string, []manifest.Application) {
+func (fake *FakeV2PushActor) ConvertToApplicationConfigsArgsForCall(i int) (string, string, bool, []manifest.Application) {
 	fake.convertToApplicationConfigsMutex.RLock()
 	defer fake.convertToApplicationConfigsMutex.RUnlock()
-	return fake.convertToApplicationConfigsArgsForCall[i].orgGUID, fake.convertToApplicationConfigsArgsForCall[i].spaceGUID, fake.convertToApplicationConfigsArgsForCall[i].apps
+	return fake.convertToApplicationConfigsArgsForCall[i].orgGUID, fake.convertToApplicationConfigsArgsForCall[i].spaceGUID, fake.convertToApplicationConfigsArgsForCall[i].noStart, fake.convertToApplicationConfigsArgsForCall[i].apps
 }
 
 func (fake *FakeV2PushActor) ConvertToApplicationConfigsReturns(result1 []pushaction.ApplicationConfig, result2 pushaction.Warnings, result3 error) {

@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -33,7 +34,7 @@ func (config ApplicationConfig) UpdatingApplication() bool {
 	return !config.CreatingApplication()
 }
 
-func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
+func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string, noStart bool, apps []manifest.Application) ([]ApplicationConfig, Warnings, error) {
 	var configs []ApplicationConfig
 	var warnings Warnings
 
@@ -70,7 +71,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			config.DesiredApplication = constructedApp
 		}
 
-		config.DesiredApplication = actor.overrideApplicationProperties(config.DesiredApplication, app)
+		config.DesiredApplication = actor.overrideApplicationProperties(config.DesiredApplication, app, noStart)
 
 		var stackWarnings Warnings
 		config.DesiredApplication, stackWarnings, err = actor.overrideStack(config.DesiredApplication, app)
@@ -145,7 +146,7 @@ func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath 
 	return config, nil
 }
 
-func (Actor) overrideApplicationProperties(application Application, manifest manifest.Application) Application {
+func (Actor) overrideApplicationProperties(application Application, manifest manifest.Application, noStart bool) Application {
 	if manifest.BuildpackName != "" {
 		application.Buildpack = manifest.BuildpackName
 	}
@@ -169,6 +170,10 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 	if manifest.Memory != 0 {
 		application.Memory = manifest.Memory
+	}
+
+	if noStart {
+		application.State = ccv2.ApplicationStopped
 	}
 
 	return application
