@@ -12,8 +12,10 @@ import (
 type Process struct {
 	GUID        string             `json:"guid"`
 	Type        string             `json:"type"`
-	MemoryInMB  int                `json:"memory_in_mb"`
 	HealthCheck ProcessHealthCheck `json:"health_check"`
+	Instances   int                `json:"instances"`
+	MemoryInMB  int                `json:"memory_in_mb"`
+	DiskInMB    int                `json:"disk_in_mb"`
 }
 
 type ProcessHealthCheck struct {

@@ -14,6 +14,7 @@ type Process struct {
 	Type       string
 	Instances  []Instance
 	MemoryInMB int
+	DiskInMB   int
 }
 
 // Instance represents a V3 actor instance.
@@ -78,4 +79,12 @@ func (ps Processes) Summary() string {
 	}
 
 	return strings.Join(summaries, ", ")
+}
+
+func (actor Actor) GetProcessByApplication(appGUID string) (ccv3.Process, Warnings, error) {
+	return ccv3.Process{}, nil, nil
+}
+
+func (actor Actor) ScaleProcessByApplication(appGUID string, process ccv3.Process) (ccv3.Process, Warnings, error) {
+	return ccv3.Process{}, nil, nil
 }
