@@ -23,7 +23,7 @@ var _ = Describe("Poll Start", func() {
 		fakeConfig  *commandfakes.FakeConfig
 		messages    chan *v2action.LogMessage
 		logErrs     chan error
-		appState    chan v2action.ApplicationState
+		appState    chan v2action.ApplicationStateChange
 		apiWarnings chan string
 		apiErrs     chan error
 		err         error
@@ -37,7 +37,7 @@ var _ = Describe("Poll Start", func() {
 
 		messages = make(chan *v2action.LogMessage)
 		logErrs = make(chan error)
-		appState = make(chan v2action.ApplicationState)
+		appState = make(chan v2action.ApplicationStateChange)
 		apiWarnings = make(chan string)
 		apiErrs = make(chan error)
 		block = make(chan bool)

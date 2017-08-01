@@ -52,10 +52,10 @@ var _ = Describe("Start Command", func() {
 		testUI.TimezoneLocation, err = time.LoadLocation("America/Los_Angeles")
 		Expect(err).NotTo(HaveOccurred())
 
-		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+		fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 			messages := make(chan *v2action.LogMessage)
 			logErrs := make(chan error)
-			appState := make(chan v2action.ApplicationState)
+			appState := make(chan v2action.ApplicationStateChange)
 			warnings := make(chan string)
 			errs := make(chan error)
 
@@ -167,10 +167,10 @@ var _ = Describe("Start Command", func() {
 
 				Context("when passed an ApplicationStateStarting message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
-							appState := make(chan v2action.ApplicationState)
+							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 
@@ -199,10 +199,10 @@ var _ = Describe("Start Command", func() {
 
 				Context("when passed a log message", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
-							appState := make(chan v2action.ApplicationState)
+							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 
@@ -232,10 +232,10 @@ var _ = Describe("Start Command", func() {
 				Context("when passed an log err", func() {
 					Context("NOAA connection times out/closes", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
-								appState := make(chan v2action.ApplicationState)
+								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -306,10 +306,10 @@ var _ = Describe("Start Command", func() {
 
 						BeforeEach(func() {
 							expectedErr = errors.New("err log message")
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
-								appState := make(chan v2action.ApplicationState)
+								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -336,10 +336,10 @@ var _ = Describe("Start Command", func() {
 				Context("when passed a warning", func() {
 					Context("while NOAA is still logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
-								appState := make(chan v2action.ApplicationState)
+								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -366,10 +366,10 @@ var _ = Describe("Start Command", func() {
 
 					Context("while NOAA is no longer logging", func() {
 						BeforeEach(func() {
-							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+							fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 								messages := make(chan *v2action.LogMessage)
 								logErrs := make(chan error)
-								appState := make(chan v2action.ApplicationState)
+								appState := make(chan v2action.ApplicationStateChange)
 								warnings := make(chan string)
 								errs := make(chan error)
 
@@ -405,10 +405,10 @@ var _ = Describe("Start Command", func() {
 					var apiErr error
 
 					BeforeEach(func() {
-						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationState, <-chan string, <-chan error) {
+						fakeActor.StartApplicationStub = func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 							messages := make(chan *v2action.LogMessage)
 							logErrs := make(chan error)
-							appState := make(chan v2action.ApplicationState)
+							appState := make(chan v2action.ApplicationStateChange)
 							warnings := make(chan string)
 							errs := make(chan error)
 

@@ -645,7 +645,7 @@ var _ = Describe("Application Actions", func() {
 
 			messages <-chan *LogMessage
 			logErrs  <-chan error
-			appState <-chan ApplicationState
+			appState <-chan ApplicationStateChange
 			warnings <-chan string
 			errs     <-chan error
 

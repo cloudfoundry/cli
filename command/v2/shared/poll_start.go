@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationState, apiWarnings <-chan string, apiErrs <-chan error) error {
+func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.LogMessage, logErrs <-chan error, appState <-chan v2action.ApplicationStateChange, apiWarnings <-chan string, apiErrs <-chan error) error {
 	var breakAppState, breakWarnings, breakAPIErrs bool
 	for {
 		select {
