@@ -225,5 +225,34 @@ var _ = Describe("push with a simple manifest and flags", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		Context("manifest contains multiple apps and '--no-start' is provided", func() {
+			var appName1, appName2 string
+
+			BeforeEach(func() {
+				appName1 = helpers.NewAppName()
+				appName2 = helpers.NewAppName()
+			})
+
+			It("does not start the apps", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]string{
+							{"name": appName1},
+							{"name": appName2},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
+					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+					Eventually(session).Should(Say("\\s+name:\\s+%s", appName1))
+					Eventually(session).Should(Say("requested state:\\s+stopped"))
+					Eventually(session).Should(Say("\\s+name:\\s+%s", appName2))
+					Eventually(session).Should(Say("requested state:\\s+stopped"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
 	})
 })
