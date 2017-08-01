@@ -144,7 +144,7 @@ var _ = Describe("api command", func() {
 			It("warns about skip SSL", func() {
 				session := helpers.CF("api", apiURL)
 				Eventually(session).Should(Say("Setting api endpoint to %s...", apiURL))
-				Eventually(session.Err).Should(Say("SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
+				Eventually(session.Err).Should(Say("x509: certificate has expired or is not yet valid|SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
