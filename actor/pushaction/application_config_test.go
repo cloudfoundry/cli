@@ -267,6 +267,10 @@ var _ = Describe("Application Config", func() {
 					manifestApps[0].DiskQuota = 2
 					manifestApps[0].Memory = 3
 					manifestApps[0].StackName = "some-stack"
+					manifestApps[0].EnvironmentVariables = map[string]string{
+						"env1": "1",
+						"env3": "3",
+					}
 
 					stack = v2action.Stack{
 						Name: "some-stack",
@@ -281,6 +285,10 @@ var _ = Describe("Application Config", func() {
 
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
+						"env1": "1",
+						"env3": "3",
+					}))
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
 					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
@@ -307,7 +315,11 @@ var _ = Describe("Application Config", func() {
 						Buildpack: "some-buildpack",
 						Command:   "some-buildpack",
 						DiskQuota: 2,
-						GUID:      "some-app-guid",
+						EnvironmentVariables: map[string]string{
+							"env2": "2",
+							"env3": "9",
+						},
+						GUID: "some-app-guid",
 						HealthCheckHTTPEndpoint: "some-buildpack",
 						HealthCheckTimeout:      5,
 						HealthCheckType:         "some-buildpack",
@@ -322,6 +334,10 @@ var _ = Describe("Application Config", func() {
 				It("keeps the original app properties", func() {
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
+						"env2": "2",
+						"env3": "9",
+					}))
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
 					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
@@ -346,6 +362,37 @@ var _ = Describe("Application Config", func() {
 				It("returns the error and warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-stack-warning"))
+				})
+			})
+
+			Context("when both the manifest and application contains environment variables", func() {
+				BeforeEach(func() {
+					manifestApps[0].EnvironmentVariables = map[string]string{
+						"env1": "1",
+						"env3": "3",
+					}
+
+					app := v2action.Application{
+						EnvironmentVariables: map[string]string{
+							"env2": "2",
+							"env3": "9",
+						},
+					}
+					fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, nil, nil)
+				})
+
+				It("adds/overrides the existing environment variables", func() {
+					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
+						"env1": "1",
+						"env2": "2",
+						"env3": "3",
+					}))
+				})
+			})
+
+			Context("when neither the manifest or the application contains environment variables", func() {
+				It("leaves the EnvironmentVariables as nil", func() {
+					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(BeNil())
 				})
 			})
 
@@ -489,7 +536,6 @@ var _ = Describe("Application Config", func() {
 					})
 				})
 			})
-
 		})
 
 		Context("when a docker image is configured", func() {

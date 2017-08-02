@@ -176,6 +176,16 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 		application.State = ccv2.ApplicationStopped
 	}
 
+	if len(manifest.EnvironmentVariables) > 0 {
+		if application.EnvironmentVariables == nil {
+			application.EnvironmentVariables = manifest.EnvironmentVariables
+		} else {
+			for key, value := range manifest.EnvironmentVariables {
+				application.EnvironmentVariables[key] = value
+			}
+		}
+	}
+
 	return application
 }
 
