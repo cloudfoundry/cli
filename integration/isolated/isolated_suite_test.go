@@ -43,6 +43,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	helpers.TurnOffColors()
 
+	EnableDockerSupport()
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 })
 
@@ -81,4 +82,13 @@ func setupCF(org string, space string) {
 		helpers.CreateOrgAndSpace(org, space)
 	}
 	helpers.TargetOrgAndSpace(org, space)
+}
+
+func EnableDockerSupport() {
+	homeDir := helpers.SetHomeDir()
+	helpers.SetAPI()
+	helpers.LoginCF()
+	Eventually(helpers.CF("enable-feature-flag", "diego_docker")).Should(Exit(0))
+	helpers.DestroyHomeDir(homeDir)
+	return orgName, spaceName1
 }
