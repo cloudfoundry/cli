@@ -410,14 +410,32 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("routes", func() {
+	Context("user provided environment variables", func() {
+		var oldMap, newMap map[string]string
+
+		BeforeEach(func() {
+			oldMap = map[string]string{"a": "b"}
+			newMap = map[string]string{"1": "2"}
+			appConfig.CurrentApplication.EnvironmentVariables = oldMap
+			appConfig.DesiredApplication.EnvironmentVariables = newMap
+		})
+
 		It("sets the third change to routes", func() {
 			Expect(changes[2]).To(Equal(ui.Change{
+				Header:       "env:",
+				CurrentValue: oldMap,
+				NewValue:     newMap,
+			}))
+		})
+	})
+
+	Context("routes", func() {
+		It("sets the fourth change to routes", func() {
+			Expect(changes[3]).To(Equal(ui.Change{
 				Header:       "routes:",
 				CurrentValue: []string{"route1.example.com", "route2.example.com"},
 				NewValue:     []string{"route3.example.com", "route4.example.com"},
 			}))
 		})
 	})
-
 })

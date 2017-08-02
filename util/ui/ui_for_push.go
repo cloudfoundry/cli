@@ -50,67 +50,131 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 
 	offset := strings.Repeat(" ", stringTypePadding)
 	switch oVal := originalValue.(type) {
-	case string:
-		nVal, ok := newValue.(string)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
-		if oVal != nVal {
-			formattedOld := fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
-			formattedNew := fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, nVal)
-
-			if oVal != "" {
-				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
-			}
-			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
-		} else {
-			fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, oVal)
-		}
-	case []string:
-		nVal, ok := newValue.([]string)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
-		fmt.Fprintf(ui.Out, "  %s\n", ui.TranslateText(header))
-
-		fullList := sortedUniqueArray(oVal, nVal)
-		for _, item := range fullList {
-			inOld := existsIn(item, oVal)
-			inNew := existsIn(item, nVal)
-
-			if inOld && inNew {
-				fmt.Fprintf(ui.Out, "    %s\n", item)
-			} else if inOld {
-				formattedOld := fmt.Sprintf("-   %s", item)
-				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
-			} else {
-				formattedNew := fmt.Sprintf("+   %s", item)
-				fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
-			}
-		}
 	case int:
 		nVal, ok := newValue.(int)
 		if !ok {
 			return ErrValueMissmatch
 		}
 
-		if oVal != nVal {
-			formattedOld := fmt.Sprintf("- %s%s%d", ui.TranslateText(header), offset, oVal)
-			formattedNew := fmt.Sprintf("+ %s%s%d", ui.TranslateText(header), offset, nVal)
-
-			if oVal != 0 {
-				fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
-			}
-			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
-		} else {
-			fmt.Fprintf(ui.Out, "  %s%s%d\n", ui.TranslateText(header), offset, oVal)
+		ui.displayDiffForInt(offset, header, oVal, nVal)
+	case string:
+		nVal, ok := newValue.(string)
+		if !ok {
+			return ErrValueMissmatch
 		}
+
+		ui.displayDiffForString(offset, header, oVal, nVal)
+	case []string:
+		nVal, ok := newValue.([]string)
+		if !ok {
+			return ErrValueMissmatch
+		}
+
+		if len(oVal) == 0 && len(nVal) == 0 {
+			return nil
+		}
+
+		ui.displayDiffForStrings(offset, header, oVal, nVal)
+	case map[string]string:
+		nVal, ok := newValue.(map[string]string)
+		if !ok {
+			return ErrValueMissmatch
+		}
+
+		if len(oVal) == 0 && len(nVal) == 0 {
+			return nil
+		}
+
+		ui.displayDiffForMapStringString(offset, header, oVal, nVal)
 	default:
 		panic(fmt.Sprintf("diff display does not have case for '%s'", header))
 	}
 	return nil
+}
+
+func (ui UI) displayDiffForInt(offset string, header string, oldValue int, newValue int) {
+	if oldValue != newValue {
+		formattedOld := fmt.Sprintf("- %s%s%d", ui.TranslateText(header), offset, oldValue)
+		formattedNew := fmt.Sprintf("+ %s%s%d", ui.TranslateText(header), offset, newValue)
+
+		if oldValue != 0 {
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		}
+		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+	} else {
+		fmt.Fprintf(ui.Out, "  %s%s%d\n", ui.TranslateText(header), offset, oldValue)
+	}
+}
+
+func (ui UI) displayDiffForMapStringString(offset string, header string, oldMap map[string]string, newMap map[string]string) {
+	var oldKeys []string
+	for key := range oldMap {
+		oldKeys = append(oldKeys, key)
+	}
+
+	var newKeys []string
+	for key := range newMap {
+		newKeys = append(newKeys, key)
+	}
+
+	sortedKeys := sortedUniqueArray(oldKeys, newKeys)
+
+	fmt.Fprintf(ui.Out, "  %s\n", ui.TranslateText(header))
+	for _, key := range sortedKeys {
+		newVal, ok := newMap[key]
+		if !ok {
+			formattedOld := fmt.Sprintf("-   %s", key)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		}
+		oldVal, ok := oldMap[key]
+		if !ok {
+			formattedNew := fmt.Sprintf("+   %s", key)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		}
+
+		if oldVal == newVal {
+			fmt.Fprintf(ui.Out, "    %s\n", key)
+		} else {
+			formattedOld := fmt.Sprintf("-   %s", key)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+			formattedNew := fmt.Sprintf("+   %s", key)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		}
+	}
+}
+
+func (ui UI) displayDiffForString(offset string, header string, oVal string, nVal string) {
+	if oVal != nVal {
+		formattedOld := fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
+		formattedNew := fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, nVal)
+
+		if oVal != "" {
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		}
+		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+	} else {
+		fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, oVal)
+	}
+}
+
+func (ui UI) displayDiffForStrings(offset string, header string, oldList []string, newList []string) {
+	fmt.Fprintf(ui.Out, "  %s\n", ui.TranslateText(header))
+
+	fullList := sortedUniqueArray(oldList, newList)
+	for _, item := range fullList {
+		inOld := existsIn(item, oldList)
+		inNew := existsIn(item, newList)
+
+		if inOld && inNew {
+			fmt.Fprintf(ui.Out, "    %s\n", item)
+		} else if inOld {
+			formattedOld := fmt.Sprintf("-   %s", item)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		} else {
+			formattedNew := fmt.Sprintf("+   %s", item)
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		}
+	}
 }
 
 func existsIn(str string, ary []string) bool {

@@ -180,9 +180,14 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 		if application.EnvironmentVariables == nil {
 			application.EnvironmentVariables = manifest.EnvironmentVariables
 		} else {
-			for key, value := range manifest.EnvironmentVariables {
-				application.EnvironmentVariables[key] = value
+			env := map[string]string{}
+			for key, value := range application.EnvironmentVariables {
+				env[key] = value
 			}
+			for key, value := range manifest.EnvironmentVariables {
+				env[key] = value
+			}
+			application.EnvironmentVariables = env
 		}
 	}
 

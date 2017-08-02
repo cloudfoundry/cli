@@ -33,7 +33,6 @@ var _ = Describe("UI", func() {
 
 	Describe("DisplayChangeForPush", func() {
 		Context("in english", func() {
-
 			Context("when passed strings for values", func() {
 				Context("when the values are not equal", func() {
 					Context("when the originalValue is not empty", func() {
@@ -93,6 +92,16 @@ var _ = Describe("UI", func() {
 						Expect(err).To(MatchError(ErrValueMissmatch))
 					})
 				})
+
+				Context("when both sets are empty", func() {
+					It("does not display anything", func() {
+						var old []string
+						new := []string{}
+						err := ui.DisplayChangeForPush("val", 2, old, new)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(out).ToNot(Say("\\s+val"))
+					})
+				})
 			})
 
 			Context("when passed ints for values", func() {
@@ -127,6 +136,38 @@ var _ = Describe("UI", func() {
 					It("should return an ErrValueMissmatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, 7, "asdf")
 						Expect(err).To(MatchError(ErrValueMissmatch))
+					})
+				})
+			})
+
+			Context("when passed map[string]string for values", func() {
+				It("should display the header with sorted differences", func() {
+					old := map[string]string{"val1": "1", "val3": "3", "val4": "4"}
+					new := map[string]string{"val2": "2", "val3": "2", "val4": "4"}
+					err := ui.DisplayChangeForPush("maps", 2, old, new)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(out).To(Say("\\s+maps"))
+					Expect(out).To(Say("\x1b\\[32m\\+\\s+val1\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[31m\\-\\s+val2\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[31m\\-\\s+val3\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[32m\\+\\s+val3\x1b\\[0m"))
+					Expect(out).To(Say("(?m)^\\s+val4"))
+				})
+
+				Context("when the values are a different type", func() {
+					It("should return an ErrValueMissmatch", func() {
+						err := ui.DisplayChangeForPush("asdf", 2, map[string]string{}, map[string]int{})
+						Expect(err).To(MatchError(ErrValueMissmatch))
+					})
+				})
+
+				Context("when both sets are empty", func() {
+					It("does not display anything", func() {
+						var old map[string]string
+						new := map[string]string{}
+						err := ui.DisplayChangeForPush("maps", 2, old, new)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(out).ToNot(Say("\\s+maps"))
 					})
 				})
 			})
