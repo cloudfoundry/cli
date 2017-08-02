@@ -81,10 +81,29 @@ func (ps Processes) Summary() string {
 	return strings.Join(summaries, ", ")
 }
 
-func (actor Actor) GetProcessByApplication(appGUID string) (ccv3.Process, Warnings, error) {
-	return ccv3.Process{}, nil, nil
-}
+func (actor Actor) ScaleProcessByApplication(appGUID string, scaleOptions ccv3.Process) (Process, Warnings, error) {
+	var allWarnings Warnings
 
-func (actor Actor) ScaleProcessByApplication(appGUID string, process ccv3.Process) (ccv3.Process, Warnings, error) {
-	return ccv3.Process{}, nil, nil
+	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, scaleOptions)
+	allWarnings = Warnings(warnings)
+	if err != nil {
+		return Process{}, allWarnings, err
+	}
+
+	ccv3Instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(ccv3Process.GUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Process{}, allWarnings, err
+	}
+
+	process := Process{
+		Type:       ccv3Process.Type,
+		MemoryInMB: ccv3Process.MemoryInMB,
+		DiskInMB:   ccv3Process.DiskInMB,
+	}
+	for _, ccv3Instance := range ccv3Instances {
+		process.Instances = append(process.Instances, Instance(ccv3Instance))
+	}
+
+	return process, allWarnings, nil
 }

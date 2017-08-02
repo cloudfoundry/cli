@@ -50,6 +50,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	CreateApplicationProcessScaleStub        func(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error)
+	createApplicationProcessScaleMutex       sync.RWMutex
+	createApplicationProcessScaleArgsForCall []struct {
+		appGUID string
+		process ccv3.Process
+	}
+	createApplicationProcessScaleReturns struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}
+	createApplicationProcessScaleReturnsOnCall map[int]struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}
 	CreateApplicationTaskStub        func(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error)
 	createApplicationTaskMutex       sync.RWMutex
 	createApplicationTaskArgsForCall []struct {
@@ -111,19 +127,6 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	DeleteIsolationSegmentStub        func(guid string) (ccv3.Warnings, error)
-	deleteIsolationSegmentMutex       sync.RWMutex
-	deleteIsolationSegmentArgsForCall []struct {
-		guid string
-	}
-	deleteIsolationSegmentReturns struct {
-		result1 ccv3.Warnings
-		result2 error
-	}
-	deleteIsolationSegmentReturnsOnCall map[int]struct {
-		result1 ccv3.Warnings
-		result2 error
-	}
 	DeleteApplicationStub        func(guid string) (string, ccv3.Warnings, error)
 	deleteApplicationMutex       sync.RWMutex
 	deleteApplicationArgsForCall []struct {
@@ -151,6 +154,19 @@ type FakeCloudControllerClient struct {
 		result2 error
 	}
 	deleteApplicationProcessInstanceReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	DeleteIsolationSegmentStub        func(guid string) (ccv3.Warnings, error)
+	deleteIsolationSegmentMutex       sync.RWMutex
+	deleteIsolationSegmentArgsForCall []struct {
+		guid string
+	}
+	deleteIsolationSegmentReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	deleteIsolationSegmentReturnsOnCall map[int]struct {
 		result1 ccv3.Warnings
 		result2 error
 	}
@@ -697,6 +713,61 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Process, ccv3.Warnings, error) {
+	fake.createApplicationProcessScaleMutex.Lock()
+	ret, specificReturn := fake.createApplicationProcessScaleReturnsOnCall[len(fake.createApplicationProcessScaleArgsForCall)]
+	fake.createApplicationProcessScaleArgsForCall = append(fake.createApplicationProcessScaleArgsForCall, struct {
+		appGUID string
+		process ccv3.Process
+	}{appGUID, process})
+	fake.recordInvocation("CreateApplicationProcessScale", []interface{}{appGUID, process})
+	fake.createApplicationProcessScaleMutex.Unlock()
+	if fake.CreateApplicationProcessScaleStub != nil {
+		return fake.CreateApplicationProcessScaleStub(appGUID, process)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createApplicationProcessScaleReturns.result1, fake.createApplicationProcessScaleReturns.result2, fake.createApplicationProcessScaleReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleCallCount() int {
+	fake.createApplicationProcessScaleMutex.RLock()
+	defer fake.createApplicationProcessScaleMutex.RUnlock()
+	return len(fake.createApplicationProcessScaleArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleArgsForCall(i int) (string, ccv3.Process) {
+	fake.createApplicationProcessScaleMutex.RLock()
+	defer fake.createApplicationProcessScaleMutex.RUnlock()
+	return fake.createApplicationProcessScaleArgsForCall[i].appGUID, fake.createApplicationProcessScaleArgsForCall[i].process
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturns(result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+	fake.CreateApplicationProcessScaleStub = nil
+	fake.createApplicationProcessScaleReturns = struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturnsOnCall(i int, result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+	fake.CreateApplicationProcessScaleStub = nil
+	if fake.createApplicationProcessScaleReturnsOnCall == nil {
+		fake.createApplicationProcessScaleReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Process
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.createApplicationProcessScaleReturnsOnCall[i] = struct {
+		result1 ccv3.Process
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) CreateApplicationTask(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error) {
 	fake.createApplicationTaskMutex.Lock()
 	ret, specificReturn := fake.createApplicationTaskReturnsOnCall[len(fake.createApplicationTaskArgsForCall)]
@@ -914,57 +985,6 @@ func (fake *FakeCloudControllerClient) CreatePackageReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) DeleteIsolationSegment(guid string) (ccv3.Warnings, error) {
-	fake.deleteIsolationSegmentMutex.Lock()
-	ret, specificReturn := fake.deleteIsolationSegmentReturnsOnCall[len(fake.deleteIsolationSegmentArgsForCall)]
-	fake.deleteIsolationSegmentArgsForCall = append(fake.deleteIsolationSegmentArgsForCall, struct {
-		guid string
-	}{guid})
-	fake.recordInvocation("DeleteIsolationSegment", []interface{}{guid})
-	fake.deleteIsolationSegmentMutex.Unlock()
-	if fake.DeleteIsolationSegmentStub != nil {
-		return fake.DeleteIsolationSegmentStub(guid)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fake.deleteIsolationSegmentReturns.result1, fake.deleteIsolationSegmentReturns.result2
-}
-
-func (fake *FakeCloudControllerClient) DeleteIsolationSegmentCallCount() int {
-	fake.deleteIsolationSegmentMutex.RLock()
-	defer fake.deleteIsolationSegmentMutex.RUnlock()
-	return len(fake.deleteIsolationSegmentArgsForCall)
-}
-
-func (fake *FakeCloudControllerClient) DeleteIsolationSegmentArgsForCall(i int) string {
-	fake.deleteIsolationSegmentMutex.RLock()
-	defer fake.deleteIsolationSegmentMutex.RUnlock()
-	return fake.deleteIsolationSegmentArgsForCall[i].guid
-}
-
-func (fake *FakeCloudControllerClient) DeleteIsolationSegmentReturns(result1 ccv3.Warnings, result2 error) {
-	fake.DeleteIsolationSegmentStub = nil
-	fake.deleteIsolationSegmentReturns = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeCloudControllerClient) DeleteIsolationSegmentReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
-	fake.DeleteIsolationSegmentStub = nil
-	if fake.deleteIsolationSegmentReturnsOnCall == nil {
-		fake.deleteIsolationSegmentReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Warnings
-			result2 error
-		})
-	}
-	fake.deleteIsolationSegmentReturnsOnCall[i] = struct {
-		result1 ccv3.Warnings
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeCloudControllerClient) DeleteApplication(guid string) (string, ccv3.Warnings, error) {
 	fake.deleteApplicationMutex.Lock()
 	ret, specificReturn := fake.deleteApplicationReturnsOnCall[len(fake.deleteApplicationArgsForCall)]
@@ -1067,6 +1087,57 @@ func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceReturnsOn
 		})
 	}
 	fake.deleteApplicationProcessInstanceReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteIsolationSegment(guid string) (ccv3.Warnings, error) {
+	fake.deleteIsolationSegmentMutex.Lock()
+	ret, specificReturn := fake.deleteIsolationSegmentReturnsOnCall[len(fake.deleteIsolationSegmentArgsForCall)]
+	fake.deleteIsolationSegmentArgsForCall = append(fake.deleteIsolationSegmentArgsForCall, struct {
+		guid string
+	}{guid})
+	fake.recordInvocation("DeleteIsolationSegment", []interface{}{guid})
+	fake.deleteIsolationSegmentMutex.Unlock()
+	if fake.DeleteIsolationSegmentStub != nil {
+		return fake.DeleteIsolationSegmentStub(guid)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.deleteIsolationSegmentReturns.result1, fake.deleteIsolationSegmentReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteIsolationSegmentCallCount() int {
+	fake.deleteIsolationSegmentMutex.RLock()
+	defer fake.deleteIsolationSegmentMutex.RUnlock()
+	return len(fake.deleteIsolationSegmentArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteIsolationSegmentArgsForCall(i int) string {
+	fake.deleteIsolationSegmentMutex.RLock()
+	defer fake.deleteIsolationSegmentMutex.RUnlock()
+	return fake.deleteIsolationSegmentArgsForCall[i].guid
+}
+
+func (fake *FakeCloudControllerClient) DeleteIsolationSegmentReturns(result1 ccv3.Warnings, result2 error) {
+	fake.DeleteIsolationSegmentStub = nil
+	fake.deleteIsolationSegmentReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteIsolationSegmentReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.DeleteIsolationSegmentStub = nil
+	if fake.deleteIsolationSegmentReturnsOnCall == nil {
+		fake.deleteIsolationSegmentReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.deleteIsolationSegmentReturnsOnCall[i] = struct {
 		result1 ccv3.Warnings
 		result2 error
 	}{result1, result2}
@@ -2485,6 +2556,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
+	fake.createApplicationProcessScaleMutex.RLock()
+	defer fake.createApplicationProcessScaleMutex.RUnlock()
 	fake.createApplicationTaskMutex.RLock()
 	defer fake.createApplicationTaskMutex.RUnlock()
 	fake.createBuildMutex.RLock()
@@ -2493,12 +2566,12 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.createIsolationSegmentMutex.RUnlock()
 	fake.createPackageMutex.RLock()
 	defer fake.createPackageMutex.RUnlock()
-	fake.deleteIsolationSegmentMutex.RLock()
-	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteApplicationMutex.RLock()
 	defer fake.deleteApplicationMutex.RUnlock()
 	fake.deleteApplicationProcessInstanceMutex.RLock()
 	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
+	fake.deleteIsolationSegmentMutex.RLock()
+	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getApplicationDropletsMutex.RLock()

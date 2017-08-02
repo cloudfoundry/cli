@@ -136,6 +136,7 @@ func isCommand(s string) bool {
 
 	return found
 }
+
 func isOption(s string) bool {
 	return strings.HasPrefix(s, "-")
 }

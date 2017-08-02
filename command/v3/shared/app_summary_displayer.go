@@ -106,48 +106,52 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 	}
 
 	for _, process := range summary.Processes {
-		display.UI.DisplayNewline()
-
-		display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
-			"ProcessType":          process.Type,
-			"HealthyInstanceCount": process.HealthyInstanceCount(),
-			"TotalInstanceCount":   process.TotalInstanceCount(),
-		})
-
-		if !display.processHasAnInstance(&process) {
-			continue
-		}
-
-		table := [][]string{
-			{
-				"",
-				display.UI.TranslateText("state"),
-				display.UI.TranslateText("since"),
-				display.UI.TranslateText("cpu"),
-				display.UI.TranslateText("memory"),
-				display.UI.TranslateText("disk"),
-			},
-		}
-
-		for _, instance := range process.Instances {
-			table = append(table, []string{
-				fmt.Sprintf("#%d", instance.Index),
-				display.UI.TranslateText(strings.ToLower(string(instance.State))),
-				display.appInstanceDate(instance.StartTime()),
-				fmt.Sprintf("%.1f%%", instance.CPU*100),
-				display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
-					"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
-					"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
-				}),
-				display.UI.TranslateText("{{.DiskUsage}} of {{.DiskQuota}}", map[string]interface{}{
-					"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
-					"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
-				}),
-			})
-		}
-
-		display.UI.DisplayInstancesTableForApp(table)
+		display.DisplayAppInstancesTable(process)
 	}
+}
+
+func (display AppSummaryDisplayer) DisplayAppInstancesTable(process v3action.Process) {
+	display.UI.DisplayNewline()
+
+	display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
+		"ProcessType":          process.Type,
+		"HealthyInstanceCount": process.HealthyInstanceCount(),
+		"TotalInstanceCount":   process.TotalInstanceCount(),
+	})
+
+	if !display.processHasAnInstance(&process) {
+		return
+	}
+
+	table := [][]string{
+		{
+			"",
+			display.UI.TranslateText("state"),
+			display.UI.TranslateText("since"),
+			display.UI.TranslateText("cpu"),
+			display.UI.TranslateText("memory"),
+			display.UI.TranslateText("disk"),
+		},
+	}
+
+	for _, instance := range process.Instances {
+		table = append(table, []string{
+			fmt.Sprintf("#%d", instance.Index),
+			display.UI.TranslateText(strings.ToLower(string(instance.State))),
+			display.appInstanceDate(instance.StartTime()),
+			fmt.Sprintf("%.1f%%", instance.CPU*100),
+			display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
+				"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
+				"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
+			}),
+			display.UI.TranslateText("{{.DiskUsage}} of {{.DiskQuota}}", map[string]interface{}{
+				"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
+				"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
+			}),
+		})
+	}
+
+	display.UI.DisplayInstancesTableForApp(table)
 }
 
 func (AppSummaryDisplayer) processesSummary(processes []v3action.Process) string {

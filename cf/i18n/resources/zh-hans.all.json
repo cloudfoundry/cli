@@ -1768,6 +1768,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
     "translation": ""
   },
@@ -5288,6 +5292,14 @@
     "translation": "正在以 {{.CurrentUser}} 身份扩展组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
   {
+    "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
+    "id": "Scaling cancelled",
+    "translation": ""
+  },
+  {
     "id": "Search the plugin repositories for new versions of installed plugins",
     "translation": ""
   },
@@ -5554,6 +5566,10 @@
   {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份显示组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 的当前扩展..."
+  },
+  {
+    "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

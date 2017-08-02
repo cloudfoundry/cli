@@ -1768,6 +1768,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
     "translation": ""
   },
@@ -5288,6 +5292,14 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 스케일링 중..."
   },
   {
+    "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
+    "id": "Scaling cancelled",
+    "translation": ""
+  },
+  {
     "id": "Search the plugin repositories for new versions of installed plugins",
     "translation": ""
   },
@@ -5554,6 +5566,10 @@
   {
     "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 현재 스케일 표시 중..."
+  },
+  {
+    "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

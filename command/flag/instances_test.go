@@ -10,6 +10,7 @@ import (
 
 var _ = Describe("Instances", func() {
 	var instances Instances
+
 	BeforeEach(func() {
 		instances = Instances{}
 	})
@@ -19,7 +20,7 @@ var _ = Describe("Instances", func() {
 			It("sets IsSet to false", func() {
 				err := instances.UnmarshalFlag("")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(instances).To(Equal(Instances{types.NullInt{Value: 0, IsSet: false}}))
+				Expect(instances).To(Equal(Instances{NullInt: types.NullInt{Value: 0, IsSet: false}}))
 			})
 		})
 
@@ -30,7 +31,7 @@ var _ = Describe("Instances", func() {
 					Type:    flags.ErrRequired,
 					Message: "invalid argument for flag '-i' (expected int > 0)",
 				}))
-				Expect(instances).To(Equal(Instances{types.NullInt{Value: 0, IsSet: false}}))
+				Expect(instances).To(Equal(Instances{NullInt: types.NullInt{Value: 0, IsSet: false}}))
 			})
 		})
 
@@ -41,7 +42,7 @@ var _ = Describe("Instances", func() {
 					Type:    flags.ErrRequired,
 					Message: "invalid argument for flag '-i' (expected int > 0)",
 				}))
-				Expect(instances).To(Equal(Instances{types.NullInt{Value: -10, IsSet: true}}))
+				Expect(instances).To(Equal(Instances{NullInt: types.NullInt{Value: -10, IsSet: true}}))
 			})
 		})
 
@@ -49,7 +50,7 @@ var _ = Describe("Instances", func() {
 			It("stores the integer and sets IsSet to true", func() {
 				err := instances.UnmarshalFlag("0")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(instances).To(Equal(Instances{types.NullInt{Value: 0, IsSet: true}}))
+				Expect(instances).To(Equal(Instances{NullInt: types.NullInt{Value: 0, IsSet: true}}))
 			})
 		})
 	})

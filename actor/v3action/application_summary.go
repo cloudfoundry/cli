@@ -49,6 +49,34 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 	return summary, allWarnings, nil
 }
 
+func (actor Actor) GetInstancesByApplicationAndProcessType(appGUID string, processType string) (Process, Warnings, error) {
+	var allWarnings Warnings
+
+	ccv3Process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, processType)
+	allWarnings = Warnings(warnings)
+	if err != nil {
+		return Process{}, allWarnings, err
+	}
+
+	processGUID := ccv3Process.GUID
+	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
+	allWarnings = append(allWarnings, Warnings(warnings)...)
+	if err != nil {
+		return Process{}, allWarnings, err
+	}
+
+	process := Process{
+		Type:       ccv3Process.Type,
+		MemoryInMB: ccv3Process.MemoryInMB,
+		DiskInMB:   ccv3Process.DiskInMB,
+	}
+	for _, instance := range instances {
+		process.Instances = append(process.Instances, Instance(instance))
+	}
+
+	return process, allWarnings, nil
+}
+
 func (actor Actor) getProcessesForApp(appGUID string) (Processes, Warnings, error) {
 	var allWarnings Warnings
 
