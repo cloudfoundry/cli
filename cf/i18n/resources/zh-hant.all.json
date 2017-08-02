@@ -6908,6 +6908,10 @@
     "translation": "環境變數 '{{.PropertyName}}' 不應該是空值"
   },
   {
+    "id": "env:",
+    "translation": ""
+  },
+  {
     "id": "event",
     "translation": "事件"
   },
@@ -6977,6 +6981,10 @@
   },
   {
     "id": "integer",
+    "translation": ""
+  },
+  {
+    "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
   {

@@ -6908,6 +6908,10 @@
     "translation": "환경 변수 '{{.PropertyName}}'은(는) 널이 아니어야 함"
   },
   {
+    "id": "env:",
+    "translation": ""
+  },
+  {
     "id": "event",
     "translation": "이벤트"
   },
@@ -6977,6 +6981,10 @@
   },
   {
     "id": "integer",
+    "translation": ""
+  },
+  {
+    "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
   {
