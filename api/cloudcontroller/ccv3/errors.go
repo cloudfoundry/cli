@@ -89,6 +89,10 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 
 func handleNotFound(errorResponse ccerror.V3Error) error {
 	switch errorResponse.Detail {
+	case "App not found":
+		return ccerror.ApplicationNotFoundError{}
+	case "Instance not found":
+		return ccerror.InstanceNotFoundError{}
 	case "Process not found":
 		return ccerror.ProcessNotFoundError{}
 	default:

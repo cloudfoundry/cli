@@ -74,7 +74,7 @@ var _ = Describe("Droplet", func() {
 
 			It("returns the error", func() {
 				_, _, err := client.GetApplicationCurrentDroplet("some-app-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "App not found"}))
+				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
 			})
 		})
 	})

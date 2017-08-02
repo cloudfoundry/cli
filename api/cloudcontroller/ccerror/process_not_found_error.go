@@ -1,6 +1,7 @@
 package ccerror
 
-// ProcessNotFoundError is returned when the API endpoint is not found.
+// ProcessNotFoundError is returned when an endpoint cannot find the
+// specified process
 type ProcessNotFoundError struct {
 }
 

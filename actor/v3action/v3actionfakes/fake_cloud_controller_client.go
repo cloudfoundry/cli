@@ -139,6 +139,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	DeleteApplicationProcessInstanceStub        func(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
+	deleteApplicationProcessInstanceMutex       sync.RWMutex
+	deleteApplicationProcessInstanceArgsForCall []struct {
+		appGUID       string
+		processType   string
+		instanceIndex int
+	}
+	deleteApplicationProcessInstanceReturns struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
+	deleteApplicationProcessInstanceReturnsOnCall map[int]struct {
+		result1 ccv3.Warnings
+		result2 error
+	}
 	EntitleIsolationSegmentToOrganizationsStub        func(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	entitleIsolationSegmentToOrganizationsMutex       sync.RWMutex
 	entitleIsolationSegmentToOrganizationsArgsForCall []struct {
@@ -986,6 +1001,59 @@ func (fake *FakeCloudControllerClient) DeleteApplicationReturnsOnCall(i int, res
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error) {
+	fake.deleteApplicationProcessInstanceMutex.Lock()
+	ret, specificReturn := fake.deleteApplicationProcessInstanceReturnsOnCall[len(fake.deleteApplicationProcessInstanceArgsForCall)]
+	fake.deleteApplicationProcessInstanceArgsForCall = append(fake.deleteApplicationProcessInstanceArgsForCall, struct {
+		appGUID       string
+		processType   string
+		instanceIndex int
+	}{appGUID, processType, instanceIndex})
+	fake.recordInvocation("DeleteApplicationProcessInstance", []interface{}{appGUID, processType, instanceIndex})
+	fake.deleteApplicationProcessInstanceMutex.Unlock()
+	if fake.DeleteApplicationProcessInstanceStub != nil {
+		return fake.DeleteApplicationProcessInstanceStub(appGUID, processType, instanceIndex)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.deleteApplicationProcessInstanceReturns.result1, fake.deleteApplicationProcessInstanceReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceCallCount() int {
+	fake.deleteApplicationProcessInstanceMutex.RLock()
+	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
+	return len(fake.deleteApplicationProcessInstanceArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceArgsForCall(i int) (string, string, int) {
+	fake.deleteApplicationProcessInstanceMutex.RLock()
+	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
+	return fake.deleteApplicationProcessInstanceArgsForCall[i].appGUID, fake.deleteApplicationProcessInstanceArgsForCall[i].processType, fake.deleteApplicationProcessInstanceArgsForCall[i].instanceIndex
+}
+
+func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceReturns(result1 ccv3.Warnings, result2 error) {
+	fake.DeleteApplicationProcessInstanceStub = nil
+	fake.deleteApplicationProcessInstanceReturns = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteApplicationProcessInstanceReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
+	fake.DeleteApplicationProcessInstanceStub = nil
+	if fake.deleteApplicationProcessInstanceReturnsOnCall == nil {
+		fake.deleteApplicationProcessInstanceReturnsOnCall = make(map[int]struct {
+			result1 ccv3.Warnings
+			result2 error
+		})
+	}
+	fake.deleteApplicationProcessInstanceReturnsOnCall[i] = struct {
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error) {
@@ -2358,6 +2426,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteIsolationSegmentMutex.RUnlock()
 	fake.deleteApplicationMutex.RLock()
 	defer fake.deleteApplicationMutex.RUnlock()
+	fake.deleteApplicationProcessInstanceMutex.RLock()
+	defer fake.deleteApplicationProcessInstanceMutex.RUnlock()
 	fake.entitleIsolationSegmentToOrganizationsMutex.RLock()
 	defer fake.entitleIsolationSegmentToOrganizationsMutex.RUnlock()
 	fake.getApplicationCurrentDropletMutex.RLock()

@@ -12,15 +12,19 @@ import (
 )
 
 var _ = Describe("Error Wrapper", func() {
-	var (
-		serverResponse     string
-		serverResponseCode int
-		makeError          error
+	var client *Client
 
-		client *Client
-	)
+	BeforeEach(func() {
+		client = NewTestClient()
+	})
 
 	Describe("Make", func() {
+		var (
+			serverResponse     string
+			serverResponseCode int
+			makeError          error
+		)
+
 		BeforeEach(func() {
 			serverResponse = `
 {
@@ -33,7 +37,6 @@ var _ = Describe("Error Wrapper", func() {
   ]
 }`
 
-			client = NewTestClient()
 		})
 
 		JustBeforeEach(func() {
@@ -158,6 +161,44 @@ var _ = Describe("Error Wrapper", func() {
 
 					It("returns a ProcessNotFoundError", func() {
 						Expect(makeError).To(MatchError(ccerror.ProcessNotFoundError{}))
+					})
+				})
+
+				Context("when an instance is not found", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10010,
+      "detail": "Instance not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					})
+
+					It("returns an InstanceNotFoundError", func() {
+						Expect(makeError).To(MatchError(ccerror.InstanceNotFoundError{}))
+					})
+				})
+
+				Context("when an application is not found", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					})
+
+					It("returns an AppNotFoundError", func() {
+						Expect(makeError).To(MatchError(ccerror.ApplicationNotFoundError{}))
 					})
 				})
 

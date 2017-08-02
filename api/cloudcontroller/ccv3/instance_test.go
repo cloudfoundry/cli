@@ -18,6 +18,59 @@ var _ = Describe("Instance", func() {
 		client = NewTestClient()
 	})
 
+	Describe("DeleteInstanceByApplicationProcessTypeAndIndex", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = client.DeleteApplicationProcessInstance("some-app-guid", "some-process-type", 666)
+		})
+
+		Context("when the cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Process not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid/processes/some-process-type/instances/666"),
+						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				Expect(executeErr).To(MatchError(ccerror.ProcessNotFoundError{}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when the delete is successful", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid/processes/some-process-type/instances/666"),
+						RespondWith(http.StatusNoContent, "", http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+	})
+
 	Describe("GetProcessInstances", func() {
 		Context("when the process exists", func() {
 			BeforeEach(func() {
