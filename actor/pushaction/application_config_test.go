@@ -387,6 +387,12 @@ var _ = Describe("Application Config", func() {
 						"env2": "2",
 						"env3": "3",
 					}))
+
+					// Does not modify original set of env vars
+					Expect(firstConfig.CurrentApplication.EnvironmentVariables).To(Equal(map[string]string{
+						"env2": "2",
+						"env3": "9",
+					}))
 				})
 			})
 

@@ -127,6 +127,13 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 			})
 	}
 
+	changes = append(changes,
+		ui.Change{
+			Header:       "env:",
+			CurrentValue: appConfig.CurrentApplication.EnvironmentVariables,
+			NewValue:     appConfig.DesiredApplication.EnvironmentVariables,
+		})
+
 	var currentRoutes []string
 	for _, route := range appConfig.CurrentRoutes {
 		currentRoutes = append(currentRoutes, route.String())
