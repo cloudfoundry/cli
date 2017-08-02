@@ -184,6 +184,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Delete a V3 App",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
     "translation": ""
   },
@@ -369,6 +373,10 @@
   },
   {
     "id": "App {{.AppName}} already exists.",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} does not exist",
     "translation": ""
   },
   {
@@ -1718,6 +1726,10 @@
   {
     "id": "CF_NAME v3-create-package APP_NAME",
     "translation": "CF_NAME v3-create-package APP_NAME"
+  },
+  {
+    "id": "CF_NAME v3-delete APP_NAME [-f]",
+    "translation": ""
   },
   {
     "id": "CF_NAME v3-get-health-check APP_NAME",
@@ -4750,6 +4762,10 @@
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
     "translation": "Really delete orphaned routes?{{.Prompt}}"
+  },
+  {
+    "id": "Really delete the app {{.AppName}}?",
+    "translation": "Really delete the app {{.AppName}}?"
   },
   {
     "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",

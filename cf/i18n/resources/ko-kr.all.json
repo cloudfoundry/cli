@@ -184,6 +184,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Delete a V3 App",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
     "translation": ""
   },
@@ -369,6 +373,10 @@
   },
   {
     "id": "App {{.AppName}} already exists.",
+    "translation": ""
+  },
+  {
+    "id": "App {{.AppName}} does not exist",
     "translation": ""
   },
   {
@@ -1717,6 +1725,10 @@
   },
   {
     "id": "CF_NAME v3-create-package APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-delete APP_NAME [-f]",
     "translation": ""
   },
   {
@@ -4750,6 +4762,10 @@
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
     "translation": "고아인 라우트를 삭제하시겠습니까?{{.Prompt}}"
+  },
+  {
+    "id": "Really delete the app {{.AppName}}?",
+    "translation": ""
   },
   {
     "id": "Really delete the isolation segment {{.IsolationSegmentName}}?",

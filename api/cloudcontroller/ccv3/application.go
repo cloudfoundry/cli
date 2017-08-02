@@ -131,6 +131,21 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteApplicationRequest,
+		URIParams:   internal.Params{"guid": appGUID},
+	})
+	if err != nil {
+		return "", nil, err
+	}
+
+	response := cloudcontroller.Response{}
+	err = client.connection.Make(request, &response)
+
+	return response.ResourceLocationURL, response.Warnings, err
+}
+
 // UpdateApplication updates an application with the given settings
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
 	bodyBytes, err := json.Marshal(app)

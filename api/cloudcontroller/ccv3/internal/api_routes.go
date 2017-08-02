@@ -11,6 +11,7 @@ import "net/http"
 //
 // The const name should always be the const value + Request.
 const (
+	DeleteApplicationRequest                              = "DeleteApplication"
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
 	GetAppDropletCurrent                                  = "GetAppDropletCurrent"
@@ -63,6 +64,7 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodPost, Name: PostBuildRequest, Resource: BuildsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostPackageRequest, Resource: PackagesResource},
+	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteApplicationRequest, Resource: AppsResource},
 	{Path: "/:guid", Method: http.MethodDelete, Name: DeleteIsolationSegmentRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetBuildRequest, Resource: BuildsResource},
 	{Path: "/:guid", Method: http.MethodGet, Name: GetIsolationSegmentRequest, Resource: IsolationSegmentsResource},

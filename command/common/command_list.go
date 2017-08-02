@@ -18,6 +18,7 @@ type commandList struct {
 	V3App            v3.V3AppCommand            `command:"v3-app" description:"Display health and status for an app"`
 	V3Apps           v3.V3AppsCommand           `command:"v3-apps" description:"List all apps in the target space"`
 	V3CreateApp      v3.V3CreateAppCommand      `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
+	V3DeleteApp      v3.V3DeleteCommand         `command:"v3-delete" description:"**EXPERIMENTAL** Delete a V3 App"`
 	V3CreatePackage  v3.V3CreatePackageCommand  `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 	V3GetHealthCheck v3.V3GetHealthCheckCommand `command:"v3-get-health-check" description:"**EXPERIMENTAL** Show the type of health check performed on an app"`
 	V3Push           v3.V3PushCommand           `command:"v3-push" description:"Push a new app or sync changes to an existing app"`

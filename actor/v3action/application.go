@@ -37,6 +37,26 @@ func (e ApplicationAlreadyExistsError) Error() string {
 	return fmt.Sprintf("Application '%s' already exists.", e.Name)
 }
 
+func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
+	var allWarnings Warnings
+
+	app, getAppWarnings, err := actor.GetApplicationByNameAndSpace(name, spaceGUID)
+	allWarnings = append(allWarnings, getAppWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	jobURL, deleteAppWarnings, err := actor.CloudControllerClient.DeleteApplication(app.GUID)
+	allWarnings = append(allWarnings, deleteAppWarnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	pollWarnings, err := actor.CloudControllerClient.PollJob(jobURL)
+	allWarnings = append(allWarnings, pollWarnings...)
+	return allWarnings, err
+}
+
 // GetApplicationByNameAndSpace returns the application with the given
 // name in the given space.
 func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
