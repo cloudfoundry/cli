@@ -10,6 +10,9 @@ import (
 
 var _ = Describe("Instances", func() {
 	var instances Instances
+	BeforeEach(func() {
+		instances = Instances{}
+	})
 
 	Describe("UnmarshalFlag", func() {
 		Context("when the empty string is provided", func() {
