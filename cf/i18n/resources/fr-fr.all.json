@@ -6908,6 +6908,10 @@
     "translation": "La variable d'environnement '{{.PropertyName}}' ne doit pas avoir la valeur NULL"
   },
   {
+    "id": "env:",
+    "translation": ""
+  },
+  {
     "id": "event",
     "translation": "événement"
   },
@@ -6977,6 +6981,10 @@
   },
   {
     "id": "integer",
+    "translation": ""
+  },
+  {
+    "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
   {

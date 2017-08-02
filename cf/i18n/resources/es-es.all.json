@@ -6908,6 +6908,10 @@
     "translation": "la variable de entorno '{{.PropertyName}}' no debería ser nula"
   },
   {
+    "id": "env:",
+    "translation": ""
+  },
+  {
     "id": "event",
     "translation": "suceso"
   },
@@ -6977,6 +6981,10 @@
   },
   {
     "id": "integer",
+    "translation": ""
+  },
+  {
+    "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
   {
