@@ -444,6 +444,52 @@ var _ = Describe("Application", func() {
 		})
 	})
 
+	Describe("DeleteApplication", func() {
+		Context("when the application is deleted successfully", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid"),
+						RespondWith(http.StatusAccepted, ``,
+							http.Header{
+								"X-Cf-Warnings": {"some-warning"},
+								"Location":      {"/v3/jobs/some-location"},
+							},
+						),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				jobLocation, warnings, err := client.DeleteApplication("some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(jobLocation).To(Equal("/v3/jobs/some-location"))
+				Expect(warnings).To(ConsistOf("some-warning"))
+			})
+		})
+
+		Context("when deleting the application returns an error", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid"),
+						RespondWith(http.StatusBadRequest, ``,
+							http.Header{
+								"X-Cf-Warnings": {"some-warning"},
+							},
+						),
+					),
+				)
+			})
+
+			It("returns all warnings", func() {
+				_, warnings, err := client.DeleteApplication("some-app-guid")
+				Expect(err).To(MatchError(ccerror.RawHTTPStatusError{StatusCode: 400, RawResponse: []byte{}}))
+				Expect(warnings).To(ConsistOf("some-warning"))
+			})
+		})
+	})
+
 	Describe("SetApplicationDroplet", func() {
 		Context("it sets the droplet", func() {
 			BeforeEach(func() {

@@ -38,9 +38,15 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestClient() *Client {
+func NewTestClient(config ...Config) *Client {
 	SetupV3Response()
-	client := NewClient(Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"})
+	var client *Client
+
+	if config != nil {
+		client = NewClient(config[0])
+	} else {
+		client = NewClient(Config{AppName: "CF CLI API V3 Test", AppVersion: "Unknown"})
+	}
 	warnings, err := client.TargetCF(TargetSettings{
 		SkipSSLValidation: true,
 		URL:               server.URL(),

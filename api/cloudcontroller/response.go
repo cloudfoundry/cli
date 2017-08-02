@@ -17,6 +17,9 @@ type Response struct {
 
 	// HTTPResponse represents the HTTP response object.
 	HTTPResponse *http.Response
+
+	// ResourceLocationURL represents the Location header value
+	ResourceLocationURL string
 }
 
 func (r *Response) reset() {

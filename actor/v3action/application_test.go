@@ -29,6 +29,73 @@ var _ = Describe("Application Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, fakeConfig)
 	})
 
+	Describe("DeleteApplicationByNameAndSpace", func() {
+		var (
+			warnings   Warnings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.DeleteApplicationByNameAndSpace("some-app", "some-space-guid")
+		})
+
+		Context("when looking up the app guid fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{}, ccv3.Warnings{"some-get-app-warning"}, errors.New("some-get-app-error"))
+			})
+
+			It("returns the warnings and error", func() {
+				Expect(warnings).To(ConsistOf("some-get-app-warning"))
+				Expect(executeErr).To(MatchError("some-get-app-error"))
+			})
+		})
+
+		Context("when looking up the app guid succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{ccv3.Application{Name: "some-app", GUID: "abc123"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
+			})
+
+			Context("when sending the delete fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteApplicationReturns("", ccv3.Warnings{"some-delete-app-warning"}, errors.New("some-delete-app-error"))
+				})
+
+				It("returns the warnings and error", func() {
+					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-app-warning"))
+					Expect(executeErr).To(MatchError("some-delete-app-error"))
+				})
+			})
+
+			Context("when sending the delete succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteApplicationReturns("/some-job-url", ccv3.Warnings{"some-delete-app-warning"}, nil)
+				})
+
+				Context("when polling fails", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-poll-warning"}, errors.New("some-poll-error"))
+					})
+
+					It("returns the warnings and poll error", func() {
+						Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-app-warning", "some-poll-warning"))
+						Expect(executeErr).To(MatchError("some-poll-error"))
+					})
+				})
+
+				Context("when polling succeeds", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PollJobReturns(ccv3.Warnings{"some-poll-warning"}, nil)
+					})
+
+					It("returns all the warnings and no error", func() {
+						Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-app-warning", "some-poll-warning"))
+						Expect(executeErr).ToNot(HaveOccurred())
+					})
+				})
+			})
+		})
+	})
+
 	Describe("GetApplicationByNameAndSpace", func() {
 		Context("when the app exists", func() {
 			BeforeEach(func() {

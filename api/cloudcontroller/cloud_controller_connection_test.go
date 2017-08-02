@@ -112,6 +112,30 @@ var _ = Describe("Cloud Controller Connection", func() {
 		})
 
 		Describe("Response Headers", func() {
+			Describe("Location", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/foo"),
+							RespondWith(http.StatusAccepted, "{}", http.Header{"Location": {"/v2/some-location"}}),
+						),
+					)
+				})
+
+				It("returns the location in the ResourceLocationURL", func() {
+					req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+					Expect(err).ToNot(HaveOccurred())
+					request := &Request{Request: req}
+
+					var response Response
+					err = connection.Make(request, &response)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+					Expect(response.ResourceLocationURL).To(Equal("/v2/some-location"))
+				})
+			})
+
 			Describe("X-Cf-Warnings", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(

@@ -95,6 +95,10 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 		}
 	}
 
+	if resourceLocationURL := response.Header.Get("Location"); resourceLocationURL != "" {
+		passedResponse.ResourceLocationURL = resourceLocationURL
+	}
+
 	rawBytes, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
