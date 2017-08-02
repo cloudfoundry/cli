@@ -85,10 +85,9 @@ func setupCF(org string, space string) {
 }
 
 func EnableDockerSupport() {
-	homeDir := helpers.SetHomeDir()
+	tempHome := helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()
 	Eventually(helpers.CF("enable-feature-flag", "diego_docker")).Should(Exit(0))
-	helpers.DestroyHomeDir(homeDir)
-	return orgName, spaceName1
+	helpers.DestroyHomeDir(tempHome)
 }
