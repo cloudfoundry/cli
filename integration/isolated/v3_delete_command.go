@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("v3-delete command", func() {
+var _ = Describe("v3-delete command", func() {
 	var (
 		orgName   string
 		spaceName string
