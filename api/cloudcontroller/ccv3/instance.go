@@ -10,14 +10,14 @@ import (
 )
 
 type Instance struct {
+	Index       int
 	State       string
+	Uptime      int
 	CPU         float64
 	MemoryUsage uint64
-	DiskUsage   uint64
 	MemoryQuota uint64
+	DiskUsage   uint64
 	DiskQuota   uint64
-	Index       int
-	Uptime      int
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.

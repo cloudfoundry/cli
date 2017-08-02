@@ -27,10 +27,18 @@ func ParseV3AppTable(input []byte) AppTable {
 	appTable := AppTable{}
 
 	rows := strings.Split(string(input), "\n")
-	for i, row := range rows {
-		if i < 10 {
-			// this is where the processes start
-			continue
+	foundFirstProcess := false
+	for _, row := range rows {
+		if !foundFirstProcess {
+			ok, err := regexp.MatchString(`\A([^:]+):\d/\d\z`, row)
+			if err != nil {
+				panic(err)
+			}
+			if ok {
+				foundFirstProcess = true
+			} else {
+				continue
+			}
 		}
 
 		if row == "" {

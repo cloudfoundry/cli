@@ -8,6 +8,7 @@ import (
 
 var _ = Describe("NullInt", func() {
 	var nullInt NullInt
+
 	BeforeEach(func() {
 		nullInt = NullInt{}
 	})

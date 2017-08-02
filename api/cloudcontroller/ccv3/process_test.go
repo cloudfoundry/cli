@@ -405,4 +405,115 @@ var _ = Describe("Process", func() {
 			})
 		})
 	})
+
+	Describe("CreateApplicationProcessScale", func() {
+		var passedProcess Process
+
+		BeforeEach(func() {
+			passedProcess = Process{
+				Type:       "web",
+				Instances:  2,
+				MemoryInMB: 100,
+				DiskInMB:   200,
+			}
+		})
+
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				expectedBody := `{
+					"instances": 2,
+					"memory_in_mb": 100,
+					"disk_in_mb": 200
+				}`
+				response := `{
+					"guid": "some-process-guid",
+					"type": "web",
+					"command": "rackup",
+					"instances": 2,
+					"memory_in_mb": 100,
+					"disk_in_mb": 200,
+					"health_check": {
+						"type": "port",
+						"data": {
+							"timeout": null,
+							"endpoint": "some-endpoint"
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(process).To(Equal(Process{
+					GUID:       "some-process-guid",
+					Type:       "web",
+					Instances:  2,
+					MemoryInMB: 100,
+					DiskInMB:   200,
+					HealthCheck: ProcessHealthCheck{
+						Type: "port",
+						Data: ProcessHealthCheckData{
+							Endpoint: "some-endpoint",
+						},
+					},
+				}))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			BeforeEach(func() {
+				response := `{
+						"errors": [
+							{
+								"code": 10008,
+								"detail": "The request is semantically invalid: command presence",
+								"title": "CF-UnprocessableEntity"
+							},
+							{
+								"code": 10009,
+								"detail": "Some CC Error",
+								"title": "CF-SomeNewError"
+							}
+						]
+					}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						Errors: []ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10009,
+								Detail: "Some CC Error",
+								Title:  "CF-SomeNewError",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
 })

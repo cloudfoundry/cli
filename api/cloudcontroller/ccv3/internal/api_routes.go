@@ -21,7 +21,6 @@ const (
 	GetApplicationProcessByTypeRequest                    = "GetApplicationProcessByType"
 	GetAppsRequest                                        = "GetApps"
 	GetBuildRequest                                       = "GetBuild"
-	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
@@ -29,13 +28,15 @@ const (
 	GetOrgsRequest                                        = "GetOrgs"
 	GetPackageRequest                                     = "GetPackage"
 	GetPackagesRequest                                    = "GetPackages"
+	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetSpaceRelationshipIsolationSegmentRequest           = "GetSpaceRelationshipIsolationSegmentRequest"
-	PatchApplicationRequest                               = "PatchApplicationRequest"
 	PatchApplicationCurrentDropletRequest                 = "PatchApplicationCurrentDroplet"
 	PatchApplicationProcessHealthCheckRequest             = "PatchApplicationProcessHealthCheck"
+	PatchApplicationRequest                               = "PatchApplicationRequest"
 	PatchOrganizationDefaultIsolationSegmentRequest       = "PatchOrganizationDefaultIsolationSegmentRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest         = "PatchSpaceRelationshipIsolationSegmentRequest"
 	PostAppTasksRequest                                   = "PostAppTasks"
+	PostApplicationProcessScaleRequest                    = "PostApplicationProcessScale"
 	PostApplicationRequest                                = "PostApplicationRequest"
 	PostApplicationStartRequest                           = "PostApplicationStart"
 	PostApplicationStopRequest                            = "PostApplicationStop"
@@ -81,6 +82,7 @@ var APIRoutes = []Route{
 	{Path: "/:isolation_segment_guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:app_guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessByTypeRequest, Resource: AppsResource},
+	{Path: "/:app_guid/processes/:type/actions/scale", Method: http.MethodPost, Name: PostApplicationProcessScaleRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes/:type/instances/:index", Method: http.MethodDelete, Name: DeleteApplicationProcessInstanceRequest, Resource: AppsResource},
 	{Path: "/:app_guid/relationships/current_droplet", Method: http.MethodPatch, Name: PatchApplicationCurrentDropletRequest, Resource: AppsResource},
 	{Path: "/:organization_guid/relationships/default_isolation_segment", Method: http.MethodGet, Name: GetOrganizationDefaultIsolationSegmentRequest, Resource: OrgsResource},
