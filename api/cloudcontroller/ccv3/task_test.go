@@ -279,7 +279,7 @@ var _ = Describe("Task", func() {
 
 			It("returns a ResourceNotFoundError", func() {
 				_, _, err := client.GetApplicationTasks("some-app-guid", nil)
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "App not found"}))
+				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
 			})
 		})
 

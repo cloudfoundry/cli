@@ -141,7 +141,7 @@ var _ = Describe("Process", func() {
 
 			It("returns the error", func() {
 				_, _, err := client.GetApplicationProcesses("some-app-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "App not found"}))
+				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
 			})
 		})
 	})

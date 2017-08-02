@@ -19,6 +19,7 @@ type CloudControllerClient interface {
 	CreatePackage(pkg ccv3.Package) (ccv3.Package, ccv3.Warnings, error)
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
 	DeleteApplication(guid string) (string, ccv3.Warnings, error)
+	DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationCurrentDroplet(appGUID string) (ccv3.Droplet, ccv3.Warnings, error)
 	GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
