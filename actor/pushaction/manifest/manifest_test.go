@@ -31,6 +31,8 @@ var _ = Describe("Manifest", func() {
 	})
 
 	Describe("ReadAndMergeManifests", func() {
+		// There are additional tests for this function in manifest_*OS*_test.go
+
 		var (
 			apps       []Application
 			executeErr error
@@ -57,6 +59,11 @@ applications:
   disk_quota: 1G
   memory: 2G
 - name: "app-3"
+  env:
+    env_1: 'foo'
+    env_2: 182837403930483038
+    env_3: true
+    env_4: 1.00001
 `
 		})
 
@@ -80,7 +87,15 @@ applications:
 					DiskQuota: 1024,
 					Memory:    2048,
 				},
-				Application{Name: "app-3"},
+				Application{
+					Name: "app-3",
+					EnvironmentVariables: map[string]string{
+						"env_1": "foo",
+						"env_2": "182837403930483038",
+						"env_3": "true",
+						"env_4": "1.00001",
+					},
+				},
 			))
 		})
 	})

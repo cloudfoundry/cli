@@ -18,8 +18,11 @@ type Application struct {
 	BuildpackName string
 	Command       string
 	// DiskQuota is the disk size in megabytes.
-	DiskQuota               uint64
-	DockerImage             string
+	DiskQuota   uint64
+	DockerImage string
+	// EnvironmentVariables can be any valid json type (ie, strings not
+	// guaranteed, although CLI only ships strings).
+	EnvironmentVariables    map[string]string
 	HealthCheckHTTPEndpoint string
 	// HealthCheckType attribute defines the number of seconds that is allocated
 	// for starting an application.
@@ -51,19 +54,20 @@ func (app Application) String() string {
 	)
 }
 
-func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {
+func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {
 	var manifestApp struct {
-		Buildpack               string `yaml:"buildpack"`
-		Command                 string `yaml:"command"`
-		DiskQuota               string `yaml:"disk_quota"`
-		HealthCheckHTTPEndpoint string `yaml:"health-check-http-endpoint"`
-		HealthCheckType         string `yaml:"health-check-type"`
-		Instances               int    `yaml:"instances"`
-		Memory                  string `yaml:"memory"`
-		Name                    string `yaml:"name"`
-		Path                    string `yaml:"path"`
-		StackName               string `yaml:"stack"`
-		Timeout                 int    `yaml:"timeout"`
+		Buildpack               string            `yaml:"buildpack"`
+		Command                 string            `yaml:"command"`
+		DiskQuota               string            `yaml:"disk_quota"`
+		EnvironmentVariables    map[string]string `yaml:"env"`
+		HealthCheckHTTPEndpoint string            `yaml:"health-check-http-endpoint"`
+		HealthCheckType         string            `yaml:"health-check-type"`
+		Instances               int               `yaml:"instances"`
+		Memory                  string            `yaml:"memory"`
+		Name                    string            `yaml:"name"`
+		Path                    string            `yaml:"path"`
+		StackName               string            `yaml:"stack"`
+		Timeout                 int               `yaml:"timeout"`
 	}
 
 	err := unmarshaller(&manifestApp)
@@ -71,22 +75,23 @@ func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error 
 		return err
 	}
 
-	a.BuildpackName = manifestApp.Buildpack
-	a.Command = manifestApp.Command
-	a.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
-	a.HealthCheckType = manifestApp.HealthCheckType
-	a.Instances = manifestApp.Instances
-	a.Name = manifestApp.Name
-	a.Path = manifestApp.Path
-	a.StackName = manifestApp.StackName
-	a.HealthCheckTimeout = manifestApp.Timeout
+	app.BuildpackName = manifestApp.Buildpack
+	app.Command = manifestApp.Command
+	app.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
+	app.HealthCheckType = manifestApp.HealthCheckType
+	app.Instances = manifestApp.Instances
+	app.Name = manifestApp.Name
+	app.Path = manifestApp.Path
+	app.StackName = manifestApp.StackName
+	app.HealthCheckTimeout = manifestApp.Timeout
+	app.EnvironmentVariables = manifestApp.EnvironmentVariables
 
 	if manifestApp.DiskQuota != "" {
 		disk, err := bytefmt.ToMegabytes(manifestApp.DiskQuota)
 		if err != nil {
 			return err
 		}
-		a.DiskQuota = disk
+		app.DiskQuota = disk
 	}
 
 	if manifestApp.Memory != "" {
@@ -94,7 +99,7 @@ func (a *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error 
 		if err != nil {
 			return err
 		}
-		a.Memory = memory
+		app.Memory = memory
 	}
 
 	return nil
