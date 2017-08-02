@@ -3,6 +3,7 @@ package ccv2
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -47,6 +48,9 @@ type Application struct {
 
 	// DockerImage is the docker image location.
 	DockerImage string `json:"docker_image,omitempty"`
+
+	// EnvironmentVariables are the environment variables passed to the app.
+	EnvironmentVariables map[string]string `json:"environment_json,omitempty"`
 
 	// GUID is the unique application identifier.
 	GUID string `json:"guid,omitempty"`
@@ -98,27 +102,34 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	var ccApp struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Buildpack                string     `json:"buildpack"`
-			Command                  string     `json:"command"`
-			DetectedBuildpack        string     `json:"detected_buildpack"`
-			DetectedStartCommand     string     `json:"detected_start_command"`
-			DiskQuota                uint64     `json:"disk_quota"`
-			DockerImage              string     `json:"docker_image"`
-			HealthCheckHTTPEndpoint  string     `json:"health_check_http_endpoint"`
-			HealthCheckTimeout       int        `json:"health_check_timeout"`
-			HealthCheckType          string     `json:"health_check_type"`
-			Instances                int        `json:"instances"`
-			Memory                   uint64     `json:"memory"`
-			Name                     string     `json:"name"`
-			PackageState             string     `json:"package_state"`
-			PackageUpdatedAt         *time.Time `json:"package_updated_at"`
-			StackGUID                string     `json:"stack_guid"`
-			StagingFailedDescription string     `json:"staging_failed_description"`
-			StagingFailedReason      string     `json:"staging_failed_reason"`
-			State                    string     `json:"state"`
+			Buildpack            string `json:"buildpack"`
+			Command              string `json:"command"`
+			DetectedBuildpack    string `json:"detected_buildpack"`
+			DetectedStartCommand string `json:"detected_start_command"`
+			DiskQuota            uint64 `json:"disk_quota"`
+			DockerImage          string `json:"docker_image"`
+			// EnvironmentVariables' values can be any type, so we must accept
+			// interface{}, but we convert to string.
+			EnvironmentVariables     map[string]interface{} `json:"environment_json"`
+			HealthCheckHTTPEndpoint  string                 `json:"health_check_http_endpoint"`
+			HealthCheckTimeout       int                    `json:"health_check_timeout"`
+			HealthCheckType          string                 `json:"health_check_type"`
+			Instances                int                    `json:"instances"`
+			Memory                   uint64                 `json:"memory"`
+			Name                     string                 `json:"name"`
+			PackageState             string                 `json:"package_state"`
+			PackageUpdatedAt         *time.Time             `json:"package_updated_at"`
+			StackGUID                string                 `json:"stack_guid"`
+			StagingFailedDescription string                 `json:"staging_failed_description"`
+			StagingFailedReason      string                 `json:"staging_failed_reason"`
+			State                    string                 `json:"state"`
 		} `json:"entity"`
 	}
-	if err := json.Unmarshal(data, &ccApp); err != nil {
+
+	decoder := json.NewDecoder(bytes.NewBuffer(data))
+	decoder.UseNumber()
+	err := decoder.Decode(&ccApp)
+	if err != nil {
 		return err
 	}
 
@@ -140,6 +151,14 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
 	application.State = ApplicationState(ccApp.Entity.State)
+
+	if len(ccApp.Entity.EnvironmentVariables) > 0 {
+		envVariableValues := map[string]string{}
+		for key, value := range ccApp.Entity.EnvironmentVariables {
+			envVariableValues[key] = fmt.Sprint(value)
+		}
+		application.EnvironmentVariables = envVariableValues
+	}
 
 	if ccApp.Entity.PackageUpdatedAt != nil {
 		application.PackageUpdatedAt = *ccApp.Entity.PackageUpdatedAt

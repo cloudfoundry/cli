@@ -100,6 +100,12 @@ var _ = Describe("Application", func() {
 							"disk_quota": 586,
 							"detected_buildpack": null,
 							"docker_image": "some-docker-path",
+							"environment_json": {
+								"key1": "val1",
+								"key2": 83493475092347,
+								"key3": true,
+								"key4": 75821.521
+							},
 							"health_check_timeout": 120,
 							"health_check_type": "port",
 							"health_check_http_endpoint": "/",
@@ -131,12 +137,18 @@ var _ = Describe("Application", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(app).To(Equal(Application{
-					Buildpack:                "ruby 1.6.29",
-					Command:                  "some-command",
-					DetectedBuildpack:        "",
-					DetectedStartCommand:     "echo 'I am a banana'",
-					DiskQuota:                586,
-					DockerImage:              "some-docker-path",
+					Buildpack:            "ruby 1.6.29",
+					Command:              "some-command",
+					DetectedBuildpack:    "",
+					DetectedStartCommand: "echo 'I am a banana'",
+					DiskQuota:            586,
+					DockerImage:          "some-docker-path",
+					EnvironmentVariables: map[string]string{
+						"key1": "val1",
+						"key2": "83493475092347",
+						"key3": "true",
+						"key4": "75821.521",
+					},
 					GUID:                     "app-guid-1",
 					HealthCheckTimeout:       120,
 					HealthCheckType:          "port",
@@ -288,6 +300,12 @@ var _ = Describe("Application", func() {
 					"disk_quota": 586,
 					"detected_buildpack": null,
 					"docker_image": "some-docker-path",
+					"environment_json": {
+						"key1": "val1",
+						"key2": 83493475092347,
+						"key3": true,
+						"key4": 75821.521
+					},
 					"health_check_timeout": 120,
 					"health_check_type": "some-health-check-type",
 					"health_check_http_endpoint": "/anything",
@@ -300,10 +318,16 @@ var _ = Describe("Application", func() {
 				}
 			}`
 					expectedBody := map[string]interface{}{
-						"buildpack":                  "ruby 1.6.29",
-						"command":                    "some-command",
-						"disk_quota":                 586,
-						"docker_image":               "some-docker-path",
+						"buildpack":    "ruby 1.6.29",
+						"command":      "some-command",
+						"disk_quota":   586,
+						"docker_image": "some-docker-path",
+						"environment_json": map[string]string{
+							"key1": "val1",
+							"key2": "83493475092347",
+							"key3": "true",
+							"key4": "75821.521",
+						},
 						"health_check_http_endpoint": "/anything",
 						"health_check_type":          "some-health-check-type",
 						"instances":                  13,
@@ -327,7 +351,13 @@ var _ = Describe("Application", func() {
 						Command:     "some-command",
 						DiskQuota:   586,
 						DockerImage: "some-docker-path",
-						GUID:        "some-app-guid",
+						EnvironmentVariables: map[string]string{
+							"key1": "val1",
+							"key2": "83493475092347",
+							"key3": "true",
+							"key4": "75821.521",
+						},
+						GUID: "some-app-guid",
 						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckType:         "some-health-check-type",
 						Instances:               13,
@@ -341,16 +371,22 @@ var _ = Describe("Application", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						Buildpack:               "ruby 1.6.29",
-						Command:                 "some-command",
-						DetectedBuildpack:       "",
-						DetectedStartCommand:    "echo 'I am a banana'",
-						DiskQuota:               586,
-						DockerImage:             "some-docker-path",
-						GUID:                    "some-app-guid",
+						Buildpack:            "ruby 1.6.29",
+						Command:              "some-command",
+						DetectedBuildpack:    "",
+						DetectedStartCommand: "echo 'I am a banana'",
+						DiskQuota:            586,
+						DockerImage:          "some-docker-path",
+						EnvironmentVariables: map[string]string{
+							"key1": "val1",
+							"key2": "83493475092347",
+							"key3": "true",
+							"key4": "75821.521",
+						},
+						GUID: "some-app-guid",
+						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckTimeout:      120,
 						HealthCheckType:         "some-health-check-type",
-						HealthCheckHTTPEndpoint: "/anything",
 						Instances:               13,
 						Memory:                  1024,
 						Name:                    "app-name-1",
