@@ -142,16 +142,16 @@ var _ = Describe("UI", func() {
 
 			Context("when passed map[string]string for values", func() {
 				It("should display the header with sorted differences", func() {
-					old := map[string]string{"val1": "1", "val3": "3", "val4": "4"}
-					new := map[string]string{"val2": "2", "val3": "2", "val4": "4"}
+					old := map[string]string{"key2": "2", "key3": "2", "key4": "4"}
+					new := map[string]string{"key1": "1", "key3": "3", "key4": "4"}
 					err := ui.DisplayChangeForPush("maps", 2, old, new)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(out).To(Say("\\s+maps"))
-					Expect(out).To(Say("\x1b\\[32m\\+\\s+val1\x1b\\[0m"))
-					Expect(out).To(Say("\x1b\\[31m\\-\\s+val2\x1b\\[0m"))
-					Expect(out).To(Say("\x1b\\[31m\\-\\s+val3\x1b\\[0m"))
-					Expect(out).To(Say("\x1b\\[32m\\+\\s+val3\x1b\\[0m"))
-					Expect(out).To(Say("(?m)^\\s+val4"))
+					Expect(out).To(Say("\x1b\\[32m\\+\\s+key1\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[31m\\-\\s+key2\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[31m\\-\\s+key3\x1b\\[0m"))
+					Expect(out).To(Say("\x1b\\[32m\\+\\s+key3\x1b\\[0m"))
+					Expect(out).To(Say("(?m)^\\s+key4"))
 				})
 
 				Context("when the values are a different type", func() {
