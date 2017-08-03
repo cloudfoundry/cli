@@ -125,11 +125,13 @@ func (ui UI) displayDiffForMapStringString(offset string, header string, oldMap 
 		if !ok {
 			formattedOld := fmt.Sprintf("-   %s", key)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+			continue
 		}
 		oldVal, ok := oldMap[key]
 		if !ok {
 			formattedNew := fmt.Sprintf("+   %s", key)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+			continue
 		}
 
 		if oldVal == newVal {
