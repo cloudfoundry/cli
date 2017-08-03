@@ -5296,6 +5296,10 @@
     "translation": "Instancia de servicio"
   },
   {
+    "id": "Service instance (GUID: {{.GUID}}) not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance {{.InstanceName}} not found",
     "translation": "No se ha encontrado la instancia de servicio {{.InstanceName}}"
   },

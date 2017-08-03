@@ -5296,6 +5296,10 @@
     "translation": "서비스 인스턴스"
   },
   {
+    "id": "Service instance (GUID: {{.GUID}}) not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance {{.InstanceName}} not found",
     "translation": "서비스 인스턴스 {{.InstanceName}}을(를) 찾을 수 없음"
   },

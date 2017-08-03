@@ -5296,6 +5296,10 @@
     "translation": "Service instance"
   },
   {
+    "id": "Service instance (GUID: {{.GUID}}) not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance {{.InstanceName}} not found",
     "translation": "Service instance {{.InstanceName}} not found"
   },
