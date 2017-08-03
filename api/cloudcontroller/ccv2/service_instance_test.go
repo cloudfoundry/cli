@@ -119,6 +119,41 @@ var _ = Describe("Service Instance", func() {
 		})
 	})
 
+	Describe("GetServiceInstance", func() {
+		BeforeEach(func() {
+			response := `{
+				"metadata": {
+					"guid": "some-service-guid"
+				},
+				"entity": {
+					"name": "some-service-name",
+					"type": "managed_service_instance"
+				}
+			}`
+
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/service_instances/some-service-guid"),
+					RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+				),
+			)
+		})
+
+		Context("when service instances exist", func() {
+			It("returns the service instance and warnings", func() {
+				serviceInstance, warnings, err := client.GetServiceInstance("some-service-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(serviceInstance).To(Equal(ServiceInstance{
+					Name: "some-service-name",
+					GUID: "some-service-guid",
+					Type: ManagedService,
+				}))
+				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			})
+		})
+	})
+
 	Describe("GetServiceInstances", func() {
 		BeforeEach(func() {
 			response1 := `{

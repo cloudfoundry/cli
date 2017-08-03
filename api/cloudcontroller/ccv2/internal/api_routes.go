@@ -42,6 +42,7 @@ const (
 	GetSecurityGroupsRequest               = "GetSecurityGroups"
 	GetSecurityGroupStagingSpacesRequest   = "GetSecurityGroupStagingSpaces"
 	GetServiceBindingsRequest              = "GetServiceBindings"
+	GetServiceInstanceRequest              = "GetServiceInstance"
 	GetServiceInstancesRequest             = "GetServiceInstances"
 	GetSharedDomainRequest                 = "GetSharedDomain"
 	GetSharedDomainsRequest                = "GetSharedDomains"
@@ -106,6 +107,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_bindings", Method: http.MethodPost, Name: PostServiceBindingRequest},
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
+	{Path: "/v2/service_instances/:service_instance_guid", Method: http.MethodGet, Name: GetServiceInstanceRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: GetSharedDomainRequest},
 	{Path: "/v2/space_quota_definitions/:space_quota_guid", Method: http.MethodGet, Name: GetSpaceQuotaDefinitionRequest},
