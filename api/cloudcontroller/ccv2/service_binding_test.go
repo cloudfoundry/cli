@@ -90,11 +90,19 @@ var _ = Describe("Service Binding", func() {
 					{
 						"metadata": {
 							"guid": "service-binding-guid-1"
+						},
+						"entity": {
+							"app_guid":"app-guid-1",
+							"service_instance_guid": "service-instance-guid-1"
 						}
 					},
 					{
 						"metadata": {
 							"guid": "service-binding-guid-2"
+						},
+						"entity": {
+							"app_guid":"app-guid-2",
+							"service_instance_guid": "service-instance-guid-2"
 						}
 					}
 				]
@@ -105,11 +113,19 @@ var _ = Describe("Service Binding", func() {
 					{
 						"metadata": {
 							"guid": "service-binding-guid-3"
+						},
+						"entity": {
+							"app_guid":"app-guid-3",
+							"service_instance_guid": "service-instance-guid-3"
 						}
 					},
 					{
 						"metadata": {
 							"guid": "service-binding-guid-4"
+						},
+						"entity": {
+							"app_guid":"app-guid-4",
+							"service_instance_guid": "service-instance-guid-4"
 						}
 					}
 				]
@@ -137,10 +153,10 @@ var _ = Describe("Service Binding", func() {
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceBindings).To(ConsistOf([]ServiceBinding{
-					{GUID: "service-binding-guid-1"},
-					{GUID: "service-binding-guid-2"},
-					{GUID: "service-binding-guid-3"},
-					{GUID: "service-binding-guid-4"},
+					{GUID: "service-binding-guid-1", AppGUID: "app-guid-1", ServiceInstanceGUID: "service-instance-guid-1"},
+					{GUID: "service-binding-guid-2", AppGUID: "app-guid-2", ServiceInstanceGUID: "service-instance-guid-2"},
+					{GUID: "service-binding-guid-3", AppGUID: "app-guid-3", ServiceInstanceGUID: "service-instance-guid-3"},
+					{GUID: "service-binding-guid-4", AppGUID: "app-guid-4", ServiceInstanceGUID: "service-instance-guid-4"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})

@@ -11,20 +11,28 @@ import (
 
 // ServiceBinding represents a Cloud Controller Service Binding.
 type ServiceBinding struct {
-	GUID string
+	AppGUID             string
+	GUID                string
+	ServiceInstanceGUID string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Binding response.
 func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	var ccServiceBinding struct {
 		Metadata internal.Metadata
+		Entity   struct {
+			AppGUID             string `json:"app_guid"`
+			ServiceInstanceGUID string `json:"service_instance_guid"`
+		} `json:"entity"`
 	}
 	err := json.Unmarshal(data, &ccServiceBinding)
 	if err != nil {
 		return err
 	}
 
+	serviceBinding.AppGUID = ccServiceBinding.Entity.AppGUID
 	serviceBinding.GUID = ccServiceBinding.Metadata.GUID
+	serviceBinding.ServiceInstanceGUID = ccServiceBinding.Entity.ServiceInstanceGUID
 	return nil
 }
 
