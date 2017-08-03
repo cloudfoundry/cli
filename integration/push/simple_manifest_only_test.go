@@ -29,11 +29,16 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 							"applications": []map[string]interface{}{
 								{
-									"name":                       appName,
-									"path":                       dir,
-									"command":                    "echo 'hi' && $HOME/boot.sh",
-									"buildpack":                  "staticfile_buildpack",
-									"disk_quota":                 "300M",
+									"name":       appName,
+									"path":       dir,
+									"command":    "echo 'hi' && $HOME/boot.sh",
+									"buildpack":  "staticfile_buildpack",
+									"disk_quota": "300M",
+									"env": map[string]interface{}{
+										"key1": "val1",
+										"key2": 2,
+										"key3": true,
+									},
 									"instances":                  2,
 									"memory":                     "70M",
 									"stack":                      "cflinuxfs2",
@@ -58,6 +63,10 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("\\s+instances:\\s+2"))
 						Eventually(session).Should(Say("\\s+memory:\\s+70M"))
 						Eventually(session).Should(Say("\\s+stack:\\s+cflinuxfs2"))
+						Eventually(session).Should(Say("\\s+env:"))
+						Eventually(session).Should(Say("\\+\\s+key1"))
+						Eventually(session).Should(Say("\\+\\s+key2"))
+						Eventually(session).Should(Say("\\+\\s+key3"))
 						Eventually(session).Should(Say("\\s+routes:"))
 						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
 						Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
@@ -157,6 +166,70 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 					Eventually(session.Err).Should(Say("Incorrect usage: The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
 					Eventually(session).Should(Exit(1))
 				})
+			})
+		})
+	})
+
+	Context("when the app already exists", func() {
+		Context("when the app has manifest properties", func() {
+			BeforeEach(func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"path": dir,
+								"env": map[string]interface{}{
+									"key1": "val10",
+									"key2": 2,
+									"key3": true,
+								},
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
+					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+					Eventually(session).Should(Say("\\s+env:"))
+					Eventually(session).Should(Say("\\+\\s+key1"))
+					Eventually(session).Should(Say("\\+\\s+key2"))
+					Eventually(session).Should(Say("\\+\\s+key3"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			It("adds or overrides the original env values", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"path": dir,
+								"env": map[string]interface{}{
+									"key1": "val1",
+									"key4": false,
+								},
+							},
+						},
+					})
+
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
+					Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
+					Eventually(session).Should(Say("\\s+env:"))
+					Eventually(session).Should(Say("\\-\\s+key1"))
+					Eventually(session).Should(Say("\\+\\s+key1"))
+					Eventually(session).Should(Say("\\s+key2"))
+					Eventually(session).Should(Say("\\s+key3"))
+					Eventually(session).Should(Say("\\+\\s+key4"))
+					Eventually(session).Should(Exit(0))
+				})
+
+				session := helpers.CF("env", appName)
+				Eventually(session).Should(Say("key1:\\s+val1"))
+				Eventually(session).Should(Say("key2:\\s+2"))
+				Eventually(session).Should(Say("key3:\\s+true"))
+				Eventually(session).Should(Say("key4:\\s+false"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
