@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -48,7 +49,29 @@ var _ = Describe("instance actions", func() {
 				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{GUID: "some-app-guid"}}, ccv3.Warnings{"some-get-app-warning"}, nil)
 			})
 
-			Context("when deleting the instance errors", func() {
+			Context("when deleting the instance returns ProcessNotFoundError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteApplicationProcessInstanceReturns(ccv3.Warnings{"some-delete-warning"}, ccerror.ProcessNotFoundError{})
+				})
+
+				It("returns all warnings and the ProcessNotFoundError error", func() {
+					Expect(executeErr).To(Equal(ProcessNotFoundError{ProcessType: "some-process-type"}))
+					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-warning"))
+				})
+			})
+
+			Context("when deleting the instance returns InstanceNotFoundError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.DeleteApplicationProcessInstanceReturns(ccv3.Warnings{"some-delete-warning"}, ccerror.InstanceNotFoundError{})
+				})
+
+				It("returns all warnings and the ProcessInstanceNotFoundError error", func() {
+					Expect(executeErr).To(Equal(ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 666}))
+					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-warning"))
+				})
+			})
+
+			Context("when deleting the instance returns other error", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.DeleteApplicationProcessInstanceReturns(ccv3.Warnings{"some-delete-warning"}, errors.New("some-delete-error"))
 				})
