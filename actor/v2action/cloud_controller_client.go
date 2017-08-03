@@ -34,6 +34,7 @@ type CloudControllerClient interface {
 	GetRunningSpacesBySecurityGroup(securityGroupGUID string) ([]ccv2.Space, ccv2.Warnings, error)
 	GetSecurityGroups(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	GetServiceBindings(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
+	GetServiceInstance(serviceInstanceGUID string) (ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetServiceInstances(queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSharedDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	GetSharedDomains() ([]ccv2.Domain, ccv2.Warnings, error)
@@ -50,9 +51,9 @@ type CloudControllerClient interface {
 	RemoveSpaceFromRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	RemoveSpaceFromStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	ResourceMatch(resourcesToMatch []ccv2.Resource) ([]ccv2.Resource, ccv2.Warnings, error)
+	RestageApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	UpdateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
-	RestageApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []ccv2.Resource, newResources ccv2.Reader, newResourcesLength int64) (ccv2.Job, ccv2.Warnings, error)
 
 	API() string
