@@ -3,6 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
@@ -54,6 +55,26 @@ func (serviceInstance ServiceInstance) UserProvided() bool {
 // Managed returns true if the Service Instance is a managed service.
 func (serviceInstance ServiceInstance) Managed() bool {
 	return serviceInstance.Type == ManagedService
+}
+
+// GetServiceInstance returns the service instance with the given GUID. This
+// service can be either a managed or user provided.
+func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceInstance, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetServiceInstanceRequest,
+		URIParams:   Params{"service_instance_guid": serviceInstanceGUID},
+	})
+	if err != nil {
+		return ServiceInstance{}, nil, err
+	}
+
+	var serviceInstance ServiceInstance
+	response := cloudcontroller.Response{
+		Result: &serviceInstance,
+	}
+
+	err = client.connection.Make(request, &response)
+	return serviceInstance, response.Warnings, err
 }
 
 // GetServiceInstances returns back a list of *managed* Service Instances based
