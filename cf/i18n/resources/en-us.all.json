@@ -192,6 +192,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Terminate, then instantiate an app instance",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Uploads a V3 Package",
     "translation": ""
   },
@@ -1737,6 +1741,10 @@
   },
   {
     "id": "CF_NAME v3-restart APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS_TYPE]",
     "translation": ""
   },
   {
@@ -3680,6 +3688,10 @@
     "translation": "Instance must be a non-negative integer"
   },
   {
+    "id": "Instance {{.InstanceIndex}} of process {{.ProcessType}} not found",
+    "translation": ""
+  },
+  {
     "id": "Invalid JSON content from server: {{.Err}}",
     "translation": ""
   },
@@ -4668,6 +4680,10 @@
     "translation": "Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}"
   },
   {
+    "id": "Process to restart",
+    "translation": ""
+  },
+  {
     "id": "Process {{.ProcessType}} not found",
     "translation": ""
   },
@@ -4985,6 +5001,10 @@
   },
   {
     "id": "Restarting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
+    "id": "Restarting instance {{.InstanceIndex}} of process {{.ProcessType}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {

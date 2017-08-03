@@ -44,6 +44,8 @@ func HandleError(err error) error {
 		return translatableerror.OrganizationNotFoundError(e)
 	case v3action.ProcessNotFoundError:
 		return translatableerror.ProcessNotFoundError(e)
+	case v3action.ProcessInstanceNotFoundError:
+		return translatableerror.ProcessInstanceNotFoundError(e)
 	case v3action.StagingTimeoutError:
 		return translatableerror.StagingTimeoutError(e)
 	case v3action.TaskWorkersUnavailableError:
