@@ -12,7 +12,7 @@ type Droplet struct {
 	Buildpacks []Buildpack
 }
 
-type Buildpack ccv3.Buildpack
+type Buildpack ccv3.DropletBuildpack
 
 // AssignDropletError is returned when assigning the current droplet of an app
 // fails

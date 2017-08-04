@@ -8,12 +8,12 @@ import (
 )
 
 type Droplet struct {
-	GUID       string      `json:"guid"`
-	Stack      string      `json:"stack,omitempty"`
-	Buildpacks []Buildpack `json:"buildpacks,omitempty"`
+	GUID       string             `json:"guid"`
+	Stack      string             `json:"stack,omitempty"`
+	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
 }
 
-type Buildpack struct {
+type DropletBuildpack struct {
 	Name         string `json:"name"`
 	DetectOutput string `json:"detect_output"`
 }
