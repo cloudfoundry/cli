@@ -57,10 +57,6 @@ var _ = Describe("HandleError", func() {
 			v3action.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
-		Entry("v3action.ApplicationAlreadyExistsError -> ApplicationAlreadyExistsError",
-			v3action.ApplicationAlreadyExistsError{Name: "some-app"},
-			translatableerror.ApplicationAlreadyExistsError{Name: "some-app"}),
-
 		Entry("v3action.TaskWorkersUnavailableError -> RunTaskError",
 			v3action.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
 			translatableerror.RunTaskError{Message: "Task workers are unavailable."}),

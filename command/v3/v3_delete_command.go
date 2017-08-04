@@ -75,13 +75,12 @@ func (cmd V3DeleteCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.DeleteApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		if _, ok := err.(v3action.ApplicationNotFoundError); ok {
-			cmd.UI.DisplayOK()
+		switch err.(type) {
+		case v3action.ApplicationNotFoundError:
 			cmd.UI.DisplayTextWithFlavor("App {{.AppName}} does not exist", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})
-			return nil
-		} else {
+		default:
 			return shared.HandleError(err)
 		}
 	}

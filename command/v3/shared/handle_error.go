@@ -34,8 +34,6 @@ func HandleError(err error) error {
 
 	case v3action.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError(e)
-	case v3action.ApplicationAlreadyExistsError:
-		return translatableerror.ApplicationAlreadyExistsError(e)
 	case v3action.AssignDropletError:
 		return translatableerror.AssignDropletError(e)
 	case v3action.EmptyDirectoryError:

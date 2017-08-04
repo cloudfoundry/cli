@@ -130,7 +130,7 @@ var _ = Describe("v3-create-app Command", func() {
 
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
-					Expect(testUI.Err).To(Say("App %s already exists.", app))
+					Expect(testUI.Err).To(Say("App %s already exists", app))
 				})
 			})
 		})
