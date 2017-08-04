@@ -14,6 +14,7 @@ resources:
   type: time
   source:
     start: 09:00 PM
+    stop: 10:00 PM
     location: America/Los_Angeles
     days: [Saturday]
 - name: cf-deployment-concourse-tasks
