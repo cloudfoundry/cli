@@ -174,7 +174,10 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	if err != nil {
 		if _, ok := err.(v3action.StartupTimeoutError); ok {
-			return translatableerror.StartupTimeoutError{AppName: cmd.RequiredArgs.AppName}
+			return translatableerror.StartupTimeoutError{
+				AppName:    cmd.RequiredArgs.AppName,
+				BinaryName: cmd.Config.BinaryName(),
+			}
 		} else {
 			return shared.HandleError(err)
 		}
