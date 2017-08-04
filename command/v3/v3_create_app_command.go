@@ -65,7 +65,14 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		switch err.(type) {
+		case v3action.ApplicationAlreadyExistsError:
+			cmd.UI.DisplayWarning("App {{.AppName}} already exists", map[string]interface{}{
+				"AppName": cmd.RequiredArgs.AppName,
+			})
+		default:
+			return shared.HandleError(err)
+		}
 	}
 
 	cmd.UI.DisplayOK()

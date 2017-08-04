@@ -194,8 +194,8 @@ var _ = Describe("v3-delete Command", func() {
 
 				Expect(testUI.Err).To(Say("some-warning"))
 				Expect(testUI.Out).To(Say("Deleting app some-app in org some-org / space some-space as steve\\.\\.\\."))
-				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say("App some-app does not exist"))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 

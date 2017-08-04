@@ -376,8 +376,8 @@
     "translation": ""
   },
   {
-    "id": "App {{.AppName}} already exists.",
-    "translation": ""
+    "id": "App {{.AppName}} already exists",
+    "translation": "App {{.AppName}} already exists"
   },
   {
     "id": "App {{.AppName}} does not exist",
