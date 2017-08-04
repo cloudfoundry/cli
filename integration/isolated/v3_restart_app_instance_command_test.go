@@ -146,15 +146,16 @@ var _ = Describe("v3-restart-app-instance command", func() {
 					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
-					var restartedAppTable helpers.AppTable
 					Eventually(func() string {
-						appOutputSession = helpers.CF("v3-app", appName)
-						Eventually(appOutputSession).Should(Exit(0))
-						restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
-						return restartedAppTable.Processes[0].Title
-					}).Should(MatchRegexp(`web:\d/1`))
-
-					Expect(restartedAppTable.Processes[0].Instances[0].Since).NotTo(Equal(firstAppTable.Processes[0].Instances[0].Since))
+						var restartedAppTable helpers.AppTable
+						Eventually(func() string {
+							appOutputSession := helpers.CF("v3-app", appName)
+							Eventually(appOutputSession).Should(Exit(0))
+							restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+							return restartedAppTable.Processes[0].Title
+						}).Should(MatchRegexp(`web:\d/1`))
+						return restartedAppTable.Processes[0].Instances[0].Since
+					}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
 				})
 			})
 
@@ -180,15 +181,16 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							Eventually(session.Out).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
-							var restartedAppTable helpers.AppTable
 							Eventually(func() string {
-								appOutputSession = helpers.CF("v3-app", appName)
-								Eventually(appOutputSession).Should(Exit(0))
-								restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
-								return restartedAppTable.Processes[0].Title
-							}).Should(MatchRegexp(`web:\d/1`))
-
-							Expect(restartedAppTable.Processes[0].Instances[0].Since).NotTo(Equal(firstAppTable.Processes[0].Instances[0].Since))
+								var restartedAppTable helpers.AppTable
+								Eventually(func() string {
+									appOutputSession := helpers.CF("v3-app", appName)
+									Eventually(appOutputSession).Should(Exit(0))
+									restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+									return restartedAppTable.Processes[0].Title
+								}).Should(MatchRegexp(`web:\d/1`))
+								return restartedAppTable.Processes[0].Instances[0].Since
+							}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
 						})
 					})
 
