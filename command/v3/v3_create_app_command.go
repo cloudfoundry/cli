@@ -64,11 +64,7 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 		SpaceGUID: cmd.Config.TargetedSpace().GUID,
 	})
 	cmd.UI.DisplayWarnings(warnings)
-	if _, ok := err.(v3action.ApplicationAlreadyExistsError); ok {
-		cmd.UI.DisplayWarning("App {{.AppName}} already exists.", map[string]interface{}{
-			"AppName": cmd.RequiredArgs.AppName,
-		})
-	} else if err != nil {
+	if err != nil {
 		return shared.HandleError(err)
 	}
 
