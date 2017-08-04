@@ -135,8 +135,14 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 				display.UI.TranslateText(strings.ToLower(string(instance.State))),
 				display.appInstanceDate(instance.StartTime()),
 				fmt.Sprintf("%.1f%%", instance.CPU*100),
-				fmt.Sprintf("%s of %s", bytefmt.ByteSize(instance.MemoryUsage), bytefmt.ByteSize(instance.MemoryQuota)),
-				fmt.Sprintf("%s of %s", bytefmt.ByteSize(instance.DiskUsage), bytefmt.ByteSize(instance.DiskQuota)),
+				display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
+					"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
+					"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
+				}),
+				display.UI.TranslateText("{{.DiskUsage}} of {{.DiskQuota}}", map[string]interface{}{
+					"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
+					"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
+				}),
 			})
 		}
 
