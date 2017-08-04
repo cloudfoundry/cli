@@ -15,7 +15,7 @@ const (
 	DeleteApplicationRequest                              = "DeleteApplication"
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
-	GetAppDropletCurrent                                  = "GetAppDropletCurrent"
+	GetAppDroplets                                        = "GetAppDroplets"
 	GetAppProcessesRequest                                = "GetAppProcesses"
 	GetAppTasksRequest                                    = "GetAppTasks"
 	GetApplicationProcessByTypeRequest                    = "GetApplicationProcessByType"
@@ -75,7 +75,7 @@ var APIRoutes = []Route{
 	{Path: "/:guid/actions/start", Method: http.MethodPost, Name: PostApplicationStartRequest, Resource: AppsResource},
 	{Path: "/:guid/actions/stop", Method: http.MethodPost, Name: PostApplicationStopRequest, Resource: AppsResource},
 	{Path: "/:guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
-	{Path: "/:guid/droplets/current", Method: http.MethodGet, Name: GetAppDropletCurrent, Resource: AppsResource},
+	{Path: "/:guid/droplets", Method: http.MethodGet, Name: GetAppDroplets, Resource: AppsResource},
 	{Path: "/:guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
 	{Path: "/:guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessByTypeRequest, Resource: AppsResource},
