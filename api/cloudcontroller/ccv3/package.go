@@ -70,6 +70,9 @@ func (client *Client) CreatePackage(pkg Package) (Package, Warnings, error) {
 		RequestName: internal.PostPackageRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
+	if err != nil {
+		return Package{}, nil, err
+	}
 
 	var responsePackage Package
 	response := cloudcontroller.Response{
@@ -98,6 +101,10 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 		Method: link.Method,
 		Body:   body,
 	})
+	if err != nil {
+		return Package{}, nil, err
+	}
+
 	request.Header.Set("Content-Type", contentType)
 
 	var responsePackage Package

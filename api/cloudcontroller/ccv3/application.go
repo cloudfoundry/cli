@@ -121,6 +121,9 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 		RequestName: internal.PostApplicationRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
+	if err != nil {
+		return Application{}, nil, err
+	}
 
 	var responseApp Application
 	response := cloudcontroller.Response{
@@ -158,6 +161,9 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 		Body:        bytes.NewReader(bodyBytes),
 		URIParams:   map[string]string{"guid": app.GUID},
 	})
+	if err != nil {
+		return Application{}, nil, err
+	}
 
 	var responseApp Application
 	response := cloudcontroller.Response{
@@ -180,6 +186,9 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 		URIParams:   map[string]string{"guid": appGUID},
 		Body:        bytes.NewReader(bodyBytes),
 	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
 
 	var responseRelationship Relationship
 	response := cloudcontroller.Response{
@@ -195,6 +204,9 @@ func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 		RequestName: internal.PostApplicationStopRequest,
 		URIParams:   map[string]string{"guid": appGUID},
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	response := cloudcontroller.Response{}
 	err = client.connection.Make(request, &response)
@@ -207,6 +219,9 @@ func (client *Client) StartApplication(appGUID string) (Application, Warnings, e
 		RequestName: internal.PostApplicationStartRequest,
 		URIParams:   map[string]string{"guid": appGUID},
 	})
+	if err != nil {
+		return Application{}, nil, err
+	}
 
 	var responseApp Application
 	response := cloudcontroller.Response{

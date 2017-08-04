@@ -61,6 +61,9 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 		URIParams:   internal.Params{"guid": spaceGUID},
 		Body:        bytes.NewReader(body),
 	})
+	if err != nil {
+		return Relationship{}, nil, err
+	}
 
 	var relationship Relationship
 	response := cloudcontroller.Response{

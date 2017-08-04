@@ -39,5 +39,6 @@ func (s SecurityGroup) Create() {
 	Expect(err).ToNot(HaveOccurred())
 
 	err = ioutil.WriteFile(tempfile, securityGroup, 0666)
+	Expect(err).ToNot(HaveOccurred())
 	Eventually(CF("create-security-group", s.Name, tempfile)).Should(Exit(0))
 }

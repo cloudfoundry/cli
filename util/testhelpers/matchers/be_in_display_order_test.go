@@ -31,8 +31,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(true))
-		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"1st"},
@@ -42,8 +42,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err = matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(false))
-		Expect(err).To(BeNil())
 		msg := matcher.FailureMessage([]string{})
 		Expect(strings.Contains(msg, "2nd")).To(Equal(true))
 	})
@@ -54,8 +54,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(false))
-		Expect(err).To(BeNil())
 
 		msg := matcher.FailureMessage([]string{})
 		Expect(strings.Contains(msg, "Not in the actual")).To(Equal(true))
@@ -68,14 +68,15 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(true))
-		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"1st", "line 2"},
 		)
 
 		success, err = matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(false))
 
 		msg := matcher.FailureMessage([]string{})
@@ -100,8 +101,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
+		Expect(err).ToNot(HaveOccurred())
 		Expect(success).To(Equal(true))
-		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"line 1", "1st"},
@@ -114,5 +115,4 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		msg := matcher.FailureMessage([]string{})
 		Expect(strings.Contains(msg, "1st")).To(Equal(true))
 	})
-
 })
