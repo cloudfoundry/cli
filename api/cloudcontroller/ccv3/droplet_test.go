@@ -80,7 +80,7 @@ var _ = Describe("Droplet", func() {
 
 				Expect(droplets[0]).To(Equal(Droplet{
 					Stack: "some-stack",
-					Buildpacks: []Buildpack{
+					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack",
 							DetectOutput: "detected-buildpack",
@@ -89,7 +89,7 @@ var _ = Describe("Droplet", func() {
 				}))
 				Expect(droplets[1]).To(Equal(Droplet{
 					Stack: "some-stack2",
-					Buildpacks: []Buildpack{
+					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack2",
 							DetectOutput: "detected-buildpack2",
@@ -98,7 +98,7 @@ var _ = Describe("Droplet", func() {
 				}))
 				Expect(droplets[2]).To(Equal(Droplet{
 					Stack: "some-stack3",
-					Buildpacks: []Buildpack{
+					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack3",
 							DetectOutput: "detected-buildpack3",

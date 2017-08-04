@@ -73,7 +73,7 @@ var _ = Describe("Application Summary Actions", func() {
 						[]ccv3.Droplet{
 							{
 								Stack: "some-stack",
-								Buildpacks: []ccv3.Buildpack{
+								Buildpacks: []ccv3.DropletBuildpack{
 									{
 										Name: "some-buildpack",
 									},
@@ -293,7 +293,7 @@ var _ = Describe("Application Summary Actions", func() {
 					[]ccv3.Droplet{
 						{
 							Stack: "some-stack",
-							Buildpacks: []ccv3.Buildpack{
+							Buildpacks: []ccv3.DropletBuildpack{
 								{
 									Name: "some-buildpack",
 								},
