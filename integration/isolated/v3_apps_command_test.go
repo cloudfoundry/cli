@@ -125,7 +125,7 @@ var _ = Describe("v3-apps command", func() {
 			})
 
 			It("displays apps in the list", func() {
-				session := helpers.CF("v3-app", appName1)
+				session := helpers.CF("v3-apps")
 				Eventually(session).Should(Say("Getting apps in org %s / space %s as %s\\.\\.\\.", orgName, spaceName, userName))
 				Eventually(session).Should(Say("name\\s+requested state\\s+processes\\s+routes"))
 				Eventually(session).Should(Say("%s\\s+started\\s+web:1/1, worker:0/0\\s+%s\\.%s", appName1, appName1, domainName))
