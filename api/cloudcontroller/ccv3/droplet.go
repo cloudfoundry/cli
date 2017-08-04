@@ -22,6 +22,9 @@ func (client *Client) GetApplicationCurrentDroplet(appGUID string) (Droplet, War
 		RequestName: internal.GetAppDropletCurrent,
 		URIParams:   map[string]string{"guid": appGUID},
 	})
+	if err != nil {
+		return Droplet{}, nil, err
+	}
 
 	var responseDroplet Droplet
 	response := cloudcontroller.Response{
