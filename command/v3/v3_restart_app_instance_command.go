@@ -17,7 +17,7 @@ type V3RestartAppInstanceActor interface {
 type V3RestartAppInstanceCommand struct {
 	RequiredArgs    flag.AppInstance `positional-args:"yes"`
 	ProcessType     string           `long:"process" default:"web" description:"Process to restart"`
-	usage           interface{}      `usage:"CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS_TYPE]"`
+	usage           interface{}      `usage:"CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS]"`
 	relatedCommands interface{}      `related_commands:"v3-restart"`
 
 	UI          command.UI

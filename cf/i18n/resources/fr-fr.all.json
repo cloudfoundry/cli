@@ -1744,7 +1744,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS_TYPE]",
+    "id": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS]",
     "translation": ""
   },
   {

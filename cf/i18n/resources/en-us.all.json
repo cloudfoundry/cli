@@ -1744,8 +1744,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS_TYPE]",
-    "translation": ""
+    "id": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS]",
+    "translation": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS]"
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
