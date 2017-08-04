@@ -58,6 +58,9 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 		URIParams:   internal.Params{"guid": isolationSegmentGUID},
 		Body:        bytes.NewReader(body),
 	})
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
 
 	var relationships RelationshipList
 	response := cloudcontroller.Response{

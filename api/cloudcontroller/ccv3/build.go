@@ -48,6 +48,9 @@ func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 		RequestName: internal.PostBuildRequest,
 		Body:        bytes.NewReader(bodyBytes),
 	})
+	if err != nil {
+		return Build{}, nil, err
+	}
 
 	var responseBuild Build
 	response := cloudcontroller.Response{
