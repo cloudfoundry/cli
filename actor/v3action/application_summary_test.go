@@ -6,7 +6,6 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -70,12 +69,14 @@ var _ = Describe("Application Summary Actions", func() {
 
 			Context("when app has droplet", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationCurrentDropletReturns(
-						ccv3.Droplet{
-							Stack: "some-stack",
-							Buildpacks: []ccv3.Buildpack{
-								{
-									Name: "some-buildpack",
+					fakeCloudControllerClient.GetApplicationDropletsReturns(
+						[]ccv3.Droplet{
+							{
+								Stack: "some-stack",
+								Buildpacks: []ccv3.Buildpack{
+									{
+										Name: "some-buildpack",
+									},
 								},
 							},
 						},
@@ -129,9 +130,10 @@ var _ = Describe("Application Summary Actions", func() {
 					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(query).To(Equal(expectedQuery))
 
-					Expect(fakeCloudControllerClient.GetApplicationCurrentDropletCallCount()).To(Equal(1))
-					appGUID := fakeCloudControllerClient.GetApplicationCurrentDropletArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetApplicationDropletsCallCount()).To(Equal(1))
+					appGUID, urlValues := fakeCloudControllerClient.GetApplicationDropletsArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(urlValues).To(Equal(url.Values{"current": []string{"true"}}))
 
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
 					appGUID = fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)
@@ -147,8 +149,8 @@ var _ = Describe("Application Summary Actions", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("some error")
-						fakeCloudControllerClient.GetApplicationCurrentDropletReturns(
-							ccv3.Droplet{},
+						fakeCloudControllerClient.GetApplicationDropletsReturns(
+							[]ccv3.Droplet{},
 							ccv3.Warnings{"some-droplet-warning"},
 							expectedErr,
 						)
@@ -162,12 +164,12 @@ var _ = Describe("Application Summary Actions", func() {
 				})
 			})
 
-			Context("when app does not have droplet", func() {
+			Context("when app does not have current droplet", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetApplicationCurrentDropletReturns(
-						ccv3.Droplet{},
+					fakeCloudControllerClient.GetApplicationDropletsReturns(
+						[]ccv3.Droplet{},
 						ccv3.Warnings{"some-droplet-warning"},
-						ccerror.ResourceNotFoundError{},
+						nil,
 					)
 				})
 
@@ -208,9 +210,10 @@ var _ = Describe("Application Summary Actions", func() {
 					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(query).To(Equal(expectedQuery))
 
-					Expect(fakeCloudControllerClient.GetApplicationCurrentDropletCallCount()).To(Equal(1))
-					appGUID := fakeCloudControllerClient.GetApplicationCurrentDropletArgsForCall(0)
+					Expect(fakeCloudControllerClient.GetApplicationDropletsCallCount()).To(Equal(1))
+					appGUID, urlValues := fakeCloudControllerClient.GetApplicationDropletsArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(urlValues).To(Equal(url.Values{"current": []string{"true"}}))
 
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
 					appGUID = fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)
@@ -286,12 +289,14 @@ var _ = Describe("Application Summary Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetApplicationCurrentDropletReturns(
-					ccv3.Droplet{
-						Stack: "some-stack",
-						Buildpacks: []ccv3.Buildpack{
-							{
-								Name: "some-buildpack",
+				fakeCloudControllerClient.GetApplicationDropletsReturns(
+					[]ccv3.Droplet{
+						{
+							Stack: "some-stack",
+							Buildpacks: []ccv3.Buildpack{
+								{
+									Name: "some-buildpack",
+								},
 							},
 						},
 					},

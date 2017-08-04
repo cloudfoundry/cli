@@ -1,6 +1,6 @@
 package v3action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+import "net/url"
 
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {
@@ -25,18 +25,18 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 	}
 
 	var droplet Droplet
-	ccv3Droplet, warnings, err := actor.CloudControllerClient.GetApplicationCurrentDroplet(app.GUID)
+	ccv3Droplets, warnings, err := actor.CloudControllerClient.GetApplicationDroplets(
+		app.GUID,
+		url.Values{"current": []string{"true"}},
+	)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
-		if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
-			// If application fails staging it is not going to have current droplet
-			return ApplicationSummary{}, allWarnings, err
-		}
-	} else {
-		droplet = Droplet{
-			Stack: ccv3Droplet.Stack,
-		}
-		for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
+		return ApplicationSummary{}, allWarnings, err
+	}
+
+	if len(ccv3Droplets) == 1 {
+		droplet.Stack = ccv3Droplets[0].Stack
+		for _, ccv3Buildpack := range ccv3Droplets[0].Buildpacks {
 			droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
 		}
 	}
