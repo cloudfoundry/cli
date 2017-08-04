@@ -32,22 +32,22 @@ type V3AppSummaryActor interface {
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 }
 
-func (cmd AppSummaryDisplayer) DisplayAppInfo() error {
-	user, err := cmd.Config.CurrentUser()
+func (display AppSummaryDisplayer) DisplayAppInfo() error {
+	user, err := display.Config.CurrentUser()
 	if err != nil {
 		return HandleError(err)
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
+	display.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"AppName":   display.AppName,
+		"OrgName":   display.Config.TargetedOrganization().Name,
+		"SpaceName": display.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	cmd.UI.DisplayNewline()
+	display.UI.DisplayNewline()
 
-	summary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.AppName, cmd.Config.TargetedSpace().GUID)
-	cmd.UI.DisplayWarnings(warnings)
+	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
+	display.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return HandleError(err)
 	}
@@ -55,92 +55,92 @@ func (cmd AppSummaryDisplayer) DisplayAppInfo() error {
 	var routes v2action.Routes
 	if len(summary.Processes) > 0 {
 		var routeWarnings v2action.Warnings
-		routes, routeWarnings, err = cmd.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
-		cmd.UI.DisplayWarnings(routeWarnings)
+		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
+		display.UI.DisplayWarnings(routeWarnings)
 		if err != nil {
 			return sharedV2.HandleError(err)
 		}
 	}
 
-	cmd.displayAppTable(summary, routes)
+	display.displayAppTable(summary, routes)
 
 	return nil
 }
 
 // Sort processes alphabetically and put web first.
-func (cmd AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
+func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
 	summary.Processes.Sort()
 
 	keyValueTable := [][]string{
-		{cmd.UI.TranslateText("name:"), summary.Application.Name},
-		{cmd.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
-		{cmd.UI.TranslateText("processes:"), cmd.processesSummary(summary.Processes)},
-		{cmd.UI.TranslateText("memory usage:"), cmd.usageSummary(summary.Processes)},
-		{cmd.UI.TranslateText("routes:"), routes.Summary()},
-		{cmd.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-		{cmd.UI.TranslateText("buildpacks:"), cmd.buildpackNames(summary.CurrentDroplet.Buildpacks)},
+		{display.UI.TranslateText("name:"), summary.Application.Name},
+		{display.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
+		{display.UI.TranslateText("processes:"), display.processesSummary(summary.Processes)},
+		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.Processes)},
+		{display.UI.TranslateText("routes:"), routes.Summary()},
+		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+		{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
 
 	crashedProcesses := []string{}
 	for i := range summary.Processes {
-		if cmd.processInstancesAreAllCrashed(&summary.Processes[i]) {
+		if display.processInstancesAreAllCrashed(&summary.Processes[i]) {
 			crashedProcesses = append(crashedProcesses, summary.Processes[i].Type)
 		}
 	}
 
-	cmd.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
+	display.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
 
 	appHasARunningInstance := false
 
 	for processIdx := range summary.Processes {
-		if cmd.processHasAnInstance(&summary.Processes[processIdx]) {
+		if display.processHasAnInstance(&summary.Processes[processIdx]) {
 			appHasARunningInstance = true
 			break
 		}
 	}
 
 	if !appHasARunningInstance {
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("There are no running instances of this app.")
+		display.UI.DisplayNewline()
+		display.UI.DisplayText("There are no running instances of this app.")
 		return
 	}
 
 	for _, process := range summary.Processes {
-		cmd.UI.DisplayNewline()
+		display.UI.DisplayNewline()
 
-		cmd.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
+		display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
 			"ProcessType":          process.Type,
 			"HealthyInstanceCount": process.HealthyInstanceCount(),
 			"TotalInstanceCount":   process.TotalInstanceCount(),
 		})
 
-		if !cmd.processHasAnInstance(&process) {
+		if !display.processHasAnInstance(&process) {
 			continue
 		}
 
 		table := [][]string{
 			{
 				"",
-				cmd.UI.TranslateText("state"),
-				cmd.UI.TranslateText("since"),
-				cmd.UI.TranslateText("cpu"),
-				cmd.UI.TranslateText("memory"),
-				cmd.UI.TranslateText("disk"),
+				display.UI.TranslateText("state"),
+				display.UI.TranslateText("since"),
+				display.UI.TranslateText("cpu"),
+				display.UI.TranslateText("memory"),
+				display.UI.TranslateText("disk"),
 			},
 		}
 
 		for _, instance := range process.Instances {
 			table = append(table, []string{
 				fmt.Sprintf("#%d", instance.Index),
-				cmd.UI.TranslateText(strings.ToLower(string(instance.State))),
-				cmd.appInstanceDate(instance.StartTime()),
+				display.UI.TranslateText(strings.ToLower(string(instance.State))),
+				display.appInstanceDate(instance.StartTime()),
 				fmt.Sprintf("%.1f%%", instance.CPU*100),
 				fmt.Sprintf("%s of %s", bytefmt.ByteSize(instance.MemoryUsage), bytefmt.ByteSize(instance.MemoryQuota)),
 				fmt.Sprintf("%s of %s", bytefmt.ByteSize(instance.DiskUsage), bytefmt.ByteSize(instance.DiskQuota)),
 			})
 		}
 
-		cmd.UI.DisplayInstancesTableForApp(table)
+		display.UI.DisplayInstancesTableForApp(table)
 	}
 }
 
