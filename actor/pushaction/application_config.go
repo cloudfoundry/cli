@@ -17,6 +17,8 @@ type ApplicationConfig struct {
 	CurrentRoutes []v2action.Route
 	DesiredRoutes []v2action.Route
 
+	CurrentServices []v2action.ServiceInstance
+
 	AllResources       []v2action.Resource
 	MatchedResources   []v2action.Resource
 	UnmatchedResources []v2action.Resource
@@ -104,7 +106,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 }
 
 func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.Application, foundApp Application) (ApplicationConfig, v2action.Warnings, error) {
-	log.Debugf("found app: %#v", foundApp)
+	log.Debugln("found app:", foundApp)
 	config.CurrentApplication = foundApp
 	config.DesiredApplication = foundApp
 
@@ -114,7 +116,16 @@ func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.A
 		log.Errorln("existing routes lookup:", err)
 		return config, warnings, err
 	}
+
+	serviceInstances, serviceWarnings, err := actor.V2Actor.GetServiceInstancesByApplication(foundApp.GUID)
+	warnings = append(warnings, serviceWarnings...)
+	if err != nil {
+		log.Errorln("existing services lookup:", err)
+		return config, warnings, err
+	}
+
 	config.CurrentRoutes = routes
+	config.CurrentServices = serviceInstances
 	return config, warnings, nil
 }
 

@@ -142,6 +142,21 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	GetServiceInstancesByApplicationStub        func(appGUID string) ([]v2action.ServiceInstance, v2action.Warnings, error)
+	getServiceInstancesByApplicationMutex       sync.RWMutex
+	getServiceInstancesByApplicationArgsForCall []struct {
+		appGUID string
+	}
+	getServiceInstancesByApplicationReturns struct {
+		result1 []v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}
+	getServiceInstancesByApplicationReturnsOnCall map[int]struct {
+		result1 []v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}
 	GetStackStub        func(guid string) (v2action.Stack, v2action.Warnings, error)
 	getStackMutex       sync.RWMutex
 	getStackArgsForCall []struct {
@@ -747,6 +762,60 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) GetServiceInstancesByApplication(appGUID string) ([]v2action.ServiceInstance, v2action.Warnings, error) {
+	fake.getServiceInstancesByApplicationMutex.Lock()
+	ret, specificReturn := fake.getServiceInstancesByApplicationReturnsOnCall[len(fake.getServiceInstancesByApplicationArgsForCall)]
+	fake.getServiceInstancesByApplicationArgsForCall = append(fake.getServiceInstancesByApplicationArgsForCall, struct {
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("GetServiceInstancesByApplication", []interface{}{appGUID})
+	fake.getServiceInstancesByApplicationMutex.Unlock()
+	if fake.GetServiceInstancesByApplicationStub != nil {
+		return fake.GetServiceInstancesByApplicationStub(appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getServiceInstancesByApplicationReturns.result1, fake.getServiceInstancesByApplicationReturns.result2, fake.getServiceInstancesByApplicationReturns.result3
+}
+
+func (fake *FakeV2Actor) GetServiceInstancesByApplicationCallCount() int {
+	fake.getServiceInstancesByApplicationMutex.RLock()
+	defer fake.getServiceInstancesByApplicationMutex.RUnlock()
+	return len(fake.getServiceInstancesByApplicationArgsForCall)
+}
+
+func (fake *FakeV2Actor) GetServiceInstancesByApplicationArgsForCall(i int) string {
+	fake.getServiceInstancesByApplicationMutex.RLock()
+	defer fake.getServiceInstancesByApplicationMutex.RUnlock()
+	return fake.getServiceInstancesByApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeV2Actor) GetServiceInstancesByApplicationReturns(result1 []v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.GetServiceInstancesByApplicationStub = nil
+	fake.getServiceInstancesByApplicationReturns = struct {
+		result1 []v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetServiceInstancesByApplicationReturnsOnCall(i int, result1 []v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.GetServiceInstancesByApplicationStub = nil
+	if fake.getServiceInstancesByApplicationReturnsOnCall == nil {
+		fake.getServiceInstancesByApplicationReturnsOnCall = make(map[int]struct {
+			result1 []v2action.ServiceInstance
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstancesByApplicationReturnsOnCall[i] = struct {
+		result1 []v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV2Actor) GetStack(guid string) (v2action.Stack, v2action.Warnings, error) {
 	fake.getStackMutex.Lock()
 	ret, specificReturn := fake.getStackReturnsOnCall[len(fake.getStackArgsForCall)]
@@ -1219,6 +1288,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.getServiceInstancesByApplicationMutex.RLock()
+	defer fake.getServiceInstancesByApplicationMutex.RUnlock()
 	fake.getStackMutex.RLock()
 	defer fake.getStackMutex.RUnlock()
 	fake.getStackByNameMutex.RLock()
