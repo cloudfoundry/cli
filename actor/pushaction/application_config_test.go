@@ -184,22 +184,60 @@ var _ = Describe("Application Config", func() {
 					fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{route}, v2action.Warnings{"app-route-warnings"}, nil)
 				})
 
-				It("sets the current application to the existing application", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
-					Expect(firstConfig.CurrentApplication).To(Equal(app))
-					Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
+				Context("when retrieving the application's services is successful", func() {
+					var services []v2action.ServiceInstance
 
-					Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					passedName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(passedName).To(Equal(app.Name))
-					Expect(passedSpaceGUID).To(Equal(spaceGUID))
+					BeforeEach(func() {
+						services = []v2action.ServiceInstance{
+							{Name: "service-1"},
+							{Name: "service-2"},
+						}
+
+						fakeV2Actor.GetServiceInstancesByApplicationReturns(services, v2action.Warnings{"service-instance-warning-1", "service-instance-warning-2"}, nil)
+					})
+
+					It("return warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings", "service-instance-warning-1", "service-instance-warning-2"))
+					})
+
+					It("sets the current application to the existing application", func() {
+						Expect(firstConfig.CurrentApplication).To(Equal(app))
+						Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
+
+						Expect(fakeV2Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						passedName, passedSpaceGUID := fakeV2Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(passedName).To(Equal(app.Name))
+						Expect(passedSpaceGUID).To(Equal(spaceGUID))
+					})
+
+					It("sets the current routes", func() {
+						Expect(firstConfig.CurrentRoutes).To(ConsistOf(route))
+
+						Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.GetApplicationRoutesArgsForCall(0)).To(Equal(app.GUID))
+					})
+
+					It("sets the bound services", func() {
+						Expect(firstConfig.CurrentServices).To(Equal(services))
+
+						Expect(fakeV2Actor.GetServiceInstancesByApplicationCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.GetServiceInstancesByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+					})
 				})
 
-				It("sets the current routes", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
-					Expect(firstConfig.CurrentRoutes).To(ConsistOf(route))
+				Context("when retrieving the application's services errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("dios mio")
+						fakeV2Actor.GetServiceInstancesByApplicationReturns(nil, v2action.Warnings{"service-instance-warning-1", "service-instance-warning-2"}, expectedErr)
+					})
+
+					It("returns the error and warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "service-instance-warning-1", "service-instance-warning-2"))
+					})
 				})
 			})
 
@@ -211,12 +249,9 @@ var _ = Describe("Application Config", func() {
 					fakeV2Actor.GetApplicationRoutesReturns(nil, v2action.Warnings{"app-route-warnings"}, expectedErr)
 				})
 
-				It("sets the current and desired application to the current", func() {
+				It("returns the error and warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings"))
-
-					Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.GetApplicationRoutesArgsForCall(0)).To(Equal(app.GUID))
 				})
 			})
 		})
