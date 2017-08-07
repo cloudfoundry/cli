@@ -72,6 +72,7 @@ jobs:
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
+      ops-files: state
       bbl-state: state
     params:
       BBL_IAAS: gcp
