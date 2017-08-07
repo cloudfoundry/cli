@@ -9,7 +9,6 @@ image_resource:
 inputs:
   - name: input1
   - name: input2
-  - name: input3
 
 outputs:
   - name: combine_inputs_output
