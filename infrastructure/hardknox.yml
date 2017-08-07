@@ -73,6 +73,7 @@ jobs:
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
       bbl-state: state
+      ops-files: state
     params:
       BBL_IAAS: gcp
       BBL_GCP_SERVICE_ACCOUNT_KEY: {{google_account_creds}}
