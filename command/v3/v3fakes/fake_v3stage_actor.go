@@ -6,19 +6,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/clock"
 )
 
 type FakeV3StageActor struct {
-	GetClockStub        func() clock.Clock
-	getClockMutex       sync.RWMutex
-	getClockArgsForCall []struct{}
-	getClockReturns     struct {
-		result1 clock.Clock
-	}
-	getClockReturnsOnCall map[int]struct {
-		result1 clock.Clock
-	}
 	GetStreamingLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
@@ -56,46 +46,6 @@ type FakeV3StageActor struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeV3StageActor) GetClock() clock.Clock {
-	fake.getClockMutex.Lock()
-	ret, specificReturn := fake.getClockReturnsOnCall[len(fake.getClockArgsForCall)]
-	fake.getClockArgsForCall = append(fake.getClockArgsForCall, struct{}{})
-	fake.recordInvocation("GetClock", []interface{}{})
-	fake.getClockMutex.Unlock()
-	if fake.GetClockStub != nil {
-		return fake.GetClockStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getClockReturns.result1
-}
-
-func (fake *FakeV3StageActor) GetClockCallCount() int {
-	fake.getClockMutex.RLock()
-	defer fake.getClockMutex.RUnlock()
-	return len(fake.getClockArgsForCall)
-}
-
-func (fake *FakeV3StageActor) GetClockReturns(result1 clock.Clock) {
-	fake.GetClockStub = nil
-	fake.getClockReturns = struct {
-		result1 clock.Clock
-	}{result1}
-}
-
-func (fake *FakeV3StageActor) GetClockReturnsOnCall(i int, result1 clock.Clock) {
-	fake.GetClockStub = nil
-	if fake.getClockReturnsOnCall == nil {
-		fake.getClockReturnsOnCall = make(map[int]struct {
-			result1 clock.Clock
-		})
-	}
-	fake.getClockReturnsOnCall[i] = struct {
-		result1 clock.Clock
-	}{result1}
 }
 
 func (fake *FakeV3StageActor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error) {
@@ -215,8 +165,6 @@ func (fake *FakeV3StageActor) StagePackageReturnsOnCall(i int, result1 <-chan v3
 func (fake *FakeV3StageActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getClockMutex.RLock()
-	defer fake.getClockMutex.RUnlock()
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
 	fake.stagePackageMutex.RLock()

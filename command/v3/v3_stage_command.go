@@ -6,13 +6,11 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	"code.cloudfoundry.org/clock"
 )
 
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
-	GetClock() clock.Clock
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
 }

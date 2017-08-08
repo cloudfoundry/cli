@@ -6,7 +6,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/clock"
 )
 
 type FakeV3PushActor struct {
@@ -41,15 +40,6 @@ type FakeV3PushActor struct {
 		result1 v3action.Application
 		result2 v3action.Warnings
 		result3 error
-	}
-	GetClockStub        func() clock.Clock
-	getClockMutex       sync.RWMutex
-	getClockArgsForCall []struct{}
-	getClockReturns     struct {
-		result1 clock.Clock
-	}
-	getClockReturnsOnCall map[int]struct {
-		result1 clock.Clock
 	}
 	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
@@ -301,46 +291,6 @@ func (fake *FakeV3PushActor) CreateApplicationByNameAndSpaceReturnsOnCall(i int,
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
-}
-
-func (fake *FakeV3PushActor) GetClock() clock.Clock {
-	fake.getClockMutex.Lock()
-	ret, specificReturn := fake.getClockReturnsOnCall[len(fake.getClockArgsForCall)]
-	fake.getClockArgsForCall = append(fake.getClockArgsForCall, struct{}{})
-	fake.recordInvocation("GetClock", []interface{}{})
-	fake.getClockMutex.Unlock()
-	if fake.GetClockStub != nil {
-		return fake.GetClockStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.getClockReturns.result1
-}
-
-func (fake *FakeV3PushActor) GetClockCallCount() int {
-	fake.getClockMutex.RLock()
-	defer fake.getClockMutex.RUnlock()
-	return len(fake.getClockArgsForCall)
-}
-
-func (fake *FakeV3PushActor) GetClockReturns(result1 clock.Clock) {
-	fake.GetClockStub = nil
-	fake.getClockReturns = struct {
-		result1 clock.Clock
-	}{result1}
-}
-
-func (fake *FakeV3PushActor) GetClockReturnsOnCall(i int, result1 clock.Clock) {
-	fake.GetClockStub = nil
-	if fake.getClockReturnsOnCall == nil {
-		fake.getClockReturnsOnCall = make(map[int]struct {
-			result1 clock.Clock
-		})
-	}
-	fake.getClockReturnsOnCall[i] = struct {
-		result1 clock.Clock
-	}{result1}
 }
 
 func (fake *FakeV3PushActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
@@ -841,8 +791,6 @@ func (fake *FakeV3PushActor) Invocations() map[string][][]interface{} {
 	defer fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RUnlock()
 	fake.createApplicationByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getClockMutex.RLock()
-	defer fake.getClockMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationSummaryByNameAndSpaceMutex.RLock()
