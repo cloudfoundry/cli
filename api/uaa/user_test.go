@@ -10,9 +10,7 @@ import (
 )
 
 var _ = Describe("User", func() {
-	var (
-		client *Client
-	)
+	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestUAAClientAndStore()

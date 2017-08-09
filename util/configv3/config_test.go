@@ -64,6 +64,7 @@ var _ = Describe("Config", func() {
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
 			Expect(config.Locale()).To(BeEmpty())
+			Expect(config.SSHOAuthClient()).To(Equal(DefaultSSHOAuthClient))
 			Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
 			Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 			Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
@@ -259,6 +260,24 @@ var _ = Describe("Config", func() {
 
 			It("returns fields directly from config", func() {
 				Expect(config.RefreshToken()).To(Equal("some-token"))
+			})
+		})
+
+		Describe("SSHOAuthClient", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "SSHOAuthClient":"some-ssh-client" }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
+			It("returns the client ID", func() {
+				Expect(config.SSHOAuthClient()).To(Equal("some-ssh-client"))
 			})
 		})
 

@@ -9,6 +9,15 @@ import (
 )
 
 type FakeConfig struct {
+	AccessTokenStub        func() string
+	accessTokenMutex       sync.RWMutex
+	accessTokenArgsForCall []struct{}
+	accessTokenReturns     struct {
+		result1 string
+	}
+	accessTokenReturnsOnCall map[int]struct {
+		result1 string
+	}
 	PollingIntervalStub        func() time.Duration
 	pollingIntervalMutex       sync.RWMutex
 	pollingIntervalArgsForCall []struct{}
@@ -17,6 +26,15 @@ type FakeConfig struct {
 	}
 	pollingIntervalReturnsOnCall map[int]struct {
 		result1 time.Duration
+	}
+	SSHOAuthClientStub        func() string
+	sSHOAuthClientMutex       sync.RWMutex
+	sSHOAuthClientArgsForCall []struct{}
+	sSHOAuthClientReturns     struct {
+		result1 string
+	}
+	sSHOAuthClientReturnsOnCall map[int]struct {
+		result1 string
 	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
@@ -94,6 +112,46 @@ type FakeConfig struct {
 	invocationsMutex sync.RWMutex
 }
 
+func (fake *FakeConfig) AccessToken() string {
+	fake.accessTokenMutex.Lock()
+	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.recordInvocation("AccessToken", []interface{}{})
+	fake.accessTokenMutex.Unlock()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.accessTokenReturns.result1
+}
+
+func (fake *FakeConfig) AccessTokenCallCount() int {
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	return len(fake.accessTokenArgsForCall)
+}
+
+func (fake *FakeConfig) AccessTokenReturns(result1 string) {
+	fake.AccessTokenStub = nil
+	fake.accessTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) AccessTokenReturnsOnCall(i int, result1 string) {
+	fake.AccessTokenStub = nil
+	if fake.accessTokenReturnsOnCall == nil {
+		fake.accessTokenReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.accessTokenReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) PollingInterval() time.Duration {
 	fake.pollingIntervalMutex.Lock()
 	ret, specificReturn := fake.pollingIntervalReturnsOnCall[len(fake.pollingIntervalArgsForCall)]
@@ -131,6 +189,46 @@ func (fake *FakeConfig) PollingIntervalReturnsOnCall(i int, result1 time.Duratio
 	}
 	fake.pollingIntervalReturnsOnCall[i] = struct {
 		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) SSHOAuthClient() string {
+	fake.sSHOAuthClientMutex.Lock()
+	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
+	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("SSHOAuthClient", []interface{}{})
+	fake.sSHOAuthClientMutex.Unlock()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.sSHOAuthClientReturns.result1
+}
+
+func (fake *FakeConfig) SSHOAuthClientCallCount() int {
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	return len(fake.sSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturns(result1 string) {
+	fake.SSHOAuthClientStub = nil
+	fake.sSHOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.SSHOAuthClientStub = nil
+	if fake.sSHOAuthClientReturnsOnCall == nil {
+		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.sSHOAuthClientReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
@@ -429,8 +527,12 @@ func (fake *FakeConfig) VerboseReturnsOnCall(i int, result1 bool, result2 []stri
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
 	fake.pollingIntervalMutex.RLock()
 	defer fake.pollingIntervalMutex.RUnlock()
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
