@@ -127,6 +127,23 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 			})
 	}
 
+	var oldServices []string
+	for name := range appConfig.CurrentServices {
+		oldServices = append(oldServices, name)
+	}
+
+	var newServices []string
+	for name := range appConfig.DesiredServices {
+		newServices = append(newServices, name)
+	}
+
+	changes = append(changes,
+		ui.Change{
+			Header:       "services:",
+			CurrentValue: oldServices,
+			NewValue:     newServices,
+		})
+
 	changes = append(changes,
 		ui.Change{
 			Header:       "env:",

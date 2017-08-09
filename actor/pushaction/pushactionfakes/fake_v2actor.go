@@ -24,6 +24,20 @@ type FakeV2Actor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
+	BindServiceByApplicationAndServiceInstanceStub        func(appGUID string, serviceInstanceGUID string) (v2action.Warnings, error)
+	bindServiceByApplicationAndServiceInstanceMutex       sync.RWMutex
+	bindServiceByApplicationAndServiceInstanceArgsForCall []struct {
+		appGUID             string
+		serviceInstanceGUID string
+	}
+	bindServiceByApplicationAndServiceInstanceReturns struct {
+		result1 v2action.Warnings
+		result2 error
+	}
+	bindServiceByApplicationAndServiceInstanceReturnsOnCall map[int]struct {
+		result1 v2action.Warnings
+		result2 error
+	}
 	CreateApplicationStub        func(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	createApplicationMutex       sync.RWMutex
 	createApplicationArgsForCall []struct {
@@ -139,6 +153,22 @@ type FakeV2Actor struct {
 	}
 	getOrganizationDomainsReturnsOnCall map[int]struct {
 		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}
+	GetServiceInstanceByNameAndSpaceStub        func(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
+	getServiceInstanceByNameAndSpaceMutex       sync.RWMutex
+	getServiceInstanceByNameAndSpaceArgsForCall []struct {
+		name      string
+		spaceGUID string
+	}
+	getServiceInstanceByNameAndSpaceReturns struct {
+		result1 v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}
+	getServiceInstanceByNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v2action.ServiceInstance
 		result2 v2action.Warnings
 		result3 error
 	}
@@ -329,6 +359,58 @@ func (fake *FakeV2Actor) BindRouteToApplicationReturnsOnCall(i int, result1 v2ac
 		})
 	}
 	fake.bindRouteToApplicationReturnsOnCall[i] = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) BindServiceByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (v2action.Warnings, error) {
+	fake.bindServiceByApplicationAndServiceInstanceMutex.Lock()
+	ret, specificReturn := fake.bindServiceByApplicationAndServiceInstanceReturnsOnCall[len(fake.bindServiceByApplicationAndServiceInstanceArgsForCall)]
+	fake.bindServiceByApplicationAndServiceInstanceArgsForCall = append(fake.bindServiceByApplicationAndServiceInstanceArgsForCall, struct {
+		appGUID             string
+		serviceInstanceGUID string
+	}{appGUID, serviceInstanceGUID})
+	fake.recordInvocation("BindServiceByApplicationAndServiceInstance", []interface{}{appGUID, serviceInstanceGUID})
+	fake.bindServiceByApplicationAndServiceInstanceMutex.Unlock()
+	if fake.BindServiceByApplicationAndServiceInstanceStub != nil {
+		return fake.BindServiceByApplicationAndServiceInstanceStub(appGUID, serviceInstanceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.bindServiceByApplicationAndServiceInstanceReturns.result1, fake.bindServiceByApplicationAndServiceInstanceReturns.result2
+}
+
+func (fake *FakeV2Actor) BindServiceByApplicationAndServiceInstanceCallCount() int {
+	fake.bindServiceByApplicationAndServiceInstanceMutex.RLock()
+	defer fake.bindServiceByApplicationAndServiceInstanceMutex.RUnlock()
+	return len(fake.bindServiceByApplicationAndServiceInstanceArgsForCall)
+}
+
+func (fake *FakeV2Actor) BindServiceByApplicationAndServiceInstanceArgsForCall(i int) (string, string) {
+	fake.bindServiceByApplicationAndServiceInstanceMutex.RLock()
+	defer fake.bindServiceByApplicationAndServiceInstanceMutex.RUnlock()
+	return fake.bindServiceByApplicationAndServiceInstanceArgsForCall[i].appGUID, fake.bindServiceByApplicationAndServiceInstanceArgsForCall[i].serviceInstanceGUID
+}
+
+func (fake *FakeV2Actor) BindServiceByApplicationAndServiceInstanceReturns(result1 v2action.Warnings, result2 error) {
+	fake.BindServiceByApplicationAndServiceInstanceStub = nil
+	fake.bindServiceByApplicationAndServiceInstanceReturns = struct {
+		result1 v2action.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeV2Actor) BindServiceByApplicationAndServiceInstanceReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+	fake.BindServiceByApplicationAndServiceInstanceStub = nil
+	if fake.bindServiceByApplicationAndServiceInstanceReturnsOnCall == nil {
+		fake.bindServiceByApplicationAndServiceInstanceReturnsOnCall = make(map[int]struct {
+			result1 v2action.Warnings
+			result2 error
+		})
+	}
+	fake.bindServiceByApplicationAndServiceInstanceReturnsOnCall[i] = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
@@ -757,6 +839,61 @@ func (fake *FakeV2Actor) GetOrganizationDomainsReturnsOnCall(i int, result1 []v2
 	}
 	fake.getOrganizationDomainsReturnsOnCall[i] = struct {
 		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error) {
+	fake.getServiceInstanceByNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getServiceInstanceByNameAndSpaceReturnsOnCall[len(fake.getServiceInstanceByNameAndSpaceArgsForCall)]
+	fake.getServiceInstanceByNameAndSpaceArgsForCall = append(fake.getServiceInstanceByNameAndSpaceArgsForCall, struct {
+		name      string
+		spaceGUID string
+	}{name, spaceGUID})
+	fake.recordInvocation("GetServiceInstanceByNameAndSpace", []interface{}{name, spaceGUID})
+	fake.getServiceInstanceByNameAndSpaceMutex.Unlock()
+	if fake.GetServiceInstanceByNameAndSpaceStub != nil {
+		return fake.GetServiceInstanceByNameAndSpaceStub(name, spaceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getServiceInstanceByNameAndSpaceReturns.result1, fake.getServiceInstanceByNameAndSpaceReturns.result2, fake.getServiceInstanceByNameAndSpaceReturns.result3
+}
+
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceCallCount() int {
+	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
+	return len(fake.getServiceInstanceByNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
+	return fake.getServiceInstanceByNameAndSpaceArgsForCall[i].name, fake.getServiceInstanceByNameAndSpaceArgsForCall[i].spaceGUID
+}
+
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturns(result1 v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.GetServiceInstanceByNameAndSpaceStub = nil
+	fake.getServiceInstanceByNameAndSpaceReturns = struct {
+		result1 v2action.ServiceInstance
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetServiceInstanceByNameAndSpaceReturnsOnCall(i int, result1 v2action.ServiceInstance, result2 v2action.Warnings, result3 error) {
+	fake.GetServiceInstanceByNameAndSpaceStub = nil
+	if fake.getServiceInstanceByNameAndSpaceReturnsOnCall == nil {
+		fake.getServiceInstanceByNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v2action.ServiceInstance
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstanceByNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v2action.ServiceInstance
 		result2 v2action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -1272,6 +1409,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.bindRouteToApplicationMutex.RLock()
 	defer fake.bindRouteToApplicationMutex.RUnlock()
+	fake.bindServiceByApplicationAndServiceInstanceMutex.RLock()
+	defer fake.bindServiceByApplicationAndServiceInstanceMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
 	defer fake.createApplicationMutex.RUnlock()
 	fake.createRouteMutex.RLock()
@@ -1288,6 +1427,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
+	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
+	defer fake.getServiceInstanceByNameAndSpaceMutex.RUnlock()
 	fake.getServiceInstancesByApplicationMutex.RLock()
 	defer fake.getServiceInstancesByApplicationMutex.RUnlock()
 	fake.getStackMutex.RLock()

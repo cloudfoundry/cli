@@ -58,6 +58,9 @@ applications:
 - name: "app-2"
   disk_quota: 1G
   memory: 2G
+  services:
+  - service_1
+  - service_2
 - name: "app-3"
   env:
     env_1: 'foo'
@@ -86,6 +89,7 @@ applications:
 					Name:      "app-2",
 					DiskQuota: 1024,
 					Memory:    2048,
+					Services:  []string{"service_1", "service_2"},
 				},
 				Application{
 					Name: "app-3",

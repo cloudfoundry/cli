@@ -22,6 +22,52 @@ var _ = Describe("Service Binding Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
+	Describe("BindServiceByApplicationAndServiceInstance", func() {
+		var (
+			applicationGUID     string
+			serviceInstanceGUID string
+
+			executeErr error
+			warnings   Warnings
+		)
+		BeforeEach(func() {
+			applicationGUID = "some-app-guid"
+			serviceInstanceGUID = "some-service-instance-guid"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.BindServiceByApplicationAndServiceInstance(applicationGUID, serviceInstanceGUID)
+		})
+
+		Context("when the binding is successful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateServiceBindingReturns(ccv2.ServiceBinding{}, ccv2.Warnings{"some-warnings"}, nil)
+			})
+
+			It("returns errors and warnings", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-warnings"))
+
+				Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
+				inputAppGUID, inputServiceInstanceGUID, inputParameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+				Expect(inputAppGUID).To(Equal(applicationGUID))
+				Expect(inputServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+				Expect(inputParameters).To(BeNil())
+			})
+		})
+
+		Context("when the binding fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateServiceBindingReturns(ccv2.ServiceBinding{}, ccv2.Warnings{"some-warnings"}, errors.New("some-error"))
+			})
+
+			It("returns errors and warnings", func() {
+				Expect(executeErr).To(MatchError("some-error"))
+				Expect(warnings).To(ConsistOf("some-warnings"))
+			})
+		})
+	})
+
 	Describe("BindServiceBySpace", func() {
 		var (
 			executeErr error

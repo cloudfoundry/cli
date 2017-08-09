@@ -410,6 +410,21 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
+	Context("services", func() {
+		BeforeEach(func() {
+			appConfig.CurrentServices = map[string]v2action.ServiceInstance{"service-1": {}, "service-2": {}}
+			appConfig.DesiredServices = map[string]v2action.ServiceInstance{"service-3": {}, "service-4": {}}
+		})
+
+		It("sets the third change to services", func() {
+			Expect(changes[2]).To(Equal(ui.Change{
+				Header:       "services:",
+				CurrentValue: []string{"service-1", "service-2"},
+				NewValue:     []string{"service-3", "service-4"},
+			}))
+		})
+	})
+
 	Context("user provided environment variables", func() {
 		var oldMap, newMap map[string]string
 
@@ -420,8 +435,8 @@ var _ = Describe("GetApplicationChanges", func() {
 			appConfig.DesiredApplication.EnvironmentVariables = newMap
 		})
 
-		It("sets the third change to routes", func() {
-			Expect(changes[2]).To(Equal(ui.Change{
+		It("sets the fourth change to routes", func() {
+			Expect(changes[3]).To(Equal(ui.Change{
 				Header:       "env:",
 				CurrentValue: oldMap,
 				NewValue:     newMap,
@@ -430,8 +445,8 @@ var _ = Describe("GetApplicationChanges", func() {
 	})
 
 	Context("routes", func() {
-		It("sets the fourth change to routes", func() {
-			Expect(changes[3]).To(Equal(ui.Change{
+		It("sets the fifth change to routes", func() {
+			Expect(changes[4]).To(Equal(ui.Change{
 				Header:       "routes:",
 				CurrentValue: []string{"route1.example.com", "route2.example.com"},
 				NewValue:     []string{"route3.example.com", "route4.example.com"},

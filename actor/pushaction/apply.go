@@ -71,6 +71,21 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			eventStream <- BoundRoutes
 		}
 
+		if len(config.CurrentServices) != len(config.DesiredServices) {
+			eventStream <- ConfiguringServices
+			var boundServices bool
+			config, boundServices, warnings, err = actor.BindServices(config)
+			warningsStream <- warnings
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			if boundServices {
+				log.Debugf("bound desired services: %#v", config.DesiredServices)
+				eventStream <- BoundServices
+			}
+		}
+
 		if config.DesiredApplication.DockerImage == "" {
 			eventStream <- ResourceMatching
 			config, warnings = actor.SetMatchedResources(config)
