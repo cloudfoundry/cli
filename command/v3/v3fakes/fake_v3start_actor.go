@@ -25,11 +25,10 @@ type FakeV3StartActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StartApplicationStub        func(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplicationStub        func(appGUID string) (v3action.Application, v3action.Warnings, error)
 	startApplicationMutex       sync.RWMutex
 	startApplicationArgsForCall []struct {
-		appGUID   string
-		spaceGUID string
+		appGUID string
 	}
 	startApplicationReturns struct {
 		result1 v3action.Application
@@ -100,17 +99,16 @@ func (fake *FakeV3StartActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3StartActor) StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+func (fake *FakeV3StartActor) StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error) {
 	fake.startApplicationMutex.Lock()
 	ret, specificReturn := fake.startApplicationReturnsOnCall[len(fake.startApplicationArgsForCall)]
 	fake.startApplicationArgsForCall = append(fake.startApplicationArgsForCall, struct {
-		appGUID   string
-		spaceGUID string
-	}{appGUID, spaceGUID})
-	fake.recordInvocation("StartApplication", []interface{}{appGUID, spaceGUID})
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("StartApplication", []interface{}{appGUID})
 	fake.startApplicationMutex.Unlock()
 	if fake.StartApplicationStub != nil {
-		return fake.StartApplicationStub(appGUID, spaceGUID)
+		return fake.StartApplicationStub(appGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -124,10 +122,10 @@ func (fake *FakeV3StartActor) StartApplicationCallCount() int {
 	return len(fake.startApplicationArgsForCall)
 }
 
-func (fake *FakeV3StartActor) StartApplicationArgsForCall(i int) (string, string) {
+func (fake *FakeV3StartActor) StartApplicationArgsForCall(i int) string {
 	fake.startApplicationMutex.RLock()
 	defer fake.startApplicationMutex.RUnlock()
-	return fake.startApplicationArgsForCall[i].appGUID, fake.startApplicationArgsForCall[i].spaceGUID
+	return fake.startApplicationArgsForCall[i].appGUID
 }
 
 func (fake *FakeV3StartActor) StartApplicationReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {

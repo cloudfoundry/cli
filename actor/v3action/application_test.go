@@ -581,7 +581,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("stops the application", func() {
-				warnings, err := actor.StopApplication("some-app-guid", "some-space-guid")
+				warnings, err := actor.StopApplication("some-app-guid")
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("stop-application-warning"))
@@ -603,7 +603,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error", func() {
-				warnings, err := actor.StopApplication("some-app-guid", "some-space-guid")
+				warnings, err := actor.StopApplication("some-app-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("stop-application-warning"))
@@ -622,7 +622,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("starts the application", func() {
-				app, warnings, err := actor.StartApplication("some-app-guid", "some-space-guid")
+				app, warnings, err := actor.StartApplication("some-app-guid")
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("start-application-warning"))
@@ -646,7 +646,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.StartApplication("some-app-guid", "some-space-guid")
+				_, warnings, err := actor.StartApplication("some-app-guid")
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("start-application-warning"))

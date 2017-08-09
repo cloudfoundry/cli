@@ -12,8 +12,8 @@ import (
 
 type V3RestartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StopApplication(appGUID string) (v3action.Warnings, error)
 }
 
 type V3RestartCommand struct {
@@ -66,7 +66,7 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 			"Username":  user.Name,
 		})
 
-		warnings, err = cmd.Actor.StopApplication(app.GUID, cmd.Config.TargetedSpace().GUID)
+		warnings, err = cmd.Actor.StopApplication(app.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return shared.HandleError(err)
@@ -82,7 +82,7 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	_, warnings, err = cmd.Actor.StartApplication(app.GUID, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err = cmd.Actor.StartApplication(app.GUID)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

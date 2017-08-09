@@ -107,9 +107,8 @@ var _ = Describe("v3-stop Command", func() {
 			Expect(testUI.Out).To(Say("OK"))
 
 			Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-			appGUID, spaceGUID := fakeActor.StopApplicationArgsForCall(0)
+			appGUID := fakeActor.StopApplicationArgsForCall(0)
 			Expect(appGUID).To(Equal("some-app-guid"))
-			Expect(spaceGUID).To(Equal("some-space-guid"))
 		})
 	})
 

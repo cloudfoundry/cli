@@ -12,7 +12,7 @@ import (
 
 type V3StartActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3StartCommand struct {
@@ -72,7 +72,7 @@ func (cmd V3StartCommand) Execute(args []string) error {
 		"Username":  user.Name,
 	})
 
-	_, warnings, err = cmd.Actor.StartApplication(app.GUID, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err = cmd.Actor.StartApplication(app.GUID)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
