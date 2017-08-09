@@ -604,6 +604,10 @@
     "translation": "正在以 {{.Username}} 身份将服务 {{.ServiceName}} 绑定到组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
   {
+    "id": "Binding services...",
+    "translation": ""
+  },
+  {
     "id": "Binding {{.URL}} to {{.AppName}}...",
     "translation": "正在将 {{.URL}} 绑定到 {{.AppName}}..."
   },
