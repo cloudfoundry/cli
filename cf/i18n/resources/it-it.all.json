@@ -604,6 +604,10 @@
     "translation": "Esecuzione del bind del servizio {{.ServiceName}} all'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
   {
+    "id": "Binding services...",
+    "translation": ""
+  },
+  {
     "id": "Binding {{.URL}} to {{.AppName}}...",
     "translation": "Esecuzione del bind di {{.URL}} a {{.AppName}} in corso..."
   },

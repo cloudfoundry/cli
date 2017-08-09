@@ -604,6 +604,10 @@
     "translation": "{{.Username}} としてサービス {{.ServiceName}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} にバインドしています..."
   },
   {
+    "id": "Binding services...",
+    "translation": ""
+  },
+  {
     "id": "Binding {{.URL}} to {{.AppName}}...",
     "translation": "{{.URL}} を {{.AppName}} にバインドしています..."
   },

@@ -604,6 +604,10 @@
     "translation": "Enlace del servicio {{.ServiceName}} a la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Binding services...",
+    "translation": ""
+  },
+  {
     "id": "Binding {{.URL}} to {{.AppName}}...",
     "translation": "Enlace de {{.URL}} a {{.AppName}}..."
   },
