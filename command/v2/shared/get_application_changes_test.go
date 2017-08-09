@@ -417,11 +417,11 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 
 		It("sets the third change to services", func() {
-			Expect(changes[2]).To(Equal(ui.Change{
-				Header:       "services:",
-				CurrentValue: []string{"service-1", "service-2"},
-				NewValue:     []string{"service-3", "service-4"},
-			}))
+			Expect(len(changes)).To(BeNumerically(">=", 2))
+			change := changes[2]
+			Expect(change.Header).To(Equal("services:"))
+			Expect(change.CurrentValue).To(ConsistOf([]string{"service-1", "service-2"}))
+			Expect(change.NewValue).To(ConsistOf([]string{"service-3", "service-4"}))
 		})
 	})
 
