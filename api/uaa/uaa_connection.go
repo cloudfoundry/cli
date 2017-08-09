@@ -31,7 +31,15 @@ func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *UAAConnec
 	}
 
 	return &UAAConnection{
-		HTTPClient: &http.Client{Transport: tr},
+		HTTPClient: &http.Client{
+			Transport: tr,
+			CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
+				// This prevents redirects. When making a request to /oauth/authorize,
+				// the client should not follow redirects in order to obtain the ssh
+				// passcode.
+				return http.ErrUseLastResponse
+			},
+		},
 	}
 }
 

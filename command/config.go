@@ -10,10 +10,10 @@ import (
 
 // Config a way of getting basic CF configuration
 type Config interface {
+	APIVersion() string
 	AccessToken() string
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(name string, url string)
-	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
 	ColorEnabled() configv3.ColorSetting
@@ -33,6 +33,7 @@ type Config interface {
 	PollingInterval() time.Duration
 	RefreshToken() string
 	RemovePlugin(string)
+	SSHOAuthClient() string
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)

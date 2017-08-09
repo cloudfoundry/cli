@@ -40,6 +40,10 @@ const (
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
 
+	// DefaultSSHOAuthClient is the default oauth client ID for SSHing into an
+	// application/process container
+	DefaultSSHOAuthClient = "ssh-proxy"
+
 	// DefaultUAAOAuthClient is the default client ID for the CLI when
 	// communicating with the UAA.
 	DefaultUAAOAuthClient = "cf"
@@ -78,6 +82,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 					Name: DefaultPluginRepoName,
 					URL:  DefaultPluginRepoURL,
 				}},
+				SSHOAuthClient:       DefaultSSHOAuthClient,
 				UAAOAuthClient:       DefaultUAAOAuthClient,
 				UAAOAuthClientSecret: DefaultUAAOAuthClientSecret,
 			},
@@ -91,6 +96,10 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		err = json.Unmarshal(file, &config.ConfigFile)
 		if err != nil {
 			return nil, err
+		}
+
+		if config.ConfigFile.SSHOAuthClient == "" {
+			config.ConfigFile.SSHOAuthClient = DefaultSSHOAuthClient
 		}
 
 		if config.ConfigFile.UAAOAuthClient == "" {
@@ -320,6 +329,12 @@ func (config *Config) AccessToken() string {
 // RefreshToken returns the refresh token for getting a new access token
 func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
+}
+
+// SSHOAuthClient returns the OAuth client id used for SSHing into
+// application/process containers
+func (config *Config) SSHOAuthClient() string {
+	return config.ConfigFile.SSHOAuthClient
 }
 
 // UAAOAuthClient returns the CLI's UAA client ID
