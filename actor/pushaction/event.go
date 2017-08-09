@@ -9,6 +9,8 @@ const (
 	ConfiguringRoutes    Event = "configuring routes"
 	CreatedRoutes        Event = "created routes"
 	BoundRoutes          Event = "bound routes"
+	ConfiguringServices  Event = "configuring services"
+	BoundServices        Event = "bound services"
 	CreatingArchive      Event = "creating archive"
 	ResourceMatching     Event = "resource matching"
 	UploadingApplication Event = "uploading application"

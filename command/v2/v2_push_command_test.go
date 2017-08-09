@@ -160,6 +160,8 @@ var _ = Describe("v2-push Command", func() {
 								Eventually(eventStream).Should(BeSent(pushaction.ConfiguringRoutes))
 								Eventually(eventStream).Should(BeSent(pushaction.CreatedRoutes))
 								Eventually(eventStream).Should(BeSent(pushaction.BoundRoutes))
+								Eventually(eventStream).Should(BeSent(pushaction.ConfiguringServices))
+								Eventually(eventStream).Should(BeSent(pushaction.BoundServices))
 								Eventually(eventStream).Should(BeSent(pushaction.ResourceMatching))
 								Eventually(eventStream).Should(BeSent(pushaction.CreatingArchive))
 								Eventually(eventStream).Should(BeSent(pushaction.UploadingApplication))
@@ -426,6 +428,7 @@ var _ = Describe("v2-push Command", func() {
 
 							Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Binding services\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))

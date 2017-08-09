@@ -67,8 +67,8 @@ var _ = Describe("Service Instance", func() {
 						"description": "Request invalid due to parse error: Field: name, Error: Missing field name, Field: space_guid, Error: Missing field space_guid",
 						"error_code": "CF-MessageParseError",
 						"code": 1001
-					}
-			`
+					}`
+
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v2/apps"),
@@ -127,6 +127,7 @@ var _ = Describe("Service Instance", func() {
 				},
 				"entity": {
 					"name": "some-service-name",
+					"space_guid": "some-space-guid",
 					"type": "managed_service_instance"
 				}
 			}`
@@ -145,9 +146,10 @@ var _ = Describe("Service Instance", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(serviceInstance).To(Equal(ServiceInstance{
-					Name: "some-service-name",
-					GUID: "some-service-guid",
-					Type: ManagedService,
+					Name:      "some-service-name",
+					GUID:      "some-service-guid",
+					SpaceGUID: "some-space-guid",
+					Type:      ManagedService,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -165,6 +167,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-1",
+							"space_guid": "some-space-guid",
 							"type": "managed_service_instance"
 						}
 					},
@@ -174,6 +177,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-2",
+							"space_guid": "some-space-guid",
 							"type": "managed_service_instance"
 						}
 					}
@@ -189,6 +193,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-3",
+							"space_guid": "some-space-guid",
 							"type": "managed_service_instance"
 						}
 					},
@@ -198,6 +203,7 @@ var _ = Describe("Service Instance", func() {
 						},
 						"entity": {
 							"name": "some-service-name-4",
+							"space_guid": "some-space-guid",
 							"type": "managed_service_instance"
 						}
 					}
@@ -229,10 +235,30 @@ var _ = Describe("Service Instance", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-					{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
-					{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: ManagedService},
-					{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: ManagedService},
-					{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: ManagedService},
+					{
+						Name:      "some-service-name-1",
+						GUID:      "some-service-guid-1",
+						SpaceGUID: "some-space-guid",
+						Type:      ManagedService,
+					},
+					{
+						Name:      "some-service-name-2",
+						GUID:      "some-service-guid-2",
+						SpaceGUID: "some-space-guid",
+						Type:      ManagedService,
+					},
+					{
+						Name:      "some-service-name-3",
+						GUID:      "some-service-guid-3",
+						SpaceGUID: "some-space-guid",
+						Type:      ManagedService,
+					},
+					{
+						Name:      "some-service-name-4",
+						GUID:      "some-service-guid-4",
+						SpaceGUID: "some-space-guid",
+						Type:      ManagedService,
+					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
@@ -251,6 +277,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-1",
+								"space_guid": "some-space-guid",
 								"type": "managed_service_instance"
 							}
 						},
@@ -260,6 +287,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-2",
+								"space_guid": "some-space-guid",
 								"type": "user_provided_service_instance"
 							}
 						}
@@ -275,6 +303,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-3",
+								"space_guid": "some-space-guid",
 								"type": "managed_service_instance"
 							}
 						},
@@ -284,6 +313,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-4",
+								"space_guid": "some-space-guid",
 								"type": "user_provided_service_instance"
 							}
 						}
@@ -315,10 +345,10 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: UserProvidedService},
-						{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: ManagedService},
-						{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: UserProvidedService},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", Type: ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: UserProvidedService},
+						{Name: "some-service-name-3", GUID: "some-service-guid-3", SpaceGUID: "some-space-guid", Type: ManagedService},
+						{Name: "some-service-name-4", GUID: "some-service-guid-4", SpaceGUID: "some-space-guid", Type: UserProvidedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 				})
@@ -336,6 +366,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-1",
+								"space_guid": "some-space-guid",
 								"type": "managed_service_instance"
 							}
 						},
@@ -345,6 +376,7 @@ var _ = Describe("Service Instance", func() {
 							},
 							"entity": {
 								"name": "some-service-name-2",
+								"space_guid": "some-space-guid",
 								"type": "managed_service_instance"
 							}
 						}
@@ -369,8 +401,8 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: ManagedService},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", SpaceGUID: "some-space-guid", Type: ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", SpaceGUID: "some-space-guid", Type: ManagedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})

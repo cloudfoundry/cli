@@ -189,8 +189,8 @@ var _ = Describe("Application Config", func() {
 
 					BeforeEach(func() {
 						services = []v2action.ServiceInstance{
-							{Name: "service-1"},
-							{Name: "service-2"},
+							{Name: "service-1", GUID: "service-instance-1"},
+							{Name: "service-2", GUID: "service-instance-2"},
 						}
 
 						fakeV2Actor.GetServiceInstancesByApplicationReturns(services, v2action.Warnings{"service-instance-warning-1", "service-instance-warning-2"}, nil)
@@ -219,7 +219,10 @@ var _ = Describe("Application Config", func() {
 					})
 
 					It("sets the bound services", func() {
-						Expect(firstConfig.CurrentServices).To(Equal(services))
+						Expect(firstConfig.CurrentServices).To(Equal(map[string]v2action.ServiceInstance{
+							"service-1": v2action.ServiceInstance{Name: "service-1", GUID: "service-instance-1"},
+							"service-2": v2action.ServiceInstance{Name: "service-2", GUID: "service-instance-2"},
+						}))
 
 						Expect(fakeV2Actor.GetServiceInstancesByApplicationCallCount()).To(Equal(1))
 						Expect(fakeV2Actor.GetServiceInstancesByApplicationArgsForCall(0)).To(Equal("some-app-guid"))
@@ -445,6 +448,52 @@ var _ = Describe("Application Config", func() {
 				It("sets the desired app state to stopped", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(firstConfig.DesiredApplication.Stopped()).To(BeTrue())
+				})
+			})
+		})
+
+		Context("when the manifest contains services", func() {
+			BeforeEach(func() {
+				manifestApps[0].Services = []string{"service_1", "service_2"}
+				fakeV2Actor.GetServiceInstancesByApplicationReturns([]v2action.ServiceInstance{
+					{Name: "service_1", SpaceGUID: spaceGUID},
+					{Name: "service_3", SpaceGUID: spaceGUID},
+				}, v2action.Warnings{"some-service-warning-1"}, nil)
+			})
+
+			Context("when retrieving services is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(v2action.ServiceInstance{Name: "service_2", SpaceGUID: spaceGUID}, v2action.Warnings{"some-service-warning-2"}, nil)
+				})
+
+				It("sets DesiredServices", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "some-service-warning-1", "some-service-warning-2"))
+					Expect(firstConfig.DesiredServices).To(Equal(map[string]v2action.ServiceInstance{
+						"service_1": v2action.ServiceInstance{Name: "service_1", SpaceGUID: spaceGUID},
+						"service_2": v2action.ServiceInstance{Name: "service_2", SpaceGUID: spaceGUID},
+						"service_3": v2action.ServiceInstance{Name: "service_3", SpaceGUID: spaceGUID},
+					}))
+
+					Expect(fakeV2Actor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
+
+					inputServiceName, inputSpaceGUID := fakeV2Actor.GetServiceInstanceByNameAndSpaceArgsForCall(0)
+					Expect(inputServiceName).To(Equal("service_2"))
+					Expect(inputSpaceGUID).To(Equal(spaceGUID))
+				})
+			})
+
+			Context("when retrieving services fails", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("po-tat-toe")
+					fakeV2Actor.GetServiceInstanceByNameAndSpaceReturns(v2action.ServiceInstance{}, v2action.Warnings{"some-service-warning-2"}, expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("some-service-warning-1", "some-service-warning-2"))
 				})
 			})
 		})

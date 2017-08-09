@@ -21,6 +21,13 @@ func (e ServiceBindingNotFoundError) Error() string {
 	return fmt.Sprintf("Service binding for application GUID '%s', and service instance GUID '%s' not found.", e.AppGUID, e.ServiceInstanceGUID)
 }
 
+// BindServiceByApplicationAndServiceInstance binds the service instance to an application.
+func (actor Actor) BindServiceByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.CreateServiceBinding(appGUID, serviceInstanceGUID, nil)
+
+	return Warnings(warnings), err
+}
+
 // BindServiceBySpace binds the service instance to an application for a given space.
 func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string, parameters map[string]interface{}) (Warnings, error) {
 	var allWarnings Warnings

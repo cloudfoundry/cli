@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/cloudfoundry/bytefmt"
 
@@ -33,12 +34,13 @@ type Application struct {
 	Memory    uint64
 	Name      string
 	Path      string
+	Services  []string
 	StackName string
 }
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Path: '%s', Stack Name: '%s'",
+		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.BuildpackName,
 		app.Command,
@@ -50,6 +52,7 @@ func (app Application) String() string {
 		app.Instances,
 		app.Memory,
 		app.Path,
+		strings.Join(app.Services, ", "),
 		app.StackName,
 	)
 }
@@ -66,6 +69,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 		Memory                  string            `yaml:"memory"`
 		Name                    string            `yaml:"name"`
 		Path                    string            `yaml:"path"`
+		Services                []string          `yaml:"services"`
 		StackName               string            `yaml:"stack"`
 		Timeout                 int               `yaml:"timeout"`
 	}
@@ -82,6 +86,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.Instances = manifestApp.Instances
 	app.Name = manifestApp.Name
 	app.Path = manifestApp.Path
+	app.Services = manifestApp.Services
 	app.StackName = manifestApp.StackName
 	app.HealthCheckTimeout = manifestApp.Timeout
 	app.EnvironmentVariables = manifestApp.EnvironmentVariables

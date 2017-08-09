@@ -323,6 +323,8 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	switch event {
 	case pushaction.ConfiguringRoutes:
 		cmd.UI.DisplayText("Mapping routes...")
+	case pushaction.ConfiguringServices:
+		cmd.UI.DisplayText("Binding services...")
 	case pushaction.ResourceMatching:
 		cmd.UI.DisplayText("Comparing local files to remote cache...")
 	case pushaction.CreatingArchive:

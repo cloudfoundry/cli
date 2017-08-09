@@ -17,7 +17,8 @@ type ApplicationConfig struct {
 	CurrentRoutes []v2action.Route
 	DesiredRoutes []v2action.Route
 
-	CurrentServices []v2action.ServiceInstance
+	CurrentServices map[string]v2action.ServiceInstance
+	DesiredServices map[string]v2action.ServiceInstance
 
 	AllResources       []v2action.Resource
 	MatchedResources   []v2action.Resource
@@ -83,6 +84,14 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		}
 		log.Debugln("post overriding config:", config.DesiredApplication)
 
+		var serviceWarnings Warnings
+		config.DesiredServices, serviceWarnings, err = actor.getDesiredServices(config.CurrentServices, app.Services, spaceGUID)
+		warnings = append(warnings, serviceWarnings...)
+		if err != nil {
+			log.Errorln("getting services:", err)
+			return nil, warnings, err
+		}
+
 		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID, spaceGUID, config.CurrentRoutes)
 		warnings = append(warnings, routeWarnings...)
 		if err != nil {
@@ -105,6 +114,30 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 	return configs, warnings, nil
 }
 
+func (actor Actor) getDesiredServices(currentServices map[string]v2action.ServiceInstance, requestedServices []string, spaceGUID string) (map[string]v2action.ServiceInstance, Warnings, error) {
+	var warnings Warnings
+
+	desiredServices := map[string]v2action.ServiceInstance{}
+	for name, serviceInstance := range currentServices {
+		log.Debugln("adding bound service:", name)
+		desiredServices[name] = serviceInstance
+	}
+
+	for _, serviceName := range requestedServices {
+		if _, ok := desiredServices[serviceName]; !ok {
+			log.Debugln("adding requested service:", serviceName)
+			serviceInstance, serviceWarnings, err := actor.V2Actor.GetServiceInstanceByNameAndSpace(serviceName, spaceGUID)
+			warnings = append(warnings, serviceWarnings...)
+			if err != nil {
+				return nil, warnings, err
+			}
+
+			desiredServices[serviceName] = serviceInstance
+		}
+	}
+	return desiredServices, warnings, nil
+}
+
 func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.Application, foundApp Application) (ApplicationConfig, v2action.Warnings, error) {
 	log.Debugln("found app:", foundApp)
 	config.CurrentApplication = foundApp
@@ -124,8 +157,13 @@ func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.A
 		return config, warnings, err
 	}
 
+	nameToService := map[string]v2action.ServiceInstance{}
+	for _, serviceInstance := range serviceInstances {
+		nameToService[serviceInstance.Name] = serviceInstance
+	}
+
 	config.CurrentRoutes = routes
-	config.CurrentServices = serviceInstances
+	config.CurrentServices = nameToService
 	return config, warnings, nil
 }
 
