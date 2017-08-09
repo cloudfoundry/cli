@@ -131,14 +131,12 @@ var _ = Describe("v3-restart Command", func() {
 							Expect(spaceGUID).To(Equal("some-space-guid"))
 
 							Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-							appGUID, spaceGUID := fakeActor.StopApplicationArgsForCall(0)
+							appGUID := fakeActor.StopApplicationArgsForCall(0)
 							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
 
 							Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-							appGUID, spaceGUID = fakeActor.StartApplicationArgsForCall(0)
+							appGUID = fakeActor.StartApplicationArgsForCall(0)
 							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
 						})
 					})
 
@@ -169,9 +167,8 @@ var _ = Describe("v3-restart Command", func() {
 							Expect(fakeActor.StopApplicationCallCount()).To(BeZero(), "Expected StopApplication to not be called")
 
 							Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-							appGUID, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
+							appGUID := fakeActor.StartApplicationArgsForCall(0)
 							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(spaceGUID).To(Equal("some-space-guid"))
 						})
 					})
 				})

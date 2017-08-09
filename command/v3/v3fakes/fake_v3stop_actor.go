@@ -25,11 +25,10 @@ type FakeV3StopActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	StopApplicationStub        func(appGUID string, spaceGUID string) (v3action.Warnings, error)
+	StopApplicationStub        func(appGUID string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
 	stopApplicationArgsForCall []struct {
-		appGUID   string
-		spaceGUID string
+		appGUID string
 	}
 	stopApplicationReturns struct {
 		result1 v3action.Warnings
@@ -98,17 +97,16 @@ func (fake *FakeV3StopActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3StopActor) StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error) {
+func (fake *FakeV3StopActor) StopApplication(appGUID string) (v3action.Warnings, error) {
 	fake.stopApplicationMutex.Lock()
 	ret, specificReturn := fake.stopApplicationReturnsOnCall[len(fake.stopApplicationArgsForCall)]
 	fake.stopApplicationArgsForCall = append(fake.stopApplicationArgsForCall, struct {
-		appGUID   string
-		spaceGUID string
-	}{appGUID, spaceGUID})
-	fake.recordInvocation("StopApplication", []interface{}{appGUID, spaceGUID})
+		appGUID string
+	}{appGUID})
+	fake.recordInvocation("StopApplication", []interface{}{appGUID})
 	fake.stopApplicationMutex.Unlock()
 	if fake.StopApplicationStub != nil {
-		return fake.StopApplicationStub(appGUID, spaceGUID)
+		return fake.StopApplicationStub(appGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -122,10 +120,10 @@ func (fake *FakeV3StopActor) StopApplicationCallCount() int {
 	return len(fake.stopApplicationArgsForCall)
 }
 
-func (fake *FakeV3StopActor) StopApplicationArgsForCall(i int) (string, string) {
+func (fake *FakeV3StopActor) StopApplicationArgsForCall(i int) string {
 	fake.stopApplicationMutex.RLock()
 	defer fake.stopApplicationMutex.RUnlock()
-	return fake.stopApplicationArgsForCall[i].appGUID, fake.stopApplicationArgsForCall[i].spaceGUID
+	return fake.stopApplicationArgsForCall[i].appGUID
 }
 
 func (fake *FakeV3StopActor) StopApplicationReturns(result1 v3action.Warnings, result2 error) {

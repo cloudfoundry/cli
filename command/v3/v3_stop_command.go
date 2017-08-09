@@ -12,7 +12,7 @@ import (
 
 type V3StopActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
+	StopApplication(appGUID string) (v3action.Warnings, error)
 }
 
 type V3StopCommand struct {
@@ -71,7 +71,7 @@ func (cmd V3StopCommand) Execute(args []string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  user.Name,
 	})
-	warnings, err = cmd.Actor.StopApplication(app.GUID, cmd.Config.TargetedSpace().GUID)
+	warnings, err = cmd.Actor.StopApplication(app.GUID)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

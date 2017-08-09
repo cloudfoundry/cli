@@ -33,8 +33,8 @@ type V3PushActor interface {
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
-	StartApplication(appGUID string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	StopApplication(appGUID string, spaceGUID string) (v3action.Warnings, error)
+	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
+	StopApplication(appGUID string) (v3action.Warnings, error)
 	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
 }
 
@@ -344,7 +344,7 @@ func (cmd V3PushCommand) startApplication(appGUID string, userName string) error
 		"Username":  userName,
 	})
 
-	_, warnings, err := cmd.Actor.StartApplication(appGUID, cmd.Config.TargetedSpace().GUID)
+	_, warnings, err := cmd.Actor.StartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -362,7 +362,7 @@ func (cmd V3PushCommand) stopApplication(appGUID string, userName string) error 
 		"CurrentUser":  userName,
 	})
 
-	warnings, err := cmd.Actor.StopApplication(appGUID, cmd.Config.TargetedSpace().GUID)
+	warnings, err := cmd.Actor.StopApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

@@ -108,9 +108,8 @@ var _ = Describe("v3-start Command", func() {
 			Expect(testUI.Out).To(Say("OK"))
 
 			Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-			appName, spaceGUID := fakeActor.StartApplicationArgsForCall(0)
+			appName := fakeActor.StartApplicationArgsForCall(0)
 			Expect(appName).To(Equal("some-app-guid"))
-			Expect(spaceGUID).To(Equal("some-space-guid"))
 		})
 	})
 
