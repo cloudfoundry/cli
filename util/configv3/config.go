@@ -106,6 +106,8 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 			config.ConfigFile.UAAOAuthClient = DefaultUAAOAuthClient
 			config.ConfigFile.UAAOAuthClientSecret = DefaultUAAOAuthClientSecret
 		}
+
+		config.ConfigFile.Target = config.sanitizeURL(config.ConfigFile.Target)
 	}
 
 	config.ENV = EnvOverride{
@@ -565,13 +567,13 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs
 func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
-	config.ConfigFile.Target = api
+	config.ConfigFile.Target = config.sanitizeURL(api)
 	config.ConfigFile.APIVersion = apiVersion
-	config.ConfigFile.AuthorizationEndpoint = auth
+	config.ConfigFile.AuthorizationEndpoint = config.sanitizeURL(auth)
 	config.ConfigFile.MinCLIVersion = minCLIVersion
-	config.ConfigFile.DopplerEndpoint = doppler
-	config.ConfigFile.UAAEndpoint = uaa
-	config.ConfigFile.RoutingEndpoint = routing
+	config.ConfigFile.DopplerEndpoint = config.sanitizeURL(doppler)
+	config.ConfigFile.UAAEndpoint = config.sanitizeURL(uaa)
+	config.ConfigFile.RoutingEndpoint = config.sanitizeURL(routing)
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
 	config.UnsetOrganizationInformation()
@@ -603,4 +605,9 @@ func (config *Config) UnsetSpaceInformation() {
 // UnsetOrganizationInformation resets the organization values to default
 func (config *Config) UnsetOrganizationInformation() {
 	config.SetOrganizationInformation("", "")
+}
+
+// sanitizeURL removes trailing slashes from URL
+func (*Config) sanitizeURL(url string) string {
+	return strings.TrimRight(url, "/")
 }

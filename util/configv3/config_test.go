@@ -26,110 +26,129 @@ var _ = Describe("Config", func() {
 		teardown(homeDir)
 	})
 
-	Context("when there isn't a config set", func() {
-		var (
-			oldLang  string
-			oldLCAll string
-		)
+	Describe("LoadConfig", func() {
+		Context("when there isn't a config set", func() {
+			var (
+				oldLang  string
+				oldLCAll string
+			)
 
-		BeforeEach(func() {
-			oldLang = os.Getenv("LANG")
-			oldLCAll = os.Getenv("LC_ALL")
-			Expect(os.Unsetenv("LANG")).ToNot(HaveOccurred())
-			Expect(os.Unsetenv("LC_ALL")).ToNot(HaveOccurred())
-		})
-
-		It("returns a default config", func() {
-			defer os.Setenv("LANG", oldLang)
-			defer os.Setenv("LC_ALL", oldLCAll)
-
-			// specifically for when we run unit tests locally
-			// we save and unset this variable in case it's present
-			// since we want to load a default config
-			envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
-			Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
-
-			config, err := LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-
-			// then we reset the env variable
-			err = os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(config).ToNot(BeNil())
-			Expect(config.Target()).To(Equal(DefaultTarget))
-			Expect(config.SkipSSLValidation()).To(BeFalse())
-			Expect(config.ColorEnabled()).To(Equal(ColorEnabled))
-			Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
-			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
-			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
-			Expect(config.Locale()).To(BeEmpty())
-			Expect(config.SSHOAuthClient()).To(Equal(DefaultSSHOAuthClient))
-			Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
-			Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
-			Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
-			Expect(config.LogLevel()).To(Equal(0))
-
-			Expect(config.PluginRepositories()).To(Equal([]PluginRepository{{
-				Name: "CF-Community",
-				URL:  "https://plugins.cloudfoundry.org",
-			}}))
-			Expect(config.Experimental()).To(BeFalse())
-
-			pluginConfig := config.Plugins()
-			Expect(pluginConfig).To(BeEmpty())
-
-			trace, location := config.Verbose()
-			Expect(trace).To(BeFalse())
-			Expect(location).To(BeEmpty())
-
-			// test the plugins map is initialized
-			config.AddPlugin(Plugin{})
-		})
-	})
-
-	Context("when there is a config set", func() {
-		var (
-			config *Config
-			err    error
-		)
-
-		Context("when UAAOAuthClient is not present", func() {
 			BeforeEach(func() {
-				rawConfig := `{}`
-				setConfig(homeDir, rawConfig)
+				oldLang = os.Getenv("LANG")
+				oldLCAll = os.Getenv("LC_ALL")
+				Expect(os.Unsetenv("LANG")).ToNot(HaveOccurred())
+				Expect(os.Unsetenv("LC_ALL")).ToNot(HaveOccurred())
+			})
 
-				config, err = LoadConfig()
+			It("returns a default config", func() {
+				defer os.Setenv("LANG", oldLang)
+				defer os.Setenv("LC_ALL", oldLCAll)
+
+				// specifically for when we run unit tests locally
+				// we save and unset this variable in case it's present
+				// since we want to load a default config
+				envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
+				Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
+
+				config, err := LoadConfig()
 				Expect(err).ToNot(HaveOccurred())
-			})
 
-			It("sets UAAOAuthClient to the default", func() {
+				// then we reset the env variable
+				err = os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(config).ToNot(BeNil())
+				Expect(config.Target()).To(Equal(DefaultTarget))
+				Expect(config.SkipSSLValidation()).To(BeFalse())
+				Expect(config.ColorEnabled()).To(Equal(ColorEnabled))
+				Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
+				Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
+				Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
+				Expect(config.Locale()).To(BeEmpty())
+				Expect(config.SSHOAuthClient()).To(Equal(DefaultSSHOAuthClient))
 				Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
-			})
-
-			It("sets UAAOAuthClientSecret to the default", func() {
 				Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+				Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
+				Expect(config.LogLevel()).To(Equal(0))
+
+				Expect(config.PluginRepositories()).To(Equal([]PluginRepository{{
+					Name: "CF-Community",
+					URL:  "https://plugins.cloudfoundry.org",
+				}}))
+				Expect(config.Experimental()).To(BeFalse())
+
+				pluginConfig := config.Plugins()
+				Expect(pluginConfig).To(BeEmpty())
+
+				trace, location := config.Verbose()
+				Expect(trace).To(BeFalse())
+				Expect(location).To(BeEmpty())
+
+				// test the plugins map is initialized
+				config.AddPlugin(Plugin{})
 			})
 		})
 
-		Context("when UAAOAuthClient is empty", func() {
-			BeforeEach(func() {
-				rawConfig := `
+		Context("when there is a config set", func() {
+			var (
+				config *Config
+				err    error
+			)
+
+			Context("when UAAOAuthClient is not present", func() {
+				BeforeEach(func() {
+					rawConfig := `{}`
+					setConfig(homeDir, rawConfig)
+
+					config, err = LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("sets UAAOAuthClient to the default", func() {
+					Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
+				})
+
+				It("sets UAAOAuthClientSecret to the default", func() {
+					Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+				})
+			})
+
+			Context("when UAAOAuthClient is empty", func() {
+				BeforeEach(func() {
+					rawConfig := `
 					{
 						"UAAOAuthClient": ""
 					}`
-				setConfig(homeDir, rawConfig)
+					setConfig(homeDir, rawConfig)
 
-				config, err = LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
+					config, err = LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("sets UAAOAuthClient to the default", func() {
+					Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
+				})
+
+				It("sets UAAOAuthClientSecret to the default", func() {
+					Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+				})
 			})
 
-			It("sets UAAOAuthClient to the default", func() {
-				Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
-			})
+			Context("when Target is set and has a trailing slash", func() {
+				BeforeEach(func() {
+					rawConfig := `
+					{
+						"Target": "https://api.bosh-lite.com/"
+					}`
+					setConfig(homeDir, rawConfig)
 
-			It("sets UAAOAuthClientSecret to the default", func() {
-				Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+					config, err = LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("sanitizes Target", func() {
+					Expect(config.ConfigFile.Target).To(Equal("https://api.bosh-lite.com"))
+				})
 			})
 		})
 	})
@@ -184,7 +203,7 @@ var _ = Describe("Config", func() {
 				Expect(config).ToNot(BeNil())
 			})
 
-			It("returns fields directly from config", func() {
+			It("returns the target", func() {
 				Expect(config.Target()).To(Equal("https://api.foo.com"))
 			})
 		})
@@ -599,6 +618,26 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+			})
+
+			It("sanitizes endpoint URLs", func() {
+				config := Config{}
+				config.SetTargetInformation(
+					"https://api.foo.com///",
+					"2.59.31",
+					"https://login.foo.com//",
+					"2.0.0",
+					"wws://doppler.foo.com:443/",
+					"https://uaa.foo.com//",
+					"https://api.foo.com/routing///",
+					true,
+				)
+
+				Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
+				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
+				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
+				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
+				Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 			})
 		})
 
