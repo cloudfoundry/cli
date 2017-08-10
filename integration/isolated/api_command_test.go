@@ -281,4 +281,14 @@ var _ = Describe("api command", func() {
 		Expect(configFile.TargetedSpace.Name).To(BeEmpty())
 		Expect(configFile.TargetedSpace.AllowSSH).To(BeFalse())
 	})
+
+	It("handles API endpoints with trailing slash", func() {
+		session := helpers.CF("api", apiURL+"/", skipSSLValidation)
+		Eventually(session).Should(Exit(0))
+
+		helpers.LoginCF()
+
+		session = helpers.CF("orgs")
+		Eventually(session).Should(Exit(0))
+	})
 })

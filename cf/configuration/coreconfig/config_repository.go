@@ -1,6 +1,7 @@
 package coreconfig
 
 import (
+	"strings"
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/configuration"
@@ -211,11 +212,14 @@ func (c *ConfigRepository) RoutingAPIEndpoint() (routingAPIEndpoint string) {
 	return
 }
 
-func (c *ConfigRepository) APIEndpoint() (apiEndpoint string) {
+func (c *ConfigRepository) APIEndpoint() string {
+	var apiEndpoint string
 	c.read(func() {
 		apiEndpoint = c.data.Target
 	})
-	return
+	apiEndpoint = strings.TrimRight(apiEndpoint, "/")
+
+	return apiEndpoint
 }
 
 func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {

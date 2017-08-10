@@ -120,6 +120,13 @@ var _ = Describe("Configuration Repository", func() {
 		Expect(config.MinRecommendedCLIVersion()).To(Equal("6.9.0"))
 	})
 
+	Describe("APIEndpoint", func() {
+		It("sanitizes the target URL", func() {
+			config.SetAPIEndpoint("http://api.the-endpoint/")
+			Expect(config.APIEndpoint()).To(Equal("http://api.the-endpoint"))
+		})
+	})
+
 	Describe("HasAPIEndpoint", func() {
 		Context("when both endpoint and version are set", func() {
 			BeforeEach(func() {
