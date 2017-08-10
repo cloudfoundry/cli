@@ -556,25 +556,6 @@ var _ = Describe("Config", func() {
 				Expect(writtenCFConfig.ColorEnabled).To(Equal(config.ConfigFile.ColorEnabled))
 			})
 		})
-
-		Context("when an error is encountered", func() {
-			BeforeEach(func() {
-				err := WriteConfig(config)
-				Expect(err).ToNot(HaveOccurred())
-
-				configFilePath := filepath.Join(homeDir, ".cf", "config.json")
-				err = os.Remove(configFilePath)
-				Expect(err).ToNot(HaveOccurred())
-				err = os.Mkdir(configFilePath, 0700)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("returns the error", func() {
-				err := WriteConfig(config)
-				_, ok := err.(*os.PathError)
-				Expect(ok).To(BeTrue())
-			})
-		})
 	})
 
 	Describe("setter functions", func() {
