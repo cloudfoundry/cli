@@ -4108,6 +4108,14 @@
     "translation": "Nenhum terminal de API configurado. Use '{{.LoginTip}}' ou '{{.APITip}}' para destinar um terminal."
   },
   {
+    "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No UAA Endpoint Found",
+    "translation": ""
+  },
+  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "Nenhum terminal de API configurado. Use '{{.Name}}' para configurar um terminal"
   },

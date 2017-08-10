@@ -22,10 +22,10 @@ type requestOptions struct {
 	// RequestName is the name of the request (see routes)
 	RequestName string
 
-	// URL is the request path.
-	URL string
 	// Method is the HTTP method.
 	Method string
+	// URL is the request path.
+	URL string
 	// Body is the content of the request.
 	Body io.ReadSeeker
 }

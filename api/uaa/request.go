@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/tedsuo/rata"
+	"code.cloudfoundry.org/cli/api/uaa/internal"
 )
 
 // RequestOptions contains all the options to create an HTTP Request.
@@ -13,8 +13,8 @@ type requestOptions struct {
 	// Header is the set of request headers
 	Header http.Header
 
-	// Params are the list URI route parameters
-	Params rata.Params
+	// URIParams are the list URI route parameters
+	URIParams internal.Params
 
 	// Query is a list of HTTP query parameters
 	Query url.Values
@@ -22,6 +22,10 @@ type requestOptions struct {
 	// RequestName is the name of the request (see routes)
 	RequestName string
 
+	// Method is the HTTP method.
+	Method string
+	// URL is the request path.
+	URL string
 	// Body is the request body
 	Body io.Reader
 }
@@ -30,16 +34,29 @@ type requestOptions struct {
 // request will terminate the connection after it is sent (via a 'Connection:
 // close' header).
 func (client *Client) newRequest(passedRequest requestOptions) (*http.Request, error) {
-	request, err := client.router.CreateRequest(
-		passedRequest.RequestName,
-		passedRequest.Params,
-		passedRequest.Body,
-	)
+	var request *http.Request
+	var err error
+
+	if passedRequest.URL != "" {
+		request, err = http.NewRequest(
+			passedRequest.Method,
+			passedRequest.URL,
+			passedRequest.Body,
+		)
+	} else {
+		request, err = client.router.CreateRequest(
+			passedRequest.RequestName,
+			passedRequest.URIParams,
+			passedRequest.Body,
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
 
-	request.URL.RawQuery = passedRequest.Query.Encode()
+	if passedRequest.Query != nil {
+		request.URL.RawQuery = passedRequest.Query.Encode()
+	}
 
 	if passedRequest.Header != nil {
 		request.Header = passedRequest.Header

@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -130,7 +131,11 @@ var _ = Describe("unbind-security-group command", func() {
 				),
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v2/info"),
-					RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
+					RespondWith(http.StatusOK, fmt.Sprintf(`{"api_version":"2.34.0", "authorization_endpoint": "%s"}`, server.URL())),
+				),
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/login"),
+					RespondWith(http.StatusOK, `{}`),
 				),
 			)
 			Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))

@@ -3,6 +3,8 @@ package uaa_test
 import (
 	"bytes"
 	"log"
+	"net/http"
+	"strings"
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
@@ -36,13 +38,37 @@ var _ = BeforeEach(func() {
 })
 
 func NewTestUAAClientAndStore() *Client {
+	SetupAuthResponse()
+
 	client := NewClient(Config{
 		AppName:           "CF CLI UAA API Test",
 		AppVersion:        "Unknown",
 		ClientID:          "client-id",
 		ClientSecret:      "client-secret",
 		SkipSSLValidation: true,
-		URL:               server.URL(),
 	})
+
+	err := client.SetupResources(server.URL())
+
+	Expect(err).ToNot(HaveOccurred())
+
 	return client
+}
+
+func SetupAuthResponse() {
+	serverURL := server.URL()
+
+	response := strings.Replace(`{
+				"links": {
+					"uaa": "SERVER_URL",
+					"login": "SERVER_URL"
+				}
+			}`, "SERVER_URL", serverURL, -1)
+
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest(http.MethodGet, "/login"),
+			RespondWith(http.StatusOK, response),
+		),
+	)
 }

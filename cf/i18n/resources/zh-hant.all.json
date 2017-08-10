@@ -4108,6 +4108,14 @@
     "translation": "未設定任何 API 端點。使用 '{{.LoginTip}}' 或 '{{.APITip}}'，將目標設為端點。"
   },
   {
+    "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No UAA Endpoint Found",
+    "translation": ""
+  },
+  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "未設定任何 API 端點。使用 '{{.Name}}' 以設定端點"
   },

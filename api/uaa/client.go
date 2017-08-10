@@ -11,17 +11,15 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/uaa/internal"
-	"github.com/tedsuo/rata"
 )
 
 // Client is the UAA client
 type Client struct {
-	URL    string
 	id     string
 	secret string
 
 	connection Connection
-	router     *rata.RequestGenerator
+	router     *internal.Router
 	userAgent  string
 }
 
@@ -51,9 +49,6 @@ type Config struct {
 	// In this mode, TLS is susceptible to man-in-the-middle attacks. This should
 	// be used only for testing.
 	SkipSSLValidation bool
-
-	// URL is the api URL for the UAA target.
-	URL string
 }
 
 // NewClient returns a new UAA Client with the provided configuration
@@ -67,11 +62,9 @@ func NewClient(config Config) *Client {
 	)
 
 	client := Client{
-		URL:    config.URL,
 		id:     config.ClientID,
 		secret: config.ClientSecret,
 
-		router:     rata.NewRequestGenerator(config.URL, internal.Routes),
 		connection: NewConnection(config.SkipSSLValidation, config.DialTimeout),
 		userAgent:  userAgent,
 	}

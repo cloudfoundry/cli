@@ -4108,6 +4108,14 @@
     "translation": "Nessun endpoint API impostato. Utilizza '{{.LoginTip}}' o '{{.APITip}}' per specificare un endpoint."
   },
   {
+    "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No UAA Endpoint Found",
+    "translation": ""
+  },
+  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "Nessun endpoint api impostato. Utilizza '{{.Name}}' per impostare un endpoint"
   },

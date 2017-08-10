@@ -59,7 +59,7 @@ var _ = Describe("UAA Client", func() {
 				Type:         "bearer",
 			}))
 
-			Expect(server.ReceivedRequests()).To(HaveLen(1))
+			Expect(server.ReceivedRequests()).To(HaveLen(2))
 		})
 	})
 })
