@@ -233,7 +233,7 @@ type SetOrgRoleArgs struct {
 type SetSpaceRoleArgs struct {
 	Username     string    `positional-arg-name:"USERNAME" required:"true" description:"The user"`
 	Organization string    `positional-arg-name:"ORG" required:"true" description:"The organization"`
-	Space        string    `positional-arg-name:"ORG" required:"true" description:"The space"`
+	Space        string    `positional-arg-name:"SPACE" required:"true" description:"The space"`
 	Role         SpaceRole `positional-arg-name:"ROLE" required:"true" description:"The space role"`
 }
 
