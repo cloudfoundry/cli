@@ -187,12 +187,24 @@ func WriteConfig(c *Config) error {
 		return err
 	}
 
-	err = os.MkdirAll(filepath.Join(homeDirectory(), ".cf"), 0700)
+	dir := configDirectory()
+	err = os.MkdirAll(dir, 0700)
 	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(ConfigFilePath(), rawConfig, 0600)
+	tempConfigFile, err := ioutil.TempFile(dir, "config")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempConfigFile.Name())
+
+	err = ioutil.WriteFile(tempConfigFile.Name(), rawConfig, 0600)
+	if err != nil {
+		return err
+	}
+
+	return os.Rename(tempConfigFile.Name(), ConfigFilePath())
 }
 
 // Config combines the settings taken from the .cf/config.json, os.ENV, and the
