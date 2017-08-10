@@ -55,6 +55,10 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		return nil, nil, HandleError(err)
 	}
 
+	if ccClient.AuthorizationEndpoint() == "" {
+		return nil, nil, translatableerror.AuthorizationEndpointNotFoundError{}
+	}
+
 	uaaClient := uaa.NewClient(uaa.Config{
 		AppName:           config.BinaryName(),
 		AppVersion:        config.BinaryVersion(),
@@ -62,7 +66,6 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		ClientSecret:      config.UAAOAuthClientSecret(),
 		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
-		URL:               ccClient.TokenEndpoint(),
 	})
 
 	if verbose {
@@ -72,9 +75,16 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		uaaClient.WrapConnection(uaaWrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	uaaClient.WrapConnection(uaaWrapper.NewUAAAuthentication(uaaClient, config))
+	uaaAuthWrapper := uaaWrapper.NewUAAAuthentication(nil, config)
+	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(2))
 
+	err = uaaClient.SetupResources(ccClient.AuthorizationEndpoint())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	uaaAuthWrapper.SetClient(uaaClient)
 	authWrapper.SetClient(uaaClient)
 
 	return ccClient, uaaClient, err

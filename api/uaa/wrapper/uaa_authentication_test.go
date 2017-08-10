@@ -25,6 +25,7 @@ var _ = Describe("UAA Authentication", func() {
 
 		wrapper uaa.Connection
 		request *http.Request
+		inner   *UAAAuthentication
 	)
 
 	BeforeEach(func() {
@@ -32,11 +33,27 @@ var _ = Describe("UAA Authentication", func() {
 		fakeClient = new(wrapperfakes.FakeUAAClient)
 		inMemoryCache = util.NewInMemoryTokenCache()
 
-		inner := NewUAAAuthentication(fakeClient, inMemoryCache)
+		inner = NewUAAAuthentication(fakeClient, inMemoryCache)
 		wrapper = inner.Wrap(fakeConnection)
 	})
 
 	Describe("Make", func() {
+		Context("when the client is nil", func() {
+			BeforeEach(func() {
+				inner.SetClient(nil)
+
+				fakeConnection.MakeReturns(uaa.InvalidAuthTokenError{})
+			})
+
+			It("calls the connection without any side effects", func() {
+				err := wrapper.Make(request, nil)
+				Expect(err).To(MatchError(uaa.InvalidAuthTokenError{}))
+
+				Expect(fakeClient.RefreshAccessTokenCallCount()).To(Equal(0))
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+			})
+		})
+
 		Context("when the token is valid", func() {
 			BeforeEach(func() {
 				request = &http.Request{

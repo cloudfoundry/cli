@@ -4108,6 +4108,14 @@
     "translation": "No se ha establecido ningún punto final de API. Utilice '{{.LoginTip}}' o '{{.APITip}}' para establecer un punto final como destino."
   },
   {
+    "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No UAA Endpoint Found",
+    "translation": ""
+  },
+  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "No se ha establecido ningún punto final de api. Utilice '{{.Name}}' para establecer un punto final"
   },

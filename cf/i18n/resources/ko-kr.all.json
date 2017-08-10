@@ -4108,6 +4108,14 @@
     "translation": "API 엔드포인트가 설정되지 않았습니다. 엔드포인트를 대상 지정하려면 '{{.LoginTip}}' 또는 '{{.APITip}}'을(를) 사용하십시오."
   },
   {
+    "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No UAA Endpoint Found",
+    "translation": ""
+  },
+  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "API 엔드포인트가 설정되지 않았습니다. 엔드포인트를 설정하려면 '{{.Name}}'을(를) 사용하십시오."
   },
