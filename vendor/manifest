@@ -359,7 +359,7 @@
 			"importpath": "github.com/tedsuo/rata",
 			"repository": "https://github.com/tedsuo/rata",
 			"vcs": "git",
-			"revision": "0649c23705dfb45a9693b668c4fc1c0666f485d9",
+			"revision": "88dadd5b7d95869a307d31691591e2e7aea32971",
 			"branch": "master",
 			"notests": true
 		},
