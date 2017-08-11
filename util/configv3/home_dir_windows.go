@@ -7,8 +7,13 @@ import (
 	"path/filepath"
 )
 
+// ConfigFilePath returns the location of the config file
 func ConfigFilePath() string {
 	return filepath.Join(homeDirectory(), ".cf", "config.json")
+}
+
+func configDirectory() string {
+	return filepath.Join(homeDirectory(), ".cf")
 }
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory

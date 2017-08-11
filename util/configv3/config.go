@@ -203,6 +203,7 @@ func WriteConfig(c *Config) error {
 	if err != nil {
 		return err
 	}
+	tempConfigFile.Close()
 
 	return os.Rename(tempConfigFile.Name(), ConfigFilePath())
 }
