@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
+	"net/url"
+	"path"
 )
 
 // RequestGenerator creates http.Request objects with the correct path and method
@@ -39,14 +40,19 @@ func (r *RequestGenerator) CreateRequest(
 	if !ok {
 		return &http.Request{}, fmt.Errorf("No route exists with the name %s", name)
 	}
-	path, err := route.CreatePath(params)
+
+	routePath, err := route.CreatePath(params)
 	if err != nil {
 		return &http.Request{}, err
 	}
 
-	url := r.host + "/" + strings.TrimLeft(path, "/")
+	u, err := url.Parse(r.host)
+	if err != nil {
+		return &http.Request{}, err
+	}
+	u.Path = path.Join(u.Path, routePath)
 
-	req, err := http.NewRequest(route.Method, url, body)
+	req, err := http.NewRequest(route.Method, u.String(), body)
 	if err != nil {
 		return &http.Request{}, err
 	}

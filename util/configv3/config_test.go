@@ -133,23 +133,6 @@ var _ = Describe("Config", func() {
 					Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 				})
 			})
-
-			Context("when Target is set and has a trailing slash", func() {
-				BeforeEach(func() {
-					rawConfig := `
-					{
-						"Target": "https://api.bosh-lite.com/"
-					}`
-					setConfig(homeDir, rawConfig)
-
-					config, err = LoadConfig()
-					Expect(err).ToNot(HaveOccurred())
-				})
-
-				It("sanitizes Target", func() {
-					Expect(config.ConfigFile.Target).To(Equal("https://api.bosh-lite.com"))
-				})
-			})
 		})
 	})
 
@@ -599,26 +582,6 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
-			})
-
-			It("sanitizes endpoint URLs", func() {
-				config := Config{}
-				config.SetTargetInformation(
-					"https://api.foo.com///",
-					"2.59.31",
-					"https://login.foo.com//",
-					"2.0.0",
-					"wws://doppler.foo.com:443/",
-					"https://uaa.foo.com//",
-					"https://api.foo.com/routing///",
-					true,
-				)
-
-				Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
-				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
-				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
-				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
-				Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 			})
 		})
 
