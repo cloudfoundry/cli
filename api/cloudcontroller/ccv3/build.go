@@ -65,7 +65,7 @@ func (client *Client) CreateBuild(build Build) (Build, Warnings, error) {
 func (client *Client) GetBuild(guid string) (Build, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetBuildRequest,
-		URIParams:   internal.Params{"guid": guid},
+		URIParams:   internal.Params{"build_guid": guid},
 	})
 	if err != nil {
 		return Build{}, nil, err

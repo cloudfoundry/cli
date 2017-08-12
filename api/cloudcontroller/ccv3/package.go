@@ -40,10 +40,10 @@ type Package struct {
 }
 
 // GetPackage returns the package with the given GUID.
-func (client *Client) GetPackage(guid string) (Package, Warnings, error) {
+func (client *Client) GetPackage(packageGUID string) (Package, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetPackageRequest,
-		URIParams:   internal.Params{"guid": guid},
+		URIParams:   internal.Params{"package_guid": packageGUID},
 	})
 	if err != nil {
 		return Package{}, nil, err

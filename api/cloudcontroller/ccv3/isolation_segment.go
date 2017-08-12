@@ -73,7 +73,7 @@ func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment
 func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentRequest,
-		URIParams:   map[string]string{"guid": guid},
+		URIParams:   map[string]string{"isolation_segment_guid": guid},
 	})
 	if err != nil {
 		return IsolationSegment{}, nil, err
@@ -97,7 +97,7 @@ func (client *Client) GetIsolationSegment(guid string) (IsolationSegment, Warnin
 func (client *Client) DeleteIsolationSegment(guid string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteIsolationSegmentRequest,
-		URIParams:   map[string]string{"guid": guid},
+		URIParams:   map[string]string{"isolation_segment_guid": guid},
 	})
 	if err != nil {
 		return nil, err

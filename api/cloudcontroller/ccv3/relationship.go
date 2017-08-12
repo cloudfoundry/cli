@@ -58,7 +58,7 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchSpaceRelationshipIsolationSegmentRequest,
-		URIParams:   internal.Params{"guid": spaceGUID},
+		URIParams:   internal.Params{"space_guid": spaceGUID},
 		Body:        bytes.NewReader(body),
 	})
 	if err != nil {
@@ -79,7 +79,7 @@ func (client *Client) AssignSpaceToIsolationSegment(spaceGUID string, isolationS
 func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceRelationshipIsolationSegmentRequest,
-		URIParams:   internal.Params{"guid": spaceGUID},
+		URIParams:   internal.Params{"space_guid": spaceGUID},
 	})
 	if err != nil {
 		return Relationship{}, nil, err
@@ -96,10 +96,10 @@ func (client *Client) GetSpaceIsolationSegment(spaceGUID string) (Relationship, 
 
 // RevokeIsolationSegmentFromOrganization will delete the relationship between
 // the isolation segment and the organization provided.
-func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, organizationGUID string) (Warnings, error) {
+func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUID string, orgGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteIsolationSegmentRelationshipOrganizationRequest,
-		URIParams:   internal.Params{"guid": isolationSegmentGUID, "org_guid": organizationGUID},
+		URIParams:   internal.Params{"isolation_segment_guid": isolationSegmentGUID, "organization_guid": orgGUID},
 	})
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (client *Client) RevokeIsolationSegmentFromOrganization(isolationSegmentGUI
 func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Relationship, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationDefaultIsolationSegmentRequest,
-		URIParams:   internal.Params{"guid": orgGUID},
+		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
 	if err != nil {
 		return Relationship{}, nil, err
@@ -143,7 +143,7 @@ func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, i
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchOrganizationDefaultIsolationSegmentRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"guid": orgGUID},
+		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
 	if err != nil {
 		return nil, err
