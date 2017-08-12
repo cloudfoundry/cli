@@ -33,7 +33,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostAppTasksRequest,
 		URIParams: internal.Params{
-			"guid": appGUID,
+			"app_guid": appGUID,
 		},
 		Body: bytes.NewReader(bodyBytes),
 	})
@@ -56,7 +56,7 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppTasksRequest,
 		URIParams: internal.Params{
-			"guid": appGUID,
+			"app_guid": appGUID,
 		},
 		Query: query,
 	})
@@ -85,7 +85,7 @@ func (client *Client) UpdateTask(taskGUID string) (Task, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutTaskCancelRequest,
 		URIParams: internal.Params{
-			"guid": taskGUID,
+			"task_guid": taskGUID,
 		},
 	})
 	if err != nil {

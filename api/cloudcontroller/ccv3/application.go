@@ -137,7 +137,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteApplicationRequest,
-		URIParams:   internal.Params{"guid": appGUID},
+		URIParams:   internal.Params{"app_guid": appGUID},
 	})
 	if err != nil {
 		return "", nil, err
@@ -159,7 +159,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchApplicationRequest,
 		Body:        bytes.NewReader(bodyBytes),
-		URIParams:   map[string]string{"guid": app.GUID},
+		URIParams:   map[string]string{"app_guid": app.GUID},
 	})
 	if err != nil {
 		return Application{}, nil, err
@@ -183,7 +183,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchApplicationCurrentDropletRequest,
-		URIParams:   map[string]string{"guid": appGUID},
+		URIParams:   map[string]string{"app_guid": appGUID},
 		Body:        bytes.NewReader(bodyBytes),
 	})
 	if err != nil {
@@ -202,7 +202,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationStopRequest,
-		URIParams:   map[string]string{"guid": appGUID},
+		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
 		return nil, err
@@ -217,7 +217,7 @@ func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 func (client *Client) StartApplication(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationStartRequest,
-		URIParams:   map[string]string{"guid": appGUID},
+		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
 		return Application{}, nil, err

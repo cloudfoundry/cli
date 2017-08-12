@@ -22,7 +22,7 @@ type DropletBuildpack struct {
 func (client *Client) GetApplicationDroplets(appGUID string, query url.Values) ([]Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppDroplets,
-		URIParams:   map[string]string{"guid": appGUID},
+		URIParams:   map[string]string{"app_guid": appGUID},
 		Query:       query,
 	})
 	if err != nil {

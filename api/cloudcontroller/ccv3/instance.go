@@ -55,9 +55,9 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteApplicationProcessInstanceRequest,
 		URIParams: map[string]string{
-			"guid":  appGUID,
-			"type":  processType,
-			"index": strconv.Itoa(instanceIndex),
+			"app_guid": appGUID,
+			"type":     processType,
+			"index":    strconv.Itoa(instanceIndex),
 		},
 	})
 	if err != nil {
@@ -74,7 +74,7 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 func (client *Client) GetProcessInstances(processGUID string) ([]Instance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetProcessInstancesRequest,
-		URIParams:   map[string]string{"guid": processGUID},
+		URIParams:   map[string]string{"process_guid": processGUID},
 	})
 	if err != nil {
 		return nil, nil, err

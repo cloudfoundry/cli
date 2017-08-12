@@ -46,7 +46,7 @@ func (p Process) MarshalJSON() ([]byte, error) {
 func (client *Client) GetApplicationProcesses(appGUID string) ([]Process, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppProcessesRequest,
-		URIParams:   map[string]string{"guid": appGUID},
+		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
 		return nil, nil, err
@@ -73,8 +73,8 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetApplicationProcessByTypeRequest,
 		URIParams: map[string]string{
-			"guid": appGUID,
-			"type": processType,
+			"app_guid": appGUID,
+			"type":     processType,
 		},
 	})
 	if err != nil {
@@ -104,7 +104,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	request, _ := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PatchApplicationProcessHealthCheckRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"guid": processGUID},
+		URIParams:   internal.Params{"process_guid": processGUID},
 	})
 	if err != nil {
 		return nil, err

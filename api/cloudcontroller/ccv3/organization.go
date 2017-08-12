@@ -44,7 +44,7 @@ func (client *Client) GetOrganizations(query url.Values) ([]Organization, Warnin
 func (client *Client) GetIsolationSegmentOrganizationsByIsolationSegment(isolationSegmentGUID string) ([]Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentOrganizationsRequest,
-		URIParams:   map[string]string{"guid": isolationSegmentGUID},
+		URIParams:   map[string]string{"isolation_segment_guid": isolationSegmentGUID},
 	})
 	if err != nil {
 		return nil, nil, err
