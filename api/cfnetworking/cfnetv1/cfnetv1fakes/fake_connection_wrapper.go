@@ -2,7 +2,6 @@
 package cfnetv1fakes
 
 import (
-	"net/http"
 	"sync"
 
 	"code.cloudfoundry.org/cli/api/cfnetworking"
@@ -10,10 +9,10 @@ import (
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(request *http.Request, passedResponse *cfnetworking.Response) error
+	MakeStub        func(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		request        *http.Request
+		request        *cfnetworking.Request
 		passedResponse *cfnetworking.Response
 	}
 	makeReturns struct {
@@ -37,11 +36,11 @@ type FakeConnectionWrapper struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *cfnetworking.Response) error {
+func (fake *FakeConnectionWrapper) Make(request *cfnetworking.Request, passedResponse *cfnetworking.Response) error {
 	fake.makeMutex.Lock()
 	ret, specificReturn := fake.makeReturnsOnCall[len(fake.makeArgsForCall)]
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		request        *http.Request
+		request        *cfnetworking.Request
 		passedResponse *cfnetworking.Response
 	}{request, passedResponse})
 	fake.recordInvocation("Make", []interface{}{request, passedResponse})
@@ -61,7 +60,7 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
-func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*http.Request, *cfnetworking.Response) {
+func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*cfnetworking.Request, *cfnetworking.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
 	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse

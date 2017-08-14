@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+//go:generate counterfeiter . ReadSeeker
+
+type ReadSeeker interface {
+	io.ReadSeeker
+}
+
 // Request represents the request of the cloud controller.
 type Request struct {
 	*http.Request
