@@ -24,12 +24,13 @@ type V3ScaleActor interface {
 }
 
 type V3ScaleCommand struct {
-	RequiredArgs    flag.AppName   `positional-args:"yes"`
-	Instances       flag.Instances `short:"i" description:"Number of instances"`
-	DiskLimit       flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	MemoryLimit     flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	usage           interface{}    `usage:"CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]"`
-	relatedCommands interface{}    `related_commands:"v3-push"`
+	RequiredArgs        flag.AppName   `positional-args:"yes"`
+	Instances           flag.Instances `short:"i" description:"Number of instances"`
+	DiskLimit           flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	MemoryLimit         flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	usage               interface{}    `usage:"CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]"`
+	relatedCommands     interface{}    `related_commands:"v3-push"`
+	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI                  command.UI
 	Config              command.Config

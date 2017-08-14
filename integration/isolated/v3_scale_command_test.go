@@ -39,6 +39,9 @@ var _ = Describe("v3-scale command", func() {
 				Eventually(session.Out).Should(Say("-k\\s+Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
 				Eventually(session.Out).Should(Say("-m\\s+Memory limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
 
+				Eventually(session.Out).Should(Say("ENVIRONMENT:"))
+				Eventually(session.Out).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
+
 				Eventually(session).Should(Exit(0))
 			})
 		})
