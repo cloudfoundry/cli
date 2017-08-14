@@ -154,7 +154,27 @@ var _ = Describe("v3-scale command", func() {
 				})
 			})
 
-			// test when only the -i flag is provided
+			Context("when only one flag is provided", func() {
+				It("scales the app accordingly", func() {
+					session := helpers.CF("v3-scale", appName)
+					Eventually(session).Should(Exit(0))
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(appTable.Processes).To(HaveLen(1))
+
+					session = helpers.CF("v3-scale", appName, "-i", "3")
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					updatedAppTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary := updatedAppTable.Processes[0]
+					instanceSummary := processSummary.Instances[0]
+					Expect(processSummary.Title).To(Equal("web:3/3"))
+					Expect(instanceSummary.Memory).To(Equal(appTable.Processes[0].Instances[0].Memory))
+					Expect(instanceSummary.Disk).To(Equal(appTable.Processes[0].Instances[0].Disk))
+				})
+			})
 
 			Context("when all the flags are provided", func() {
 				var buffer *Buffer
@@ -170,7 +190,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(len(appTable.Processes)).To(Equal(1))
+					Expect(appTable.Processes).To(HaveLen(1))
 
 					processSummary := appTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]

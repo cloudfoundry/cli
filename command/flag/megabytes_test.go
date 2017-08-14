@@ -19,7 +19,7 @@ var _ = Describe("Megabytes", func() {
 			It("interprets the number as megabytes", func() {
 				err := megabytes.UnmarshalFlag("17M")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(megabytes.Size).To(BeEquivalentTo(17))
+				Expect(megabytes.Value).To(BeEquivalentTo(17))
 			})
 		})
 
@@ -27,7 +27,7 @@ var _ = Describe("Megabytes", func() {
 			It("interprets the number as megabytes", func() {
 				err := megabytes.UnmarshalFlag("19MB")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(megabytes.Size).To(BeEquivalentTo(19))
+				Expect(megabytes.Value).To(BeEquivalentTo(19))
 			})
 		})
 
@@ -35,7 +35,7 @@ var _ = Describe("Megabytes", func() {
 			It("interprets the number as gigabytes", func() {
 				err := megabytes.UnmarshalFlag("2G")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(megabytes.Size).To(BeEquivalentTo(2048))
+				Expect(megabytes.Value).To(BeEquivalentTo(2048))
 			})
 		})
 
@@ -43,7 +43,7 @@ var _ = Describe("Megabytes", func() {
 			It("interprets the number as gigabytes", func() {
 				err := megabytes.UnmarshalFlag("3GB")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(megabytes.Size).To(BeEquivalentTo(3072))
+				Expect(megabytes.Value).To(BeEquivalentTo(3072))
 			})
 		})
 
@@ -51,7 +51,7 @@ var _ = Describe("Megabytes", func() {
 			It("is case insensitive", func() {
 				err := megabytes.UnmarshalFlag("7m")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(megabytes.Size).To(BeEquivalentTo(7))
+				Expect(megabytes.Value).To(BeEquivalentTo(7))
 			})
 		})
 
@@ -94,28 +94,13 @@ var _ = Describe("Megabytes", func() {
 				}))
 			})
 		})
-		// DescribeTable("downcases and sets type",
-		// 	func(settingType string, expectedType string) {
-		// 		err := healthCheck.UnmarshalFlag(settingType)
-		// 		Expect(err).ToNot(HaveOccurred())
-		// 		Expect(healthCheck.Type).To(Equal(expectedType))
-		// 	},
-		// 	Entry("sets 'port' when passed 'port'", "port", "port"),
-		// 	Entry("sets 'port' when passed 'pOrt'", "pOrt", "port"),
-		// 	Entry("sets 'process' when passed 'none'", "none", "none"),
-		// 	Entry("sets 'process' when passed 'process'", "process", "process"),
-		// 	Entry("sets 'http' when passed 'http'", "http", "http"),
-		// )
 
-		// Context("when passed anything else", func() {
-		// 	It("returns an error", func() {
-		// 		err := healthCheck.UnmarshalFlag("banana")
-		// 		Expect(err).To(MatchError(&flags.Error{
-		// 			Type:    flags.ErrRequired,
-		// 			Message: `HEALTH_CHECK_TYPE must be "port", "process", or "http"`,
-		// 		}))
-		// 		Expect(healthCheck.Type).To(BeEmpty())
-		// 	})
-		// })
+		Context("when value is empty", func() {
+			It("sets IsSet to false", func() {
+				err := megabytes.UnmarshalFlag("")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(megabytes.IsSet).To(BeFalse())
+			})
+		})
 	})
 })

@@ -25,9 +25,9 @@ type V3ScaleActor interface {
 
 type V3ScaleCommand struct {
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
-	Instances           flag.Instances `short:"i" description:"Number of instances"`
-	DiskLimit           flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	MemoryLimit         flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
+	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	usage               interface{}    `usage:"CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]"`
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
@@ -81,7 +81,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	if cmd.Instances.IsSet == false && cmd.DiskLimit.Size == 0 && cmd.MemoryLimit.Size == 0 {
+	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
 		cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"AppName":   cmd.RequiredArgs.AppName,
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -148,7 +148,7 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 		"Username":  username,
 	})
 
-	shouldRestart := cmd.DiskLimit.Size != 0 || cmd.MemoryLimit.Size != 0
+	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
 	if shouldRestart {
 		cmd.UI.DisplayNewline()
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
@@ -168,8 +168,8 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 	ccv3Process := ccv3.Process{
 		Type:       "web",
 		Instances:  cmd.Instances.Value,
-		MemoryInMB: int(cmd.MemoryLimit.Size),
-		DiskInMB:   int(cmd.DiskLimit.Size),
+		MemoryInMB: int(cmd.MemoryLimit.Value), // TODO: check it does not set to 0 always
+		DiskInMB:   int(cmd.DiskLimit.Value),
 	}
 	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, ccv3Process)
 	cmd.UI.DisplayWarnings(warnings)
