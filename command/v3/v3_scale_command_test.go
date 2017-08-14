@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
+	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -24,6 +25,7 @@ var _ = Describe("Scale Command", func() {
 	var (
 		cmd             v3.V3ScaleCommand
 		input           *Buffer
+		output          *Buffer
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
@@ -35,7 +37,8 @@ var _ = Describe("Scale Command", func() {
 
 	BeforeEach(func() {
 		input = NewBuffer()
-		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
+		output = NewBuffer()
+		testUI = ui.NewTestUI(input, output, NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeV3ScaleActor)
@@ -201,14 +204,26 @@ var _ = Describe("Scale Command", func() {
 
 				It("displays current scale properties and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-
 					Expect(testUI.Out).ToNot(Say("Scaling"))
 					Expect(testUI.Out).To(Say("Showing current scale of app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-					Expect(testUI.Out).To(Say("web:3/3"))
-					Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-					Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
-					Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
-					Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
+
+					firstAppTable := helpers.ParseV3AppTable(output.Contents())
+					Expect(len(firstAppTable.Processes)).To(Equal(1))
+
+					processSummary := firstAppTable.Processes[0]
+					Expect(processSummary.Title).To(Equal("web:3/3"))
+
+					Expect(processSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+					Expect(processSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
+					Expect(processSummary.Instances[0].CPU).To(Equal("0.0%"))
+
+					Expect(processSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
+					Expect(processSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
+					Expect(processSummary.Instances[1].CPU).To(Equal("0.0%"))
+
+					Expect(processSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
+					Expect(processSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
+					Expect(processSummary.Instances[2].CPU).To(Equal("0.0%"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("get-instance-warning"))
