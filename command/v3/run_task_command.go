@@ -84,11 +84,11 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	if cmd.Name != "" {
 		inputTask.Name = cmd.Name
 	}
-	if cmd.Disk.Size != 0 {
-		inputTask.DiskInMB = cmd.Disk.Size
+	if cmd.Disk.IsSet {
+		inputTask.DiskInMB = cmd.Disk.Value
 	}
-	if cmd.Memory.Size != 0 {
-		inputTask.MemoryInMB = cmd.Memory.Size
+	if cmd.Memory.IsSet {
+		inputTask.MemoryInMB = cmd.Memory.Value
 	}
 
 	task, warnings, err := cmd.Actor.RunTask(application.GUID, inputTask)

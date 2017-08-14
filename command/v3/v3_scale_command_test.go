@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -329,8 +330,8 @@ var _ = Describe("Scale Command", func() {
 				BeforeEach(func() {
 					cmd.Instances.Value = 2
 					cmd.Instances.IsSet = true
-					cmd.DiskLimit = flag.Megabytes{Size: 50}
-					cmd.MemoryLimit = flag.Megabytes{Size: 100}
+					cmd.DiskLimit = flag.Megabytes{NullUint64: types.NullUint64{Value: 50, IsSet: true}}
+					cmd.MemoryLimit = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 					fakeActor.ScaleProcessByApplicationReturns(
 						v3action.Warnings{"scale-warning"},
 						nil)

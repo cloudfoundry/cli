@@ -649,11 +649,11 @@ var _ = Describe("v2-push Command", func() {
 			BeforeEach(func() {
 				cmd.BuildpackName = "some-buildpack"
 				cmd.Command = "echo foo bar baz"
-				cmd.DiskQuota = flag.Megabytes{Size: 1024}
+				cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 				cmd.HealthCheckTimeout = 14
 				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
 				cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
-				cmd.Memory = flag.Megabytes{Size: 100}
+				cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
 				cmd.StackName = "some-stack"
 			})
 
