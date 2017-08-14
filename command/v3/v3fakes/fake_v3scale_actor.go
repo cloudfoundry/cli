@@ -58,21 +58,19 @@ type FakeV3ScaleActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	ScaleProcessByApplicationStub        func(appGUID string, process ccv3.Process) (v3action.Process, v3action.Warnings, error)
+	ScaleProcessByApplicationStub        func(appGUID string, process ccv3.Process) (v3action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
 		appGUID string
 		process ccv3.Process
 	}
 	scaleProcessByApplicationReturns struct {
-		result1 v3action.Process
-		result2 v3action.Warnings
-		result3 error
+		result1 v3action.Warnings
+		result2 error
 	}
 	scaleProcessByApplicationReturnsOnCall map[int]struct {
-		result1 v3action.Process
-		result2 v3action.Warnings
-		result3 error
+		result1 v3action.Warnings
+		result2 error
 	}
 	StopApplicationStub        func(appGUID string) (v3action.Warnings, error)
 	stopApplicationMutex       sync.RWMutex
@@ -283,7 +281,7 @@ func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeReturnsOnCa
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ScaleActor) ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Process, v3action.Warnings, error) {
+func (fake *FakeV3ScaleActor) ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
 	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
@@ -296,9 +294,9 @@ func (fake *FakeV3ScaleActor) ScaleProcessByApplication(appGUID string, process 
 		return fake.ScaleProcessByApplicationStub(appGUID, process)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
-	return fake.scaleProcessByApplicationReturns.result1, fake.scaleProcessByApplicationReturns.result2, fake.scaleProcessByApplicationReturns.result3
+	return fake.scaleProcessByApplicationReturns.result1, fake.scaleProcessByApplicationReturns.result2
 }
 
 func (fake *FakeV3ScaleActor) ScaleProcessByApplicationCallCount() int {
@@ -313,29 +311,26 @@ func (fake *FakeV3ScaleActor) ScaleProcessByApplicationArgsForCall(i int) (strin
 	return fake.scaleProcessByApplicationArgsForCall[i].appGUID, fake.scaleProcessByApplicationArgsForCall[i].process
 }
 
-func (fake *FakeV3ScaleActor) ScaleProcessByApplicationReturns(result1 v3action.Process, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3ScaleActor) ScaleProcessByApplicationReturns(result1 v3action.Warnings, result2 error) {
 	fake.ScaleProcessByApplicationStub = nil
 	fake.scaleProcessByApplicationReturns = struct {
-		result1 v3action.Process
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeV3ScaleActor) ScaleProcessByApplicationReturnsOnCall(i int, result1 v3action.Process, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3ScaleActor) ScaleProcessByApplicationReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
 	fake.ScaleProcessByApplicationStub = nil
 	if fake.scaleProcessByApplicationReturnsOnCall == nil {
 		fake.scaleProcessByApplicationReturnsOnCall = make(map[int]struct {
-			result1 v3action.Process
-			result2 v3action.Warnings
-			result3 error
+			result1 v3action.Warnings
+			result2 error
 		})
 	}
 	fake.scaleProcessByApplicationReturnsOnCall[i] = struct {
-		result1 v3action.Process
-		result2 v3action.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 v3action.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeV3ScaleActor) StopApplication(appGUID string) (v3action.Warnings, error) {

@@ -17,7 +17,7 @@ type V3ScaleActor interface {
 
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetInstancesByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
-	ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Process, v3action.Warnings, error)
+	ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
@@ -82,10 +82,20 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	}
 
 	if cmd.Instances.IsSet == false && cmd.DiskLimit.Size == 0 && cmd.MemoryLimit.Size == 0 {
-		return cmd.getAndDisplayProcess(app.GUID, user.Name)
+		cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   cmd.RequiredArgs.AppName,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
+
+		return cmd.getAndDisplayProcess(app.GUID)
 	}
 
-	process, actorErr := cmd.scaleProcess(app.GUID, user.Name)
+	err = cmd.scaleProcess(app.GUID, user.Name)
+	if err != nil {
+		return shared.HandleError(err)
+	}
 
 	cmd.UI.DisplayText("Waiting for app to start...")
 
@@ -116,18 +126,10 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.AppSummaryDisplayer.DisplayAppInstancesTable(process)
-	return actorErr
+	return cmd.getAndDisplayProcess(app.GUID)
 }
 
-func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string, username string) error {
-	cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   cmd.RequiredArgs.AppName,
-		"OrgName":   cmd.Config.TargetedOrganization().Name,
-		"SpaceName": cmd.Config.TargetedSpace().Name,
-		"Username":  username,
-	})
-
+func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string) error {
 	process, warnings, err := cmd.Actor.GetInstancesByApplicationAndProcessType(appGUID, "web")
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -138,7 +140,7 @@ func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string, username string) 
 	return nil
 }
 
-func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) (v3action.Process, error) {
+func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 	cmd.UI.DisplayTextWithFlavor("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
@@ -154,12 +156,12 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) (v3actio
 			"This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
 			map[string]interface{}{"AppName": cmd.RequiredArgs.AppName})
 		if err != nil {
-			return v3action.Process{}, err
+			return err
 		}
 
 		if !shouldScale {
 			cmd.UI.DisplayText("Scaling cancelled")
-			return v3action.Process{}, nil
+			return nil
 		}
 	}
 
@@ -169,20 +171,20 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) (v3actio
 		MemoryInMB: int(cmd.MemoryLimit.Size),
 		DiskInMB:   int(cmd.DiskLimit.Size),
 	}
-	process, warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, ccv3Process)
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, ccv3Process)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return v3action.Process{}, err
+		return err
 	}
 
 	if shouldRestart {
 		err := cmd.restartApplication(appGUID, username)
 		if err != nil {
-			return v3action.Process{}, err
+			return err
 		}
 	}
 
-	return process, nil
+	return nil
 }
 
 func (cmd V3ScaleCommand) restartApplication(appGUID string, username string) error {

@@ -265,8 +265,11 @@ var _ = Describe("Scale Command", func() {
 					cmd.Instances.Value = 3
 					cmd.Instances.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
-						process,
 						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
 						nil)
 				})
 
@@ -283,6 +286,7 @@ var _ = Describe("Scale Command", func() {
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
+					Expect(testUI.Err).To(Say("get-instances-warning"))
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
@@ -297,7 +301,10 @@ var _ = Describe("Scale Command", func() {
 						Instances: 3,
 					}))
 
-					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(0))
+					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(processType).To(Equal("web"))
 				})
 
 				Context("when an error is encountered scaling the application", func() {
@@ -306,7 +313,6 @@ var _ = Describe("Scale Command", func() {
 					BeforeEach(func() {
 						expectedErr = errors.New("scale process error")
 						fakeActor.ScaleProcessByApplicationReturns(
-							v3action.Process{},
 							v3action.Warnings{"scale-process-warning"},
 							expectedErr,
 						)
@@ -326,8 +332,11 @@ var _ = Describe("Scale Command", func() {
 					cmd.DiskLimit = flag.Megabytes{Size: 50}
 					cmd.MemoryLimit = flag.Megabytes{Size: 100}
 					fakeActor.ScaleProcessByApplicationReturns(
-						process,
 						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
 						nil)
 				})
 
@@ -403,6 +412,7 @@ var _ = Describe("Scale Command", func() {
 							Expect(testUI.Err).To(Say("scale-warning"))
 							Expect(testUI.Err).To(Say("some-poll-warning-1"))
 							Expect(testUI.Err).To(Say("some-poll-warning-2"))
+							Expect(testUI.Err).To(Say("get-instances-warning"))
 
 							Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
 							appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
@@ -425,7 +435,10 @@ var _ = Describe("Scale Command", func() {
 							Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 							Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
 
-							Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(0))
+							Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+							appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+							Expect(appGUID).To(Equal("some-app-guid"))
+							Expect(processType).To(Equal("web"))
 						})
 					})
 

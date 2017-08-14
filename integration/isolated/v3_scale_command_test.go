@@ -175,8 +175,8 @@ var _ = Describe("v3-scale command", func() {
 					processSummary := appTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
 					Expect(processSummary.Title).To(Equal("web:3/3"))
-					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]?  of 64M`))
-					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]?  of 92M`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
 				})
 			})
 		})

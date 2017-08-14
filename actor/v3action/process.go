@@ -81,19 +81,19 @@ func (ps Processes) Summary() string {
 	return strings.Join(summaries, ", ")
 }
 
-func (actor Actor) ScaleProcessByApplication(appGUID string, scaleOptions ccv3.Process) (Process, Warnings, error) {
+func (actor Actor) ScaleProcessByApplication(appGUID string, scaleOptions ccv3.Process) (Warnings, error) {
 	var allWarnings Warnings
 
 	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, scaleOptions)
 	allWarnings = Warnings(warnings)
 	if err != nil {
-		return Process{}, allWarnings, err
+		return allWarnings, err
 	}
 
 	ccv3Instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(ccv3Process.GUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
-		return Process{}, allWarnings, err
+		return allWarnings, err
 	}
 
 	process := Process{
@@ -105,5 +105,5 @@ func (actor Actor) ScaleProcessByApplication(appGUID string, scaleOptions ccv3.P
 		process.Instances = append(process.Instances, Instance(ccv3Instance))
 	}
 
-	return process, allWarnings, nil
+	return allWarnings, nil
 }
