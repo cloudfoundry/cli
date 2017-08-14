@@ -160,16 +160,10 @@ var _ = Describe("Process Actions", func() {
 				})
 
 				It("returns the process with instance information and all warnings", func() {
-					process, warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
+					warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("scale-process-warning", "get-instances-warning"))
-					Expect(process).To(Equal(Process{
-						Type:       "web",
-						Instances:  []Instance{Instance(instance1), Instance(instance2)},
-						MemoryInMB: 100,
-						DiskInMB:   200,
-					}))
 
 					Expect(fakeCloudControllerClient.CreateApplicationProcessScaleCallCount()).To(Equal(1))
 					appGUIDArg, processArg := fakeCloudControllerClient.CreateApplicationProcessScaleArgsForCall(0)
@@ -193,7 +187,7 @@ var _ = Describe("Process Actions", func() {
 				})
 
 				It("returns the error and all warnings", func() {
-					_, warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
+					warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("scale-process-warning", "get-instances-warning"))
 				})
@@ -212,7 +206,7 @@ var _ = Describe("Process Actions", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
+				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})
