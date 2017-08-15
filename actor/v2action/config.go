@@ -7,7 +7,10 @@ import "time"
 type Config interface {
 	AccessToken() string
 	PollingInterval() time.Duration
+	RefreshToken() string
 	SSHOAuthClient() string
+	SetAccessToken(accessToken string)
+	SetRefreshToken(refreshToken string)
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SkipSSLValidation() bool

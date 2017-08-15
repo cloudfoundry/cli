@@ -8,7 +8,7 @@ import "code.cloudfoundry.org/cli/api/uaa"
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
-	RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error)
+	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 }
 
 //go:generate counterfeiter . TokenCache
@@ -39,12 +39,12 @@ func NewTokenRefresher(uaaClient UAAClient, cache TokenCache) *TokenRefresher {
 // Access and Refresh token in it's cache. The returned Authorization Token
 // includes the type prefixed by a space.
 func (t *TokenRefresher) RefreshAuthToken() (string, error) {
-	token, err := t.uaaClient.RefreshAccessToken(t.cache.RefreshToken())
+	tokens, err := t.uaaClient.RefreshAccessToken(t.cache.RefreshToken())
 	if err != nil {
 		return "", err
 	}
-	t.cache.SetAccessToken(token.AuthorizationToken())
-	t.cache.SetRefreshToken(token.RefreshToken)
 
-	return token.AuthorizationToken(), nil
+	t.cache.SetAccessToken(tokens.AuthorizationToken())
+	t.cache.SetRefreshToken(tokens.RefreshToken)
+	return tokens.AuthorizationToken(), nil
 }

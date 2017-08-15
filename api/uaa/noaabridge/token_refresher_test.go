@@ -28,7 +28,7 @@ var _ = Describe("TokenRefresher", func() {
 			BeforeEach(func() {
 				fakeTokenCache.RefreshTokenReturns("old-refresh-token")
 
-				refreshToken := uaa.RefreshToken{
+				refreshToken := uaa.RefreshedTokens{
 					AccessToken:  "some-access-token",
 					RefreshToken: "some-refresh-token",
 					Type:         "bearer",
@@ -61,7 +61,7 @@ var _ = Describe("TokenRefresher", func() {
 
 			BeforeEach(func() {
 				expectedErr = errors.New("it's not working!!!!")
-				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshToken{}, expectedErr)
+				fakeUAAClient.RefreshAccessTokenReturns(uaa.RefreshedTokens{}, expectedErr)
 			})
 
 			It("returns the error", func() {

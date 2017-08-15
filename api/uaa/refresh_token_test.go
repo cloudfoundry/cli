@@ -12,9 +12,7 @@ import (
 )
 
 var _ = Describe("UAA Client", func() {
-	var (
-		client *Client
-	)
+	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestUAAClientAndStore()
@@ -26,6 +24,7 @@ var _ = Describe("UAA Client", func() {
 			sentRefreshToken     string
 			returnedRefreshToken string
 		)
+
 		BeforeEach(func() {
 			returnedAccessToken = "I-ACCESS-TOKEN"
 			sentRefreshToken = "I-R-REFRESH-TOKEN"
@@ -53,7 +52,7 @@ var _ = Describe("UAA Client", func() {
 		It("refreshes the tokens", func() {
 			token, err := client.RefreshAccessToken(sentRefreshToken)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(token).To(Equal(RefreshToken{
+			Expect(token).To(Equal(RefreshedTokens{
 				AccessToken:  returnedAccessToken,
 				RefreshToken: returnedRefreshToken,
 				Type:         "bearer",

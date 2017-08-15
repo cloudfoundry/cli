@@ -9,24 +9,24 @@ import (
 )
 
 type FakeUAAClient struct {
-	RefreshAccessTokenStub        func(refreshToken string) (uaa.RefreshToken, error)
+	RefreshAccessTokenStub        func(refreshToken string) (uaa.RefreshedTokens, error)
 	refreshAccessTokenMutex       sync.RWMutex
 	refreshAccessTokenArgsForCall []struct {
 		refreshToken string
 	}
 	refreshAccessTokenReturns struct {
-		result1 uaa.RefreshToken
+		result1 uaa.RefreshedTokens
 		result2 error
 	}
 	refreshAccessTokenReturnsOnCall map[int]struct {
-		result1 uaa.RefreshToken
+		result1 uaa.RefreshedTokens
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error) {
+func (fake *FakeUAAClient) RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error) {
 	fake.refreshAccessTokenMutex.Lock()
 	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
 	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
@@ -55,24 +55,24 @@ func (fake *FakeUAAClient) RefreshAccessTokenArgsForCall(i int) string {
 	return fake.refreshAccessTokenArgsForCall[i].refreshToken
 }
 
-func (fake *FakeUAAClient) RefreshAccessTokenReturns(result1 uaa.RefreshToken, result2 error) {
+func (fake *FakeUAAClient) RefreshAccessTokenReturns(result1 uaa.RefreshedTokens, result2 error) {
 	fake.RefreshAccessTokenStub = nil
 	fake.refreshAccessTokenReturns = struct {
-		result1 uaa.RefreshToken
+		result1 uaa.RefreshedTokens
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.RefreshToken, result2 error) {
+func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.RefreshedTokens, result2 error) {
 	fake.RefreshAccessTokenStub = nil
 	if fake.refreshAccessTokenReturnsOnCall == nil {
 		fake.refreshAccessTokenReturnsOnCall = make(map[int]struct {
-			result1 uaa.RefreshToken
+			result1 uaa.RefreshedTokens
 			result2 error
 		})
 	}
 	fake.refreshAccessTokenReturnsOnCall[i] = struct {
-		result1 uaa.RefreshToken
+		result1 uaa.RefreshedTokens
 		result2 error
 	}{result1, result2}
 }

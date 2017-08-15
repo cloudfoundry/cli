@@ -32,17 +32,6 @@ type FakeRequestLoggerOutput struct {
 	displayHostReturnsOnCall map[int]struct {
 		result1 error
 	}
-	DisplayMessageStub        func(msg string) error
-	displayMessageMutex       sync.RWMutex
-	displayMessageArgsForCall []struct {
-		msg string
-	}
-	displayMessageReturns struct {
-		result1 error
-	}
-	displayMessageReturnsOnCall map[int]struct {
-		result1 error
-	}
 	DisplayJSONBodyStub        func(body []byte) error
 	displayJSONBodyMutex       sync.RWMutex
 	displayJSONBodyArgsForCall []struct {
@@ -52,6 +41,17 @@ type FakeRequestLoggerOutput struct {
 		result1 error
 	}
 	displayJSONBodyReturnsOnCall map[int]struct {
+		result1 error
+	}
+	DisplayMessageStub        func(msg string) error
+	displayMessageMutex       sync.RWMutex
+	displayMessageArgsForCall []struct {
+		msg string
+	}
+	displayMessageReturns struct {
+		result1 error
+	}
+	displayMessageReturnsOnCall map[int]struct {
 		result1 error
 	}
 	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string) error
@@ -215,54 +215,6 @@ func (fake *FakeRequestLoggerOutput) DisplayHostReturnsOnCall(i int, result1 err
 	}{result1}
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayMessage(msg string) error {
-	fake.displayMessageMutex.Lock()
-	ret, specificReturn := fake.displayMessageReturnsOnCall[len(fake.displayMessageArgsForCall)]
-	fake.displayMessageArgsForCall = append(fake.displayMessageArgsForCall, struct {
-		msg string
-	}{msg})
-	fake.recordInvocation("DisplayMessage", []interface{}{msg})
-	fake.displayMessageMutex.Unlock()
-	if fake.DisplayMessageStub != nil {
-		return fake.DisplayMessageStub(msg)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.displayMessageReturns.result1
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayMessageCallCount() int {
-	fake.displayMessageMutex.RLock()
-	defer fake.displayMessageMutex.RUnlock()
-	return len(fake.displayMessageArgsForCall)
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayMessageArgsForCall(i int) string {
-	fake.displayMessageMutex.RLock()
-	defer fake.displayMessageMutex.RUnlock()
-	return fake.displayMessageArgsForCall[i].msg
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayMessageReturns(result1 error) {
-	fake.DisplayMessageStub = nil
-	fake.displayMessageReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayMessageReturnsOnCall(i int, result1 error) {
-	fake.DisplayMessageStub = nil
-	if fake.displayMessageReturnsOnCall == nil {
-		fake.displayMessageReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.displayMessageReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeRequestLoggerOutput) DisplayJSONBody(body []byte) error {
 	var bodyCopy []byte
 	if body != nil {
@@ -312,6 +264,54 @@ func (fake *FakeRequestLoggerOutput) DisplayJSONBodyReturnsOnCall(i int, result1
 		})
 	}
 	fake.displayJSONBodyReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayMessage(msg string) error {
+	fake.displayMessageMutex.Lock()
+	ret, specificReturn := fake.displayMessageReturnsOnCall[len(fake.displayMessageArgsForCall)]
+	fake.displayMessageArgsForCall = append(fake.displayMessageArgsForCall, struct {
+		msg string
+	}{msg})
+	fake.recordInvocation("DisplayMessage", []interface{}{msg})
+	fake.displayMessageMutex.Unlock()
+	if fake.DisplayMessageStub != nil {
+		return fake.DisplayMessageStub(msg)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.displayMessageReturns.result1
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayMessageCallCount() int {
+	fake.displayMessageMutex.RLock()
+	defer fake.displayMessageMutex.RUnlock()
+	return len(fake.displayMessageArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayMessageArgsForCall(i int) string {
+	fake.displayMessageMutex.RLock()
+	defer fake.displayMessageMutex.RUnlock()
+	return fake.displayMessageArgsForCall[i].msg
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayMessageReturns(result1 error) {
+	fake.DisplayMessageStub = nil
+	fake.displayMessageReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayMessageReturnsOnCall(i int, result1 error) {
+	fake.DisplayMessageStub = nil
+	if fake.displayMessageReturnsOnCall == nil {
+		fake.displayMessageReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.displayMessageReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -575,10 +575,10 @@ func (fake *FakeRequestLoggerOutput) Invocations() map[string][][]interface{} {
 	defer fake.displayHeaderMutex.RUnlock()
 	fake.displayHostMutex.RLock()
 	defer fake.displayHostMutex.RUnlock()
-	fake.displayMessageMutex.RLock()
-	defer fake.displayMessageMutex.RUnlock()
 	fake.displayJSONBodyMutex.RLock()
 	defer fake.displayJSONBodyMutex.RUnlock()
+	fake.displayMessageMutex.RLock()
+	defer fake.displayMessageMutex.RUnlock()
 	fake.displayRequestHeaderMutex.RLock()
 	defer fake.displayRequestHeaderMutex.RUnlock()
 	fake.displayResponseHeaderMutex.RLock()

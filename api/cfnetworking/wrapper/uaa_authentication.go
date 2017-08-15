@@ -10,7 +10,7 @@ import (
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
-	RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error)
+	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 }
 
 //go:generate counterfeiter . TokenCache
@@ -59,13 +59,13 @@ func (t *UAAAuthentication) Make(request *cfnetworking.Request, passedResponse *
 
 	requestErr := t.connection.Make(request, passedResponse)
 	if _, ok := requestErr.(networkerror.InvalidAuthTokenError); ok {
-		token, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
+		tokens, err := t.client.RefreshAccessToken(t.cache.RefreshToken())
 		if err != nil {
 			return err
 		}
 
-		t.cache.SetAccessToken(token.AuthorizationToken())
-		t.cache.SetRefreshToken(token.RefreshToken)
+		t.cache.SetAccessToken(tokens.AuthorizationToken())
+		t.cache.SetRefreshToken(tokens.RefreshToken)
 
 		if request.Body != nil {
 			err = request.ResetBody()

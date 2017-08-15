@@ -54,6 +54,19 @@ type FakeUAAClient struct {
 		result1 string
 		result2 error
 	}
+	RefreshAccessTokenStub        func(refreshToken string) (uaa.RefreshedTokens, error)
+	refreshAccessTokenMutex       sync.RWMutex
+	refreshAccessTokenArgsForCall []struct {
+		refreshToken string
+	}
+	refreshAccessTokenReturns struct {
+		result1 uaa.RefreshedTokens
+		result2 error
+	}
+	refreshAccessTokenReturnsOnCall map[int]struct {
+		result1 uaa.RefreshedTokens
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -218,6 +231,57 @@ func (fake *FakeUAAClient) GetSSHPasscodeReturnsOnCall(i int, result1 string, re
 	}{result1, result2}
 }
 
+func (fake *FakeUAAClient) RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error) {
+	fake.refreshAccessTokenMutex.Lock()
+	ret, specificReturn := fake.refreshAccessTokenReturnsOnCall[len(fake.refreshAccessTokenArgsForCall)]
+	fake.refreshAccessTokenArgsForCall = append(fake.refreshAccessTokenArgsForCall, struct {
+		refreshToken string
+	}{refreshToken})
+	fake.recordInvocation("RefreshAccessToken", []interface{}{refreshToken})
+	fake.refreshAccessTokenMutex.Unlock()
+	if fake.RefreshAccessTokenStub != nil {
+		return fake.RefreshAccessTokenStub(refreshToken)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.refreshAccessTokenReturns.result1, fake.refreshAccessTokenReturns.result2
+}
+
+func (fake *FakeUAAClient) RefreshAccessTokenCallCount() int {
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
+	return len(fake.refreshAccessTokenArgsForCall)
+}
+
+func (fake *FakeUAAClient) RefreshAccessTokenArgsForCall(i int) string {
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
+	return fake.refreshAccessTokenArgsForCall[i].refreshToken
+}
+
+func (fake *FakeUAAClient) RefreshAccessTokenReturns(result1 uaa.RefreshedTokens, result2 error) {
+	fake.RefreshAccessTokenStub = nil
+	fake.refreshAccessTokenReturns = struct {
+		result1 uaa.RefreshedTokens
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUAAClient) RefreshAccessTokenReturnsOnCall(i int, result1 uaa.RefreshedTokens, result2 error) {
+	fake.RefreshAccessTokenStub = nil
+	if fake.refreshAccessTokenReturnsOnCall == nil {
+		fake.refreshAccessTokenReturnsOnCall = make(map[int]struct {
+			result1 uaa.RefreshedTokens
+			result2 error
+		})
+	}
+	fake.refreshAccessTokenReturnsOnCall[i] = struct {
+		result1 uaa.RefreshedTokens
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -227,6 +291,8 @@ func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	defer fake.createUserMutex.RUnlock()
 	fake.getSSHPasscodeMutex.RLock()
 	defer fake.getSSHPasscodeMutex.RUnlock()
+	fake.refreshAccessTokenMutex.RLock()
+	defer fake.refreshAccessTokenMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
