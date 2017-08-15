@@ -2,6 +2,8 @@
 
 set -e
 
+echo "Be sure to run this prior to making a commit, not post commit!!!"
+
 function printStatus {
   if [ $? -eq 0 ]; then
     echo -e "\nSWEET SUITE SUCCESS"
