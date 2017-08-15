@@ -28,7 +28,7 @@ var _ = Describe("Request Logger", func() {
 
 		request  *http.Request
 		response *plugin.Response
-		err      error
+		makeErr  error
 	)
 
 	BeforeEach(func() {
@@ -60,12 +60,12 @@ var _ = Describe("Request Logger", func() {
 	})
 
 	JustBeforeEach(func() {
-		err = wrapper.Make(request, response, fakeProxyReader)
+		makeErr = wrapper.Make(request, response, fakeProxyReader)
 	})
 
 	Describe("Make", func() {
 		It("outputs the request", func() {
-			Expect(err).NotTo(HaveOccurred())
+			Expect(makeErr).NotTo(HaveOccurred())
 
 			Expect(fakeOutput.DisplayTypeCallCount()).To(BeNumerically(">=", 1))
 			name, date := fakeOutput.DisplayTypeArgsForCall(0)
@@ -93,7 +93,6 @@ var _ = Describe("Request Logger", func() {
 			Expect(name).To(Equal("Aghi"))
 			Expect(value).To(Equal("bar"))
 
-			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 			_, _, proxyReader := fakeConnection.MakeArgsForCall(0)
 			Expect(proxyReader).To(Equal(fakeProxyReader))
@@ -105,7 +104,7 @@ var _ = Describe("Request Logger", func() {
 			})
 
 			It("redacts the contents of the authorization header", func() {
-				Expect(err).NotTo(HaveOccurred())
+				Expect(makeErr).NotTo(HaveOccurred())
 				Expect(fakeOutput.DisplayHeaderCallCount()).To(Equal(1))
 				key, value := fakeOutput.DisplayHeaderArgsForCall(0)
 				Expect(key).To(Equal("Authorization"))
@@ -116,6 +115,7 @@ var _ = Describe("Request Logger", func() {
 		Context("when passed a body", func() {
 			Context("when the request's Content-Type is application/json", func() {
 				var originalBody io.ReadCloser
+
 				BeforeEach(func() {
 					request.Header.Set("Content-Type", "application/json")
 					originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
@@ -123,7 +123,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("outputs the body", func() {
-					Expect(err).NotTo(HaveOccurred())
+					Expect(makeErr).NotTo(HaveOccurred())
 
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
 					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
@@ -140,6 +140,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("does not display the request body", func() {
+					Expect(makeErr).NotTo(HaveOccurred())
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(0))
 				})
 			})
@@ -162,7 +163,7 @@ var _ = Describe("Request Logger", func() {
 			})
 
 			It("should display the error and continue on", func() {
-				Expect(err).NotTo(HaveOccurred())
+				Expect(makeErr).NotTo(HaveOccurred())
 
 				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(1))
 				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))
@@ -189,7 +190,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("outputs the response", func() {
-					Expect(err).NotTo(HaveOccurred())
+					Expect(makeErr).NotTo(HaveOccurred())
 
 					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
 					name, date := fakeOutput.DisplayTypeArgsForCall(1)
@@ -240,7 +241,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("outputs the response", func() {
-					Expect(err).NotTo(HaveOccurred())
+					Expect(makeErr).NotTo(HaveOccurred())
 
 					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
 					name, date := fakeOutput.DisplayTypeArgsForCall(1)
@@ -286,7 +287,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("outputs nothing", func() {
-					Expect(err).To(MatchError(expectedErr))
+					Expect(makeErr).To(MatchError(expectedErr))
 					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(0))
 				})
 			})
@@ -299,7 +300,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("does not output the response body", func() {
-					Expect(err).To(MatchError(expectedErr))
+					Expect(makeErr).To(MatchError(expectedErr))
 					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
 
 					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(Equal(0))
@@ -326,7 +327,7 @@ var _ = Describe("Request Logger", func() {
 				})
 
 				It("outputs the response", func() {
-					Expect(err).To(MatchError(expectedErr))
+					Expect(makeErr).To(MatchError(expectedErr))
 
 					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
 					name, date := fakeOutput.DisplayTypeArgsForCall(1)
@@ -381,7 +382,7 @@ var _ = Describe("Request Logger", func() {
 			})
 
 			It("should display the error and continue on", func() {
-				Expect(err).To(MatchError(originalErr))
+				Expect(makeErr).To(MatchError(originalErr))
 
 				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(1))
 				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))
@@ -389,19 +390,21 @@ var _ = Describe("Request Logger", func() {
 		})
 
 		It("starts and stops the output", func() {
+			Expect(makeErr).ToNot(HaveOccurred())
 			Expect(fakeOutput.StartCallCount()).To(Equal(2))
 			Expect(fakeOutput.StopCallCount()).To(Equal(2))
 		})
 
 		Context("when displaying the logs have an error", func() {
 			var expectedErr error
+
 			BeforeEach(func() {
 				expectedErr = errors.New("Display error on request")
 				fakeOutput.StartReturns(expectedErr)
 			})
 
 			It("calls handle internal error", func() {
-				Expect(err).ToNot(HaveOccurred())
+				Expect(makeErr).ToNot(HaveOccurred())
 
 				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(2))
 				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))

@@ -95,13 +95,13 @@ func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) (
 
 	returnedInstances := map[int]ApplicationInstanceStatus{}
 	for instanceID, instance := range instances {
-		id, err := strconv.Atoi(instanceID)
-		if err != nil {
-			return nil, response.Warnings, err
+		id, convertErr := strconv.Atoi(instanceID)
+		if convertErr != nil {
+			return nil, response.Warnings, convertErr
 		}
 		instance.ID = id
 		returnedInstances[id] = instance
 	}
 
-	return returnedInstances, response.Warnings, err
+	return returnedInstances, response.Warnings, nil
 }

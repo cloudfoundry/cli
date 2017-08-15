@@ -132,15 +132,12 @@ func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID
 // GetSecurityGroupsWithOrganizationAndSpace returns a list of security groups
 // with org and space information, optionally including staging spaces.
 func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging bool) ([]SecurityGroupWithOrganizationSpaceAndLifecycle, Warnings, error) {
-	var err error
-
 	securityGroups, allWarnings, err := actor.CloudControllerClient.GetSecurityGroups(nil)
 	if err != nil {
 		return nil, Warnings(allWarnings), err
 	}
 
 	cachedOrgs := make(map[string]Organization)
-
 	var secGroupOrgSpaces []SecurityGroupWithOrganizationSpaceAndLifecycle
 
 	for _, s := range securityGroups {
@@ -151,15 +148,15 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			StagingDefault: s.StagingDefault,
 		}
 
-		spaces, warnings, err := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
+		var getErr error
+		spaces, warnings, getErr := actor.getSecurityGroupSpacesAndAssignedLifecycles(s.GUID, includeStaging)
 		allWarnings = append(allWarnings, warnings...)
-
-		if err != nil {
-			if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-				allWarnings = append(allWarnings, err.Error())
+		if getErr != nil {
+			if _, ok := getErr.(ccerror.ResourceNotFoundError); ok {
+				allWarnings = append(allWarnings, getErr.Error())
 				continue
 			}
-			return nil, Warnings(allWarnings), err
+			return nil, Warnings(allWarnings), getErr
 		}
 
 		if securityGroup.RunningDefault {
@@ -206,15 +203,15 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 			if cached, ok := cachedOrgs[sp.OrganizationGUID]; ok {
 				org = cached
 			} else {
-				o, warnings, err := actor.CloudControllerClient.GetOrganization(sp.OrganizationGUID)
+				var getOrgErr error
+				o, warnings, getOrgErr := actor.CloudControllerClient.GetOrganization(sp.OrganizationGUID)
 				allWarnings = append(allWarnings, warnings...)
-
-				if err != nil {
-					if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-						allWarnings = append(allWarnings, err.Error())
+				if getOrgErr != nil {
+					if _, ok := getOrgErr.(ccerror.ResourceNotFoundError); ok {
+						allWarnings = append(allWarnings, getOrgErr.Error())
 						continue
 					}
-					return nil, Warnings(allWarnings), err
+					return nil, Warnings(allWarnings), getOrgErr
 				}
 
 				org = Organization{
@@ -262,7 +259,8 @@ func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeSta
 
 			return secGroupOrgSpaces[i].Lifecycle < secGroupOrgSpaces[j].Lifecycle
 		})
-	return secGroupOrgSpaces, Warnings(allWarnings), err
+
+	return secGroupOrgSpaces, Warnings(allWarnings), nil
 }
 
 // GetSpaceRunningSecurityGroupsBySpace returns a list of all security groups

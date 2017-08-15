@@ -37,8 +37,8 @@ var _ = Describe("Retry Request", func() {
 			}
 			fakeConnection.MakeStub = func(req *cfnetworking.Request, passedResponse *cfnetworking.Response) error {
 				defer req.Body.Close()
-				body, err := ioutil.ReadAll(request.Body)
-				Expect(err).ToNot(HaveOccurred())
+				body, readBodyErr := ioutil.ReadAll(request.Body)
+				Expect(readBodyErr).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal(rawRequestBody))
 				return expectedErr
 			}

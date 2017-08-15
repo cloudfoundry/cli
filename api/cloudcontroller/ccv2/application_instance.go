@@ -80,13 +80,13 @@ func (client *Client) GetApplicationInstancesByApplication(guid string) (map[int
 
 	returnedInstances := map[int]ApplicationInstance{}
 	for instanceID, instance := range instances {
-		id, err := strconv.Atoi(instanceID)
-		if err != nil {
-			return nil, response.Warnings, err
+		id, convertErr := strconv.Atoi(instanceID)
+		if convertErr != nil {
+			return nil, response.Warnings, convertErr
 		}
 		instance.ID = id
 		returnedInstances[id] = instance
 	}
 
-	return returnedInstances, response.Warnings, err
+	return returnedInstances, response.Warnings, nil
 }

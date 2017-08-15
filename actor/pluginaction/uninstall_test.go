@@ -30,10 +30,10 @@ var _ = Describe("Plugin actor", func() {
 			binaryPath            string
 			fakePluginUninstaller *pluginactionfakes.FakePluginUninstaller
 			pluginHome            string
-			err                   error
 		)
 
 		BeforeEach(func() {
+			var err error
 			pluginHome, err = ioutil.TempDir("", "")
 			Expect(err).ToNot(HaveOccurred())
 
@@ -118,9 +118,7 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns a PluginExecuteError, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					Expect(err).To(MatchError(PluginExecuteError{
-						Err: expectedErr,
-					}))
+					Expect(err).To(MatchError(PluginExecuteError{Err: expectedErr}))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -140,9 +138,7 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns the error, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					Expect(err).To(MatchError(PluginExecuteError{
-						Err: expectedErr,
-					}))
+					Expect(err).To(MatchError(PluginExecuteError{Err: expectedErr}))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -173,7 +169,7 @@ var _ = Describe("Plugin actor", func() {
 
 			Context("when deleting the plugin binary returns a 'file does not exist' error", func() {
 				BeforeEach(func() {
-					err = os.Remove(binaryPath)
+					err := os.Remove(binaryPath)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -187,7 +183,7 @@ var _ = Describe("Plugin actor", func() {
 
 			Context("when deleting the plugin binary returns a path error", func() {
 				BeforeEach(func() {
-					err = os.Remove(binaryPath)
+					err := os.Remove(binaryPath)
 					Expect(err).ToNot(HaveOccurred())
 					err = os.Mkdir(binaryPath, 0700)
 					Expect(err).ToNot(HaveOccurred())
@@ -212,7 +208,6 @@ var _ = Describe("Plugin actor", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("some plugin config write error")
-
 					fakeConfig.WritePluginConfigReturns(expectedErr)
 				})
 
