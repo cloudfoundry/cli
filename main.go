@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
@@ -20,6 +21,7 @@ import (
 
 type UI interface {
 	DisplayError(err error)
+	DisplayWarning(template string, templateValues ...map[string]interface{})
 }
 
 type DisplayUsage interface {
@@ -139,11 +141,28 @@ func isOption(s string) bool {
 }
 
 func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, err := configv3.LoadConfig(configv3.FlagOverride{
+	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
 		Verbose: common.Commands.VerboseOrVersion,
 	})
+
+	var configErrTemplate string
+	if configErr != nil {
+		if ce, ok := configErr.(translatableerror.EmptyConfigError); ok {
+			configErrTemplate = ce.Error()
+		} else {
+			return configErr
+		}
+	}
+
+	commandUI, err := ui.NewUI(cfConfig)
 	if err != nil {
 		return err
+	}
+
+	if configErr != nil {
+		commandUI.DisplayWarning(configErrTemplate, map[string]interface{}{
+			"FilePath": configv3.ConfigFilePath(),
+		})
 	}
 
 	defer func() {
@@ -154,11 +173,6 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	}()
 
 	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
-		commandUI, err := ui.NewUI(cfConfig)
-		if err != nil {
-			return err
-		}
-
 		log.SetOutput(os.Stderr)
 		log.SetLevel(log.Level(cfConfig.LogLevel()))
 

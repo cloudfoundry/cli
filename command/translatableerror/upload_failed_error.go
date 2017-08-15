@@ -1,7 +1,5 @@
 package translatableerror
 
-import "code.cloudfoundry.org/cli/util/ui"
-
 type UploadFailedError struct {
 	Err error
 }
@@ -12,7 +10,7 @@ func (UploadFailedError) Error() string {
 
 func (e UploadFailedError) Translate(translate func(string, ...interface{}) string) string {
 	var message string
-	if err, ok := e.Err.(ui.TranslatableError); ok {
+	if err, ok := e.Err.(TranslatableError); ok {
 		message = err.Translate(translate)
 	} else {
 		message = e.Err.Error()

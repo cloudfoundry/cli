@@ -6,7 +6,6 @@ import (
 	"text/template"
 
 	. "code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -32,7 +31,7 @@ var _ = Describe("Translatable Errors", func() {
 
 	DescribeTable("translates error",
 		func(e error) {
-			err, ok := e.(ui.TranslatableError)
+			err, ok := e.(TranslatableError)
 			Expect(ok).To(BeTrue())
 			err.Translate(translateFunc)
 		},

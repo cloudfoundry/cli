@@ -6640,6 +6640,10 @@
     "translation": ""
   },
   {
+    "id": "Warning: Error read/writing config: unexpected end of JSON input for {{.FilePath}}",
+    "translation": ""
+  },
+  {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
     "translation": ""
   },

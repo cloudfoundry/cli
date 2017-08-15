@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
@@ -19,12 +20,25 @@ var Commands = NewRegistry()
 
 func initI18nFunc() bool {
 	config, err := configv3.LoadConfig()
+
+	var configErrTemplate string
 	if err != nil {
-		fmt.Println(FailureColor("FAILED"))
-		fmt.Println("Error read/writing config: ", err.Error())
-		os.Exit(1)
+		if ce, ok := err.(translatableerror.EmptyConfigError); ok {
+			configErrTemplate = ce.Error()
+		} else {
+			fmt.Println(FailureColor("FAILED"))
+			fmt.Println("Error read/writing config: ", err.Error())
+			os.Exit(1)
+		}
 	}
+
 	T = Init(config)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, T(configErrTemplate, map[string]interface{}{
+			"FilePath": configv3.ConfigFilePath(),
+		}))
+	}
 	return true
 }
 

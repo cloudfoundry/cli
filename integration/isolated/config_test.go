@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"path/filepath"
+
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
@@ -10,6 +12,24 @@ import (
 )
 
 var _ = Describe("Config", func() {
+	Describe("Empty Config File", func() {
+		var configDir string
+		BeforeEach(func() {
+			configDir = filepath.Join(homeDir, ".cf")
+			helpers.SetConfigContent(configDir, "")
+		})
+
+		It("displays json warning for a refactored command", func() {
+			session := helpers.CF("api")
+			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s", filepath.Join(configDir, "config.json")))
+		})
+
+		It("displays json warning for an unrefactored command", func() {
+			session := helpers.CF("curl")
+			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s", filepath.Join(configDir, "config.json")))
+		})
+	})
+
 	Describe("Enable Color", func() {
 		Context("when color is enabled", func() {
 			It("prints colors", func() {
