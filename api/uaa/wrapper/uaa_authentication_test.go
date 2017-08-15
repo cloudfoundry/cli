@@ -132,7 +132,7 @@ var _ = Describe("UAA Authentication", func() {
 				}
 
 				fakeClient.RefreshAccessTokenReturns(
-					uaa.RefreshToken{
+					uaa.RefreshedTokens{
 						AccessToken:  "foobar-2",
 						RefreshToken: "bananananananana",
 						Type:         "bearer",

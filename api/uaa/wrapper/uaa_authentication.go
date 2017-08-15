@@ -13,7 +13,7 @@ import (
 
 // UAAClient is the interface for getting a valid access token
 type UAAClient interface {
-	RefreshAccessToken(refreshToken string) (uaa.RefreshToken, error)
+	RefreshAccessToken(refreshToken string) (uaa.RefreshedTokens, error)
 }
 
 //go:generate counterfeiter . TokenCache
@@ -82,14 +82,13 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *uaa.Resp
 
 	err = t.connection.Make(request, passedResponse)
 	if _, ok := err.(uaa.InvalidAuthTokenError); ok {
-		var token uaa.RefreshToken
-		token, err = t.client.RefreshAccessToken(t.cache.RefreshToken())
-		if err != nil {
-			return err
+		tokens, refreshErr := t.client.RefreshAccessToken(t.cache.RefreshToken())
+		if refreshErr != nil {
+			return refreshErr
 		}
 
-		t.cache.SetAccessToken(token.AuthorizationToken())
-		t.cache.SetRefreshToken(token.RefreshToken)
+		t.cache.SetAccessToken(tokens.AuthorizationToken())
+		t.cache.SetRefreshToken(tokens.RefreshToken)
 
 		if rawRequestBody != nil {
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))

@@ -138,7 +138,7 @@ var _ = Describe("UAA Authentication", func() {
 				inMemoryCache.SetAccessToken("what")
 
 				fakeClient.RefreshAccessTokenReturns(
-					uaa.RefreshToken{
+					uaa.RefreshedTokens{
 						AccessToken:  "foobar-2",
 						RefreshToken: "bananananananana",
 						Type:         "bearer",
