@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -407,18 +408,17 @@ var _ = Describe("Process", func() {
 	})
 
 	Describe("CreateApplicationProcessScale", func() {
-		var passedProcess Process
+		var passedProcess ProcessScaleOptions
 
 		BeforeEach(func() {
-			passedProcess = Process{
-				Type:       "web",
-				Instances:  2,
-				MemoryInMB: 100,
-				DiskInMB:   200,
+			passedProcess = ProcessScaleOptions{
+				Instances:  types.NullInt{Value: 2, IsSet: true},
+				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+				DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
 			}
 		})
 
-		Context("when no errors are encountered", func() {
+		Context("when providing all scale options", func() {
 			BeforeEach(func() {
 				expectedBody := `{
 					"instances": 2,
@@ -450,7 +450,57 @@ var _ = Describe("Process", func() {
 			})
 
 			It("scales the application process; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(process).To(Equal(Process{
+					GUID:       "some-process-guid",
+					Type:       "web",
+					Instances:  2,
+					MemoryInMB: 100,
+					DiskInMB:   200,
+					HealthCheck: ProcessHealthCheck{
+						Type: "port",
+						Data: ProcessHealthCheckData{
+							Endpoint: "some-endpoint",
+						},
+					},
+				}))
+			})
+		})
+
+		Context("when providing only one scale option", func() {
+			BeforeEach(func() {
+				passedProcess = ProcessScaleOptions{Instances: types.NullInt{Value: 2, IsSet: true}}
+				expectedBody := `{
+					"instances": 2
+				}`
+				response := `{
+					"guid": "some-process-guid",
+					"type": "web",
+					"command": "rackup",
+					"instances": 2,
+					"memory_in_mb": 100,
+					"disk_in_mb": 200,
+					"health_check": {
+						"type": "port",
+						"data": {
+							"timeout": null,
+							"endpoint": "some-endpoint"
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(process).To(Equal(Process{
@@ -494,7 +544,7 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				_, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

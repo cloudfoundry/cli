@@ -20,6 +20,9 @@ type Process struct {
 // Instance represents a V3 actor instance.
 type Instance ccv3.Instance
 
+// ProcessScaleOptions represents V3 process scale options.
+type ProcessScaleOptions ccv3.ProcessScaleOptions
+
 // StartTime returns the time that the instance started.
 func (instance *Instance) StartTime() time.Time {
 	uptimeDuration := time.Duration(instance.Uptime) * time.Second
@@ -81,10 +84,10 @@ func (ps Processes) Summary() string {
 	return strings.Join(summaries, ", ")
 }
 
-func (actor Actor) ScaleProcessByApplication(appGUID string, scaleOptions ccv3.Process) (Warnings, error) {
+func (actor Actor) ScaleProcessByApplication(appGUID string, processType string, scaleOptions ProcessScaleOptions) (Warnings, error) {
 	var allWarnings Warnings
 
-	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, scaleOptions)
+	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, processType, ccv3.ProcessScaleOptions(scaleOptions))
 	allWarnings = Warnings(warnings)
 	if err != nil {
 		return allWarnings, err

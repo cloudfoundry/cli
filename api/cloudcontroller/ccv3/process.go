@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type Process struct {
@@ -25,6 +26,12 @@ type ProcessHealthCheck struct {
 
 type ProcessHealthCheckData struct {
 	Endpoint string `json:"endpoint"`
+}
+
+type ProcessScaleOptions struct {
+	Instances  types.NullInt    `json:"instances"`
+	MemoryInMB types.NullUint64 `json:"memory_in_mb"`
+	DiskInMB   types.NullUint64 `json:"disk_in_mb"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -117,16 +124,23 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	return response.Warnings, err
 }
 
-func (client *Client) CreateApplicationProcessScale(appGUID string, scaleOptions Process) (Process, Warnings, error) {
+func (client *Client) CreateApplicationProcessScale(appGUID string, processType string, scaleOptions ProcessScaleOptions) (Process, Warnings, error) {
 	ccProcessScale := struct {
-		Instances  int `json:"instances"`
-		MemoryInMB int `json:"memory_in_mb"`
-		DiskInMB   int `json:"disk_in_mb"`
-	}{
-		Instances:  scaleOptions.Instances,
-		MemoryInMB: scaleOptions.MemoryInMB,
-		DiskInMB:   scaleOptions.DiskInMB,
+		Instances  int    `json:"instances,omitempty"`
+		MemoryInMB uint64 `json:"memory_in_mb,omitempty"`
+		DiskInMB   uint64 `json:"disk_in_mb,omitempty"`
+	}{}
+
+	if scaleOptions.Instances.IsSet {
+		ccProcessScale.Instances = scaleOptions.Instances.Value
 	}
+	if scaleOptions.MemoryInMB.IsSet {
+		ccProcessScale.MemoryInMB = scaleOptions.MemoryInMB.Value
+	}
+	if scaleOptions.DiskInMB.IsSet {
+		ccProcessScale.DiskInMB = scaleOptions.DiskInMB.Value
+	}
+
 	body, err := json.Marshal(ccProcessScale)
 	if err != nil {
 		return Process{}, nil, err
@@ -135,7 +149,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, scaleOptions
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationProcessScaleRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"app_guid": appGUID, "type": scaleOptions.Type},
+		URIParams:   internal.Params{"app_guid": appGUID, "type": processType},
 	})
 	if err != nil {
 		return Process{}, nil, err
