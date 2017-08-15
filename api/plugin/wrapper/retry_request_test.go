@@ -36,8 +36,8 @@ var _ = Describe("Retry Request", func() {
 			}
 			fakeConnection.MakeStub = func(req *http.Request, passedResponse *plugin.Response, proxyReader plugin.ProxyReader) error {
 				defer req.Body.Close()
-				body, err := ioutil.ReadAll(request.Body)
-				Expect(err).ToNot(HaveOccurred())
+				body, readErr := ioutil.ReadAll(request.Body)
+				Expect(readErr).ToNot(HaveOccurred())
 				Expect(string(body)).To(Equal(rawRequestBody))
 				return expectedErr
 			}

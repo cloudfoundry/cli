@@ -123,8 +123,6 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when getting the repository information errors", func() {
 				Context("with a generic error", func() {
-					var expectedErr error
-
 					BeforeEach(func() {
 						expectedErr = errors.New("some-client-error")
 						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.FetchingPluginInfoFromRepositoryError{

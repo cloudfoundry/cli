@@ -1,7 +1,6 @@
 package ccv3_test
 
 import (
-	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -74,7 +73,7 @@ var _ = Describe("Instance", func() {
 	Describe("GetProcessInstances", func() {
 		Context("when the process exists", func() {
 			BeforeEach(func() {
-				response := fmt.Sprintf(`{
+				response := `{
 					"resources": [
 						{
 							"state": "RUNNING",
@@ -101,7 +100,7 @@ var _ = Describe("Instance", func() {
 							"uptime": 456
 						}
 					]
-				}`, server.URL())
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/processes/some-process-guid/stats"),

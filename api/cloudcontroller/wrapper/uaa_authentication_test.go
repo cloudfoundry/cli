@@ -109,10 +109,8 @@ var _ = Describe("UAA Authentication", func() {
 		Context("when the token is invalid", func() {
 			var (
 				expectedBody string
-
-				request *cloudcontroller.Request
-
-				executeErr error
+				request      *cloudcontroller.Request
+				executeErr   error
 			)
 
 			BeforeEach(func() {
@@ -162,8 +160,8 @@ var _ = Describe("UAA Authentication", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(fakeConnection.MakeCallCount()).To(Equal(2))
 
-				request, _ := fakeConnection.MakeArgsForCall(1)
-				Expect(request.Header.Get("Authorization")).To(Equal("bearer foobar-2"))
+				requestArg, _ := fakeConnection.MakeArgsForCall(1)
+				Expect(requestArg.Header.Get("Authorization")).To(Equal("bearer foobar-2"))
 			})
 
 			It("should save the refresh token", func() {

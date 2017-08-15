@@ -119,8 +119,8 @@ var _ = Describe("UAA Authentication", func() {
 
 				makeCount := 0
 				fakeConnection.MakeStub = func(request *http.Request, response *uaa.Response) error {
-					body, err := ioutil.ReadAll(request.Body)
-					Expect(err).NotTo(HaveOccurred())
+					body, readErr := ioutil.ReadAll(request.Body)
+					Expect(readErr).NotTo(HaveOccurred())
 					Expect(string(body)).To(Equal(expectedBody))
 
 					if makeCount == 0 {

@@ -65,7 +65,6 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
 		}
 	}
-	return nil
 }
 
 func handleBadRequest(errorResponse ccerror.V2ErrorResponse) error {
