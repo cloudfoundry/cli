@@ -61,6 +61,7 @@ var _ = Describe("Scale Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd.RequiredArgs.AppName = appName
+		cmd.ProcessType = "web"
 	})
 
 	JustBeforeEach(func() {
@@ -524,7 +525,7 @@ var _ = Describe("Scale Command", func() {
 				})
 			})
 
-			Context("when only the memory flag option is provided", func() {
+			Context("when only the disk flag option is provided", func() {
 				BeforeEach(func() {
 					cmd.DiskLimit.Value = 1024
 					cmd.DiskLimit.IsSet = true
@@ -574,6 +575,52 @@ var _ = Describe("Scale Command", func() {
 					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
 					Expect(processType).To(Equal("web"))
+				})
+			})
+
+			Context("when process flag is provided", func() {
+				BeforeEach(func() {
+					cmd.ProcessType = "some-process-type"
+					cmd.Instances.Value = 2
+					cmd.Instances.IsSet = true
+					fakeActor.ScaleProcessByApplicationReturns(
+						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
+						nil)
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("scales the specified process", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).ToNot(Say("Showing"))
+					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+
+					Expect(testUI.Err).To(Say("get-app-warning"))
+					Expect(testUI.Err).To(Say("scale-warning"))
+					Expect(testUI.Err).To(Say("get-instances-warning"))
+
+					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(processTypeArg).To(Equal("some-process-type"))
+					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+						Instances: types.NullInt{Value: 2, IsSet: true},
+					}))
+
+					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(processType).To(Equal("some-process-type"))
 				})
 			})
 

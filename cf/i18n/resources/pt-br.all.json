@@ -384,6 +384,10 @@
     "translation": "Nome do app é um campo obrigatório"
   },
   {
+    "id": "App process to scale",
+    "translation": ""
+  },
+  {
     "id": "App process to update",
     "translation": ""
   },
@@ -1772,7 +1776,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]",
+    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [--process PROCESS] [-k DISK] [-m MEMORY]",
     "translation": ""
   },
   {

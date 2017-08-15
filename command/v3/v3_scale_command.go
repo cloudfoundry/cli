@@ -25,9 +25,10 @@ type V3ScaleActor interface {
 type V3ScaleCommand struct {
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
 	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
+	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
 	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	usage               interface{}    `usage:"CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]"`
+	usage               interface{}    `usage:"CF_NAME v3-scale APP_NAME [-i INSTANCES] [--process PROCESS] [-k DISK] [-m MEMORY]"`
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
@@ -129,7 +130,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 }
 
 func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string) error {
-	process, warnings, err := cmd.Actor.GetInstancesByApplicationAndProcessType(appGUID, "web")
+	process, warnings, err := cmd.Actor.GetInstancesByApplicationAndProcessType(appGUID, cmd.ProcessType)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
@@ -164,7 +165,7 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 		}
 	}
 
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, "web", v3action.ProcessScaleOptions{
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, cmd.ProcessType, v3action.ProcessScaleOptions{
 		Instances:  cmd.Instances.NullInt,
 		MemoryInMB: cmd.MemoryLimit.NullUint64,
 		DiskInMB:   cmd.DiskLimit.NullUint64,
