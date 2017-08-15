@@ -29,7 +29,7 @@ var _ = Describe("v3-scale command", func() {
 				session := helpers.CF("v3-scale", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-scale - Change or view the instance count, disk space limit, and memory limit for an app"))
+				Eventually(session.Out).Should(Say("v3-scale - \\*\\*EXPERIMENTAL\\*\\* Change or view the instance count, disk space limit, and memory limit for an app"))
 
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-scale APP_NAME \\[-i INSTANCES\\] \\[-k DISK\\] \\[-m MEMORY\\]"))

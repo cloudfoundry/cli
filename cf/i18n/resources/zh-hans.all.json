@@ -172,6 +172,10 @@
     "translation": "**注意: 插件是由可能不可信的作者编写的二进制文件。安装并使用插件所产生的风险，由您自行承担。\n\n要安装插件 {{.Plugin}} 吗？"
   },
   {
+    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
     "translation": ""
   },

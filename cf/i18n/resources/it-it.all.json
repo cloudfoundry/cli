@@ -172,6 +172,10 @@
     "translation": "**Attenzione: i plug-in sono binari scritti da autori potenzialmente non attendibili. L'installazione e l'utilizzo dei plug-in è a tuo proprio rischio.**\n\nVuoi installare il plug-in {{.Plugin}}?"
   },
   {
+    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
     "translation": ""
   },
