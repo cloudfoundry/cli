@@ -172,6 +172,10 @@
     "translation": "**注意: 外掛程式是由潛在未授信作者所編寫的二進位檔。您必須自行承擔安裝和使用外掛程式的風險。**\n\n您要安裝外掛程式 {{.Plugin}} 嗎？"
   },
   {
+    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
     "translation": ""
   },

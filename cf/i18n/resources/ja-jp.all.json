@@ -172,6 +172,10 @@
     "translation": "**注意: プラグインは必ずしも信頼できない作成者によって書かれたバイナリーです。 プラグインのインストールと使用は自らの責任で行ってください。**\n\nプラグイン {{.Plugin}} をインストールしますか?"
   },
   {
+    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
     "translation": ""
   },

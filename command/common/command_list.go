@@ -26,7 +26,7 @@ type commandList struct {
 	V3Push               v3.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
 	V3RestartAppInstance v3.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"**EXPERIMENTAL** Terminate, then instantiate an app instance"`
-	V3Scale              v3.V3ScaleCommand              `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	V3Scale              v3.V3ScaleCommand              `command:"v3-scale" description:"**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app"`
 	V3SetDroplet         v3.V3SetDropletCommand         `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
 	V3SetHealthCheck     v3.V3SetHealthCheckCommand     `command:"v3-set-health-check" description:"**EXPERIMENTAL** Change type of health check performed on an app's process"`
 	V3Stage              v3.V3StageCommand              `command:"v3-stage" description:"**EXPERIMENTAL** Create a new droplet for an app"`

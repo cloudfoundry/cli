@@ -172,6 +172,10 @@
     "translation": "**Atención: Los plugins son binarios grabados por autores potencialmente no de confianza. Instale y utilice los plugins a su cuenta y riesgo.**\n\n¿Desea instalar el plugin {{.Plugin}}?"
   },
   {
+    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
     "translation": ""
   },
