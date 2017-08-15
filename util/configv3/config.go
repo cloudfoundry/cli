@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/version"
 )
 
@@ -71,41 +72,45 @@ const (
 func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	filePath := ConfigFilePath()
 
-	var config Config
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		config = Config{
-			ConfigFile: CFConfig{
-				ConfigVersion: 3,
-				Target:        DefaultTarget,
-				ColorEnabled:  DefaultColorEnabled,
-				PluginRepositories: []PluginRepository{{
-					Name: DefaultPluginRepoName,
-					URL:  DefaultPluginRepoURL,
-				}},
-				SSHOAuthClient:       DefaultSSHOAuthClient,
-				UAAOAuthClient:       DefaultUAAOAuthClient,
-				UAAOAuthClientSecret: DefaultUAAOAuthClientSecret,
-			},
-		}
-	} else {
+	config := Config{
+		ConfigFile: CFConfig{
+			ConfigVersion: 3,
+			Target:        DefaultTarget,
+			ColorEnabled:  DefaultColorEnabled,
+			PluginRepositories: []PluginRepository{{
+				Name: DefaultPluginRepoName,
+				URL:  DefaultPluginRepoURL,
+			}},
+		},
+	}
+
+	var jsonError error
+
+	if _, err := os.Stat(filePath); err == nil || !os.IsNotExist(err) {
 		file, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			return nil, err
 		}
 
-		err = json.Unmarshal(file, &config.ConfigFile)
-		if err != nil {
-			return nil, err
+		if len(file) == 0 {
+			jsonError = translatableerror.EmptyConfigError{FilePath: filePath}
+		} else {
+			var configFile CFConfig
+			err = json.Unmarshal(file, &configFile)
+			if err != nil {
+				return nil, err
+			}
+			config.ConfigFile = configFile
 		}
+	}
 
-		if config.ConfigFile.SSHOAuthClient == "" {
-			config.ConfigFile.SSHOAuthClient = DefaultSSHOAuthClient
-		}
+	if config.ConfigFile.SSHOAuthClient == "" {
+		config.ConfigFile.SSHOAuthClient = DefaultSSHOAuthClient
+	}
 
-		if config.ConfigFile.UAAOAuthClient == "" {
-			config.ConfigFile.UAAOAuthClient = DefaultUAAOAuthClient
-			config.ConfigFile.UAAOAuthClientSecret = DefaultUAAOAuthClientSecret
-		}
+	if config.ConfigFile.UAAOAuthClient == "" {
+		config.ConfigFile.UAAOAuthClient = DefaultUAAOAuthClient
+		config.ConfigFile.UAAOAuthClientSecret = DefaultUAAOAuthClientSecret
 	}
 
 	config.ENV = EnvOverride{
@@ -173,7 +178,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		tty:              isTTY,
 	}
 
-	return &config, nil
+	return &config, jsonError
 }
 
 // WriteConfig creates the .cf directory and then writes the config.json. The

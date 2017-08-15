@@ -3,6 +3,7 @@ package helpers
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/util/configv3"
 
@@ -36,6 +37,13 @@ func SetConfig(cb func(conf *configv3.Config)) {
 	cb(config)
 
 	err = configv3.WriteConfig(config)
+	Expect(err).ToNot(HaveOccurred())
+}
+
+func SetConfigContent(dir string, rawConfig string) {
+	err := os.MkdirAll(filepath.Join(dir), 0777)
+	Expect(err).ToNot(HaveOccurred())
+	err = ioutil.WriteFile(filepath.Join(dir, "config.json"), []byte(rawConfig), 0644)
 	Expect(err).ToNot(HaveOccurred())
 }
 

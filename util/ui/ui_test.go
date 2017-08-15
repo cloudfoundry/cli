@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/command/translatableerror/translatableerrorfakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/util/ui/uifakes"
@@ -112,10 +113,10 @@ var _ = Describe("UI", func() {
 
 	Describe("DisplayError", func() {
 		Context("when passed a TranslatableError", func() {
-			var fakeTranslateErr *uifakes.FakeTranslatableError
+			var fakeTranslateErr *translatableerrorfakes.FakeTranslatableError
 
 			BeforeEach(func() {
-				fakeTranslateErr = new(uifakes.FakeTranslatableError)
+				fakeTranslateErr = new(translatableerrorfakes.FakeTranslatableError)
 				fakeTranslateErr.TranslateReturns("I am an error")
 
 				ui.DisplayError(fakeTranslateErr)

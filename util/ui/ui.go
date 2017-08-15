@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"github.com/fatih/color"
 	"github.com/lunixbochs/vtclean"
@@ -47,16 +48,6 @@ type LogMessage interface {
 	Timestamp() time.Time
 	SourceType() string
 	SourceInstance() string
-}
-
-//go:generate counterfeiter . TranslatableError
-
-// TranslatableError it wraps the error interface adding a way to set the
-// translation function on the error
-type TranslatableError interface {
-	// Returns the untranslated error string
-	Error() string
-	Translate(func(string, ...interface{}) string) string
 }
 
 // UI is interface to interact with the user
@@ -144,7 +135,7 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 // to ui.Err. It also outputs "FAILED" in bold red to ui.Out.
 func (ui *UI) DisplayError(err error) {
 	var errMsg string
-	if translatableError, ok := err.(TranslatableError); ok {
+	if translatableError, ok := err.(translatableerror.TranslatableError); ok {
 		errMsg = translatableError.Translate(ui.translate)
 	} else {
 		errMsg = err.Error()
