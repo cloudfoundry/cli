@@ -384,6 +384,10 @@
     "translation": "App name is a required field"
   },
   {
+    "id": "App process to scale",
+    "translation": ""
+  },
+  {
     "id": "App process to update",
     "translation": ""
   },
@@ -1772,8 +1776,8 @@
     "translation": "CF_NAME v3-restart-app-instance APP_NAME INDEX [--process PROCESS]"
   },
   {
-    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY]",
-    "translation": ""
+    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [--process PROCESS] [-k DISK] [-m MEMORY]",
+    "translation": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [--process PROCESS] [-k DISK] [-m MEMORY]"
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
