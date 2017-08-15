@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
@@ -58,11 +57,12 @@ type FakeV3ScaleActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	ScaleProcessByApplicationStub        func(appGUID string, process ccv3.Process) (v3action.Warnings, error)
+	ScaleProcessByApplicationStub        func(appGUID string, processType string, scaleOptions v3action.ProcessScaleOptions) (v3action.Warnings, error)
 	scaleProcessByApplicationMutex       sync.RWMutex
 	scaleProcessByApplicationArgsForCall []struct {
-		appGUID string
-		process ccv3.Process
+		appGUID      string
+		processType  string
+		scaleOptions v3action.ProcessScaleOptions
 	}
 	scaleProcessByApplicationReturns struct {
 		result1 v3action.Warnings
@@ -281,17 +281,18 @@ func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeReturnsOnCa
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ScaleActor) ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Warnings, error) {
+func (fake *FakeV3ScaleActor) ScaleProcessByApplication(appGUID string, processType string, scaleOptions v3action.ProcessScaleOptions) (v3action.Warnings, error) {
 	fake.scaleProcessByApplicationMutex.Lock()
 	ret, specificReturn := fake.scaleProcessByApplicationReturnsOnCall[len(fake.scaleProcessByApplicationArgsForCall)]
 	fake.scaleProcessByApplicationArgsForCall = append(fake.scaleProcessByApplicationArgsForCall, struct {
-		appGUID string
-		process ccv3.Process
-	}{appGUID, process})
-	fake.recordInvocation("ScaleProcessByApplication", []interface{}{appGUID, process})
+		appGUID      string
+		processType  string
+		scaleOptions v3action.ProcessScaleOptions
+	}{appGUID, processType, scaleOptions})
+	fake.recordInvocation("ScaleProcessByApplication", []interface{}{appGUID, processType, scaleOptions})
 	fake.scaleProcessByApplicationMutex.Unlock()
 	if fake.ScaleProcessByApplicationStub != nil {
-		return fake.ScaleProcessByApplicationStub(appGUID, process)
+		return fake.ScaleProcessByApplicationStub(appGUID, processType, scaleOptions)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -305,10 +306,10 @@ func (fake *FakeV3ScaleActor) ScaleProcessByApplicationCallCount() int {
 	return len(fake.scaleProcessByApplicationArgsForCall)
 }
 
-func (fake *FakeV3ScaleActor) ScaleProcessByApplicationArgsForCall(i int) (string, ccv3.Process) {
+func (fake *FakeV3ScaleActor) ScaleProcessByApplicationArgsForCall(i int) (string, string, v3action.ProcessScaleOptions) {
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
-	return fake.scaleProcessByApplicationArgsForCall[i].appGUID, fake.scaleProcessByApplicationArgsForCall[i].process
+	return fake.scaleProcessByApplicationArgsForCall[i].appGUID, fake.scaleProcessByApplicationArgsForCall[i].processType, fake.scaleProcessByApplicationArgsForCall[i].scaleOptions
 }
 
 func (fake *FakeV3ScaleActor) ScaleProcessByApplicationReturns(result1 v3action.Warnings, result2 error) {

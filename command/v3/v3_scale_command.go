@@ -3,7 +3,6 @@ package v3
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -17,7 +16,7 @@ type V3ScaleActor interface {
 
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetInstancesByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
-	ScaleProcessByApplication(appGUID string, process ccv3.Process) (v3action.Warnings, error)
+	ScaleProcessByApplication(appGUID string, processType string, scaleOptions v3action.ProcessScaleOptions) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
@@ -165,13 +164,11 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 		}
 	}
 
-	ccv3Process := ccv3.Process{
-		Type:       "web",
-		Instances:  cmd.Instances.Value,
-		MemoryInMB: int(cmd.MemoryLimit.Value), // TODO: check it does not set to 0 always
-		DiskInMB:   int(cmd.DiskLimit.Value),
-	}
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, ccv3Process)
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, "web", v3action.ProcessScaleOptions{
+		Instances:  cmd.Instances.NullInt,
+		MemoryInMB: cmd.MemoryLimit.NullUint64,
+		DiskInMB:   cmd.DiskLimit.NullUint64,
+	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err

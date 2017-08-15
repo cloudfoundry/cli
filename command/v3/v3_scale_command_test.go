@@ -6,9 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/shared"
@@ -261,77 +259,14 @@ var _ = Describe("Scale Command", func() {
 				})
 			})
 
-			Context("when only the instances flag option is provided", func() {
-				BeforeEach(func() {
-					cmd.Instances.Value = 3
-					cmd.Instances.IsSet = true
-					fakeActor.ScaleProcessByApplicationReturns(
-						v3action.Warnings{"scale-warning"},
-						nil)
-					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
-						process,
-						v3action.Warnings{"get-instances-warning"},
-						nil)
-				})
-
-				It("scales the number of instances, displays scale properties, and does not restart the application", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(testUI.Out).ToNot(Say("Showing"))
-					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-					Expect(testUI.Out).To(Say("web:3/3"))
-					Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-					Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
-					Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
-					Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
-
-					Expect(testUI.Err).To(Say("get-app-warning"))
-					Expect(testUI.Err).To(Say("scale-warning"))
-					Expect(testUI.Err).To(Say("get-instances-warning"))
-
-					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appNameArg).To(Equal(appName))
-					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
-
-					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-					appGUIDArg, ccv3ProcessArg := fakeActor.ScaleProcessByApplicationArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(ccv3ProcessArg).To(Equal(ccv3.Process{
-						Type:      "web",
-						Instances: 3,
-					}))
-
-					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
-					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(processType).To(Equal("web"))
-				})
-
-				Context("when an error is encountered scaling the application", func() {
-					var expectedErr error
-
-					BeforeEach(func() {
-						expectedErr = errors.New("scale process error")
-						fakeActor.ScaleProcessByApplicationReturns(
-							v3action.Warnings{"scale-process-warning"},
-							expectedErr,
-						)
-					})
-
-					It("returns the error and displays all warnings", func() {
-						Expect(executeErr).To(Equal(expectedErr))
-						Expect(testUI.Err).To(Say("scale-process-warning"))
-					})
-				})
-			})
-
 			Context("when all flag options are provided", func() {
 				BeforeEach(func() {
 					cmd.Instances.Value = 2
 					cmd.Instances.IsSet = true
-					cmd.DiskLimit = flag.Megabytes{NullUint64: types.NullUint64{Value: 50, IsSet: true}}
-					cmd.MemoryLimit = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
+					cmd.DiskLimit.Value = 50
+					cmd.DiskLimit.IsSet = true
+					cmd.MemoryLimit.Value = 100
+					cmd.MemoryLimit.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
 						v3action.Warnings{"scale-warning"},
 						nil)
@@ -400,14 +335,27 @@ var _ = Describe("Scale Command", func() {
 							Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
-							Expect(testUI.Out).To(Say("web:3/3"))
-							Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-							// We did not explicitly test that this is displaying the disk quota
-							// was scaled to 96M, it is tested below when we check the arguments
+
+							// Note that this does test that the disk quota was scaled to 96M,
+							// it is tested below when we check the arguments
 							// passed to ScaleProcessByApplication
-							Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
-							Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
-							Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
+							firstAppTable := helpers.ParseV3AppTable(output.Contents())
+							Expect(len(firstAppTable.Processes)).To(Equal(1))
+
+							processSummary := firstAppTable.Processes[0]
+							Expect(processSummary.Title).To(Equal("web:3/3"))
+
+							Expect(processSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+							Expect(processSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
+							Expect(processSummary.Instances[0].CPU).To(Equal("0.0%"))
+
+							Expect(processSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
+							Expect(processSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
+							Expect(processSummary.Instances[1].CPU).To(Equal("0.0%"))
+
+							Expect(processSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
+							Expect(processSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
+							Expect(processSummary.Instances[2].CPU).To(Equal("0.0%"))
 
 							Expect(testUI.Err).To(Say("get-app-warning"))
 							Expect(testUI.Err).To(Say("scale-warning"))
@@ -421,13 +369,13 @@ var _ = Describe("Scale Command", func() {
 							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-							appGUIDArg, ccv3ProcessArg := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+							appGUIDArg, processTypeArg, scaleOptionsArg := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 							Expect(appGUIDArg).To(Equal("some-app-guid"))
-							Expect(ccv3ProcessArg).To(Equal(ccv3.Process{
-								Type:       "web",
-								Instances:  2,
-								DiskInMB:   50,
-								MemoryInMB: 100,
+							Expect(processTypeArg).To(Equal("web"))
+							Expect(scaleOptionsArg).To(Equal(v3action.ProcessScaleOptions{
+								Instances:  types.NullInt{Value: 2, IsSet: true},
+								DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
+								MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
 							}))
 
 							Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
@@ -473,6 +421,178 @@ var _ = Describe("Scale Command", func() {
 							}))
 						})
 					})
+				})
+			})
+
+			Context("when only the instances flag option is provided", func() {
+				BeforeEach(func() {
+					cmd.Instances.Value = 3
+					cmd.Instances.IsSet = true
+					fakeActor.ScaleProcessByApplicationReturns(
+						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
+						nil)
+				})
+
+				It("scales the number of instances, displays scale properties, and does not restart the application", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).ToNot(Say("Showing"))
+					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+
+					Expect(testUI.Err).To(Say("get-app-warning"))
+					Expect(testUI.Err).To(Say("scale-warning"))
+					Expect(testUI.Err).To(Say("get-instances-warning"))
+
+					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(processTypeArg).To(Equal("web"))
+					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+						Instances: types.NullInt{Value: 3, IsSet: true},
+					}))
+
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
+
+					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(processType).To(Equal("web"))
+				})
+			})
+
+			Context("when only the memory flag option is provided", func() {
+				BeforeEach(func() {
+					cmd.MemoryLimit.Value = 256
+					cmd.MemoryLimit.IsSet = true
+					fakeActor.ScaleProcessByApplicationReturns(
+						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
+						nil)
+
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("scales the number of instances, displays scale properties, and restarts the application", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).ToNot(Say("Showing"))
+					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+
+					Expect(testUI.Err).To(Say("get-app-warning"))
+					Expect(testUI.Err).To(Say("scale-warning"))
+					Expect(testUI.Err).To(Say("get-instances-warning"))
+
+					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(processTypeArg).To(Equal("web"))
+					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+						MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
+					}))
+
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+					appGUID := fakeActor.StopApplicationArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+					appGUID = fakeActor.StartApplicationArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(processType).To(Equal("web"))
+				})
+			})
+
+			Context("when only the memory flag option is provided", func() {
+				BeforeEach(func() {
+					cmd.DiskLimit.Value = 1024
+					cmd.DiskLimit.IsSet = true
+					fakeActor.ScaleProcessByApplicationReturns(
+						v3action.Warnings{"scale-warning"},
+						nil)
+					fakeActor.GetInstancesByApplicationAndProcessTypeReturns(
+						process,
+						v3action.Warnings{"get-instances-warning"},
+						nil)
+					_, err := input.Write([]byte("y\n"))
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("scales the number of instances, displays scale properties, and restarts the application", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).ToNot(Say("Showing"))
+					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+
+					Expect(testUI.Err).To(Say("get-app-warning"))
+					Expect(testUI.Err).To(Say("scale-warning"))
+					Expect(testUI.Err).To(Say("get-instances-warning"))
+
+					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+					appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+					Expect(appNameArg).To(Equal(appName))
+					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(processTypeArg).To(Equal("web"))
+					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+						DiskInMB: types.NullUint64{Value: 1024, IsSet: true},
+					}))
+
+					Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+					appGUID := fakeActor.StopApplicationArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+					appGUID = fakeActor.StartApplicationArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))
+					appGUID, processType := fakeActor.GetInstancesByApplicationAndProcessTypeArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(processType).To(Equal("web"))
+				})
+			})
+
+			Context("when an error is encountered scaling the application", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					cmd.Instances.Value = 3
+					cmd.Instances.IsSet = true
+					expectedErr = errors.New("scale process error")
+					fakeActor.ScaleProcessByApplicationReturns(
+						v3action.Warnings{"scale-process-warning"},
+						expectedErr,
+					)
+				})
+
+				It("returns the error and displays all warnings", func() {
+					Expect(executeErr).To(Equal(expectedErr))
+					Expect(testUI.Err).To(Say("scale-process-warning"))
 				})
 			})
 		})

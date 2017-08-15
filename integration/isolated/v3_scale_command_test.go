@@ -170,9 +170,43 @@ var _ = Describe("v3-scale command", func() {
 
 					processSummary := updatedAppTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
-					Expect(processSummary.Title).To(Equal("web:3/3"))
-					Expect(instanceSummary.Memory).To(Equal(appTable.Processes[0].Instances[0].Memory))
-					Expect(instanceSummary.Disk).To(Equal(appTable.Processes[0].Instances[0].Disk))
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 32M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 1G`))
+
+					buffer := NewBuffer()
+					buffer.Write([]byte("y\n"))
+					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-m", "64M")
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					instanceSummary = processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 1G`))
+
+					buffer = NewBuffer()
+					buffer.Write([]byte("y\n"))
+					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-k", "92M")
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					instanceSummary = processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
 				})
 			})
 
@@ -194,7 +228,7 @@ var _ = Describe("v3-scale command", func() {
 
 					processSummary := appTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
-					Expect(processSummary.Title).To(Equal("web:3/3"))
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
 				})
