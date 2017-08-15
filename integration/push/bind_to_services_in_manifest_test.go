@@ -12,19 +12,19 @@ import (
 
 var _ = Describe("bind app to provided services from manifest", func() {
 	var (
-		appName              string
-		serviceName          string
-		servicePlan          string
-		serviceInstanceName1 string
-		serviceInstanceName2 string
+		appName                         string
+		serviceName                     string
+		servicePlan                     string
+		managedServiceInstanceName      string
+		userProvidedServiceInstanceName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
 		serviceName = helpers.PrefixedRandomName("SERVICE")
 		servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
-		serviceInstanceName1 = helpers.PrefixedRandomName("si")
-		serviceInstanceName2 = helpers.PrefixedRandomName("si")
+		managedServiceInstanceName = helpers.PrefixedRandomName("si")
+		userProvidedServiceInstanceName = helpers.PrefixedRandomName("usi")
 	})
 
 	Context("when the services do not exist", func() {
@@ -35,13 +35,13 @@ var _ = Describe("bind app to provided services from manifest", func() {
 						{
 							"name":     appName,
 							"path":     dir,
-							"services": []string{serviceInstanceName1, serviceInstanceName2},
+							"services": []string{managedServiceInstanceName, userProvidedServiceInstanceName},
 						},
 					},
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
-				Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstanceName1))
+				Eventually(session.Err).Should(Say("Service instance %s not found", managedServiceInstanceName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
@@ -54,8 +54,6 @@ var _ = Describe("bind app to provided services from manifest", func() {
 		BeforeEach(func() {
 			domain := defaultSharedDomain()
 
-			Eventually(helpers.CF("create-user-provided-service", serviceInstanceName1)).Should(Exit(0))
-
 			broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, serviceName, servicePlan)
 			broker.Push()
 			broker.Configure()
@@ -63,7 +61,9 @@ var _ = Describe("bind app to provided services from manifest", func() {
 
 			Eventually(helpers.CF("enable-service-access", serviceName)).Should(Exit(0))
 
-			Eventually(helpers.CF("create-service", serviceName, servicePlan, serviceInstanceName2)).Should(Exit(0))
+			Eventually(helpers.CF("create-service", serviceName, servicePlan, managedServiceInstanceName)).Should(Exit(0))
+
+			Eventually(helpers.CF("create-user-provided-service", userProvidedServiceInstanceName)).Should(Exit(0))
 		})
 
 		AfterEach(func() {
@@ -78,7 +78,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 							{
 								"name":     appName,
 								"path":     dir,
-								"services": []string{serviceInstanceName1, serviceInstanceName2},
+								"services": []string{managedServiceInstanceName, userProvidedServiceInstanceName},
 							},
 						},
 					})
@@ -88,16 +88,16 @@ var _ = Describe("bind app to provided services from manifest", func() {
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 					Eventually(session).Should(Say("services:"))
-					Eventually(session).Should(Say("\\+\\s+%s", "si"))
-					Eventually(session).Should(Say("\\+\\s+%s", "si"))
+					Eventually(session).Should(Say("\\+\\s+%s", managedServiceInstanceName))
+					Eventually(session).Should(Say("\\+\\s+%s", userProvidedServiceInstanceName))
 					Eventually(session).Should(Say("Binding services\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
 				})
 
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("name\\s+service\\s+plan\\s+bound apps\\s+last operation"))
-				Eventually(session).Should(Say("%s\\s+user-provided\\s+%s", serviceInstanceName1, appName))
-				Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+%s", serviceInstanceName2, serviceName, servicePlan, appName))
+				Eventually(session).Should(Say("%s\\s+%s\\s+%s\\s+%s", managedServiceInstanceName, serviceName, servicePlan, appName))
+				Eventually(session).Should(Say("%s\\s+user-provided\\s+%s", userProvidedServiceInstanceName, appName))
 
 			})
 		})
@@ -110,14 +110,13 @@ var _ = Describe("bind app to provided services from manifest", func() {
 							{
 								"name":     appName,
 								"path":     dir,
-								"services": []string{serviceInstanceName1},
+								"services": []string{managedServiceInstanceName},
 							},
 						},
 					})
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
 					Eventually(session).Should(Exit(0))
 				})
-
 			})
 
 			It("binds the unbound services", func() {
@@ -127,7 +126,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 							{
 								"name":     appName,
 								"path":     dir,
-								"services": []string{serviceInstanceName1, serviceInstanceName2},
+								"services": []string{managedServiceInstanceName, userProvidedServiceInstanceName},
 							},
 						},
 					})
@@ -137,15 +136,15 @@ var _ = Describe("bind app to provided services from manifest", func() {
 					Eventually(session).Should(Say("Updating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
 					Eventually(session).Should(Say("services:"))
-					Eventually(session).Should(Say("\\+\\s+%s", "si"))
-					Consistently(session).ShouldNot(Say("\\+\\s+%s", "si"))
+					Eventually(session).Should(Say("(?m)$\\s+%s", managedServiceInstanceName))
+					Eventually(session).Should(Say("\\+\\s+%s", userProvidedServiceInstanceName))
 					Eventually(session).Should(Say("Binding services\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
 				})
 
 				session := helpers.CF("services")
 				Eventually(session).Should(Say("name\\s+service\\s+plan\\s+bound apps\\s+last operation"))
-				Eventually(session).Should(Say("%s\\s+user-provided\\s+%s", serviceInstanceName1, appName))
+				Eventually(session).Should(Say("%s\\s+user-provided\\s+%s", userProvidedServiceInstanceName, appName))
 			})
 		})
 	})
