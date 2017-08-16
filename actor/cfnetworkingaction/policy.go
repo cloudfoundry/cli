@@ -32,8 +32,5 @@ func (actor Actor) AllowNetworkAccess(spaceGUID string, srcAppName string, destA
 			},
 		},
 	})
-	if err != nil {
-		return allWarnings, err
-	}
-	return allWarnings, nil
+	return allWarnings, err
 }
