@@ -71,9 +71,7 @@ var _ = Describe("oauth-token command", func() {
 				session := helpers.CF("oauth-token")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect: invalid-refresh-token"))
-				// Eventually(session.Err).Should(Say("Authentication has expired\\.  Please log back in to re-authenticate\\."))
-				// Eventually(session.Err).Should(Say("TIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate\\."))
+				Eventually(session.Err).Should(Say("The token expired, was revoked, or the token ID is incorrect\\. Please log back in to re-authenticate\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -90,7 +88,7 @@ var _ = Describe("oauth-token command", func() {
 				session := helpers.CF("oauth-token")
 
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Bad credentials"))
+				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
