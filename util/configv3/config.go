@@ -6,9 +6,11 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -91,8 +93,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	var jsonError error
 
-	if _, err := os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
-		file, err := ioutil.ReadFile(configFilePath)
+	if _, err = os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
+		var file []byte
+		file, err = ioutil.ReadFile(configFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -135,12 +138,13 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
-	if _, err := os.Stat(pluginFilePath); os.IsNotExist(err) {
+	if _, err = os.Stat(pluginFilePath); os.IsNotExist(err) {
 		config.pluginsConfig = PluginsConfig{
 			Plugins: make(map[string]Plugin),
 		}
 	} else {
-		file, err := ioutil.ReadFile(pluginFilePath)
+		var file []byte
+		file, err = ioutil.ReadFile(pluginFilePath)
 		if err != nil {
 			return nil, err
 		}
@@ -217,19 +221,41 @@ func WriteConfig(c *Config) error {
 		return err
 	}
 
+	// Developer Note: The following is untested! Change at your own risk.
+	// Setup notifications of termination signals to channel sig, create a process to
+	// watch for these signals so we can remove transient config temp files.
+	sig := make(chan os.Signal, 10)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
+	defer signal.Stop(sig)
+
 	tempConfigFile, err := ioutil.TempFile(dir, "temp-config")
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tempConfigFile.Name())
 
-	err = ioutil.WriteFile(tempConfigFile.Name(), rawConfig, 0600)
+	go catchSignal(sig, tempConfigFile)
+
+	tempConfigFileName := tempConfigFile.Name()
+	err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
 	if err != nil {
 		return err
 	}
 	tempConfigFile.Close()
 
-	return os.Rename(tempConfigFile.Name(), ConfigFilePath())
+	return os.Rename(tempConfigFileName, ConfigFilePath())
+}
+
+// catchSignal tries to catch SIGHUP, SIGINT, SIGKILL, SIGQUIT and SIGTERM, and
+// Interrupt for removing temporarily created config files before the program
+// ends.  Note:  we cannot intercept a `kill -9`, so a well-timed `kill -9`
+// will allow a temp config file to linger.
+func catchSignal(sig chan os.Signal, tempConfigFile *os.File) {
+	select {
+	case <-sig:
+		tempConfigFile.Close()
+		_ = os.Remove(tempConfigFile.Name())
+		os.Exit(2)
+	}
 }
 
 // Config combines the settings taken from the .cf/config.json, os.ENV, and the
