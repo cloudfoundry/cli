@@ -45,7 +45,7 @@ func (cmd OauthTokenCommand) Execute(_ []string) error {
 
 	accessToken, err := cmd.Actor.RefreshAccessToken(cmd.Config.RefreshToken())
 	if err != nil {
-		return err
+		return shared.HandleError(err)
 	}
 
 	cmd.UI.DisplayText(accessToken)
