@@ -52,8 +52,7 @@ var _ = Describe("custom oauth client id", func() {
 				It("uses the custom client id and secret", func() {
 					session := helpers.CF("oauth-token")
 					Eventually(session).Should(Exit(1))
-					Expect(session.Out).To(Say(
-						"Server error, status code: 401, error code: unauthorized"))
+					Expect(session.Err).To(Say("Credentials were rejected, please try again\\."))
 				})
 			})
 
@@ -85,12 +84,13 @@ var _ = Describe("custom oauth client id", func() {
 			})
 
 			Context("v2 command", func() {
-				It("does not write default values for client id and secret", func() {
+				It("replaces the empty client id with the default values for client id and secret", func() {
 					session := helpers.CF("oauth-token")
-					Eventually(session).Should(Exit(1))
+					Eventually(session).Should(Exit(0))
 
 					configString := fileAsString(configPath)
-					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": ""`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 				})
 			})
 
