@@ -36,10 +36,11 @@ func (retry *RetryRequest) Make(request *cfnetworking.Request, passedResponse *c
 			return nil
 		}
 
-		if passedResponse.HTTPResponse.StatusCode == http.StatusBadGateway ||
-			passedResponse.HTTPResponse.StatusCode == http.StatusServiceUnavailable ||
-			passedResponse.HTTPResponse.StatusCode == http.StatusGatewayTimeout ||
-			(passedResponse.HTTPResponse.StatusCode >= 400 && passedResponse.HTTPResponse.StatusCode < 500) {
+		if passedResponse.HTTPResponse != nil &&
+			(passedResponse.HTTPResponse.StatusCode == http.StatusBadGateway ||
+				passedResponse.HTTPResponse.StatusCode == http.StatusServiceUnavailable ||
+				passedResponse.HTTPResponse.StatusCode == http.StatusGatewayTimeout ||
+				(passedResponse.HTTPResponse.StatusCode >= 400 && passedResponse.HTTPResponse.StatusCode < 500)) {
 			break
 		}
 
