@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"io/ioutil"
 	"path/filepath"
 
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
@@ -12,10 +13,14 @@ import (
 )
 
 var _ = Describe("Config", func() {
+	var configDir string
+
+	BeforeEach(func() {
+		configDir = filepath.Join(homeDir, ".cf")
+	})
+
 	Describe("Empty Config File", func() {
-		var configDir string
 		BeforeEach(func() {
-			configDir = filepath.Join(homeDir, ".cf")
 			helpers.SetConfigContent(configDir, "")
 		})
 
@@ -27,6 +32,48 @@ var _ = Describe("Config", func() {
 		It("displays json warning for an unrefactored command", func() {
 			session := helpers.CF("curl", "/v2/info")
 			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s\n", helpers.ConvertPathToRegularExpression(filepath.Join(configDir, "config.json"))))
+		})
+	})
+
+	Context("when lingering tmp files exist from previous failed attempts to write the config", func() {
+		BeforeEach(func() {
+			for i := 0; i < 3; i++ {
+				tmpFile, err := ioutil.TempFile(configDir, "temp-config")
+				Expect(err).ToNot(HaveOccurred())
+				tmpFile.Close()
+			}
+		})
+
+		It("removes those temp files on `logout`", func() {
+			Eventually(helpers.CF("logout")).Should(Exit(0))
+
+			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(oldTempFileNames).To(BeEmpty())
+		})
+
+		It("removes those temp files on `login`", func() {
+			Eventually(helpers.CF("login")).Should(Exit(1))
+
+			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(oldTempFileNames).To(BeEmpty())
+		})
+
+		It("removes those temp files on `auth`", func() {
+			helpers.LoginCF()
+
+			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(oldTempFileNames).To(BeEmpty())
+		})
+
+		It("removes those temp files on `oauth-token`", func() {
+			Eventually(helpers.CF("oauth-token")).Should(Exit(1))
+
+			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(oldTempFileNames).To(BeEmpty())
 		})
 	})
 

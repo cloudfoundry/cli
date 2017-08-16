@@ -2,7 +2,6 @@ package configv3_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -160,10 +159,79 @@ var _ = Describe("Config", func() {
 				})
 			})
 
+			Context("and there are old temp-config* files lingering from previous failed attempts to write the config", func() {
+				var (
+					oldLang  string
+					oldLCAll string
+				)
+
+				BeforeEach(func() {
+					oldLang = os.Getenv("LANG")
+					oldLCAll = os.Getenv("LC_ALL")
+					Expect(os.Unsetenv("LANG")).ToNot(HaveOccurred())
+					Expect(os.Unsetenv("LC_ALL")).ToNot(HaveOccurred())
+
+					setConfig(homeDir, `{}`)
+					configDir := filepath.Join(homeDir, ".cf")
+					for i := 0; i < 3; i++ {
+						tmpFile, err := ioutil.TempFile(configDir, "temp-config")
+						Expect(err).ToNot(HaveOccurred())
+						tmpFile.Close()
+					}
+				})
+
+				It("returns the default config and removes the lingering temp-config* files", func() {
+					defer os.Setenv("LANG", oldLang)
+					defer os.Setenv("LC_ALL", oldLCAll)
+
+					// specifically for when we run unit tests locally
+					// we save and unset this variable in case it's present
+					// since we want to load a default config
+					envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
+					Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
+
+					config, err := LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+
+					oldTempFileNames, err := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(oldTempFileNames).To(BeEmpty())
+
+					// then we reset the env variable
+					err = os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(config).ToNot(BeNil())
+					Expect(config.Target()).To(Equal(DefaultTarget))
+					Expect(config.SkipSSLValidation()).To(BeFalse())
+					Expect(config.ColorEnabled()).To(Equal(ColorEnabled))
+					Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
+					Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
+					Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
+					Expect(config.Locale()).To(BeEmpty())
+					Expect(config.SSHOAuthClient()).To(Equal(DefaultSSHOAuthClient))
+					Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
+					Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+					Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
+					Expect(config.LogLevel()).To(Equal(0))
+
+					Expect(config.Experimental()).To(BeFalse())
+
+					pluginConfig := config.Plugins()
+					Expect(pluginConfig).To(BeEmpty())
+
+					trace, location := config.Verbose()
+					Expect(trace).To(BeFalse())
+					Expect(location).To(BeEmpty())
+
+					// test the plugins map is initialized
+					config.AddPlugin(Plugin{})
+				})
+			})
+
 			Context("when UAAOAuthClient is not present", func() {
 				BeforeEach(func() {
-					rawConfig := `{}`
-					setConfig(homeDir, rawConfig)
+					setConfig(homeDir, `{}`)
 
 					config, err = LoadConfig()
 					Expect(err).ToNot(HaveOccurred())
@@ -390,8 +458,7 @@ var _ = Describe("Config", func() {
 
 		DescribeTable("Experimental",
 			func(envVal string, expected bool) {
-				rawConfig := fmt.Sprintf(`{}`)
-				setConfig(homeDir, rawConfig)
+				setConfig(homeDir, `{}`)
 
 				defer os.Unsetenv("CF_CLI_EXPERIMENTAL")
 				if envVal == "" {
