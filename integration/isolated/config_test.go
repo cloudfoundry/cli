@@ -35,45 +35,47 @@ var _ = Describe("Config", func() {
 		})
 	})
 
-	Context("when lingering tmp files exist from previous failed attempts to write the config", func() {
-		BeforeEach(func() {
-			for i := 0; i < 3; i++ {
-				tmpFile, err := ioutil.TempFile(configDir, "temp-config")
+	Describe("Lingering Config Temp Files", func() {
+		Context("when lingering tmp files exist from previous failed attempts to write the config", func() {
+			BeforeEach(func() {
+				for i := 0; i < 3; i++ {
+					tmpFile, err := ioutil.TempFile(configDir, "temp-config")
+					Expect(err).ToNot(HaveOccurred())
+					tmpFile.Close()
+				}
+			})
+
+			It("removes those temp files on `logout`", func() {
+				Eventually(helpers.CF("logout")).Should(Exit(0))
+
+				oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
 				Expect(err).ToNot(HaveOccurred())
-				tmpFile.Close()
-			}
-		})
+				Expect(oldTempFileNames).To(BeEmpty())
+			})
 
-		It("removes those temp files on `logout`", func() {
-			Eventually(helpers.CF("logout")).Should(Exit(0))
+			It("removes those temp files on `login`", func() {
+				Eventually(helpers.CF("login")).Should(Exit(1))
 
-			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(oldTempFileNames).To(BeEmpty())
-		})
+				oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(oldTempFileNames).To(BeEmpty())
+			})
 
-		It("removes those temp files on `login`", func() {
-			Eventually(helpers.CF("login")).Should(Exit(1))
+			It("removes those temp files on `auth`", func() {
+				helpers.LoginCF()
 
-			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(oldTempFileNames).To(BeEmpty())
-		})
+				oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(oldTempFileNames).To(BeEmpty())
+			})
 
-		It("removes those temp files on `auth`", func() {
-			helpers.LoginCF()
+			It("removes those temp files on `oauth-token`", func() {
+				Eventually(helpers.CF("oauth-token")).Should(Exit(1))
 
-			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(oldTempFileNames).To(BeEmpty())
-		})
-
-		It("removes those temp files on `oauth-token`", func() {
-			Eventually(helpers.CF("oauth-token")).Should(Exit(1))
-
-			oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(oldTempFileNames).To(BeEmpty())
+				oldTempFileNames, err := filepath.Glob(filepath.Join(configDir, "temp-config?*"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(oldTempFileNames).To(BeEmpty())
+			})
 		})
 	})
 
