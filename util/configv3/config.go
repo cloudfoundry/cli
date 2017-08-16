@@ -70,7 +70,12 @@ const (
 //   2. HOMEDRIVE\HOMEPATH\.cf if HOMEDRIVE or HOMEPATH is set
 //   3. USERPROFILE\.cf as the default
 func LoadConfig(flags ...FlagOverride) (*Config, error) {
-	filePath := ConfigFilePath()
+	err := removeOldTempConfigFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	configFilePath := ConfigFilePath()
 
 	config := Config{
 		ConfigFile: CFConfig{
@@ -86,14 +91,14 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 
 	var jsonError error
 
-	if _, err := os.Stat(filePath); err == nil || !os.IsNotExist(err) {
-		file, err := ioutil.ReadFile(filePath)
+	if _, err := os.Stat(configFilePath); err == nil || !os.IsNotExist(err) {
+		file, err := ioutil.ReadFile(configFilePath)
 		if err != nil {
 			return nil, err
 		}
 
 		if len(file) == 0 {
-			jsonError = translatableerror.EmptyConfigError{FilePath: filePath}
+			jsonError = translatableerror.EmptyConfigError{FilePath: configFilePath}
 		} else {
 			var configFile CFConfig
 			err = json.Unmarshal(file, &configFile)
@@ -181,6 +186,22 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	return &config, jsonError
 }
 
+func removeOldTempConfigFiles() error {
+	oldTempFileNames, err := filepath.Glob(filepath.Join(configDirectory(), "temp-config?*"))
+	if err != nil {
+		return err
+	}
+
+	for _, oldTempFileName := range oldTempFileNames {
+		err = os.Remove(oldTempFileName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // WriteConfig creates the .cf directory and then writes the config.json. The
 // location of .cf directory is written in the same way LoadConfig reads .cf
 // directory.
@@ -196,7 +217,7 @@ func WriteConfig(c *Config) error {
 		return err
 	}
 
-	tempConfigFile, err := ioutil.TempFile(dir, "config")
+	tempConfigFile, err := ioutil.TempFile(dir, "temp-config")
 	if err != nil {
 		return err
 	}
