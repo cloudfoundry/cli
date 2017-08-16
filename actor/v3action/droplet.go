@@ -1,13 +1,26 @@
 package v3action
 
 import (
+	"net/url"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+)
+
+type DropletState string
+
+const (
+	DropletStateStaged  DropletState = "STAGED"
+	DropletStateFailed  DropletState = "FAILED"
+	DropletStateCopying DropletState = "COPYING"
+	DropletStateExpired DropletState = "EXPIRED"
 )
 
 // Droplet represents a Cloud Controller droplet.
 type Droplet struct {
 	GUID       string
+	State      DropletState
+	CreatedAt  string
 	Stack      string
 	Buildpacks []Buildpack
 }
@@ -41,4 +54,39 @@ func (actor Actor) SetApplicationDroplet(appName string, spaceGUID string, dropl
 	}
 
 	return allWarnings, err
+}
+
+// GetApplicationDroplets returns the list of droplets that belong to applicaiton.
+func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]Droplet, Warnings, error) {
+	allWarnings := Warnings{}
+	application, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetApplicationDroplets(application.GUID, url.Values{})
+	actorWarnings := Warnings(apiWarnings)
+	allWarnings = append(allWarnings, actorWarnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	var droplets []Droplet
+	for _, ccv3Droplet := range ccv3Droplets {
+		var buildpacks []Buildpack
+		for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
+			buildpacks = append(buildpacks, Buildpack(ccv3Buildpack))
+		}
+
+		droplets = append(droplets, Droplet{
+			GUID:       ccv3Droplet.GUID,
+			State:      DropletState(ccv3Droplet.State),
+			CreatedAt:  ccv3Droplet.CreatedAt,
+			Stack:      ccv3Droplet.Stack,
+			Buildpacks: buildpacks,
+		})
+	}
+
+	return droplets, allWarnings, err
 }

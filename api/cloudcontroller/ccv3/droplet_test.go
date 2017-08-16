@@ -30,18 +30,27 @@ var _ = Describe("Droplet", func() {
 					},
 					"resources": [
 						{
-							"stack": "some-stack",
+							"guid": "some-guid-1",
+							"stack": "some-stack-1",
 							"buildpacks": [{
-								"name": "some-buildpack",
-								"detect_output": "detected-buildpack"
-							}]
+								"name": "some-buildpack-1",
+								"detect_output": "detected-buildpack-1"
+							}],
+							"state": "STAGED",
+							"created_at": "2017-08-16T00:18:24Z",
+							"links": {
+								"package": "https://api.com/v3/packages/some-package-guid"
+							}
 						},
 						{
-							"stack": "some-stack2",
+							"guid": "some-guid-2",
+							"stack": "some-stack-2",
 							"buildpacks": [{
-								"name": "some-buildpack2",
-								"detect_output": "detected-buildpack2"
-							}]
+								"name": "some-buildpack-2",
+								"detect_output": "detected-buildpack-2"
+							}],
+							"state": "COPYING",
+							"created_at": "2017-08-16T00:19:05Z"
 						}
 					]
 				}`, server.URL())
@@ -51,11 +60,14 @@ var _ = Describe("Droplet", func() {
 					},
 					"resources": [
 						{
-							"stack": "some-stack3",
+							"guid": "some-guid-3",
+							"stack": "some-stack-3",
 							"buildpacks": [{
-								"name": "some-buildpack3",
-								"detect_output": "detected-buildpack3"
-							}]
+								"name": "some-buildpack-3",
+								"detect_output": "detected-buildpack-3"
+							}],
+							"state": "FAILED",
+							"created_at": "2017-08-22T17:55:02Z"
 						}
 					]
 				}`
@@ -79,31 +91,40 @@ var _ = Describe("Droplet", func() {
 				Expect(droplets).To(HaveLen(3))
 
 				Expect(droplets[0]).To(Equal(Droplet{
-					Stack: "some-stack",
+					GUID:  "some-guid-1",
+					Stack: "some-stack-1",
+					State: "STAGED",
 					Buildpacks: []DropletBuildpack{
 						{
-							Name:         "some-buildpack",
-							DetectOutput: "detected-buildpack",
+							Name:         "some-buildpack-1",
+							DetectOutput: "detected-buildpack-1",
 						},
 					},
+					CreatedAt: "2017-08-16T00:18:24Z",
 				}))
 				Expect(droplets[1]).To(Equal(Droplet{
-					Stack: "some-stack2",
+					GUID:  "some-guid-2",
+					Stack: "some-stack-2",
+					State: "COPYING",
 					Buildpacks: []DropletBuildpack{
 						{
-							Name:         "some-buildpack2",
-							DetectOutput: "detected-buildpack2",
+							Name:         "some-buildpack-2",
+							DetectOutput: "detected-buildpack-2",
 						},
 					},
+					CreatedAt: "2017-08-16T00:19:05Z",
 				}))
 				Expect(droplets[2]).To(Equal(Droplet{
-					Stack: "some-stack3",
+					GUID:  "some-guid-3",
+					Stack: "some-stack-3",
+					State: "FAILED",
 					Buildpacks: []DropletBuildpack{
 						{
-							Name:         "some-buildpack3",
-							DetectOutput: "detected-buildpack3",
+							Name:         "some-buildpack-3",
+							DetectOutput: "detected-buildpack-3",
 						},
 					},
+					CreatedAt: "2017-08-22T17:55:02Z",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})

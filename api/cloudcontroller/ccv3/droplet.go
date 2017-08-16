@@ -7,8 +7,19 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+type DropletState string
+
+const (
+	DropletStateStaged  DropletState = "STAGED"
+	DropletStateFailed  DropletState = "FAILED"
+	DropletStateCopying DropletState = "COPYING"
+	DropletStateExpired DropletState = "EXPIRED"
+)
+
 type Droplet struct {
 	GUID       string             `json:"guid"`
+	State      DropletState       `json:"state"`
+	CreatedAt  string             `json:"created_at"`
 	Stack      string             `json:"stack,omitempty"`
 	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
 }
