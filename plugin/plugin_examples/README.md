@@ -31,7 +31,8 @@ For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.
 
 - [GoLang installed](https://golang.org/doc/install)
 - Tagged version of CLI release source code that supports plugins; cf CLI v.6.7.0 and above
-```mkdir -p "${GOPATH}/src/code.cloudfoundry.org"
+```
+mkdir -p "${GOPATH}/src/code.cloudfoundry.org"
 cd "${GOPATH}/src/code.cloudfoundry.org"
 git clone "https://github.com/cloudfoundry/cli"
 ```
