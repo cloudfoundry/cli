@@ -21,12 +21,12 @@ var _ = Describe("Config", func() {
 
 		It("displays json warning for a refactored command", func() {
 			session := helpers.CF("api")
-			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s", filepath.Join(configDir, "config.json")))
+			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s\n", helpers.ConvertPathToRegularExpression(filepath.Join(configDir, "config.json"))))
 		})
 
 		It("displays json warning for an unrefactored command", func() {
-			session := helpers.CF("curl")
-			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s", filepath.Join(configDir, "config.json")))
+			session := helpers.CF("curl", "/v2/info")
+			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s\n", helpers.ConvertPathToRegularExpression(filepath.Join(configDir, "config.json"))))
 		})
 	})
 

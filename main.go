@@ -144,12 +144,8 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	cfConfig, configErr := configv3.LoadConfig(configv3.FlagOverride{
 		Verbose: common.Commands.VerboseOrVersion,
 	})
-
-	var configErrTemplate string
 	if configErr != nil {
-		if ce, ok := configErr.(translatableerror.EmptyConfigError); ok {
-			configErrTemplate = ce.Error()
-		} else {
+		if _, ok := configErr.(translatableerror.EmptyConfigError); !ok {
 			return configErr
 		}
 	}
@@ -159,11 +155,29 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 		return err
 	}
 
-	if configErr != nil {
-		commandUI.DisplayWarning(configErrTemplate, map[string]interface{}{
-			"FilePath": configv3.ConfigFilePath(),
-		})
-	}
+	// TODO: when the line in the old code under `cf` which calls
+	// configv3.LoadConfig() is finally removed, then we should replace the code
+	// path above with the following:
+	//
+	// var configErrTemplate string
+	// if configErr != nil {
+	// 	if ce, ok := configErr.(translatableerror.EmptyConfigError); ok {
+	// 		configErrTemplate = ce.Error()
+	// 	} else {
+	// 		return configErr
+	// 	}
+	// }
+
+	// commandUI, err := ui.NewUI(cfConfig)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// if configErr != nil {
+	//   commandUI.DisplayWarning(configErrTemplate, map[string]interface{}{
+	//   	"FilePath": configv3.ConfigFilePath(),
+	//   })
+	// }
 
 	defer func() {
 		configWriteErr := configv3.WriteConfig(cfConfig)
