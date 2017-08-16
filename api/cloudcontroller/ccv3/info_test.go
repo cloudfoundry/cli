@@ -54,6 +54,9 @@ var _ = Describe("Info", func() {
 							"version": "3.0.0-alpha.5"
 						}
 					},
+					"network_policy_v1": {
+						"href": "SERVER_URL/networking/v1/external"
+					},
 					"uaa": {
 						"href": "https://uaa.bosh-lite.com"
 					},
@@ -93,6 +96,7 @@ var _ = Describe("Info", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 			Expect(apis.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
+			Expect(apis.NetworkPolicyV1()).To(Equal(fmt.Sprintf("%s/networking/v1/external", server.URL())))
 		})
 
 		It("returns back the resource links", func() {

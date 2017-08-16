@@ -19,6 +19,8 @@ type APIInfo struct {
 		// Logging is the link to the Logging API
 		Logging APILink `json:"logging"`
 
+		NetworkPolicyV1 APILink `json:"network_policy_v1"`
+
 		// UAA is the link to the UAA API
 		UAA APILink `json:"uaa"`
 	} `json:"links"`
@@ -27,6 +29,10 @@ type APIInfo struct {
 // Logging returns the HREF for Logging.
 func (info APIInfo) Logging() string {
 	return info.Links.Logging.HREF
+}
+
+func (info APIInfo) NetworkPolicyV1() string {
+	return info.Links.NetworkPolicyV1.HREF
 }
 
 // UAA returns the HREF for the UAA.
