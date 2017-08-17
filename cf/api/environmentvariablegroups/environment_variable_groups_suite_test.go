@@ -14,5 +14,5 @@ func TestEnvironmentVariableGroups(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "EnvironmentVariableGroups Suite")
+	RunSpecs(t, "Environment Variable Groups Suite")
 }

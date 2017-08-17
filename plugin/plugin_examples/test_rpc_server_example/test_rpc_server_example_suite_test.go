@@ -13,5 +13,5 @@ func TestTestRpcServerExample(t *testing.T) {
 
 	pluginbuilder.BuildTestBinary("", "test_rpc_server_example")
 
-	RunSpecs(t, "TestRpcServerExample Suite")
+	RunSpecs(t, "Test RPC Server Example Suite")
 }

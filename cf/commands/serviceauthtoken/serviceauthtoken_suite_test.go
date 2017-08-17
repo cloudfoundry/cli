@@ -14,5 +14,5 @@ func TestServiceauthtoken(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Serviceauthtoken Suite")
+	RunSpecs(t, "Service Authentication Token Suite")
 }
