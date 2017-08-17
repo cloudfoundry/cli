@@ -32,69 +32,129 @@ const (
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
-	Buildpack string `json:"buildpack,omitempty"`
+	Buildpack string
 
 	// Command is the user specified start command.
-	Command string `json:"command,omitempty"`
+	Command string
 
 	// DetectedBuildpack is the buildpack automatically detected.
-	DetectedBuildpack string `json:"-"`
+	DetectedBuildpack string
 
 	// DetectedStartCommand is the command used to start the application.
-	DetectedStartCommand string `json:"-"`
+	DetectedStartCommand string
 
 	// DiskQuota is the disk given to each instance, in megabytes.
-	DiskQuota uint64 `json:"disk_quota,omitempty"`
+	DiskQuota uint64
+
+	// DockerCredentials is the authentication information for the provided
+	// DockerImage.
+	DockerCredentials DockerCredentials
 
 	// DockerImage is the docker image location.
-	DockerImage string `json:"docker_image,omitempty"`
+	DockerImage string
 
 	// EnvironmentVariables are the environment variables passed to the app.
-	EnvironmentVariables map[string]string `json:"environment_json,omitempty"`
+	EnvironmentVariables map[string]string
 
 	// GUID is the unique application identifier.
-	GUID string `json:"guid,omitempty"`
+	GUID string
 
 	// HealthCheckTimeout is the number of seconds for health checking of an
 	// staged app when starting up.
-	HealthCheckTimeout int `json:"health_check_timeout,omitempty"`
+	HealthCheckTimeout int
 
 	// HealthCheckType is the type of health check that will be done to the app.
-	HealthCheckType string `json:"health_check_type,omitempty"`
+	HealthCheckType string
 
 	// HealthCheckHTTPEndpoint is the url of the http health check endpoint.
-	HealthCheckHTTPEndpoint string `json:"health_check_http_endpoint,omitempty"`
+	HealthCheckHTTPEndpoint string
 
 	// Instances is the total number of app instances.
-	Instances int `json:"instances,omitempty"`
+	Instances int
 
 	// Memory is the memory given to each instance, in megabytes.
-	Memory uint64 `json:"memory,omitempty"`
+	Memory uint64
 
 	// Name is the name given to the application.
-	Name string `json:"name,omitempty"`
+	Name string
 
 	// PackageState represents the staging state of the application bits.
-	PackageState ApplicationPackageState `json:"-"`
+	PackageState ApplicationPackageState
 
 	// PackageUpdatedAt is the last time the app bits were updated. In RFC3339.
-	PackageUpdatedAt time.Time `json:"-"`
+	PackageUpdatedAt time.Time
 
 	// SpaceGUID is the GUID of the app's space.
-	SpaceGUID string `json:"space_guid,omitempty"`
+	SpaceGUID string
 
 	// StackGUID is the GUID for the Stack the application is running on.
-	StackGUID string `json:"stack_guid,omitempty"`
+	StackGUID string
 
 	// StagingFailedDescription is the verbose description of why the package
 	// failed to stage.
-	StagingFailedDescription string `json:"-"`
+	StagingFailedDescription string
 
 	// StagingFailedReason is the reason why the package failed to stage.
-	StagingFailedReason string `json:"-"`
+	StagingFailedReason string
 
 	// State is the desired state of the application.
-	State ApplicationState `json:"state,omitempty"`
+	State ApplicationState
+}
+
+// DockerCredentials are the authentication credentials to pull a docker image
+// from it's repository.
+type DockerCredentials struct {
+	// Username is the username for a user that has access to a given docker
+	// image.
+	Username string `json:"username,omitempty"`
+
+	// Password is the password for the user.
+	Password string `json:"password,omitempty"`
+}
+
+// MarshalJSON converts an application into a Cloud Controller Application.
+func (application Application) MarshalJSON() ([]byte, error) {
+	ccApp := struct {
+		Buildpack               string             `json:"buildpack,omitempty"`
+		Command                 string             `json:"command,omitempty"`
+		DiskQuota               uint64             `json:"disk_quota,omitempty"`
+		DockerCredentials       *DockerCredentials `json:"docker_credentials,omitempty"`
+		DockerImage             string             `json:"docker_image,omitempty"`
+		EnvironmentVariables    map[string]string  `json:"environment_json,omitempty"`
+		HealthCheckHTTPEndpoint string             `json:"health_check_http_endpoint,omitempty"`
+		HealthCheckTimeout      int                `json:"health_check_timeout,omitempty"`
+		HealthCheckType         string             `json:"health_check_type,omitempty"`
+		Instances               int                `json:"instances,omitempty"`
+		Memory                  uint64             `json:"memory,omitempty"`
+		Name                    string             `json:"name,omitempty"`
+		SpaceGUID               string             `json:"space_guid,omitempty"`
+		StackGUID               string             `json:"stack_guid,omitempty"`
+		State                   ApplicationState   `json:"state,omitempty"`
+	}{
+		Buildpack:               application.Buildpack,
+		Command:                 application.Command,
+		DiskQuota:               application.DiskQuota,
+		DockerImage:             application.DockerImage,
+		EnvironmentVariables:    application.EnvironmentVariables,
+		HealthCheckHTTPEndpoint: application.HealthCheckHTTPEndpoint,
+		HealthCheckTimeout:      application.HealthCheckTimeout,
+		HealthCheckType:         application.HealthCheckType,
+		Instances:               application.Instances,
+		Memory:                  application.Memory,
+		Name:                    application.Name,
+		SpaceGUID:               application.SpaceGUID,
+		StackGUID:               application.StackGUID,
+		State:                   application.State,
+	}
+
+	if application.DockerCredentials.Username != "" || application.DockerCredentials.Password != "" {
+		ccApp.DockerCredentials = &DockerCredentials{
+			Username: application.DockerCredentials.Username,
+			Password: application.DockerCredentials.Password,
+		}
+	}
+
+	return json.Marshal(ccApp)
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Application response.
@@ -102,12 +162,13 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	var ccApp struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Buildpack            string `json:"buildpack"`
-			Command              string `json:"command"`
-			DetectedBuildpack    string `json:"detected_buildpack"`
-			DetectedStartCommand string `json:"detected_start_command"`
-			DiskQuota            uint64 `json:"disk_quota"`
-			DockerImage          string `json:"docker_image"`
+			Buildpack            string            `json:"buildpack"`
+			Command              string            `json:"command"`
+			DetectedBuildpack    string            `json:"detected_buildpack"`
+			DetectedStartCommand string            `json:"detected_start_command"`
+			DiskQuota            uint64            `json:"disk_quota"`
+			DockerImage          string            `json:"docker_image"`
+			DockerCredentials    DockerCredentials `json:"docker_credentials"`
 			// EnvironmentVariables' values can be any type, so we must accept
 			// interface{}, but we convert to string.
 			EnvironmentVariables     map[string]interface{} `json:"environment_json"`
@@ -139,6 +200,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
 	application.DockerImage = ccApp.Entity.DockerImage
+	application.DockerCredentials = ccApp.Entity.DockerCredentials
 	application.GUID = ccApp.Metadata.GUID
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.HealthCheckTimeout = ccApp.Entity.HealthCheckTimeout
@@ -240,9 +302,6 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 // UpdateApplication updates the application with the given GUID. Note: Sending
 // DockerImage and StackGUID at the same time will result in an API error.
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
-	appGUID := app.GUID
-	app.GUID = ""
-
 	body, err := json.Marshal(app)
 	if err != nil {
 		return Application{}, nil, err
@@ -250,7 +309,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutAppRequest,
-		URIParams:   Params{"app_guid": appGUID},
+		URIParams:   Params{"app_guid": app.GUID},
 		Body:        bytes.NewReader(body),
 	})
 	if err != nil {
