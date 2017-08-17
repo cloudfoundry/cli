@@ -188,6 +188,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** List packages of an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
     "translation": ""
   },
@@ -1741,6 +1745,10 @@
   },
   {
     "id": "CF_NAME v3-get-health-check APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-list-packages APP_NAME",
     "translation": ""
   },
   {
@@ -3960,6 +3968,10 @@
     "translation": ""
   },
   {
+    "id": "Listing packages of app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Local port forward specification. This flag can be defined more than once.",
     "translation": "ローカル・ポート転送指定。 このフラグは何度でも定義できます。"
   },
@@ -4174,6 +4186,10 @@
   {
     "id": "No orgs found",
     "translation": "組織が見つかりませんでした"
+  },
+  {
+    "id": "No packages found",
+    "translation": ""
   },
   {
     "id": "No plugin repositories registered to search for plugin updates.",
@@ -6845,6 +6861,10 @@
   },
   {
     "id": "create-isolation-segment",
+    "translation": ""
+  },
+  {
+    "id": "created",
     "translation": ""
   },
   {
