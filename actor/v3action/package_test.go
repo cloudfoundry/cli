@@ -407,6 +407,116 @@ var _ = Describe("Package Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetApplicationPackages", func() {
+		Context("when there are no client errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{
+						{
+							GUID:      "some-package-guid-1",
+							State:     ccv3.PackageStateReady,
+							CreatedAt: "2017-08-14T21:16:42Z",
+						},
+						{
+							GUID:      "some-package-guid-2",
+							State:     ccv3.PackageStateFailed,
+							CreatedAt: "2017-08-16T00:18:24Z",
+						},
+					},
+					ccv3.Warnings{"get-application-packages-warning"},
+					nil,
+				)
+			})
+
+			It("gets the app's packages", func() {
+				packages, warnings, err := actor.GetApplicationPackages("some-app-name", "some-space-guid")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-packages-warning"))
+				Expect(packages).To(Equal([]Package{
+					{
+						GUID:      "some-package-guid-1",
+						State:     "READY",
+						CreatedAt: "2017-08-14T21:16:42Z",
+					},
+					{
+						GUID:      "some-package-guid-2",
+						State:     "FAILED",
+						CreatedAt: "2017-08-16T00:18:24Z",
+					},
+				}))
+
+				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
+				Expect(queryURL).To(Equal(query))
+
+				Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
+				query = fakeCloudControllerClient.GetPackagesArgsForCall(0)
+				Expect(query).To(Equal(url.Values{"app_guids": []string{"some-app-guid"}}))
+			})
+		})
+
+		Context("when getting the application fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get application error")
+
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"get-applications-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.GetApplicationPackages("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning"))
+			})
+		})
+
+		Context("when getting the application packages fails", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get application error")
+
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{GUID: "some-app-guid"},
+					},
+					ccv3.Warnings{"get-applications-warning"},
+					nil,
+				)
+
+				fakeCloudControllerClient.GetPackagesReturns(
+					[]ccv3.Package{},
+					ccv3.Warnings{"get-application-packages-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error", func() {
+				_, warnings, err := actor.GetApplicationPackages("some-app-name", "some-space-guid")
+
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-packages-warning"))
+			})
+		})
+	})
+
 })
 
 func expectFileContentsToEqual(file *zip.File, expectedContents string) {

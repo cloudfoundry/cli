@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"mime/multipart"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -33,6 +34,7 @@ const (
 
 type Package struct {
 	GUID          string        `json:"guid,omitempty"`
+	CreatedAt     string        `json:"created_at,omitempty"`
 	Links         APILinks      `json:"links,omitempty"`
 	Relationships Relationships `json:"relationships,omitempty"`
 	State         PackageState  `json:"state,omitempty"`
@@ -114,6 +116,32 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 	err = client.connection.Make(request, &response)
 
 	return responsePackage, response.Warnings, err
+}
+
+// GetPackages returns the list of packages.
+func (client *Client) GetPackages(query url.Values) ([]Package, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetPackagesRequest,
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullPackagesList []Package
+	warnings, err := client.paginate(request, Package{}, func(item interface{}) error {
+		if pkg, ok := item.(Package); ok {
+			fullPackagesList = append(fullPackagesList, pkg)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   Package{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullPackagesList, warnings, err
 }
 
 func (*Client) createUploadStream(path string, paramName string) (io.ReadSeeker, string, error) {

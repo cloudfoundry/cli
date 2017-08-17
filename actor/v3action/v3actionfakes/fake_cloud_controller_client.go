@@ -338,6 +338,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	GetPackagesStub        func(query url.Values) ([]ccv3.Package, ccv3.Warnings, error)
+	getPackagesMutex       sync.RWMutex
+	getPackagesArgsForCall []struct {
+		query url.Values
+	}
+	getPackagesReturns struct {
+		result1 []ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
+	getPackagesReturnsOnCall map[int]struct {
+		result1 []ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}
 	GetPackageStub        func(guid string) (ccv3.Package, ccv3.Warnings, error)
 	getPackageMutex       sync.RWMutex
 	getPackageArgsForCall []struct {
@@ -1714,6 +1729,60 @@ func (fake *FakeCloudControllerClient) GetOrganizationsReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetPackages(query url.Values) ([]ccv3.Package, ccv3.Warnings, error) {
+	fake.getPackagesMutex.Lock()
+	ret, specificReturn := fake.getPackagesReturnsOnCall[len(fake.getPackagesArgsForCall)]
+	fake.getPackagesArgsForCall = append(fake.getPackagesArgsForCall, struct {
+		query url.Values
+	}{query})
+	fake.recordInvocation("GetPackages", []interface{}{query})
+	fake.getPackagesMutex.Unlock()
+	if fake.GetPackagesStub != nil {
+		return fake.GetPackagesStub(query)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getPackagesReturns.result1, fake.getPackagesReturns.result2, fake.getPackagesReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetPackagesCallCount() int {
+	fake.getPackagesMutex.RLock()
+	defer fake.getPackagesMutex.RUnlock()
+	return len(fake.getPackagesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetPackagesArgsForCall(i int) url.Values {
+	fake.getPackagesMutex.RLock()
+	defer fake.getPackagesMutex.RUnlock()
+	return fake.getPackagesArgsForCall[i].query
+}
+
+func (fake *FakeCloudControllerClient) GetPackagesReturns(result1 []ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.GetPackagesStub = nil
+	fake.getPackagesReturns = struct {
+		result1 []ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetPackagesReturnsOnCall(i int, result1 []ccv3.Package, result2 ccv3.Warnings, result3 error) {
+	fake.GetPackagesStub = nil
+	if fake.getPackagesReturnsOnCall == nil {
+		fake.getPackagesReturnsOnCall = make(map[int]struct {
+			result1 []ccv3.Package
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.getPackagesReturnsOnCall[i] = struct {
+		result1 []ccv3.Package
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error) {
 	fake.getPackageMutex.Lock()
 	ret, specificReturn := fake.getPackageReturnsOnCall[len(fake.getPackageArgsForCall)]
@@ -2454,6 +2523,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getOrganizationDefaultIsolationSegmentMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
+	fake.getPackagesMutex.RLock()
+	defer fake.getPackagesMutex.RUnlock()
 	fake.getPackageMutex.RLock()
 	defer fake.getPackageMutex.RUnlock()
 	fake.getProcessInstancesMutex.RLock()

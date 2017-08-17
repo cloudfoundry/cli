@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -300,5 +301,121 @@ var _ = Describe("Package", func() {
 				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
 			})
 		})
+	})
+
+	Describe("GetPackages", func() {
+		Context("when cloud controller returns list of packages", func() {
+			BeforeEach(func() {
+				response := `{
+					"resources": [
+					  {
+						  "guid": "some-pkg-guid-1",
+							"type": "bits",
+						  "state": "PROCESSING_UPLOAD",
+							"created_at": "2017-08-14T21:16:12Z",
+							"links": {
+								"upload": {
+									"href": "some-pkg-upload-url-1",
+									"method": "POST"
+								}
+							}
+					  },
+					  {
+						  "guid": "some-pkg-guid-2",
+							"type": "bits",
+						  "state": "READY",
+							"created_at": "2017-08-14T21:20:13Z",
+							"links": {
+								"upload": {
+									"href": "some-pkg-upload-url-2",
+									"method": "POST"
+								}
+							}
+					  }
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the queried packages and all warnings", func() {
+				packages, warnings, err := client.GetPackages(url.Values{"app_guids": []string{"some-app-guid"}})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(packages).To(Equal([]Package{
+					{
+						GUID:      "some-pkg-guid-1",
+						Type:      "bits",
+						State:     PackageStateProcessingUpload,
+						CreatedAt: "2017-08-14T21:16:12Z",
+						Links: map[string]APILink{
+							"upload": APILink{HREF: "some-pkg-upload-url-1", Method: http.MethodPost},
+						},
+					},
+					{
+						GUID:      "some-pkg-guid-2",
+						Type:      "bits",
+						State:     PackageStateReady,
+						CreatedAt: "2017-08-14T21:20:13Z",
+						Links: map[string]APILink{
+							"upload": APILink{HREF: "some-pkg-upload-url-2", Method: http.MethodPost},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the cloud controller returns errors and warnings", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10008,
+							"detail": "The request is semantically invalid: command presence",
+							"title": "CF-UnprocessableEntity"
+						},
+						{
+							"code": 10010,
+							"detail": "Package not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/packages", "app_guids=some-app-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				_, warnings, err := client.GetPackages(url.Values{"app_guids": []string{"some-app-guid"}})
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V3ErrorResponse: ccerror.V3ErrorResponse{
+						[]ccerror.V3Error{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "Package not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
 	})
 })

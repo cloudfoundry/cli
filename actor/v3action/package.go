@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -107,6 +108,29 @@ func (actor Actor) CreateAndUploadPackageByApplicationNameAndSpace(appName strin
 	}
 
 	return Package(pkg), allWarnings, err
+}
+
+// GetApplicationPackages returns a list of package of an app.
+func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]Package, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(url.Values{
+		ccv3.AppGUIDFilter: []string{app.GUID},
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	var packages []Package
+	for _, ccv3Package := range ccv3Packages {
+		packages = append(packages, Package(ccv3Package))
+	}
+
+	return packages, allWarnings, nil
 }
 
 func copyZipArchive(sourceArchivePath string, destZipFile *os.File) error {
