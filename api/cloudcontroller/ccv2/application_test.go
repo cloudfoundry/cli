@@ -99,6 +99,10 @@ var _ = Describe("Application", func() {
 							"detected_start_command": "echo 'I am a banana'",
 							"disk_quota": 586,
 							"detected_buildpack": null,
+							"docker_credentials": {
+								"username": "docker-username",
+								"password": "docker-password"
+							},
 							"docker_image": "some-docker-path",
 							"environment_json": {
 								"key1": "val1",
@@ -142,7 +146,11 @@ var _ = Describe("Application", func() {
 					DetectedBuildpack:    "",
 					DetectedStartCommand: "echo 'I am a banana'",
 					DiskQuota:            586,
-					DockerImage:          "some-docker-path",
+					DockerCredentials: DockerCredentials{
+						Username: "docker-username",
+						Password: "docker-password",
+					},
+					DockerImage: "some-docker-path",
 					EnvironmentVariables: map[string]string{
 						"key1": "val1",
 						"key2": "83493475092347",
@@ -299,6 +307,10 @@ var _ = Describe("Application", func() {
 					"detected_start_command": "echo 'I am a banana'",
 					"disk_quota": 586,
 					"detected_buildpack": null,
+					"docker_credentials": {
+						"username": "docker-username",
+						"password": "docker-password"
+					},
 					"docker_image": "some-docker-path",
 					"environment_json": {
 						"key1": "val1",
@@ -318,9 +330,13 @@ var _ = Describe("Application", func() {
 				}
 			}`
 					expectedBody := map[string]interface{}{
-						"buildpack":    "ruby 1.6.29",
-						"command":      "some-command",
-						"disk_quota":   586,
+						"buildpack":  "ruby 1.6.29",
+						"command":    "some-command",
+						"disk_quota": 586,
+						"docker_credentials": map[string]string{
+							"username": "docker-username",
+							"password": "docker-password",
+						},
 						"docker_image": "some-docker-path",
 						"environment_json": map[string]string{
 							"key1": "val1",
@@ -347,9 +363,13 @@ var _ = Describe("Application", func() {
 
 				It("returns the updated object and warnings and sends all updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
-						Buildpack:   "ruby 1.6.29",
-						Command:     "some-command",
-						DiskQuota:   586,
+						Buildpack: "ruby 1.6.29",
+						Command:   "some-command",
+						DiskQuota: 586,
+						DockerCredentials: DockerCredentials{
+							Username: "docker-username",
+							Password: "docker-password",
+						},
 						DockerImage: "some-docker-path",
 						EnvironmentVariables: map[string]string{
 							"key1": "val1",
@@ -376,7 +396,11 @@ var _ = Describe("Application", func() {
 						DetectedBuildpack:    "",
 						DetectedStartCommand: "echo 'I am a banana'",
 						DiskQuota:            586,
-						DockerImage:          "some-docker-path",
+						DockerCredentials: DockerCredentials{
+							Username: "docker-username",
+							Password: "docker-password",
+						},
+						DockerImage: "some-docker-path",
 						EnvironmentVariables: map[string]string{
 							"key1": "val1",
 							"key2": "83493475092347",
