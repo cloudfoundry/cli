@@ -14,5 +14,5 @@ func TestSpacequota(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Spacequota Suite")
+	RunSpecs(t, "Space Quota Suite")
 }

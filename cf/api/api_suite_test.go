@@ -14,5 +14,5 @@ func TestApi(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Api Suite")
+	RunSpecs(t, "API Suite")
 }
