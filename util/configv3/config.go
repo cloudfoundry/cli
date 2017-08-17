@@ -51,7 +51,7 @@ const (
 	// communicating with the UAA.
 	DefaultUAAOAuthClient = "cf"
 
-	// DefaultCFOClientSecret is the default client secret for the CLI when
+	// DefaultUAAOAuthClientSecret is the default client secret for the CLI when
 	// communicating with the UAA.
 	DefaultUAAOAuthClientSecret = ""
 )
@@ -124,17 +124,18 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	config.ENV = EnvOverride{
 		BinaryName:       filepath.Base(os.Args[0]),
 		CFColor:          os.Getenv("CF_COLOR"),
+		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
+		CFLogLevel:       os.Getenv("CF_LOG_LEVEL"),
 		CFPluginHome:     os.Getenv("CF_PLUGIN_HOME"),
 		CFStagingTimeout: os.Getenv("CF_STAGING_TIMEOUT"),
 		CFStartupTimeout: os.Getenv("CF_STARTUP_TIMEOUT"),
 		CFTrace:          os.Getenv("CF_TRACE"),
+		DockerPassword:   os.Getenv("CF_DOCKER_PASSWORD"),
+		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
+		ForceTTY:         os.Getenv("FORCE_TTY"),
 		HTTPSProxy:       os.Getenv("https_proxy"),
 		Lang:             os.Getenv("LANG"),
 		LCAll:            os.Getenv("LC_ALL"),
-		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
-		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
-		ForceTTY:         os.Getenv("FORCE_TTY"),
-		CFLogLevel:       os.Getenv("CF_LOG_LEVEL"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -333,18 +334,19 @@ type Space struct {
 type EnvOverride struct {
 	BinaryName       string
 	CFColor          string
+	CFDialTimeout    string
 	CFHome           string
+	CFLogLevel       string
 	CFPluginHome     string
 	CFStagingTimeout string
 	CFStartupTimeout string
 	CFTrace          string
+	DockerPassword   string
+	Experimental     string
+	ForceTTY         string
 	HTTPSProxy       string
 	Lang             string
 	LCAll            string
-	Experimental     string
-	CFDialTimeout    string
-	ForceTTY         string
-	CFLogLevel       string
 }
 
 // FlagOverride represents all the global flags passed to the CF CLI
@@ -611,6 +613,11 @@ func (config *Config) HasTargetedOrganization() bool {
 // HasTargetedSpace returns true if the space is set
 func (config *Config) HasTargetedSpace() bool {
 	return config.ConfigFile.TargetedSpace.GUID != ""
+}
+
+// DockerPassword returns the docker password from the environment.
+func (config *Config) DockerPassword() string {
+	return config.ENV.DockerPassword
 }
 
 // SetOrganizationInformation sets the currently targeted organization

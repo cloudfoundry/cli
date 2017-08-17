@@ -70,6 +70,7 @@ var _ = Describe("Config", func() {
 				Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 				Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
 				Expect(config.LogLevel()).To(Equal(0))
+				Expect(config.DockerPassword()).To(BeEmpty())
 
 				Expect(config.PluginRepositories()).To(Equal([]PluginRepository{{
 					Name: "CF-Community",
@@ -140,6 +141,7 @@ var _ = Describe("Config", func() {
 					Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 					Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
 					Expect(config.LogLevel()).To(Equal(0))
+					Expect(config.DockerPassword()).To(BeEmpty())
 
 					Expect(config.PluginRepositories()).To(Equal([]PluginRepository{{
 						Name: "CF-Community",
@@ -497,6 +499,7 @@ var _ = Describe("Config", func() {
 				originalCFStartupTimeout string
 				originalHTTPSProxy       string
 				originalForceTTY         string
+				originalDockerPassword   string
 
 				config *Config
 			)
@@ -506,10 +509,12 @@ var _ = Describe("Config", func() {
 				originalCFStartupTimeout = os.Getenv("CF_STARTUP_TIMEOUT")
 				originalHTTPSProxy = os.Getenv("https_proxy")
 				originalForceTTY = os.Getenv("FORCE_TTY")
+				originalDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_STAGING_TIMEOUT", "8675")).ToNot(HaveOccurred())
 				Expect(os.Setenv("CF_STARTUP_TIMEOUT", "309")).ToNot(HaveOccurred())
 				Expect(os.Setenv("https_proxy", "proxy.com")).ToNot(HaveOccurred())
 				Expect(os.Setenv("FORCE_TTY", "true")).ToNot(HaveOccurred())
+				Expect(os.Setenv("CF_DOCKER_PASSWORD", "banana")).ToNot(HaveOccurred())
 
 				var err error
 				config, err = LoadConfig()
@@ -522,6 +527,7 @@ var _ = Describe("Config", func() {
 				Expect(os.Setenv("CF_STARTUP_TIMEOUT", originalCFStartupTimeout)).ToNot(HaveOccurred())
 				Expect(os.Setenv("https_proxy", originalHTTPSProxy)).ToNot(HaveOccurred())
 				Expect(os.Setenv("FORCE_TTY", originalForceTTY)).ToNot(HaveOccurred())
+				Expect(os.Setenv("CF_DOCKER_PASSWORD", originalDockerPassword)).ToNot(HaveOccurred())
 			})
 
 			It("overrides specific config values", func() {
@@ -529,6 +535,7 @@ var _ = Describe("Config", func() {
 				Expect(config.StartupTimeout()).To(Equal(time.Duration(309) * time.Minute))
 				Expect(config.HTTPSProxy()).To(Equal("proxy.com"))
 				Expect(config.IsTTY()).To(BeTrue())
+				Expect(config.DockerPassword()).To(Equal("banana"))
 			})
 		})
 
