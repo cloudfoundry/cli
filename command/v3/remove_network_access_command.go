@@ -18,8 +18,8 @@ type RemoveNetworkAccessActor interface {
 type RemoveNetworkAccessCommand struct {
 	RequiredArgs   flag.RemoveNetworkAccessArgs `positional-args:"yes"`
 	DestinationApp string                       `long:"destination-app" required:"true" description:"The destination app"`
-	Port           flag.NetworkPort             `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
-	Protocol       flag.NetworkProtocol         `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
+	Port           flag.NetworkPort             `long:"port" description:"Port or range to connect to destination app with"`
+	Protocol       flag.NetworkProtocol         `long:"protocol" description:"Protocol to connect apps with"`
 
 	usage           interface{} `usage:"CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, list-network-access"`
