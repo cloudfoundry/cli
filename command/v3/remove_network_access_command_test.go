@@ -83,7 +83,7 @@ var _ = Describe("remove-network-access Command", func() {
 		})
 
 		It("outputs flavor text", func() {
-			Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+			Expect(testUI.Out).To(Say("Denying network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 		})
 
 		Context("when the policy deletion is successful", func() {
@@ -102,7 +102,7 @@ var _ = Describe("remove-network-access Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+				Expect(testUI.Out).To(Say("Denying network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).To(Say("OK"))
@@ -116,7 +116,7 @@ var _ = Describe("remove-network-access Command", func() {
 			It("does not display OK when an error occurs", func() {
 				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
 
-				Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+				Expect(testUI.Out).To(Say("Denying network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).ToNot(Say("OK"))

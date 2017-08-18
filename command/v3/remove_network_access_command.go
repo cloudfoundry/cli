@@ -57,7 +57,7 @@ func (cmd RemoveNetworkAccessCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Denying traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Denying network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
 		"SrcAppName":  cmd.RequiredArgs.SourceApp,
 		"DestAppName": cmd.DestinationApp,
 		"Org":         cmd.Config.TargetedOrganization().Name,
