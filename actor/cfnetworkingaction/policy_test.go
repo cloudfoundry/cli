@@ -114,7 +114,7 @@ var _ = Describe("Policy", func() {
 		})
 	})
 
-	FDescribe("ListNetworkAccess", func() {
+	Describe("ListNetworkAccess", func() {
 		var (
 			policies []Policy
 			srcApp   string
@@ -123,30 +123,55 @@ var _ = Describe("Policy", func() {
 		BeforeEach(func() {
 			fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{{
 				Source: cfnetv1.PolicySource{
-					ID: "appA",
+					ID: "appAGUID",
 				},
 				Destination: cfnetv1.PolicyDestination{
-					ID:       "appB",
+					ID:       "appBGUID",
 					Protocol: "tcp",
 					Ports: cfnetv1.Ports{
 						Start: 8080,
 						End:   8080,
 					},
 				},
-			},
-				{
-					Source: cfnetv1.PolicySource{
-						ID: "appB",
+			}, {
+				Source: cfnetv1.PolicySource{
+					ID: "appBGUID",
+				},
+				Destination: cfnetv1.PolicyDestination{
+					ID:       "appBGUID",
+					Protocol: "tcp",
+					Ports: cfnetv1.Ports{
+						Start: 8080,
+						End:   8080,
 					},
-					Destination: cfnetv1.PolicyDestination{
-						ID:       "appB",
-						Protocol: "tcp",
-						Ports: cfnetv1.Ports{
-							Start: 8080,
-							End:   8080,
-						},
+				},
+			}, {
+				Source: cfnetv1.PolicySource{
+					ID: "appCGUID",
+				},
+				Destination: cfnetv1.PolicyDestination{
+					ID:       "appCGUID",
+					Protocol: "tcp",
+					Ports: cfnetv1.Ports{
+						Start: 8080,
+						End:   8080,
 					},
-				}}, nil)
+				},
+			}}, nil)
+
+			fakeV3Actor.GetApplicationsBySpaceStub = func(_ string) ([]v3action.Application, v3action.Warnings, error) {
+				return []v3action.Application{
+					{
+						Name: "appA",
+						GUID: "appAGUID",
+					},
+					{
+						Name: "appB",
+						GUID: "appBGUID",
+					},
+				}, []string{"GetApplicationsBySpaceWarning"}, nil
+			}
+
 		})
 
 		JustBeforeEach(func() {
@@ -162,17 +187,18 @@ var _ = Describe("Policy", func() {
 					Protocol:        "tcp",
 					StartPort:       8080,
 					EndPort:         8080,
-				},
-					{
-						SourceName:      "appB",
-						DestinationName: "appB",
-						Protocol:        "tcp",
-						StartPort:       8080,
-						EndPort:         8080,
-					}}))
-			Expect(warnings).To(Equal(Warnings([]string{})))
+				}, {
+					SourceName:      "appB",
+					DestinationName: "appB",
+					Protocol:        "tcp",
+					StartPort:       8080,
+					EndPort:         8080,
+				}},
+			))
+			Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
 			Expect(executeErr).NotTo(HaveOccurred())
 
+			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
 			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
 
 			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
@@ -184,8 +210,20 @@ var _ = Describe("Policy", func() {
 				srcApp = "appA"
 			})
 
+			It("lists only policies for which the app is a source", func() {
+				Expect(policies).To(Equal(
+					[]Policy{{
+						SourceName:      "appA",
+						DestinationName: "appB",
+						Protocol:        "tcp",
+						StartPort:       8080,
+						EndPort:         8080,
+					}},
+				))
+			})
+
 			It("passes through the source app argument", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA"})))
+				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning", "v3ActorWarningA"})))
 				Expect(executeErr).NotTo(HaveOccurred())
 
 				Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -195,6 +233,18 @@ var _ = Describe("Policy", func() {
 
 				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
 				Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(Equal("appAGUID"))
+			})
+		})
+
+		Context("when getting the applications fails", func() {
+			BeforeEach(func() {
+				fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
+			})
+
+			It("returns a sensible error", func() {
+				Expect(policies).To(Equal([]Policy{}))
+				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
+				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
 
@@ -212,7 +262,7 @@ var _ = Describe("Policy", func() {
 
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA"})))
+				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning", "v3ActorWarningA"})))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -222,7 +272,6 @@ var _ = Describe("Policy", func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
 			})
 			It("returns a sensible error", func() {
-				Expect(policies).To(Equal([]Policy{}))
 				Expect(executeErr).To(MatchError("apple"))
 			})
 		})

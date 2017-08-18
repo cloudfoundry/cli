@@ -52,3 +52,39 @@ func (client Client) CreatePolicies(policies []Policy) error {
 
 	return client.connection.Make(request, &cfnetworking.Response{})
 }
+
+// ListPolicies will list the policies
+func (client Client) ListPolicies(appGUID string) ([]Policy, error) {
+	var request *cfnetworking.Request
+	var err error
+	if appGUID == "" {
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.ListPolicies,
+		})
+	} else {
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.ListPolicies,
+			Query: map[string][]string{
+				"id": []string{appGUID},
+			},
+		})
+	}
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	policies := PolicyList{}
+	response := &cfnetworking.Response{}
+
+	err = client.connection.Make(request, response)
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	err = json.Unmarshal(response.RawResponse, &policies)
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	return policies.Policies, nil
+}

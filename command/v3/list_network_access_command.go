@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //go:generate counterfeiter . ListNetworkAccessActor
@@ -17,8 +17,7 @@ type ListNetworkAccessActor interface {
 }
 
 type ListNetworkAccessCommand struct {
-	// RequiredArgs flag.ListNetworkAccessArgs `positional-args:"yes"`
-	SourceApp string `long:"source" required:"false" description:"The source app"`
+	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
 
 	usage           interface{} `usage:"CF_NAME list-network-access [--source SOURCE_APP]"`
 	relatedCommands interface{} ``

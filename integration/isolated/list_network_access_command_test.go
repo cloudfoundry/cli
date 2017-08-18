@@ -17,7 +17,7 @@ var _ = Describe("list-network-access command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("list-network-access", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("list-network-access - List policy for direct network traffic from one app to another"))
+				Eventually(session).Should(Say("list-network-access - List direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(regexp.QuoteMeta("cf list-network-access [--source SOURCE_APP]")))
 				Eventually(session).Should(Say("OPTIONS:"))
@@ -111,7 +111,7 @@ var _ = Describe("list-network-access command", func() {
 				session := helpers.CF("list-network-access")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing policies as %s...", username))
+				Eventually(session).Should(Say("Listing network traffic as %s...", username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
@@ -135,9 +135,10 @@ var _ = Describe("list-network-access command", func() {
 				session := helpers.CF("list-network-access", "--source", srcAppName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing policies as %s...", username))
+				Eventually(session).Should(Say("Listing network traffic as %s...", username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", srcAppName, appName))
 				Eventually(session).Should(Exit(0))
 			})
@@ -148,7 +149,7 @@ var _ = Describe("list-network-access command", func() {
 				session := helpers.CF("list-network-access", "--source", "pineapple")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing policies as %s...", username))
+				Eventually(session).Should(Say("Listing network traffic as %s...", username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
