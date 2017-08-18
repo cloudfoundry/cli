@@ -12,10 +12,7 @@ import (
 
 var _ = Describe("Policy", func() {
 	var client *Client
-
-	BeforeEach(func() {
-		client = NewTestClient()
-	})
+	BeforeEach(func() { client = NewTestClient() })
 
 	Describe("CreatePolicies", func() {
 		Context("when the stack is found", func() {
@@ -108,6 +105,92 @@ var _ = Describe("Policy", func() {
 
 			It("returns the error and warnings", func() {
 				err := client.CreatePolicies(nil)
+				Expect(err).To(MatchError(networkerror.BadRequestError{
+					Message: "Oh Noes",
+				}))
+			})
+		})
+	})
+
+	Describe("ListPolicies", func() {
+		var expectedPolicies []Policy
+		Context("when the stack is found", func() {
+			BeforeEach(func() {
+				expectedResponse := `{
+					"policies": [
+						{
+							"source": {
+								"id": "source-id-1"
+							},
+							"destination": {
+								"id": "destination-id-1",
+								"protocol": "tcp",
+								"ports": {
+									"start": 1234,
+									"end": 1235
+								}
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/policies"),
+						RespondWith(http.StatusOK, expectedResponse),
+					),
+				)
+				expectedPolicies = []Policy{
+					{
+						Source: PolicySource{
+							ID: "source-id-1",
+						},
+						Destination: PolicyDestination{
+							ID:       "destination-id-1",
+							Protocol: "tcp",
+							Ports: Ports{
+								Start: 1234,
+								End:   1235,
+							},
+						},
+					},
+				}
+			})
+
+			It("returns the policies correctly", func() {
+				policies, err := client.ListPolicies("")
+				Expect(policies).To(Equal(expectedPolicies))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			Context("when an app guid is passed", func() {
+				It("makes the query correctly", func() {
+					policies, err := client.ListPolicies("source-id-1")
+					Expect(policies).To(Equal(expectedPolicies))
+					Expect(err).ToNot(HaveOccurred())
+
+					requests := server.ReceivedRequests()
+					Expect(requests).To(HaveLen(1))
+					Expect(requests[0].RequestURI).To(Equal("/policies?id=source-id-1"))
+				})
+			})
+
+		})
+		Context("when the client returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"error": "Oh Noes"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/policies"),
+						RespondWith(http.StatusBadRequest, response),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				_, err := client.ListPolicies("")
 				Expect(err).To(MatchError(networkerror.BadRequestError{
 					Message: "Oh Noes",
 				}))

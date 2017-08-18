@@ -1,7 +1,6 @@
 package cfnetworkingaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
 )
 
@@ -46,7 +45,7 @@ func (actor Actor) AllowNetworkAccess(spaceGUID, srcAppName, destAppName, protoc
 	return allWarnings, err
 }
 
-func (actor Actor) ListNetworkAccess(spaceGUID, srcAppName string) ([]Policy, Warnings, error) {
+func (actor Actor) ListNetworkAccess(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 	var appGUID string
 
@@ -69,30 +68,29 @@ func (actor Actor) ListNetworkAccess(spaceGUID, srcAppName string) ([]Policy, Wa
 	var policies []Policy
 	v1Policies, err := actor.NetworkingClient.ListPolicies(appGUID)
 
-	for _, policy := range v1Policies {
-		policies = append(policies, translateV1Policy(applications, policy))
+	for _, v1Policy := range v1Policies {
+		if appGUID == "" || v1Policy.Source.ID == appGUID {
+			srcName := ""
+			dstName := ""
+			for _, app := range applications {
+				if v1Policy.Source.ID == app.GUID {
+					srcName = app.Name
+				}
+				if v1Policy.Destination.ID == app.GUID {
+					dstName = app.Name
+				}
+			}
+			if srcName != "" && dstName != "" {
+				policies = append(policies, Policy{
+					SourceName:      srcName,
+					DestinationName: dstName,
+					Protocol:        string(v1Policy.Destination.Protocol),
+					StartPort:       v1Policy.Destination.Ports.Start,
+					EndPort:         v1Policy.Destination.Ports.End,
+				})
+			}
+		}
 	}
 
 	return policies, allWarnings, err
-}
-
-func translateV1Policy(applications []v3action.Application, policy cfnetv1.Policy) Policy {
-	srcName := ""
-	dstName := ""
-	for _, app := range applications {
-		if policy.Source.ID == app.GUID {
-			srcName = app.Name
-		}
-		if policy.Destination.ID == app.GUID {
-			dstName = app.Name
-		}
-	}
-
-	return Policy{
-		SourceName:      srcName,
-		DestinationName: dstName,
-		Protocol:        string(policy.Destination.Protocol),
-		StartPort:       policy.Destination.Ports.Start,
-		EndPort:         policy.Destination.Ports.End,
-	}
 }
