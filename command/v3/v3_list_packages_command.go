@@ -91,7 +91,7 @@ func (cmd V3ListPackagesCommand) Execute(args []string) error {
 		table = append(table, []string{
 			pkg.GUID,
 			cmd.UI.TranslateText(strings.ToLower(string(pkg.State))),
-			t.Format(time.RFC1123),
+			cmd.UI.UserFriendlyDate(t),
 		})
 	}
 

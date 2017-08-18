@@ -2,6 +2,7 @@ package v3_test
 
 import (
 	"errors"
+	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -109,17 +110,22 @@ var _ = Describe("v3-list-packages Command", func() {
 	})
 
 	Context("when getting the application packages returns some packages", func() {
+		var package1UTC, package2UTC string
+
 		BeforeEach(func() {
+			package1UTC = "2017-08-14T21:16:42Z"
+			package2UTC = "2017-08-16T00:18:24Z"
+
 			packages := []v3action.Package{
 				{
 					GUID:      "some-package-guid-1",
 					State:     "READY",
-					CreatedAt: "2017-08-14T21:16:42Z",
+					CreatedAt: package1UTC,
 				},
 				{
 					GUID:      "some-package-guid-2",
 					State:     "FAILED",
-					CreatedAt: "2017-08-16T00:18:24Z",
+					CreatedAt: package2UTC,
 				},
 			}
 			fakeActor.GetApplicationPackagesReturns(packages, v3action.Warnings{"warning-1", "warning-2"}, nil)
@@ -131,8 +137,12 @@ var _ = Describe("v3-list-packages Command", func() {
 			Expect(testUI.Out).To(Say("Listing packages of app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 			Expect(testUI.Out).To(Say("guid\\s+state\\s+created"))
-			Expect(testUI.Out).To(Say("some-package-guid-1\\s+ready\\s+Mon, 14 Aug 2017 21:16:42 UTC"))
-			Expect(testUI.Out).To(Say("some-package-guid-2\\s+failed\\s+Wed, 16 Aug 2017 00:18:24 UTC"))
+			package1UTCTime, err := time.Parse(time.RFC3339, package1UTC)
+			Expect(err).ToNot(HaveOccurred())
+			package2UTCTime, err := time.Parse(time.RFC3339, package2UTC)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("some-package-guid-1\\s+ready\\s+%s", testUI.UserFriendlyDate(package1UTCTime)))
+			Expect(testUI.Out).To(Say("some-package-guid-2\\s+failed\\s+%s", testUI.UserFriendlyDate(package2UTCTime)))
 
 			Expect(testUI.Err).To(Say("warning-1"))
 			Expect(testUI.Err).To(Say("warning-2"))
