@@ -15,6 +15,7 @@ type Change struct {
 	Header       string
 	CurrentValue interface{}
 	NewValue     interface{}
+	HiddenValue  bool
 }
 
 // DisplayChangesForPush will display the set of changes via
@@ -33,7 +34,7 @@ func (ui *UI) DisplayChangesForPush(changeSet []Change) error {
 
 	for _, change := range changeSet {
 		padding := columnWidth - wordSize(ui.TranslateText(change.Header)) + 3
-		err := ui.DisplayChangeForPush(change.Header, padding, change.CurrentValue, change.NewValue)
+		err := ui.DisplayChangeForPush(change.Header, padding, change.HiddenValue, change.CurrentValue, change.NewValue)
 		if err != nil {
 			return err
 		}
@@ -44,7 +45,7 @@ func (ui *UI) DisplayChangesForPush(changeSet []Change) error {
 
 // DisplayChangeForPush will display the header and old/new value with the
 // appropriately red/green minuses and pluses.
-func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, originalValue interface{}, newValue interface{}) error {
+func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenValue bool, originalValue interface{}, newValue interface{}) error {
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
@@ -63,7 +64,7 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, origina
 			return ErrValueMissmatch
 		}
 
-		ui.displayDiffForString(offset, header, oVal, nVal)
+		ui.displayDiffForString(offset, header, hiddenValue, oVal, nVal)
 	case []string:
 		nVal, ok := newValue.([]string)
 		if !ok {
@@ -145,17 +146,27 @@ func (ui UI) displayDiffForMapStringString(offset string, header string, oldMap 
 	}
 }
 
-func (ui UI) displayDiffForString(offset string, header string, oVal string, nVal string) {
+func (ui UI) displayDiffForString(offset string, header string, hiddenValue bool, oVal string, nVal string) {
 	if oVal != nVal {
-		formattedOld := fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
-		formattedNew := fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, nVal)
+		var formattedOld, formattedNew string
+		if hiddenValue {
+			formattedOld = fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, RedactedValue)
+			formattedNew = fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, RedactedValue)
+		} else {
+			formattedOld = fmt.Sprintf("- %s%s%s", ui.TranslateText(header), offset, oVal)
+			formattedNew = fmt.Sprintf("+ %s%s%s", ui.TranslateText(header), offset, nVal)
+		}
 
 		if oVal != "" {
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
 		}
 		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 	} else {
-		fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, oVal)
+		if hiddenValue {
+			fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, RedactedValue)
+		} else {
+			fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, oVal)
+		}
 	}
 }
 

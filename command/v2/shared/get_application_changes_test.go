@@ -50,7 +50,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		changes = GetApplicationChanges(appConfig)
 	})
 
-	Context("name", func() {
+	Describe("name", func() {
 		It("sets the first change to name", func() {
 			Expect(changes[0]).To(Equal(ui.Change{
 				Header:       "name:",
@@ -60,7 +60,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 	})
 
-	Context("docker image", func() {
+	Describe("docker image", func() {
 		BeforeEach(func() {
 			appConfig.CurrentApplication.DockerImage = "some-path"
 			appConfig.DesiredApplication.DockerImage = "some-new-path"
@@ -73,9 +73,34 @@ var _ = Describe("GetApplicationChanges", func() {
 				NewValue:     "some-new-path",
 			}))
 		})
+
+		Describe("docker username and docker password", func() {
+			BeforeEach(func() {
+				appConfig.CurrentApplication.DockerCredentials.Username = "some-username"
+				appConfig.DesiredApplication.DockerCredentials.Username = "some-new-username"
+
+				appConfig.CurrentApplication.DockerCredentials.Password = "some-password"
+				appConfig.DesiredApplication.DockerCredentials.Password = "some-new-password"
+			})
+
+			It("set the second change to docker image", func() {
+				Expect(changes[2]).To(Equal(ui.Change{
+					Header:       "docker username:",
+					CurrentValue: "some-username",
+					NewValue:     "some-new-username",
+				}))
+
+				Expect(changes[3]).To(Equal(ui.Change{
+					Header:       "docker password:",
+					CurrentValue: "some-password",
+					NewValue:     "some-new-password",
+					HiddenValue:  true,
+				}))
+			})
+		})
 	})
 
-	Context("path", func() {
+	Describe("path", func() {
 		It("sets the second change to path", func() {
 			Expect(changes[1]).To(Equal(ui.Change{
 				Header:       "path:",
@@ -85,8 +110,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 	})
 
-	Context("buildpack", func() {
-		Describe("new app with no specified buildpack", func() {
+	Describe("buildpack", func() {
+		Context("new app with no specified buildpack", func() {
 			It("does not provide a buildpack change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("buildpack:"), fmt.Sprintf("entry %d should not be a buildpack", i))
@@ -150,8 +175,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("command", func() {
-		Describe("new app with no specified command", func() {
+	Describe("command", func() {
+		Context("new app with no specified command", func() {
 			It("does not provide a command change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("command:"), fmt.Sprintf("entry %d should not be command", i))
@@ -214,8 +239,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("disk_quota", func() {
-		Describe("new app with no specified disk_quota", func() {
+	Describe("disk_quota", func() {
+		Context("new app with no specified disk_quota", func() {
 			It("does not provide a disk_quota change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("disk quota:"), fmt.Sprintf("entry %d should not be disk quota", i))
@@ -242,8 +267,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("health-check-http-endpoint", func() {
-		Describe("new app with no specified health check http endpoint", func() {
+	Describe("health-check-http-endpoint", func() {
+		Context("new app with no specified health check http endpoint", func() {
 			It("does not provide an http endpoint check type change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("health check http endpoint:"), fmt.Sprintf("entry %d should not be health check http endpoint", i))
@@ -270,8 +295,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("health-check-timeout", func() {
-		Describe("new app with no specified health check timeout", func() {
+	Describe("health-check-timeout", func() {
+		Context("new app with no specified health check timeout", func() {
 			It("does not provide an health check timeout change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("health check http endpoint:"), fmt.Sprintf("entry %d should not be health check http endpoint", i))
@@ -298,8 +323,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("health-check-type", func() {
-		Describe("new app with no specified health-check-type", func() {
+	Describe("health-check-type", func() {
+		Context("new app with no specified health-check-type", func() {
 			It("does not provide a health check type change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("health check type:"), fmt.Sprintf("entry %d should not be health check type", i))
@@ -326,8 +351,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("instances", func() {
-		Describe("new app with no specified instances", func() {
+	Describe("instances", func() {
+		Context("new app with no specified instances", func() {
 			It("does not provide an instances change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("instances:"), fmt.Sprintf("entry %d should not be instances", i))
@@ -354,8 +379,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("memory", func() {
-		Describe("new app with no specified memory", func() {
+	Describe("memory", func() {
+		Context("new app with no specified memory", func() {
 			It("does not provide a memory change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("memory:"), fmt.Sprintf("entry %d should not be memory", i))
@@ -382,8 +407,8 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("stack", func() {
-		Describe("new app with no specified stack", func() {
+	Describe("stack", func() {
+		Context("new app with no specified stack", func() {
 			It("does not provide an stack change", func() {
 				for i, change := range changes {
 					Expect(change.Header).ToNot(Equal("stack:"), fmt.Sprintf("entry %d should not be stack", i))
@@ -410,7 +435,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		)
 	})
 
-	Context("services", func() {
+	Describe("services", func() {
 		BeforeEach(func() {
 			appConfig.CurrentServices = map[string]v2action.ServiceInstance{"service-1": {}, "service-2": {}}
 			appConfig.DesiredServices = map[string]v2action.ServiceInstance{"service-3": {}, "service-4": {}}
@@ -444,7 +469,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 	})
 
-	Context("routes", func() {
+	Describe("routes", func() {
 		It("sets the fifth change to routes", func() {
 			Expect(changes[4]).To(Equal(ui.Change{
 				Header:       "routes:",

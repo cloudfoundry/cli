@@ -22,6 +22,22 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 				CurrentValue: appConfig.CurrentApplication.DockerImage,
 				NewValue:     appConfig.DesiredApplication.DockerImage,
 			})
+
+		if appConfig.CurrentApplication.DockerCredentials.Username != "" || appConfig.DesiredApplication.DockerCredentials.Username != "" {
+			changes = append(changes,
+				ui.Change{
+					Header:       "docker username:",
+					CurrentValue: appConfig.CurrentApplication.DockerCredentials.Username,
+					NewValue:     appConfig.DesiredApplication.DockerCredentials.Username,
+				})
+			changes = append(changes,
+				ui.Change{
+					Header:       "docker password:",
+					CurrentValue: appConfig.CurrentApplication.DockerCredentials.Password,
+					NewValue:     appConfig.DesiredApplication.DockerCredentials.Password,
+					HiddenValue:  true,
+				})
+		}
 	} else {
 		changes = append(changes,
 			ui.Change{
