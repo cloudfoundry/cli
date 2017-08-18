@@ -13,6 +13,8 @@ type CommandLineSettings struct {
 	CurrentDirectory   string
 	DiskQuota          uint64
 	DockerImage        string
+	DockerPassword     string
+	DockerUsername     string
 	HealthCheckTimeout int
 	HealthCheckType    string
 	Instances          int
@@ -44,6 +46,14 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 	if settings.DockerImage != "" {
 		app.DockerImage = settings.DockerImage
+	}
+
+	if settings.DockerUsername != "" {
+		app.DockerUsername = settings.DockerUsername
+	}
+
+	if settings.DockerPassword != "" {
+		app.DockerPassword = settings.DockerPassword
 	}
 
 	if settings.HealthCheckTimeout != 0 {

@@ -188,8 +188,6 @@ func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath 
 		}
 		config.AllResources = resources
 		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
-	} else {
-		config.DesiredApplication.DockerImage = dockerImagePath
 	}
 
 	return config, nil
@@ -201,6 +199,13 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 	if manifest.Command != "" {
 		application.Command = manifest.Command
+	}
+	if manifest.DockerImage != "" {
+		application.DockerImage = manifest.DockerImage
+		if manifest.DockerUsername != "" {
+			application.DockerCredentials.Username = manifest.DockerUsername
+			application.DockerCredentials.Password = manifest.DockerPassword
+		}
 	}
 	if manifest.DiskQuota != 0 {
 		application.DiskQuota = manifest.DiskQuota

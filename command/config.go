@@ -10,15 +10,16 @@ import (
 
 // Config a way of getting basic CF configuration
 type Config interface {
-	APIVersion() string
 	AccessToken() string
 	AddPlugin(configv3.Plugin)
 	AddPluginRepository(name string, url string)
+	APIVersion() string
 	BinaryName() string
 	BinaryVersion() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
+	DockerPassword() string
 	Experimental() bool
 	GetPlugin(pluginName string) (configv3.Plugin, bool)
 	GetPluginCaseInsensitive(pluginName string) (configv3.Plugin, bool)
@@ -33,7 +34,6 @@ type Config interface {
 	PollingInterval() time.Duration
 	RefreshToken() string
 	RemovePlugin(string)
-	SSHOAuthClient() string
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
@@ -41,6 +41,7 @@ type Config interface {
 	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SkipSSLValidation() bool
+	SSHOAuthClient() string
 	StagingTimeout() time.Duration
 	StartupTimeout() time.Duration
 	Target() string

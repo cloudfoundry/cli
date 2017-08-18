@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -298,6 +299,9 @@ var _ = Describe("Application Config", func() {
 				BeforeEach(func() {
 					manifestApps[0].BuildpackName = "some-buildpack"
 					manifestApps[0].Command = "some-buildpack"
+					manifestApps[0].DockerImage = "some-docker-image"
+					manifestApps[0].DockerUsername = "some-docker-username"
+					manifestApps[0].DockerPassword = "some-docker-password"
 					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
 					manifestApps[0].HealthCheckTimeout = 5
 					manifestApps[0].HealthCheckType = "some-buildpack"
@@ -323,6 +327,9 @@ var _ = Describe("Application Config", func() {
 
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image"))
+					Expect(firstConfig.DesiredApplication.DockerCredentials.Username).To(Equal("some-docker-username"))
+					Expect(firstConfig.DesiredApplication.DockerCredentials.Password).To(Equal("some-docker-password"))
 					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
 						"env1": "1",
 						"env3": "3",
@@ -352,7 +359,12 @@ var _ = Describe("Application Config", func() {
 					app := v2action.Application{
 						Buildpack: "some-buildpack",
 						Command:   "some-buildpack",
-						DiskQuota: 2,
+						DockerCredentials: ccv2.DockerCredentials{
+							Username: "some-docker-username",
+							Password: "some-docker-password",
+						},
+						DockerImage: "some-docker-image",
+						DiskQuota:   2,
 						EnvironmentVariables: map[string]string{
 							"env2": "2",
 							"env3": "9",
@@ -372,6 +384,9 @@ var _ = Describe("Application Config", func() {
 				It("keeps the original app properties", func() {
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image"))
+					Expect(firstConfig.DesiredApplication.DockerCredentials.Username).To(Equal("some-docker-username"))
+					Expect(firstConfig.DesiredApplication.DockerCredentials.Password).To(Equal("some-docker-password"))
 					Expect(firstConfig.DesiredApplication.EnvironmentVariables).To(Equal(map[string]string{
 						"env2": "2",
 						"env3": "9",

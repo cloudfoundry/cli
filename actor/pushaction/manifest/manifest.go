@@ -19,8 +19,10 @@ type Application struct {
 	BuildpackName string
 	Command       string
 	// DiskQuota is the disk size in megabytes.
-	DiskQuota   uint64
-	DockerImage string
+	DiskQuota      uint64
+	DockerImage    string
+	DockerUsername string
+	DockerPassword string
 	// EnvironmentVariables can be any valid json type (ie, strings not
 	// guaranteed, although CLI only ships strings).
 	EnvironmentVariables    map[string]string

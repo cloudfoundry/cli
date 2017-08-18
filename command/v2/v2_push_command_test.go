@@ -635,6 +635,15 @@ var _ = Describe("v2-push Command", func() {
 	})
 
 	Describe("GetCommandLineSettings", func() {
+		var (
+			settings   pushaction.CommandLineSettings
+			executeErr error
+		)
+
+		JustBeforeEach(func() {
+			settings, executeErr = cmd.GetCommandLineSettings()
+		})
+
 		Context("when passed app related flags", func() {
 			BeforeEach(func() {
 				cmd.BuildpackName = "some-buildpack"
@@ -648,8 +657,7 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("sets them on the command line settings", func() {
-				settings, err := cmd.GetCommandLineSettings()
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(settings.BuildpackName).To(Equal("some-buildpack"))
 				Expect(settings.Command).To(Equal("echo foo bar baz"))
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
@@ -668,8 +676,7 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("returns an error", func() {
-				_, err := cmd.GetCommandLineSettings()
-				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
 					Arg1: "--docker-image, -o",
 					Arg2: "-p",
 				}))
@@ -683,8 +690,7 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("returns an ArgumentCombinationError", func() {
-				_, err := cmd.GetCommandLineSettings()
-				Expect(err).To(MatchError(translatableerror.ArgumentCombinationError{
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
 					Arg1: "-f",
 					Arg2: "--no-manifest",
 				}))
@@ -697,10 +703,49 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("creates command line setting from command line arguments", func() {
-				settings, err := cmd.GetCommandLineSettings()
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(settings.Name).To(Equal(appName))
 				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+			})
+		})
+
+		Context("when only --docker-username flag are passed", func() {
+			BeforeEach(func() {
+				cmd.DockerUsername = "some-docker-username"
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.RequiredFlagsError{
+					Arg1: "--docker-image, -o",
+					Arg2: "--docker-username",
+				}))
+			})
+		})
+
+		Context("when the -o, --docker-username flags are passed", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image-path"
+				cmd.DockerUsername = "some-docker-username"
+			})
+
+			Context("the docker password environment variable is set", func() {
+				BeforeEach(func() {
+					fakeConfig.DockerPasswordReturns("some-docker-password")
+				})
+
+				It("creates command line setting from command line arguments and config", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(settings.Name).To(Equal(appName))
+					Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+					Expect(settings.DockerUsername).To(Equal("some-docker-username"))
+					Expect(settings.DockerPassword).To(Equal("some-docker-password"))
+				})
+			})
+
+			Context("the docker password environment variable is *not* set", func() {
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError(translatableerror.DockerPasswordNotSetError{}))
+				})
 			})
 		})
 
@@ -710,8 +755,7 @@ var _ = Describe("v2-push Command", func() {
 			})
 
 			It("creates command line setting from command line arguments", func() {
-				settings, err := cmd.GetCommandLineSettings()
-				Expect(err).ToNot(HaveOccurred())
+				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(settings.Name).To(Equal(appName))
 				Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
 			})

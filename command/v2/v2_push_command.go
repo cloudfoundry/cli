@@ -40,8 +40,8 @@ type V2PushCommand struct {
 	BuildpackName string               `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	Command       string               `short:"c" description:"Startup command, set to null to reset to default start command"`
 	// Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
-	DockerImage flag.DockerImage `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
-	// DockerUsername       string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	DockerImage     flag.DockerImage            `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
+	DockerUsername  string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	// Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
@@ -55,13 +55,13 @@ type V2PushCommand struct {
 	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
 	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
-	StackName          string `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	HealthCheckTimeout int    `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
-
-	usage               interface{} `usage:"cf v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
+	StackName           string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	HealthCheckTimeout  int         `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
-	// dockerPassword       interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
+	dockerPassword      interface{} `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
+
+	usage           interface{} `usage:"cf v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 
 	UI          command.UI
@@ -218,6 +218,8 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		CurrentDirectory:   pwd,
 		DiskQuota:          cmd.DiskQuota.Size,
 		DockerImage:        cmd.DockerImage.Path,
+		DockerUsername:     cmd.DockerUsername,
+		DockerPassword:     cmd.Config.DockerPassword(),
 		HealthCheckTimeout: cmd.HealthCheckTimeout,
 		HealthCheckType:    cmd.HealthCheckType.Type,
 		Instances:          cmd.Instances,
@@ -354,6 +356,13 @@ func (cmd V2PushCommand) validateArgs() error {
 			Arg1: "--docker-image, -o",
 			Arg2: "-p",
 		}
+	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
+		return translatableerror.RequiredFlagsError{
+			Arg1: "--docker-image, -o",
+			Arg2: "--docker-username",
+		}
+	case cmd.DockerUsername != "" && cmd.Config.DockerPassword() == "":
+		return translatableerror.DockerPasswordNotSetError{}
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{
 			Arg1: "-f",
