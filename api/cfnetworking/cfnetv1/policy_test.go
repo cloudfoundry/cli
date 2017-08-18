@@ -199,5 +199,100 @@ var _ = Describe("Policy", func() {
 	})
 
 	Describe("RemovePolicies", func() {
+		Context("when the policy is found", func() {
+			BeforeEach(func() {
+				expectedBody := `{
+					"policies": [
+						{
+							"source": {
+								"id": "source-id-1"
+							},
+							"destination": {
+								"id": "destination-id-1",
+								"protocol": "tcp",
+								"ports": {
+									"start": 1234,
+									"end": 1235
+								}
+							}
+						},
+						{
+							"source": {
+								"id": "source-id-2"
+							},
+							"destination": {
+								"id": "destination-id-2",
+								"protocol": "udp",
+								"ports": {
+									"start": 1234,
+									"end": 1235
+								}
+							}
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/policies/delete"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusOK, ""),
+					),
+				)
+			})
+
+			It("passes the body correctly", func() {
+				err := client.RemovePolicies([]Policy{
+					{
+						Source: PolicySource{
+							ID: "source-id-1",
+						},
+						Destination: PolicyDestination{
+							ID:       "destination-id-1",
+							Protocol: PolicyProtocolTCP,
+							Ports: Ports{
+								Start: 1234,
+								End:   1235,
+							},
+						},
+					},
+					{
+						Source: PolicySource{
+							ID: "source-id-2",
+						},
+						Destination: PolicyDestination{
+							ID:       "destination-id-2",
+							Protocol: PolicyProtocolUDP,
+							Ports: Ports{
+								Start: 1234,
+								End:   1235,
+							},
+						},
+					},
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when the client returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"error": "Oh Noes"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/policies/delete"),
+						RespondWith(http.StatusBadRequest, response),
+					),
+				)
+			})
+
+			It("returns the error and warnings", func() {
+				err := client.RemovePolicies(nil)
+				Expect(err).To(MatchError(networkerror.BadRequestError{
+					Message: "Oh Noes",
+				}))
+			})
+		})
 	})
 })

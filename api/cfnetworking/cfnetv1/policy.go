@@ -91,5 +91,13 @@ func (client Client) ListPolicies(appGUID string) ([]Policy, error) {
 
 // RemovePolicies will remove the network policy with the given parameters.
 func (client Client) RemovePolicies(policies []Policy) error {
-	return nil
+	rawJSON, err := json.Marshal(PolicyList{Policies: policies})
+	if err != nil {
+		return err
+	}
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeletePolicies,
+		Body:        bytes.NewReader(rawJSON),
+	})
+	return client.connection.Make(request, &cfnetworking.Response{})
 }
