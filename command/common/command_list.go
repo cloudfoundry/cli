@@ -37,6 +37,7 @@ type commandList struct {
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	AllowNetworkAccess                 v3.AllowNetworkAccessCommand                 `command:"allow-network-access" description:"Allow direct network traffic from one app to another"`
+	RemoveNetworkAccess                v3.RemoveNetworkAccessCommand                `command:"remove-network-access" description:"Remove direct network traffic from one app to another"`
 	App                                v2.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate user non-interactively"`
 	BindRouteService                   v2.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
