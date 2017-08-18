@@ -197,4 +197,7 @@ var _ = Describe("Policy", func() {
 			})
 		})
 	})
+
+	Describe("RemovePolicies", func() {
+	})
 })

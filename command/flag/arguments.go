@@ -317,3 +317,7 @@ type ResetOrgDefaultIsolationArgs struct {
 type AllowNetworkAccessArgs struct {
 	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
 }
+
+type RemoveNetworkAccessArgs struct {
+	SourceApp string
+}
