@@ -119,7 +119,12 @@ var _ = Describe("allow-network-access command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				//TODO: verify this worked
+				session = helpers.CF("list-network-access")
+				Eventually(session).Should(Say("Listing network traffic as %s...", username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 

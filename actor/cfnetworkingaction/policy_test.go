@@ -276,4 +276,80 @@ var _ = Describe("Policy", func() {
 			})
 		})
 	})
+
+	Describe("RemoveNetworkAccess", func() {
+		JustBeforeEach(func() {
+			spaceGuid := "space"
+			srcApp := "appA"
+			destApp := "appB"
+			protocol := "udp"
+			startPort := 123
+			endPort := 345
+			warnings, executeErr = actor.RemoveNetworkAccess(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
+		})
+		It("removes policies", func() {
+			Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+			Expect(executeErr).NotTo(HaveOccurred())
+
+			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(2))
+			sourceAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(0)
+			Expect(sourceAppName).To(Equal("appA"))
+			Expect(spaceGUID).To(Equal("space"))
+
+			destAppName, spaceGUID := fakeV3Actor.GetApplicationByNameAndSpaceArgsForCall(1)
+			Expect(destAppName).To(Equal("appB"))
+			Expect(spaceGUID).To(Equal("space"))
+
+			Expect(fakeNetworkingClient.RemovePoliciesCallCount()).To(Equal(1))
+			Expect(fakeNetworkingClient.RemovePoliciesArgsForCall(0)).To(Equal([]cfnetv1.Policy{
+				{
+					Source: cfnetv1.PolicySource{
+						ID: "appAGUID",
+					},
+					Destination: cfnetv1.PolicyDestination{
+						ID:       "appBGUID",
+						Protocol: "udp",
+						Ports: cfnetv1.Ports{
+							Start: 123,
+							End:   345,
+						},
+					},
+				},
+			}))
+		})
+
+		Context("when getting the source app fails ", func() {
+			BeforeEach(func() {
+				fakeV3Actor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, []string{"v3ActorWarningA"}, errors.New("banana"))
+			})
+			It("returns a sensible error", func() {
+				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA"})))
+				Expect(executeErr).To(MatchError("banana"))
+			})
+		})
+
+		Context("when getting the destination app fails ", func() {
+			BeforeEach(func() {
+				fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
+					if appName == "appB" {
+						return v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
+					}
+					return v3action.Application{}, []string{"v3ActorWarningA"}, nil
+				}
+			})
+			It("returns a sensible error", func() {
+				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+				Expect(executeErr).To(MatchError("banana"))
+			})
+		})
+
+		Context("when creating the policy fails", func() {
+			BeforeEach(func() {
+				fakeNetworkingClient.RemovePoliciesReturns(errors.New("apple"))
+			})
+			It("returns a sensible error", func() {
+				Expect(executeErr).To(MatchError("apple"))
+			})
+		})
+	})
 })

@@ -16,13 +16,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("allow-network-access Command", func() {
+var _ = Describe("remove-network-access Command", func() {
 	var (
-		cmd             AllowNetworkAccessCommand
+		cmd             RemoveNetworkAccessCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeAllowNetworkAccessActor
+		fakeActor       *v3fakes.FakeRemoveNetworkAccessActor
 		binaryName      string
 		executeErr      error
 		srcApp          string
@@ -34,18 +34,18 @@ var _ = Describe("allow-network-access Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeAllowNetworkAccessActor)
+		fakeActor = new(v3fakes.FakeRemoveNetworkAccessActor)
 
 		srcApp = "some-app"
 		destApp = "some-other-app"
 		protocol = "tcp"
 
-		cmd = AllowNetworkAccessCommand{
+		cmd = RemoveNetworkAccessCommand{
 			UI:             testUI,
 			Config:         fakeConfig,
 			SharedActor:    fakeSharedActor,
 			Actor:          fakeActor,
-			RequiredArgs:   flag.AllowNetworkAccessArgs{SourceApp: srcApp},
+			RequiredArgs:   flag.RemoveNetworkAccessArgs{SourceApp: srcApp},
 			DestinationApp: destApp,
 			Protocol:       flag.NetworkProtocol{Protocol: protocol},
 			Port:           flag.NetworkPort{StartPort: 8080, EndPort: 8081},
@@ -83,18 +83,18 @@ var _ = Describe("allow-network-access Command", func() {
 		})
 
 		It("outputs flavor text", func() {
-			Expect(testUI.Out).To(Say("Allowing network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+			Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 		})
 
-		Context("when the policy creation is successful", func() {
+		Context("when the policy deletion is successful", func() {
 			BeforeEach(func() {
-				fakeActor.AllowNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
 
 			It("displays OK when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.AllowNetworkAccessCallCount()).To(Equal(1))
-				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.AllowNetworkAccessArgsForCall(0)
+				Expect(fakeActor.RemoveNetworkAccessCallCount()).To(Equal(1))
+				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkAccessArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestAppName).To(Equal("some-other-app"))
@@ -102,21 +102,21 @@ var _ = Describe("allow-network-access Command", func() {
 				Expect(passedStartPort).To(Equal(8080))
 				Expect(passedEndPort).To(Equal(8081))
 
-				Expect(testUI.Out).To(Say("Allowing network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+				Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
-		Context("when the policy creation is not successful", func() {
+		Context("when the policy deletion is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.AllowNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
+				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("does not display OK when an error occurs", func() {
 				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
 
-				Expect(testUI.Out).To(Say("Allowing network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+				Expect(testUI.Out).To(Say("Denying traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).ToNot(Say("OK"))

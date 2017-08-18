@@ -88,3 +88,8 @@ func (client Client) ListPolicies(appGUID string) ([]Policy, error) {
 
 	return policies.Policies, nil
 }
+
+// RemovePolicies will remove the network policy with the given parameters.
+func (client Client) RemovePolicies(policies []Policy) error {
+	return nil
+}

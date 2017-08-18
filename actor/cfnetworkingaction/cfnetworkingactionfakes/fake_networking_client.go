@@ -33,6 +33,17 @@ type FakeNetworkingClient struct {
 		result1 []cfnetv1.Policy
 		result2 error
 	}
+	RemovePoliciesStub        func(policies []cfnetv1.Policy) error
+	removePoliciesMutex       sync.RWMutex
+	removePoliciesArgsForCall []struct {
+		policies []cfnetv1.Policy
+	}
+	removePoliciesReturns struct {
+		result1 error
+	}
+	removePoliciesReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -141,6 +152,59 @@ func (fake *FakeNetworkingClient) ListPoliciesReturnsOnCall(i int, result1 []cfn
 	}{result1, result2}
 }
 
+func (fake *FakeNetworkingClient) RemovePolicies(policies []cfnetv1.Policy) error {
+	var policiesCopy []cfnetv1.Policy
+	if policies != nil {
+		policiesCopy = make([]cfnetv1.Policy, len(policies))
+		copy(policiesCopy, policies)
+	}
+	fake.removePoliciesMutex.Lock()
+	ret, specificReturn := fake.removePoliciesReturnsOnCall[len(fake.removePoliciesArgsForCall)]
+	fake.removePoliciesArgsForCall = append(fake.removePoliciesArgsForCall, struct {
+		policies []cfnetv1.Policy
+	}{policiesCopy})
+	fake.recordInvocation("RemovePolicies", []interface{}{policiesCopy})
+	fake.removePoliciesMutex.Unlock()
+	if fake.RemovePoliciesStub != nil {
+		return fake.RemovePoliciesStub(policies)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.removePoliciesReturns.result1
+}
+
+func (fake *FakeNetworkingClient) RemovePoliciesCallCount() int {
+	fake.removePoliciesMutex.RLock()
+	defer fake.removePoliciesMutex.RUnlock()
+	return len(fake.removePoliciesArgsForCall)
+}
+
+func (fake *FakeNetworkingClient) RemovePoliciesArgsForCall(i int) []cfnetv1.Policy {
+	fake.removePoliciesMutex.RLock()
+	defer fake.removePoliciesMutex.RUnlock()
+	return fake.removePoliciesArgsForCall[i].policies
+}
+
+func (fake *FakeNetworkingClient) RemovePoliciesReturns(result1 error) {
+	fake.RemovePoliciesStub = nil
+	fake.removePoliciesReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeNetworkingClient) RemovePoliciesReturnsOnCall(i int, result1 error) {
+	fake.RemovePoliciesStub = nil
+	if fake.removePoliciesReturnsOnCall == nil {
+		fake.removePoliciesReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.removePoliciesReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeNetworkingClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -148,6 +212,8 @@ func (fake *FakeNetworkingClient) Invocations() map[string][][]interface{} {
 	defer fake.createPoliciesMutex.RUnlock()
 	fake.listPoliciesMutex.RLock()
 	defer fake.listPoliciesMutex.RUnlock()
+	fake.removePoliciesMutex.RLock()
+	defer fake.removePoliciesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
