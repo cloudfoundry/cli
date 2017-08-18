@@ -10,15 +10,6 @@ import (
 )
 
 type FakeConfig struct {
-	APIVersionStub        func() string
-	aPIVersionMutex       sync.RWMutex
-	aPIVersionArgsForCall []struct{}
-	aPIVersionReturns     struct {
-		result1 string
-	}
-	aPIVersionReturnsOnCall map[int]struct {
-		result1 string
-	}
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
@@ -38,6 +29,15 @@ type FakeConfig struct {
 	addPluginRepositoryArgsForCall []struct {
 		name string
 		url  string
+	}
+	APIVersionStub        func() string
+	aPIVersionMutex       sync.RWMutex
+	aPIVersionArgsForCall []struct{}
+	aPIVersionReturns     struct {
+		result1 string
+	}
+	aPIVersionReturnsOnCall map[int]struct {
+		result1 string
 	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
@@ -85,6 +85,15 @@ type FakeConfig struct {
 	}
 	dialTimeoutReturnsOnCall map[int]struct {
 		result1 time.Duration
+	}
+	DockerPasswordStub        func() string
+	dockerPasswordMutex       sync.RWMutex
+	dockerPasswordArgsForCall []struct{}
+	dockerPasswordReturns     struct {
+		result1 string
+	}
+	dockerPasswordReturnsOnCall map[int]struct {
+		result1 string
 	}
 	ExperimentalStub        func() bool
 	experimentalMutex       sync.RWMutex
@@ -216,15 +225,6 @@ type FakeConfig struct {
 	removePluginArgsForCall []struct {
 		arg1 string
 	}
-	SSHOAuthClientStub        func() string
-	sSHOAuthClientMutex       sync.RWMutex
-	sSHOAuthClientArgsForCall []struct{}
-	sSHOAuthClientReturns     struct {
-		result1 string
-	}
-	sSHOAuthClientReturnsOnCall map[int]struct {
-		result1 string
-	}
 	SetAccessTokenStub        func(token string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
@@ -275,6 +275,15 @@ type FakeConfig struct {
 	}
 	skipSSLValidationReturnsOnCall map[int]struct {
 		result1 bool
+	}
+	SSHOAuthClientStub        func() string
+	sSHOAuthClientMutex       sync.RWMutex
+	sSHOAuthClientArgsForCall []struct{}
+	sSHOAuthClientReturns     struct {
+		result1 string
+	}
+	sSHOAuthClientReturnsOnCall map[int]struct {
+		result1 string
 	}
 	StagingTimeoutStub        func() time.Duration
 	stagingTimeoutMutex       sync.RWMutex
@@ -369,46 +378,6 @@ type FakeConfig struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConfig) APIVersion() string {
-	fake.aPIVersionMutex.Lock()
-	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
-	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
-	fake.recordInvocation("APIVersion", []interface{}{})
-	fake.aPIVersionMutex.Unlock()
-	if fake.APIVersionStub != nil {
-		return fake.APIVersionStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.aPIVersionReturns.result1
-}
-
-func (fake *FakeConfig) APIVersionCallCount() int {
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
-	return len(fake.aPIVersionArgsForCall)
-}
-
-func (fake *FakeConfig) APIVersionReturns(result1 string) {
-	fake.APIVersionStub = nil
-	fake.aPIVersionReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) APIVersionReturnsOnCall(i int, result1 string) {
-	fake.APIVersionStub = nil
-	if fake.aPIVersionReturnsOnCall == nil {
-		fake.aPIVersionReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.aPIVersionReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeConfig) AccessToken() string {
 	fake.accessTokenMutex.Lock()
 	ret, specificReturn := fake.accessTokenReturnsOnCall[len(fake.accessTokenArgsForCall)]
@@ -496,6 +465,46 @@ func (fake *FakeConfig) AddPluginRepositoryArgsForCall(i int) (string, string) {
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
 	return fake.addPluginRepositoryArgsForCall[i].name, fake.addPluginRepositoryArgsForCall[i].url
+}
+
+func (fake *FakeConfig) APIVersion() string {
+	fake.aPIVersionMutex.Lock()
+	ret, specificReturn := fake.aPIVersionReturnsOnCall[len(fake.aPIVersionArgsForCall)]
+	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("APIVersion", []interface{}{})
+	fake.aPIVersionMutex.Unlock()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.aPIVersionReturns.result1
+}
+
+func (fake *FakeConfig) APIVersionCallCount() int {
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
+	return len(fake.aPIVersionArgsForCall)
+}
+
+func (fake *FakeConfig) APIVersionReturns(result1 string) {
+	fake.APIVersionStub = nil
+	fake.aPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) APIVersionReturnsOnCall(i int, result1 string) {
+	fake.APIVersionStub = nil
+	if fake.aPIVersionReturnsOnCall == nil {
+		fake.aPIVersionReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.aPIVersionReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) BinaryName() string {
@@ -698,6 +707,46 @@ func (fake *FakeConfig) DialTimeoutReturnsOnCall(i int, result1 time.Duration) {
 	}
 	fake.dialTimeoutReturnsOnCall[i] = struct {
 		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) DockerPassword() string {
+	fake.dockerPasswordMutex.Lock()
+	ret, specificReturn := fake.dockerPasswordReturnsOnCall[len(fake.dockerPasswordArgsForCall)]
+	fake.dockerPasswordArgsForCall = append(fake.dockerPasswordArgsForCall, struct{}{})
+	fake.recordInvocation("DockerPassword", []interface{}{})
+	fake.dockerPasswordMutex.Unlock()
+	if fake.DockerPasswordStub != nil {
+		return fake.DockerPasswordStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.dockerPasswordReturns.result1
+}
+
+func (fake *FakeConfig) DockerPasswordCallCount() int {
+	fake.dockerPasswordMutex.RLock()
+	defer fake.dockerPasswordMutex.RUnlock()
+	return len(fake.dockerPasswordArgsForCall)
+}
+
+func (fake *FakeConfig) DockerPasswordReturns(result1 string) {
+	fake.DockerPasswordStub = nil
+	fake.dockerPasswordReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) DockerPasswordReturnsOnCall(i int, result1 string) {
+	fake.DockerPasswordStub = nil
+	if fake.dockerPasswordReturnsOnCall == nil {
+		fake.dockerPasswordReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.dockerPasswordReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
@@ -1267,46 +1316,6 @@ func (fake *FakeConfig) RemovePluginArgsForCall(i int) string {
 	return fake.removePluginArgsForCall[i].arg1
 }
 
-func (fake *FakeConfig) SSHOAuthClient() string {
-	fake.sSHOAuthClientMutex.Lock()
-	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
-	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("SSHOAuthClient", []interface{}{})
-	fake.sSHOAuthClientMutex.Unlock()
-	if fake.SSHOAuthClientStub != nil {
-		return fake.SSHOAuthClientStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.sSHOAuthClientReturns.result1
-}
-
-func (fake *FakeConfig) SSHOAuthClientCallCount() int {
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
-	return len(fake.sSHOAuthClientArgsForCall)
-}
-
-func (fake *FakeConfig) SSHOAuthClientReturns(result1 string) {
-	fake.SSHOAuthClientStub = nil
-	fake.sSHOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
-	fake.SSHOAuthClientStub = nil
-	if fake.sSHOAuthClientReturnsOnCall == nil {
-		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
-			result1 string
-		})
-	}
-	fake.sSHOAuthClientReturnsOnCall[i] = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeConfig) SetAccessToken(token string) {
 	fake.setAccessTokenMutex.Lock()
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
@@ -1500,6 +1509,46 @@ func (fake *FakeConfig) SkipSSLValidationReturnsOnCall(i int, result1 bool) {
 	}
 	fake.skipSSLValidationReturnsOnCall[i] = struct {
 		result1 bool
+	}{result1}
+}
+
+func (fake *FakeConfig) SSHOAuthClient() string {
+	fake.sSHOAuthClientMutex.Lock()
+	ret, specificReturn := fake.sSHOAuthClientReturnsOnCall[len(fake.sSHOAuthClientArgsForCall)]
+	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("SSHOAuthClient", []interface{}{})
+	fake.sSHOAuthClientMutex.Unlock()
+	if fake.SSHOAuthClientStub != nil {
+		return fake.SSHOAuthClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.sSHOAuthClientReturns.result1
+}
+
+func (fake *FakeConfig) SSHOAuthClientCallCount() int {
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
+	return len(fake.sSHOAuthClientArgsForCall)
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturns(result1 string) {
+	fake.SSHOAuthClientStub = nil
+	fake.sSHOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) SSHOAuthClientReturnsOnCall(i int, result1 string) {
+	fake.SSHOAuthClientStub = nil
+	if fake.sSHOAuthClientReturnsOnCall == nil {
+		fake.sSHOAuthClientReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.sSHOAuthClientReturnsOnCall[i] = struct {
+		result1 string
 	}{result1}
 }
 
@@ -1901,14 +1950,14 @@ func (fake *FakeConfig) WritePluginConfigReturnsOnCall(i int, result1 error) {
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.aPIVersionMutex.RLock()
-	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
 	fake.addPluginMutex.RLock()
 	defer fake.addPluginMutex.RUnlock()
 	fake.addPluginRepositoryMutex.RLock()
 	defer fake.addPluginRepositoryMutex.RUnlock()
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.binaryVersionMutex.RLock()
@@ -1919,6 +1968,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.currentUserMutex.RUnlock()
 	fake.dialTimeoutMutex.RLock()
 	defer fake.dialTimeoutMutex.RUnlock()
+	fake.dockerPasswordMutex.RLock()
+	defer fake.dockerPasswordMutex.RUnlock()
 	fake.experimentalMutex.RLock()
 	defer fake.experimentalMutex.RUnlock()
 	fake.getPluginMutex.RLock()
@@ -1947,8 +1998,6 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.refreshTokenMutex.RUnlock()
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
-	fake.sSHOAuthClientMutex.RLock()
-	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setOrganizationInformationMutex.RLock()
@@ -1963,6 +2012,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.setTokenInformationMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
+	fake.sSHOAuthClientMutex.RLock()
+	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.stagingTimeoutMutex.RLock()
 	defer fake.stagingTimeoutMutex.RUnlock()
 	fake.startupTimeoutMutex.RLock()
