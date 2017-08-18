@@ -3648,6 +3648,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' must be used together.",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
     "translation": ""
   },
