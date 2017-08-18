@@ -22,6 +22,9 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated integra
 - `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default `--skip-ssl-validation` if not set.
 - `CF_USERNAME` - The CF Administrator username. Will default to `admin` if not set.
 - `CF_PASSWORD` - The CF Administrator password. Will default to `admin` if not set.
+- `CF_INT_DOCKER_IMAGE` - A private docker image used for the docker authentication tests.
+- `CF_INT_DOCKER_USERNAME` - The username for the private docker registry for `CF_INT_DOCKER_IMAGE`.
+- `CF_INT_DOCKER_PASSWORD` - The password for `CF_INT_DOCKER_USERNAME`.
 - `CF_CLI_EXPERIMENTAL` - Will enable both experimental functionality of the CF CLI and tests for that functionality. Will default to `false` if not set.
 
 ### The test suite does not cleanup after itself!

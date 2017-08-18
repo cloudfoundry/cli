@@ -15,7 +15,7 @@ const (
 	CFEventuallyTimeout  = 300 * time.Second
 	RealIsolationSegment = "persistent_isolation_segment"
 	PushCommandName      = "v2-push"
-	DockerImage          = "cloudfoundry/diego-docker-app-custom"
+	PublicDockerImage    = "cloudfoundry/diego-docker-app-custom"
 )
 
 var (
