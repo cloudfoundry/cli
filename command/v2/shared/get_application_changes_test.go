@@ -74,13 +74,10 @@ var _ = Describe("GetApplicationChanges", func() {
 			}))
 		})
 
-		Describe("docker username and docker password", func() {
+		Describe("docker username", func() {
 			BeforeEach(func() {
 				appConfig.CurrentApplication.DockerCredentials.Username = "some-username"
 				appConfig.DesiredApplication.DockerCredentials.Username = "some-new-username"
-
-				appConfig.CurrentApplication.DockerCredentials.Password = "some-password"
-				appConfig.DesiredApplication.DockerCredentials.Password = "some-new-password"
 			})
 
 			It("set the second change to docker image", func() {
@@ -88,13 +85,6 @@ var _ = Describe("GetApplicationChanges", func() {
 					Header:       "docker username:",
 					CurrentValue: "some-username",
 					NewValue:     "some-new-username",
-				}))
-
-				Expect(changes[3]).To(Equal(ui.Change{
-					Header:       "docker password:",
-					CurrentValue: "some-password",
-					NewValue:     "some-new-password",
-					HiddenValue:  true,
 				}))
 			})
 		})
