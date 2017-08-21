@@ -3,6 +3,7 @@ package pushaction_test
 import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -117,14 +118,14 @@ var _ = Describe("CommandLineSettings", func() {
 			manifest.Application{HealthCheckType: "http"},
 		),
 		Entry("overrides instances",
-			CommandLineSettings{Instances: 1024},
-			manifest.Application{Instances: 512},
-			manifest.Application{Instances: 1024},
+			CommandLineSettings{Instances: types.NullInt{Value: 1024, IsSet: true}},
+			manifest.Application{Instances: types.NullInt{Value: 512, IsSet: true}},
+			manifest.Application{Instances: types.NullInt{Value: 1024, IsSet: true}},
 		),
 		Entry("passes through instances",
 			CommandLineSettings{},
-			manifest.Application{Instances: 1024},
-			manifest.Application{Instances: 1024},
+			manifest.Application{Instances: types.NullInt{Value: 1024, IsSet: true}},
+			manifest.Application{Instances: types.NullInt{Value: 1024, IsSet: true}},
 		),
 		Entry("overrides memory",
 			CommandLineSettings{Memory: 1024},

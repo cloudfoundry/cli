@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/types"
+
 	"github.com/fatih/color"
 )
 
@@ -58,6 +60,12 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenV
 		}
 
 		ui.displayDiffForInt(offset, header, oVal, nVal)
+	case types.NullInt:
+		nVal, ok := newValue.(types.NullInt)
+		if !ok {
+			return ErrValueMissmatch
+		}
+		ui.displayDiffForNullInt(offset, header, oVal, nVal)
 	case string:
 		nVal, ok := newValue.(string)
 		if !ok {
@@ -143,6 +151,20 @@ func (ui UI) displayDiffForMapStringString(offset string, header string, oldMap 
 			formattedNew := fmt.Sprintf("+   %s", key)
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
 		}
+	}
+}
+
+func (ui UI) displayDiffForNullInt(offset string, header string, oldValue types.NullInt, newValue types.NullInt) {
+	if oldValue != newValue {
+		formattedOld := fmt.Sprintf("- %s%s%d", ui.TranslateText(header), offset, oldValue.Value)
+		formattedNew := fmt.Sprintf("+ %s%s%d", ui.TranslateText(header), offset, newValue.Value)
+
+		if oldValue.IsSet {
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
+		}
+		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+	} else {
+		fmt.Fprintf(ui.Out, "  %s%s%d\n", ui.TranslateText(header), offset, oldValue.Value)
 	}
 }
 

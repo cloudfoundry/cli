@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -161,7 +162,7 @@ var _ = Describe("Application", func() {
 					HealthCheckTimeout:       120,
 					HealthCheckType:          "port",
 					HealthCheckHTTPEndpoint:  "/",
-					Instances:                13,
+					Instances:                types.NullInt{Value: 13, IsSet: true},
 					Memory:                   1024,
 					Name:                     "app-name-1",
 					PackageState:             ApplicationPackageFailed,
@@ -274,7 +275,7 @@ var _ = Describe("Application", func() {
 						GUID:                    "app-guid-1",
 						HealthCheckType:         "port",
 						HealthCheckHTTPEndpoint: "/",
-						Instances:               13,
+						Instances:               types.NullInt{Value: 13, IsSet: true},
 						Memory:                  1024,
 						Name:                    "app-name-1",
 						PackageState:            ApplicationPackageFailed,
@@ -321,7 +322,7 @@ var _ = Describe("Application", func() {
 					"health_check_timeout": 120,
 					"health_check_type": "some-health-check-type",
 					"health_check_http_endpoint": "/anything",
-					"instances": 13,
+					"instances": 0,
 					"memory": 1024,
 					"name": "app-name-1",
 					"package_updated_at": "2015-03-10T23:11:54Z",
@@ -346,7 +347,7 @@ var _ = Describe("Application", func() {
 						},
 						"health_check_http_endpoint": "/anything",
 						"health_check_type":          "some-health-check-type",
-						"instances":                  13,
+						"instances":                  0,
 						"memory":                     1024,
 						"stack_guid":                 "some-stack-guid",
 						"state":                      "STARTED",
@@ -380,7 +381,7 @@ var _ = Describe("Application", func() {
 						GUID: "some-app-guid",
 						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckType:         "some-health-check-type",
-						Instances:               13,
+						Instances:               types.NullInt{Value: 0, IsSet: true},
 						Memory:                  1024,
 						StackGUID:               "some-stack-guid",
 						State:                   ApplicationStarted,
@@ -411,7 +412,7 @@ var _ = Describe("Application", func() {
 						HealthCheckHTTPEndpoint: "/anything",
 						HealthCheckTimeout:      120,
 						HealthCheckType:         "some-health-check-type",
-						Instances:               13,
+						Instances:               types.NullInt{Value: 0, IsSet: true},
 						Memory:                  1024,
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,
@@ -471,7 +472,7 @@ var _ = Describe("Application", func() {
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/",
-						Instances:               13,
+						Instances:               types.NullInt{Value: 13, IsSet: true},
 						Memory:                  1024,
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,
@@ -567,7 +568,7 @@ var _ = Describe("Application", func() {
 					GUID:                    "some-app-guid",
 					HealthCheckType:         "some-health-check-type",
 					HealthCheckHTTPEndpoint: "/anything",
-					Instances:               13,
+					Instances:               types.NullInt{Value: 13, IsSet: true},
 					Memory:                  1024,
 					Name:                    "app-name-1",
 					PackageUpdatedAt:        updatedAt,

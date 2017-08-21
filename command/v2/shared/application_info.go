@@ -13,13 +13,13 @@ import (
 // DisplayAppSummary displays the application summary to the UI, and optionally
 // the command to start the app.
 func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, displayStartCommand bool) {
-	instances := fmt.Sprintf("%d/%d", appSummary.StartingOrRunningInstanceCount(), appSummary.Instances)
+	instances := fmt.Sprintf("%d/%d", appSummary.StartingOrRunningInstanceCount(), appSummary.Instances.Value)
 
 	usage := ui.TranslateText(
 		"{{.MemorySize}} x {{.NumInstances}} instances",
 		map[string]interface{}{
 			"MemorySize":   bytefmt.ByteSize(uint64(appSummary.Memory) * bytefmt.MEGABYTE),
-			"NumInstances": appSummary.Instances,
+			"NumInstances": appSummary.Instances.Value,
 		})
 
 	formattedRoutes := []string{}

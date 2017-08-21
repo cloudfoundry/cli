@@ -157,7 +157,7 @@ func (application Application) Stopped() bool {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
+		"App Name: '%s', Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
 		app.Name,
 		app.Buildpack,
 		app.Command,
@@ -168,7 +168,8 @@ func (app Application) String() string {
 		app.HealthCheckHTTPEndpoint,
 		app.HealthCheckTimeout,
 		app.HealthCheckType,
-		app.Instances,
+		app.Instances.IsSet,
+		app.Instances.Value,
 		app.Memory,
 		app.SpaceGUID,
 		app.StackGUID,
@@ -480,7 +481,7 @@ func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAC
 		return
 	}
 
-	if app.Instances == 0 {
+	if app.Instances.Value == 0 {
 		return
 	}
 

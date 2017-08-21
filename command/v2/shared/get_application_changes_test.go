@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -351,7 +352,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 
 		DescribeTable("non-empty values",
-			func(existingInstances int, newInstances int, currentValue int, newValue int) {
+			func(existingInstances types.NullInt, newInstances types.NullInt, currentValue types.NullInt, newValue types.NullInt) {
 				appConfig.CurrentApplication.Instances = existingInstances
 				appConfig.DesiredApplication.Instances = newInstances
 
@@ -363,9 +364,8 @@ var _ = Describe("GetApplicationChanges", func() {
 					NewValue:     newValue,
 				}))
 			},
-			Entry("new app with instances specified", 0, 200, 0, 200),
-			Entry("existing instances with no instances specified", 100, 0, 100, 0),
-			Entry("existing instances with new instances specified", 100, 200, 100, 200),
+			Entry("new app with instances specified", types.NullInt{IsSet: false}, types.NullInt{Value: 200, IsSet: true}, types.NullInt{IsSet: false}, types.NullInt{Value: 200, IsSet: true}),
+			Entry("existing instances with new instances specified", types.NullInt{Value: 100, IsSet: true}, types.NullInt{Value: 0, IsSet: true}, types.NullInt{Value: 100, IsSet: true}, types.NullInt{Value: 0, IsSet: true}),
 		)
 	})
 

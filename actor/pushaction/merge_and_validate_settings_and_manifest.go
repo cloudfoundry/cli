@@ -100,7 +100,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			settings.DockerImage != "",
 			settings.HealthCheckTimeout != 0,
 			settings.HealthCheckType != "",
-			settings.Instances != 0,
+			settings.Instances.IsSet,
 			settings.Memory != 0,
 			settings.ProvidedAppPath != "",
 			settings.StackName != "":

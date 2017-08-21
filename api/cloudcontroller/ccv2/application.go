@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // ApplicationState is the running state of an application.
@@ -70,7 +71,7 @@ type Application struct {
 	HealthCheckHTTPEndpoint string
 
 	// Instances is the total number of app instances.
-	Instances int
+	Instances types.NullInt
 
 	// Memory is the memory given to each instance, in megabytes.
 	Memory uint64
@@ -124,7 +125,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		HealthCheckHTTPEndpoint string             `json:"health_check_http_endpoint,omitempty"`
 		HealthCheckTimeout      int                `json:"health_check_timeout,omitempty"`
 		HealthCheckType         string             `json:"health_check_type,omitempty"`
-		Instances               int                `json:"instances,omitempty"`
+		Instances               json.Number        `json:"instances,omitempty"`
 		Memory                  uint64             `json:"memory,omitempty"`
 		Name                    string             `json:"name,omitempty"`
 		SpaceGUID               string             `json:"space_guid,omitempty"`
@@ -139,7 +140,6 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		HealthCheckHTTPEndpoint: application.HealthCheckHTTPEndpoint,
 		HealthCheckTimeout:      application.HealthCheckTimeout,
 		HealthCheckType:         application.HealthCheckType,
-		Instances:               application.Instances,
 		Memory:                  application.Memory,
 		Name:                    application.Name,
 		SpaceGUID:               application.SpaceGUID,
@@ -152,6 +152,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 			Username: application.DockerCredentials.Username,
 			Password: application.DockerCredentials.Password,
 		}
+	}
+
+	if application.Instances.IsSet {
+		ccApp.Instances = json.Number(fmt.Sprint(application.Instances.Value))
 	}
 
 	return json.Marshal(ccApp)
@@ -175,7 +179,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			HealthCheckHTTPEndpoint  string                 `json:"health_check_http_endpoint"`
 			HealthCheckTimeout       int                    `json:"health_check_timeout"`
 			HealthCheckType          string                 `json:"health_check_type"`
-			Instances                int                    `json:"instances"`
+			Instances                json.Number            `json:"instances"`
 			Memory                   uint64                 `json:"memory"`
 			Name                     string                 `json:"name"`
 			PackageState             string                 `json:"package_state"`
@@ -205,7 +209,6 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.HealthCheckTimeout = ccApp.Entity.HealthCheckTimeout
 	application.HealthCheckType = ccApp.Entity.HealthCheckType
-	application.Instances = ccApp.Entity.Instances
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name
 	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)
@@ -220,6 +223,11 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			envVariableValues[key] = fmt.Sprint(value)
 		}
 		application.EnvironmentVariables = envVariableValues
+	}
+
+	err = application.Instances.ParseFlagValue(ccApp.Entity.Instances.String())
+	if err != nil {
+		return err
 	}
 
 	if ccApp.Entity.PackageUpdatedAt != nil {

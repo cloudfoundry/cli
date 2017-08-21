@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
+	"code.cloudfoundry.org/cli/types"
 )
 
 type CommandLineSettings struct {
@@ -17,7 +18,7 @@ type CommandLineSettings struct {
 	DockerUsername     string
 	HealthCheckTimeout int
 	HealthCheckType    string
-	Instances          int
+	Instances          types.NullInt
 	Memory             uint64
 	Name               string
 	ProvidedAppPath    string
@@ -64,7 +65,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.HealthCheckType = settings.HealthCheckType
 	}
 
-	if settings.Instances != 0 {
+	if settings.Instances.IsSet {
 		app.Instances = settings.Instances
 	}
 
@@ -92,7 +93,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s'",
+		"App Name: '%s', Buildpack: '%s', Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s'",
 		settings.Name,
 		settings.BuildpackName,
 		settings.Command,
@@ -101,7 +102,8 @@ func (settings CommandLineSettings) String() string {
 		settings.DockerImage,
 		settings.HealthCheckTimeout,
 		settings.HealthCheckType,
-		settings.Instances,
+		settings.Instances.IsSet,
+		settings.Instances.Value,
 		settings.Memory,
 		settings.ProvidedAppPath,
 		settings.StackName,

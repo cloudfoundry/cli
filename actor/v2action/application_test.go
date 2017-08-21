@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/types"
 
 	"github.com/cloudfoundry/sonde-go/events"
 	. "github.com/onsi/ginkgo"
@@ -661,7 +662,7 @@ var _ = Describe("Application Actions", func() {
 			app = Application{
 				GUID:      "some-app-guid",
 				Name:      "some-app",
-				Instances: 2,
+				Instances: types.NullInt{Value: 2, IsSet: true},
 			}
 
 			fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
@@ -687,7 +688,7 @@ var _ = Describe("Application Actions", func() {
 					appCount += 1
 					return ccv2.Application{
 						GUID:         "some-app-guid",
-						Instances:    2,
+						Instances:    types.NullInt{Value: 2, IsSet: true},
 						Name:         "some-app",
 						PackageState: ccv2.ApplicationPackagePending,
 					}, ccv2.Warnings{"app-warnings-1"}, nil
@@ -696,7 +697,7 @@ var _ = Describe("Application Actions", func() {
 				return ccv2.Application{
 					GUID:         "some-app-guid",
 					Name:         "some-app",
-					Instances:    2,
+					Instances:    types.NullInt{Value: 2, IsSet: true},
 					PackageState: ccv2.ApplicationPackageStaged,
 				}, ccv2.Warnings{"app-warnings-2"}, nil
 			}
@@ -756,7 +757,7 @@ var _ = Describe("Application Actions", func() {
 								return ccv2.Application{
 									GUID:                "some-app-guid",
 									Name:                "some-app",
-									Instances:           2,
+									Instances:           types.NullInt{Value: 2, IsSet: true},
 									PackageState:        ccv2.ApplicationPackageFailed,
 									StagingFailedReason: "NoAppDetectedError",
 								}, ccv2.Warnings{"app-warnings-1"}, nil
@@ -782,7 +783,7 @@ var _ = Describe("Application Actions", func() {
 								return ccv2.Application{
 									GUID:                "some-app-guid",
 									Name:                "some-app",
-									Instances:           2,
+									Instances:           types.NullInt{Value: 2, IsSet: true},
 									PackageState:        ccv2.ApplicationPackageFailed,
 									StagingFailedReason: "OhNoes",
 								}, ccv2.Warnings{"app-warnings-1"}, nil
@@ -821,7 +822,6 @@ var _ = Describe("Application Actions", func() {
 					})
 				})
 			})
-
 		}
 
 		var ItHandlesStartingIssues = func() {
@@ -947,7 +947,7 @@ var _ = Describe("Application Actions", func() {
 			Context("when the app has zero instances", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-						Instances: 0,
+						Instances: types.NullInt{Value: 0, IsSet: true},
 						Name:      "some-app",
 					}, ccv2.Warnings{"state-warning"}, nil)
 				})
@@ -999,7 +999,7 @@ var _ = Describe("Application Actions", func() {
 		Describe("StartApplication", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-					Instances: 2,
+					Instances: types.NullInt{Value: 2, IsSet: true},
 					Name:      "some-app",
 				}, ccv2.Warnings{"state-warning"}, nil)
 			})
@@ -1036,7 +1036,7 @@ var _ = Describe("Application Actions", func() {
 		Describe("RestartApplication", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-					Instances: 2,
+					Instances: types.NullInt{Value: 2, IsSet: true},
 					Name:      "some-app",
 				}, ccv2.Warnings{"state-warning"}, nil)
 			})
@@ -1093,7 +1093,7 @@ var _ = Describe("Application Actions", func() {
 
 							updateApplicationCalled = true
 							return ccv2.Application{GUID: "some-app-guid",
-								Instances: 2,
+								Instances: types.NullInt{Value: 2, IsSet: true},
 								Name:      "some-app",
 							}, ccv2.Warnings{"state-warning"}, nil
 						}
@@ -1167,7 +1167,7 @@ var _ = Describe("Application Actions", func() {
 			Context("when restaging succeeds", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-						Instances: 2,
+						Instances: types.NullInt{Value: 2, IsSet: true},
 						Name:      "some-app",
 					}, ccv2.Warnings{"state-warning"}, nil)
 				})
@@ -1202,7 +1202,7 @@ var _ = Describe("Application Actions", func() {
 			Context("when restaging errors", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.RestageApplicationReturns(ccv2.Application{GUID: "some-app-guid",
-						Instances: 2,
+						Instances: types.NullInt{Value: 2, IsSet: true},
 						Name:      "some-app",
 					}, ccv2.Warnings{"state-warning"}, errors.New("some-error"))
 				})
