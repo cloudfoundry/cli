@@ -18,6 +18,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -209,7 +210,7 @@ var _ = Describe("v2-push Command", func() {
 								DetectedBuildpack:    "some-buildpack",
 								DetectedStartCommand: "some start command",
 								GUID:                 "some-app-guid",
-								Instances:            3,
+								Instances:            types.NullInt{Value: 3, IsSet: true},
 								Memory:               128,
 								Name:                 appName,
 								PackageUpdatedAt:     time.Unix(0, 0),
@@ -475,7 +476,7 @@ var _ = Describe("v2-push Command", func() {
 										DetectedBuildpack:    "some-buildpack",
 										DetectedStartCommand: "some start command",
 										GUID:                 "some-app-guid",
-										Instances:            3,
+										Instances:            types.NullInt{Value: 3, IsSet: true},
 										Memory:               128,
 										Name:                 appName,
 										PackageUpdatedAt:     time.Unix(0, 0),
@@ -525,7 +526,7 @@ var _ = Describe("v2-push Command", func() {
 									DetectedBuildpack:    "some-buildpack",
 									DetectedStartCommand: "some start command",
 									GUID:                 "some-app-guid",
-									Instances:            3,
+									Instances:            types.NullInt{Value: 3, IsSet: true},
 									Memory:               128,
 									Name:                 appName,
 									PackageUpdatedAt:     time.Unix(0, 0),
@@ -651,7 +652,7 @@ var _ = Describe("v2-push Command", func() {
 				cmd.DiskQuota = flag.Megabytes{Size: 1024}
 				cmd.HealthCheckTimeout = 14
 				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
-				cmd.Instances = 12
+				cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
 				cmd.Memory = flag.Megabytes{Size: 100}
 				cmd.StackName = "some-stack"
 			})
@@ -663,7 +664,7 @@ var _ = Describe("v2-push Command", func() {
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 				Expect(settings.HealthCheckTimeout).To(Equal(14))
 				Expect(settings.HealthCheckType).To(Equal("http"))
-				Expect(settings.Instances).To(Equal(12))
+				Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
 				Expect(settings.Memory).To(Equal(uint64(100)))
 				Expect(settings.StackName).To(Equal("some-stack"))
 			})

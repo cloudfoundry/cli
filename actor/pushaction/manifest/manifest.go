@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/types"
+
 	"github.com/cloudfoundry/bytefmt"
 
 	yaml "gopkg.in/yaml.v2"
@@ -31,7 +33,7 @@ type Application struct {
 	// for starting an application.
 	HealthCheckTimeout int
 	HealthCheckType    string
-	Instances          int
+	Instances          types.NullInt
 	// Memory is the amount of memory in megabytes.
 	Memory    uint64
 	Name      string
@@ -42,7 +44,7 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.BuildpackName,
 		app.Command,
@@ -51,7 +53,8 @@ func (app Application) String() string {
 		app.HealthCheckHTTPEndpoint,
 		app.HealthCheckTimeout,
 		app.HealthCheckType,
-		app.Instances,
+		app.Instances.IsSet,
+		app.Instances.Value,
 		app.Memory,
 		app.Path,
 		strings.Join(app.Services, ", "),
@@ -67,7 +70,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 		EnvironmentVariables    map[string]string `yaml:"env"`
 		HealthCheckHTTPEndpoint string            `yaml:"health-check-http-endpoint"`
 		HealthCheckType         string            `yaml:"health-check-type"`
-		Instances               int               `yaml:"instances"`
+		Instances               string            `yaml:"instances"`
 		Memory                  string            `yaml:"memory"`
 		Name                    string            `yaml:"name"`
 		Path                    string            `yaml:"path"`
@@ -85,13 +88,17 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.Command = manifestApp.Command
 	app.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
 	app.HealthCheckType = manifestApp.HealthCheckType
-	app.Instances = manifestApp.Instances
 	app.Name = manifestApp.Name
 	app.Path = manifestApp.Path
 	app.Services = manifestApp.Services
 	app.StackName = manifestApp.StackName
 	app.HealthCheckTimeout = manifestApp.Timeout
 	app.EnvironmentVariables = manifestApp.EnvironmentVariables
+
+	err = app.Instances.ParseFlagValue(manifestApp.Instances)
+	if err != nil {
+		return err
+	}
 
 	if manifestApp.DiskQuota != "" {
 		disk, err := bytefmt.ToMegabytes(manifestApp.DiskQuota)

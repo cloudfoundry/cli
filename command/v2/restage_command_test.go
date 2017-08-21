@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/cloudfoundry/bytefmt"
@@ -256,7 +257,7 @@ var _ = Describe("Restage Command", func() {
 							Application: v2action.Application{
 								Name:                 "some-app",
 								GUID:                 "some-app-guid",
-								Instances:            3,
+								Instances:            types.NullInt{Value: 3, IsSet: true},
 								Memory:               128,
 								PackageUpdatedAt:     time.Unix(0, 0),
 								DetectedBuildpack:    "some-buildpack",
@@ -495,7 +496,7 @@ var _ = Describe("Restage Command", func() {
 						Application: v2action.Application{
 							Name:                 "some-app",
 							GUID:                 "some-app-guid",
-							Instances:            3,
+							Instances:            types.NullInt{Value: 3, IsSet: true},
 							Memory:               128,
 							PackageUpdatedAt:     time.Unix(0, 0),
 							DetectedBuildpack:    "some-buildpack",

@@ -3,6 +3,7 @@ package ui_test
 import (
 	"regexp"
 
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	. "code.cloudfoundry.org/cli/util/ui"
 	"code.cloudfoundry.org/cli/util/ui/uifakes"
@@ -179,6 +180,60 @@ var _ = Describe("UI", func() {
 				Context("when the values are a different type", func() {
 					It("should return an ErrValueMissmatch", func() {
 						err := ui.DisplayChangeForPush("asdf", 2, false, 7, "asdf")
+						Expect(err).To(MatchError(ErrValueMissmatch))
+					})
+				})
+			})
+
+			Context("when passed NullInt for values", func() {
+				Context("when the values are not equal", func() {
+					Context("when the originalValue is not empty", func() {
+						It("should display the header with differences", func() {
+							err := ui.DisplayChangeForPush("val", 2, false, types.NullInt{
+								Value: 1,
+								IsSet: true,
+							}, types.NullInt{
+								Value: 2,
+								IsSet: true,
+							})
+							Expect(err).ToNot(HaveOccurred())
+							Expect(out).To(Say("\x1b\\[31m\\-\\s+val  1\x1b\\[0m"))
+							Expect(out).To(Say("\x1b\\[32m\\+\\s+val  2\x1b\\[0m"))
+						})
+					})
+
+					Context("when the originalValue is not set", func() {
+						It("should display the header with the new value only", func() {
+							err := ui.DisplayChangeForPush("val", 2, false, types.NullInt{
+								Value: 0,
+								IsSet: false,
+							}, types.NullInt{
+								Value: 1,
+								IsSet: true,
+							})
+							Expect(err).ToNot(HaveOccurred())
+							Expect(out).To(Say("\x1b\\[32m\\+\\s+val  1\x1b\\[0m"))
+						})
+					})
+				})
+
+				Context("when the values are the equal", func() {
+					It("should display the header without differences", func() {
+						err := ui.DisplayChangeForPush("val", 2, false, types.NullInt{
+							Value: 3,
+							IsSet: true,
+						}, types.NullInt{
+							Value: 3,
+							IsSet: true,
+						})
+						Expect(err).ToNot(HaveOccurred())
+						Expect(out).To(Say("(?m)^\\s+val  3$"))
+					})
+				})
+
+				Context("when the values are a different type", func() {
+					It("should return an ErrValueMissmatch", func() {
+						err := ui.DisplayChangeForPush("asdf", 2, false, types.NullInt{}, "asdf")
 						Expect(err).To(MatchError(ErrValueMissmatch))
 					})
 				})

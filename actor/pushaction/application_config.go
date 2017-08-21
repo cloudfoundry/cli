@@ -219,7 +219,7 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	if manifest.HealthCheckType != "" {
 		application.HealthCheckType = manifest.HealthCheckType
 	}
-	if manifest.Instances != 0 {
+	if manifest.Instances.IsSet {
 		application.Instances = manifest.Instances
 	}
 	if manifest.Memory != 0 {
@@ -244,6 +244,8 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 			application.EnvironmentVariables = env
 		}
 	}
+
+	log.Debugln("post application override:", application)
 
 	return application
 }

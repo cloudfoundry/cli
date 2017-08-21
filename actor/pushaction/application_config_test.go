@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -305,7 +306,7 @@ var _ = Describe("Application Config", func() {
 					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
 					manifestApps[0].HealthCheckTimeout = 5
 					manifestApps[0].HealthCheckType = "some-buildpack"
-					manifestApps[0].Instances = 1
+					manifestApps[0].Instances = types.NullInt{Value: 1, IsSet: true}
 					manifestApps[0].DiskQuota = 2
 					manifestApps[0].Memory = 3
 					manifestApps[0].StackName = "some-stack"
@@ -337,7 +338,7 @@ var _ = Describe("Application Config", func() {
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
 					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
-					Expect(firstConfig.DesiredApplication.Instances).To(Equal(1))
+					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 1, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
 					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))
@@ -373,7 +374,7 @@ var _ = Describe("Application Config", func() {
 						HealthCheckHTTPEndpoint: "some-buildpack",
 						HealthCheckTimeout:      5,
 						HealthCheckType:         "some-buildpack",
-						Instances:               1,
+						Instances:               types.NullInt{Value: 3, IsSet: true},
 						Memory:                  3,
 						Name:                    appName,
 						StackGUID:               stack.GUID,
@@ -394,7 +395,7 @@ var _ = Describe("Application Config", func() {
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
 					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
-					Expect(firstConfig.DesiredApplication.Instances).To(Equal(1))
+					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 3, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
 					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))

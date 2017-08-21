@@ -45,7 +45,7 @@ type V2PushCommand struct {
 	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	// Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
-	Instances int            `short:"i" description:"Number of instances"`
+	Instances flag.Instances `short:"i" description:"Number of instances"`
 	DiskQuota flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	Memory    flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	// NoHostname           bool                        `long:"no-hostname" description:"Map the root domain to this app"`
@@ -222,7 +222,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		DockerPassword:     cmd.Config.DockerPassword(),
 		HealthCheckTimeout: cmd.HealthCheckTimeout,
 		HealthCheckType:    cmd.HealthCheckType.Type,
-		Instances:          cmd.Instances,
+		Instances:          cmd.Instances.NullInt,
 		Memory:             cmd.Memory.Size,
 		Name:               cmd.OptionalArgs.AppName,
 		ProvidedAppPath:    string(cmd.AppPath),

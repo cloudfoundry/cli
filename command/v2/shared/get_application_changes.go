@@ -104,8 +104,7 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 			})
 	}
 
-	// TODO: figure this out later
-	if appConfig.CurrentApplication.Instances != 0 || appConfig.DesiredApplication.Instances != 0 {
+	if appConfig.CurrentApplication.Instances.IsSet || appConfig.DesiredApplication.Instances.IsSet {
 		changes = append(changes,
 			ui.Change{
 				Header:       "instances:",

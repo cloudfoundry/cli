@@ -3,6 +3,7 @@ package pushaction_test
 import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -196,7 +197,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{DockerImage: "some-docker-image"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{HealthCheckTimeout: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{HealthCheckType: "http"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Instances: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Instances: types.NullInt{IsSet: true}}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Memory: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{ProvidedAppPath: "some-path"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{StackName: "some-stackname"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),

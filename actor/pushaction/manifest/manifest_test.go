@@ -5,6 +5,7 @@ import (
 	"os"
 
 	. "code.cloudfoundry.org/cli/actor/pushaction/manifest"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -57,6 +58,7 @@ applications:
   timeout: 120
 - name: "app-2"
   disk_quota: 1G
+  instances: 0
   memory: 2G
   services:
   - service_1
@@ -79,17 +81,24 @@ applications:
 					Command:                 "some-command",
 					HealthCheckHTTPEndpoint: "\\some-endpoint",
 					HealthCheckType:         "http",
-					Instances:               10,
-					DiskQuota:               100,
-					Memory:                  200,
-					StackName:               "some-stack",
-					HealthCheckTimeout:      120,
+					Instances: types.NullInt{
+						Value: 10,
+						IsSet: true,
+					},
+					DiskQuota:          100,
+					Memory:             200,
+					StackName:          "some-stack",
+					HealthCheckTimeout: 120,
 				},
 				Application{
 					Name:      "app-2",
 					DiskQuota: 1024,
-					Memory:    2048,
-					Services:  []string{"service_1", "service_2"},
+					Instances: types.NullInt{
+						Value: 0,
+						IsSet: true,
+					},
+					Memory:   2048,
+					Services: []string{"service_1", "service_2"},
 				},
 				Application{
 					Name: "app-3",
