@@ -103,7 +103,7 @@ type commandList struct {
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
 	InstallPlugin                      InstallPluginCommand                         `command:"install-plugin" description:"Install CLI plugin"`
 	IsolationSegments                  v3.IsolationSegmentsCommand                  `command:"isolation-segments" description:"List all isolation segments"`
-	ListNetworkAccess                  v3.ListNetworkAccessCommand                  `command:"list-network-access" description:"List direct network traffic from one app to another"`
+	ListNetworkAccess                  v3.ListNetworkAccessCommand                  `command:"list-network-access" description:"List policy for direct network traffic from one app to another"`
 	ListPluginRepos                    plugin.ListPluginReposCommand                `command:"list-plugin-repos" description:"List all the added plugin repositories"`
 	Login                              v2.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v2.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`

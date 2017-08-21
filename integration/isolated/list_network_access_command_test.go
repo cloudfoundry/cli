@@ -17,7 +17,7 @@ var _ = Describe("list-network-access command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("list-network-access", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("list-network-access - List direct network traffic from one app to another"))
+				Eventually(session).Should(Say("list-network-access - List policy for direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(regexp.QuoteMeta("cf list-network-access [--source SOURCE_APP]")))
 				Eventually(session).Should(Say("OPTIONS:"))
