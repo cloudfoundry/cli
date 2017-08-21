@@ -132,7 +132,8 @@ var _ = Describe("v3-list-droplets Command", func() {
 		It("prints the application droplets and outputs warnings", func() {
 			Expect(executeErr).ToNot(HaveOccurred())
 
-			Expect(testUI.Out).To(Say("Listing droplets of app some-app in org some-org / space some-space as steve\\.\\.\\."))
+			Expect(testUI.Out).To(Say("Listing droplets of app some-app in org some-org / space some-space as steve\\.\\.\\.\n"))
+			Expect(testUI.Out).To(Say("\n"))
 
 			createdAtOneParsed, err := time.Parse(time.RFC3339, createdAtOne)
 			Expect(err).ToNot(HaveOccurred())

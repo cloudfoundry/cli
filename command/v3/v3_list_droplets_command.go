@@ -61,6 +61,7 @@ func (cmd V3ListDropletsCommand) Execute(args []string) error {
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  user.Name,
 	})
+	cmd.UI.DisplayNewline()
 
 	droplets, warnings, err := cmd.Actor.GetApplicationDroplets(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
