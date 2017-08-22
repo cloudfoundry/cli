@@ -410,16 +410,13 @@ var _ = Describe("Process", func() {
 	Describe("CreateApplicationProcessScale", func() {
 		var passedProcess ProcessScaleOptions
 
-		BeforeEach(func() {
-			passedProcess = ProcessScaleOptions{
-				Instances:  types.NullInt{Value: 2, IsSet: true},
-				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
-				DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
-			}
-		})
-
 		Context("when providing all scale options", func() {
 			BeforeEach(func() {
+				passedProcess = ProcessScaleOptions{
+					Instances:  types.NullInt{Value: 2, IsSet: true},
+					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
+				}
 				expectedBody := `{
 					"instances": 2,
 					"memory_in_mb": 100,
@@ -459,6 +456,62 @@ var _ = Describe("Process", func() {
 					Instances:  2,
 					MemoryInMB: 100,
 					DiskInMB:   200,
+					HealthCheck: ProcessHealthCheck{
+						Type: "port",
+						Data: ProcessHealthCheckData{
+							Endpoint: "some-endpoint",
+						},
+					},
+				}))
+			})
+		})
+
+		Context("when providing all scale options with 0 values", func() {
+			BeforeEach(func() {
+				passedProcess = ProcessScaleOptions{
+					Instances:  types.NullInt{Value: 0, IsSet: true},
+					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
+					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
+				}
+				expectedBody := `{
+					"instances": 0,
+					"memory_in_mb": 0,
+					"disk_in_mb": 0
+				}`
+				response := `{
+					"guid": "some-process-guid",
+					"type": "web",
+					"command": "rackup",
+					"instances": 0,
+					"memory_in_mb": 0,
+					"disk_in_mb": 0,
+					"health_check": {
+						"type": "port",
+						"data": {
+							"timeout": null,
+							"endpoint": "some-endpoint"
+						}
+					}
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/processes/web/actions/scale"),
+						VerifyJSON(expectedBody),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+				Expect(process).To(Equal(Process{
+					GUID:       "some-process-guid",
+					Type:       "web",
+					Instances:  0,
+					MemoryInMB: 0,
+					DiskInMB:   0,
 					HealthCheck: ProcessHealthCheck{
 						Type: "port",
 						Data: ProcessHealthCheckData{
