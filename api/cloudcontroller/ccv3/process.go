@@ -3,6 +3,7 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -126,19 +127,19 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 
 func (client *Client) CreateApplicationProcessScale(appGUID string, processType string, scaleOptions ProcessScaleOptions) (Process, Warnings, error) {
 	ccProcessScale := struct {
-		Instances  int    `json:"instances,omitempty"`
-		MemoryInMB uint64 `json:"memory_in_mb,omitempty"`
-		DiskInMB   uint64 `json:"disk_in_mb,omitempty"`
+		Instances  json.Number `json:"instances,omitempty"`
+		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
+		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
 	}{}
 
 	if scaleOptions.Instances.IsSet {
-		ccProcessScale.Instances = scaleOptions.Instances.Value
+		ccProcessScale.Instances = json.Number(fmt.Sprint(scaleOptions.Instances.Value))
 	}
 	if scaleOptions.MemoryInMB.IsSet {
-		ccProcessScale.MemoryInMB = scaleOptions.MemoryInMB.Value
+		ccProcessScale.MemoryInMB = json.Number(fmt.Sprint(scaleOptions.MemoryInMB.Value))
 	}
 	if scaleOptions.DiskInMB.IsSet {
-		ccProcessScale.DiskInMB = scaleOptions.DiskInMB.Value
+		ccProcessScale.DiskInMB = json.Number(fmt.Sprint(scaleOptions.DiskInMB.Value))
 	}
 
 	body, err := json.Marshal(ccProcessScale)

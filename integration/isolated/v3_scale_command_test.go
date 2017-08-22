@@ -170,11 +170,13 @@ var _ = Describe("v3-scale command", func() {
 
 			Context("when only one scale option flag is provided", func() {
 				It("scales the app accordingly", func() {
+					By("getting current scale information")
 					session := helpers.CF("v3-scale", appName)
 					Eventually(session).Should(Exit(0))
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
 					Expect(appTable.Processes).To(HaveLen(1))
 
+					By("scaling to 3 instances")
 					session = helpers.CF("v3-scale", appName, "-i", "3")
 					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
@@ -188,6 +190,7 @@ var _ = Describe("v3-scale command", func() {
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 32M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 1G`))
 
+					By("scaling memory to 64M")
 					buffer := NewBuffer()
 					buffer.Write([]byte("y\n"))
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-m", "64M")
@@ -205,6 +208,7 @@ var _ = Describe("v3-scale command", func() {
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 1G`))
 
+					By("scaling disk to 92M")
 					buffer = NewBuffer()
 					buffer.Write([]byte("y\n"))
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-k", "92M")
@@ -221,6 +225,17 @@ var _ = Describe("v3-scale command", func() {
 					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
+
+					By("scaling to 0 instances")
+					session = helpers.CF("v3-scale", appName, "-i", "0")
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:0/0`))
 				})
 			})
 
