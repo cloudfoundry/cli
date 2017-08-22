@@ -1756,15 +1756,15 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-droplets APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-get-health-check APP_NAME",
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-list-droplets APP_NAME",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME v3-list-packages APP_NAME",
+    "id": "CF_NAME v3-packages APP_NAME",
     "translation": ""
   },
   {
@@ -1846,6 +1846,10 @@
   {
     "id": "Cannot provision instances of paid service plans",
     "translation": "Impossible de mettre à disposition les instances des plans de service payants"
+  },
+  {
+    "id": "Cannot specify 'null' or 'default' with other buildpacks",
+    "translation": ""
   },
   {
     "id": "Cannot specify both lock and unlock options.",
@@ -6876,7 +6880,7 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK_NAME] [-p APP_PATH]",
+    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH]",
     "translation": ""
   },
   {
