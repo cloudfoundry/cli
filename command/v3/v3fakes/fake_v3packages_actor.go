@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
-type FakeV3ListPackagesActor struct {
+type FakeV3PackagesActor struct {
 	GetApplicationPackagesStub        func(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error)
 	getApplicationPackagesMutex       sync.RWMutex
 	getApplicationPackagesArgsForCall []struct {
@@ -29,7 +29,7 @@ type FakeV3ListPackagesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3ListPackagesActor) GetApplicationPackages(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error) {
+func (fake *FakeV3PackagesActor) GetApplicationPackages(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error) {
 	fake.getApplicationPackagesMutex.Lock()
 	ret, specificReturn := fake.getApplicationPackagesReturnsOnCall[len(fake.getApplicationPackagesArgsForCall)]
 	fake.getApplicationPackagesArgsForCall = append(fake.getApplicationPackagesArgsForCall, struct {
@@ -47,19 +47,19 @@ func (fake *FakeV3ListPackagesActor) GetApplicationPackages(appName string, spac
 	return fake.getApplicationPackagesReturns.result1, fake.getApplicationPackagesReturns.result2, fake.getApplicationPackagesReturns.result3
 }
 
-func (fake *FakeV3ListPackagesActor) GetApplicationPackagesCallCount() int {
+func (fake *FakeV3PackagesActor) GetApplicationPackagesCallCount() int {
 	fake.getApplicationPackagesMutex.RLock()
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	return len(fake.getApplicationPackagesArgsForCall)
 }
 
-func (fake *FakeV3ListPackagesActor) GetApplicationPackagesArgsForCall(i int) (string, string) {
+func (fake *FakeV3PackagesActor) GetApplicationPackagesArgsForCall(i int) (string, string) {
 	fake.getApplicationPackagesMutex.RLock()
 	defer fake.getApplicationPackagesMutex.RUnlock()
 	return fake.getApplicationPackagesArgsForCall[i].appName, fake.getApplicationPackagesArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeV3ListPackagesActor) GetApplicationPackagesReturns(result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3PackagesActor) GetApplicationPackagesReturns(result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
 	fake.GetApplicationPackagesStub = nil
 	fake.getApplicationPackagesReturns = struct {
 		result1 []v3action.Package
@@ -68,7 +68,7 @@ func (fake *FakeV3ListPackagesActor) GetApplicationPackagesReturns(result1 []v3a
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ListPackagesActor) GetApplicationPackagesReturnsOnCall(i int, result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3PackagesActor) GetApplicationPackagesReturnsOnCall(i int, result1 []v3action.Package, result2 v3action.Warnings, result3 error) {
 	fake.GetApplicationPackagesStub = nil
 	if fake.getApplicationPackagesReturnsOnCall == nil {
 		fake.getApplicationPackagesReturnsOnCall = make(map[int]struct {
@@ -84,7 +84,7 @@ func (fake *FakeV3ListPackagesActor) GetApplicationPackagesReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ListPackagesActor) Invocations() map[string][][]interface{} {
+func (fake *FakeV3PackagesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationPackagesMutex.RLock()
@@ -96,7 +96,7 @@ func (fake *FakeV3ListPackagesActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeV3ListPackagesActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeV3PackagesActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -108,4 +108,4 @@ func (fake *FakeV3ListPackagesActor) recordInvocation(key string, args []interfa
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v3.V3ListPackagesActor = new(FakeV3ListPackagesActor)
+var _ v3.V3PackagesActor = new(FakeV3PackagesActor)

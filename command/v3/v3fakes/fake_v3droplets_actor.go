@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
-type FakeV3ListDropletsActor struct {
+type FakeV3DropletsActor struct {
 	GetApplicationDropletsStub        func(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error)
 	getApplicationDropletsMutex       sync.RWMutex
 	getApplicationDropletsArgsForCall []struct {
@@ -29,7 +29,7 @@ type FakeV3ListDropletsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3ListDropletsActor) GetApplicationDroplets(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error) {
+func (fake *FakeV3DropletsActor) GetApplicationDroplets(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error) {
 	fake.getApplicationDropletsMutex.Lock()
 	ret, specificReturn := fake.getApplicationDropletsReturnsOnCall[len(fake.getApplicationDropletsArgsForCall)]
 	fake.getApplicationDropletsArgsForCall = append(fake.getApplicationDropletsArgsForCall, struct {
@@ -47,19 +47,19 @@ func (fake *FakeV3ListDropletsActor) GetApplicationDroplets(appName string, spac
 	return fake.getApplicationDropletsReturns.result1, fake.getApplicationDropletsReturns.result2, fake.getApplicationDropletsReturns.result3
 }
 
-func (fake *FakeV3ListDropletsActor) GetApplicationDropletsCallCount() int {
+func (fake *FakeV3DropletsActor) GetApplicationDropletsCallCount() int {
 	fake.getApplicationDropletsMutex.RLock()
 	defer fake.getApplicationDropletsMutex.RUnlock()
 	return len(fake.getApplicationDropletsArgsForCall)
 }
 
-func (fake *FakeV3ListDropletsActor) GetApplicationDropletsArgsForCall(i int) (string, string) {
+func (fake *FakeV3DropletsActor) GetApplicationDropletsArgsForCall(i int) (string, string) {
 	fake.getApplicationDropletsMutex.RLock()
 	defer fake.getApplicationDropletsMutex.RUnlock()
 	return fake.getApplicationDropletsArgsForCall[i].appName, fake.getApplicationDropletsArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeV3ListDropletsActor) GetApplicationDropletsReturns(result1 []v3action.Droplet, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3DropletsActor) GetApplicationDropletsReturns(result1 []v3action.Droplet, result2 v3action.Warnings, result3 error) {
 	fake.GetApplicationDropletsStub = nil
 	fake.getApplicationDropletsReturns = struct {
 		result1 []v3action.Droplet
@@ -68,7 +68,7 @@ func (fake *FakeV3ListDropletsActor) GetApplicationDropletsReturns(result1 []v3a
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ListDropletsActor) GetApplicationDropletsReturnsOnCall(i int, result1 []v3action.Droplet, result2 v3action.Warnings, result3 error) {
+func (fake *FakeV3DropletsActor) GetApplicationDropletsReturnsOnCall(i int, result1 []v3action.Droplet, result2 v3action.Warnings, result3 error) {
 	fake.GetApplicationDropletsStub = nil
 	if fake.getApplicationDropletsReturnsOnCall == nil {
 		fake.getApplicationDropletsReturnsOnCall = make(map[int]struct {
@@ -84,7 +84,7 @@ func (fake *FakeV3ListDropletsActor) GetApplicationDropletsReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ListDropletsActor) Invocations() map[string][][]interface{} {
+func (fake *FakeV3DropletsActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getApplicationDropletsMutex.RLock()
@@ -96,7 +96,7 @@ func (fake *FakeV3ListDropletsActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeV3ListDropletsActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeV3DropletsActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -108,4 +108,4 @@ func (fake *FakeV3ListDropletsActor) recordInvocation(key string, args []interfa
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v3.V3ListDropletsActor = new(FakeV3ListDropletsActor)
+var _ v3.V3DropletsActor = new(FakeV3DropletsActor)

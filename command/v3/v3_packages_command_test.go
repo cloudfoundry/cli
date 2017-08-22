@@ -19,13 +19,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v3-list-packages Command", func() {
+var _ = Describe("v3-packages Command", func() {
 	var (
-		cmd             v3.V3ListPackagesCommand
+		cmd             v3.V3PackagesCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeV3ListPackagesActor
+		fakeActor       *v3fakes.FakeV3PackagesActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,12 +34,12 @@ var _ = Describe("v3-list-packages Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeV3ListPackagesActor)
+		fakeActor = new(v3fakes.FakeV3PackagesActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		cmd = v3.V3ListPackagesCommand{
+		cmd = v3.V3PackagesCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
 			UI:           testUI,
 			Config:       fakeConfig,

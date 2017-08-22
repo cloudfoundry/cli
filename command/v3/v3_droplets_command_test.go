@@ -19,13 +19,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v3-list-droplets Command", func() {
+var _ = Describe("v3-droplets Command", func() {
 	var (
-		cmd             v3.V3ListDropletsCommand
+		cmd             v3.V3DropletsCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeV3ListDropletsActor
+		fakeActor       *v3fakes.FakeV3DropletsActor
 		binaryName      string
 		executeErr      error
 	)
@@ -34,12 +34,12 @@ var _ = Describe("v3-list-droplets Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeV3ListDropletsActor)
+		fakeActor = new(v3fakes.FakeV3DropletsActor)
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		cmd = v3.V3ListDropletsCommand{
+		cmd = v3.V3DropletsCommand{
 			RequiredArgs: flag.AppName{AppName: "some-app"},
 			UI:           testUI,
 			Config:       fakeConfig,

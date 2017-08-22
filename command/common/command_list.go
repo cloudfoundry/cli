@@ -21,8 +21,8 @@ type commandList struct {
 	V3DeleteApp          v3.V3DeleteCommand             `command:"v3-delete" description:"**EXPERIMENTAL** Delete a V3 App"`
 	V3CreatePackage      v3.V3CreatePackageCommand      `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
 	V3GetHealthCheck     v3.V3GetHealthCheckCommand     `command:"v3-get-health-check" description:"**EXPERIMENTAL** Show the type of health check performed on an app"`
-	V3ListDroplets       v3.V3ListDropletsCommand       `command:"v3-list-droplets" description:"**EXPERIMENTAL** List droplets of an app"`
-	V3ListPackages       v3.V3ListPackagesCommand       `command:"v3-list-packages" description:"**EXPERIMENTAL** List packages of an app"`
+	V3Droplets           v3.V3DropletsCommand           `command:"v3-droplets" description:"**EXPERIMENTAL** List droplets of an app"`
+	V3Packages           v3.V3PackagesCommand           `command:"v3-packages" description:"**EXPERIMENTAL** List packages of an app"`
 	V3Push               v3.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
 	V3RestartAppInstance v3.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"**EXPERIMENTAL** Terminate, then instantiate an app instance"`
