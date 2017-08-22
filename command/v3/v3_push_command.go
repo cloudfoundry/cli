@@ -39,9 +39,9 @@ type V3PushActor interface {
 type V3PushCommand struct {
 	RequiredArgs        flag.AppName                `positional-args:"yes"`
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
-	Buildpack           string                      `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK_NAME] [-p APP_PATH]"`
+	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH]"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 
 	UI                  command.UI
@@ -189,9 +189,13 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 		AppName:   cmd.RequiredArgs.AppName,
 		SpaceGUID: cmd.Config.TargetedSpace().GUID,
 	}
-	if cmd.Buildpack != "" {
-		createInput.Buildpacks = []string{cmd.Buildpack}
+
+	if verifyBuildpacks(cmd.Buildpacks) {
+		createInput.Buildpacks = cmd.Buildpacks
+	} else {
+		return v3action.Application{}, translatableerror.ConflictingBuildpacksError{}
 	}
+
 	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(createInput)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
@@ -230,8 +234,10 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 		"CurrentUser":  userName,
 	})
 
-	if cmd.Buildpack != "" {
-		buildpacks = []string{cmd.Buildpack}
+	if verifyBuildpacks(cmd.Buildpacks) {
+		buildpacks = cmd.Buildpacks
+	} else {
+		return v3action.Application{}, translatableerror.ConflictingBuildpacksError{}
 	}
 
 	app, warnings, err := cmd.Actor.UpdateApplication(appGUID, buildpacks)
@@ -368,4 +374,17 @@ func (cmd V3PushCommand) stopApplication(appGUID string, userName string) error 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 	return nil
+}
+
+func verifyBuildpacks(buildpacks []string) bool {
+	if len(buildpacks) < 2 {
+		return true
+	}
+
+	for _, buildpack := range buildpacks {
+		if buildpack == "default" || buildpack == "null" {
+			return false
+		}
+	}
+	return true
 }
