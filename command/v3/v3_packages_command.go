@@ -11,23 +11,23 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . V3ListDropletsActor
+//go:generate counterfeiter . V3PackagesActor
 
-type V3ListDropletsActor interface {
-	GetApplicationDroplets(appName string, spaceGUID string) ([]v3action.Droplet, v3action.Warnings, error)
+type V3PackagesActor interface {
+	GetApplicationPackages(appName string, spaceGUID string) ([]v3action.Package, v3action.Warnings, error)
 }
 
-type V3ListDropletsCommand struct {
+type V3PackagesCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-list-droplets APP_NAME"`
+	usage        interface{}  `usage:"CF_NAME v3-packages APP_NAME"`
 
 	UI          command.UI
 	Config      command.Config
-	Actor       V3ListDropletsActor
+	Actor       V3PackagesActor
 	SharedActor command.SharedActor
 }
 
-func (cmd *V3ListDropletsCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *V3PackagesCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
@@ -41,7 +41,7 @@ func (cmd *V3ListDropletsCommand) Setup(config command.Config, ui command.UI) er
 	return nil
 }
 
-func (cmd V3ListDropletsCommand) Execute(args []string) error {
+func (cmd V3PackagesCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
@@ -55,7 +55,7 @@ func (cmd V3ListDropletsCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Listing droplets of app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Listing packages of app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
@@ -63,14 +63,14 @@ func (cmd V3ListDropletsCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	droplets, warnings, err := cmd.Actor.GetApplicationDroplets(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
+	packages, warnings, err := cmd.Actor.GetApplicationPackages(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
-	if len(droplets) == 0 {
-		cmd.UI.DisplayText("No droplets found")
+	if len(packages) == 0 {
+		cmd.UI.DisplayText("No packages found")
 		return nil
 	}
 
@@ -82,15 +82,15 @@ func (cmd V3ListDropletsCommand) Execute(args []string) error {
 		},
 	}
 
-	for _, droplet := range droplets {
-		t, err := time.Parse(time.RFC3339, droplet.CreatedAt)
+	for _, pkg := range packages {
+		t, err := time.Parse(time.RFC3339, pkg.CreatedAt)
 		if err != nil {
 			return err
 		}
 
 		table = append(table, []string{
-			droplet.GUID,
-			cmd.UI.TranslateText(strings.ToLower(string(droplet.State))),
+			pkg.GUID,
+			cmd.UI.TranslateText(strings.ToLower(string(pkg.State))),
 			cmd.UI.UserFriendlyDate(t),
 		})
 	}
