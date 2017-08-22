@@ -43,16 +43,14 @@ var _ = Describe("Build", func() {
 			})
 
 			It("returns the created build and warnings", func() {
-				build, warnings, err := client.CreateBuild(Build{Package: Package{GUID: "some-package-guid"}})
+				build, warnings, err := client.CreateBuild(Build{PackageGUID: "some-package-guid"})
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(build).To(Equal(Build{
-					GUID:  "some-build-guid",
-					State: BuildStateStaging,
-					Droplet: Droplet{
-						GUID: "some-droplet-guid",
-					},
+					GUID:        "some-build-guid",
+					State:       BuildStateStaging,
+					DropletGUID: "some-droplet-guid",
 				}))
 			})
 		})
@@ -82,11 +80,11 @@ var _ = Describe("Build", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateBuild(Build{Package: Package{GUID: "some-package-guid"}})
+				_, warnings, err := client.CreateBuild(Build{PackageGUID: "some-package-guid"})
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "I can't even",
@@ -129,12 +127,10 @@ var _ = Describe("Build", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedBuild := Build{
-					GUID:  "some-build-guid",
-					State: BuildStateFailed,
-					Error: "some error",
-					Droplet: Droplet{
-						GUID: "some-droplet-guid",
-					},
+					GUID:        "some-build-guid",
+					State:       BuildStateFailed,
+					Error:       "some error",
+					DropletGUID: "some-droplet-guid",
 				}
 				Expect(build).To(Equal(expectedBuild))
 				Expect(warnings).To(ConsistOf("this is a warning"))
@@ -171,7 +167,7 @@ var _ = Describe("Build", func() {
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "I can't even",

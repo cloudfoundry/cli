@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -103,18 +102,18 @@ var _ = Describe("v3-push Command", func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
 
 			// we stub out StagePackage out here so the happy paths below don't hang
-			fakeActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-				buildStream := make(chan v3action.Build)
+			fakeActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+				dropletStream := make(chan v3action.Droplet)
 				warningsStream := make(chan v3action.Warnings)
 				errorStream := make(chan error)
 
 				go func() {
-					defer close(buildStream)
+					defer close(dropletStream)
 					defer close(warningsStream)
 					defer close(errorStream)
 				}()
 
-				return buildStream, warningsStream, errorStream
+				return dropletStream, warningsStream, errorStream
 			}
 		})
 
@@ -255,21 +254,21 @@ var _ = Describe("v3-push Command", func() {
 
 							BeforeEach(func() {
 								expectedErr = errors.New("any gibberish")
-								fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-									buildStream := make(chan v3action.Build)
+								fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+									dropletStream := make(chan v3action.Droplet)
 									warningsStream := make(chan v3action.Warnings)
 									errorStream := make(chan error)
 
 									go func() {
 										<-allLogsWritten
-										defer close(buildStream)
+										defer close(dropletStream)
 										defer close(warningsStream)
 										defer close(errorStream)
 										warningsStream <- v3action.Warnings{"some-staging-warning", "some-other-staging-warning"}
 										errorStream <- expectedErr
 									}()
 
-									return buildStream, warningsStream, errorStream
+									return dropletStream, warningsStream, errorStream
 								}
 							})
 
@@ -287,29 +286,28 @@ var _ = Describe("v3-push Command", func() {
 
 						Context("when the staging is successful", func() {
 							BeforeEach(func() {
-								fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-									buildStream := make(chan v3action.Build)
+								fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+									dropletStream := make(chan v3action.Droplet)
 									warningsStream := make(chan v3action.Warnings)
 									errorStream := make(chan error)
 
 									go func() {
 										<-allLogsWritten
-										defer close(buildStream)
+										defer close(dropletStream)
 										defer close(warningsStream)
 										defer close(errorStream)
 										warningsStream <- v3action.Warnings{"some-staging-warning", "some-other-staging-warning"}
-										buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "some-droplet-guid"}}
+										dropletStream <- v3action.Droplet{GUID: "some-droplet-guid"}
 									}()
 
-									return buildStream, warningsStream, errorStream
+									return dropletStream, warningsStream, errorStream
 								}
 							})
 
-							It("outputs the droplet GUID", func() {
+							It("outputs the staging message and warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
 								Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
-								Expect(testUI.Out).To(Say("droplet: some-droplet-guid"))
 								Expect(testUI.Out).To(Say("OK"))
 
 								Expect(testUI.Err).To(Say("some-staging-warning"))
@@ -364,7 +362,6 @@ var _ = Describe("v3-push Command", func() {
 
 								It("displays that the droplet was assigned", func() {
 									Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
-									Expect(testUI.Out).To(Say("droplet: some-droplet-guid"))
 									Expect(testUI.Out).To(Say("OK"))
 
 									Expect(testUI.Out).ToNot(Say("Stopping .*"))

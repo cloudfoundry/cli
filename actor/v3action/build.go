@@ -7,8 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
-type Build ccv3.Build
-
 type StagingTimeoutError struct {
 	AppName string
 	Timeout time.Duration
@@ -18,17 +16,17 @@ func (StagingTimeoutError) Error() string {
 	return "Timed out waiting for package to stage"
 }
 
-func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Build, <-chan Warnings, <-chan error) {
-	buildStream := make(chan Build)
+func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Droplet, <-chan Warnings, <-chan error) {
+	dropletStream := make(chan Droplet)
 	warningsStream := make(chan Warnings)
 	errorStream := make(chan error)
 
 	go func() {
-		defer close(buildStream)
+		defer close(dropletStream)
 		defer close(warningsStream)
 		defer close(errorStream)
 
-		build := ccv3.Build{Package: ccv3.Package{GUID: packageGUID}}
+		build := ccv3.Build{PackageGUID: packageGUID}
 		build, allWarnings, err := actor.CloudControllerClient.CreateBuild(build)
 		warningsStream <- Warnings(allWarnings)
 
@@ -55,7 +53,14 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Buil
 			case ccv3.BuildStateStaging:
 				time.Sleep(actor.Config.PollingInterval())
 			default:
-				buildStream <- Build(build)
+				ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
+				warningsStream <- Warnings(warnings)
+				if err != nil {
+					errorStream <- err
+					return
+				}
+
+				dropletStream <- actor.convertCCToActorDroplet(ccv3Droplet)
 				return
 			}
 		}
@@ -63,5 +68,5 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Buil
 		errorStream <- StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 	}()
 
-	return buildStream, warningsStream, errorStream
+	return dropletStream, warningsStream, errorStream
 }

@@ -4492,6 +4492,10 @@
     "translation": ""
   },
   {
+    "id": "Package staged",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "유료 서비스 플랜"
   },
@@ -6920,6 +6924,10 @@
     "translation": ""
   },
   {
+    "id": "created:",
+    "translation": ""
+  },
+  {
     "id": "delete-isolation-segment",
     "translation": ""
   },
@@ -6996,7 +7004,7 @@
     "translation": "작동 중지"
   },
   {
-    "id": "droplet: {{.DropletGUID}}",
+    "id": "droplet guid:",
     "translation": ""
   },
   {
@@ -7486,6 +7494,10 @@
   {
     "id": "state",
     "translation": "상태"
+  },
+  {
+    "id": "state:",
+    "translation": ""
   },
   {
     "id": "status",

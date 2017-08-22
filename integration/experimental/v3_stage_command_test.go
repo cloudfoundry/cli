@@ -146,8 +146,10 @@ var _ = Describe("v3-stage command", func() {
 				userName, _ := helpers.GetCredentials()
 
 				Eventually(session.Out).Should(Say("Staging package for %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("droplet: %s", helpers.GUIDRegex))
-				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Package staged"))
+				Eventually(session.Out).Should(Say("droplet guid:\\s+%s", helpers.GUIDRegex))
+				Eventually(session.Out).Should(Say("state:\\s+staged"))
+				Eventually(session.Out).Should(Say("created:\\s+%s", helpers.UserFriendlyDateRegex))
 
 				Eventually(session).Should(Exit(0))
 			})

@@ -91,6 +91,8 @@ func handleNotFound(errorResponse ccerror.V3Error) error {
 	switch errorResponse.Detail {
 	case "App not found":
 		return ccerror.ApplicationNotFoundError{}
+	case "Droplet not found":
+		return ccerror.DropletNotFoundError{}
 	case "Instance not found":
 		return ccerror.InstanceNotFoundError{}
 	case "Process not found":

@@ -202,6 +202,25 @@ var _ = Describe("Error Wrapper", func() {
 					})
 				})
 
+				Context("when a droplet is not found", func() {
+					BeforeEach(func() {
+						serverResponse = `
+{
+  "errors": [
+    {
+      "code": 10010,
+      "detail": "Droplet not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+					})
+
+					It("returns a DropletNotFoundError", func() {
+						Expect(makeError).To(MatchError(ccerror.DropletNotFoundError{}))
+					})
+				})
+
 				Context("generic not found", func() {
 
 					It("returns a ResourceNotFoundError", func() {

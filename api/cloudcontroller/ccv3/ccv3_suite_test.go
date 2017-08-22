@@ -117,6 +117,9 @@ func SetupV3Response() {
 			},
 			"processes": {
 				"href": "SERVER_URL/v3/processes"
+			},
+			"droplets": {
+				"href": "SERVER_URL/v3/droplets"
 			}
 		}
 	}`, "SERVER_URL", serverURL, -1)
