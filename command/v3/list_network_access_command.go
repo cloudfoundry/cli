@@ -20,7 +20,7 @@ type ListNetworkAccessCommand struct {
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
 
 	usage           interface{} `usage:"CF_NAME list-network-access [--source SOURCE_APP]"`
-	relatedCommands interface{} ``
+	relatedCommands interface{} `related_commands:"allow-network-access, apps, remove-network-access"`
 
 	UI          command.UI
 	Config      command.Config
@@ -39,7 +39,10 @@ func (cmd *ListNetworkAccessCommand) Setup(config command.Config, ui command.UI)
 	}
 
 	v3Actor := v3action.NewActor(client, config)
-	networkingClient := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	if err != nil {
+		return err
+	}
 	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
 
 	return nil

@@ -44,6 +44,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("ArgumentCombinationError", ArgumentCombinationError{}),
 		Entry("AssignDropletError", AssignDropletError{}),
 		Entry("BadCredentialsError", BadCredentialsError{}),
+		Entry("CFNetworkingEndpointNotFoundError", CFNetworkingEndpointNotFoundError{}),
 		Entry("CommandLineArgsWithMultipleAppsError", CommandLineArgsWithMultipleAppsError{}),
 		Entry("DockerPasswordNotSetError", DockerPasswordNotSetError{}),
 		Entry("DownloadPluginHTTPError", DownloadPluginHTTPError{}),

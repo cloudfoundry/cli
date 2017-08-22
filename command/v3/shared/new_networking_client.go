@@ -5,10 +5,15 @@ import (
 	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
 // NewNetworkingClient creates a new cfnetworking client.
-func NewNetworkingClient(apiURL string, config command.Config, uaaClient *uaa.Client, ui command.UI) *cfnetv1.Client {
+func NewNetworkingClient(apiURL string, config command.Config, uaaClient *uaa.Client, ui command.UI) (*cfnetv1.Client, error) {
+	if apiURL == "" {
+		return nil, translatableerror.CFNetworkingEndpointNotFoundError{}
+	}
+
 	wrappers := []cfnetv1.ConnectionWrapper{}
 
 	verbose, location := config.Verbose()
@@ -31,5 +36,5 @@ func NewNetworkingClient(apiURL string, config command.Config, uaaClient *uaa.Cl
 		SkipSSLValidation: config.SkipSSLValidation(),
 		URL:               apiURL,
 		Wrappers:          wrappers,
-	})
+	}), nil
 }

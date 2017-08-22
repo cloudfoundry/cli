@@ -17,11 +17,11 @@ type RemoveNetworkAccessActor interface {
 
 type RemoveNetworkAccessCommand struct {
 	RequiredArgs   flag.RemoveNetworkAccessArgs `positional-args:"yes"`
-	DestinationApp string                       `long:"destination-app" required:"true" description:"The destination app"`
-	Port           flag.NetworkPort             `long:"port" description:"Port or range to connect to destination app with"`
-	Protocol       flag.NetworkProtocol         `long:"protocol" description:"Protocol to connect apps with"`
+	DestinationApp string                       `long:"destination-app" required:"true"`
+	Port           flag.NetworkPort             `long:"port" required:"true" description:"Port or range to connect to destination app with"`
+	Protocol       flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol to connect apps with"`
 
-	usage           interface{} `usage:"CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, list-network-access"`
 
 	UI          command.UI
@@ -41,7 +41,10 @@ func (cmd *RemoveNetworkAccessCommand) Setup(config command.Config, ui command.U
 	}
 
 	v3Actor := v3action.NewActor(client, config)
-	networkingClient := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	if err != nil {
+		return err
+	}
 	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
 
 	return nil
@@ -57,7 +60,7 @@ func (cmd RemoveNetworkAccessCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Denying network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
 		"SrcAppName":  cmd.RequiredArgs.SourceApp,
 		"DestAppName": cmd.DestinationApp,
 		"Org":         cmd.Config.TargetedOrganization().Name,
