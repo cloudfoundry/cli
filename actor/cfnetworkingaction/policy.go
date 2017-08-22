@@ -12,6 +12,8 @@ type Policy struct {
 	EndPort         int
 }
 
+const policyNotFoundWarning = "Policy does not exist."
+
 func (actor Actor) AllowNetworkAccess(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
@@ -67,6 +69,9 @@ func (actor Actor) ListNetworkAccess(spaceGUID string, srcAppName string) ([]Pol
 
 	var policies []Policy
 	v1Policies, err := actor.NetworkingClient.ListPolicies(appGUID)
+	if err != nil {
+		return []Policy{}, allWarnings, err
+	}
 
 	for _, v1Policy := range v1Policies {
 		if appGUID == "" || v1Policy.Source.ID == appGUID {
@@ -92,7 +97,7 @@ func (actor Actor) ListNetworkAccess(spaceGUID string, srcAppName string) ([]Pol
 		}
 	}
 
-	return policies, allWarnings, err
+	return policies, allWarnings, nil
 }
 
 func (actor Actor) RemoveNetworkAccess(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
@@ -110,19 +115,30 @@ func (actor Actor) RemoveNetworkAccess(spaceGUID, srcAppName, destAppName, proto
 		return allWarnings, err
 	}
 
-	return allWarnings, actor.NetworkingClient.RemovePolicies([]cfnetv1.Policy{
-		{
-			Source: cfnetv1.PolicySource{
-				ID: srcApp.GUID,
-			},
-			Destination: cfnetv1.PolicyDestination{
-				ID:       destApp.GUID,
-				Protocol: cfnetv1.PolicyProtocol(protocol),
-				Ports: cfnetv1.Ports{
-					Start: startPort,
-					End:   endPort,
-				},
+	policyToRemove := cfnetv1.Policy{
+		Source: cfnetv1.PolicySource{
+			ID: srcApp.GUID,
+		},
+		Destination: cfnetv1.PolicyDestination{
+			ID:       destApp.GUID,
+			Protocol: cfnetv1.PolicyProtocol(protocol),
+			Ports: cfnetv1.Ports{
+				Start: startPort,
+				End:   endPort,
 			},
 		},
-	})
+	}
+
+	v1Policies, err := actor.NetworkingClient.ListPolicies(srcApp.GUID)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	for _, v1Policy := range v1Policies {
+		if v1Policy == policyToRemove {
+			return allWarnings, actor.NetworkingClient.RemovePolicies([]cfnetv1.Policy{policyToRemove})
+		}
+	}
+
+	return append(allWarnings, Warnings([]string{policyNotFoundWarning})...), nil
 }

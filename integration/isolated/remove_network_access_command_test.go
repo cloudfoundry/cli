@@ -162,12 +162,12 @@ var _ = Describe("remove-network-access command", func() {
 				})
 			})
 
-			PContext("when the policy does not exist", func() {
+			Context("when the policy does not exist", func() {
 				It("returns a helpful message and exits 0", func() {
 					session := helpers.CF("remove-network-access", appName, "--destination-app", appName, "--port", "8081", "--protocol", "udp")
 					username, _ := helpers.GetCredentials()
 					Eventually(session).Should(Say("Deny network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
-					Eventually(session).Should(Say("Policy does not exist"))
+					Eventually(session.Err).Should(Say("Policy does not exist."))
 					Eventually(session).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 
