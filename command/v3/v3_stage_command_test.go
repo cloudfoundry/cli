@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -116,31 +115,43 @@ var _ = Describe("v3-stage Command", func() {
 			})
 
 			Context("when the staging is successful", func() {
+				const dropletCreateTime = "2017-08-14T21:16:42Z"
+
 				BeforeEach(func() {
-					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-						buildStream := make(chan v3action.Build)
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+						dropletStream := make(chan v3action.Droplet)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
 
 						go func() {
 							<-allLogsWritten
-							defer close(buildStream)
+							defer close(dropletStream)
 							defer close(warningsStream)
 							defer close(errorStream)
 							warningsStream <- v3action.Warnings{"some-warning", "some-other-warning"}
-							buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "some-droplet-guid"}}
+							dropletStream <- v3action.Droplet{
+								GUID:      "some-droplet-guid",
+								CreatedAt: dropletCreateTime,
+								State:     v3action.DropletStateStaged,
+							}
 						}()
 
-						return buildStream, warningsStream, errorStream
+						return dropletStream, warningsStream, errorStream
 					}
 				})
 
 				It("outputs the droplet GUID", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
+					createdAtTimeParsed, err := time.Parse(time.RFC3339, dropletCreateTime)
+					Expect(err).ToNot(HaveOccurred())
+
 					Expect(testUI.Out).To(Say("Staging package for %s in org some-org / space some-space as steve...", app))
-					Expect(testUI.Out).To(Say("droplet: some-droplet-guid"))
-					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("\n\n"))
+					Expect(testUI.Out).To(Say("Package staged"))
+					Expect(testUI.Out).To(Say("droplet guid:\\s+some-droplet-guid"))
+					Expect(testUI.Out).To(Say("state:\\s+staged"))
+					Expect(testUI.Out).To(Say("created:\\s+%s", testUI.UserFriendlyDate(createdAtTimeParsed)))
 
 					Expect(testUI.Err).To(Say("some-warning"))
 					Expect(testUI.Err).To(Say("some-other-warning"))
@@ -176,21 +187,21 @@ var _ = Describe("v3-stage Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("any gibberish")
-					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-						buildStream := make(chan v3action.Build)
+					fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+						dropletStream := make(chan v3action.Droplet)
 						warningsStream := make(chan v3action.Warnings)
 						errorStream := make(chan error)
 
 						go func() {
 							<-allLogsWritten
-							defer close(buildStream)
+							defer close(dropletStream)
 							defer close(warningsStream)
 							defer close(errorStream)
 							warningsStream <- v3action.Warnings{"some-warning", "some-other-warning"}
 							errorStream <- expectedErr
 						}()
 
-						return buildStream, warningsStream, errorStream
+						return dropletStream, warningsStream, errorStream
 					}
 				})
 
@@ -228,21 +239,25 @@ var _ = Describe("v3-stage Command", func() {
 					return logStream, errorStream, v3action.Warnings{"steve for all I care"}, nil
 				}
 
-				fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
-					buildStream := make(chan v3action.Build)
+				fakeActor.StagePackageStub = func(packageGUID string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
+					dropletStream := make(chan v3action.Droplet)
 					warningsStream := make(chan v3action.Warnings)
 					errorStream := make(chan error)
 
 					go func() {
 						<-allLogsWritten
-						defer close(buildStream)
+						defer close(dropletStream)
 						defer close(warningsStream)
 						defer close(errorStream)
 						warningsStream <- v3action.Warnings{"some-warning", "some-other-warning"}
-						buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "some-droplet-guid"}}
+						dropletStream <- v3action.Droplet{
+							GUID:      "some-droplet-guid",
+							CreatedAt: "2017-08-14T21:16:42Z",
+							State:     v3action.DropletStateStaged,
+						}
 					}()
 
-					return buildStream, warningsStream, errorStream
+					return dropletStream, warningsStream, errorStream
 				}
 			})
 

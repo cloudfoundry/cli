@@ -17,11 +17,11 @@ const (
 )
 
 type Build struct {
-	GUID    string     `json:"guid,omitempty"`
-	Error   string     `json:"error"`
-	Package Package    `json:"package"`
-	State   BuildState `json:"state,omitempty"`
-	Droplet Droplet    `json:"droplet"`
+	GUID        string
+	Error       string
+	PackageGUID string
+	State       BuildState
+	DropletGUID string
 }
 
 func (b Build) MarshalJSON() ([]byte, error) {
@@ -31,9 +31,35 @@ func (b Build) MarshalJSON() ([]byte, error) {
 		} `json:"package"`
 	}
 
-	ccBuild.Package.GUID = b.Package.GUID
+	ccBuild.Package.GUID = b.PackageGUID
 
 	return json.Marshal(ccBuild)
+}
+
+func (b *Build) UnmarshalJSON(data []byte) error {
+	var ccBuild struct {
+		GUID    string `json:"guid,omitempty"`
+		Error   string `json:"error"`
+		Package struct {
+			GUID string `json:"guid"`
+		} `json:"package"`
+		State   BuildState `json:"state,omitempty"`
+		Droplet struct {
+			GUID string `json:"guid"`
+		} `json:"droplet"`
+	}
+
+	if err := json.Unmarshal(data, &ccBuild); err != nil {
+		return err
+	}
+
+	b.GUID = ccBuild.GUID
+	b.Error = ccBuild.Error
+	b.PackageGUID = ccBuild.Package.GUID
+	b.State = ccBuild.State
+	b.DropletGUID = ccBuild.Droplet.GUID
+
+	return nil
 }
 
 // CreateBuild creates the given build, requires Package GUID to be set on the

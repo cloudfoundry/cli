@@ -155,4 +155,79 @@ var _ = Describe("Droplet", func() {
 			})
 		})
 	})
+
+	Describe("GetDroplet", func() {
+		Context("when the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+					"guid": "some-guid",
+					"state": "STAGED",
+					"error": null,
+					"lifecycle": {
+						"type": "buildpack",
+						"data": {}
+					},
+					"buildpacks": [
+						{
+							"name": "some-buildpack",
+							"detect_output": "detected-buildpack"
+						}
+					],
+					"stack": "some-stack",
+					"created_at": "2016-03-28T23:39:34Z",
+					"updated_at": "2016-03-28T23:39:47Z"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/droplets/some-guid"),
+						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"warning-1"}}),
+					),
+				)
+			})
+
+			It("returns the given droplet and all warnings", func() {
+				droplet, warnings, err := client.GetDroplet("some-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(droplet).To(Equal(Droplet{
+					GUID:  "some-guid",
+					Stack: "some-stack",
+					State: "STAGED",
+					Buildpacks: []DropletBuildpack{
+						{
+							Name:         "some-buildpack",
+							DetectOutput: "detected-buildpack",
+						},
+					},
+					CreatedAt: "2016-03-28T23:39:34Z",
+				}))
+				Expect(warnings).To(ConsistOf("warning-1"))
+			})
+		})
+
+		Context("when cloud controller returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"errors": [
+						{
+							"code": 10010,
+							"detail": "Droplet not found",
+							"title": "CF-ResourceNotFound"
+						}
+					]
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v3/droplets/some-guid"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
+
+			It("returns the error", func() {
+				_, _, err := client.GetDroplet("some-guid")
+				Expect(err).To(MatchError(ccerror.DropletNotFoundError{}))
+			})
+		})
+	})
 })

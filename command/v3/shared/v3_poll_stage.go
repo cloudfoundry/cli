@@ -5,20 +5,18 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI) (string, error) {
+func PollStage(dropletStream <-chan v3action.Droplet, warningsStream <-chan v3action.Warnings, errStream <-chan error, logStream <-chan *v3action.LogMessage, logErrStream <-chan error, ui command.UI) (v3action.Droplet, error) {
 	var closedBuildStream, closedWarningsStream, closedErrStream bool
-	var dropletGUID string
+	var droplet v3action.Droplet
 
 	for {
 		select {
-		case build, ok := <-buildStream:
+		case d, ok := <-dropletStream:
 			if !ok {
 				closedBuildStream = true
 				break
 			}
-			dropletGUID = build.Droplet.GUID
-			ui.DisplayNewline()
-			ui.DisplayText("droplet: {{.DropletGUID}}", map[string]interface{}{"DropletGUID": dropletGUID})
+			droplet = d
 		case log, ok := <-logStream:
 			if !ok {
 				break
@@ -42,10 +40,10 @@ func PollStage(buildStream <-chan v3action.Build, warningsStream <-chan v3action
 				closedErrStream = true
 				break
 			}
-			return "", HandleError(err)
+			return v3action.Droplet{}, HandleError(err)
 		}
 		if closedBuildStream && closedWarningsStream && closedErrStream {
-			return dropletGUID, nil
+			return droplet, nil
 		}
 	}
 }

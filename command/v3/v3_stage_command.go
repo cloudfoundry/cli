@@ -1,6 +1,9 @@
 package v3
 
 import (
+	"strings"
+	"time"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -12,7 +15,7 @@ import (
 
 type V3StageActor interface {
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
-	StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 }
 
 type V3StageCommand struct {
@@ -68,11 +71,27 @@ func (cmd V3StageCommand) Execute(args []string) error {
 		return shared.HandleError(logErr)
 	}
 
-	buildStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
-	_, err = shared.PollStage(buildStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
-	if err == nil {
-		cmd.UI.DisplayOK()
+	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)
+	var droplet v3action.Droplet
+	droplet, err = shared.PollStage(dropletStream, warningsStream, errStream, logStream, logErrStream, cmd.UI)
+	if err != nil {
+		return err
 	}
 
-	return err
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("Package staged")
+
+	t, err := time.Parse(time.RFC3339, droplet.CreatedAt)
+	if err != nil {
+		return err
+	}
+
+	table := [][]string{
+		{cmd.UI.TranslateText("droplet guid:"), droplet.GUID},
+		{cmd.UI.TranslateText("state:"), strings.ToLower(string(droplet.State))},
+		{cmd.UI.TranslateText("created:"), cmd.UI.UserFriendlyDate(t)},
+	}
+
+	cmd.UI.DisplayKeyValueTable("", table, 3)
+	return nil
 }

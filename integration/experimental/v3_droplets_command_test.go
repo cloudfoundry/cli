@@ -114,7 +114,6 @@ var _ = Describe("v3-droplets command", func() {
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				session := helpers.CF("v3-droplets", appName)
-				userName, _ = helpers.GetCredentials()
 
 				Eventually(session).Should(Say("Listing droplets of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
@@ -149,7 +148,7 @@ var _ = Describe("v3-droplets command", func() {
 					session := helpers.CF("v3-droplets", appName)
 					Eventually(session).Should(Say("Listing droplets of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Say("guid\\s+state\\s+created"))
-					Eventually(session).Should(Say("\\s+.*\\s+staged\\s+.*"))
+					Eventually(session).Should(Say("\\s+.*\\s+staged\\s+%s", helpers.UserFriendlyDateRegex))
 
 					Eventually(session).Should(Exit(0))
 				})

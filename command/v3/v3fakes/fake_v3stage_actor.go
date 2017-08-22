@@ -28,19 +28,19 @@ type FakeV3StageActor struct {
 		result3 v3action.Warnings
 		result4 error
 	}
-	StagePackageStub        func(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error)
+	StagePackageStub        func(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 	stagePackageMutex       sync.RWMutex
 	stagePackageArgsForCall []struct {
 		packageGUID string
 		appName     string
 	}
 	stagePackageReturns struct {
-		result1 <-chan v3action.Build
+		result1 <-chan v3action.Droplet
 		result2 <-chan v3action.Warnings
 		result3 <-chan error
 	}
 	stagePackageReturnsOnCall map[int]struct {
-		result1 <-chan v3action.Build
+		result1 <-chan v3action.Droplet
 		result2 <-chan v3action.Warnings
 		result3 <-chan error
 	}
@@ -107,7 +107,7 @@ func (fake *FakeV3StageActor) GetStreamingLogsForApplicationByNameAndSpaceReturn
 	}{result1, result2, result3, result4}
 }
 
-func (fake *FakeV3StageActor) StagePackage(packageGUID string, appName string) (<-chan v3action.Build, <-chan v3action.Warnings, <-chan error) {
+func (fake *FakeV3StageActor) StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
 	fake.stagePackageMutex.Lock()
 	ret, specificReturn := fake.stagePackageReturnsOnCall[len(fake.stagePackageArgsForCall)]
 	fake.stagePackageArgsForCall = append(fake.stagePackageArgsForCall, struct {
@@ -137,26 +137,26 @@ func (fake *FakeV3StageActor) StagePackageArgsForCall(i int) (string, string) {
 	return fake.stagePackageArgsForCall[i].packageGUID, fake.stagePackageArgsForCall[i].appName
 }
 
-func (fake *FakeV3StageActor) StagePackageReturns(result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
+func (fake *FakeV3StageActor) StagePackageReturns(result1 <-chan v3action.Droplet, result2 <-chan v3action.Warnings, result3 <-chan error) {
 	fake.StagePackageStub = nil
 	fake.stagePackageReturns = struct {
-		result1 <-chan v3action.Build
+		result1 <-chan v3action.Droplet
 		result2 <-chan v3action.Warnings
 		result3 <-chan error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3StageActor) StagePackageReturnsOnCall(i int, result1 <-chan v3action.Build, result2 <-chan v3action.Warnings, result3 <-chan error) {
+func (fake *FakeV3StageActor) StagePackageReturnsOnCall(i int, result1 <-chan v3action.Droplet, result2 <-chan v3action.Warnings, result3 <-chan error) {
 	fake.StagePackageStub = nil
 	if fake.stagePackageReturnsOnCall == nil {
 		fake.stagePackageReturnsOnCall = make(map[int]struct {
-			result1 <-chan v3action.Build
+			result1 <-chan v3action.Droplet
 			result2 <-chan v3action.Warnings
 			result3 <-chan error
 		})
 	}
 	fake.stagePackageReturnsOnCall[i] = struct {
-		result1 <-chan v3action.Build
+		result1 <-chan v3action.Droplet
 		result2 <-chan v3action.Warnings
 		result3 <-chan error
 	}{result1, result2, result3}

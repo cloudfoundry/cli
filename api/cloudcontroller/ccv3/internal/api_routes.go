@@ -15,12 +15,14 @@ const (
 	DeleteApplicationRequest                              = "DeleteApplication"
 	DeleteIsolationSegmentRelationshipOrganizationRequest = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                         = "DeleteIsolationSegment"
-	GetAppDroplets                                        = "GetAppDroplets"
+	GetAppDropletsRequest                                 = "GetAppDroplets"
 	GetAppProcessesRequest                                = "GetAppProcesses"
 	GetAppTasksRequest                                    = "GetAppTasks"
 	GetApplicationProcessByTypeRequest                    = "GetApplicationProcessByType"
 	GetAppsRequest                                        = "GetApps"
 	GetBuildRequest                                       = "GetBuild"
+	GetDropletRequest                                     = "GetDroplet"
+	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
@@ -50,6 +52,7 @@ const (
 const (
 	AppsResource              = "apps"
 	BuildsResource            = "builds"
+	DropletsResource          = "droplets"
 	IsolationSegmentsResource = "isolation_segments"
 	OrgsResource              = "organizations"
 	PackagesResource          = "packages"
@@ -78,7 +81,8 @@ var APIRoutes = []Route{
 	{Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationStartRequest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/stop", Method: http.MethodPost, Name: PostApplicationStopRequest, Resource: AppsResource},
 	{Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},
-	{Path: "/:app_guid/droplets", Method: http.MethodGet, Name: GetAppDroplets, Resource: AppsResource},
+	{Path: "/:app_guid/droplets", Method: http.MethodGet, Name: GetAppDropletsRequest, Resource: AppsResource},
+	{Path: "/:droplet_guid", Method: http.MethodGet, Name: GetDropletRequest, Resource: DropletsResource},
 	{Path: "/:isolation_segment_guid/organizations", Method: http.MethodGet, Name: GetIsolationSegmentOrganizationsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/:app_guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessByTypeRequest, Resource: AppsResource},

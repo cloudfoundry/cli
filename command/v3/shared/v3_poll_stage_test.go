@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -16,10 +15,10 @@ import (
 
 var _ = Describe("V3PollStage", func() {
 	var (
-		returnedDropletGUID   string
+		returnedDroplet       v3action.Droplet
 		executeErr            error
 		testUI                *ui.UI
-		buildStream           chan v3action.Build
+		dropletStream         chan v3action.Droplet
 		warningsStream        chan v3action.Warnings
 		errStream             chan error
 		logStream             chan *v3action.LogMessage
@@ -34,7 +33,7 @@ var _ = Describe("V3PollStage", func() {
 	closeStreams = func() {
 		close(errStream)
 		close(warningsStream)
-		close(buildStream)
+		close(dropletStream)
 		finishedClosing <- true
 	}
 
@@ -47,8 +46,8 @@ var _ = Describe("V3PollStage", func() {
 	}
 
 	executePollStage = func(codeAssertions func()) {
-		returnedDropletGUID, executeErr = PollStage(
-			buildStream,
+		returnedDroplet, executeErr = PollStage(
+			dropletStream,
 			warningsStream,
 			errStream,
 			logStream,
@@ -61,11 +60,11 @@ var _ = Describe("V3PollStage", func() {
 	BeforeEach(func() {
 		// reset assertion variables
 		executeErr = nil
-		returnedDropletGUID = ""
+		returnedDroplet = v3action.Droplet{}
 
 		// create new channels
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		buildStream = make(chan v3action.Build)
+		dropletStream = make(chan v3action.Droplet)
 		warningsStream = make(chan v3action.Warnings)
 		errStream = make(chan error)
 		logStream = make(chan *v3action.LogMessage)
@@ -83,20 +82,18 @@ var _ = Describe("V3PollStage", func() {
 		}()
 	})
 
-	Context("when the build stream contains a droplet GUID", func() {
+	Context("when the droplet stream contains a droplet GUID", func() {
 		BeforeEach(func() {
 			writeEventsAsync(func() {
-				buildStream <- v3action.Build{Droplet: ccv3.Droplet{GUID: "droplet-guid"}}
+				dropletStream <- v3action.Droplet{GUID: "droplet-guid"}
 			})
 		})
 
 		It("returns the droplet GUID", func() {
 			executePollStage(func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(returnedDropletGUID).To(Equal("droplet-guid"))
+				Expect(returnedDroplet.GUID).To(Equal("droplet-guid"))
 			})
-
-			Eventually(testUI.Out).Should(Say("droplet: droplet-guid"))
 		})
 	})
 
@@ -110,7 +107,7 @@ var _ = Describe("V3PollStage", func() {
 		It("displays the warnings", func() {
 			executePollStage(func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(returnedDropletGUID).To(BeEmpty())
+				Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 			})
 
 			Eventually(testUI.Err).Should(Say("warning-1"))
@@ -129,7 +126,7 @@ var _ = Describe("V3PollStage", func() {
 			It("prints the log message", func() {
 				executePollStage(func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(returnedDropletGUID).To(BeEmpty())
+					Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 				})
 				Eventually(testUI.Out).Should(Say("some-log-message"))
 			})
@@ -145,7 +142,7 @@ var _ = Describe("V3PollStage", func() {
 			It("ignores the log message", func() {
 				executePollStage(func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(returnedDropletGUID).To(BeEmpty())
+					Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 				})
 				Consistently(testUI.Out).ShouldNot(Say("some-log-message"))
 			})
@@ -162,9 +159,8 @@ var _ = Describe("V3PollStage", func() {
 		It("returns the error without waiting for streams to be closed", func() {
 			executePollStage(func() {
 				Expect(executeErr).To(MatchError("some error"))
-				Expect(returnedDropletGUID).To(BeEmpty())
+				Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 			})
-			Consistently(testUI.Out).ShouldNot(Say("droplet: droplet-guid"))
 		})
 	})
 
@@ -178,7 +174,7 @@ var _ = Describe("V3PollStage", func() {
 		It("displays the log errors as warnings", func() {
 			executePollStage(func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(returnedDropletGUID).To(BeEmpty())
+				Expect(returnedDroplet).To(Equal(v3action.Droplet{}))
 			})
 			Eventually(testUI.Err).Should(Say("some-log-error"))
 		})
