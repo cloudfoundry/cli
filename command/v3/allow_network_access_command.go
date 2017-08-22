@@ -17,7 +17,7 @@ type AllowNetworkAccessActor interface {
 
 type AllowNetworkAccessCommand struct {
 	RequiredArgs   flag.AllowNetworkAccessArgs `positional-args:"yes"`
-	DestinationApp string                      `long:"destination-app" required:"true" description:"The destination app"`
+	DestinationApp string                      `long:"destination-app" required:"true"`
 	Port           flag.NetworkPort            `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
 	Protocol       flag.NetworkProtocol        `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
 
@@ -41,7 +41,10 @@ func (cmd *AllowNetworkAccessCommand) Setup(config command.Config, ui command.UI
 	}
 
 	v3Actor := v3action.NewActor(client, config)
-	networkingClient := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
+	if err != nil {
+		return err
+	}
 	cmd.Actor = cfnetworkingaction.NewActor(networkingClient, v3Actor)
 
 	return nil

@@ -19,14 +19,13 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("remove-network-access - Remove direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(regexp.QuoteMeta("cf remove-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE")))
 				Eventually(session).Should(Say("EXAMPLES:"))
 				Eventually(session).Should(Say("   cf remove-network-access frontend --destination-app backend --protocol tcp --port 8081"))
 				Eventually(session).Should(Say("   cf remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("   --destination-app      The destination app"))
-				Eventually(session).Should(Say("   --port                 Port or range to connect to destination app with"))
-				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with"))
+				Eventually(session).Should(Say("   --port          Port or range to connect to destination app with"))
+				Eventually(session).Should(Say("   --protocol      Protocol to connect apps with"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, list-network-access"))
 				Eventually(session).Should(Exit(0))
@@ -131,7 +130,7 @@ var _ = Describe("remove-network-access command", func() {
 				session := helpers.CF("remove-network-access", appName, "--destination-app", appName, "--port", "8080", "--protocol", "tcp")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Denying network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
+				Eventually(session).Should(Say("Deny network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
@@ -142,6 +141,39 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
 				Eventually(session).Should(Exit(0))
 			})
+
+			Context("when the protocol is not provided", func() {
+				It("returns a helpful message", func() {
+					session := helpers.CF("remove-network-access", appName, "--destination-app", appName, "--port", "8080")
+					Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--protocol' was not specified"))
+					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Say("remove-network-access - Remove direct network traffic from one app to another"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when the port is not provided", func() {
+				It("returns a helpful message", func() {
+					session := helpers.CF("remove-network-access", appName, "--destination-app", appName, "--protocol", "tcp")
+					Eventually(session.Err).Should(Say("Incorrect Usage: the required flag `--port' was not specified"))
+					Eventually(session).Should(Say("NAME:"))
+					Eventually(session).Should(Say("remove-network-access - Remove direct network traffic from one app to another"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			PContext("when the policy does not exist", func() {
+				It("returns a helpful message and exits 0", func() {
+					session := helpers.CF("remove-network-access", appName, "--destination-app", appName, "--port", "8081", "--protocol", "udp")
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say("Deny network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("Policy does not exist"))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+				})
+
+			})
 		})
 
 		Context("when the source app does not exist", func() {
@@ -149,7 +181,7 @@ var _ = Describe("remove-network-access command", func() {
 				session := helpers.CF("remove-network-access", "pineapple", "--destination-app", appName, "--port", "8080", "--protocol", "tcp")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Denying network traffic from app pineapple to %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say("Deny network traffic from app pineapple to %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -161,13 +193,11 @@ var _ = Describe("remove-network-access command", func() {
 				session := helpers.CF("remove-network-access", appName, "--destination-app", "pineapple", "--port", "8080", "--protocol", "tcp")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Denying network traffic from app %s to pineapple in org %s / space %s as %s...", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say("Deny network traffic from app %s to pineapple in org %s / space %s as %s...", appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
-
 		})
-
 	})
 })
