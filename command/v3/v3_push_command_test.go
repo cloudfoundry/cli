@@ -395,7 +395,7 @@ var _ = Describe("v3-push Command", func() {
 
 								Context("when -b flag is set", func() {
 									BeforeEach(func() {
-										cmd.Buildpack = "some-buildpack"
+										cmd.Buildpacks = []string{"some-buildpack"}
 									})
 
 									It("creates the app with the specified buildpack and prints the buildpack name in the summary", func() {
@@ -679,7 +679,7 @@ var _ = Describe("v3-push Command", func() {
 
 			Context("when a buildpack was not provided", func() {
 				BeforeEach(func() {
-					cmd.Buildpack = ""
+					cmd.Buildpacks = []string{}
 				})
 
 				It("does not update the buildpack", func() {
@@ -691,13 +691,49 @@ var _ = Describe("v3-push Command", func() {
 
 			Context("when a buildpack was provided", func() {
 				BeforeEach(func() {
-					cmd.Buildpack = "some-buildpack"
+					cmd.Buildpacks = []string{"some-buildpack"}
 				})
 
 				It("updates the buildpack", func() {
+					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
 					appGUIDArg, buildpackArg := fakeActor.UpdateApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(buildpackArg).To(ConsistOf("some-buildpack"))
+				})
+			})
+
+			Context("when multiple buildpacks are provided", func() {
+				BeforeEach(func() {
+					cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
+				})
+
+				It("updates the buildpacks", func() {
+					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
+					appGUIDArg, buildpackArg := fakeActor.UpdateApplicationArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(buildpackArg).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
+				})
+
+				Context("when default was also provided", func() {
+					BeforeEach(func() {
+						cmd.Buildpacks = []string{"default", "some-buildpack-2"}
+					})
+
+					It("returns the ConflictingBuildpacksError", func() {
+						Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
+						Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+					})
+				})
+
+				Context("when null was also provided", func() {
+					BeforeEach(func() {
+						cmd.Buildpacks = []string{"null", "some-buildpack-2"}
+					})
+
+					It("returns the ConflictingBuildpacksError", func() {
+						Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
+						Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+					})
 				})
 			})
 

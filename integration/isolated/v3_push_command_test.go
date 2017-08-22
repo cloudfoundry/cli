@@ -1,7 +1,9 @@
 package isolated
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"regexp"
 
@@ -34,7 +36,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("v3-push - Push a new app or sync changes to an existing app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK_NAME\\] \\[-p APP_PATH\\]"))
+				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK\\]\\.\\.\\. \\[-p APP_PATH\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
 				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
@@ -373,6 +375,26 @@ var _ = Describe("v3-push command", func() {
 
 		Context("when the -b flag is set", func() {
 			var session *Session
+
+			Context("when pushing a multi-buildpack app", func() {
+				BeforeEach(func() {
+					helpers.WithMultiBuildpackApp(func(appDir string) {
+						session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName, "-b", "ruby_buildpack", "-b", "go_buildpack")
+
+						// TODO: uncomment this expectation once capi-release displays all buildpacks on droplet
+						// Story: https://www.pivotaltracker.com/story/show/150425459
+						// Eventually(session.Out).Should(Say("buildpacks:.*ruby_buildpack, go_buildpack"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				It("successfully compiles and runs the app", func() {
+					resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName, defaultSharedDomain()))
+					Expect(err).ToNot(HaveOccurred())
+					Expect(resp.StatusCode).To(Equal(http.StatusOK))
+				})
+			})
 
 			Context("when resetting the buildpack to default", func() {
 				BeforeEach(func() {

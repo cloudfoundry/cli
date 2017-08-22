@@ -34,6 +34,10 @@ func WithHelloWorldApp(f func(dir string)) {
 	f(dir)
 }
 
+func WithMultiBuildpackApp(f func(dir string)) {
+	f("../assets/go_calls_ruby")
+}
+
 // WithProcfileApp creates an application to use with your CLI command
 // that contains Procfile defining web and worker processes.
 func WithProcfileApp(f func(dir string)) {
