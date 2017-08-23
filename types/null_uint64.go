@@ -8,8 +8,8 @@ import (
 // NullUint64 is a wrapper around uint64 values that can be null or an unint64.
 // Use IsSet to check if the value is provided, instead of checking against 0.
 type NullUint64 struct {
-	Value uint64
 	IsSet bool
+	Value uint64
 }
 
 // ParseFlagValue is used to parse a user provided flag argument.

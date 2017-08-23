@@ -35,7 +35,7 @@ var _ = Describe("Application Actions", func() {
 		Describe("CalculatedBuildpack", func() {
 			Context("when buildpack is set", func() {
 				BeforeEach(func() {
-					app.Buildpack = "foo"
+					app.Buildpack = types.FilteredString{IsSet: true, Value: "foo"}
 					app.DetectedBuildpack = "bar"
 				})
 

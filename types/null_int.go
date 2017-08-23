@@ -8,8 +8,8 @@ import (
 // NullInt is a wrapper around integer values that can be null or an integer.
 // Use IsSet to check if the value is provided, instead of checking against 0.
 type NullInt struct {
-	Value int
 	IsSet bool
+	Value int
 }
 
 // ParseFlagValue is used to parse a user provided flag argument.

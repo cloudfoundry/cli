@@ -647,7 +647,7 @@ var _ = Describe("v2-push Command", func() {
 
 		Context("when passed app related flags", func() {
 			BeforeEach(func() {
-				cmd.BuildpackName = "some-buildpack"
+				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
 				cmd.Command = "echo foo bar baz"
 				cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 				cmd.HealthCheckTimeout = 14
@@ -659,7 +659,7 @@ var _ = Describe("v2-push Command", func() {
 
 			It("sets them on the command line settings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(settings.BuildpackName).To(Equal("some-buildpack"))
+				Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
 				Expect(settings.Command).To(Equal("echo foo bar baz"))
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 				Expect(settings.HealthCheckTimeout).To(Equal(14))

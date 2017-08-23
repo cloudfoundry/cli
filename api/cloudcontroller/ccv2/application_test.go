@@ -142,7 +142,7 @@ var _ = Describe("Application", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(app).To(Equal(Application{
-					Buildpack:            "ruby 1.6.29",
+					Buildpack:            types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 					Command:              "some-command",
 					DetectedBuildpack:    "",
 					DetectedStartCommand: "echo 'I am a banana'",
@@ -268,7 +268,7 @@ var _ = Describe("Application", func() {
 
 				Expect(apps).To(ConsistOf([]Application{
 					{
-						Buildpack:               "ruby 1.6.29",
+						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 						DetectedBuildpack:       "",
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
@@ -303,7 +303,6 @@ var _ = Describe("Application", func() {
 					"updated_at": null
 				},
 				"entity": {
-					"buildpack": "ruby 1.6.29",
 					"command": "some-command",
 					"detected_start_command": "echo 'I am a banana'",
 					"disk_quota": 586,
@@ -331,7 +330,7 @@ var _ = Describe("Application", func() {
 				}
 			}`
 					expectedBody := map[string]interface{}{
-						"buildpack":  "ruby 1.6.29",
+						"buildpack":  "",
 						"command":    "some-command",
 						"disk_quota": 586,
 						"docker_credentials": map[string]string{
@@ -364,7 +363,7 @@ var _ = Describe("Application", func() {
 
 				It("returns the updated object and warnings and sends all updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
-						Buildpack: "ruby 1.6.29",
+						Buildpack: types.FilteredString{IsSet: true, Value: ""},
 						Command:   "some-command",
 						DiskQuota: 586,
 						DockerCredentials: DockerCredentials{
@@ -392,7 +391,6 @@ var _ = Describe("Application", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						Buildpack:            "ruby 1.6.29",
 						Command:              "some-command",
 						DetectedBuildpack:    "",
 						DetectedStartCommand: "echo 'I am a banana'",
@@ -465,7 +463,7 @@ var _ = Describe("Application", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						Buildpack:               "ruby 1.6.29",
+						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 						DetectedBuildpack:       "",
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
@@ -560,7 +558,7 @@ var _ = Describe("Application", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(app).To(Equal(Application{
-					Buildpack:               "ruby 1.6.29",
+					Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 					DetectedBuildpack:       "",
 					DetectedStartCommand:    "echo 'I am a banana'",
 					DiskQuota:               586,

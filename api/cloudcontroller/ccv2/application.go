@@ -33,7 +33,7 @@ const (
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
-	Buildpack string
+	Buildpack types.FilteredString
 
 	// Command is the user specified start command.
 	Command string
@@ -116,7 +116,7 @@ type DockerCredentials struct {
 // MarshalJSON converts an application into a Cloud Controller Application.
 func (application Application) MarshalJSON() ([]byte, error) {
 	ccApp := struct {
-		Buildpack               string             `json:"buildpack,omitempty"`
+		Buildpack               *string            `json:"buildpack,omitempty"`
 		Command                 string             `json:"command,omitempty"`
 		DiskQuota               uint64             `json:"disk_quota,omitempty"`
 		DockerCredentials       *DockerCredentials `json:"docker_credentials,omitempty"`
@@ -132,7 +132,6 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		StackGUID               string             `json:"stack_guid,omitempty"`
 		State                   ApplicationState   `json:"state,omitempty"`
 	}{
-		Buildpack:               application.Buildpack,
 		Command:                 application.Command,
 		DiskQuota:               application.DiskQuota,
 		DockerImage:             application.DockerImage,
@@ -145,6 +144,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		SpaceGUID:               application.SpaceGUID,
 		StackGUID:               application.StackGUID,
 		State:                   application.State,
+	}
+
+	if application.Buildpack.IsSet {
+		ccApp.Buildpack = &application.Buildpack.Value
 	}
 
 	if application.DockerCredentials.Username != "" || application.DockerCredentials.Password != "" {
@@ -198,7 +201,6 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	application.Buildpack = ccApp.Entity.Buildpack
 	application.Command = ccApp.Entity.Command
 	application.DetectedBuildpack = ccApp.Entity.DetectedBuildpack
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
@@ -216,6 +218,8 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
 	application.State = ApplicationState(ccApp.Entity.State)
+
+	application.Buildpack.ParseValue(ccApp.Entity.Buildpack)
 
 	if len(ccApp.Entity.EnvironmentVariables) > 0 {
 		envVariableValues := map[string]string{}
