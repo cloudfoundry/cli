@@ -18,8 +18,8 @@ type Manifest struct {
 }
 
 type Application struct {
-	BuildpackName string
-	Command       string
+	Buildpack types.FilteredString
+	Command   string
 	// DiskQuota is the disk size in megabytes.
 	DiskQuota      uint64
 	DockerImage    string
@@ -44,9 +44,10 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
 		app.Name,
-		app.BuildpackName,
+		app.Buildpack.IsSet,
+		app.Buildpack.Value,
 		app.Command,
 		app.DiskQuota,
 		app.DockerImage,
@@ -84,7 +85,6 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 		return err
 	}
 
-	app.BuildpackName = manifestApp.Buildpack
 	app.Command = manifestApp.Command
 	app.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
 	app.HealthCheckType = manifestApp.HealthCheckType
@@ -94,6 +94,8 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.StackName = manifestApp.StackName
 	app.HealthCheckTimeout = manifestApp.Timeout
 	app.EnvironmentVariables = manifestApp.EnvironmentVariables
+
+	app.Buildpack.ParseValue(manifestApp.Buildpack)
 
 	err = app.Instances.ParseFlagValue(manifestApp.Instances)
 	if err != nil {

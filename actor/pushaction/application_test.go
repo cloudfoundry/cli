@@ -6,6 +6,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -55,7 +56,7 @@ var _ = Describe("Applications", func() {
 						Name:      "some-app-name",
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
-						Buildpack: "java",
+						Buildpack: types.FilteredString{Value: "java", IsSet: true},
 					},
 				}
 				config.DesiredApplication = Application{
@@ -63,7 +64,7 @@ var _ = Describe("Applications", func() {
 						Name:      "some-app-name",
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
+						Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 					},
 				}
 			})
@@ -74,7 +75,7 @@ var _ = Describe("Applications", func() {
 						Name:      "some-app-name",
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
+						Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 					}, v2action.Warnings{"update-warning"}, nil)
 				})
 
@@ -88,7 +89,7 @@ var _ = Describe("Applications", func() {
 							Name:      "some-app-name",
 							GUID:      "some-app-guid",
 							SpaceGUID: "some-space-guid",
-							Buildpack: "ruby",
+							Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 						}}))
 					Expect(returnedConfig.CurrentApplication).To(Equal(returnedConfig.DesiredApplication))
 
@@ -97,7 +98,7 @@ var _ = Describe("Applications", func() {
 						Name:      "some-app-name",
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
+						Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 					}))
 				})
 
@@ -115,7 +116,7 @@ var _ = Describe("Applications", func() {
 							Name:      "some-app-name",
 							GUID:      "some-app-guid",
 							SpaceGUID: "some-space-guid",
-							Buildpack: "ruby",
+							Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 						}))
 					})
 				})
@@ -142,7 +143,7 @@ var _ = Describe("Applications", func() {
 						Name:      "some-app-name",
 						GUID:      "some-app-guid",
 						SpaceGUID: "some-space-guid",
-						Buildpack: "ruby",
+						Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 					}, v2action.Warnings{"create-warning"}, nil)
 				})
 
@@ -156,7 +157,7 @@ var _ = Describe("Applications", func() {
 							Name:      "some-app-name",
 							GUID:      "some-app-guid",
 							SpaceGUID: "some-space-guid",
-							Buildpack: "ruby",
+							Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
 						}}))
 					Expect(returnedConfig.CurrentApplication).To(Equal(returnedConfig.DesiredApplication))
 

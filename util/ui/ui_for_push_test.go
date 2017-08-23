@@ -39,7 +39,7 @@ var _ = Describe("UI", func() {
 			Context("when passed strings for values", func() {
 				Context("when the values are *not* hidden", func() {
 					Context("when the values are not equal", func() {
-						Context("when the originalValue is not empty", func() {
+						Context("when both values are not empty", func() {
 							It("should display the header with differences", func() {
 								err := ui.DisplayChangeForPush("val", 2, false, "old", "new")
 								Expect(err).ToNot(HaveOccurred())
@@ -57,6 +57,15 @@ var _ = Describe("UI", func() {
 								err = ui.DisplayChangeForPush("val", 2, false, "", "new")
 								Expect(err).ToNot(HaveOccurred())
 								Expect(out).ToNot(Say("\x1b\\[31m\\-\\s+val  old\x1b\\[0m"))
+							})
+						})
+
+						Context("when the newValue is empty", func() {
+							It("should display the header with the new value only", func() {
+								err := ui.DisplayChangeForPush("val", 2, false, "old", "")
+								Expect(err).ToNot(HaveOccurred())
+								Expect(out).To(Say("\x1b\\[31m\\-\\s+val  old\x1b\\[0m"))
+								Expect(out).ToNot(Say("\x1b\\[32m\\+\\s+val  \x1b\\[0m"))
 							})
 						})
 					})

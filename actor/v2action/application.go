@@ -102,8 +102,8 @@ type Application ccv2.Application
 
 // CalculatedBuildpack returns the buildpack that will be used.
 func (application Application) CalculatedBuildpack() string {
-	if application.Buildpack != "" {
-		return application.Buildpack
+	if application.Buildpack.IsSet {
+		return application.Buildpack.Value
 	}
 
 	return application.DetectedBuildpack
@@ -157,9 +157,10 @@ func (application Application) Stopped() bool {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command: '%s', Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
 		app.Name,
-		app.Buildpack,
+		app.Buildpack.IsSet,
+		app.Buildpack.Value,
 		app.Command,
 		app.DetectedBuildpack,
 		app.DetectedStartCommand,

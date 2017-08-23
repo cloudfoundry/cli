@@ -57,6 +57,7 @@ applications:
   stack: "some-stack"
   timeout: 120
 - name: "app-2"
+  buildpack: default
   disk_quota: 1G
   instances: 0
   memory: 2G
@@ -76,8 +77,11 @@ applications:
 			Expect(executeErr).ToNot(HaveOccurred())
 			Expect(apps).To(ConsistOf(
 				Application{
-					Name:                    "app-1",
-					BuildpackName:           "some-buildpack",
+					Name: "app-1",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "some-buildpack",
+					},
 					Command:                 "some-command",
 					HealthCheckHTTPEndpoint: "\\some-endpoint",
 					HealthCheckType:         "http",
@@ -91,11 +95,15 @@ applications:
 					HealthCheckTimeout: 120,
 				},
 				Application{
-					Name:      "app-2",
+					Name: "app-2",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "",
+					},
 					DiskQuota: 1024,
 					Instances: types.NullInt{
-						Value: 0,
 						IsSet: true,
+						Value: 0,
 					},
 					Memory:   2048,
 					Services: []string{"service_1", "service_2"},

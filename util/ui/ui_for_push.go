@@ -182,7 +182,9 @@ func (ui UI) displayDiffForString(offset string, header string, hiddenValue bool
 		if oVal != "" {
 			fmt.Fprintln(ui.Out, ui.modifyColor(formattedOld, color.New(color.FgRed)))
 		}
-		fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		if nVal != "" {
+			fmt.Fprintln(ui.Out, ui.modifyColor(formattedNew, color.New(color.FgGreen)))
+		}
 	} else {
 		if hiddenValue {
 			fmt.Fprintf(ui.Out, "  %s%s%s\n", ui.TranslateText(header), offset, RedactedValue)

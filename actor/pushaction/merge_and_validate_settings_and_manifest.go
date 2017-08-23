@@ -94,7 +94,8 @@ func (Actor) setSaneDefaults(apps []manifest.Application) []manifest.Application
 func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {
 	if len(apps) > 1 {
 		switch {
-		case settings.BuildpackName != "",
+		case
+			settings.Buildpack.IsSet,
 			settings.Command != "",
 			settings.DiskQuota != 0,
 			settings.DockerImage != "",
