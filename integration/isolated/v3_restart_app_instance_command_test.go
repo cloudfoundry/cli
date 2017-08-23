@@ -1,6 +1,8 @@
 package isolated
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -171,26 +173,57 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 				Context("when the process type exists", func() {
 					Context("when instance index exists", func() {
-						It("defaults to requested process", func() {
-							appOutputSession := helpers.CF("v3-app", appName)
-							Eventually(appOutputSession).Should(Exit(0))
-							firstAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+						findWorkerProcess := func(appTable helpers.AppTable) (helpers.AppProcessTable, bool) {
+							for _, process := range appTable.Processes {
+								if strings.HasPrefix(process.Title, "worker") {
+									return process, true
+								}
+							}
+							return helpers.AppProcessTable{}, false
+						}
 
-							session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "web")
-							Eventually(session.Out).Should(Say("Restarting instance 0 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
+						It("defaults to requested process", func() {
+							By("scaling worker process to 1 instance")
+							session := helpers.CF("v3-scale", appName, "--process", "worker", "-i", "1")
+							Eventually(session).Should(Exit(0))
+
+							By("waiting for worker process to come up")
+							var firstAppTableWorkerProcess helpers.AppProcessTable
+							Eventually(func() string {
+								appOutputSession := helpers.CF("v3-app", appName)
+								Eventually(appOutputSession).Should(Exit(0))
+								firstAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+
+								var found bool
+								firstAppTableWorkerProcess, found = findWorkerProcess(firstAppTable)
+								Expect(found).To(BeTrue())
+								return firstAppTableWorkerProcess.Title
+							}).Should(MatchRegexp(`worker:1/1`))
+
+							By("restarting worker process instance")
+							session = helpers.CF("v3-restart-app-instance", appName, "0", "--process", "worker")
+							Eventually(session.Out).Should(Say("Restarting instance 0 of process worker of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
 							Eventually(session.Out).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 
+							By("waiting for restarted process instance to come up")
 							Eventually(func() string {
-								var restartedAppTable helpers.AppTable
+								var restartedAppTableWorkerProcess helpers.AppProcessTable
+
 								Eventually(func() string {
 									appOutputSession := helpers.CF("v3-app", appName)
 									Eventually(appOutputSession).Should(Exit(0))
-									restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
-									return restartedAppTable.Processes[0].Title
-								}).Should(MatchRegexp(`web:\d/1`))
-								return restartedAppTable.Processes[0].Instances[0].Since
-							}).ShouldNot(Equal(firstAppTable.Processes[0].Instances[0].Since))
+
+									restartedAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+									var found bool
+									restartedAppTableWorkerProcess, found = findWorkerProcess(restartedAppTable)
+									Expect(found).To(BeTrue())
+
+									return restartedAppTableWorkerProcess.Title
+								}).Should(MatchRegexp(`worker:1/1`))
+
+								return restartedAppTableWorkerProcess.Instances[0].Since
+							}).ShouldNot(Equal(firstAppTableWorkerProcess.Instances[0].Since))
 						})
 					})
 
