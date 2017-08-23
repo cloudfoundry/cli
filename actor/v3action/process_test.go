@@ -34,11 +34,11 @@ var _ = Describe("Process Actions", func() {
 		})
 	})
 
-	Describe("Process", func() {
-		var process Process
+	Describe("ProcessSummary", func() {
+		var summary ProcessSummary
 		BeforeEach(func() {
-			process = Process{
-				Instances: []Instance{
+			summary = ProcessSummary{
+				InstanceDetails: []Instance{
 					Instance{State: "RUNNING"},
 					Instance{State: "RUNNING"},
 					Instance{State: "STOPPED"},
@@ -48,38 +48,44 @@ var _ = Describe("Process Actions", func() {
 
 		Describe("TotalInstanceCount", func() {
 			It("returns the total number of instances", func() {
-				Expect(process.TotalInstanceCount()).To(Equal(3))
+				Expect(summary.TotalInstanceCount()).To(Equal(3))
 			})
 		})
 
 		Describe("HealthyInstanceCount", func() {
 			It("returns the total number of RUNNING instances", func() {
-				Expect(process.HealthyInstanceCount()).To(Equal(2))
+				Expect(summary.HealthyInstanceCount()).To(Equal(2))
 			})
 		})
 	})
 
-	Describe("Processes", func() {
-		var processes Processes
+	Describe("ProcessSummaries", func() {
+		var summaries ProcessSummaries
 
 		BeforeEach(func() {
-			processes = Processes{
+			summaries = ProcessSummaries{
 				{
-					Type: "worker",
-					Instances: []Instance{
+					Process: Process{
+						Type: "worker",
+					},
+					InstanceDetails: []Instance{
 						{State: "RUNNING"},
 						{State: "STOPPED"},
 					},
 				},
 				{
-					Type: "console",
-					Instances: []Instance{
+					Process: Process{
+						Type: "console",
+					},
+					InstanceDetails: []Instance{
 						{State: "RUNNING"},
 					},
 				},
 				{
-					Type: "web",
-					Instances: []Instance{
+					Process: Process{
+						Type: "web",
+					},
+					InstanceDetails: []Instance{
 						{State: "RUNNING"},
 						{State: "RUNNING"},
 						{State: "STOPPED"},
@@ -90,16 +96,16 @@ var _ = Describe("Process Actions", func() {
 
 		Describe("Sort", func() {
 			It("sorts processes with web first and then alphabetically sorted", func() {
-				processes.Sort()
-				Expect(processes[0].Type).To(Equal("web"))
-				Expect(processes[1].Type).To(Equal("console"))
-				Expect(processes[2].Type).To(Equal("worker"))
+				summaries.Sort()
+				Expect(summaries[0].Type).To(Equal("web"))
+				Expect(summaries[1].Type).To(Equal("console"))
+				Expect(summaries[2].Type).To(Equal("worker"))
 			})
 		})
 
-		Describe("Summary", func() {
+		Describe("String", func() {
 			It("returns all processes and their instance count ", func() {
-				Expect(processes.Summary()).To(Equal("web:2/3, console:1/1, worker:1/2"))
+				Expect(summaries.String()).To(Equal("web:2/3, console:1/1, worker:1/2"))
 			})
 		})
 	})
@@ -109,10 +115,10 @@ var _ = Describe("Process Actions", func() {
 
 		BeforeEach(func() {
 			passedProcess = Process{
-				Type: "web",
-				DesiredInstancesCount: types.NullInt{Value: 2, IsSet: true},
-				MemoryInMB:            types.NullUint64{Value: 100, IsSet: true},
-				DiskInMB:              types.NullUint64{Value: 200, IsSet: true},
+				Type:       "web",
+				Instances:  types.NullInt{Value: 2, IsSet: true},
+				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+				DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
 			}
 		})
 
@@ -134,7 +140,7 @@ var _ = Describe("Process Actions", func() {
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
 				Expect(processArg).To(Equal(ccv3.Process{
 					Type:       "web",
-					Instances:  passedProcess.DesiredInstancesCount,
+					Instances:  passedProcess.Instances,
 					MemoryInMB: passedProcess.MemoryInMB,
 					DiskInMB:   passedProcess.DiskInMB,
 				}))

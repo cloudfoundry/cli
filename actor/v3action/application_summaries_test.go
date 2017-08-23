@@ -100,14 +100,14 @@ var _ = Describe("Application Summaries Actions", func() {
 							GUID:  "some-app-guid-1",
 							State: "RUNNING",
 						},
-						Processes: []Process{
+						ProcessSummaries: []ProcessSummary{
 							{
-								Type:      "some-process-type-1",
-								Instances: []Instance{{State: "RUNNING"}, {State: "DOWN"}, {State: "RUNNING"}},
+								Process:         Process{GUID: "some-process-guid-1", Type: "some-process-type-1"},
+								InstanceDetails: []Instance{{State: "RUNNING"}, {State: "DOWN"}, {State: "RUNNING"}},
 							},
 							{
-								Type:      "some-process-type-2",
-								Instances: []Instance{{State: "RUNNING"}, {State: "RUNNING"}},
+								Process:         Process{GUID: "some-process-guid-2", Type: "some-process-type-2"},
+								InstanceDetails: []Instance{{State: "RUNNING"}, {State: "RUNNING"}},
 							},
 						},
 					},
@@ -117,10 +117,10 @@ var _ = Describe("Application Summaries Actions", func() {
 							GUID:  "some-app-guid-2",
 							State: "STOPPED",
 						},
-						Processes: []Process{
+						ProcessSummaries: []ProcessSummary{
 							{
-								Type:      "some-process-type-3",
-								Instances: []Instance{{State: "DOWN"}},
+								Process:         Process{GUID: "some-process-guid-3", Type: "some-process-type-3"},
+								InstanceDetails: []Instance{{State: "DOWN"}},
 							},
 						},
 					},

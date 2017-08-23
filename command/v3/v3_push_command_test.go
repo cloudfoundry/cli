@@ -562,11 +562,13 @@ var _ = Describe("v3-push Command", func() {
 															},
 														},
 													},
-													Processes: []v3action.Process{
-														v3action.Process{
-															Type:       "worker",
-															MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-															Instances: []v3action.Instance{
+													ProcessSummaries: []v3action.ProcessSummary{
+														{
+															Process: v3action.Process{
+																Type:       "worker",
+																MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+															},
+															InstanceDetails: []v3action.Instance{
 																v3action.Instance{
 																	Index:       0,
 																	State:       "RUNNING",

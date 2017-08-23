@@ -103,11 +103,14 @@ var _ = Describe("Application Summary Actions", func() {
 								},
 							},
 						},
-						Processes: []Process{
-							Process{
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								Type:       "some-type",
-								Instances: []Instance{
+						ProcessSummaries: []ProcessSummary{
+							{
+								Process: Process{
+									GUID:       "some-process-guid",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									Type:       "some-type",
+								},
+								InstanceDetails: []Instance{
 									{
 										State:       "RUNNING",
 										CPU:         0.01,
@@ -183,11 +186,14 @@ var _ = Describe("Application Summary Actions", func() {
 							GUID:  "some-app-guid",
 							State: "RUNNING",
 						},
-						Processes: []Process{
-							Process{
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								Type:       "some-type",
-								Instances: []Instance{
+						ProcessSummaries: []ProcessSummary{
+							{
+								Process: Process{
+									GUID:       "some-process-guid",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+									Type:       "some-type",
+								},
+								InstanceDetails: []Instance{
 									{
 										State:       "RUNNING",
 										CPU:         0.01,

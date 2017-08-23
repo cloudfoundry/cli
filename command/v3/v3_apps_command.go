@@ -88,7 +88,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 
 	for _, summary := range summaries {
 		var routesList string
-		if len(summary.Processes) > 0 {
+		if len(summary.ProcessSummaries) > 0 {
 			routes, warnings, err := cmd.V2AppRouteActor.GetApplicationRoutes(summary.GUID)
 			cmd.UI.DisplayWarnings(warnings)
 			if err != nil {
@@ -100,7 +100,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 		table = append(table, []string{
 			summary.Name,
 			cmd.UI.TranslateText(strings.ToLower(string(summary.State))),
-			summary.Processes.Summary(),
+			summary.ProcessSummaries.String(),
 			routesList,
 		})
 	}

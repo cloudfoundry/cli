@@ -41,19 +41,19 @@ type FakeV3ScaleActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
-	GetInstancesByApplicationAndProcessTypeStub        func(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
-	getInstancesByApplicationAndProcessTypeMutex       sync.RWMutex
-	getInstancesByApplicationAndProcessTypeArgsForCall []struct {
+	GetProcessSummaryByApplicationAndProcessTypeStub        func(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error)
+	getProcessSummaryByApplicationAndProcessTypeMutex       sync.RWMutex
+	getProcessSummaryByApplicationAndProcessTypeArgsForCall []struct {
 		appGUID     string
 		processType string
 	}
-	getInstancesByApplicationAndProcessTypeReturns struct {
-		result1 v3action.Process
+	getProcessSummaryByApplicationAndProcessTypeReturns struct {
+		result1 v3action.ProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}
-	getInstancesByApplicationAndProcessTypeReturnsOnCall map[int]struct {
-		result1 v3action.Process
+	getProcessSummaryByApplicationAndProcessTypeReturnsOnCall map[int]struct {
+		result1 v3action.ProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}
@@ -225,56 +225,56 @@ func (fake *FakeV3ScaleActor) GetApplicationByNameAndSpaceReturnsOnCall(i int, r
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error) {
-	fake.getInstancesByApplicationAndProcessTypeMutex.Lock()
-	ret, specificReturn := fake.getInstancesByApplicationAndProcessTypeReturnsOnCall[len(fake.getInstancesByApplicationAndProcessTypeArgsForCall)]
-	fake.getInstancesByApplicationAndProcessTypeArgsForCall = append(fake.getInstancesByApplicationAndProcessTypeArgsForCall, struct {
+func (fake *FakeV3ScaleActor) GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error) {
+	fake.getProcessSummaryByApplicationAndProcessTypeMutex.Lock()
+	ret, specificReturn := fake.getProcessSummaryByApplicationAndProcessTypeReturnsOnCall[len(fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall)]
+	fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall = append(fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall, struct {
 		appGUID     string
 		processType string
 	}{appGUID, processType})
-	fake.recordInvocation("GetInstancesByApplicationAndProcessType", []interface{}{appGUID, processType})
-	fake.getInstancesByApplicationAndProcessTypeMutex.Unlock()
-	if fake.GetInstancesByApplicationAndProcessTypeStub != nil {
-		return fake.GetInstancesByApplicationAndProcessTypeStub(appGUID, processType)
+	fake.recordInvocation("GetProcessSummaryByApplicationAndProcessType", []interface{}{appGUID, processType})
+	fake.getProcessSummaryByApplicationAndProcessTypeMutex.Unlock()
+	if fake.GetProcessSummaryByApplicationAndProcessTypeStub != nil {
+		return fake.GetProcessSummaryByApplicationAndProcessTypeStub(appGUID, processType)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getInstancesByApplicationAndProcessTypeReturns.result1, fake.getInstancesByApplicationAndProcessTypeReturns.result2, fake.getInstancesByApplicationAndProcessTypeReturns.result3
+	return fake.getProcessSummaryByApplicationAndProcessTypeReturns.result1, fake.getProcessSummaryByApplicationAndProcessTypeReturns.result2, fake.getProcessSummaryByApplicationAndProcessTypeReturns.result3
 }
 
-func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeCallCount() int {
-	fake.getInstancesByApplicationAndProcessTypeMutex.RLock()
-	defer fake.getInstancesByApplicationAndProcessTypeMutex.RUnlock()
-	return len(fake.getInstancesByApplicationAndProcessTypeArgsForCall)
+func (fake *FakeV3ScaleActor) GetProcessSummaryByApplicationAndProcessTypeCallCount() int {
+	fake.getProcessSummaryByApplicationAndProcessTypeMutex.RLock()
+	defer fake.getProcessSummaryByApplicationAndProcessTypeMutex.RUnlock()
+	return len(fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall)
 }
 
-func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeArgsForCall(i int) (string, string) {
-	fake.getInstancesByApplicationAndProcessTypeMutex.RLock()
-	defer fake.getInstancesByApplicationAndProcessTypeMutex.RUnlock()
-	return fake.getInstancesByApplicationAndProcessTypeArgsForCall[i].appGUID, fake.getInstancesByApplicationAndProcessTypeArgsForCall[i].processType
+func (fake *FakeV3ScaleActor) GetProcessSummaryByApplicationAndProcessTypeArgsForCall(i int) (string, string) {
+	fake.getProcessSummaryByApplicationAndProcessTypeMutex.RLock()
+	defer fake.getProcessSummaryByApplicationAndProcessTypeMutex.RUnlock()
+	return fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall[i].appGUID, fake.getProcessSummaryByApplicationAndProcessTypeArgsForCall[i].processType
 }
 
-func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeReturns(result1 v3action.Process, result2 v3action.Warnings, result3 error) {
-	fake.GetInstancesByApplicationAndProcessTypeStub = nil
-	fake.getInstancesByApplicationAndProcessTypeReturns = struct {
-		result1 v3action.Process
+func (fake *FakeV3ScaleActor) GetProcessSummaryByApplicationAndProcessTypeReturns(result1 v3action.ProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.GetProcessSummaryByApplicationAndProcessTypeStub = nil
+	fake.getProcessSummaryByApplicationAndProcessTypeReturns = struct {
+		result1 v3action.ProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3ScaleActor) GetInstancesByApplicationAndProcessTypeReturnsOnCall(i int, result1 v3action.Process, result2 v3action.Warnings, result3 error) {
-	fake.GetInstancesByApplicationAndProcessTypeStub = nil
-	if fake.getInstancesByApplicationAndProcessTypeReturnsOnCall == nil {
-		fake.getInstancesByApplicationAndProcessTypeReturnsOnCall = make(map[int]struct {
-			result1 v3action.Process
+func (fake *FakeV3ScaleActor) GetProcessSummaryByApplicationAndProcessTypeReturnsOnCall(i int, result1 v3action.ProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.GetProcessSummaryByApplicationAndProcessTypeStub = nil
+	if fake.getProcessSummaryByApplicationAndProcessTypeReturnsOnCall == nil {
+		fake.getProcessSummaryByApplicationAndProcessTypeReturnsOnCall = make(map[int]struct {
+			result1 v3action.ProcessSummary
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.getInstancesByApplicationAndProcessTypeReturnsOnCall[i] = struct {
-		result1 v3action.Process
+	fake.getProcessSummaryByApplicationAndProcessTypeReturnsOnCall[i] = struct {
+		result1 v3action.ProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -493,8 +493,8 @@ func (fake *FakeV3ScaleActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationSummaryByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
-	fake.getInstancesByApplicationAndProcessTypeMutex.RLock()
-	defer fake.getInstancesByApplicationAndProcessTypeMutex.RUnlock()
+	fake.getProcessSummaryByApplicationAndProcessTypeMutex.RLock()
+	defer fake.getProcessSummaryByApplicationAndProcessTypeMutex.RUnlock()
 	fake.scaleProcessByApplicationMutex.RLock()
 	defer fake.scaleProcessByApplicationMutex.RUnlock()
 	fake.stopApplicationMutex.RLock()

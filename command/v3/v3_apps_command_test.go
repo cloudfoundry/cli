@@ -123,7 +123,7 @@ var _ = Describe("v3-apps Command", func() {
 						Name:  "some-app",
 						State: "STARTED",
 					},
-					Processes: []v3action.Process{{Type: "process-type"}},
+					ProcessSummaries: []v3action.ProcessSummary{{Process: v3action.Process{Type: "process-type"}}},
 				},
 			}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 
@@ -183,23 +183,29 @@ var _ = Describe("v3-apps Command", func() {
 							Name:  "some-app-1",
 							State: "STARTED",
 						},
-						Processes: []v3action.Process{
-							v3action.Process{
-								Type:      "console",
-								Instances: []v3action.Instance{},
+						ProcessSummaries: []v3action.ProcessSummary{
+							{
+								Process: v3action.Process{
+									Type: "console",
+								},
+								InstanceDetails: []v3action.Instance{},
 							},
-							v3action.Process{
-								Type: "worker",
-								Instances: []v3action.Instance{
+							{
+								Process: v3action.Process{
+									Type: "worker",
+								},
+								InstanceDetails: []v3action.Instance{
 									{
 										Index: 0,
 										State: "DOWN",
 									},
 								},
 							},
-							v3action.Process{
-								Type: "web",
-								Instances: []v3action.Instance{
+							{
+								Process: v3action.Process{
+									Type: "web",
+								},
+								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index: 0,
 										State: "RUNNING",
@@ -218,10 +224,12 @@ var _ = Describe("v3-apps Command", func() {
 							Name:  "some-app-2",
 							State: "STOPPED",
 						},
-						Processes: []v3action.Process{
-							v3action.Process{
-								Type: "web",
-								Instances: []v3action.Instance{
+						ProcessSummaries: []v3action.ProcessSummary{
+							{
+								Process: v3action.Process{
+									Type: "web",
+								},
+								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index: 0,
 										State: "DOWN",
@@ -276,7 +284,7 @@ var _ = Describe("v3-apps Command", func() {
 							Name:  "some-app",
 							State: "STARTED",
 						},
-						Processes: []v3action.Process{},
+						ProcessSummaries: []v3action.ProcessSummary{},
 					},
 				}
 				fakeActor.GetApplicationSummariesBySpaceReturns(appSummaries, v3action.Warnings{"warning"}, nil)

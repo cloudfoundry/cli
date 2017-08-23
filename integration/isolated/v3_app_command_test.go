@@ -134,7 +134,7 @@ var _ = Describe("v3-app command", func() {
 				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
 				Eventually(session.Out).Should(Say("requested state:\\s+started"))
 				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
-				Eventually(session.Out).Should(Say("memory usage:\\s+\\d{2}M x 1"))
+				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
 				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
 				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
 				Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
