@@ -50,22 +50,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	CreateApplicationProcessScaleStub        func(appGUID string, processType string, process ccv3.ProcessScaleOptions) (ccv3.Process, ccv3.Warnings, error)
+	CreateApplicationProcessScaleStub        func(appGUID string, process ccv3.Process) (ccv3.Warnings, error)
 	createApplicationProcessScaleMutex       sync.RWMutex
 	createApplicationProcessScaleArgsForCall []struct {
-		appGUID     string
-		processType string
-		process     ccv3.ProcessScaleOptions
+		appGUID string
+		process ccv3.Process
 	}
 	createApplicationProcessScaleReturns struct {
-		result1 ccv3.Process
-		result2 ccv3.Warnings
-		result3 error
+		result1 ccv3.Warnings
+		result2 error
 	}
 	createApplicationProcessScaleReturnsOnCall map[int]struct {
-		result1 ccv3.Process
-		result2 ccv3.Warnings
-		result3 error
+		result1 ccv3.Warnings
+		result2 error
 	}
 	CreateApplicationTaskStub        func(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error)
 	createApplicationTaskMutex       sync.RWMutex
@@ -714,23 +711,22 @@ func (fake *FakeCloudControllerClient) CreateApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) CreateApplicationProcessScale(appGUID string, processType string, process ccv3.ProcessScaleOptions) (ccv3.Process, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScale(appGUID string, process ccv3.Process) (ccv3.Warnings, error) {
 	fake.createApplicationProcessScaleMutex.Lock()
 	ret, specificReturn := fake.createApplicationProcessScaleReturnsOnCall[len(fake.createApplicationProcessScaleArgsForCall)]
 	fake.createApplicationProcessScaleArgsForCall = append(fake.createApplicationProcessScaleArgsForCall, struct {
-		appGUID     string
-		processType string
-		process     ccv3.ProcessScaleOptions
-	}{appGUID, processType, process})
-	fake.recordInvocation("CreateApplicationProcessScale", []interface{}{appGUID, processType, process})
+		appGUID string
+		process ccv3.Process
+	}{appGUID, process})
+	fake.recordInvocation("CreateApplicationProcessScale", []interface{}{appGUID, process})
 	fake.createApplicationProcessScaleMutex.Unlock()
 	if fake.CreateApplicationProcessScaleStub != nil {
-		return fake.CreateApplicationProcessScaleStub(appGUID, processType, process)
+		return fake.CreateApplicationProcessScaleStub(appGUID, process)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2, ret.result3
+		return ret.result1, ret.result2
 	}
-	return fake.createApplicationProcessScaleReturns.result1, fake.createApplicationProcessScaleReturns.result2, fake.createApplicationProcessScaleReturns.result3
+	return fake.createApplicationProcessScaleReturns.result1, fake.createApplicationProcessScaleReturns.result2
 }
 
 func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleCallCount() int {
@@ -739,35 +735,32 @@ func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleCallCount() 
 	return len(fake.createApplicationProcessScaleArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleArgsForCall(i int) (string, string, ccv3.ProcessScaleOptions) {
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleArgsForCall(i int) (string, ccv3.Process) {
 	fake.createApplicationProcessScaleMutex.RLock()
 	defer fake.createApplicationProcessScaleMutex.RUnlock()
-	return fake.createApplicationProcessScaleArgsForCall[i].appGUID, fake.createApplicationProcessScaleArgsForCall[i].processType, fake.createApplicationProcessScaleArgsForCall[i].process
+	return fake.createApplicationProcessScaleArgsForCall[i].appGUID, fake.createApplicationProcessScaleArgsForCall[i].process
 }
 
-func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturns(result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturns(result1 ccv3.Warnings, result2 error) {
 	fake.CreateApplicationProcessScaleStub = nil
 	fake.createApplicationProcessScaleReturns = struct {
-		result1 ccv3.Process
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturnsOnCall(i int, result1 ccv3.Process, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) CreateApplicationProcessScaleReturnsOnCall(i int, result1 ccv3.Warnings, result2 error) {
 	fake.CreateApplicationProcessScaleStub = nil
 	if fake.createApplicationProcessScaleReturnsOnCall == nil {
 		fake.createApplicationProcessScaleReturnsOnCall = make(map[int]struct {
-			result1 ccv3.Process
-			result2 ccv3.Warnings
-			result3 error
+			result1 ccv3.Warnings
+			result2 error
 		})
 	}
 	fake.createApplicationProcessScaleReturnsOnCall[i] = struct {
-		result1 ccv3.Process
-		result2 ccv3.Warnings
-		result3 error
-	}{result1, result2, result3}
+		result1 ccv3.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) CreateApplicationTask(appGUID string, task ccv3.Task) (ccv3.Task, ccv3.Warnings, error) {

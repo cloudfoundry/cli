@@ -98,13 +98,13 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:        "process-1-guid",
 						Type:        "web",
-						MemoryInMB:  32,
+						MemoryInMB:  types.NullUint64{Value: 32, IsSet: true},
 						HealthCheck: ProcessHealthCheck{Type: "port"},
 					},
 					Process{
 						GUID:       "process-2-guid",
 						Type:       "worker",
-						MemoryInMB: 64,
+						MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 						HealthCheck: ProcessHealthCheck{
 							Type: "http",
 							Data: ProcessHealthCheckData{Endpoint: "/health"},
@@ -113,7 +113,7 @@ var _ = Describe("Process", func() {
 					Process{
 						GUID:        "process-3-guid",
 						Type:        "console",
-						MemoryInMB:  128,
+						MemoryInMB:  types.NullUint64{Value: 128, IsSet: true},
 						HealthCheck: ProcessHealthCheck{Type: "process"},
 					},
 				))
@@ -186,7 +186,7 @@ var _ = Describe("Process", func() {
 				Expect(process).To(Equal(Process{
 					GUID:       "process-1-guid",
 					Type:       "some-type",
-					MemoryInMB: 32,
+					MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 					HealthCheck: ProcessHealthCheck{
 						Type: "http",
 						Data: ProcessHealthCheckData{Endpoint: "/health"}},
@@ -408,11 +408,12 @@ var _ = Describe("Process", func() {
 	})
 
 	Describe("CreateApplicationProcessScale", func() {
-		var passedProcess ProcessScaleOptions
+		var passedProcess Process
 
 		Context("when providing all scale options", func() {
 			BeforeEach(func() {
-				passedProcess = ProcessScaleOptions{
+				passedProcess = Process{
+					Type:       "web",
 					Instances:  types.NullInt{Value: 2, IsSet: true},
 					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
 					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
@@ -423,19 +424,7 @@ var _ = Describe("Process", func() {
 					"disk_in_mb": 200
 				}`
 				response := `{
-					"guid": "some-process-guid",
-					"type": "web",
-					"command": "rackup",
-					"instances": 2,
-					"memory_in_mb": 100,
-					"disk_in_mb": 200,
-					"health_check": {
-						"type": "port",
-						"data": {
-							"timeout": null,
-							"endpoint": "some-endpoint"
-						}
-					}
+					"guid": "some-process-guid"
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -446,29 +435,17 @@ var _ = Describe("Process", func() {
 				)
 			})
 
-			It("scales the application process; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+			It("scales the application process; returns all warnings", func() {
+				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(process).To(Equal(Process{
-					GUID:       "some-process-guid",
-					Type:       "web",
-					Instances:  2,
-					MemoryInMB: 100,
-					DiskInMB:   200,
-					HealthCheck: ProcessHealthCheck{
-						Type: "port",
-						Data: ProcessHealthCheckData{
-							Endpoint: "some-endpoint",
-						},
-					},
-				}))
 			})
 		})
 
 		Context("when providing all scale options with 0 values", func() {
 			BeforeEach(func() {
-				passedProcess = ProcessScaleOptions{
+				passedProcess = Process{
+					Type:       "web",
 					Instances:  types.NullInt{Value: 0, IsSet: true},
 					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
 					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
@@ -479,19 +456,7 @@ var _ = Describe("Process", func() {
 					"disk_in_mb": 0
 				}`
 				response := `{
-					"guid": "some-process-guid",
-					"type": "web",
-					"command": "rackup",
-					"instances": 0,
-					"memory_in_mb": 0,
-					"disk_in_mb": 0,
-					"health_check": {
-						"type": "port",
-						"data": {
-							"timeout": null,
-							"endpoint": "some-endpoint"
-						}
-					}
+					"guid": "some-process-guid"
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -503,45 +468,20 @@ var _ = Describe("Process", func() {
 			})
 
 			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(process).To(Equal(Process{
-					GUID:       "some-process-guid",
-					Type:       "web",
-					Instances:  0,
-					MemoryInMB: 0,
-					DiskInMB:   0,
-					HealthCheck: ProcessHealthCheck{
-						Type: "port",
-						Data: ProcessHealthCheckData{
-							Endpoint: "some-endpoint",
-						},
-					},
-				}))
 			})
 		})
 
 		Context("when providing only one scale option", func() {
 			BeforeEach(func() {
-				passedProcess = ProcessScaleOptions{Instances: types.NullInt{Value: 2, IsSet: true}}
+				passedProcess = Process{Type: "web", Instances: types.NullInt{Value: 2, IsSet: true}}
 				expectedBody := `{
 					"instances": 2
 				}`
 				response := `{
 					"guid": "some-process-guid",
-					"type": "web",
-					"command": "rackup",
-					"instances": 2,
-					"memory_in_mb": 100,
-					"disk_in_mb": 200,
-					"health_check": {
-						"type": "port",
-						"data": {
-							"timeout": null,
-							"endpoint": "some-endpoint"
-						}
-					}
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -552,28 +492,16 @@ var _ = Describe("Process", func() {
 				)
 			})
 
-			It("scales the application process; returns the scaled process and all warnings", func() {
-				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+			It("scales the application process; returns all warnings", func() {
+				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(process).To(Equal(Process{
-					GUID:       "some-process-guid",
-					Type:       "web",
-					Instances:  2,
-					MemoryInMB: 100,
-					DiskInMB:   200,
-					HealthCheck: ProcessHealthCheck{
-						Type: "port",
-						Data: ProcessHealthCheckData{
-							Endpoint: "some-endpoint",
-						},
-					},
-				}))
 			})
 		})
 
 		Context("when an error is encountered", func() {
 			BeforeEach(func() {
+				passedProcess = Process{Type: "web", Instances: types.NullInt{Value: 2, IsSet: true}}
 				response := `{
 						"errors": [
 							{
@@ -597,7 +525,7 @@ var _ = Describe("Process", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.CreateApplicationProcessScale("some-app-guid", "web", passedProcess)
+				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

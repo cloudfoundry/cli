@@ -38,4 +38,22 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 	})
+
+	Describe("UnmarshalJSON", func() {
+		Context("when integer value is provided", func() {
+			It("parses JSON number correctly", func() {
+				err := nullInt.UnmarshalJSON([]byte("42"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(nullInt).To(Equal(NullInt{Value: 42, IsSet: true}))
+			})
+		})
+
+		Context("when empty json is provided", func() {
+			It("returns an unset NullInt", func() {
+				err := nullInt.UnmarshalJSON([]byte(`""`))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
+			})
+		})
+	})
 })

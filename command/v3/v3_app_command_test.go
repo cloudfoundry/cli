@@ -15,6 +15,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -298,16 +299,16 @@ var _ = Describe("v3-app Command", func() {
 							v3action.Process{
 								Type:       "console",
 								Instances:  []v3action.Instance{},
-								MemoryInMB: 128,
+								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
 							},
 							v3action.Process{
 								Type:       "worker",
-								MemoryInMB: 64,
+								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 								Instances:  []v3action.Instance{},
 							},
 							v3action.Process{
 								Type:       "web",
-								MemoryInMB: 32,
+								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								Instances:  []v3action.Instance{},
 							},
 						},
@@ -352,16 +353,16 @@ var _ = Describe("v3-app Command", func() {
 							v3action.Process{
 								Type:       "console",
 								Instances:  []v3action.Instance{{State: "DOWN"}},
-								MemoryInMB: 128,
+								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
 							},
 							v3action.Process{
 								Type:       "worker",
-								MemoryInMB: 64,
+								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 								Instances:  []v3action.Instance{{State: "DOWN"}},
 							},
 							v3action.Process{
 								Type:       "web",
-								MemoryInMB: 32,
+								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								Instances:  []v3action.Instance{{State: "DOWN"}},
 							},
 						},
@@ -408,11 +409,11 @@ var _ = Describe("v3-app Command", func() {
 							v3action.Process{
 								Type:       "console",
 								Instances:  []v3action.Instance{},
-								MemoryInMB: 128,
+								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
 							},
 							v3action.Process{
 								Type:       "worker",
-								MemoryInMB: 64,
+								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 								Instances: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,
@@ -427,7 +428,7 @@ var _ = Describe("v3-app Command", func() {
 							},
 							v3action.Process{
 								Type:       "web",
-								MemoryInMB: 32,
+								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								Instances: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,

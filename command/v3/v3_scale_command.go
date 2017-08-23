@@ -16,7 +16,7 @@ type V3ScaleActor interface {
 
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetInstancesByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
-	ScaleProcessByApplication(appGUID string, processType string, scaleOptions v3action.ProcessScaleOptions) (v3action.Warnings, error)
+	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	PollStart(appGUID string, warnings chan<- v3action.Warnings) error
@@ -165,10 +165,11 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 		}
 	}
 
-	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, cmd.ProcessType, v3action.ProcessScaleOptions{
-		Instances:  cmd.Instances.NullInt,
-		MemoryInMB: cmd.MemoryLimit.NullUint64,
-		DiskInMB:   cmd.DiskLimit.NullUint64,
+	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v3action.Process{
+		Type: cmd.ProcessType,
+		DesiredInstancesCount: cmd.Instances.NullInt,
+		MemoryInMB:            cmd.MemoryLimit.NullUint64,
+		DiskInMB:              cmd.DiskLimit.NullUint64,
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

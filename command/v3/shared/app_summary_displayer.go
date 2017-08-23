@@ -167,7 +167,7 @@ func (AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {
 	var usageStrings []string
 	for _, process := range processes {
 		if process.TotalInstanceCount() > 0 {
-			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", process.MemoryInMB, process.TotalInstanceCount()))
+			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", process.MemoryInMB.Value, process.TotalInstanceCount()))
 		}
 	}
 

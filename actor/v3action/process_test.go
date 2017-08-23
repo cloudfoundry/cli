@@ -105,94 +105,39 @@ var _ = Describe("Process Actions", func() {
 	})
 
 	Describe("ScaleProcessByApplication", func() {
-		var passedProcessScaleOptions ProcessScaleOptions
+		var passedProcess Process
 
 		BeforeEach(func() {
-			passedProcessScaleOptions = ProcessScaleOptions{
-				Instances:  types.NullInt{Value: 2, IsSet: true},
-				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
-				DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
+			passedProcess = Process{
+				Type: "web",
+				DesiredInstancesCount: types.NullInt{Value: 2, IsSet: true},
+				MemoryInMB:            types.NullUint64{Value: 100, IsSet: true},
+				DiskInMB:              types.NullUint64{Value: 200, IsSet: true},
 			}
 		})
 
 		Context("when no errors are encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{
-						GUID:       "some-process-guid",
-						Type:       "web",
-						Instances:  2,
-						MemoryInMB: 100,
-						DiskInMB:   200,
-					},
 					ccv3.Warnings{"scale-process-warning"},
 					nil)
 			})
 
-			Context("when no errors are encountered getting process instances", func() {
-				var (
-					instance1 ccv3.Instance
-					instance2 ccv3.Instance
-				)
+			It("scales correct process", func() {
+				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 
-				BeforeEach(func() {
-					instance1 = ccv3.Instance{
-						Index:       0,
-						State:       "RUNNING",
-						CPU:         0.33,
-						MemoryUsage: 10 * 1024 * 1024,
-						DiskUsage:   20 * 1024 * 1024,
-						MemoryQuota: 100 * 1024 * 1024,
-						DiskQuota:   200 * 1024 * 1024,
-					}
-					instance2 = ccv3.Instance{
-						Index:       1,
-						State:       "RUNNING",
-						CPU:         0.40,
-						MemoryUsage: 10 * 1024 * 1024,
-						DiskUsage:   20 * 1024 * 1024,
-						MemoryQuota: 100 * 1024 * 1024,
-						DiskQuota:   200 * 1024 * 1024,
-					}
-					fakeCloudControllerClient.GetProcessInstancesReturns(
-						[]ccv3.Instance{instance1, instance2},
-						ccv3.Warnings{"get-instances-warning"},
-						nil)
-				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("scale-process-warning"))
 
-				It("returns the process with instance information and all warnings", func() {
-					warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
-
-					Expect(err).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("scale-process-warning", "get-instances-warning"))
-
-					Expect(fakeCloudControllerClient.CreateApplicationProcessScaleCallCount()).To(Equal(1))
-					appGUIDArg, processTypeArg, processArg := fakeCloudControllerClient.CreateApplicationProcessScaleArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(processTypeArg).To(Equal("web"))
-					Expect(processArg).To(Equal(ccv3.ProcessScaleOptions(passedProcessScaleOptions)))
-
-					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
-				})
-			})
-
-			Context("when an error is encountered getting process instances", func() {
-				var expectedErr error
-
-				BeforeEach(func() {
-					expectedErr = errors.New("get instances error")
-					fakeCloudControllerClient.GetProcessInstancesReturns(
-						nil,
-						ccv3.Warnings{"get-instances-warning"},
-						expectedErr)
-				})
-
-				It("returns the error and all warnings", func() {
-					warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
-					Expect(err).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("scale-process-warning", "get-instances-warning"))
-				})
+				Expect(fakeCloudControllerClient.CreateApplicationProcessScaleCallCount()).To(Equal(1))
+				appGUIDArg, processArg := fakeCloudControllerClient.CreateApplicationProcessScaleArgsForCall(0)
+				Expect(appGUIDArg).To(Equal("some-app-guid"))
+				Expect(processArg).To(Equal(ccv3.Process{
+					Type:       "web",
+					Instances:  passedProcess.DesiredInstancesCount,
+					MemoryInMB: passedProcess.MemoryInMB,
+					DiskInMB:   passedProcess.DiskInMB,
+				}))
 			})
 		})
 
@@ -202,13 +147,12 @@ var _ = Describe("Process Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("scale process error")
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{},
 					ccv3.Warnings{"scale-process-warning"},
 					expectedErr)
 			})
 
 			It("returns the error and all warnings", func() {
-				warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
+				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})
@@ -217,14 +161,13 @@ var _ = Describe("Process Actions", func() {
 		Context("when a ProcessNotFoundError error is encountered scaling the application process", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
-					ccv3.Process{},
 					ccv3.Warnings{"scale-process-warning"},
 					ccerror.ProcessNotFoundError{},
 				)
 			})
 
 			It("returns the error and all warnings", func() {
-				warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
+				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
 				Expect(err).To(Equal(ProcessNotFoundError{ProcessType: "web"}))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})

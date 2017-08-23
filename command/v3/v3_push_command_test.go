@@ -17,6 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared/sharedfakes"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
+	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
@@ -564,7 +565,7 @@ var _ = Describe("v3-push Command", func() {
 													Processes: []v3action.Process{
 														v3action.Process{
 															Type:       "worker",
-															MemoryInMB: 64,
+															MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 															Instances: []v3action.Instance{
 																v3action.Instance{
 																	Index:       0,
