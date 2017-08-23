@@ -21,7 +21,7 @@ type ListNetworkAccessCommand struct {
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
 
 	usage           interface{} `usage:"CF_NAME list-network-access [--source SOURCE_APP]"`
-	relatedCommands interface{} `related_commands:"allow-network-access, apps, remove-network-access"`
+	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-access"`
 
 	UI          command.UI
 	Config      command.Config

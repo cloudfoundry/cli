@@ -9,28 +9,28 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . AllowNetworkAccessActor
+//go:generate counterfeiter . AddNetworkPolicyActor
 
-type AllowNetworkAccessActor interface {
-	AllowNetworkAccess(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+type AddNetworkPolicyActor interface {
+	AddNetworkPolicy(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
 }
 
-type AllowNetworkAccessCommand struct {
-	RequiredArgs   flag.AllowNetworkAccessArgs `positional-args:"yes"`
-	DestinationApp string                      `long:"destination-app" required:"true"`
+type AddNetworkPolicyCommand struct {
+	RequiredArgs   flag.AddNetworkPolicyArgs   `positional-args:"yes"`
+	DestinationApp string                      `long:"destination-app" required:"true" description:"Name of app to connect to"`
 	Port           flag.NetworkPort            `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
 	Protocol       flag.NetworkProtocol        `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
 
-	usage           interface{} `usage:"CF_NAME allow-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, list-network-access"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       AllowNetworkAccessActor
+	Actor       AddNetworkPolicyActor
 }
 
-func (cmd *AllowNetworkAccessCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
@@ -50,7 +50,7 @@ func (cmd *AllowNetworkAccessCommand) Setup(config command.Config, ui command.UI
 	return nil
 }
 
-func (cmd AllowNetworkAccessCommand) Execute(args []string) error {
+func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
@@ -68,7 +68,7 @@ func (cmd AllowNetworkAccessCommand) Execute(args []string) error {
 		"User":        user.Name,
 	})
 
-	warnings, err := cmd.Actor.AllowNetworkAccess(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	warnings, err := cmd.Actor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

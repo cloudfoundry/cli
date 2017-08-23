@@ -23,7 +23,7 @@ var _ = Describe("list-network-access command", func() {
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --source      Source app to filter results by \\(optional\\)"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("   allow-network-access, apps, remove-network-access"))
+				Eventually(session).Should(Say("   add-network-policy, apps, remove-network-access"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -104,7 +104,7 @@ var _ = Describe("list-network-access command", func() {
 				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 			})
 
-			session := helpers.CF("allow-network-access", appName, "--destination-app", appName)
+			session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -129,7 +129,7 @@ var _ = Describe("list-network-access command", func() {
 					Eventually(helpers.CF("push", srcAppName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
 				})
 
-				session := helpers.CF("allow-network-access", srcAppName, "--destination-app", appName)
+				session := helpers.CF("add-network-policy", srcAppName, "--destination-app", appName)
 				Eventually(session).Should(Exit(0))
 			})
 

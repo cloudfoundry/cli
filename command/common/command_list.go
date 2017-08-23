@@ -33,7 +33,7 @@ type commandList struct {
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
-	AllowNetworkAccess                 v3.AllowNetworkAccessCommand                 `command:"allow-network-access" description:"Allow direct network traffic from one app to another"`
+	AddNetworkPolicy                   v3.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
