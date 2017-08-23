@@ -13,7 +13,8 @@ import (
 //go:generate counterfeiter . ListNetworkAccessActor
 
 type ListNetworkAccessActor interface {
-	ListNetworkAccess(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+	ListNetworkAccessBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+	ListNetworkAccessBySpace(spaceGUID string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
 }
 
 type ListNetworkAccessCommand struct {
@@ -62,7 +63,15 @@ func (cmd ListNetworkAccessCommand) Execute(args []string) error {
 		"User": user.Name,
 	})
 
-	policies, warnings, err := cmd.Actor.ListNetworkAccess(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
+	var policies []cfnetworkingaction.Policy
+	var warnings cfnetworkingaction.Warnings
+
+	if cmd.SourceApp != "" {
+		policies, warnings, err = cmd.Actor.ListNetworkAccessBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
+	} else {
+		policies, warnings, err = cmd.Actor.ListNetworkAccessBySpace(cmd.Config.TargetedSpace().GUID)
+	}
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

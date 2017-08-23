@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cfnetworking"
 	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1/internal"
+	"strings"
 )
 
 type PolicyProtocol string
@@ -54,10 +55,10 @@ func (client Client) CreatePolicies(policies []Policy) error {
 }
 
 // ListPolicies will list the policies
-func (client Client) ListPolicies(appGUID string) ([]Policy, error) {
+func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
 	var request *cfnetworking.Request
 	var err error
-	if appGUID == "" {
+	if len(appGUIDs) == 0 {
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.ListPolicies,
 		})
@@ -65,7 +66,7 @@ func (client Client) ListPolicies(appGUID string) ([]Policy, error) {
 		request, err = client.newHTTPRequest(requestOptions{
 			RequestName: internal.ListPolicies,
 			Query: map[string][]string{
-				"id": []string{appGUID},
+				"id": {strings.Join(appGUIDs, ",")},
 			},
 		})
 	}

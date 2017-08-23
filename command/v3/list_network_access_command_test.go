@@ -34,7 +34,7 @@ var _ = Describe("list-network-access Command", func() {
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
 		fakeActor = new(v3fakes.FakeListNetworkAccessActor)
 
-		srcApp = "some-app"
+		srcApp = ""
 
 		cmd = ListNetworkAccessCommand{
 			UI:          testUI,
@@ -91,7 +91,7 @@ var _ = Describe("list-network-access Command", func() {
 
 		Context("when listing policies is successful", func() {
 			BeforeEach(func() {
-				fakeActor.ListNetworkAccessReturns([]cfnetworkingaction.Policy{
+				fakeActor.ListNetworkAccessBySpaceReturns([]cfnetworkingaction.Policy{
 					{
 						SourceName:      "app1",
 						DestinationName: "app2",
@@ -110,10 +110,9 @@ var _ = Describe("list-network-access Command", func() {
 
 			It("lists the policies when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.ListNetworkAccessCallCount()).To(Equal(1))
-				passedSpaceGuid, passedSrcAppName := fakeActor.ListNetworkAccessArgsForCall(0)
+				Expect(fakeActor.ListNetworkAccessBySpaceCallCount()).To(Equal(1))
+				passedSpaceGuid := fakeActor.ListNetworkAccessBySpaceArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
-				Expect(passedSrcAppName).To(Equal("some-app"))
 
 				Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
 				Expect(testUI.Out).To(Say("OK"))
@@ -125,11 +124,50 @@ var _ = Describe("list-network-access Command", func() {
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 			})
+
+			Context("when a source app name is passed", func() {
+				BeforeEach(func() {
+					cmd.SourceApp = "some-app"
+					fakeActor.ListNetworkAccessBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
+						{
+							SourceName:      "app1",
+							DestinationName: "app2",
+							Protocol:        "tcp",
+							StartPort:       8080,
+							EndPort:         8090,
+						}, {
+							SourceName:      "app2",
+							DestinationName: "app1",
+							Protocol:        "udp",
+							StartPort:       1234,
+							EndPort:         2345,
+						},
+					}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				})
+
+				It("lists the policies when no error occurs", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.ListNetworkAccessBySpaceAndAppNameCallCount()).To(Equal(1))
+					passedSpaceGuid, passedSrcAppName := fakeActor.ListNetworkAccessBySpaceAndAppNameArgsForCall(0)
+					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
+					Expect(passedSrcAppName).To(Equal("some-app"))
+
+					Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("\n\n"))
+					Expect(testUI.Out).To(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+					Expect(testUI.Out).To(Say("app1\\s+app2\\s+tcp\\s+8080-8090"))
+					Expect(testUI.Out).To(Say("app2\\s+app1\\s+udp\\s+1234-2345"))
+
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+				})
+			})
 		})
 
 		Context("when listing the policies is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.ListNetworkAccessReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, translatableerror.ApplicationNotFoundError{Name: srcApp})
+				fakeActor.ListNetworkAccessBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, translatableerror.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("displays warnings and returns the error", func() {

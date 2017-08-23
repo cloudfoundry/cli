@@ -20,10 +20,10 @@ type FakeNetworkingClient struct {
 	createPoliciesReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ListPoliciesStub        func(appName string) ([]cfnetv1.Policy, error)
+	ListPoliciesStub        func(appNames ...string) ([]cfnetv1.Policy, error)
 	listPoliciesMutex       sync.RWMutex
 	listPoliciesArgsForCall []struct {
-		appName string
+		appNames []string
 	}
 	listPoliciesReturns struct {
 		result1 []cfnetv1.Policy
@@ -101,16 +101,16 @@ func (fake *FakeNetworkingClient) CreatePoliciesReturnsOnCall(i int, result1 err
 	}{result1}
 }
 
-func (fake *FakeNetworkingClient) ListPolicies(appName string) ([]cfnetv1.Policy, error) {
+func (fake *FakeNetworkingClient) ListPolicies(appNames ...string) ([]cfnetv1.Policy, error) {
 	fake.listPoliciesMutex.Lock()
 	ret, specificReturn := fake.listPoliciesReturnsOnCall[len(fake.listPoliciesArgsForCall)]
 	fake.listPoliciesArgsForCall = append(fake.listPoliciesArgsForCall, struct {
-		appName string
-	}{appName})
-	fake.recordInvocation("ListPolicies", []interface{}{appName})
+		appNames []string
+	}{appNames})
+	fake.recordInvocation("ListPolicies", []interface{}{appNames})
 	fake.listPoliciesMutex.Unlock()
 	if fake.ListPoliciesStub != nil {
-		return fake.ListPoliciesStub(appName)
+		return fake.ListPoliciesStub(appNames...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -124,10 +124,10 @@ func (fake *FakeNetworkingClient) ListPoliciesCallCount() int {
 	return len(fake.listPoliciesArgsForCall)
 }
 
-func (fake *FakeNetworkingClient) ListPoliciesArgsForCall(i int) string {
+func (fake *FakeNetworkingClient) ListPoliciesArgsForCall(i int) []string {
 	fake.listPoliciesMutex.RLock()
 	defer fake.listPoliciesMutex.RUnlock()
-	return fake.listPoliciesArgsForCall[i].appName
+	return fake.listPoliciesArgsForCall[i].appNames
 }
 
 func (fake *FakeNetworkingClient) ListPoliciesReturns(result1 []cfnetv1.Policy, result2 error) {

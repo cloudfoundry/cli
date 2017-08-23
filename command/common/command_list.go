@@ -33,11 +33,10 @@ type commandList struct {
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
+	AllowNetworkAccess                 v3.AllowNetworkAccessCommand                 `command:"allow-network-access" description:"Allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
-	AllowNetworkAccess                 v3.AllowNetworkAccessCommand                 `command:"allow-network-access" description:"Allow direct network traffic from one app to another"`
-	RemoveNetworkAccess                v3.RemoveNetworkAccessCommand                `command:"remove-network-access" description:"Remove direct network traffic from one app to another"`
 	App                                v2.AppCommand                                `command:"app" description:"Display health and status for an app"`
 	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate user non-interactively"`
 	BindRouteService                   v2.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
@@ -122,6 +121,7 @@ type commandList struct {
 	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v2.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v2.QuotaCommand                              `command:"quota" description:"Show quota info"`
+	RemoveNetworkAccess                v3.RemoveNetworkAccessCommand                `command:"remove-network-access" description:"Remove direct network traffic from one app to another"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	RenameBuildpack                    v2.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v2.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`

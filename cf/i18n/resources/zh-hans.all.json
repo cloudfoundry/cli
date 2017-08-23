@@ -344,7 +344,15 @@
     "translation": "允许对空间进行 SSH 访问"
   },
   {
+    "id": "Allow direct network traffic from one app to another",
+    "translation": ""
+  },
+  {
     "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
+    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -649,6 +657,10 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME allow-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1128,6 +1140,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME list-network-access [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1254,6 +1270,10 @@
   {
     "id": "CF_NAME quotas",
     "translation": "CF_NAME quotas"
+  },
+  {
+    "id": "CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
   },
   {
     "id": "CF_NAME remove-plugin-repo PrivateRepo",
@@ -2416,8 +2436,16 @@
     "translation": "正在以 {{.CurrentUser}} 身份删除用户 {{.TargetUser}}..."
   },
   {
+    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "描述: {{.ServiceDescription}}"
+  },
+  {
+    "id": "Destination",
+    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -3936,6 +3964,10 @@
     "translation": ""
   },
   {
+    "id": "List direct network traffic policies",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "列出目标组织中的域"
   },
@@ -3981,6 +4013,10 @@
   },
   {
     "id": "Listing installed plugins...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network traffic as {{.User}}...",
     "translation": ""
   },
   {
@@ -4464,7 +4500,19 @@
     "translation": "PORT"
   },
   {
+    "id": "PORT must be a positive integer",
+    "translation": ""
+  },
+  {
+    "id": "PORT syntax must match integer[-integer]",
+    "translation": ""
+  },
+  {
     "id": "POSITION",
+    "translation": ""
+  },
+  {
+    "id": "PROTOCOL must be \"tcp\" or \"udp\"",
     "translation": ""
   },
   {
@@ -4692,6 +4740,10 @@
     "translation": ""
   },
   {
+    "id": "Policy does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Port for the TCP route",
     "translation": "TCP 路径的端口"
   },
@@ -4700,8 +4752,16 @@
     "translation": "HTTP 路径 {{.RouteName}} 中不允许端口"
   },
   {
+    "id": "Port or range to connect to destination app with",
+    "translation": ""
+  },
+  {
     "id": "Port used to identify the TCP route",
     "translation": "用于识别 TCP 路径的端口"
+  },
+  {
+    "id": "Ports",
+    "translation": ""
   },
   {
     "id": "Prevent use of a feature",
@@ -4742,6 +4802,14 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "在清单中找到了属性 '{{.PropertyName}}'。此功能不再受支持。请将其除去，然后重试。"
+  },
+  {
+    "id": "Protocol",
+    "translation": ""
+  },
+  {
+    "id": "Protocol to connect apps with",
+    "translation": ""
   },
   {
     "id": "Provider",
@@ -4902,6 +4970,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "除去用户的组织角色"
+  },
+  {
+    "id": "Remove direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5576,6 +5648,14 @@
     "translation": "跳过 API 端点的验证步骤。不建议使用！"
   },
   {
+    "id": "Source",
+    "translation": ""
+  },
+  {
+    "id": "Source app to filter results by (optional)",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "空间"
   },
@@ -6088,6 +6168,10 @@
     "translation": "服务实例将使用的服务套餐"
   },
   {
+    "id": "The source app",
+    "translation": ""
+  },
+  {
     "id": "The space",
     "translation": "空间"
   },
@@ -6181,6 +6265,10 @@
   },
   {
     "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
+    "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
   {
@@ -7124,6 +7212,10 @@
     "translation": "已锁定"
   },
   {
+    "id": "long:\"destination-app\" required:\"true\"",
+    "translation": ""
+  },
+  {
     "id": "memory",
     "translation": "内存"
   },
@@ -7505,6 +7597,10 @@
   },
   {
     "id": "uaa",
+    "translation": ""
+  },
+  {
+    "id": "udp",
     "translation": ""
   },
   {
