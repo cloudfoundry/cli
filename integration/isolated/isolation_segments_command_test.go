@@ -9,12 +9,6 @@ import (
 )
 
 var _ = Describe("isolation-segments command", func() {
-	var isolationSegmentName string
-
-	BeforeEach(func() {
-		isolationSegmentName = helpers.NewIsolationSegmentName()
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
