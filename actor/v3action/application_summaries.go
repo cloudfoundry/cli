@@ -13,20 +13,20 @@ func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]Applicati
 		return nil, allWarnings, err
 	}
 
-	var summaries []ApplicationSummary
+	var appSummaries []ApplicationSummary
 
 	for _, app := range apps {
-		processes, processWarnings, err := actor.getProcessesForApp(app.GUID)
+		processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID)
 		allWarnings = append(allWarnings, processWarnings...)
 		if err != nil {
 			return nil, allWarnings, err
 		}
 
-		summaries = append(summaries, ApplicationSummary{
-			Application: Application(app),
-			Processes:   processes,
+		appSummaries = append(appSummaries, ApplicationSummary{
+			Application:      Application(app),
+			ProcessSummaries: processSummaries,
 		})
 	}
 
-	return summaries, allWarnings, nil
+	return appSummaries, allWarnings, nil
 }

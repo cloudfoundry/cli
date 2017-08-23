@@ -242,8 +242,8 @@ var _ = Describe("v3-app Command", func() {
 						Name:  "some-app",
 						State: "STARTED",
 					},
-					Processes: []v3action.Process{
-						{Type: "web"},
+					ProcessSummaries: []v3action.ProcessSummary{
+						{Process: v3action.Process{Type: "web"}},
 					},
 				}
 				fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
@@ -295,21 +295,24 @@ var _ = Describe("v3-app Command", func() {
 								},
 							},
 						},
-						Processes: []v3action.Process{
-							v3action.Process{
-								Type:       "console",
-								Instances:  []v3action.Instance{},
-								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+						ProcessSummaries: []v3action.ProcessSummary{
+							{
+								Process: v3action.Process{
+									Type:       "console",
+									MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+								},
 							},
-							v3action.Process{
-								Type:       "worker",
-								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-								Instances:  []v3action.Instance{},
+							{
+								Process: v3action.Process{
+									Type:       "worker",
+									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+								},
 							},
-							v3action.Process{
-								Type:       "web",
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								Instances:  []v3action.Instance{},
+							{
+								Process: v3action.Process{
+									Type:       "web",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+								},
 							},
 						},
 					}
@@ -349,21 +352,27 @@ var _ = Describe("v3-app Command", func() {
 								},
 							},
 						},
-						Processes: []v3action.Process{
-							v3action.Process{
-								Type:       "console",
-								Instances:  []v3action.Instance{{State: "DOWN"}},
-								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+						ProcessSummaries: []v3action.ProcessSummary{
+							{
+								Process: v3action.Process{
+									Type:       "console",
+									MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
 							},
-							v3action.Process{
-								Type:       "worker",
-								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-								Instances:  []v3action.Instance{{State: "DOWN"}},
+							{
+								Process: v3action.Process{
+									Type:       "worker",
+									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
 							},
-							v3action.Process{
-								Type:       "web",
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								Instances:  []v3action.Instance{{State: "DOWN"}},
+							{
+								Process: v3action.Process{
+									Type:       "web",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
 							},
 						},
 					}
@@ -405,16 +414,20 @@ var _ = Describe("v3-app Command", func() {
 								},
 							},
 						},
-						Processes: []v3action.Process{
-							v3action.Process{
-								Type:       "console",
-								Instances:  []v3action.Instance{},
-								MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+						ProcessSummaries: []v3action.ProcessSummary{
+							{
+								Process: v3action.Process{
+									Type:       "console",
+									MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{},
 							},
-							v3action.Process{
-								Type:       "worker",
-								MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-								Instances: []v3action.Instance{
+							{
+								Process: v3action.Process{
+									Type:       "worker",
+									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,
 										State:       "DOWN",
@@ -426,10 +439,12 @@ var _ = Describe("v3-app Command", func() {
 									},
 								},
 							},
-							v3action.Process{
-								Type:       "web",
-								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-								Instances: []v3action.Instance{
+							{
+								Process: v3action.Process{
+									Type:       "web",
+									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+								},
+								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,
 										State:       "RUNNING",

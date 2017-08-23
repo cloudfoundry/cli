@@ -5,8 +5,8 @@ import "net/url"
 // ApplicationSummary represents an application with its processes and droplet.
 type ApplicationSummary struct {
 	Application
-	Processes      Processes
-	CurrentDroplet Droplet
+	ProcessSummaries ProcessSummaries
+	CurrentDroplet   Droplet
 }
 
 // GetApplicationSummaryByNameAndSpace returns an application with process and
@@ -18,7 +18,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 		return ApplicationSummary{}, allWarnings, err
 	}
 
-	processes, processWarnings, err := actor.getProcessesForApp(app.GUID)
+	processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID)
 	allWarnings = append(allWarnings, processWarnings...)
 	if err != nil {
 		return ApplicationSummary{}, allWarnings, err
@@ -42,42 +42,40 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 	}
 
 	summary := ApplicationSummary{
-		Application:    app,
-		Processes:      processes,
-		CurrentDroplet: droplet,
+		Application:      app,
+		ProcessSummaries: processSummaries,
+		CurrentDroplet:   droplet,
 	}
 	return summary, allWarnings, nil
 }
 
-func (actor Actor) GetInstancesByApplicationAndProcessType(appGUID string, processType string) (Process, Warnings, error) {
+func (actor Actor) GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (ProcessSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	ccv3Process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, processType)
 	allWarnings = Warnings(warnings)
 	if err != nil {
-		return Process{}, allWarnings, err
+		return ProcessSummary{}, allWarnings, err
 	}
 
 	processGUID := ccv3Process.GUID
 	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
-		return Process{}, allWarnings, err
+		return ProcessSummary{}, allWarnings, err
 	}
 
-	process := Process{
-		Type:       ccv3Process.Type,
-		MemoryInMB: ccv3Process.MemoryInMB,
-		DiskInMB:   ccv3Process.DiskInMB,
+	processSummary := ProcessSummary{
+		Process: Process(ccv3Process),
 	}
 	for _, instance := range instances {
-		process.Instances = append(process.Instances, Instance(instance))
+		processSummary.InstanceDetails = append(processSummary.InstanceDetails, Instance(instance))
 	}
 
-	return process, allWarnings, nil
+	return processSummary, allWarnings, nil
 }
 
-func (actor Actor) getProcessesForApp(appGUID string) (Processes, Warnings, error) {
+func (actor Actor) getProcessSummariesForApp(appGUID string) (ProcessSummaries, Warnings, error) {
 	var allWarnings Warnings
 
 	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
@@ -86,7 +84,7 @@ func (actor Actor) getProcessesForApp(appGUID string) (Processes, Warnings, erro
 		return nil, allWarnings, err
 	}
 
-	var processes Processes
+	var processSummaries ProcessSummaries
 	for _, ccv3Process := range ccv3Processes {
 		processGUID := ccv3Process.GUID
 		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
@@ -95,17 +93,15 @@ func (actor Actor) getProcessesForApp(appGUID string) (Processes, Warnings, erro
 			return nil, allWarnings, err
 		}
 
-		process := Process{
-			Type:       ccv3Process.Type,
-			Instances:  []Instance{},
-			MemoryInMB: ccv3Process.MemoryInMB,
+		processSummary := ProcessSummary{
+			Process: Process(ccv3Process),
 		}
 		for _, instance := range instances {
-			process.Instances = append(process.Instances, Instance(instance))
+			processSummary.InstanceDetails = append(processSummary.InstanceDetails, Instance(instance))
 		}
 
-		processes = append(processes, process)
+		processSummaries = append(processSummaries, processSummary)
 	}
 
-	return processes, allWarnings, nil
+	return processSummaries, allWarnings, nil
 }

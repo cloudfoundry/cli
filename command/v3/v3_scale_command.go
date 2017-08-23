@@ -15,7 +15,7 @@ type V3ScaleActor interface {
 	shared.V3AppSummaryActor
 
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	GetInstancesByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
+	GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
@@ -130,7 +130,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 }
 
 func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string) error {
-	process, warnings, err := cmd.Actor.GetInstancesByApplicationAndProcessType(appGUID, cmd.ProcessType)
+	process, warnings, err := cmd.Actor.GetProcessSummaryByApplicationAndProcessType(appGUID, cmd.ProcessType)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
@@ -166,10 +166,10 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 	}
 
 	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v3action.Process{
-		Type: cmd.ProcessType,
-		DesiredInstancesCount: cmd.Instances.NullInt,
-		MemoryInMB:            cmd.MemoryLimit.NullUint64,
-		DiskInMB:              cmd.DiskLimit.NullUint64,
+		Type:       cmd.ProcessType,
+		Instances:  cmd.Instances.NullInt,
+		MemoryInMB: cmd.MemoryLimit.NullUint64,
+		DiskInMB:   cmd.DiskLimit.NullUint64,
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

@@ -53,7 +53,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	}
 
 	var routes v2action.Routes
-	if len(summary.Processes) > 0 {
+	if len(summary.ProcessSummaries) > 0 {
 		var routeWarnings v2action.Warnings
 		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
 		display.UI.DisplayWarnings(routeWarnings)
@@ -69,22 +69,22 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 
 // Sort processes alphabetically and put web first.
 func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
-	summary.Processes.Sort()
+	summary.ProcessSummaries.Sort()
 
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
 		{display.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
-		{display.UI.TranslateText("processes:"), display.processesSummary(summary.Processes)},
-		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.Processes)},
+		{display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
+		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
 		{display.UI.TranslateText("routes:"), routes.Summary()},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
 		{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
 
 	crashedProcesses := []string{}
-	for i := range summary.Processes {
-		if display.processInstancesAreAllCrashed(&summary.Processes[i]) {
-			crashedProcesses = append(crashedProcesses, summary.Processes[i].Type)
+	for i := range summary.ProcessSummaries {
+		if display.processInstancesAreAllCrashed(&summary.ProcessSummaries[i]) {
+			crashedProcesses = append(crashedProcesses, summary.ProcessSummaries[i].Type)
 		}
 	}
 
@@ -92,8 +92,8 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 
 	appHasARunningInstance := false
 
-	for processIdx := range summary.Processes {
-		if display.processHasAnInstance(&summary.Processes[processIdx]) {
+	for processIdx := range summary.ProcessSummaries {
+		if display.processHasAnInstance(&summary.ProcessSummaries[processIdx]) {
 			appHasARunningInstance = true
 			break
 		}
@@ -105,21 +105,21 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 		return
 	}
 
-	for _, process := range summary.Processes {
+	for _, process := range summary.ProcessSummaries {
 		display.DisplayAppInstancesTable(process)
 	}
 }
 
-func (display AppSummaryDisplayer) DisplayAppInstancesTable(process v3action.Process) {
+func (display AppSummaryDisplayer) DisplayAppInstancesTable(processSummary v3action.ProcessSummary) {
 	display.UI.DisplayNewline()
 
 	display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
-		"ProcessType":          process.Type,
-		"HealthyInstanceCount": process.HealthyInstanceCount(),
-		"TotalInstanceCount":   process.TotalInstanceCount(),
+		"ProcessType":          processSummary.Type,
+		"HealthyInstanceCount": processSummary.HealthyInstanceCount(),
+		"TotalInstanceCount":   processSummary.TotalInstanceCount(),
 	})
 
-	if !display.processHasAnInstance(&process) {
+	if !display.processHasAnInstance(&processSummary) {
 		return
 	}
 
@@ -134,7 +134,7 @@ func (display AppSummaryDisplayer) DisplayAppInstancesTable(process v3action.Pro
 		},
 	}
 
-	for _, instance := range process.Instances {
+	for _, instance := range processSummary.InstanceDetails {
 		table = append(table, []string{
 			fmt.Sprintf("#%d", instance.Index),
 			display.UI.TranslateText(strings.ToLower(string(instance.State))),
@@ -154,20 +154,11 @@ func (display AppSummaryDisplayer) DisplayAppInstancesTable(process v3action.Pro
 	display.UI.DisplayInstancesTableForApp(table)
 }
 
-func (AppSummaryDisplayer) processesSummary(processes []v3action.Process) string {
-	var processesStrings []string
-	for _, process := range processes {
-		processesStrings = append(processesStrings, fmt.Sprintf("%s:%d/%d", process.Type, process.HealthyInstanceCount(), process.TotalInstanceCount()))
-	}
-
-	return strings.Join(processesStrings, ", ")
-}
-
-func (AppSummaryDisplayer) usageSummary(processes []v3action.Process) string {
+func (AppSummaryDisplayer) usageSummary(processSummaries v3action.ProcessSummaries) string {
 	var usageStrings []string
-	for _, process := range processes {
-		if process.TotalInstanceCount() > 0 {
-			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", process.MemoryInMB.Value, process.TotalInstanceCount()))
+	for _, summary := range processSummaries {
+		if summary.TotalInstanceCount() > 0 {
+			usageStrings = append(usageStrings, fmt.Sprintf("%dM x %d", summary.MemoryInMB.Value, summary.TotalInstanceCount()))
 		}
 	}
 
@@ -191,9 +182,9 @@ func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 	return input.Local().Format("2006-01-02 15:04:05 PM")
 }
 
-func (AppSummaryDisplayer) processHasAnInstance(process *v3action.Process) bool {
-	for instanceIdx := range process.Instances {
-		if process.Instances[instanceIdx].State != "DOWN" {
+func (AppSummaryDisplayer) processHasAnInstance(processSummary *v3action.ProcessSummary) bool {
+	for instanceIdx := range processSummary.InstanceDetails {
+		if processSummary.InstanceDetails[instanceIdx].State != "DOWN" {
 			return true
 		}
 	}
@@ -201,13 +192,13 @@ func (AppSummaryDisplayer) processHasAnInstance(process *v3action.Process) bool 
 	return false
 }
 
-func (AppSummaryDisplayer) processInstancesAreAllCrashed(process *v3action.Process) bool {
-	if len(process.Instances) < 1 {
+func (AppSummaryDisplayer) processInstancesAreAllCrashed(processSummary *v3action.ProcessSummary) bool {
+	if len(processSummary.InstanceDetails) < 1 {
 		return false
 	}
 
-	for instanceIdx := range process.Instances {
-		if process.Instances[instanceIdx].State != "CRASHED" {
+	for instanceIdx := range processSummary.InstanceDetails {
+		if processSummary.InstanceDetails[instanceIdx].State != "CRASHED" {
 			return false
 		}
 	}

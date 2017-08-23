@@ -8,16 +8,16 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/types"
 )
 
 // Process represents a V3 actor process.
-type Process struct {
-	Type                  string
-	Instances             []Instance
-	DesiredInstancesCount types.NullInt
-	MemoryInMB            types.NullUint64
-	DiskInMB              types.NullUint64
+type Process ccv3.Process
+
+// ProcessSumary represents a process with instance details.
+type ProcessSummary struct {
+	Process
+
+	InstanceDetails []Instance
 }
 
 // Instance represents a V3 actor instance.
@@ -39,13 +39,13 @@ func (instance *Instance) StartTime() time.Time {
 	return time.Now().Add(-uptimeDuration)
 }
 
-func (p Process) TotalInstanceCount() int {
-	return len(p.Instances)
+func (p ProcessSummary) TotalInstanceCount() int {
+	return len(p.InstanceDetails)
 }
 
-func (p Process) HealthyInstanceCount() int {
+func (p ProcessSummary) HealthyInstanceCount() int {
 	count := 0
-	for _, instance := range p.Instances {
+	for _, instance := range p.InstanceDetails {
 		if instance.State == "RUNNING" {
 			count++
 		}
@@ -53,9 +53,9 @@ func (p Process) HealthyInstanceCount() int {
 	return count
 }
 
-type Processes []Process
+type ProcessSummaries []ProcessSummary
 
-func (ps Processes) Sort() {
+func (ps ProcessSummaries) Sort() {
 	sort.Slice(ps, func(i int, j int) bool {
 		var iScore int
 		var jScore int
@@ -82,7 +82,7 @@ func (ps Processes) Sort() {
 
 }
 
-func (ps Processes) Summary() string {
+func (ps ProcessSummaries) String() string {
 	ps.Sort()
 
 	var summaries []string
@@ -94,13 +94,7 @@ func (ps Processes) Summary() string {
 }
 
 func (actor Actor) ScaleProcessByApplication(appGUID string, process Process) (Warnings, error) {
-	ccv3Process := ccv3.Process{
-		Type:       process.Type,
-		Instances:  process.DesiredInstancesCount,
-		MemoryInMB: process.MemoryInMB,
-		DiskInMB:   process.DiskInMB,
-	}
-	warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3Process)
+	warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3.Process(process))
 	allWarnings := Warnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
