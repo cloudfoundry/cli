@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
 
@@ -209,6 +210,22 @@ var _ = Describe("Process Actions", func() {
 			It("returns the error and all warnings", func() {
 				warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
 				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("scale-process-warning"))
+			})
+		})
+
+		Context("when a ProcessNotFoundError error is encountered scaling the application process", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.CreateApplicationProcessScaleReturns(
+					ccv3.Process{},
+					ccv3.Warnings{"scale-process-warning"},
+					ccerror.ProcessNotFoundError{},
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				warnings, err := actor.ScaleProcessByApplication("some-app-guid", "web", passedProcessScaleOptions)
+				Expect(err).To(Equal(ProcessNotFoundError{ProcessType: "web"}))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})
 		})

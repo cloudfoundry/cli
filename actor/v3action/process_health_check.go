@@ -1,24 +1,11 @@
 package v3action
 
-import (
-	"fmt"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-)
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 
 type ProcessHealthCheck struct {
 	ProcessType     string
 	HealthCheckType string
 	Endpoint        string
-}
-
-// ProcessNotFoundError is returned when the proccess type cannot be found
-type ProcessNotFoundError struct {
-	ProcessType string
-}
-
-func (e ProcessNotFoundError) Error() string {
-	return fmt.Sprintf("Process %s not found", e.ProcessType)
 }
 
 // HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a

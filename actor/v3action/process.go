@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
@@ -22,6 +23,15 @@ type Instance ccv3.Instance
 
 // ProcessScaleOptions represents V3 process scale options.
 type ProcessScaleOptions ccv3.ProcessScaleOptions
+
+// ProcessNotFoundError is returned when the proccess type cannot be found
+type ProcessNotFoundError struct {
+	ProcessType string
+}
+
+func (e ProcessNotFoundError) Error() string {
+	return fmt.Sprintf("Process %s not found", e.ProcessType)
+}
 
 // StartTime returns the time that the instance started.
 func (instance *Instance) StartTime() time.Time {
@@ -90,6 +100,9 @@ func (actor Actor) ScaleProcessByApplication(appGUID string, processType string,
 	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, processType, ccv3.ProcessScaleOptions(scaleOptions))
 	allWarnings = Warnings(warnings)
 	if err != nil {
+		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
+			return allWarnings, ProcessNotFoundError{ProcessType: processType}
+		}
 		return allWarnings, err
 	}
 
