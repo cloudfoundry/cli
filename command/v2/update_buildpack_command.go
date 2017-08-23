@@ -9,7 +9,7 @@ import (
 )
 
 type UpdateBuildpackCommand struct {
-	RequiredArgs    flag.Buildpack                   `positional-args:"yes"`
+	RequiredArgs    flag.BuildpackName               `positional-args:"yes"`
 	Disable         bool                             `long:"disable" description:"Disable the buildpack from being used for staging"`
 	Enable          bool                             `long:"enable" description:"Enable the buildpack to be used for staging"`
 	Order           int                              `short:"i" description:"The order in which the buildpacks are checked during buildpack auto-detection"`

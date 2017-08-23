@@ -9,10 +9,10 @@ import (
 )
 
 type DeleteBuildpackCommand struct {
-	RequiredArgs    flag.Buildpack `positional-args:"yes"`
-	Force           bool           `short:"f" description:"Force deletion without confirmation"`
-	usage           interface{}    `usage:"CF_NAME delete-buildpack BUILDPACK [-f]"`
-	relatedCommands interface{}    `related_commands:"buildpacks"`
+	RequiredArgs    flag.BuildpackName `positional-args:"yes"`
+	Force           bool               `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{}        `usage:"CF_NAME delete-buildpack BUILDPACK [-f]"`
+	relatedCommands interface{}        `related_commands:"buildpacks"`
 }
 
 func (DeleteBuildpackCommand) Setup(config command.Config, ui command.UI) error {
