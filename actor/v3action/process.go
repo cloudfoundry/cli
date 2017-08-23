@@ -8,21 +8,20 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 )
 
 // Process represents a V3 actor process.
 type Process struct {
-	Type       string
-	Instances  []Instance
-	MemoryInMB int
-	DiskInMB   int
+	Type                  string
+	Instances             []Instance
+	DesiredInstancesCount types.NullInt
+	MemoryInMB            types.NullUint64
+	DiskInMB              types.NullUint64
 }
 
 // Instance represents a V3 actor instance.
 type Instance ccv3.Instance
-
-// ProcessScaleOptions represents V3 process scale options.
-type ProcessScaleOptions ccv3.ProcessScaleOptions
 
 // ProcessNotFoundError is returned when the proccess type cannot be found
 type ProcessNotFoundError struct {
@@ -94,31 +93,20 @@ func (ps Processes) Summary() string {
 	return strings.Join(summaries, ", ")
 }
 
-func (actor Actor) ScaleProcessByApplication(appGUID string, processType string, scaleOptions ProcessScaleOptions) (Warnings, error) {
-	var allWarnings Warnings
-
-	ccv3Process, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, processType, ccv3.ProcessScaleOptions(scaleOptions))
-	allWarnings = Warnings(warnings)
+func (actor Actor) ScaleProcessByApplication(appGUID string, process Process) (Warnings, error) {
+	ccv3Process := ccv3.Process{
+		Type:       process.Type,
+		Instances:  process.DesiredInstancesCount,
+		MemoryInMB: process.MemoryInMB,
+		DiskInMB:   process.DiskInMB,
+	}
+	warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3Process)
+	allWarnings := Warnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
-			return allWarnings, ProcessNotFoundError{ProcessType: processType}
+			return allWarnings, ProcessNotFoundError{ProcessType: process.Type}
 		}
 		return allWarnings, err
-	}
-
-	ccv3Instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(ccv3Process.GUID)
-	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return allWarnings, err
-	}
-
-	process := Process{
-		Type:       ccv3Process.Type,
-		MemoryInMB: ccv3Process.MemoryInMB,
-		DiskInMB:   ccv3Process.DiskInMB,
-	}
-	for _, ccv3Instance := range ccv3Instances {
-		process.Instances = append(process.Instances, Instance(ccv3Instance))
 	}
 
 	return allWarnings, nil

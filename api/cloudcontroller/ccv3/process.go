@@ -15,9 +15,9 @@ type Process struct {
 	GUID        string             `json:"guid"`
 	Type        string             `json:"type"`
 	HealthCheck ProcessHealthCheck `json:"health_check"`
-	Instances   int                `json:"instances"`
-	MemoryInMB  int                `json:"memory_in_mb"`
-	DiskInMB    int                `json:"disk_in_mb"`
+	Instances   types.NullInt      `json:"instances"`
+	MemoryInMB  types.NullUint64   `json:"memory_in_mb"`
+	DiskInMB    types.NullUint64   `json:"disk_in_mb"`
 }
 
 type ProcessHealthCheck struct {
@@ -27,12 +27,6 @@ type ProcessHealthCheck struct {
 
 type ProcessHealthCheckData struct {
 	Endpoint string `json:"endpoint"`
-}
-
-type ProcessScaleOptions struct {
-	Instances  types.NullInt    `json:"instances"`
-	MemoryInMB types.NullUint64 `json:"memory_in_mb"`
-	DiskInMB   types.NullUint64 `json:"disk_in_mb"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -125,42 +119,39 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 	return response.Warnings, err
 }
 
-func (client *Client) CreateApplicationProcessScale(appGUID string, processType string, scaleOptions ProcessScaleOptions) (Process, Warnings, error) {
+// CreateApplicationProcessScale updates process instances count, memory or disk
+func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Warnings, error) {
 	ccProcessScale := struct {
 		Instances  json.Number `json:"instances,omitempty"`
 		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
 		DiskInMB   json.Number `json:"disk_in_mb,omitempty"`
 	}{}
 
-	if scaleOptions.Instances.IsSet {
-		ccProcessScale.Instances = json.Number(fmt.Sprint(scaleOptions.Instances.Value))
+	if process.Instances.IsSet {
+		ccProcessScale.Instances = json.Number(fmt.Sprint(process.Instances.Value))
 	}
-	if scaleOptions.MemoryInMB.IsSet {
-		ccProcessScale.MemoryInMB = json.Number(fmt.Sprint(scaleOptions.MemoryInMB.Value))
+	if process.MemoryInMB.IsSet {
+		ccProcessScale.MemoryInMB = json.Number(fmt.Sprint(process.MemoryInMB.Value))
 	}
-	if scaleOptions.DiskInMB.IsSet {
-		ccProcessScale.DiskInMB = json.Number(fmt.Sprint(scaleOptions.DiskInMB.Value))
+	if process.DiskInMB.IsSet {
+		ccProcessScale.DiskInMB = json.Number(fmt.Sprint(process.DiskInMB.Value))
 	}
 
 	body, err := json.Marshal(ccProcessScale)
 	if err != nil {
-		return Process{}, nil, err
+		return nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationProcessScaleRequest,
 		Body:        bytes.NewReader(body),
-		URIParams:   internal.Params{"app_guid": appGUID, "type": processType},
+		URIParams:   internal.Params{"app_guid": appGUID, "type": process.Type},
 	})
 	if err != nil {
-		return Process{}, nil, err
+		return nil, err
 	}
 
-	var process Process
-	response := cloudcontroller.Response{
-		Result: &process,
-	}
-
+	var response cloudcontroller.Response
 	err = client.connection.Make(request, &response)
-	return process, response.Warnings, err
+	return response.Warnings, err
 }

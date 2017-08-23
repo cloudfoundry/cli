@@ -156,7 +156,7 @@ var _ = Describe("Scale Command", func() {
 			BeforeEach(func() {
 				process = v3action.Process{
 					Type:       "web",
-					MemoryInMB: 32,
+					MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 					Instances: []v3action.Instance{
 						v3action.Instance{
 							Index:       0,
@@ -370,13 +370,13 @@ var _ = Describe("Scale Command", func() {
 							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-							appGUIDArg, processTypeArg, scaleOptionsArg := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+							appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 							Expect(appGUIDArg).To(Equal("some-app-guid"))
-							Expect(processTypeArg).To(Equal("web"))
-							Expect(scaleOptionsArg).To(Equal(v3action.ProcessScaleOptions{
-								Instances:  types.NullInt{Value: 2, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
-								MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+							Expect(scaleProcess).To(Equal(v3action.Process{
+								Type: "web",
+								DesiredInstancesCount: types.NullInt{Value: 2, IsSet: true},
+								DiskInMB:              types.NullUint64{Value: 50, IsSet: true},
+								MemoryInMB:            types.NullUint64{Value: 100, IsSet: true},
 							}))
 
 							Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
@@ -454,11 +454,11 @@ var _ = Describe("Scale Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(processTypeArg).To(Equal("web"))
-					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
-						Instances: types.NullInt{Value: 3, IsSet: true},
+					Expect(scaleProcess).To(Equal(v3action.Process{
+						Type: "web",
+						DesiredInstancesCount: types.NullInt{Value: 3, IsSet: true},
 					}))
 
 					Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
@@ -503,10 +503,10 @@ var _ = Describe("Scale Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(processTypeArg).To(Equal("web"))
-					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+					Expect(scaleProcess).To(Equal(v3action.Process{
+						Type:       "web",
 						MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
 					}))
 
@@ -556,10 +556,10 @@ var _ = Describe("Scale Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(processTypeArg).To(Equal("web"))
-					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
+					Expect(scaleProcess).To(Equal(v3action.Process{
+						Type:     "web",
 						DiskInMB: types.NullUint64{Value: 1024, IsSet: true},
 					}))
 
@@ -610,11 +610,11 @@ var _ = Describe("Scale Command", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-					appGUIDArg, processTypeArg, processScaleOptions := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(processTypeArg).To(Equal("some-process-type"))
-					Expect(processScaleOptions).To(Equal(v3action.ProcessScaleOptions{
-						Instances: types.NullInt{Value: 2, IsSet: true},
+					Expect(scaleProcess).To(Equal(v3action.Process{
+						Type: "some-process-type",
+						DesiredInstancesCount: types.NullInt{Value: 2, IsSet: true},
 					}))
 
 					Expect(fakeActor.GetInstancesByApplicationAndProcessTypeCallCount()).To(Equal(1))

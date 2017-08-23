@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -43,7 +44,7 @@ var _ = Describe("Application Summary Actions", func() {
 						{
 							GUID:       "some-process-guid",
 							Type:       "some-type",
-							MemoryInMB: 32,
+							MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 						},
 					},
 					ccv3.Warnings{"some-process-warning"},
@@ -104,7 +105,7 @@ var _ = Describe("Application Summary Actions", func() {
 						},
 						Processes: []Process{
 							Process{
-								MemoryInMB: 32,
+								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								Type:       "some-type",
 								Instances: []Instance{
 									{
@@ -184,7 +185,7 @@ var _ = Describe("Application Summary Actions", func() {
 						},
 						Processes: []Process{
 							Process{
-								MemoryInMB: 32,
+								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								Type:       "some-type",
 								Instances: []Instance{
 									{
