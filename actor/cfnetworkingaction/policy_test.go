@@ -114,7 +114,7 @@ var _ = Describe("Policy", func() {
 		})
 	})
 
-	Describe("ListNetworkAccess", func() {
+	Describe("ListNetworkAccessBySpaceAndAppName", func() {
 		var (
 			policies []Policy
 			srcApp   string
@@ -176,33 +176,7 @@ var _ = Describe("Policy", func() {
 
 		JustBeforeEach(func() {
 			spaceGuid := "space"
-			policies, warnings, executeErr = actor.ListNetworkAccess(spaceGuid, srcApp)
-		})
-
-		It("lists policies", func() {
-			Expect(policies).To(Equal(
-				[]Policy{{
-					SourceName:      "appA",
-					DestinationName: "appB",
-					Protocol:        "tcp",
-					StartPort:       8080,
-					EndPort:         8080,
-				}, {
-					SourceName:      "appB",
-					DestinationName: "appB",
-					Protocol:        "tcp",
-					StartPort:       8080,
-					EndPort:         8080,
-				}},
-			))
-			Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
-			Expect(executeErr).NotTo(HaveOccurred())
-
-			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
-			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
-
-			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
-			Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(Equal(""))
+			policies, warnings, executeErr = actor.ListNetworkAccessBySpaceAndAppName(spaceGuid, srcApp)
 		})
 
 		Context("when listing policies based on a source app", func() {
@@ -232,7 +206,7 @@ var _ = Describe("Policy", func() {
 				Expect(spaceGUID).To(Equal("space"))
 
 				Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
-				Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(Equal("appAGUID"))
+				Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(Equal([]string{"appAGUID"}))
 			})
 		})
 
@@ -263,6 +237,118 @@ var _ = Describe("Policy", func() {
 			It("returns a sensible error", func() {
 				Expect(policies).To(Equal([]Policy{}))
 				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning", "v3ActorWarningA"})))
+				Expect(executeErr).To(MatchError("banana"))
+			})
+		})
+
+		Context("when listing the policy fails", func() {
+			BeforeEach(func() {
+				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, errors.New("apple"))
+			})
+			It("returns a sensible error", func() {
+				Expect(executeErr).To(MatchError("apple"))
+			})
+		})
+	})
+
+	Describe("ListNetworkAccessBySpace", func() {
+		var (
+			policies []Policy
+		)
+
+		BeforeEach(func() {
+			fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{{
+				Source: cfnetv1.PolicySource{
+					ID: "appAGUID",
+				},
+				Destination: cfnetv1.PolicyDestination{
+					ID:       "appBGUID",
+					Protocol: "tcp",
+					Ports: cfnetv1.Ports{
+						Start: 8080,
+						End:   8080,
+					},
+				},
+			}, {
+				Source: cfnetv1.PolicySource{
+					ID: "appBGUID",
+				},
+				Destination: cfnetv1.PolicyDestination{
+					ID:       "appBGUID",
+					Protocol: "tcp",
+					Ports: cfnetv1.Ports{
+						Start: 8080,
+						End:   8080,
+					},
+				},
+			}, {
+				Source: cfnetv1.PolicySource{
+					ID: "appCGUID",
+				},
+				Destination: cfnetv1.PolicyDestination{
+					ID:       "appCGUID",
+					Protocol: "tcp",
+					Ports: cfnetv1.Ports{
+						Start: 8080,
+						End:   8080,
+					},
+				},
+			}}, nil)
+
+			fakeV3Actor.GetApplicationsBySpaceStub = func(_ string) ([]v3action.Application, v3action.Warnings, error) {
+				return []v3action.Application{
+					{
+						Name: "appA",
+						GUID: "appAGUID",
+					},
+					{
+						Name: "appB",
+						GUID: "appBGUID",
+					},
+				}, []string{"GetApplicationsBySpaceWarning"}, nil
+			}
+
+		})
+
+		JustBeforeEach(func() {
+			spaceGuid := "space"
+			policies, warnings, executeErr = actor.ListNetworkAccessBySpace(spaceGuid)
+		})
+
+		It("lists policies", func() {
+			Expect(policies).To(Equal(
+				[]Policy{{
+					SourceName:      "appA",
+					DestinationName: "appB",
+					Protocol:        "tcp",
+					StartPort:       8080,
+					EndPort:         8080,
+				}, {
+					SourceName:      "appB",
+					DestinationName: "appB",
+					Protocol:        "tcp",
+					StartPort:       8080,
+					EndPort:         8080,
+				}},
+			))
+			Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
+			Expect(executeErr).NotTo(HaveOccurred())
+
+			Expect(fakeV3Actor.GetApplicationsBySpaceCallCount()).To(Equal(1))
+			Expect(fakeV3Actor.GetApplicationByNameAndSpaceCallCount()).To(Equal(0))
+
+			Expect(fakeNetworkingClient.ListPoliciesCallCount()).To(Equal(1))
+			Expect(fakeNetworkingClient.ListPoliciesArgsForCall(0)).To(BeNil())
+		})
+
+		Context("when getting the applications fails", func() {
+			BeforeEach(func() {
+				fakeV3Actor.GetApplicationsBySpaceReturns([]v3action.Application{}, []string{"GetApplicationsBySpaceWarning"}, errors.New("banana"))
+			})
+
+			It("returns a sensible error", func() {
+				Expect(policies).To(Equal([]Policy{}))
+				Expect(warnings).To(Equal(Warnings([]string{"GetApplicationsBySpaceWarning"})))
 				Expect(executeErr).To(MatchError("banana"))
 			})
 		})
@@ -343,9 +429,9 @@ var _ = Describe("Policy", func() {
 				fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{}, nil)
 			})
 
-			It("returns a warning", func() {
-				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB", "Policy does not exist."})))
-				Expect(executeErr).NotTo(HaveOccurred())
+			It("returns an error", func() {
+				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
+				Expect(executeErr).To(MatchError("Policy does not exist."))
 			})
 		})
 
@@ -361,13 +447,10 @@ var _ = Describe("Policy", func() {
 
 		Context("when getting the destination app fails ", func() {
 			BeforeEach(func() {
-				fakeV3Actor.GetApplicationByNameAndSpaceStub = func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
-					if appName == "appB" {
-						return v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana")
-					}
-					return v3action.Application{}, []string{"v3ActorWarningA"}, nil
-				}
+				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(0, v3action.Application{}, []string{"v3ActorWarningA"}, nil)
+				fakeV3Actor.GetApplicationByNameAndSpaceReturnsOnCall(1, v3action.Application{}, []string{"v3ActorWarningB"}, errors.New("banana"))
 			})
+
 			It("returns a sensible error", func() {
 				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
 				Expect(executeErr).To(MatchError("banana"))

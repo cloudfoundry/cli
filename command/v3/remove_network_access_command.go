@@ -71,7 +71,12 @@ func (cmd RemoveNetworkAccessCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.RemoveNetworkAccess(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		switch err.(type) {
+		case cfnetworkingaction.PolicyDoesNotExistError:
+			cmd.UI.DisplayText("Policy does not exist.")
+		default:
+			return shared.HandleError(err)
+		}
 	}
 	cmd.UI.DisplayOK()
 

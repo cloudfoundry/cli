@@ -344,7 +344,15 @@
     "translation": "Consenti accesso SSH per lo spazio"
   },
   {
+    "id": "Allow direct network traffic from one app to another",
+    "translation": ""
+  },
+  {
     "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
+    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -649,6 +657,10 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME allow-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME allow-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1128,6 +1140,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME list-network-access [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1254,6 +1270,10 @@
   {
     "id": "CF_NAME quotas",
     "translation": "CF_NAME quotas"
+  },
+  {
+    "id": "CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
   },
   {
     "id": "CF_NAME remove-plugin-repo PrivateRepo",
@@ -2416,8 +2436,16 @@
     "translation": "Eliminazione dell'utente {{.TargetUser}} come {{.CurrentUser}} in corso..."
   },
   {
+    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "Descrizione: {{.ServiceDescription}}"
+  },
+  {
+    "id": "Destination",
+    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -3936,6 +3964,10 @@
     "translation": ""
   },
   {
+    "id": "List direct network traffic policies",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "Elenca i domini nell'organizzazione di destinazione"
   },
@@ -3981,6 +4013,10 @@
   },
   {
     "id": "Listing installed plugins...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network traffic as {{.User}}...",
     "translation": ""
   },
   {
@@ -4464,7 +4500,19 @@
     "translation": "PORTA"
   },
   {
+    "id": "PORT must be a positive integer",
+    "translation": ""
+  },
+  {
+    "id": "PORT syntax must match integer[-integer]",
+    "translation": ""
+  },
+  {
     "id": "POSITION",
+    "translation": ""
+  },
+  {
+    "id": "PROTOCOL must be \"tcp\" or \"udp\"",
     "translation": ""
   },
   {
@@ -4692,6 +4740,10 @@
     "translation": ""
   },
   {
+    "id": "Policy does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Port for the TCP route",
     "translation": "Porta per la rotta TCP"
   },
@@ -4700,8 +4752,16 @@
     "translation": "Porta non consentita nella rotta HTTP {{.RouteName}}"
   },
   {
+    "id": "Port or range to connect to destination app with",
+    "translation": ""
+  },
+  {
     "id": "Port used to identify the TCP route",
     "translation": "Porta utilizzata per identificare la rotta TCP"
+  },
+  {
+    "id": "Ports",
+    "translation": ""
   },
   {
     "id": "Prevent use of a feature",
@@ -4742,6 +4802,14 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Proprietà '{{.PropertyName}}' trovata nel manifest. Questa funzione non è più supportata. Eliminarla e riprovare."
+  },
+  {
+    "id": "Protocol",
+    "translation": ""
+  },
+  {
+    "id": "Protocol to connect apps with",
+    "translation": ""
   },
   {
     "id": "Provider",
@@ -4902,6 +4970,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "Rimuovi un ruolo organizzazione da un utente"
+  },
+  {
+    "id": "Remove direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5576,6 +5648,14 @@
     "translation": "Tralascia la verifica dell'endpoint API. Non consigliato."
   },
   {
+    "id": "Source",
+    "translation": ""
+  },
+  {
+    "id": "Source app to filter results by (optional)",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "Spazio"
   },
@@ -6088,6 +6168,10 @@
     "translation": "Il piano dei servizi che l'istanza del servizio utilizzerà "
   },
   {
+    "id": "The source app",
+    "translation": ""
+  },
+  {
     "id": "The space",
     "translation": "Lo spazio "
   },
@@ -6181,6 +6265,10 @@
   },
   {
     "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
+    "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
   {
@@ -7124,6 +7212,10 @@
     "translation": "bloccato"
   },
   {
+    "id": "long:\"destination-app\" required:\"true\"",
+    "translation": ""
+  },
+  {
     "id": "memory",
     "translation": "memoria"
   },
@@ -7505,6 +7597,10 @@
   },
   {
     "id": "uaa",
+    "translation": ""
+  },
+  {
+    "id": "udp",
     "translation": ""
   },
   {

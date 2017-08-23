@@ -9,18 +9,33 @@ import (
 )
 
 type FakeListNetworkAccessActor struct {
-	ListNetworkAccessStub        func(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
-	listNetworkAccessMutex       sync.RWMutex
-	listNetworkAccessArgsForCall []struct {
+	ListNetworkAccessBySpaceAndAppNameStub        func(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+	listNetworkAccessBySpaceAndAppNameMutex       sync.RWMutex
+	listNetworkAccessBySpaceAndAppNameArgsForCall []struct {
 		spaceGUID  string
 		srcAppName string
 	}
-	listNetworkAccessReturns struct {
+	listNetworkAccessBySpaceAndAppNameReturns struct {
 		result1 []cfnetworkingaction.Policy
 		result2 cfnetworkingaction.Warnings
 		result3 error
 	}
-	listNetworkAccessReturnsOnCall map[int]struct {
+	listNetworkAccessBySpaceAndAppNameReturnsOnCall map[int]struct {
+		result1 []cfnetworkingaction.Policy
+		result2 cfnetworkingaction.Warnings
+		result3 error
+	}
+	ListNetworkAccessBySpaceStub        func(spaceGUID string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+	listNetworkAccessBySpaceMutex       sync.RWMutex
+	listNetworkAccessBySpaceArgsForCall []struct {
+		spaceGUID string
+	}
+	listNetworkAccessBySpaceReturns struct {
+		result1 []cfnetworkingaction.Policy
+		result2 cfnetworkingaction.Warnings
+		result3 error
+	}
+	listNetworkAccessBySpaceReturnsOnCall map[int]struct {
 		result1 []cfnetworkingaction.Policy
 		result2 cfnetworkingaction.Warnings
 		result3 error
@@ -29,55 +44,109 @@ type FakeListNetworkAccessActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeListNetworkAccessActor) ListNetworkAccess(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error) {
-	fake.listNetworkAccessMutex.Lock()
-	ret, specificReturn := fake.listNetworkAccessReturnsOnCall[len(fake.listNetworkAccessArgsForCall)]
-	fake.listNetworkAccessArgsForCall = append(fake.listNetworkAccessArgsForCall, struct {
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error) {
+	fake.listNetworkAccessBySpaceAndAppNameMutex.Lock()
+	ret, specificReturn := fake.listNetworkAccessBySpaceAndAppNameReturnsOnCall[len(fake.listNetworkAccessBySpaceAndAppNameArgsForCall)]
+	fake.listNetworkAccessBySpaceAndAppNameArgsForCall = append(fake.listNetworkAccessBySpaceAndAppNameArgsForCall, struct {
 		spaceGUID  string
 		srcAppName string
 	}{spaceGUID, srcAppName})
-	fake.recordInvocation("ListNetworkAccess", []interface{}{spaceGUID, srcAppName})
-	fake.listNetworkAccessMutex.Unlock()
-	if fake.ListNetworkAccessStub != nil {
-		return fake.ListNetworkAccessStub(spaceGUID, srcAppName)
+	fake.recordInvocation("ListNetworkAccessBySpaceAndAppName", []interface{}{spaceGUID, srcAppName})
+	fake.listNetworkAccessBySpaceAndAppNameMutex.Unlock()
+	if fake.ListNetworkAccessBySpaceAndAppNameStub != nil {
+		return fake.ListNetworkAccessBySpaceAndAppNameStub(spaceGUID, srcAppName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.listNetworkAccessReturns.result1, fake.listNetworkAccessReturns.result2, fake.listNetworkAccessReturns.result3
+	return fake.listNetworkAccessBySpaceAndAppNameReturns.result1, fake.listNetworkAccessBySpaceAndAppNameReturns.result2, fake.listNetworkAccessBySpaceAndAppNameReturns.result3
 }
 
-func (fake *FakeListNetworkAccessActor) ListNetworkAccessCallCount() int {
-	fake.listNetworkAccessMutex.RLock()
-	defer fake.listNetworkAccessMutex.RUnlock()
-	return len(fake.listNetworkAccessArgsForCall)
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceAndAppNameCallCount() int {
+	fake.listNetworkAccessBySpaceAndAppNameMutex.RLock()
+	defer fake.listNetworkAccessBySpaceAndAppNameMutex.RUnlock()
+	return len(fake.listNetworkAccessBySpaceAndAppNameArgsForCall)
 }
 
-func (fake *FakeListNetworkAccessActor) ListNetworkAccessArgsForCall(i int) (string, string) {
-	fake.listNetworkAccessMutex.RLock()
-	defer fake.listNetworkAccessMutex.RUnlock()
-	return fake.listNetworkAccessArgsForCall[i].spaceGUID, fake.listNetworkAccessArgsForCall[i].srcAppName
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceAndAppNameArgsForCall(i int) (string, string) {
+	fake.listNetworkAccessBySpaceAndAppNameMutex.RLock()
+	defer fake.listNetworkAccessBySpaceAndAppNameMutex.RUnlock()
+	return fake.listNetworkAccessBySpaceAndAppNameArgsForCall[i].spaceGUID, fake.listNetworkAccessBySpaceAndAppNameArgsForCall[i].srcAppName
 }
 
-func (fake *FakeListNetworkAccessActor) ListNetworkAccessReturns(result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
-	fake.ListNetworkAccessStub = nil
-	fake.listNetworkAccessReturns = struct {
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceAndAppNameReturns(result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
+	fake.ListNetworkAccessBySpaceAndAppNameStub = nil
+	fake.listNetworkAccessBySpaceAndAppNameReturns = struct {
 		result1 []cfnetworkingaction.Policy
 		result2 cfnetworkingaction.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeListNetworkAccessActor) ListNetworkAccessReturnsOnCall(i int, result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
-	fake.ListNetworkAccessStub = nil
-	if fake.listNetworkAccessReturnsOnCall == nil {
-		fake.listNetworkAccessReturnsOnCall = make(map[int]struct {
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceAndAppNameReturnsOnCall(i int, result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
+	fake.ListNetworkAccessBySpaceAndAppNameStub = nil
+	if fake.listNetworkAccessBySpaceAndAppNameReturnsOnCall == nil {
+		fake.listNetworkAccessBySpaceAndAppNameReturnsOnCall = make(map[int]struct {
 			result1 []cfnetworkingaction.Policy
 			result2 cfnetworkingaction.Warnings
 			result3 error
 		})
 	}
-	fake.listNetworkAccessReturnsOnCall[i] = struct {
+	fake.listNetworkAccessBySpaceAndAppNameReturnsOnCall[i] = struct {
+		result1 []cfnetworkingaction.Policy
+		result2 cfnetworkingaction.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpace(spaceGUID string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error) {
+	fake.listNetworkAccessBySpaceMutex.Lock()
+	ret, specificReturn := fake.listNetworkAccessBySpaceReturnsOnCall[len(fake.listNetworkAccessBySpaceArgsForCall)]
+	fake.listNetworkAccessBySpaceArgsForCall = append(fake.listNetworkAccessBySpaceArgsForCall, struct {
+		spaceGUID string
+	}{spaceGUID})
+	fake.recordInvocation("ListNetworkAccessBySpace", []interface{}{spaceGUID})
+	fake.listNetworkAccessBySpaceMutex.Unlock()
+	if fake.ListNetworkAccessBySpaceStub != nil {
+		return fake.ListNetworkAccessBySpaceStub(spaceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.listNetworkAccessBySpaceReturns.result1, fake.listNetworkAccessBySpaceReturns.result2, fake.listNetworkAccessBySpaceReturns.result3
+}
+
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceCallCount() int {
+	fake.listNetworkAccessBySpaceMutex.RLock()
+	defer fake.listNetworkAccessBySpaceMutex.RUnlock()
+	return len(fake.listNetworkAccessBySpaceArgsForCall)
+}
+
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceArgsForCall(i int) string {
+	fake.listNetworkAccessBySpaceMutex.RLock()
+	defer fake.listNetworkAccessBySpaceMutex.RUnlock()
+	return fake.listNetworkAccessBySpaceArgsForCall[i].spaceGUID
+}
+
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceReturns(result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
+	fake.ListNetworkAccessBySpaceStub = nil
+	fake.listNetworkAccessBySpaceReturns = struct {
+		result1 []cfnetworkingaction.Policy
+		result2 cfnetworkingaction.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeListNetworkAccessActor) ListNetworkAccessBySpaceReturnsOnCall(i int, result1 []cfnetworkingaction.Policy, result2 cfnetworkingaction.Warnings, result3 error) {
+	fake.ListNetworkAccessBySpaceStub = nil
+	if fake.listNetworkAccessBySpaceReturnsOnCall == nil {
+		fake.listNetworkAccessBySpaceReturnsOnCall = make(map[int]struct {
+			result1 []cfnetworkingaction.Policy
+			result2 cfnetworkingaction.Warnings
+			result3 error
+		})
+	}
+	fake.listNetworkAccessBySpaceReturnsOnCall[i] = struct {
 		result1 []cfnetworkingaction.Policy
 		result2 cfnetworkingaction.Warnings
 		result3 error
@@ -87,8 +156,10 @@ func (fake *FakeListNetworkAccessActor) ListNetworkAccessReturnsOnCall(i int, re
 func (fake *FakeListNetworkAccessActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.listNetworkAccessMutex.RLock()
-	defer fake.listNetworkAccessMutex.RUnlock()
+	fake.listNetworkAccessBySpaceAndAppNameMutex.RLock()
+	defer fake.listNetworkAccessBySpaceAndAppNameMutex.RUnlock()
+	fake.listNetworkAccessBySpaceMutex.RLock()
+	defer fake.listNetworkAccessBySpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

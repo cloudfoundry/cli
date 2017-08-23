@@ -108,6 +108,31 @@ var _ = Describe("remove-network-access Command", func() {
 				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
+
+		Context("when the policy does not exist", func() {
+			BeforeEach(func() {
+				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, cfnetworkingaction.PolicyDoesNotExistError{})
+			})
+
+			It("displays OK when no error occurs", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(fakeActor.RemoveNetworkAccessCallCount()).To(Equal(1))
+				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkAccessArgsForCall(0)
+				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
+				Expect(passedSrcAppName).To(Equal("some-app"))
+				Expect(passedDestAppName).To(Equal("some-other-app"))
+				Expect(passedProtocol).To(Equal("tcp"))
+				Expect(passedStartPort).To(Equal(8080))
+				Expect(passedEndPort).To(Equal(8081))
+
+				Expect(testUI.Out).To(Say("Deny network traffic from app %s to %s in org some-org / space some-space as some-user...", srcApp, destApp))
+				Expect(testUI.Err).To(Say("some-warning-1"))
+				Expect(testUI.Err).To(Say("some-warning-2"))
+				Expect(testUI.Out).To(Say("Policy does not exist."))
+				Expect(testUI.Out).To(Say("OK"))
+			})
+		})
+
 		Context("when the policy deletion is not successful", func() {
 			BeforeEach(func() {
 				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
