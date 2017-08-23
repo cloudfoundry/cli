@@ -23,8 +23,9 @@ var _ = Describe("User", func() {
 					response := `{
 					"ID": "new-user-id"
 				}`
-					server.AppendHandlers(
+					uaaServer.AppendHandlers(
 						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
 							VerifyRequest(http.MethodPost, "/Users"),
 							VerifyHeaderKV("Content-Type", "application/json"),
 							VerifyBody([]byte(`{"userName":"new-user","password":"","origin":"some-origin","name":{"familyName":"new-user","givenName":"new-user"},"emails":[{"value":"new-user","primary":true}]}`)),
@@ -46,8 +47,9 @@ var _ = Describe("User", func() {
 					response := `{
 					"ID": "new-user-id"
 				}`
-					server.AppendHandlers(
+					uaaServer.AppendHandlers(
 						CombineHandlers(
+							verifyRequestHost(TestUAAResource),
 							VerifyRequest(http.MethodPost, "/Users"),
 							VerifyHeaderKV("Content-Type", "application/json"),
 							VerifyBody([]byte(`{"userName":"new-user","password":"new-password","origin":"","name":{"familyName":"new-user","givenName":"new-user"},"emails":[{"value":"new-user","primary":true}]}`)),
@@ -74,8 +76,9 @@ var _ = Describe("User", func() {
 					"error": "some-error",
 					"error_description": "some-description"
 				}`
-				server.AppendHandlers(
+				uaaServer.AppendHandlers(
 					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
 						VerifyRequest(http.MethodPost, "/Users"),
 						RespondWith(http.StatusTeapot, response),
 					))

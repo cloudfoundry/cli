@@ -36,6 +36,7 @@ var _ = Describe("Auth", func() {
 				password = helpers.NewPassword()
 				server.AppendHandlers(
 					CombineHandlers(
+						verifyRequestHost(TestAuthorizationResource),
 						VerifyRequest(http.MethodPost, "/oauth/token"),
 						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
@@ -63,6 +64,7 @@ var _ = Describe("Auth", func() {
 					}`
 				server.AppendHandlers(
 					CombineHandlers(
+						verifyRequestHost(TestAuthorizationResource),
 						VerifyRequest(http.MethodPost, "/oauth/token"),
 						RespondWith(http.StatusTeapot, response),
 					))

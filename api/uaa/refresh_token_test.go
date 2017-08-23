@@ -40,6 +40,7 @@ var _ = Describe("UAA Client", func() {
 
 			server.AppendHandlers(
 				CombineHandlers(
+					verifyRequestHost(TestAuthorizationResource),
 					VerifyRequest(http.MethodPost, "/oauth/token"),
 					VerifyHeaderKV("Accept", "application/json"),
 					VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
