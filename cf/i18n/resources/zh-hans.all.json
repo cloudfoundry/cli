@@ -1776,7 +1776,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-scale APP_NAME [-i INSTANCES] [--process PROCESS] [-k DISK] [-m MEMORY]",
+    "id": "CF_NAME v3-scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY]",
     "translation": ""
   },
   {
