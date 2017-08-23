@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/api/password"
-	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 type FakeRepository struct {
