@@ -17,7 +17,7 @@ type RemoveNetworkAccessActor interface {
 
 type RemoveNetworkAccessCommand struct {
 	RequiredArgs   flag.RemoveNetworkAccessArgs `positional-args:"yes"`
-	DestinationApp string                       `long:"destination-app" required:"true"`
+	DestinationApp string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
 	Port           flag.NetworkPort             `long:"port" required:"true" description:"Port or range to connect to destination app with"`
 	Protocol       flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol to connect apps with"`
 

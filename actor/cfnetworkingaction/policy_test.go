@@ -37,7 +37,7 @@ var _ = Describe("Policy", func() {
 		actor = NewActor(fakeNetworkingClient, fakeV3Actor)
 	})
 
-	Describe("AllowNetworkAccess", func() {
+	Describe("AddNetworkPolicy", func() {
 		JustBeforeEach(func() {
 			spaceGuid := "space"
 			srcApp := "appA"
@@ -45,7 +45,7 @@ var _ = Describe("Policy", func() {
 			protocol := "tcp"
 			startPort := 8080
 			endPort := 8090
-			warnings, executeErr = actor.AllowNetworkAccess(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
+			warnings, executeErr = actor.AddNetworkPolicy(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
 		})
 
 		It("creates policies", func() {

@@ -11,21 +11,22 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("allow-network-access command", func() {
+var _ = FDescribe("add-network-policy command", func() {
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
-				session := helpers.CF("allow-network-access", "--help")
+				session := helpers.CF("add-network-policy", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("allow-network-access - Allow direct network traffic from one app to another"))
+				Eventually(session).Should(Say("add-network-policy - Allow direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(regexp.QuoteMeta("cf allow-network-access SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]")))
 				Eventually(session).Should(Say("EXAMPLES:"))
-				Eventually(session).Should(Say("   cf allow-network-access frontend --destination-app backend --protocol tcp --port 8081"))
-				Eventually(session).Should(Say("   cf allow-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"))
+				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8081"))
+				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("   --port          Port or range to connect to destination app with \\(Default: 8080\\)"))
-				Eventually(session).Should(Say("   --protocol      Protocol to connect apps with \\(Default: tcp\\)"))
+				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
+				Eventually(session).Should(Say("   --port                 Port or range to connect to destination app with \\(Default: 8080\\)"))
+				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with \\(Default: tcp\\)"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, list-network-access"))
 				Eventually(session).Should(Exit(0))
@@ -40,7 +41,7 @@ var _ = Describe("allow-network-access command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("allow-network-access", "some-app", "--destination-app", "some-other-app")
+				session := helpers.CF("add-network-policy", "some-app", "--destination-app", "some-other-app")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
@@ -53,7 +54,7 @@ var _ = Describe("allow-network-access command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("allow-network-access", "some-app", "--destination-app", "some-other-app")
+				session := helpers.CF("add-network-policy", "some-app", "--destination-app", "some-other-app")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
@@ -67,7 +68,7 @@ var _ = Describe("allow-network-access command", func() {
 			})
 
 			It("fails with no targeted org error message", func() {
-				session := helpers.CF("allow-network-access", "some-app", "--destination-app", "some-other-app")
+				session := helpers.CF("add-network-policy", "some-app", "--destination-app", "some-other-app")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
@@ -82,7 +83,7 @@ var _ = Describe("allow-network-access command", func() {
 			})
 
 			It("fails with no targeted space error message", func() {
-				session := helpers.CF("allow-network-access", "some-app", "--destination-app", "some-other-app")
+				session := helpers.CF("add-network-policy", "some-app", "--destination-app", "some-other-app")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
@@ -111,7 +112,7 @@ var _ = Describe("allow-network-access command", func() {
 
 		Context("when an app exists", func() {
 			It("creates a policy", func() {
-				session := helpers.CF("allow-network-access", appName, "--destination-app", appName)
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Allowing network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
@@ -129,7 +130,7 @@ var _ = Describe("allow-network-access command", func() {
 
 		Context("when the source app does not exist", func() {
 			It("returns an error", func() {
-				session := helpers.CF("allow-network-access", "pineapple", "--destination-app", appName)
+				session := helpers.CF("add-network-policy", "pineapple", "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Allowing network traffic from app pineapple to %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
@@ -141,7 +142,7 @@ var _ = Describe("allow-network-access command", func() {
 
 		Context("when the dest app does not exist", func() {
 			It("returns an error", func() {
-				session := helpers.CF("allow-network-access", appName, "--destination-app", "pineapple")
+				session := helpers.CF("add-network-policy", appName, "--destination-app", "pineapple")
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Allowing network traffic from app %s to pineapple in org %s / space %s as %s...", appName, orgName, spaceName, username))

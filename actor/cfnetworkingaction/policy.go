@@ -19,7 +19,7 @@ type Policy struct {
 	EndPort         int
 }
 
-func (actor Actor) AllowNetworkAccess(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
+func (actor Actor) AddNetworkPolicy(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
 	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)

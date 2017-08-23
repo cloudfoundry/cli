@@ -24,8 +24,9 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).Should(Say("   cf remove-network-access frontend --destination-app backend --protocol tcp --port 8081"))
 				Eventually(session).Should(Say("   cf remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("   --port          Port or range to connect to destination app with"))
-				Eventually(session).Should(Say("   --protocol      Protocol to connect apps with"))
+				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
+				Eventually(session).Should(Say("   --port                 Port or range to connect to destination app with"))
+				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, list-network-access"))
 				Eventually(session).Should(Exit(0))
@@ -111,7 +112,7 @@ var _ = Describe("remove-network-access command", func() {
 
 		Context("when an app exists", func() {
 			BeforeEach(func() {
-				session := helpers.CF("allow-network-access", appName, "--destination-app", appName)
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Allowing network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
