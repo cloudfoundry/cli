@@ -30,8 +30,7 @@ type SetupSettings struct {
 // AuthInfo represents a GET response from a login server
 type AuthInfo struct {
 	Links struct {
-		UAA   string `json:"uaa"`
-		Login string `json:"login"`
+		UAA string `json:"uaa"`
 	} `json:"links"`
 }
 
@@ -57,8 +56,8 @@ func (client *Client) SetupResources(bootstrapURL string) error {
 	}
 
 	resources := map[string]string{
-		"uaa":   info.Links.UAA,
-		"login": info.Links.Login,
+		"uaa": info.Links.UAA,
+		"authorization_endpoint": bootstrapURL,
 	}
 
 	client.router = internal.NewRouter(internal.APIRoutes, resources)

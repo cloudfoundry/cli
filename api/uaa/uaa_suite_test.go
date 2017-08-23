@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -18,12 +19,29 @@ func TestUaa(t *testing.T) {
 	RunSpecs(t, "UAA Suite")
 }
 
-var server *Server
+var (
+	// we create two servers in order to test that requests using different
+	// resources are going to the correct server
+	server    *Server
+	uaaServer *Server
+
+	TestAuthorizationResource string
+	TestUAAResource           string
+)
 
 var _ = SynchronizedBeforeSuite(func() []byte {
 	return []byte{}
 }, func(data []byte) {
 	server = NewTLSServer()
+	uaaServer = NewTLSServer()
+
+	testAuthURL, err := url.Parse(server.URL())
+	Expect(err).ToNot(HaveOccurred())
+	TestAuthorizationResource = testAuthURL.Host
+
+	testUAAURL, err := url.Parse(uaaServer.URL())
+	Expect(err).ToNot(HaveOccurred())
+	TestUAAResource = testUAAURL.Host
 
 	// Suppresses ginkgo server logs
 	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
@@ -38,7 +56,7 @@ var _ = BeforeEach(func() {
 })
 
 func NewTestUAAClientAndStore() *Client {
-	SetupAuthResponse()
+	SetupBootstrapResponse()
 
 	client := NewClient(Config{
 		AppName:           "CF CLI UAA API Test",
@@ -48,22 +66,20 @@ func NewTestUAAClientAndStore() *Client {
 		SkipSSLValidation: true,
 	})
 
+	// the 'uaaServer' is discovered via the bootstrapping when we hit the /login
+	// endpoint on 'server'
 	err := client.SetupResources(server.URL())
-
 	Expect(err).ToNot(HaveOccurred())
 
 	return client
 }
 
-func SetupAuthResponse() {
-	serverURL := server.URL()
-
+func SetupBootstrapResponse() {
 	response := strings.Replace(`{
 				"links": {
-					"uaa": "SERVER_URL",
-					"login": "SERVER_URL"
+					"uaa": "SERVER_URL"
 				}
-			}`, "SERVER_URL", serverURL, -1)
+			}`, "SERVER_URL", uaaServer.URL(), -1)
 
 	server.AppendHandlers(
 		CombineHandlers(
@@ -71,4 +87,10 @@ func SetupAuthResponse() {
 			RespondWith(http.StatusOK, response),
 		),
 	)
+}
+
+func verifyRequestHost(host string) http.HandlerFunc {
+	return func(_ http.ResponseWriter, req *http.Request) {
+		Expect(req.Host).To(Equal(host))
+	}
 }

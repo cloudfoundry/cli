@@ -25,8 +25,9 @@ var _ = Describe("SSH", func() {
 				expectedCode = "c0d3"
 				locationHeader := http.Header{}
 				locationHeader.Add("Location", fmt.Sprintf("http://localhost/redirect/cf?code=%s&state=", expectedCode))
-				server.AppendHandlers(
+				uaaServer.AppendHandlers(
 					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
 						VerifyRequest(http.MethodGet, "/oauth/authorize", "response_type=code&client_id=ssh-proxy"),
 						RespondWith(http.StatusFound, nil, locationHeader),
 					))
@@ -47,8 +48,9 @@ var _ = Describe("SSH", func() {
 					"error": "some-error",
 					"error_description": "some-description"
 				}`
-				server.AppendHandlers(
+				uaaServer.AppendHandlers(
 					CombineHandlers(
+						verifyRequestHost(TestUAAResource),
 						VerifyRequest(http.MethodGet, "/oauth/authorize", "response_type=code&client_id=ssh-proxy"),
 						RespondWith(http.StatusBadRequest, response),
 					))

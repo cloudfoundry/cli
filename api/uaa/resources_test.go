@@ -11,12 +11,12 @@ import (
 
 var _ = Describe("SetupResources", func() {
 	var (
-		client *Client
-		err    error
+		client            *Client
+		setupResourcesErr error
 	)
 
 	JustBeforeEach(func() {
-		err = client.SetupResources(server.URL())
+		setupResourcesErr = client.SetupResources(server.URL())
 	})
 
 	BeforeEach(func() {
@@ -40,7 +40,7 @@ var _ = Describe("SetupResources", func() {
 		})
 
 		It("returns the error", func() {
-			Expect(err).To(HaveOccurred())
+			Expect(setupResourcesErr).To(HaveOccurred())
 		})
 	})
 
@@ -48,8 +48,7 @@ var _ = Describe("SetupResources", func() {
 		BeforeEach(func() {
 			response := `{
 				"links": {
-					"uaa": "https://uaa.bosh-lite.com",
-					"login": "https://login.bosh-lite.com"
+					"uaa": "https://uaa.bosh-lite.com"
 				}
 			}`
 
@@ -62,7 +61,7 @@ var _ = Describe("SetupResources", func() {
 		})
 
 		It("does not return an error", func() {
-			Expect(err).ToNot(HaveOccurred())
+			Expect(setupResourcesErr).ToNot(HaveOccurred())
 		})
 	})
 })
