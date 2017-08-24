@@ -121,7 +121,7 @@ var _ = Describe("Config", func() {
 					envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
 					Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
 
-					config, err := LoadConfig()
+					config, err = LoadConfig()
 					Expect(err).To(Equal(translatableerror.EmptyConfigError{FilePath: filepath.Join(homeDir, ".cf", "config.json")}))
 
 					// then we reset the env variable
@@ -176,8 +176,8 @@ var _ = Describe("Config", func() {
 					setConfig(homeDir, `{}`)
 					configDir := filepath.Join(homeDir, ".cf")
 					for i := 0; i < 3; i++ {
-						tmpFile, err := ioutil.TempFile(configDir, "temp-config")
-						Expect(err).ToNot(HaveOccurred())
+						tmpFile, fileErr := ioutil.TempFile(configDir, "temp-config")
+						Expect(fileErr).ToNot(HaveOccurred())
 						tmpFile.Close()
 					}
 				})
@@ -192,11 +192,11 @@ var _ = Describe("Config", func() {
 					envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
 					Expect(os.Unsetenv("CF_CLI_EXPERIMENTAL")).ToNot(HaveOccurred())
 
-					config, err := LoadConfig()
+					config, err = LoadConfig()
 					Expect(err).ToNot(HaveOccurred())
 
-					oldTempFileNames, err := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
-					Expect(err).ToNot(HaveOccurred())
+					oldTempFileNames, configErr := filepath.Glob(filepath.Join(homeDir, ".cf", "temp-config?*"))
+					Expect(configErr).ToNot(HaveOccurred())
 					Expect(oldTempFileNames).To(BeEmpty())
 
 					// then we reset the env variable
@@ -702,7 +702,6 @@ var _ = Describe("Config", func() {
 					"https://login.foo.com",
 					"2.0.0",
 					"wws://doppler.foo.com:443",
-					"https://uaa.foo.com",
 					"https://api.foo.com/routing",
 					true,
 				)
@@ -712,7 +711,6 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
 				Expect(config.ConfigFile.MinCLIVersion).To(Equal("2.0.0"))
 				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
-				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
 				Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 				Expect(config.ConfigFile.SkipSSLValidation).To(BeTrue())
 
@@ -769,6 +767,14 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal("guid-value-1"))
 				Expect(config.ConfigFile.TargetedSpace.Name).To(Equal("my-org-name"))
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeTrue())
+			})
+		})
+
+		Describe("SetUAAEndpoint", func() {
+			It("sets the UAA endpoint", func() {
+				var config Config
+				config.SetUAAEndpoint("some-uaa-endpoint.com")
+				Expect(config.ConfigFile.UAAEndpoint).To(Equal("some-uaa-endpoint.com"))
 			})
 		})
 

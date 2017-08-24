@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -27,6 +28,7 @@ var (
 
 	TestAuthorizationResource string
 	TestUAAResource           string
+	TestSuiteFakeStore        *uaafakes.FakeUAAEndpointStore
 )
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -68,7 +70,8 @@ func NewTestUAAClientAndStore() *Client {
 
 	// the 'uaaServer' is discovered via the bootstrapping when we hit the /login
 	// endpoint on 'server'
-	err := client.SetupResources(server.URL())
+	TestSuiteFakeStore = new(uaafakes.FakeUAAEndpointStore)
+	err := client.SetupResources(TestSuiteFakeStore, server.URL())
 	Expect(err).ToNot(HaveOccurred())
 
 	return client
