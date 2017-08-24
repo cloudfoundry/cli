@@ -22,6 +22,37 @@ var _ = Describe("Process Health Check Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
+	Describe("ProcessHealthChecks", func() {
+		var healthchecks ProcessHealthChecks
+
+		BeforeEach(func() {
+			healthchecks = ProcessHealthChecks{
+				{
+					ProcessType:     "worker",
+					HealthCheckType: "process",
+				},
+				{
+					ProcessType:     "console",
+					HealthCheckType: "process",
+				},
+				{
+					ProcessType:     "web",
+					HealthCheckType: "http",
+					Endpoint:        "/",
+				},
+			}
+		})
+
+		Describe("Sort", func() {
+			It("sorts healthchecks with web first and then alphabetically sorted", func() {
+				healthchecks.Sort()
+				Expect(healthchecks[0].ProcessType).To(Equal("web"))
+				Expect(healthchecks[1].ProcessType).To(Equal("console"))
+				Expect(healthchecks[2].ProcessType).To(Equal("worker"))
+			})
+		})
+	})
+
 	Describe("GetApplicationProcessHealthChecksByNameAndSpace", func() {
 		Context("when application does not exist", func() {
 			BeforeEach(func() {

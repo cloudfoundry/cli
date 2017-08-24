@@ -1,11 +1,43 @@
 package v3action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+import (
+	"sort"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+)
 
 type ProcessHealthCheck struct {
 	ProcessType     string
 	HealthCheckType string
 	Endpoint        string
+}
+
+type ProcessHealthChecks []ProcessHealthCheck
+
+func (phs ProcessHealthChecks) Sort() {
+	sort.Slice(phs, func(i int, j int) bool {
+		var iScore int
+		var jScore int
+
+		switch phs[i].ProcessType {
+		case "web":
+			iScore = 0
+		default:
+			iScore = 1
+		}
+
+		switch phs[j].ProcessType {
+		case "web":
+			jScore = 0
+		default:
+			jScore = 1
+		}
+
+		if iScore == 1 && jScore == 1 {
+			return phs[i].ProcessType < phs[j].ProcessType
+		}
+		return iScore < jScore
+	})
 }
 
 // HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a
@@ -29,7 +61,7 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 		return nil, allWarnings, err
 	}
 
-	var processHealthChecks []ProcessHealthCheck
+	var processHealthChecks ProcessHealthChecks
 	for _, ccv3Process := range ccv3Processes {
 		processHealthCheck := ProcessHealthCheck{
 			ProcessType:     ccv3Process.Type,
@@ -38,6 +70,8 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 		}
 		processHealthChecks = append(processHealthChecks, processHealthCheck)
 	}
+
+	processHealthChecks.Sort()
 
 	return processHealthChecks, allWarnings, nil
 }

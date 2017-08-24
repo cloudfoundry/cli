@@ -125,7 +125,7 @@ var _ = Describe("v3-get-health-check command", func() {
 				Eventually(session.Out).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say(`process\s+health check\s+endpoint \(for http\)\n`))
 				Eventually(session.Out).Should(Say(`web\s+port\s+\n`))
-				Eventually(session.Out).Should(Say(`console\s+process\n`))
+				Eventually(session.Out).Should(Say(`console\s+process\s+\n`))
 
 				Eventually(session).Should(Exit(0))
 			})
