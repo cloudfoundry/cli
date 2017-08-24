@@ -318,6 +318,6 @@ type AddNetworkPolicyArgs struct {
 	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
 }
 
-type RemoveNetworkAccessArgs struct {
+type RemoveNetworkPolicyArgs struct {
 	SourceApp string
 }

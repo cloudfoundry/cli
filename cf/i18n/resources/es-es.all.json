@@ -648,6 +648,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
@@ -657,10 +661,6 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1140,10 +1140,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME network-policies [--source SOURCE_APP]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1216,6 +1212,10 @@
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\\n\\nAVISO: Esta operación es interna en Cloud Foundry; no se establecerá contacto con los intermediarios de servicio y los recursos para las instancias de servicio no se modificarán. El caso de uso principal para esta operación es para sustituir un intermediario de servicio que implementa la API de intermediario de servicio v1 con un intermediario que implementa la API v2 correlacionando instancias de servicio de los planes v1 a los planes v2.  Recomendamos convertir en privado el plan v1 o cerrar el intermediario v1 para evitar que se creen instancias adicionales. Una vez que se hayan migrado las instancias de servicio, los servicios y los planes de v1 se pueden eliminar de Cloud Foundry."
   },
   {
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -1272,7 +1272,7 @@
     "translation": "CF_NAME quotas"
   },
   {
-    "id": "CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "id": "CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -4154,6 +4154,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "Nombre de un repositorio registrado donde está ubicado el plugin especificado"
+  },
+  {
+    "id": "Name of app to connect to",
+    "translation": ""
   },
   {
     "id": "Name to give the task (generated if omitted)",
@@ -7210,10 +7214,6 @@
   {
     "id": "locked",
     "translation": "bloqueado"
-  },
-  {
-    "id": "long:\"destination-app\" required:\"true\"",
-    "translation": ""
   },
   {
     "id": "memory",

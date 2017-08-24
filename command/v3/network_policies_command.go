@@ -21,7 +21,7 @@ type NetworkPoliciesCommand struct {
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
 
 	usage           interface{} `usage:"CF_NAME network-policies [--source SOURCE_APP]"`
-	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-access"`
+	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-policy"`
 
 	UI          command.UI
 	Config      command.Config

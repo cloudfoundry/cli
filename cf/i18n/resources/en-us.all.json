@@ -648,6 +648,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
@@ -658,10 +662,6 @@
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
     "translation": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo"
-  },
-  {
-    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
-    "translation": ""
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
@@ -1140,10 +1140,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME network-policies [--source SOURCE_APP]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1216,6 +1212,10 @@
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\\n\\nWARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry."
   },
   {
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -1272,7 +1272,7 @@
     "translation": "CF_NAME quotas"
   },
   {
-    "id": "CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "id": "CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -4154,6 +4154,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "Name of a registered repository where the specified plugin is located"
+  },
+  {
+    "id": "Name of app to connect to",
+    "translation": "Name of app to connect to"
   },
   {
     "id": "Name to give the task (generated if omitted)",
@@ -7210,10 +7214,6 @@
   {
     "id": "locked",
     "translation": "locked"
-  },
-  {
-    "id": "long:\"destination-app\" required:\"true\"",
-    "translation": ""
   },
   {
     "id": "memory",

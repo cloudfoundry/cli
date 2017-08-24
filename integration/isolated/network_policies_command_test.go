@@ -23,7 +23,7 @@ var _ = FDescribe("network-policies command", func() {
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --source      Source app to filter results by \\(optional\\)"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("   add-network-policy, apps, remove-network-access"))
+				Eventually(session).Should(Say("   add-network-policy, apps, remove-network-policy"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

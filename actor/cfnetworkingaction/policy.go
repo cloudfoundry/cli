@@ -117,7 +117,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	return policies, allWarnings, nil
 }
 
-func (actor Actor) RemoveNetworkAccess(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
+func (actor Actor) RemoveNetworkPolicy(spaceGUID, srcAppName, destAppName, protocol string, startPort, endPort int) (Warnings, error) {
 	var allWarnings Warnings
 
 	srcApp, warnings, err := actor.V3Actor.GetApplicationByNameAndSpace(srcAppName, spaceGUID)

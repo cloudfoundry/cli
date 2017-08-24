@@ -363,7 +363,7 @@ var _ = Describe("Policy", func() {
 		})
 	})
 
-	Describe("RemoveNetworkAccess", func() {
+	Describe("RemoveNetworkPolicy", func() {
 		BeforeEach(func() {
 			fakeNetworkingClient.ListPoliciesReturns([]cfnetv1.Policy{
 				{
@@ -389,7 +389,7 @@ var _ = Describe("Policy", func() {
 			protocol := "udp"
 			startPort := 123
 			endPort := 345
-			warnings, executeErr = actor.RemoveNetworkAccess(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
+			warnings, executeErr = actor.RemoveNetworkPolicy(spaceGuid, srcApp, destApp, protocol, startPort, endPort)
 		})
 		It("removes policies", func() {
 			Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
