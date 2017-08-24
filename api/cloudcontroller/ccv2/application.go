@@ -39,7 +39,7 @@ type Application struct {
 	Command string
 
 	// DetectedBuildpack is the buildpack automatically detected.
-	DetectedBuildpack string
+	DetectedBuildpack types.FilteredString
 
 	// DetectedStartCommand is the command used to start the application.
 	DetectedStartCommand string
@@ -202,7 +202,6 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	}
 
 	application.Command = ccApp.Entity.Command
-	application.DetectedBuildpack = ccApp.Entity.DetectedBuildpack
 	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
 	application.DockerImage = ccApp.Entity.DockerImage
@@ -220,6 +219,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.State = ApplicationState(ccApp.Entity.State)
 
 	application.Buildpack.ParseValue(ccApp.Entity.Buildpack)
+	application.DetectedBuildpack.ParseValue(ccApp.Entity.DetectedBuildpack)
 
 	if len(ccApp.Entity.EnvironmentVariables) > 0 {
 		envVariableValues := map[string]string{}
