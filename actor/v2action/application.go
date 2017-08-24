@@ -109,6 +109,15 @@ func (application Application) CalculatedBuildpack() string {
 	return application.DetectedBuildpack.Value
 }
 
+// CalculatedCommand returns the command that will be used.
+func (application Application) CalculatedCommand() string {
+	if application.Command.IsSet {
+		return application.Command.Value
+	}
+
+	return application.DetectedStartCommand.Value
+}
+
 // CalculatedHealthCheckEndpoint returns the health check endpoint.
 // If the health check type is not http it will return the empty string.
 func (application Application) CalculatedHealthCheckEndpoint() string {
@@ -155,27 +164,29 @@ func (application Application) Stopped() bool {
 	return application.State == ccv2.ApplicationStopped
 }
 
-func (app Application) String() string {
+func (application Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command: '%s', Detected Buildpack IsSet: %t, Detected Buildpack: '%s', Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
-		app.Name,
-		app.Buildpack.IsSet,
-		app.Buildpack.Value,
-		app.Command,
-		app.DetectedBuildpack.IsSet,
-		app.DetectedBuildpack.Value,
-		app.DetectedStartCommand,
-		app.DiskQuota,
-		app.DockerImage,
-		app.HealthCheckHTTPEndpoint,
-		app.HealthCheckTimeout,
-		app.HealthCheckType,
-		app.Instances.IsSet,
-		app.Instances.Value,
-		app.Memory,
-		app.SpaceGUID,
-		app.StackGUID,
-		app.State,
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Detected Buildpack IsSet: %t, Detected Buildpack: '%s', Detected Start Command IsSet: %t, Detected Start Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Space GUID: '%s',Stack GUID: '%s', State: '%s'",
+		application.Name,
+		application.Buildpack.IsSet,
+		application.Buildpack.Value,
+		application.Command.IsSet,
+		application.Command.Value,
+		application.DetectedBuildpack.IsSet,
+		application.DetectedBuildpack.Value,
+		application.DetectedStartCommand.IsSet,
+		application.DetectedStartCommand.Value,
+		application.DiskQuota,
+		application.DockerImage,
+		application.HealthCheckHTTPEndpoint,
+		application.HealthCheckTimeout,
+		application.HealthCheckType,
+		application.Instances.IsSet,
+		application.Instances.Value,
+		application.Memory,
+		application.SpaceGUID,
+		application.StackGUID,
+		application.State,
 	)
 }
 

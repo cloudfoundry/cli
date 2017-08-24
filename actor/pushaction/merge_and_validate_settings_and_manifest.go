@@ -96,7 +96,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 		switch {
 		case
 			settings.Buildpack.IsSet,
-			settings.Command != "",
+			settings.Command.IsSet,
 			settings.DiskQuota != 0,
 			settings.DockerImage != "",
 			settings.HealthCheckTimeout != 0,

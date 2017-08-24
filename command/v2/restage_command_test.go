@@ -262,7 +262,7 @@ var _ = Describe("Restage Command", func() {
 								PackageUpdatedAt:     time.Unix(0, 0),
 								DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
 								State:                "STARTED",
-								DetectedStartCommand: "some start command",
+								DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
 							},
 							Stack: v2action.Stack{
 								Name: "potatos",
@@ -501,7 +501,7 @@ var _ = Describe("Restage Command", func() {
 							PackageUpdatedAt:     time.Unix(0, 0),
 							DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
 							State:                "STARTED",
-							DetectedStartCommand: "some start command",
+							DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
 						},
 						IsolationSegment: "some-isolation-segment",
 						Stack: v2action.Stack{

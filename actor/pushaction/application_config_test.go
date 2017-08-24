@@ -299,7 +299,7 @@ var _ = Describe("Application Config", func() {
 			Context("when the manifest contains all the properties", func() {
 				BeforeEach(func() {
 					manifestApps[0].Buildpack = types.FilteredString{IsSet: true, Value: "some-buildpack"}
-					manifestApps[0].Command = "some-command"
+					manifestApps[0].Command = types.FilteredString{IsSet: true, Value: "some-command"}
 					manifestApps[0].DockerImage = "some-docker-image"
 					manifestApps[0].DockerUsername = "some-docker-username"
 					manifestApps[0].DockerPassword = "some-docker-password"
@@ -327,7 +327,7 @@ var _ = Describe("Application Config", func() {
 					Expect(warnings).To(ConsistOf("some-stack-warning", "private-domain-warnings", "shared-domain-warnings"))
 
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}))
-					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-command"))
+					Expect(firstConfig.DesiredApplication.Command).To(Equal(types.FilteredString{IsSet: true, Value: "some-command"}))
 					Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image"))
 					Expect(firstConfig.DesiredApplication.DockerCredentials.Username).To(Equal("some-docker-username"))
 					Expect(firstConfig.DesiredApplication.DockerCredentials.Password).To(Equal("some-docker-password"))
@@ -359,7 +359,7 @@ var _ = Describe("Application Config", func() {
 
 					app := v2action.Application{
 						Buildpack: types.FilteredString{IsSet: true, Value: "some-buildpack"},
-						Command:   "some-command",
+						Command:   types.FilteredString{IsSet: true, Value: "some-command"},
 						DockerCredentials: ccv2.DockerCredentials{
 							Username: "some-docker-username",
 							Password: "some-docker-password",
@@ -384,7 +384,7 @@ var _ = Describe("Application Config", func() {
 
 				It("keeps the original app properties", func() {
 					Expect(firstConfig.DesiredApplication.Buildpack).To(Equal(types.FilteredString{IsSet: true, Value: "some-buildpack"}))
-					Expect(firstConfig.DesiredApplication.Command).To(Equal("some-command"))
+					Expect(firstConfig.DesiredApplication.Command).To(Equal(types.FilteredString{IsSet: true, Value: "some-command"}))
 					Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image"))
 					Expect(firstConfig.DesiredApplication.DockerCredentials.Username).To(Equal("some-docker-username"))
 					Expect(firstConfig.DesiredApplication.DockerCredentials.Password).To(Equal("some-docker-password"))

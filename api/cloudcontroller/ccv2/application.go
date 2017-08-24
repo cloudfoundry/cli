@@ -36,13 +36,13 @@ type Application struct {
 	Buildpack types.FilteredString
 
 	// Command is the user specified start command.
-	Command string
+	Command types.FilteredString
 
 	// DetectedBuildpack is the buildpack automatically detected.
 	DetectedBuildpack types.FilteredString
 
 	// DetectedStartCommand is the command used to start the application.
-	DetectedStartCommand string
+	DetectedStartCommand types.FilteredString
 
 	// DiskQuota is the disk given to each instance, in megabytes.
 	DiskQuota uint64
@@ -117,7 +117,7 @@ type DockerCredentials struct {
 func (application Application) MarshalJSON() ([]byte, error) {
 	ccApp := struct {
 		Buildpack               *string            `json:"buildpack,omitempty"`
-		Command                 string             `json:"command,omitempty"`
+		Command                 *string            `json:"command,omitempty"`
 		DiskQuota               uint64             `json:"disk_quota,omitempty"`
 		DockerCredentials       *DockerCredentials `json:"docker_credentials,omitempty"`
 		DockerImage             string             `json:"docker_image,omitempty"`
@@ -132,7 +132,6 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		StackGUID               string             `json:"stack_guid,omitempty"`
 		State                   ApplicationState   `json:"state,omitempty"`
 	}{
-		Command:                 application.Command,
 		DiskQuota:               application.DiskQuota,
 		DockerImage:             application.DockerImage,
 		EnvironmentVariables:    application.EnvironmentVariables,
@@ -148,6 +147,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 
 	if application.Buildpack.IsSet {
 		ccApp.Buildpack = &application.Buildpack.Value
+	}
+
+	if application.Command.IsSet {
+		ccApp.Command = &application.Command.Value
 	}
 
 	if application.DockerCredentials.Username != "" || application.DockerCredentials.Password != "" {
@@ -201,8 +204,6 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	application.Command = ccApp.Entity.Command
-	application.DetectedStartCommand = ccApp.Entity.DetectedStartCommand
 	application.DiskQuota = ccApp.Entity.DiskQuota
 	application.DockerImage = ccApp.Entity.DockerImage
 	application.DockerCredentials = ccApp.Entity.DockerCredentials
@@ -220,6 +221,9 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 
 	application.Buildpack.ParseValue(ccApp.Entity.Buildpack)
 	application.DetectedBuildpack.ParseValue(ccApp.Entity.DetectedBuildpack)
+
+	application.Command.ParseValue(ccApp.Entity.Command)
+	application.DetectedStartCommand.ParseValue(ccApp.Entity.DetectedStartCommand)
 
 	if len(ccApp.Entity.EnvironmentVariables) > 0 {
 		envVariableValues := map[string]string{}
