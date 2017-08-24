@@ -125,7 +125,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		HealthCheckHTTPEndpoint string             `json:"health_check_http_endpoint,omitempty"`
 		HealthCheckTimeout      int                `json:"health_check_timeout,omitempty"`
 		HealthCheckType         string             `json:"health_check_type,omitempty"`
-		Instances               json.Number        `json:"instances,omitempty"`
+		Instances               *int               `json:"instances,omitempty"`
 		Memory                  uint64             `json:"memory,omitempty"`
 		Name                    string             `json:"name,omitempty"`
 		SpaceGUID               string             `json:"space_guid,omitempty"`
@@ -158,7 +158,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 	}
 
 	if application.Instances.IsSet {
-		ccApp.Instances = json.Number(fmt.Sprint(application.Instances.Value))
+		ccApp.Instances = &application.Instances.Value
 	}
 
 	return json.Marshal(ccApp)
