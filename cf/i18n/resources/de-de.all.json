@@ -7664,7 +7664,7 @@
     "translation": ""
   },
   {
-    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0 or higher.",
     "translation": ""
   },
   {
