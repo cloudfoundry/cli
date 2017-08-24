@@ -16,13 +16,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("list-network-access Command", func() {
+var _ = Describe("network-policies Command", func() {
 	var (
-		cmd             ListNetworkAccessCommand
+		cmd             NetworkPoliciesCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeListNetworkAccessActor
+		fakeActor       *v3fakes.FakeNetworkPoliciesActor
 		binaryName      string
 		executeErr      error
 		srcApp          string
@@ -32,11 +32,11 @@ var _ = Describe("list-network-access Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeListNetworkAccessActor)
+		fakeActor = new(v3fakes.FakeNetworkPoliciesActor)
 
 		srcApp = ""
 
-		cmd = ListNetworkAccessCommand{
+		cmd = NetworkPoliciesCommand{
 			UI:          testUI,
 			SourceApp:   srcApp,
 			Config:      fakeConfig,
@@ -91,7 +91,7 @@ var _ = Describe("list-network-access Command", func() {
 
 		Context("when listing policies is successful", func() {
 			BeforeEach(func() {
-				fakeActor.ListNetworkAccessBySpaceReturns([]cfnetworkingaction.Policy{
+				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{
 					{
 						SourceName:      "app1",
 						DestinationName: "app2",
@@ -110,8 +110,8 @@ var _ = Describe("list-network-access Command", func() {
 
 			It("lists the policies when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.ListNetworkAccessBySpaceCallCount()).To(Equal(1))
-				passedSpaceGuid := fakeActor.ListNetworkAccessBySpaceArgsForCall(0)
+				Expect(fakeActor.NetworkPoliciesBySpaceCallCount()).To(Equal(1))
+				passedSpaceGuid := fakeActor.NetworkPoliciesBySpaceArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 
 				Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
@@ -128,7 +128,7 @@ var _ = Describe("list-network-access Command", func() {
 			Context("when a source app name is passed", func() {
 				BeforeEach(func() {
 					cmd.SourceApp = "some-app"
-					fakeActor.ListNetworkAccessBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
+					fakeActor.NetworkPoliciesBySpaceAndAppNameReturns([]cfnetworkingaction.Policy{
 						{
 							SourceName:      "app1",
 							DestinationName: "app2",
@@ -147,8 +147,8 @@ var _ = Describe("list-network-access Command", func() {
 
 				It("lists the policies when no error occurs", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(fakeActor.ListNetworkAccessBySpaceAndAppNameCallCount()).To(Equal(1))
-					passedSpaceGuid, passedSrcAppName := fakeActor.ListNetworkAccessBySpaceAndAppNameArgsForCall(0)
+					Expect(fakeActor.NetworkPoliciesBySpaceAndAppNameCallCount()).To(Equal(1))
+					passedSpaceGuid, passedSrcAppName := fakeActor.NetworkPoliciesBySpaceAndAppNameArgsForCall(0)
 					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedSrcAppName).To(Equal("some-app"))
 
@@ -167,7 +167,7 @@ var _ = Describe("list-network-access Command", func() {
 
 		Context("when listing the policies is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.ListNetworkAccessBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, translatableerror.ApplicationNotFoundError{Name: srcApp})
+				fakeActor.NetworkPoliciesBySpaceReturns([]cfnetworkingaction.Policy{}, cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, translatableerror.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("displays warnings and returns the error", func() {

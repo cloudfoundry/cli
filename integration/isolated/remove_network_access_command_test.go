@@ -28,7 +28,7 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).Should(Say("   --port                 Port or range to connect to destination app with"))
 				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with"))
 				Eventually(session).Should(Say("SEE ALSO:"))
-				Eventually(session).Should(Say("   apps, list-network-access"))
+				Eventually(session).Should(Say("   apps, network-policies"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -119,7 +119,7 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("list-network-access")
+				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say("Listing network traffic as %s...", username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
@@ -135,7 +135,7 @@ var _ = Describe("remove-network-access command", func() {
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
-				session = helpers.CF("list-network-access")
+				session = helpers.CF("network-policies")
 				Eventually(session).Should(Say("Listing network traffic as %s...", username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
