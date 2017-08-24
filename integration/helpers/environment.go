@@ -3,6 +3,9 @@ package helpers
 import (
 	"fmt"
 	"strings"
+
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gexec"
 )
 
 func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) []string {
@@ -19,4 +22,12 @@ func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) 
 		env = append(env, fmt.Sprintf("%s=%s", newEnvName, newEnvVal))
 	}
 	return env
+}
+
+func EnableDockerSupport() {
+	tempHome := SetHomeDir()
+	SetAPI()
+	LoginCF()
+	Eventually(CF("enable-feature-flag", "diego_docker")).Should(Exit(0))
+	DestroyHomeDir(tempHome)
 }
