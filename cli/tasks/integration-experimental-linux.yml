@@ -1,0 +1,47 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
+
+inputs:
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lite-lock
+- name: vars-store
+
+params:
+  CF_CLI_EXPERIMENTAL: false
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    ENV=$(cat bosh-lite-lock/name | cut -d "." -f 1)
+    export CF_PASSWORD=$(bosh int vars-store/ci/infrastructure/$ENV/deployment-vars.yml --path /cf_admin_password)
+
+    set -x
+
+    domain=$(cat bosh-lite-lock/name)
+    export CF_API="https://api.${domain}"
+    export CF_DIAL_TIMEOUT=15
+
+    export GOPATH=$PWD/go
+    export PATH=$GOPATH/bin:$PATH
+
+    go get -u github.com/onsi/ginkgo/ginkgo
+
+    pushd cf-cli-binaries
+      tar xvzf cf-cli-binaries.tgz
+      chmod +x cf-cli_linux_x86-64
+      mv cf-cli_linux_x86-64 $GOPATH/bin/cf
+    popd
+
+    cd $GOPATH/src/code.cloudfoundry.org/cli
+    ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/experimental

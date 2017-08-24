@@ -1,0 +1,16 @@
+---
+platform: windows
+
+inputs:
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lite-lock
+- name: cli-ci
+- name: cf-credentials
+
+params:
+  CF_CLI_EXPERIMENTAL: false
+
+run:
+  path: cli-ci/ci/cli/tasks/integration-experimental-windows.bat
