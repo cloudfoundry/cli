@@ -38,8 +38,9 @@ type Config interface {
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
 	SetSpaceInformation(guid string, name string, allowSSH bool)
-	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
+	SetUAAEndpoint(uaaEndpoint string)
 	SkipSSLValidation() bool
 	SSHOAuthClient() string
 	StagingTimeout() time.Duration

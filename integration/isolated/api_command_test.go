@@ -272,7 +272,7 @@ var _ = Describe("api command", func() {
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.DopplerEndpoint).To(MatchRegexp("^wss://"))
 		Expect(configFile.RoutingEndpoint).NotTo(BeEmpty())
-		Expect(configFile.UAAEndpoint).ToNot(BeEmpty())
+		Expect(configFile.UAAEndpoint).To(BeEmpty())
 		Expect(configFile.AccessToken).To(BeEmpty())
 		Expect(configFile.RefreshToken).To(BeEmpty())
 		Expect(configFile.TargetedOrganization.GUID).To(BeEmpty())

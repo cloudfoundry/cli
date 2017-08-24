@@ -79,7 +79,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 	uaaClient.WrapConnection(uaaAuthWrapper)
 	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(2))
 
-	err = uaaClient.SetupResources(ccClient.AuthorizationEndpoint())
+	err = uaaClient.SetupResources(config, ccClient.AuthorizationEndpoint())
 	if err != nil {
 		return nil, nil, err
 	}

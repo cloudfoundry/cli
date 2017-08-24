@@ -636,13 +636,12 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 
 // SetTargetInformation sets the currently targeted CC API and related other
 // related API URLs
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, uaa string, routing string, skipSSLValidation bool) {
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, minCLIVersion string, doppler string, routing string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
 	config.ConfigFile.MinCLIVersion = minCLIVersion
 	config.ConfigFile.DopplerEndpoint = doppler
-	config.ConfigFile.UAAEndpoint = uaa
 	config.ConfigFile.RoutingEndpoint = routing
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
@@ -665,6 +664,12 @@ func (config *Config) SetAccessToken(accessToken string) {
 // SetRefreshToken sets the current refresh token
 func (config *Config) SetRefreshToken(refreshToken string) {
 	config.ConfigFile.RefreshToken = refreshToken
+}
+
+// SetUAAEndpoint sets the UAA endpoint that is obtained from hitting
+// <AuthorizationEndpoint>/login
+func (config *Config) SetUAAEndpoint(uaaEndpoint string) {
+	config.ConfigFile.UAAEndpoint = uaaEndpoint
 }
 
 // UnsetSpaceInformation resets the space values to default

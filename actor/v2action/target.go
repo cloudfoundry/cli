@@ -22,7 +22,6 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 		actor.CloudControllerClient.AuthorizationEndpoint(),
 		actor.CloudControllerClient.MinCLIVersion(),
 		actor.CloudControllerClient.DopplerEndpoint(),
-		actor.CloudControllerClient.TokenEndpoint(),
 		actor.CloudControllerClient.RoutingEndpoint(),
 		settings.SkipSSLValidation,
 	)
@@ -33,7 +32,7 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 
 // ClearTarget clears target information from the actor.
 func (Actor) ClearTarget(config Config) {
-	config.SetTargetInformation("", "", "", "", "", "", "", false)
+	config.SetTargetInformation("", "", "", "", "", "", false)
 	config.SetTokenInformation("", "", "")
 }
 
