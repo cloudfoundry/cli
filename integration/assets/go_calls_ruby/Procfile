@@ -1,0 +1,3 @@
+web: ruby -run -e httpd . -p $PORT
+console: bundle exec irb
+rake: bundle exec rake
