@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("push with different buildpack values", func() {
+var _ = Describe("push with different buildpack values", func() {
 	var (
 		appName string
 	)
