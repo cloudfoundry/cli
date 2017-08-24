@@ -155,7 +155,7 @@ var _ = Describe("v3-scale command", func() {
 				})
 
 				It("displays the current scale properties for requested process", func() {
-					session := helpers.CF("v3-scale", appName, "--process", "worker")
+					session := helpers.CF("v3-scale", appName, "--process", "console")
 
 					Eventually(session.Out).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
@@ -164,7 +164,7 @@ var _ = Describe("v3-scale command", func() {
 					Expect(len(appTable.Processes)).To(Equal(1))
 
 					processSummary := appTable.Processes[0]
-					Expect(processSummary.Title).To(Equal("worker:0/0"))
+					Expect(processSummary.Title).To(Equal("console:0/0"))
 				})
 			})
 

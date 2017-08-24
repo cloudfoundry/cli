@@ -137,8 +137,8 @@ var _ = Describe("v3-set-health-check command", func() {
 			})
 
 			It("displays the health check types for each process", func() {
-				session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "worker")
-				Eventually(session.Out).Should(Say("Updating health check type for app %s process worker in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				session := helpers.CF("v3-set-health-check", appName, "http", "--endpoint", "/healthcheck", "--process", "console")
+				Eventually(session.Out).Should(Say("Updating health check type for app %s process console in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("TIP: An app restart is required for the change to take effect\\."))
 				Eventually(session).Should(Exit(0))
 
@@ -146,7 +146,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				Eventually(session.Out).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say(`process\s+health check\s+endpoint \(for http\)\n`))
 				Eventually(session.Out).Should(Say(`web\s+port\s+\n`))
-				Eventually(session.Out).Should(Say(`worker\s+http\s+/healthcheck`))
+				Eventually(session.Out).Should(Say(`console\s+http\s+/healthcheck`))
 
 				Eventually(session).Should(Exit(0))
 			})
