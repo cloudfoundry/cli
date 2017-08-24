@@ -1,4 +1,4 @@
-package isolated
+package experimental
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("v3-get-health-check command", func() {
+var _ = Describe("v3-stop-application command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -24,12 +24,12 @@ var _ = Describe("v3-get-health-check command", func() {
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
-				session := helpers.CF("v3-get-health-check", "--help")
+				session := helpers.CF("v3-stop", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-get-health-check - \\*\\*EXPERIMENTAL\\*\\* Show the type of health check performed on an app"))
+				Eventually(session.Out).Should(Say("v3-stop - Stop an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say("cf v3-get-health-check APP_NAME"))
+				Eventually(session.Out).Should(Say("cf v3-stop APP_NAME"))
 
 				Eventually(session).Should(Exit(0))
 			})
@@ -38,7 +38,7 @@ var _ = Describe("v3-get-health-check command", func() {
 
 	Context("when the app name is not provided", func() {
 		It("tells the user that the app name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("v3-get-health-check")
+			session := helpers.CF("v3-stop")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))
@@ -53,7 +53,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-get-health-check", appName)
+				session := helpers.CF("v3-stop", appName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
@@ -66,7 +66,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-get-health-check", appName)
+				session := helpers.CF("v3-stop", appName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
@@ -80,7 +80,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			})
 
 			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-get-health-check", appName)
+				session := helpers.CF("v3-stop", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
@@ -95,7 +95,7 @@ var _ = Describe("v3-get-health-check command", func() {
 			})
 
 			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-get-health-check", appName)
+				session := helpers.CF("v3-stop", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
@@ -104,43 +104,52 @@ var _ = Describe("v3-get-health-check command", func() {
 	})
 
 	Context("when the environment is set up correctly", func() {
-		var userName string
-
 		BeforeEach(func() {
 			setupCF(orgName, spaceName)
-			userName, _ = helpers.GetCredentials()
 		})
 
 		Context("when the app exists", func() {
 			BeforeEach(func() {
-				helpers.WithProcfileApp(func(appDir string) {
+				helpers.WithHelloWorldApp(func(appDir string) {
 					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)).Should(Exit(0))
 				})
 			})
 
-			It("displays the health check types for each process", func() {
+			It("stops the app", func() {
 				userName, _ := helpers.GetCredentials()
 
-				session := helpers.CF("v3-get-health-check", appName)
-				Eventually(session.Out).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say(`process\s+health check\s+endpoint \(for http\)\n`))
-				Eventually(session.Out).Should(Say(`web\s+port\s+\n`))
-				Eventually(session.Out).Should(Say(`worker\s+process\s+\n`))
+				session := helpers.CF("v3-stop", appName)
+				Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
 
 				Eventually(session).Should(Exit(0))
 			})
-		})
 
-		Context("when the app does not exist", func() {
-			It("displays app not found and exits 1", func() {
-				invalidAppName := "invalid-app-name"
-				session := helpers.CF("v3-get-health-check", invalidAppName)
+			Context("when the app is already stopped", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("v3-stop", appName)).Should(Exit(0))
+				})
 
-				Eventually(session.Out).Should(Say("Getting process health check types for app %s in org %s / space %s as %s\\.\\.\\.", invalidAppName, orgName, spaceName, userName))
-				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
-				Eventually(session.Out).Should(Say("FAILED"))
+				It("displays that the app is already stopped", func() {
+					session := helpers.CF("v3-stop", appName)
 
-				Eventually(session).Should(Exit(1))
+					Eventually(session.Err).Should(Say("App %s is already stopped", appName))
+					Eventually(session.Out).Should(Say("OK"))
+
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the app does not exist", func() {
+				It("displays app not found and exits 1", func() {
+					invalidAppName := "invalid-app-name"
+					session := helpers.CF("v3-stop", invalidAppName)
+
+					Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
+					Eventually(session.Out).Should(Say("FAILED"))
+
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 	})

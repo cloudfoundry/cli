@@ -1,4 +1,4 @@
-package isolated
+package experimental
 
 import (
 	"encoding/json"

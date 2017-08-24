@@ -1,4 +1,4 @@
-package isolated
+package experimental
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"

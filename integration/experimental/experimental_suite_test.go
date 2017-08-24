@@ -1,4 +1,4 @@
-package isolated
+package experimental
 
 import (
 	"regexp"
@@ -30,7 +30,7 @@ var (
 
 func TestIsolated(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Isolated Integration Suite")
+	RunSpecs(t, "Experimental Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
