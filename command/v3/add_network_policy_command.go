@@ -16,10 +16,10 @@ type AddNetworkPolicyActor interface {
 }
 
 type AddNetworkPolicyCommand struct {
-	RequiredArgs   flag.AddNetworkPolicyArgs   `positional-args:"yes"`
-	DestinationApp string                      `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port           flag.NetworkPort            `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
-	Protocol       flag.NetworkProtocol        `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
+	RequiredArgs   flag.AddNetworkPolicyArgs `positional-args:"yes"`
+	DestinationApp string                    `long:"destination-app" required:"true" description:"Name of app to connect to"`
+	Port           flag.NetworkPort          `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
+	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
 
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies"`

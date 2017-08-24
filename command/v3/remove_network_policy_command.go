@@ -9,28 +9,28 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . RemoveNetworkAccessActor
+//go:generate counterfeiter . RemoveNetworkPolicyActor
 
-type RemoveNetworkAccessActor interface {
-	RemoveNetworkAccess(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
+type RemoveNetworkPolicyActor interface {
+	RemoveNetworkPolicy(spaceGUID string, srcAppName string, destAppName string, protocol string, startPort int, endPort int) (cfnetworkingaction.Warnings, error)
 }
 
-type RemoveNetworkAccessCommand struct {
-	RequiredArgs   flag.RemoveNetworkAccessArgs `positional-args:"yes"`
+type RemoveNetworkPolicyCommand struct {
+	RequiredArgs   flag.RemoveNetworkPolicyArgs `positional-args:"yes"`
 	DestinationApp string                       `long:"destination-app" required:"true" description:"Name of app to connect to"`
 	Port           flag.NetworkPort             `long:"port" required:"true" description:"Port or range to connect to destination app with"`
 	Protocol       flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol to connect apps with"`
 
-	usage           interface{} `usage:"CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
+	usage           interface{} `usage:"CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       RemoveNetworkAccessActor
+	Actor       RemoveNetworkPolicyActor
 }
 
-func (cmd *RemoveNetworkAccessCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
@@ -50,7 +50,7 @@ func (cmd *RemoveNetworkAccessCommand) Setup(config command.Config, ui command.U
 	return nil
 }
 
-func (cmd RemoveNetworkAccessCommand) Execute(args []string) error {
+func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
@@ -68,7 +68,7 @@ func (cmd RemoveNetworkAccessCommand) Execute(args []string) error {
 		"User":        user.Name,
 	})
 
-	warnings, err := cmd.Actor.RemoveNetworkAccess(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
+	warnings, err := cmd.Actor.RemoveNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {

@@ -16,13 +16,13 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("remove-network-access Command", func() {
+var _ = Describe("remove-network-policy Command", func() {
 	var (
-		cmd             RemoveNetworkAccessCommand
+		cmd             RemoveNetworkPolicyCommand
 		testUI          *ui.UI
 		fakeConfig      *commandfakes.FakeConfig
 		fakeSharedActor *commandfakes.FakeSharedActor
-		fakeActor       *v3fakes.FakeRemoveNetworkAccessActor
+		fakeActor       *v3fakes.FakeRemoveNetworkPolicyActor
 		binaryName      string
 		executeErr      error
 		srcApp          string
@@ -34,18 +34,18 @@ var _ = Describe("remove-network-access Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeSharedActor = new(commandfakes.FakeSharedActor)
-		fakeActor = new(v3fakes.FakeRemoveNetworkAccessActor)
+		fakeActor = new(v3fakes.FakeRemoveNetworkPolicyActor)
 
 		srcApp = "some-app"
 		destApp = "some-other-app"
 		protocol = "tcp"
 
-		cmd = RemoveNetworkAccessCommand{
+		cmd = RemoveNetworkPolicyCommand{
 			UI:             testUI,
 			Config:         fakeConfig,
 			SharedActor:    fakeSharedActor,
 			Actor:          fakeActor,
-			RequiredArgs:   flag.RemoveNetworkAccessArgs{SourceApp: srcApp},
+			RequiredArgs:   flag.RemoveNetworkPolicyArgs{SourceApp: srcApp},
 			DestinationApp: destApp,
 			Protocol:       flag.NetworkProtocol{Protocol: protocol},
 			Port:           flag.NetworkPort{StartPort: 8080, EndPort: 8081},
@@ -88,13 +88,13 @@ var _ = Describe("remove-network-access Command", func() {
 
 		Context("when the policy deletion is successful", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
 			})
 
 			It("displays OK when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.RemoveNetworkAccessCallCount()).To(Equal(1))
-				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkAccessArgsForCall(0)
+				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestAppName).To(Equal("some-other-app"))
@@ -111,13 +111,13 @@ var _ = Describe("remove-network-access Command", func() {
 
 		Context("when the policy does not exist", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, cfnetworkingaction.PolicyDoesNotExistError{})
+				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, cfnetworkingaction.PolicyDoesNotExistError{})
 			})
 
 			It("displays OK when no error occurs", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(fakeActor.RemoveNetworkAccessCallCount()).To(Equal(1))
-				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkAccessArgsForCall(0)
+				Expect(fakeActor.RemoveNetworkPolicyCallCount()).To(Equal(1))
+				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.RemoveNetworkPolicyArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 				Expect(passedSrcAppName).To(Equal("some-app"))
 				Expect(passedDestAppName).To(Equal("some-other-app"))
@@ -135,7 +135,7 @@ var _ = Describe("remove-network-access Command", func() {
 
 		Context("when the policy deletion is not successful", func() {
 			BeforeEach(func() {
-				fakeActor.RemoveNetworkAccessReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
+				fakeActor.RemoveNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
 			})
 
 			It("does not display OK when an error occurs", func() {

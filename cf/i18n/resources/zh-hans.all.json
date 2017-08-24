@@ -648,6 +648,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
@@ -657,10 +661,6 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL\\n\\nEXAMPLES:\\n   CF_NAME add-plugin-repo ExampleRepo https://example.com/repo",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1140,10 +1140,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME network-policies [--source SOURCE_APP]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME list-plugin-repos",
     "translation": "CF_NAME list-plugin-repos"
   },
@@ -1216,6 +1212,10 @@
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\\n\\n警告: 这是 Cloud Foundry 的内部操作；不会联系服务代理程序，并且不会更改服务实例的资源。此操作的主要用例是通过将服务实例从 V1 套餐重新映射到 V2 套餐，将实现 V1 服务代理程序 API 的服务代理程序替换为实现 V2 API 的代理程序。我们建议将 V1 套餐设置为专用套餐或者关闭 V1 代理程序，以阻止创建更多实例。一旦迁移了服务实例，就可以从 Cloud Foundry 中除去 V1 服务和套餐。"
   },
   {
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -1272,7 +1272,7 @@
     "translation": "CF_NAME quotas"
   },
   {
-    "id": "CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "id": "CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -4154,6 +4154,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "注册的存储库的名称，指定的插件位于其中"
+  },
+  {
+    "id": "Name of app to connect to",
+    "translation": ""
   },
   {
     "id": "Name to give the task (generated if omitted)",
@@ -7210,10 +7214,6 @@
   {
     "id": "locked",
     "translation": "已锁定"
-  },
-  {
-    "id": "long:\"destination-app\" required:\"true\"",
-    "translation": ""
   },
   {
     "id": "memory",
