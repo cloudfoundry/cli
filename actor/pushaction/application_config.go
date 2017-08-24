@@ -197,7 +197,7 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	if manifest.Buildpack.IsSet {
 		application.Buildpack = manifest.Buildpack
 	}
-	if manifest.Command != "" {
+	if manifest.Command.IsSet {
 		application.Command = manifest.Command
 	}
 	if manifest.DockerImage != "" {

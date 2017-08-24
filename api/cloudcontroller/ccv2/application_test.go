@@ -143,9 +143,9 @@ var _ = Describe("Application", func() {
 
 				Expect(app).To(Equal(Application{
 					Buildpack:            types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
-					Command:              "some-command",
+					Command:              types.FilteredString{IsSet: true, Value: "some-command"},
 					DetectedBuildpack:    types.FilteredString{},
-					DetectedStartCommand: "echo 'I am a banana'",
+					DetectedStartCommand: types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
 					DiskQuota:            586,
 					DockerCredentials: DockerCredentials{
 						Username: "docker-username",
@@ -270,7 +270,7 @@ var _ = Describe("Application", func() {
 					{
 						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 						DetectedBuildpack:       types.FilteredString{},
-						DetectedStartCommand:    "echo 'I am a banana'",
+						DetectedStartCommand:    types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
 						DiskQuota:               586,
 						GUID:                    "app-guid-1",
 						HealthCheckType:         "port",
@@ -307,7 +307,6 @@ var _ = Describe("Application", func() {
 					"updated_at": null
 				},
 				"entity": {
-					"command": "some-command",
 					"detected_start_command": "echo 'I am a banana'",
 					"disk_quota": 586,
 					"detected_buildpack": null,
@@ -335,7 +334,7 @@ var _ = Describe("Application", func() {
 			}`
 					expectedBody := map[string]interface{}{
 						"buildpack":  "",
-						"command":    "some-command",
+						"command":    "",
 						"disk_quota": 586,
 						"docker_credentials": map[string]string{
 							"username": "docker-username",
@@ -368,7 +367,7 @@ var _ = Describe("Application", func() {
 				It("returns the updated object and warnings and sends all updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
 						Buildpack: types.FilteredString{IsSet: true, Value: ""},
-						Command:   "some-command",
+						Command:   types.FilteredString{IsSet: true, Value: ""},
 						DiskQuota: 586,
 						DockerCredentials: DockerCredentials{
 							Username: "docker-username",
@@ -395,9 +394,8 @@ var _ = Describe("Application", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						Command:              "some-command",
 						DetectedBuildpack:    types.FilteredString{},
-						DetectedStartCommand: "echo 'I am a banana'",
+						DetectedStartCommand: types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
 						DiskQuota:            586,
 						DockerCredentials: DockerCredentials{
 							Username: "docker-username",
@@ -469,7 +467,7 @@ var _ = Describe("Application", func() {
 					Expect(app).To(Equal(Application{
 						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 						DetectedBuildpack:       types.FilteredString{},
-						DetectedStartCommand:    "echo 'I am a banana'",
+						DetectedStartCommand:    types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
 						DiskQuota:               586,
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
@@ -564,7 +562,7 @@ var _ = Describe("Application", func() {
 				Expect(app).To(Equal(Application{
 					Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 					DetectedBuildpack:       types.FilteredString{},
-					DetectedStartCommand:    "echo 'I am a banana'",
+					DetectedStartCommand:    types.FilteredString{IsSet: true, Value: "echo 'I am a banana'"},
 					DiskQuota:               586,
 					DockerImage:             "some-docker-path",
 					GUID:                    "some-app-guid",

@@ -10,7 +10,7 @@ import (
 
 type CommandLineSettings struct {
 	Buildpack          types.FilteredString
-	Command            string
+	Command            types.FilteredString
 	CurrentDirectory   string
 	DiskQuota          uint64
 	DockerImage        string
@@ -37,7 +37,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.Buildpack = settings.Buildpack
 	}
 
-	if settings.Command != "" {
+	if settings.Command.IsSet {
 		app.Command = settings.Command
 	}
 
@@ -93,11 +93,12 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s'",
 		settings.Name,
 		settings.Buildpack.IsSet,
 		settings.Buildpack.Value,
-		settings.Command,
+		settings.Command.IsSet,
+		settings.Command.Value,
 		settings.CurrentDirectory,
 		settings.DiskQuota,
 		settings.DockerImage,

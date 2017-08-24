@@ -32,6 +32,35 @@ var _ = Describe("Application Actions", func() {
 			app = Application{}
 		})
 
+		Describe("CalculatedCommand", func() {
+			Context("when command is set", func() {
+				BeforeEach(func() {
+					app.Command = types.FilteredString{IsSet: true, Value: "foo"}
+					app.DetectedStartCommand = types.FilteredString{IsSet: true, Value: "bar"}
+				})
+
+				It("returns back the command", func() {
+					Expect(app.CalculatedCommand()).To(Equal("foo"))
+				})
+			})
+
+			Context("only detected start command is set", func() {
+				BeforeEach(func() {
+					app.DetectedStartCommand = types.FilteredString{IsSet: true, Value: "bar"}
+				})
+
+				It("returns back the detected start command", func() {
+					Expect(app.CalculatedCommand()).To(Equal("bar"))
+				})
+			})
+
+			Context("neither command nor detected start command are set", func() {
+				It("returns an empty string", func() {
+					Expect(app.CalculatedCommand()).To(BeEmpty())
+				})
+			})
+		})
+
 		Describe("CalculatedBuildpack", func() {
 			Context("when buildpack is set", func() {
 				BeforeEach(func() {
@@ -54,7 +83,7 @@ var _ = Describe("Application Actions", func() {
 				})
 			})
 
-			Context("neither buildpack or detected buildpack is set", func() {
+			Context("neither buildpack nor detected buildpack are set", func() {
 				It("returns an empty string", func() {
 					Expect(app.CalculatedBuildpack()).To(BeEmpty())
 				})

@@ -82,7 +82,10 @@ applications:
 						IsSet: true,
 						Value: "some-buildpack",
 					},
-					Command:                 "some-command",
+					Command: types.FilteredString{
+						IsSet: true,
+						Value: "some-command",
+					},
 					HealthCheckHTTPEndpoint: "\\some-endpoint",
 					HealthCheckType:         "http",
 					Instances: types.NullInt{

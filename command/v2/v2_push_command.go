@@ -38,7 +38,7 @@ type V2PushActor interface {
 type V2PushCommand struct {
 	OptionalArgs flag.OptionalAppName `positional-args:"yes"`
 	Buildpack    flag.Buildpack       `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	Command      string               `short:"c" description:"Startup command, set to null to reset to default start command"`
+	Command      flag.Command         `short:"c" description:"Startup command, set to null to reset to default start command"`
 	// Domain               string                      `short:"d" description:"Domain (e.g. example.com)"`
 	DockerImage     flag.DockerImage            `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
 	DockerUsername  string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
@@ -214,7 +214,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 
 	config := pushaction.CommandLineSettings{
 		Buildpack:          cmd.Buildpack.FilteredString,
-		Command:            cmd.Command,
+		Command:            cmd.Command.FilteredString,
 		CurrentDirectory:   pwd,
 		DiskQuota:          cmd.DiskQuota.Value,
 		DockerImage:        cmd.DockerImage.Path,

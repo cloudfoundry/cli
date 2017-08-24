@@ -53,8 +53,8 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 	}
 
 	// Existing command and existing detected start command are mutually exclusive
-	oldCommand := SelectNonBlankValue(appConfig.CurrentApplication.Command, appConfig.CurrentApplication.DetectedStartCommand)
-	newCommand := SelectNonBlankValue(appConfig.DesiredApplication.Command, appConfig.DesiredApplication.DetectedStartCommand)
+	oldCommand := appConfig.CurrentApplication.CalculatedCommand()
+	newCommand := appConfig.DesiredApplication.CalculatedCommand()
 	if oldCommand != "" || newCommand != "" {
 		changes = append(changes,
 			ui.Change{

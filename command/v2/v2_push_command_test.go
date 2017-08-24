@@ -208,7 +208,7 @@ var _ = Describe("v2-push Command", func() {
 						applicationSummary := v2action.ApplicationSummary{
 							Application: v2action.Application{
 								DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-								DetectedStartCommand: "some start command",
+								DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
 								GUID:                 "some-app-guid",
 								Instances:            types.NullInt{Value: 3, IsSet: true},
 								Memory:               128,
@@ -472,9 +472,9 @@ var _ = Describe("v2-push Command", func() {
 							BeforeEach(func() {
 								applicationSummary := v2action.ApplicationSummary{
 									Application: v2action.Application{
-										Command:              "a-different-start-command",
+										Command:              types.FilteredString{IsSet: true, Value: "a-different-start-command"},
 										DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-										DetectedStartCommand: "some start command",
+										DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
 										GUID:                 "some-app-guid",
 										Instances:            types.NullInt{Value: 3, IsSet: true},
 										Memory:               128,
@@ -522,9 +522,9 @@ var _ = Describe("v2-push Command", func() {
 
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
-									Command:              "a-different-start-command",
+									Command:              types.FilteredString{IsSet: true, Value: "a-different-start-command"},
 									DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
-									DetectedStartCommand: "some start command",
+									DetectedStartCommand: types.FilteredString{IsSet: true, Value: "some start command"},
 									GUID:                 "some-app-guid",
 									Instances:            types.NullInt{Value: 3, IsSet: true},
 									Memory:               128,
@@ -648,7 +648,7 @@ var _ = Describe("v2-push Command", func() {
 		Context("when passed app related flags", func() {
 			BeforeEach(func() {
 				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
-				cmd.Command = "echo foo bar baz"
+				cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
 				cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
 				cmd.HealthCheckTimeout = 14
 				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
@@ -660,7 +660,7 @@ var _ = Describe("v2-push Command", func() {
 			It("sets them on the command line settings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
-				Expect(settings.Command).To(Equal("echo foo bar baz"))
+				Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
 				Expect(settings.HealthCheckTimeout).To(Equal(14))
 				Expect(settings.HealthCheckType).To(Equal("http"))
