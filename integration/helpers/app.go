@@ -47,7 +47,7 @@ func WithProcfileApp(f func(dir string)) {
 
 	err = ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
 web: ruby -run -e httpd . -p $PORT
-worker: echo 0`,
+console: bundle exec irb`,
 	), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
