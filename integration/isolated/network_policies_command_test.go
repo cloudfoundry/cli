@@ -11,15 +11,15 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("list-network-access command", func() {
+var _ = FDescribe("network-policies command", func() {
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
-				session := helpers.CF("list-network-access", "--help")
+				session := helpers.CF("network-policies", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("list-network-access - List direct network traffic policies"))
+				Eventually(session).Should(Say("network-policies - List direct network traffic policies"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say(regexp.QuoteMeta("cf list-network-access [--source SOURCE_APP]")))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf network-policies [--source SOURCE_APP]")))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --source      Source app to filter results by \\(optional\\)"))
 				Eventually(session).Should(Say("SEE ALSO:"))
@@ -36,7 +36,7 @@ var _ = Describe("list-network-access command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("list-network-access")
+				session := helpers.CF("network-policies")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
@@ -49,7 +49,7 @@ var _ = Describe("list-network-access command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("list-network-access")
+				session := helpers.CF("network-policies")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
@@ -63,7 +63,7 @@ var _ = Describe("list-network-access command", func() {
 			})
 
 			It("fails with no targeted org error message", func() {
-				session := helpers.CF("list-network-access")
+				session := helpers.CF("network-policies")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
@@ -78,7 +78,7 @@ var _ = Describe("list-network-access command", func() {
 			})
 
 			It("fails with no targeted space error message", func() {
-				session := helpers.CF("list-network-access")
+				session := helpers.CF("network-policies")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
 				Eventually(session).Should(Exit(1))
@@ -110,7 +110,7 @@ var _ = Describe("list-network-access command", func() {
 
 		Context("when policies exists", func() {
 			It("lists all the policies", func() {
-				session := helpers.CF("list-network-access")
+				session := helpers.CF("network-policies")
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Listing network traffic as %s...", username))
@@ -134,7 +134,7 @@ var _ = Describe("list-network-access command", func() {
 			})
 
 			It("lists only policies for which the app is a source", func() {
-				session := helpers.CF("list-network-access", "--source", srcAppName)
+				session := helpers.CF("network-policies", "--source", srcAppName)
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Listing network traffic as %s...", username))
@@ -148,7 +148,7 @@ var _ = Describe("list-network-access command", func() {
 
 		Context("when policies are filtered by a non-existent source app", func() {
 			It("returns an error", func() {
-				session := helpers.CF("list-network-access", "--source", "pineapple")
+				session := helpers.CF("network-policies", "--source", "pineapple")
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say("Listing network traffic as %s...", username))

@@ -1140,7 +1140,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME list-network-access [--source SOURCE_APP]",
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
     "translation": ""
   },
   {

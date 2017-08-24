@@ -22,7 +22,7 @@ type RemoveNetworkAccessCommand struct {
 	Protocol       flag.NetworkProtocol         `long:"protocol" required:"true" description:"Protocol to connect apps with"`
 
 	usage           interface{} `usage:"CF_NAME remove-network-access SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\n\nEXAMPLES:\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME remove-network-access frontend --destination-app backend --protocol tcp --port 8080-8090"`
-	relatedCommands interface{} `related_commands:"apps, list-network-access"`
+	relatedCommands interface{} `related_commands:"apps, network-policies"`
 
 	UI          command.UI
 	Config      command.Config

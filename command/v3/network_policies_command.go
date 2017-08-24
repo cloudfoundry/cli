@@ -10,26 +10,26 @@ import (
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
-//go:generate counterfeiter . ListNetworkAccessActor
+//go:generate counterfeiter . NetworkPoliciesActor
 
-type ListNetworkAccessActor interface {
-	ListNetworkAccessBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
-	ListNetworkAccessBySpace(spaceGUID string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+type NetworkPoliciesActor interface {
+	NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
+	NetworkPoliciesBySpace(spaceGUID string) ([]cfnetworkingaction.Policy, cfnetworkingaction.Warnings, error)
 }
 
-type ListNetworkAccessCommand struct {
+type NetworkPoliciesCommand struct {
 	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
 
-	usage           interface{} `usage:"CF_NAME list-network-access [--source SOURCE_APP]"`
+	usage           interface{} `usage:"CF_NAME network-policies [--source SOURCE_APP]"`
 	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-access"`
 
 	UI          command.UI
 	Config      command.Config
 	SharedActor command.SharedActor
-	Actor       ListNetworkAccessActor
+	Actor       NetworkPoliciesActor
 }
 
-func (cmd *ListNetworkAccessCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 	cmd.SharedActor = sharedaction.NewActor()
@@ -49,7 +49,7 @@ func (cmd *ListNetworkAccessCommand) Setup(config command.Config, ui command.UI)
 	return nil
 }
 
-func (cmd ListNetworkAccessCommand) Execute(args []string) error {
+func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
@@ -67,9 +67,9 @@ func (cmd ListNetworkAccessCommand) Execute(args []string) error {
 	var warnings cfnetworkingaction.Warnings
 
 	if cmd.SourceApp != "" {
-		policies, warnings, err = cmd.Actor.ListNetworkAccessBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
+		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
 	} else {
-		policies, warnings, err = cmd.Actor.ListNetworkAccessBySpace(cmd.Config.TargetedSpace().GUID)
+		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpace(cmd.Config.TargetedSpace().GUID)
 	}
 
 	cmd.UI.DisplayWarnings(warnings)

@@ -22,7 +22,7 @@ type AddNetworkPolicyCommand struct {
 	Protocol       flag.NetworkProtocol        `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
 
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
-	relatedCommands interface{} `related_commands:"apps, list-network-access"`
+	relatedCommands interface{} `related_commands:"apps, network-policies"`
 
 	UI          command.UI
 	Config      command.Config

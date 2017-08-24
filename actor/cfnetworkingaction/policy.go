@@ -52,7 +52,7 @@ func (actor Actor) AddNetworkPolicy(spaceGUID, srcAppName, destAppName, protocol
 	return allWarnings, err
 }
 
-func (actor Actor) ListNetworkAccessBySpace(spaceGUID string) ([]Policy, Warnings, error) {
+func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 
 	applications, warnings, err := actor.V3Actor.GetApplicationsBySpace(spaceGUID)
@@ -79,7 +79,7 @@ func (actor Actor) ListNetworkAccessBySpace(spaceGUID string) ([]Policy, Warning
 	return policies, allWarnings, nil
 }
 
-func (actor Actor) ListNetworkAccessBySpaceAndAppName(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
+func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName string) ([]Policy, Warnings, error) {
 	var allWarnings Warnings
 	var appGUID string
 

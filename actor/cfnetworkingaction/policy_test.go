@@ -114,7 +114,7 @@ var _ = Describe("Policy", func() {
 		})
 	})
 
-	Describe("ListNetworkAccessBySpaceAndAppName", func() {
+	Describe("NetworkPoliciesBySpaceAndAppName", func() {
 		var (
 			policies []Policy
 			srcApp   string
@@ -176,7 +176,7 @@ var _ = Describe("Policy", func() {
 
 		JustBeforeEach(func() {
 			spaceGuid := "space"
-			policies, warnings, executeErr = actor.ListNetworkAccessBySpaceAndAppName(spaceGuid, srcApp)
+			policies, warnings, executeErr = actor.NetworkPoliciesBySpaceAndAppName(spaceGuid, srcApp)
 		})
 
 		Context("when listing policies based on a source app", func() {
@@ -251,7 +251,7 @@ var _ = Describe("Policy", func() {
 		})
 	})
 
-	Describe("ListNetworkAccessBySpace", func() {
+	Describe("NetworkPoliciesBySpace", func() {
 		var (
 			policies []Policy
 		)
@@ -312,7 +312,7 @@ var _ = Describe("Policy", func() {
 
 		JustBeforeEach(func() {
 			spaceGuid := "space"
-			policies, warnings, executeErr = actor.ListNetworkAccessBySpace(spaceGuid)
+			policies, warnings, executeErr = actor.NetworkPoliciesBySpace(spaceGuid)
 		})
 
 		It("lists policies", func() {
