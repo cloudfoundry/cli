@@ -154,8 +154,12 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							appOutputSession := helpers.CF("v3-app", appName)
 							Eventually(appOutputSession).Should(Exit(0))
 							restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
-							Expect(restartedAppTable.Processes).ToNot(BeEmpty())
-							return restartedAppTable.Processes[0].Title
+
+							if len(restartedAppTable.Processes) > 0 {
+								return restartedAppTable.Processes[0].Title
+							}
+
+							return ""
 						}).Should(MatchRegexp(`web:\d/1`))
 						Expect(restartedAppTable.Processes[0].Instances).ToNot(BeEmpty())
 						return restartedAppTable.Processes[0].Instances[0].Since
