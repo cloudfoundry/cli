@@ -41,8 +41,8 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 	}
 
 	// Existing buildpack and existing detected buildpack are mutually exclusive
-	oldBuildpack := SelectNonBlankValue(appConfig.CurrentApplication.Buildpack.Value, appConfig.CurrentApplication.DetectedBuildpack)
-	newBuildpack := SelectNonBlankValue(appConfig.DesiredApplication.Buildpack.Value, appConfig.DesiredApplication.DetectedBuildpack)
+	oldBuildpack := appConfig.CurrentApplication.CalculatedBuildpack()
+	newBuildpack := appConfig.DesiredApplication.CalculatedBuildpack()
 	if oldBuildpack != "" || newBuildpack != "" {
 		changes = append(changes,
 			ui.Change{

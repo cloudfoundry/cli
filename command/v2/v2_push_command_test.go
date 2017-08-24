@@ -207,7 +207,7 @@ var _ = Describe("v2-push Command", func() {
 
 						applicationSummary := v2action.ApplicationSummary{
 							Application: v2action.Application{
-								DetectedBuildpack:    "some-buildpack",
+								DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
 								DetectedStartCommand: "some start command",
 								GUID:                 "some-app-guid",
 								Instances:            types.NullInt{Value: 3, IsSet: true},
@@ -473,7 +473,7 @@ var _ = Describe("v2-push Command", func() {
 								applicationSummary := v2action.ApplicationSummary{
 									Application: v2action.Application{
 										Command:              "a-different-start-command",
-										DetectedBuildpack:    "some-buildpack",
+										DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
 										DetectedStartCommand: "some start command",
 										GUID:                 "some-app-guid",
 										Instances:            types.NullInt{Value: 3, IsSet: true},
@@ -523,7 +523,7 @@ var _ = Describe("v2-push Command", func() {
 							applicationSummary := v2action.ApplicationSummary{
 								Application: v2action.Application{
 									Command:              "a-different-start-command",
-									DetectedBuildpack:    "some-buildpack",
+									DetectedBuildpack:    types.FilteredString{IsSet: true, Value: "some-buildpack"},
 									DetectedStartCommand: "some start command",
 									GUID:                 "some-app-guid",
 									Instances:            types.NullInt{Value: 3, IsSet: true},

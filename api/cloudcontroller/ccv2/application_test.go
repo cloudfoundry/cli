@@ -144,7 +144,7 @@ var _ = Describe("Application", func() {
 				Expect(app).To(Equal(Application{
 					Buildpack:            types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
 					Command:              "some-command",
-					DetectedBuildpack:    "",
+					DetectedBuildpack:    types.FilteredString{},
 					DetectedStartCommand: "echo 'I am a banana'",
 					DiskQuota:            586,
 					DockerCredentials: DockerCredentials{
@@ -269,7 +269,7 @@ var _ = Describe("Application", func() {
 				Expect(apps).To(ConsistOf([]Application{
 					{
 						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
-						DetectedBuildpack:       "",
+						DetectedBuildpack:       types.FilteredString{},
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
 						GUID:                    "app-guid-1",
@@ -284,7 +284,11 @@ var _ = Describe("Application", func() {
 						StagingFailedReason:     "some-reason",
 						State:                   ApplicationStopped,
 					},
-					{Name: "app-name-2", GUID: "app-guid-2", DetectedBuildpack: "ruby 1.6.29"},
+					{
+						Name:              "app-name-2",
+						GUID:              "app-guid-2",
+						DetectedBuildpack: types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
+					},
 					{Name: "app-name-3", GUID: "app-guid-3"},
 					{Name: "app-name-4", GUID: "app-guid-4"},
 				}))
@@ -392,7 +396,7 @@ var _ = Describe("Application", func() {
 
 					Expect(app).To(Equal(Application{
 						Command:              "some-command",
-						DetectedBuildpack:    "",
+						DetectedBuildpack:    types.FilteredString{},
 						DetectedStartCommand: "echo 'I am a banana'",
 						DiskQuota:            586,
 						DockerCredentials: DockerCredentials{
@@ -464,7 +468,7 @@ var _ = Describe("Application", func() {
 
 					Expect(app).To(Equal(Application{
 						Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
-						DetectedBuildpack:       "",
+						DetectedBuildpack:       types.FilteredString{},
 						DetectedStartCommand:    "echo 'I am a banana'",
 						DiskQuota:               586,
 						GUID:                    "some-app-guid",
@@ -559,7 +563,7 @@ var _ = Describe("Application", func() {
 
 				Expect(app).To(Equal(Application{
 					Buildpack:               types.FilteredString{IsSet: true, Value: "ruby 1.6.29"},
-					DetectedBuildpack:       "",
+					DetectedBuildpack:       types.FilteredString{},
 					DetectedStartCommand:    "echo 'I am a banana'",
 					DiskQuota:               586,
 					DockerImage:             "some-docker-path",

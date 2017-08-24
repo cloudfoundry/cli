@@ -36,7 +36,7 @@ var _ = Describe("Application Actions", func() {
 			Context("when buildpack is set", func() {
 				BeforeEach(func() {
 					app.Buildpack = types.FilteredString{IsSet: true, Value: "foo"}
-					app.DetectedBuildpack = "bar"
+					app.DetectedBuildpack = types.FilteredString{IsSet: true, Value: "bar"}
 				})
 
 				It("returns back the buildpack", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Application Actions", func() {
 
 			Context("only detected buildpack is set", func() {
 				BeforeEach(func() {
-					app.DetectedBuildpack = "bar"
+					app.DetectedBuildpack = types.FilteredString{IsSet: true, Value: "bar"}
 				})
 
 				It("returns back the detected buildpack", func() {
