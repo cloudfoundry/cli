@@ -1784,8 +1784,8 @@
     "translation": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID"
   },
   {
-    "id": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS_NAME]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo",
-    "translation": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS_NAME]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo"
+    "id": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo",
+    "translation": "CF_NAME v3-set-health-check APP_NAME (process | port | http [--endpoint PATH]) [--process PROCESS]\\n\\nEXAMPLES:\\n   cf v3-set-health-check worker-app process --process worker\\n   cf v3-set-health-check my-web-app http --endpoint /foo"
   },
   {
     "id": "CF_NAME v3-stage APP_NAME --package-guid PACKAGE_GUID",
