@@ -266,7 +266,7 @@ var _ = Describe("v3-scale command", func() {
 
 			Context("when the process flag is provided", func() {
 				It("scales the requested process", func() {
-					session := helpers.CF("v3-scale", appName, "-i", "2", "--process", "worker")
+					session := helpers.CF("v3-scale", appName, "-i", "2", "--process", "console")
 					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
 
@@ -278,7 +278,7 @@ var _ = Describe("v3-scale command", func() {
 					Expect(processSummary.Instances).To(HaveLen(2))
 					instanceSummary := processSummary.Instances[0]
 
-					Expect(processSummary.Title).To(MatchRegexp(`worker:\d/2`))
+					Expect(processSummary.Title).To(MatchRegexp(`console:\d/2`))
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 				})
