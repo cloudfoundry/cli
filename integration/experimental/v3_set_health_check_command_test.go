@@ -29,7 +29,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				Eventually(session.Out).Should(Say("NAME:"))
 				Eventually(session.Out).Should(Say("v3-set-health-check - \\*\\*EXPERIMENTAL\\*\\* Change type of health check performed on an app's process"))
 				Eventually(session.Out).Should(Say("USAGE:"))
-				Eventually(session.Out).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS_NAME\]`))
+				Eventually(session.Out).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\]`))
 
 				Eventually(session.Out).Should(Say("EXAMPLES:"))
 				Eventually(session.Out).Should(Say("cf v3-set-health-check worker-app process --process worker"))
