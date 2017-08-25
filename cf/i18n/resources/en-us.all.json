@@ -5344,10 +5344,6 @@
     "translation": "Security group {{.security_group}} {{.error_message}}"
   },
   {
-    "id": "See 'cf help \u003ccommand\u003e' to read about a specific command.",
-    "translation": ""
-  },
-  {
     "id": "Select a space (or press enter to skip):",
     "translation": "Select a space (or press enter to skip):"
   },
@@ -6188,10 +6184,6 @@
     "translation": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}"
   },
   {
-    "id": "These are commonly used commands. Use 'cf help -a' to see all, with descriptions.",
-    "translation": ""
-  },
-  {
     "id": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
     "translation": "This action impacts all orgs using this domain.\nDeleting it will remove associated routes and could make any app with this domain, in any org, unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? "
   },
@@ -6590,6 +6582,10 @@
   {
     "id": "Usage:",
     "translation": ""
+  },
+  {
+    "id": "Use 'cf help -a' to see all commands.",
+    "translation": "Use 'cf help -a' to see all commands."
   },
   {
     "id": "Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.",
