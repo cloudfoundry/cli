@@ -18,7 +18,7 @@ type SSHCommand struct {
 	RemotePseudoTTY     bool         `long:"request-pseudo-tty" short:"t" description:"Request pseudo-tty allocation"`
 	SkipHostValidation  bool         `long:"skip-host-validation" short:"k" description:"Skip host key validation"`
 	SkipRemoteExecution bool         `long:"skip-remote-execution" short:"N" description:"Do not execute a remote command"`
-	usage               interface{}  `usage:"CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"`
+	usage               interface{}  `usage:"CF_NAME ssh APP_NAME [-i INDEX] [-c COMMAND]... [-L [BIND_ADDRESS:]PORT:HOST:HOST_PORT] [--skip-host-validation] [--skip-remote-execution] [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty]"`
 	relatedCommands     interface{}  `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
 }
 
