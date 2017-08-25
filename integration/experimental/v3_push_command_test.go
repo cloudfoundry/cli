@@ -40,6 +40,9 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
 				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
+				Eventually(session.Out).Should(Say("ENVIRONMENT:"))
+				Eventually(session.Out).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
+				Eventually(session.Out).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
 
 				Eventually(session).Should(Exit(0))
 			})
