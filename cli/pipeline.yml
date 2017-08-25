@@ -390,6 +390,7 @@ jobs:
       trigger: true
     - get: cli-ci
     - get: cli-integration
+      passed: [integration]
     - get: vars-store
     - put: bosh-lite-lock
       resource: gcp-bosh-pool
