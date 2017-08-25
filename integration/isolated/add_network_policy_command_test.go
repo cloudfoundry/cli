@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("add-network-policy command", func() {
+var _ = Describe("add-network-policy command", func() {
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {
