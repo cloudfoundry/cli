@@ -6880,7 +6880,7 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH]",
+    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]",
     "translation": ""
   },
   {
