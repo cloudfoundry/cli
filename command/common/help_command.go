@@ -202,8 +202,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	cmd.UI.DisplayNonWrappingTable(commonCommandsIndent, cmd.globalOptionsTableData(), 25)
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayText("These are commonly used commands. Use 'cf help -a' to see all, with descriptions.")
-	cmd.UI.DisplayText("See 'cf help <command>' to read about a specific command.")
+	cmd.UI.DisplayText("Use 'cf help -a' to see all commands.")
 }
 
 func (cmd HelpCommand) displayCommand() error {
