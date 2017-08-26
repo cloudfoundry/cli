@@ -56,12 +56,12 @@ func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID stri
 		ccv2.Query{
 			Filter:   ccv2.AppGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    appGUID,
+			Values:   []string{appGUID},
 		},
 		ccv2.Query{
 			Filter:   ccv2.ServiceInstanceGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    serviceInstanceGUID,
+			Values:   []string{serviceInstanceGUID},
 		},
 	})
 

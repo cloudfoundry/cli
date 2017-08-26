@@ -9,7 +9,7 @@ import (
 // Space represents a CLI Space
 type Space ccv2.Space
 
-// SpaceFoundError represents the scenario when the space searched for could
+// SpaceNotFoundError represents the scenario when the space searched for could
 // not be found.
 type SpaceNotFoundError struct {
 	GUID string
@@ -72,7 +72,7 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 		{
 			Filter:   ccv2.OrganizationGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    orgGUID,
+			Values:   []string{orgGUID},
 		}}
 	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(query)
 	if err != nil {
@@ -93,12 +93,12 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 		{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    spaceName,
+			Values:   []string{spaceName},
 		},
 		{
 			Filter:   ccv2.OrganizationGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    orgGUID,
+			Values:   []string{orgGUID},
 		},
 	}
 

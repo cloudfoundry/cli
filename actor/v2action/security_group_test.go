@@ -1131,7 +1131,7 @@ var _ = Describe("Security Group Actions", func() {
 					[]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 			})
 		})
@@ -1565,7 +1565,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1574,7 +1574,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queries).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
@@ -1621,7 +1621,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesRunning).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1630,7 +1630,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesStaging).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
@@ -1678,7 +1678,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesRunning).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1687,7 +1687,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesStaging).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
@@ -1786,7 +1786,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1795,7 +1795,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queries).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(0))
@@ -1842,7 +1842,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesStaging).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1851,7 +1851,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesRunning).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
@@ -1900,7 +1900,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesStaging).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -1909,7 +1909,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesRunning).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
@@ -2131,25 +2131,25 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org",
+							Values:   []string{"some-org"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space",
+							Values:   []string{"some-space"},
 						}, {
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org-guid",
+							Values:   []string{"some-org-guid"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2158,7 +2158,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queries).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
@@ -2209,7 +2209,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesRunning).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2218,7 +2218,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesStaging).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
@@ -2270,7 +2270,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesRunning).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2279,7 +2279,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesStaging).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.RemoveSpaceFromRunningSecurityGroupCallCount()).To(Equal(0))
@@ -2392,25 +2392,25 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(fakeCloudControllerClient.GetSecurityGroupsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org",
+							Values:   []string{"some-org"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space",
+							Values:   []string{"some-space"},
 						}, {
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org-guid",
+							Values:   []string{"some-org-guid"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2419,7 +2419,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queries).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(0))
@@ -2470,7 +2470,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesStaging).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2479,7 +2479,7 @@ var _ = Describe("Security Group Actions", func() {
 						Expect(queriesRunning).To(Equal([]ccv2.Query{{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-security-group",
+							Values:   []string{"some-security-group"},
 						}}))
 
 						Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))
@@ -2532,7 +2532,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesStaging).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
@@ -2541,7 +2541,7 @@ var _ = Describe("Security Group Actions", func() {
 					Expect(queriesRunning).To(Equal([]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-security-group",
+						Values:   []string{"some-security-group"},
 					}}))
 
 					Expect(fakeCloudControllerClient.RemoveSpaceFromStagingSecurityGroupCallCount()).To(Equal(0))

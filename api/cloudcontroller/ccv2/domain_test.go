@@ -334,7 +334,7 @@ var _ = Describe("Domain", func() {
 				client.GetOrganizationPrivateDomains("some-org-guid", []Query{{
 					Filter:   NameFilter,
 					Operator: EqualOperator,
-					Value:    "private-domain-name",
+					Values:   []string{"private-domain-name"},
 				}})
 			})
 

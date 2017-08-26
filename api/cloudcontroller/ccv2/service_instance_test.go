@@ -230,7 +230,7 @@ var _ = Describe("Service Instance", func() {
 				serviceInstances, warnings, err := client.GetServiceInstances([]Query{{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-space-guid",
+					Values:   []string{"some-space-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -340,7 +340,7 @@ var _ = Describe("Service Instance", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", true, []Query{{
 						Filter:   NameFilter,
 						Operator: EqualOperator,
-						Value:    "foobar",
+						Values:   []string{"foobar"},
 					}})
 					Expect(err).NotTo(HaveOccurred())
 
@@ -396,7 +396,7 @@ var _ = Describe("Service Instance", func() {
 					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", false, []Query{{
 						Filter:   NameFilter,
 						Operator: EqualOperator,
-						Value:    "foobar",
+						Values:   []string{"foobar"},
 					}})
 					Expect(err).NotTo(HaveOccurred())
 

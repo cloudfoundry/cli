@@ -691,8 +691,8 @@ var _ = Describe("Route Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
-						{Filter: ccv2.HostFilter, Operator: ccv2.EqualOperator, Value: host},
-						{Filter: ccv2.DomainGUIDFilter, Operator: ccv2.EqualOperator, Value: domainGUID},
+						{Filter: ccv2.HostFilter, Operator: ccv2.EqualOperator, Values: []string{host}},
+						{Filter: ccv2.DomainGUIDFilter, Operator: ccv2.EqualOperator, Values: []string{domainGUID}},
 					}))
 
 					Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))

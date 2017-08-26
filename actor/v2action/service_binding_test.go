@@ -195,12 +195,12 @@ var _ = Describe("Service Binding Actions", func() {
 					ccv2.Query{
 						Filter:   ccv2.AppGUIDFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-app-guid",
+						Values:   []string{"some-app-guid"},
 					},
 					ccv2.Query{
 						Filter:   ccv2.ServiceInstanceGUIDFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-service-instance-guid",
+						Values:   []string{"some-service-instance-guid"},
 					},
 				}))
 			})

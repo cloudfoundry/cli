@@ -259,7 +259,7 @@ var _ = Describe("Application", func() {
 				apps, warnings, err := client.GetApplications([]Query{{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-space-guid",
+					Values:   []string{"some-space-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -699,7 +699,7 @@ var _ = Describe("Application", func() {
 				apps, warnings, err := client.GetRouteApplications("some-route-guid", []Query{{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-space-guid",
+					Values:   []string{"some-space-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(ConsistOf([]Application{

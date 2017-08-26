@@ -37,7 +37,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 		[]ccv2.Query{{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    name,
+			Values:   []string{name},
 		}})
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (actor Actor) GetServiceInstancesByApplication(appGUID string) ([]ServiceIn
 	bindings, apiWarnings, err := actor.CloudControllerClient.GetServiceBindings([]ccv2.Query{{
 		Filter:   ccv2.AppGUIDFilter,
 		Operator: ccv2.EqualOperator,
-		Value:    appGUID,
+		Values:   []string{appGUID},
 	}})
 	allWarnings = append(allWarnings, apiWarnings...)
 

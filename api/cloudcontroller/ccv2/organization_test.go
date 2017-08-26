@@ -148,7 +148,7 @@ var _ = Describe("Organization", func() {
 					orgs, warnings, err := client.GetOrganizations([]Query{{
 						Filter:   "some-query",
 						Operator: EqualOperator,
-						Value:    "some-value",
+						Values:   []string{"some-value"},
 					}})
 
 					Expect(err).NotTo(HaveOccurred())

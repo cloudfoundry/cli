@@ -141,7 +141,7 @@ var _ = Describe("Stack", func() {
 					stacks, warnings, err := client.GetStacks([]Query{{
 						Filter:   "some-query",
 						Operator: EqualOperator,
-						Value:    "some-value",
+						Values:   []string{"some-value"},
 					}})
 
 					Expect(err).NotTo(HaveOccurred())

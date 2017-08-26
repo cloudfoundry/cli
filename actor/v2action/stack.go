@@ -40,7 +40,7 @@ func (actor Actor) GetStackByName(stackName string) (Stack, Warnings, error) {
 		{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    stackName,
+			Values:   []string{stackName},
 		}}
 	stacks, warnings, err := actor.CloudControllerClient.GetStacks(query)
 	if err != nil {
