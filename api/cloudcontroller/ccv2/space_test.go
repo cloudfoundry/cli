@@ -91,7 +91,7 @@ var _ = Describe("Space", func() {
 					spaces, warnings, err := client.GetSpaces([]Query{{
 						Filter:   "some-query",
 						Operator: EqualOperator,
-						Value:    "some-value",
+						Values:   []string{"some-value"},
 					}})
 
 					Expect(err).NotTo(HaveOccurred())

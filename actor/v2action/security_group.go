@@ -11,7 +11,7 @@ import (
 // SecurityGroup represents a CF SecurityGroup.
 type SecurityGroup ccv2.SecurityGroup
 
-// SecurityGroupWithOrganizationAndSpace represents a security group with
+// SecurityGroupWithOrganizationSpaceAndLifecycle represents a security group with
 // organization and space information.
 type SecurityGroupWithOrganizationSpaceAndLifecycle struct {
 	SecurityGroup *SecurityGroup
@@ -74,7 +74,7 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 		{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    securityGroupName,
+			Values:   []string{securityGroupName},
 		},
 	})
 
@@ -129,7 +129,7 @@ func (actor Actor) getSecurityGroupSpacesAndAssignedLifecycles(securityGroupGUID
 	return spacesWithLifecycles, allWarnings, nil
 }
 
-// GetSecurityGroupsWithOrganizationAndSpace returns a list of security groups
+// GetSecurityGroupsWithOrganizationSpaceAndLifecycle returns a list of security groups
 // with org and space information, optionally including staging spaces.
 func (actor Actor) GetSecurityGroupsWithOrganizationSpaceAndLifecycle(includeStaging bool) ([]SecurityGroupWithOrganizationSpaceAndLifecycle, Warnings, error) {
 	securityGroups, allWarnings, err := actor.CloudControllerClient.GetSecurityGroups(nil)
@@ -409,7 +409,7 @@ func (actor Actor) isRunningSecurityGroupBoundToSpace(securityGroupName string, 
 	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceRunningSecurityGroupsBySpace(spaceGUID, []ccv2.Query{{
 		Filter:   ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
-		Value:    securityGroupName,
+		Values:   []string{securityGroupName},
 	}})
 	return len(ccv2SecurityGroups) > 0, Warnings(warnings), err
 }
@@ -418,7 +418,7 @@ func (actor Actor) isStagingSecurityGroupBoundToSpace(securityGroupName string, 
 	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceStagingSecurityGroupsBySpace(spaceGUID, []ccv2.Query{{
 		Filter:   ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
-		Value:    securityGroupName,
+		Values:   []string{securityGroupName},
 	}})
 	return len(ccv2SecurityGroups) > 0, Warnings(warnings), err
 }

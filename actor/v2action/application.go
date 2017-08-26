@@ -214,12 +214,12 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 		ccv2.Query{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    name,
+			Values:   []string{name},
 		},
 		ccv2.Query{
 			Filter:   ccv2.SpaceGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    spaceGUID,
+			Values:   []string{spaceGUID},
 		},
 	})
 
@@ -242,7 +242,7 @@ func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warn
 		ccv2.Query{
 			Filter:   ccv2.SpaceGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    spaceGUID,
+			Values:   []string{spaceGUID},
 		},
 	})
 

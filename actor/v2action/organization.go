@@ -52,7 +52,7 @@ func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings
 		{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
-			Value:    orgName,
+			Values:   []string{orgName},
 		},
 	})
 	if err != nil {

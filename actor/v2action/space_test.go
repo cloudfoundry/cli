@@ -164,19 +164,19 @@ var _ = Describe("Space", func() {
 								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Query{{
 									Filter:   ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
-									Value:    "some-org",
+									Values:   []string{"some-org"},
 								}}))
 
 								Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Query{{
 									Filter:   ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
-									Value:    "some-space",
+									Values:   []string{"some-space"},
 								},
 									{
 										Filter:   ccv2.OrganizationGUIDFilter,
 										Operator: ccv2.EqualOperator,
-										Value:    "some-org-guid",
+										Values:   []string{"some-org-guid"},
 									},
 								}))
 
@@ -239,7 +239,7 @@ var _ = Describe("Space", func() {
 							{
 								Filter:   ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,
-								Value:    "some-org-guid",
+								Values:   []string{"some-org-guid"},
 							},
 						}))
 				})
@@ -300,12 +300,12 @@ var _ = Describe("Space", func() {
 							{
 								Filter:   ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,
-								Value:    "some-org-guid",
+								Values:   []string{"some-org-guid"},
 							},
 							{
 								Filter:   ccv2.NameFilter,
 								Operator: ccv2.EqualOperator,
-								Value:    "some-space",
+								Values:   []string{"some-space"},
 							},
 						}))
 				})

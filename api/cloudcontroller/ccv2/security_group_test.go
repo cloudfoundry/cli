@@ -173,7 +173,7 @@ var _ = Describe("Security Groups", func() {
 					securityGroups, warnings, err := client.GetSecurityGroups([]Query{{
 						Filter:   "some-query",
 						Operator: EqualOperator,
-						Value:    "some-value",
+						Values:   []string{"some-value"},
 					}})
 
 					Expect(err).NotTo(HaveOccurred())
@@ -328,7 +328,7 @@ var _ = Describe("Security Groups", func() {
 				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", []Query{{
 					Filter:   "some-query",
 					Operator: EqualOperator,
-					Value:    "some-value",
+					Values:   []string{"some-value"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
@@ -517,7 +517,7 @@ var _ = Describe("Security Groups", func() {
 				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", []Query{{
 					Filter:   "some-query",
 					Operator: EqualOperator,
-					Value:    "some-value",
+					Values:   []string{"some-value"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))

@@ -350,7 +350,7 @@ var _ = Describe("Route", func() {
 				routes, warnings, err := client.GetRoutes([]Query{{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-org-guid",
+					Values:   []string{"some-org-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
@@ -503,7 +503,7 @@ var _ = Describe("Route", func() {
 				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", []Query{{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-org-guid",
+					Values:   []string{"some-org-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
@@ -673,7 +673,7 @@ var _ = Describe("Route", func() {
 				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", []Query{{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-space-guid",
+					Values:   []string{"some-space-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{

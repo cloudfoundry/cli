@@ -3,6 +3,7 @@ package ccv2
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // QueryFilter is the type of filter a Query uses.
@@ -34,6 +35,9 @@ const (
 const (
 	// EqualOperator is the query equal operator.
 	EqualOperator QueryOperator = ":"
+
+	// InOperator is the query "IN" operator.
+	InOperator QueryOperator = " IN "
 )
 
 // Query is a type of filter that can be passed to specific request to narrow
@@ -41,11 +45,11 @@ const (
 type Query struct {
 	Filter   QueryFilter
 	Operator QueryOperator
-	Value    string
+	Values   []string
 }
 
 func (query Query) format() string {
-	return fmt.Sprintf("%s%s%s", query.Filter, query.Operator, query.Value)
+	return fmt.Sprintf("%s%s%s", query.Filter, query.Operator, strings.Join(query.Values, ","))
 }
 
 // FormatQueryParameters converts a Query object into a collection that

@@ -98,14 +98,14 @@ var _ = Describe("Organization Summary Actions", func() {
 
 			It("returns the organization summary and all warnings", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)[0].Value).To(Equal("some-org"))
+				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)[0].Values).To(ConsistOf("some-org"))
 				Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)).To(Equal("some-org-guid"))
 				Expect(fakeCloudControllerClient.GetOrganizationQuotaCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetOrganizationQuotaArgsForCall(0)).To(Equal("some-quota-definition-guid"))
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Value).To(Equal("some-org-guid"))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)[0].Values).To(ConsistOf("some-org-guid"))
 
 				Expect(orgSummary).To(Equal(OrganizationSummary{
 					Organization: Organization{

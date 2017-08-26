@@ -109,7 +109,7 @@ var _ = Describe("Stack Actions", func() {
 						{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-stack",
+							Values:   []string{"some-stack"},
 						},
 					}))
 				})

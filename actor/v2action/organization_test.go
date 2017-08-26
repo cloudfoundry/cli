@@ -126,7 +126,7 @@ var _ = Describe("Org Actions", func() {
 					[]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-org",
+						Values:   []string{"some-org"},
 					}}))
 			})
 		})
@@ -222,7 +222,7 @@ var _ = Describe("Org Actions", func() {
 					[]ccv2.Query{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-org",
+						Values:   []string{"some-org"},
 					}}))
 
 				Expect(fakeCloudControllerClient.DeleteOrganizationCallCount()).To(Equal(1))

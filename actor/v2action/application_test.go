@@ -328,12 +328,12 @@ var _ = Describe("Application Actions", func() {
 					ccv2.Query{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-app",
+						Values:   []string{"some-app"},
 					},
 					ccv2.Query{
 						Filter:   ccv2.SpaceGUIDFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-space-guid",
+						Values:   []string{"some-space-guid"},
 					},
 				}))
 			})
@@ -404,7 +404,7 @@ var _ = Describe("Application Actions", func() {
 					ccv2.Query{
 						Filter:   ccv2.SpaceGUIDFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-space-guid",
+						Values:   []string{"some-space-guid"},
 					},
 				}))
 			})
@@ -479,7 +479,7 @@ var _ = Describe("Application Actions", func() {
 					{
 						Filter:   ccv2.RouteGUIDFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "route-guid",
+						Values:   []string{"route-guid"},
 					}}
 
 				_, _, err := actor.GetRouteApplications("route-guid", expectedQuery)

@@ -149,7 +149,7 @@ var _ = Describe("Service Binding", func() {
 				serviceBindings, warnings, err := client.GetServiceBindings([]Query{{
 					Filter:   AppGUIDFilter,
 					Operator: EqualOperator,
-					Value:    "some-app-guid",
+					Values:   []string{"some-app-guid"},
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceBindings).To(ConsistOf([]ServiceBinding{

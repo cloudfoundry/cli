@@ -211,8 +211,8 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 // the associate domain GUID.
 func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Route, Warnings, error) {
 	ccv2Routes, warnings, err := actor.CloudControllerClient.GetRoutes([]ccv2.Query{
-		{Filter: ccv2.HostFilter, Operator: ccv2.EqualOperator, Value: host},
-		{Filter: ccv2.DomainGUIDFilter, Operator: ccv2.EqualOperator, Value: domainGUID},
+		{Filter: ccv2.HostFilter, Operator: ccv2.EqualOperator, Values: []string{host}},
+		{Filter: ccv2.DomainGUIDFilter, Operator: ccv2.EqualOperator, Values: []string{domainGUID}},
 	})
 	if err != nil {
 		return Route{}, Warnings(warnings), err

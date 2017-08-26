@@ -117,7 +117,7 @@ var _ = Describe("Service Instance Actions", func() {
 					ccv2.Query{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
-						Value:    "some-service-instance",
+						Values:   []string{"some-service-instance"},
 					},
 				}))
 			})

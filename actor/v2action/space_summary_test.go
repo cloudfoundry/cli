@@ -275,12 +275,12 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Query{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space",
+							Values:   []string{"some-space"},
 						},
 						ccv2.Query{
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org-guid",
+							Values:   []string{"some-org-guid"},
 						},
 					))
 
@@ -290,7 +290,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Query{
 							Filter:   ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space-guid",
+							Values:   []string{"some-space-guid"},
 						},
 					))
 
@@ -856,12 +856,12 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Query{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space",
+							Values:   []string{"some-space"},
 						},
 						ccv2.Query{
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-org-guid",
+							Values:   []string{"some-org-guid"},
 						},
 					))
 
@@ -871,7 +871,7 @@ var _ = Describe("Space Summary Actions", func() {
 						ccv2.Query{
 							Filter:   ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
-							Value:    "some-space-guid",
+							Values:   []string{"some-space-guid"},
 						},
 					))
 
