@@ -86,7 +86,7 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 }
 
 // GetSharedDomains returns the global shared domains.
-func (client *Client) GetSharedDomains(queries []Query) ([]Domain, Warnings, error) {
+func (client *Client) GetSharedDomains(queries ...Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSharedDomainsRequest,
 		Query:       FormatQueryParameters(queries),
@@ -112,7 +112,7 @@ func (client *Client) GetSharedDomains(queries []Query) ([]Domain, Warnings, err
 }
 
 // GetOrganizationPrivateDomains returns the private domains associated with an organization.
-func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries []Query) ([]Domain, Warnings, error) {
+func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries ...Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationPrivateDomainsRequest,
 		Query:       FormatQueryParameters(queries),

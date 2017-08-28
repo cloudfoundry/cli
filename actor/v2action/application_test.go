@@ -441,7 +441,7 @@ var _ = Describe("Application Actions", func() {
 					}, ccv2.Warnings{"route-applications-warning"}, nil)
 			})
 			It("returns the applications bound to the route and warnings", func() {
-				applications, warnings, err := actor.GetRouteApplications("route-guid", nil)
+				applications, warnings, err := actor.GetRouteApplications("route-guid")
 				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("route-guid"))
 
@@ -463,29 +463,13 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				apps, warnings, err := actor.GetRouteApplications("route-guid", nil)
+				apps, warnings, err := actor.GetRouteApplications("route-guid")
 				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("route-guid"))
 
 				Expect(err).To(MatchError("get-route-applications-error"))
 				Expect(warnings).To(ConsistOf("route-applications-warning"))
 				Expect(apps).To(BeNil())
-			})
-		})
-
-		Context("when a query parameter exists", func() {
-			It("passes the query to the client", func() {
-				expectedQuery := []ccv2.Query{
-					{
-						Filter:   ccv2.RouteGUIDFilter,
-						Operator: ccv2.EqualOperator,
-						Values:   []string{"route-guid"},
-					}}
-
-				_, _, err := actor.GetRouteApplications("route-guid", expectedQuery)
-				Expect(err).ToNot(HaveOccurred())
-				_, query := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
 			})
 		})
 	})

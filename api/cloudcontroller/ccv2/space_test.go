@@ -88,11 +88,11 @@ var _ = Describe("Space", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					spaces, warnings, err := client.GetSpaces([]Query{{
+					spaces, warnings, err := client.GetSpaces(Query{
 						Filter:   "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
-					}})
+					})
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(spaces).To(Equal([]Space{
@@ -145,7 +145,7 @@ var _ = Describe("Space", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetSpaces(nil)
+				_, warnings, err := client.GetSpaces()
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

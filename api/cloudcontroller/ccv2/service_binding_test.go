@@ -146,11 +146,11 @@ var _ = Describe("Service Binding", func() {
 
 		Context("when service bindings exist", func() {
 			It("returns all the queried service bindings", func() {
-				serviceBindings, warnings, err := client.GetServiceBindings([]Query{{
+				serviceBindings, warnings, err := client.GetServiceBindings(Query{
 					Filter:   AppGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-app-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceBindings).To(ConsistOf([]ServiceBinding{
 					{GUID: "service-binding-guid-1", AppGUID: "app-guid-1", ServiceInstanceGUID: "service-instance-guid-1"},

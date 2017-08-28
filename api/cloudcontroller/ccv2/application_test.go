@@ -256,11 +256,11 @@ var _ = Describe("Application", func() {
 
 		Context("when apps exist", func() {
 			It("returns all the queried apps", func() {
-				apps, warnings, err := client.GetApplications([]Query{{
+				apps, warnings, err := client.GetApplications(Query{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 
 				updatedAt, err := time.Parse(time.RFC3339, "2015-03-10T23:11:54Z")
@@ -626,7 +626,7 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns an error", func() {
-				_, _, err := client.GetRouteApplications("some-route-guid", nil)
+				_, _, err := client.GetRouteApplications("some-route-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The route could not be found: some-route-guid",
 				}))
@@ -696,11 +696,11 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns all the applications and all warnings", func() {
-				apps, warnings, err := client.GetRouteApplications("some-route-guid", []Query{{
+				apps, warnings, err := client.GetRouteApplications("some-route-guid", Query{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(ConsistOf([]Application{
 					{Name: "app-name-1", GUID: "app-guid-1"},
@@ -727,7 +727,7 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns an empty list of applications", func() {
-				apps, _, err := client.GetRouteApplications("some-route-guid", nil)
+				apps, _, err := client.GetRouteApplications("some-route-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(BeEmpty())
 			})

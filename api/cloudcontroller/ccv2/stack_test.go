@@ -138,11 +138,11 @@ var _ = Describe("Stack", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					stacks, warnings, err := client.GetStacks([]Query{{
+					stacks, warnings, err := client.GetStacks(Query{
 						Filter:   "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
-					}})
+					})
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -187,7 +187,7 @@ var _ = Describe("Stack", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetStacks(nil)
+				_, warnings, err := client.GetStacks()
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

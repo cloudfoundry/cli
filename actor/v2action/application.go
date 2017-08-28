@@ -210,7 +210,7 @@ func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 // GetApplicationByNameAndSpace returns an application with matching name in
 // the space.
 func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (Application, Warnings, error) {
-	app, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
+	app, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv2.Query{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
@@ -221,7 +221,7 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 			Operator: ccv2.EqualOperator,
 			Values:   []string{spaceGUID},
 		},
-	})
+	)
 
 	if err != nil {
 		return Application{}, Warnings(warnings), err
@@ -238,13 +238,13 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 
 // GetApplicationsBySpace returns all applications in a space.
 func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
-	ccv2Apps, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
+	ccv2Apps, warnings, err := actor.CloudControllerClient.GetApplications(
 		ccv2.Query{
 			Filter:   ccv2.SpaceGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{spaceGUID},
 		},
-	})
+	)
 
 	if err != nil {
 		return []Application{}, Warnings(warnings), err
@@ -260,8 +260,8 @@ func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warn
 
 // GetRouteApplications returns a list of apps associated with the provided
 // Route GUID.
-func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([]Application, Warnings, error) {
-	apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(routeGUID, query)
+func (actor Actor) GetRouteApplications(routeGUID string) ([]Application, Warnings, error) {
+	apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(routeGUID)
 	if err != nil {
 		return nil, Warnings(warnings), err
 	}

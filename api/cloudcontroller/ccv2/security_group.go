@@ -109,7 +109,7 @@ func (client *Client) AssociateSpaceWithStagingSecurityGroup(securityGroupGUID s
 	return response.Warnings, err
 }
 
-func (client *Client) GetSecurityGroups(queries []Query) ([]SecurityGroup, Warnings, error) {
+func (client *Client) GetSecurityGroups(queries ...Query) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSecurityGroupsRequest,
 		Query:       FormatQueryParameters(queries),
@@ -137,13 +137,13 @@ func (client *Client) GetSecurityGroups(queries []Query) ([]SecurityGroup, Warni
 
 // GetSpaceRunningSecurityGroupsBySpace returns the running Security Groups
 // associated with the provided Space GUID.
-func (client *Client) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries []Query) ([]SecurityGroup, Warnings, error) {
+func (client *Client) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries ...Query) ([]SecurityGroup, Warnings, error) {
 	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceRunningSecurityGroupsRequest, queries)
 }
 
 // GetSpaceStagingSecurityGroupsBySpace returns the staging Security Groups
 // associated with the provided Space GUID.
-func (client *Client) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries []Query) ([]SecurityGroup, Warnings, error) {
+func (client *Client) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries ...Query) ([]SecurityGroup, Warnings, error) {
 	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceStagingSecurityGroupsRequest, queries)
 }
 
