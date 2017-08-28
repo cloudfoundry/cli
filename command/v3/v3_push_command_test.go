@@ -171,7 +171,7 @@ var _ = Describe("v3-push Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("I am an error")
-						fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
+						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
 					})
 
 					It("displays the header and error", func() {
@@ -188,7 +188,7 @@ var _ = Describe("v3-push Command", func() {
 
 				Context("when creating the package succeeds", func() {
 					BeforeEach(func() {
-						fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
+						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
 					})
 
 					Context("when the -p flag is provided", func() {
@@ -197,7 +197,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 
 						It("creates the package with the provided path", func() {
-							_, _, appPath := fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceArgsForCall(0)
+							_, _, appPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
 
 							Expect(appPath).To(Equal("some-app-path"))
 						})

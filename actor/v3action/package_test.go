@@ -41,7 +41,7 @@ var _ = Describe("Package Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, fakeConfig)
 	})
 
-	Describe("CreateAndUploadPackageByApplicationNameAndSpace", func() {
+	Describe("CreateAndUploadBitsPackageByApplicationNameAndSpace", func() {
 		Context("when the application can be retrieved", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
@@ -168,7 +168,7 @@ var _ = Describe("Package Actions", func() {
 						})
 
 						It("creates a new archive with correct permissions", func() {
-							_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", archivePath)
+							_, _, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", archivePath)
 
 							Expect(err).NotTo(HaveOccurred())
 							Expect(fakeCloudControllerClient.UploadPackageCallCount()).To(Equal(1))
@@ -202,19 +202,19 @@ var _ = Describe("Package Actions", func() {
 							})
 
 							It("correctly constructs the zip", func() {
-								_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								_, _, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).NotTo(HaveOccurred())
 								Expect(fakeCloudControllerClient.UploadPackageCallCount()).To(Equal(1))
 							})
 
 							It("collects all warnings", func() {
-								_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).NotTo(HaveOccurred())
 								Expect(warnings).To(ConsistOf("some-app-warning", "some-pkg-warning", "some-upload-pkg-warning", "some-get-pkg-warning"))
 							})
 
 							It("successfully resolves the app name", func() {
-								_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								_, _, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).ToNot(HaveOccurred())
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
@@ -227,7 +227,7 @@ var _ = Describe("Package Actions", func() {
 							})
 
 							It("successfully creates the Package", func() {
-								_, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								_, _, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).ToNot(HaveOccurred())
 
 								Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
@@ -241,7 +241,7 @@ var _ = Describe("Package Actions", func() {
 							})
 
 							It("returns the package", func() {
-								pkg, _, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								pkg, _, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).ToNot(HaveOccurred())
 
 								expectedPackage := ccv3.Package{
@@ -268,7 +268,7 @@ var _ = Describe("Package Actions", func() {
 										nil,
 									)
 
-									_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+									_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 
 									if expectedErr == nil {
 										Expect(err).ToNot(HaveOccurred())
@@ -301,7 +301,7 @@ var _ = Describe("Package Actions", func() {
 							})
 
 							It("returns the error and warnings", func() {
-								_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+								_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 								Expect(err).To(MatchError(expectedErr))
 								Expect(warnings).To(ConsistOf("some-app-warning", "some-pkg-warning", "some-upload-pkg-warning", "some-get-pkg-warning"))
 							})
@@ -317,7 +317,7 @@ var _ = Describe("Package Actions", func() {
 						})
 
 						It("returns the warnings and the error", func() {
-							_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+							_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 							Expect(err).To(MatchError(expectedErr))
 							Expect(warnings).To(ConsistOf("some-app-warning", "some-pkg-warning", "some-upload-pkg-warning"))
 						})
@@ -337,7 +337,7 @@ var _ = Describe("Package Actions", func() {
 					})
 
 					It("returns the warnings and the error", func() {
-						_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
+						_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", bitsPath)
 						Expect(err).To(MatchError(expectedErr))
 						Expect(warnings).To(ConsistOf("some-app-warning", "some-pkg-warning"))
 					})
@@ -352,7 +352,7 @@ var _ = Describe("Package Actions", func() {
 				)
 
 				JustBeforeEach(func() {
-					_, warnings, executeErr = actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", appPath)
+					_, warnings, executeErr = actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", appPath)
 				})
 
 				Context("when the provided path is an empty directory", func() {
@@ -401,7 +401,7 @@ var _ = Describe("Package Actions", func() {
 			})
 
 			It("returns the warnings and the error", func() {
-				_, warnings, err := actor.CreateAndUploadPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-path")
+				_, warnings, err := actor.CreateAndUploadBitsPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-path")
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
@@ -517,6 +517,114 @@ var _ = Describe("Package Actions", func() {
 		})
 	})
 
+	Describe("CreateDockerPackageByApplicationNameAndSpace", func() {
+		var (
+			dockerPackage Package
+			warnings      Warnings
+			executeErr    error
+		)
+
+		JustBeforeEach(func() {
+			dockerPackage, warnings, executeErr = actor.CreateDockerPackageByApplicationNameAndSpace("some-app-name", "some-space-guid", "some-docker-image")
+		})
+
+		Context("when the application can't be retrieved", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{},
+					ccv3.Warnings{"some-app-warning"},
+					errors.New("some-app-error"),
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(executeErr).To(MatchError("some-app-error"))
+				Expect(warnings).To(ConsistOf("some-app-warning"))
+			})
+		})
+
+		Context("when the application can be retrieved", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(
+					[]ccv3.Application{
+						{
+							Name: "some-app-name",
+							GUID: "some-app-guid",
+						},
+					},
+					ccv3.Warnings{"some-app-warning"},
+					nil,
+				)
+			})
+
+			Context("when creating the package fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.CreatePackageReturns(
+						ccv3.Package{},
+						ccv3.Warnings{"some-create-package-warning"},
+						errors.New("some-create-package-error"),
+					)
+				})
+				It("fails to create the package", func() {
+					Expect(executeErr).To(MatchError("some-create-package-error"))
+					Expect(warnings).To(ConsistOf("some-app-warning", "some-create-package-warning"))
+				})
+			})
+
+			Context("when creating the package succeeds", func() {
+				BeforeEach(func() {
+					createdPackage := ccv3.Package{
+						DockerImage: "some-docker-image",
+						GUID:        "some-pkg-guid",
+						State:       ccv3.PackageStateReady,
+						Relationships: ccv3.Relationships{
+							ccv3.ApplicationRelationship: ccv3.Relationship{
+								GUID: "some-app-guid",
+							},
+						},
+					}
+
+					fakeCloudControllerClient.CreatePackageReturns(
+						createdPackage,
+						ccv3.Warnings{"some-create-package-warning"},
+						nil,
+					)
+				})
+
+				It("calls CC to create the package and returns the package", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-app-warning", "some-create-package-warning"))
+
+					expectedPackage := ccv3.Package{
+						DockerImage: "some-docker-image",
+						GUID:        "some-pkg-guid",
+						State:       ccv3.PackageStateReady,
+						Relationships: ccv3.Relationships{
+							ccv3.ApplicationRelationship: ccv3.Relationship{
+								GUID: "some-app-guid",
+							},
+						},
+					}
+					Expect(dockerPackage).To(Equal(Package(expectedPackage)))
+
+					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+					queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+					query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
+					Expect(queryURL).To(Equal(query))
+
+					Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
+					inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
+					Expect(inputPackage).To(Equal(ccv3.Package{
+						Type:        ccv3.PackageTypeDocker,
+						DockerImage: "some-docker-image",
+						Relationships: ccv3.Relationships{
+							ccv3.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
+						},
+					}))
+				})
+			})
+		})
+	})
 })
 
 func expectFileContentsToEqual(file *zip.File, expectedContents string) {

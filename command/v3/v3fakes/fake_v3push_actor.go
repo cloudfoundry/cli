@@ -9,19 +9,19 @@ import (
 )
 
 type FakeV3PushActor struct {
-	CreateAndUploadPackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
-	createAndUploadPackageByApplicationNameAndSpaceMutex       sync.RWMutex
-	createAndUploadPackageByApplicationNameAndSpaceArgsForCall []struct {
+	CreateAndUploadBitsPackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	createAndUploadBitsPackageByApplicationNameAndSpaceMutex       sync.RWMutex
+	createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
 		bitsPath  string
 	}
-	createAndUploadPackageByApplicationNameAndSpaceReturns struct {
+	createAndUploadBitsPackageByApplicationNameAndSpaceReturns struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}
-	createAndUploadPackageByApplicationNameAndSpaceReturnsOnCall map[int]struct {
+	createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
@@ -183,56 +183,56 @@ type FakeV3PushActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeV3PushActor) CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error) {
-	fake.createAndUploadPackageByApplicationNameAndSpaceMutex.Lock()
-	ret, specificReturn := fake.createAndUploadPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall)]
-	fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall = append(fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall, struct {
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error) {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall)]
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall = append(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
 		bitsPath  string
 	}{appName, spaceGUID, bitsPath})
-	fake.recordInvocation("CreateAndUploadPackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath})
-	fake.createAndUploadPackageByApplicationNameAndSpaceMutex.Unlock()
-	if fake.CreateAndUploadPackageByApplicationNameAndSpaceStub != nil {
-		return fake.CreateAndUploadPackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath)
+	fake.recordInvocation("CreateAndUploadBitsPackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath})
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.Unlock()
+	if fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub != nil {
+		return fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createAndUploadPackageByApplicationNameAndSpaceReturns.result1, fake.createAndUploadPackageByApplicationNameAndSpaceReturns.result2, fake.createAndUploadPackageByApplicationNameAndSpaceReturns.result3
+	return fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result1, fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result2, fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result3
 }
 
-func (fake *FakeV3PushActor) CreateAndUploadPackageByApplicationNameAndSpaceCallCount() int {
-	fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RUnlock()
-	return len(fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall)
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount() int {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3PushActor) CreateAndUploadPackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string) {
-	fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RUnlock()
-	return fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createAndUploadPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string) {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath
 }
 
-func (fake *FakeV3PushActor) CreateAndUploadPackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreateAndUploadPackageByApplicationNameAndSpaceStub = nil
-	fake.createAndUploadPackageByApplicationNameAndSpaceReturns = struct {
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub = nil
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns = struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3PushActor) CreateAndUploadPackageByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreateAndUploadPackageByApplicationNameAndSpaceStub = nil
-	if fake.createAndUploadPackageByApplicationNameAndSpaceReturnsOnCall == nil {
-		fake.createAndUploadPackageByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub = nil
+	if fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
 			result1 v3action.Package
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.createAndUploadPackageByApplicationNameAndSpaceReturnsOnCall[i] = struct {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
@@ -787,8 +787,8 @@ func (fake *FakeV3PushActor) UpdateApplicationReturnsOnCall(i int, result1 v3act
 func (fake *FakeV3PushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createAndUploadPackageByApplicationNameAndSpaceMutex.RUnlock()
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
 	fake.createApplicationByNameAndSpaceMutex.RLock()
 	defer fake.createApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()

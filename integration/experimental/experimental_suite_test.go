@@ -15,6 +15,7 @@ const (
 	CFEventuallyTimeout   = 300 * time.Second
 	CFConsistentlyTimeout = 500 * time.Millisecond
 	RealIsolationSegment  = "persistent_isolation_segment"
+	PublicDockerImage     = "cloudfoundry/diego-docker-app-custom"
 )
 
 var (
