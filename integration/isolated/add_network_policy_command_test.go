@@ -115,12 +115,12 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Allowing network traffic from app %s to %s in org %s / space %s as %s...", appName, appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Allowing network traffic from app %s to %s in org %s / space %s as %s\.\.\.`, appName, appName, orgName, spaceName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("network-policies")
-				Eventually(session).Should(Say("Listing network traffic as %s...", username))
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
@@ -133,7 +133,7 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", "pineapple", "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Allowing network traffic from app pineapple to %s in org %s / space %s as %s...", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Allowing network traffic from app pineapple to %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -145,7 +145,7 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", "pineapple")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Allowing network traffic from app %s to pineapple in org %s / space %s as %s...", appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Allowing network traffic from app %s to pineapple in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))

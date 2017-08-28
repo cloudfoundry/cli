@@ -113,7 +113,7 @@ var _ = Describe("network-policies command", func() {
 				session := helpers.CF("network-policies")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing network traffic as %s...", username))
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
@@ -137,7 +137,7 @@ var _ = Describe("network-policies command", func() {
 				session := helpers.CF("network-policies", "--source", srcAppName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing network traffic as %s...", username))
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
 				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
@@ -151,7 +151,7 @@ var _ = Describe("network-policies command", func() {
 				session := helpers.CF("network-policies", "--source", "pineapple")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Listing network traffic as %s...", username))
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))

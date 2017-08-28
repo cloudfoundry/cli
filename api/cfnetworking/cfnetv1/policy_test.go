@@ -12,7 +12,9 @@ import (
 
 var _ = Describe("Policy", func() {
 	var client *Client
-	BeforeEach(func() { client = NewTestClient() })
+	BeforeEach(func() {
+		client = NewTestClient()
+	})
 
 	Describe("CreatePolicies", func() {
 		Context("when the stack is found", func() {
@@ -116,7 +118,7 @@ var _ = Describe("Policy", func() {
 		var expectedPolicies []Policy
 		Context("when the policies are found", func() {
 			BeforeEach(func() {
-				expectedResponse := `{
+				response := `{
 					"policies": [
 						{
 							"source": {
@@ -149,7 +151,7 @@ var _ = Describe("Policy", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/policies"),
-						RespondWith(http.StatusOK, expectedResponse),
+						RespondWith(http.StatusOK, response),
 					),
 				)
 				expectedPolicies = []Policy{
@@ -228,7 +230,7 @@ var _ = Describe("Policy", func() {
 				)
 			})
 
-			It("returns the error and warnings", func() {
+			It("returns the error", func() {
 				_, err := client.ListPolicies()
 				Expect(err).To(MatchError(networkerror.BadRequestError{
 					Message: "Oh Noes",
@@ -326,7 +328,7 @@ var _ = Describe("Policy", func() {
 				)
 			})
 
-			It("returns the error and warnings", func() {
+			It("returns the error", func() {
 				err := client.RemovePolicies(nil)
 				Expect(err).To(MatchError(networkerror.BadRequestError{
 					Message: "Oh Noes",

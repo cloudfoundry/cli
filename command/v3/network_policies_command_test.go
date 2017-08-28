@@ -76,7 +76,7 @@ var _ = Describe("network-policies Command", func() {
 		})
 
 		It("outputs flavor text", func() {
-			Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
+			Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
 		})
 
 		Context("when fetching the user fails", func() {
@@ -114,7 +114,7 @@ var _ = Describe("network-policies Command", func() {
 				passedSpaceGuid := fakeActor.NetworkPoliciesBySpaceArgsForCall(0)
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 
-				Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
+				Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
 				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say("\n\n"))
 				Expect(testUI.Out).To(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
@@ -152,7 +152,7 @@ var _ = Describe("network-policies Command", func() {
 					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 					Expect(passedSrcAppName).To(Equal("some-app"))
 
-					Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
+					Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
 					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Out).To(Say("\n\n"))
 					Expect(testUI.Out).To(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
@@ -173,7 +173,7 @@ var _ = Describe("network-policies Command", func() {
 			It("displays warnings and returns the error", func() {
 				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
 
-				Expect(testUI.Out).To(Say("Listing network traffic as some-user..."))
+				Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
 				Expect(testUI.Out).ToNot(Say("OK"))

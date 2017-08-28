@@ -1,7 +1,6 @@
 package cfnetworkingaction
 
 import (
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
 )
 
@@ -67,12 +66,17 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 		return []Policy{}, allWarnings, err
 	}
 
+	appNameByGuid := map[string]string{}
+	for _, app := range applications {
+		appNameByGuid[app.GUID] = app.Name
+	}
+
 	var policies []Policy
 	emptyPolicy := Policy{}
 	for _, v1Policy := range v1Policies {
-		policy := transformPolicy(applications, v1Policy)
+		policy := actor.transformPolicy(appNameByGuid, v1Policy)
 		if policy != emptyPolicy {
-			policies = append(policies, transformPolicy(applications, v1Policy))
+			policies = append(policies, actor.transformPolicy(appNameByGuid, v1Policy))
 		}
 	}
 
@@ -87,6 +91,11 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		return []Policy{}, allWarnings, err
+	}
+
+	appNameByGuid := map[string]string{}
+	for _, app := range applications {
+		appNameByGuid[app.GUID] = app.Name
 	}
 
 	var v1Policies []cfnetv1.Policy
@@ -106,10 +115,10 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 	var policies []Policy
 	emptyPolicy := Policy{}
 	for _, v1Policy := range v1Policies {
-		if appGUID == "" || v1Policy.Source.ID == appGUID {
-			policy := transformPolicy(applications, v1Policy)
+		if v1Policy.Source.ID == appGUID {
+			policy := actor.transformPolicy(appNameByGuid, v1Policy)
 			if policy != emptyPolicy {
-				policies = append(policies, transformPolicy(applications, v1Policy))
+				policies = append(policies, actor.transformPolicy(appNameByGuid, v1Policy))
 			}
 		}
 	}
@@ -160,18 +169,10 @@ func (actor Actor) RemoveNetworkPolicy(spaceGUID, srcAppName, destAppName, proto
 	return allWarnings, PolicyDoesNotExistError{}
 }
 
-func transformPolicy(applications []v3action.Application, v1Policy cfnetv1.Policy) Policy {
-	srcName := ""
-	dstName := ""
-	for _, app := range applications {
-		if v1Policy.Source.ID == app.GUID {
-			srcName = app.Name
-		}
-		if v1Policy.Destination.ID == app.GUID {
-			dstName = app.Name
-		}
-	}
-	if srcName != "" && dstName != "" {
+func (Actor) transformPolicy(appNameByGuid map[string]string, v1Policy cfnetv1.Policy) Policy {
+	srcName, srcOk := appNameByGuid[v1Policy.Source.ID]
+	dstName, dstOk := appNameByGuid[v1Policy.Destination.ID]
+	if srcOk && dstOk {
 		return Policy{
 			SourceName:      srcName,
 			DestinationName: dstName,
