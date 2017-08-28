@@ -36,13 +36,11 @@ func (actor Actor) GetStack(guid string) (Stack, Warnings, error) {
 
 // GetStackByName returns the provided stack
 func (actor Actor) GetStackByName(stackName string) (Stack, Warnings, error) {
-	query := []ccv2.Query{
-		{
-			Filter:   ccv2.NameFilter,
-			Operator: ccv2.EqualOperator,
-			Values:   []string{stackName},
-		}}
-	stacks, warnings, err := actor.CloudControllerClient.GetStacks(query)
+	stacks, warnings, err := actor.CloudControllerClient.GetStacks(ccv2.Query{
+		Filter:   ccv2.NameFilter,
+		Operator: ccv2.EqualOperator,
+		Values:   []string{stackName},
+	})
 	if err != nil {
 		return Stack{}, Warnings(warnings), err
 	}

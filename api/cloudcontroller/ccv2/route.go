@@ -105,7 +105,7 @@ func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnin
 
 // GetApplicationRoutes returns a list of Routes associated with the provided
 // Application GUID, and filtered by the provided queries.
-func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) ([]Route, Warnings, error) {
+func (client *Client) GetApplicationRoutes(appGUID string, queryParams ...Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppRoutesRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
@@ -133,7 +133,7 @@ func (client *Client) GetApplicationRoutes(appGUID string, queryParams []Query) 
 
 // GetSpaceRoutes returns a list of Routes associated with the provided Space
 // GUID, and filtered by the provided queries.
-func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
+func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams ...Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceRoutesRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
@@ -160,7 +160,7 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]R
 }
 
 // GetRoutes returns a list of Routes based off of the provided queries.
-func (client *Client) GetRoutes(queryParams []Query) ([]Route, Warnings, error) {
+func (client *Client) GetRoutes(queryParams ...Query) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRoutesRequest,
 		Query:       FormatQueryParameters(queryParams),

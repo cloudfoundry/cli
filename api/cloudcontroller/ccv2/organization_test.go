@@ -145,11 +145,11 @@ var _ = Describe("Organization", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					orgs, warnings, err := client.GetOrganizations([]Query{{
+					orgs, warnings, err := client.GetOrganizations(Query{
 						Filter:   "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
-					}})
+					})
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(orgs).To(Equal([]Organization{
@@ -198,7 +198,7 @@ var _ = Describe("Organization", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetOrganizations(nil)
+				_, warnings, err := client.GetOrganizations()
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,

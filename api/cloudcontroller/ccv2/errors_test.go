@@ -52,7 +52,7 @@ var _ = Describe("Error Wrapper", func() {
 			})
 
 			It("returns a RawHTTPStatusError", func() {
-				_, _, err := client.GetApplications(nil)
+				_, _, err := client.GetApplications()
 				Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
@@ -79,7 +79,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns a BadRequestError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.BadRequestError{
 							Message: "bad request",
 						}))
@@ -95,7 +95,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns a NotStagedError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.NotStagedError{
 							Message: "App has not finished staging",
 						}))
@@ -111,7 +111,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns an InstancesError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.InstancesError{
 							Message: "instances went bananas",
 						}))
@@ -128,7 +128,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns an InvalidRelationError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.InvalidRelationError{
 							Message: "The requested app relation is invalid: the app and route must belong to the same space",
 						}))
@@ -145,7 +145,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns an AppStoppedStatsError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.ApplicationStoppedStatsError{
 							Message: "Could not fetch stats for stopped app: some-app",
 						}))
@@ -160,7 +160,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
@@ -175,7 +175,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns an InvalidAuthTokenError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
@@ -187,7 +187,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns a ForbiddenError", func() {
-					_, _, err := client.GetApplications(nil)
+					_, _, err := client.GetApplications()
 					Expect(err).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
@@ -199,7 +199,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("when the error is a json response from the cloud controller", func() {
 					It("returns a ResourceNotFoundError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 					})
 				})
@@ -210,7 +210,7 @@ var _ = Describe("Error Wrapper", func() {
 					})
 
 					It("returns a NotFoundError", func() {
-						_, _, err := client.GetApplications(nil)
+						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
 					})
 				})
@@ -222,7 +222,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns a UnprocessableEntityError", func() {
-					_, _, err := client.GetApplications(nil)
+					_, _, err := client.GetApplications()
 					Expect(err).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
 				})
 			})
@@ -233,7 +233,7 @@ var _ = Describe("Error Wrapper", func() {
 				})
 
 				It("returns an UnexpectedResponseError", func() {
-					_, _, err := client.GetApplications(nil)
+					_, _, err := client.GetApplications()
 					Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 						ResponseCode: http.StatusTeapot,
 						V2ErrorResponse: ccerror.V2ErrorResponse{

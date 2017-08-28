@@ -232,7 +232,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetApplicationRoutesStub        func(appGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
+	GetApplicationRoutesStub        func(appGUID string, queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	getApplicationRoutesMutex       sync.RWMutex
 	getApplicationRoutesArgsForCall []struct {
 		appGUID string
@@ -248,7 +248,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetApplicationsStub        func(queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetApplicationsStub        func(queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
 	getApplicationsMutex       sync.RWMutex
 	getApplicationsArgsForCall []struct {
 		queries []ccv2.Query
@@ -293,7 +293,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetOrganizationPrivateDomainsStub        func(orgGUID string, queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
+	GetOrganizationPrivateDomainsStub        func(orgGUID string, queries ...ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
 	getOrganizationPrivateDomainsMutex       sync.RWMutex
 	getOrganizationPrivateDomainsArgsForCall []struct {
 		orgGUID string
@@ -324,7 +324,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetOrganizationsStub        func(queries []ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error)
+	GetOrganizationsStub        func(queries ...ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error)
 	getOrganizationsMutex       sync.RWMutex
 	getOrganizationsArgsForCall []struct {
 		queries []ccv2.Query
@@ -354,7 +354,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetRouteApplicationsStub        func(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetRouteApplicationsStub        func(routeGUID string, queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
 	getRouteApplicationsMutex       sync.RWMutex
 	getRouteApplicationsArgsForCall []struct {
 		routeGUID string
@@ -370,7 +370,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetRoutesStub        func(queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
+	GetRoutesStub        func(queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	getRoutesMutex       sync.RWMutex
 	getRoutesArgsForCall []struct {
 		queries []ccv2.Query
@@ -400,7 +400,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSecurityGroupsStub        func(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
+	GetSecurityGroupsStub        func(queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	getSecurityGroupsMutex       sync.RWMutex
 	getSecurityGroupsArgsForCall []struct {
 		queries []ccv2.Query
@@ -415,7 +415,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetServiceBindingsStub        func(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
+	GetServiceBindingsStub        func(queries ...ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	getServiceBindingsMutex       sync.RWMutex
 	getServiceBindingsArgsForCall []struct {
 		queries []ccv2.Query
@@ -445,7 +445,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetServiceInstancesStub        func(queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
+	GetServiceInstancesStub        func(queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	getServiceInstancesMutex       sync.RWMutex
 	getServiceInstancesArgsForCall []struct {
 		queries []ccv2.Query
@@ -475,7 +475,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSharedDomainsStub        func(queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
+	GetSharedDomainsStub        func(queries ...ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
 	getSharedDomainsMutex       sync.RWMutex
 	getSharedDomainsArgsForCall []struct {
 		queries []ccv2.Query
@@ -505,7 +505,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpaceRoutesStub        func(spaceGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
+	GetSpaceRoutesStub        func(spaceGUID string, queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	getSpaceRoutesMutex       sync.RWMutex
 	getSpaceRoutesArgsForCall []struct {
 		spaceGUID string
@@ -521,7 +521,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpaceRunningSecurityGroupsBySpaceStub        func(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
+	GetSpaceRunningSecurityGroupsBySpaceStub        func(spaceGUID string, queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	getSpaceRunningSecurityGroupsBySpaceMutex       sync.RWMutex
 	getSpaceRunningSecurityGroupsBySpaceArgsForCall []struct {
 		spaceGUID string
@@ -537,7 +537,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpacesStub        func(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
+	GetSpacesStub        func(queries ...ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error)
 	getSpacesMutex       sync.RWMutex
 	getSpacesArgsForCall []struct {
 		queries []ccv2.Query
@@ -552,7 +552,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpaceServiceInstancesStub        func(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
+	GetSpaceServiceInstancesStub        func(spaceGUID string, includeUserProvidedServices bool, queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	getSpaceServiceInstancesMutex       sync.RWMutex
 	getSpaceServiceInstancesArgsForCall []struct {
 		spaceGUID                   string
@@ -569,7 +569,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSpaceStagingSecurityGroupsBySpaceStub        func(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
+	GetSpaceStagingSecurityGroupsBySpaceStub        func(spaceGUID string, queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)
 	getSpaceStagingSecurityGroupsBySpaceMutex       sync.RWMutex
 	getSpaceStagingSecurityGroupsBySpaceArgsForCall []struct {
 		spaceGUID string
@@ -600,7 +600,7 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetStacksStub        func(queries []ccv2.Query) ([]ccv2.Stack, ccv2.Warnings, error)
+	GetStacksStub        func(queries ...ccv2.Query) ([]ccv2.Stack, ccv2.Warnings, error)
 	getStacksMutex       sync.RWMutex
 	getStacksArgsForCall []struct {
 		queries []ccv2.Query
@@ -1618,22 +1618,17 @@ func (fake *FakeCloudControllerClient) GetApplicationInstanceStatusesByApplicati
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetApplicationRoutes(appGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetApplicationRoutes(appGUID string, queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
 	fake.getApplicationRoutesMutex.Lock()
 	ret, specificReturn := fake.getApplicationRoutesReturnsOnCall[len(fake.getApplicationRoutesArgsForCall)]
 	fake.getApplicationRoutesArgsForCall = append(fake.getApplicationRoutesArgsForCall, struct {
 		appGUID string
 		queries []ccv2.Query
-	}{appGUID, queriesCopy})
-	fake.recordInvocation("GetApplicationRoutes", []interface{}{appGUID, queriesCopy})
+	}{appGUID, queries})
+	fake.recordInvocation("GetApplicationRoutes", []interface{}{appGUID, queries})
 	fake.getApplicationRoutesMutex.Unlock()
 	if fake.GetApplicationRoutesStub != nil {
-		return fake.GetApplicationRoutesStub(appGUID, queries)
+		return fake.GetApplicationRoutesStub(appGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -1678,21 +1673,16 @@ func (fake *FakeCloudControllerClient) GetApplicationRoutesReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetApplications(queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetApplications(queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
 	fake.getApplicationsMutex.Lock()
 	ret, specificReturn := fake.getApplicationsReturnsOnCall[len(fake.getApplicationsArgsForCall)]
 	fake.getApplicationsArgsForCall = append(fake.getApplicationsArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetApplications", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetApplications", []interface{}{queries})
 	fake.getApplicationsMutex.Unlock()
 	if fake.GetApplicationsStub != nil {
-		return fake.GetApplicationsStub(queries)
+		return fake.GetApplicationsStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -1845,22 +1835,17 @@ func (fake *FakeCloudControllerClient) GetOrganizationReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomains(orgGUID string, queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetOrganizationPrivateDomains(orgGUID string, queries ...ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
 	fake.getOrganizationPrivateDomainsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationPrivateDomainsReturnsOnCall[len(fake.getOrganizationPrivateDomainsArgsForCall)]
 	fake.getOrganizationPrivateDomainsArgsForCall = append(fake.getOrganizationPrivateDomainsArgsForCall, struct {
 		orgGUID string
 		queries []ccv2.Query
-	}{orgGUID, queriesCopy})
-	fake.recordInvocation("GetOrganizationPrivateDomains", []interface{}{orgGUID, queriesCopy})
+	}{orgGUID, queries})
+	fake.recordInvocation("GetOrganizationPrivateDomains", []interface{}{orgGUID, queries})
 	fake.getOrganizationPrivateDomainsMutex.Unlock()
 	if fake.GetOrganizationPrivateDomainsStub != nil {
-		return fake.GetOrganizationPrivateDomainsStub(orgGUID, queries)
+		return fake.GetOrganizationPrivateDomainsStub(orgGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -1959,21 +1944,16 @@ func (fake *FakeCloudControllerClient) GetOrganizationQuotaReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetOrganizations(queries []ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetOrganizations(queries ...ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error) {
 	fake.getOrganizationsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationsReturnsOnCall[len(fake.getOrganizationsArgsForCall)]
 	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetOrganizations", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetOrganizations", []interface{}{queries})
 	fake.getOrganizationsMutex.Unlock()
 	if fake.GetOrganizationsStub != nil {
-		return fake.GetOrganizationsStub(queries)
+		return fake.GetOrganizationsStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2072,22 +2052,17 @@ func (fake *FakeCloudControllerClient) GetPrivateDomainReturnsOnCall(i int, resu
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetRouteApplications(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetRouteApplications(routeGUID string, queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
 	fake.getRouteApplicationsMutex.Lock()
 	ret, specificReturn := fake.getRouteApplicationsReturnsOnCall[len(fake.getRouteApplicationsArgsForCall)]
 	fake.getRouteApplicationsArgsForCall = append(fake.getRouteApplicationsArgsForCall, struct {
 		routeGUID string
 		queries   []ccv2.Query
-	}{routeGUID, queriesCopy})
-	fake.recordInvocation("GetRouteApplications", []interface{}{routeGUID, queriesCopy})
+	}{routeGUID, queries})
+	fake.recordInvocation("GetRouteApplications", []interface{}{routeGUID, queries})
 	fake.getRouteApplicationsMutex.Unlock()
 	if fake.GetRouteApplicationsStub != nil {
-		return fake.GetRouteApplicationsStub(routeGUID, queries)
+		return fake.GetRouteApplicationsStub(routeGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2132,21 +2107,16 @@ func (fake *FakeCloudControllerClient) GetRouteApplicationsReturnsOnCall(i int, 
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetRoutes(queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetRoutes(queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
 	fake.getRoutesMutex.Lock()
 	ret, specificReturn := fake.getRoutesReturnsOnCall[len(fake.getRoutesArgsForCall)]
 	fake.getRoutesArgsForCall = append(fake.getRoutesArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetRoutes", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetRoutes", []interface{}{queries})
 	fake.getRoutesMutex.Unlock()
 	if fake.GetRoutesStub != nil {
-		return fake.GetRoutesStub(queries)
+		return fake.GetRoutesStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2245,21 +2215,16 @@ func (fake *FakeCloudControllerClient) GetRunningSpacesBySecurityGroupReturnsOnC
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSecurityGroups(queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSecurityGroups(queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
 	fake.getSecurityGroupsMutex.Lock()
 	ret, specificReturn := fake.getSecurityGroupsReturnsOnCall[len(fake.getSecurityGroupsArgsForCall)]
 	fake.getSecurityGroupsArgsForCall = append(fake.getSecurityGroupsArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetSecurityGroups", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetSecurityGroups", []interface{}{queries})
 	fake.getSecurityGroupsMutex.Unlock()
 	if fake.GetSecurityGroupsStub != nil {
-		return fake.GetSecurityGroupsStub(queries)
+		return fake.GetSecurityGroupsStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2304,21 +2269,16 @@ func (fake *FakeCloudControllerClient) GetSecurityGroupsReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceBindings(queries []ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetServiceBindings(queries ...ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error) {
 	fake.getServiceBindingsMutex.Lock()
 	ret, specificReturn := fake.getServiceBindingsReturnsOnCall[len(fake.getServiceBindingsArgsForCall)]
 	fake.getServiceBindingsArgsForCall = append(fake.getServiceBindingsArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetServiceBindings", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetServiceBindings", []interface{}{queries})
 	fake.getServiceBindingsMutex.Unlock()
 	if fake.GetServiceBindingsStub != nil {
-		return fake.GetServiceBindingsStub(queries)
+		return fake.GetServiceBindingsStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2417,21 +2377,16 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceReturnsOnCall(i int, re
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetServiceInstances(queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetServiceInstances(queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
 	fake.getServiceInstancesMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesReturnsOnCall[len(fake.getServiceInstancesArgsForCall)]
 	fake.getServiceInstancesArgsForCall = append(fake.getServiceInstancesArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetServiceInstances", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetServiceInstances", []interface{}{queries})
 	fake.getServiceInstancesMutex.Unlock()
 	if fake.GetServiceInstancesStub != nil {
-		return fake.GetServiceInstancesStub(queries)
+		return fake.GetServiceInstancesStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2530,21 +2485,16 @@ func (fake *FakeCloudControllerClient) GetSharedDomainReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSharedDomains(queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSharedDomains(queries ...ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
 	fake.getSharedDomainsMutex.Lock()
 	ret, specificReturn := fake.getSharedDomainsReturnsOnCall[len(fake.getSharedDomainsArgsForCall)]
 	fake.getSharedDomainsArgsForCall = append(fake.getSharedDomainsArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetSharedDomains", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetSharedDomains", []interface{}{queries})
 	fake.getSharedDomainsMutex.Unlock()
 	if fake.GetSharedDomainsStub != nil {
-		return fake.GetSharedDomainsStub(queries)
+		return fake.GetSharedDomainsStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2643,22 +2593,17 @@ func (fake *FakeCloudControllerClient) GetSpaceQuotaReturnsOnCall(i int, result1
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceRoutes(spaceGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSpaceRoutes(spaceGUID string, queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error) {
 	fake.getSpaceRoutesMutex.Lock()
 	ret, specificReturn := fake.getSpaceRoutesReturnsOnCall[len(fake.getSpaceRoutesArgsForCall)]
 	fake.getSpaceRoutesArgsForCall = append(fake.getSpaceRoutesArgsForCall, struct {
 		spaceGUID string
 		queries   []ccv2.Query
-	}{spaceGUID, queriesCopy})
-	fake.recordInvocation("GetSpaceRoutes", []interface{}{spaceGUID, queriesCopy})
+	}{spaceGUID, queries})
+	fake.recordInvocation("GetSpaceRoutes", []interface{}{spaceGUID, queries})
 	fake.getSpaceRoutesMutex.Unlock()
 	if fake.GetSpaceRoutesStub != nil {
-		return fake.GetSpaceRoutesStub(spaceGUID, queries)
+		return fake.GetSpaceRoutesStub(spaceGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2703,22 +2648,17 @@ func (fake *FakeCloudControllerClient) GetSpaceRoutesReturnsOnCall(i int, result
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
 	fake.getSpaceRunningSecurityGroupsBySpaceMutex.Lock()
 	ret, specificReturn := fake.getSpaceRunningSecurityGroupsBySpaceReturnsOnCall[len(fake.getSpaceRunningSecurityGroupsBySpaceArgsForCall)]
 	fake.getSpaceRunningSecurityGroupsBySpaceArgsForCall = append(fake.getSpaceRunningSecurityGroupsBySpaceArgsForCall, struct {
 		spaceGUID string
 		queries   []ccv2.Query
-	}{spaceGUID, queriesCopy})
-	fake.recordInvocation("GetSpaceRunningSecurityGroupsBySpace", []interface{}{spaceGUID, queriesCopy})
+	}{spaceGUID, queries})
+	fake.recordInvocation("GetSpaceRunningSecurityGroupsBySpace", []interface{}{spaceGUID, queries})
 	fake.getSpaceRunningSecurityGroupsBySpaceMutex.Unlock()
 	if fake.GetSpaceRunningSecurityGroupsBySpaceStub != nil {
-		return fake.GetSpaceRunningSecurityGroupsBySpaceStub(spaceGUID, queries)
+		return fake.GetSpaceRunningSecurityGroupsBySpaceStub(spaceGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2763,21 +2703,16 @@ func (fake *FakeCloudControllerClient) GetSpaceRunningSecurityGroupsBySpaceRetur
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaces(queries []ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSpaces(queries ...ccv2.Query) ([]ccv2.Space, ccv2.Warnings, error) {
 	fake.getSpacesMutex.Lock()
 	ret, specificReturn := fake.getSpacesReturnsOnCall[len(fake.getSpacesArgsForCall)]
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetSpaces", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetSpaces", []interface{}{queries})
 	fake.getSpacesMutex.Unlock()
 	if fake.GetSpacesStub != nil {
-		return fake.GetSpacesStub(queries)
+		return fake.GetSpacesStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2822,23 +2757,18 @@ func (fake *FakeCloudControllerClient) GetSpacesReturnsOnCall(i int, result1 []c
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
 	fake.getSpaceServiceInstancesMutex.Lock()
 	ret, specificReturn := fake.getSpaceServiceInstancesReturnsOnCall[len(fake.getSpaceServiceInstancesArgsForCall)]
 	fake.getSpaceServiceInstancesArgsForCall = append(fake.getSpaceServiceInstancesArgsForCall, struct {
 		spaceGUID                   string
 		includeUserProvidedServices bool
 		queries                     []ccv2.Query
-	}{spaceGUID, includeUserProvidedServices, queriesCopy})
-	fake.recordInvocation("GetSpaceServiceInstances", []interface{}{spaceGUID, includeUserProvidedServices, queriesCopy})
+	}{spaceGUID, includeUserProvidedServices, queries})
+	fake.recordInvocation("GetSpaceServiceInstances", []interface{}{spaceGUID, includeUserProvidedServices, queries})
 	fake.getSpaceServiceInstancesMutex.Unlock()
 	if fake.GetSpaceServiceInstancesStub != nil {
-		return fake.GetSpaceServiceInstancesStub(spaceGUID, includeUserProvidedServices, queries)
+		return fake.GetSpaceServiceInstancesStub(spaceGUID, includeUserProvidedServices, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2883,22 +2813,17 @@ func (fake *FakeCloudControllerClient) GetSpaceServiceInstancesReturnsOnCall(i i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries ...ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error) {
 	fake.getSpaceStagingSecurityGroupsBySpaceMutex.Lock()
 	ret, specificReturn := fake.getSpaceStagingSecurityGroupsBySpaceReturnsOnCall[len(fake.getSpaceStagingSecurityGroupsBySpaceArgsForCall)]
 	fake.getSpaceStagingSecurityGroupsBySpaceArgsForCall = append(fake.getSpaceStagingSecurityGroupsBySpaceArgsForCall, struct {
 		spaceGUID string
 		queries   []ccv2.Query
-	}{spaceGUID, queriesCopy})
-	fake.recordInvocation("GetSpaceStagingSecurityGroupsBySpace", []interface{}{spaceGUID, queriesCopy})
+	}{spaceGUID, queries})
+	fake.recordInvocation("GetSpaceStagingSecurityGroupsBySpace", []interface{}{spaceGUID, queries})
 	fake.getSpaceStagingSecurityGroupsBySpaceMutex.Unlock()
 	if fake.GetSpaceStagingSecurityGroupsBySpaceStub != nil {
-		return fake.GetSpaceStagingSecurityGroupsBySpaceStub(spaceGUID, queries)
+		return fake.GetSpaceStagingSecurityGroupsBySpaceStub(spaceGUID, queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2997,21 +2922,16 @@ func (fake *FakeCloudControllerClient) GetStackReturnsOnCall(i int, result1 ccv2
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetStacks(queries []ccv2.Query) ([]ccv2.Stack, ccv2.Warnings, error) {
-	var queriesCopy []ccv2.Query
-	if queries != nil {
-		queriesCopy = make([]ccv2.Query, len(queries))
-		copy(queriesCopy, queries)
-	}
+func (fake *FakeCloudControllerClient) GetStacks(queries ...ccv2.Query) ([]ccv2.Stack, ccv2.Warnings, error) {
 	fake.getStacksMutex.Lock()
 	ret, specificReturn := fake.getStacksReturnsOnCall[len(fake.getStacksArgsForCall)]
 	fake.getStacksArgsForCall = append(fake.getStacksArgsForCall, struct {
 		queries []ccv2.Query
-	}{queriesCopy})
-	fake.recordInvocation("GetStacks", []interface{}{queriesCopy})
+	}{queries})
+	fake.recordInvocation("GetStacks", []interface{}{queries})
 	fake.getStacksMutex.Unlock()
 	if fake.GetStacksStub != nil {
-		return fake.GetStacksStub(queries)
+		return fake.GetStacksStub(queries...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3

@@ -198,11 +198,11 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("returns the shared domain and warnings", func() {
-				domains, warnings, err := client.GetSharedDomains([]Query{{
+				domains, warnings, err := client.GetSharedDomains(Query{
 					Filter:   NameFilter,
 					Operator: InOperator,
 					Values:   []string{"domain-name-1", "domain-name-2", "domain-name-3", "domain-name-4"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domains).To(Equal([]Domain{
 					{
@@ -250,7 +250,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				domains, warnings, err := client.GetSharedDomains(nil)
+				domains, warnings, err := client.GetSharedDomains()
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        1,
@@ -325,7 +325,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("returns the domains and warnings", func() {
-				domains, warnings, err := client.GetOrganizationPrivateDomains("some-org-guid", []Query{})
+				domains, warnings, err := client.GetOrganizationPrivateDomains("some-org-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domains).To(Equal([]Domain{
 					{
@@ -358,13 +358,12 @@ var _ = Describe("Domain", func() {
 					),
 				)
 
-				client.GetOrganizationPrivateDomains("some-org-guid", []Query{{
+				client.GetOrganizationPrivateDomains("some-org-guid", Query{
 					Filter:   NameFilter,
 					Operator: EqualOperator,
 					Values:   []string{"private-domain-name"},
-				}})
+				})
 			})
-
 		})
 
 		Context("when the cloud controller returns an error", func() {
@@ -381,8 +380,9 @@ var _ = Describe("Domain", func() {
 					),
 				)
 			})
+
 			It("returns the warnings and error", func() {
-				domains, warnings, err := client.GetOrganizationPrivateDomains("some-org-guid", []Query{})
+				domains, warnings, err := client.GetOrganizationPrivateDomains("some-org-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The organization could not be found: glah",
 				}))
@@ -390,7 +390,5 @@ var _ = Describe("Domain", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
-
 	})
-
 })

@@ -179,7 +179,7 @@ var _ = Describe("Route Actions", func() {
 
 	Describe("GetOrphanedRoutesBySpace", func() {
 		BeforeEach(func() {
-			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
+			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string, queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
 				switch routeGUID {
 				case "orphaned-route-guid-1":
 					return []ccv2.Application{}, nil, nil

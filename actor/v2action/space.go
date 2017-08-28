@@ -68,13 +68,11 @@ func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgNam
 
 // GetOrganizationSpaces returns a list of spaces in the specified org
 func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, error) {
-	query := []ccv2.Query{
-		{
-			Filter:   ccv2.OrganizationGUIDFilter,
-			Operator: ccv2.EqualOperator,
-			Values:   []string{orgGUID},
-		}}
-	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(query)
+	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(ccv2.Query{
+		Filter:   ccv2.OrganizationGUIDFilter,
+		Operator: ccv2.EqualOperator,
+		Values:   []string{orgGUID},
+	})
 	if err != nil {
 		return []Space{}, Warnings(warnings), err
 	}
@@ -89,20 +87,18 @@ func (actor Actor) GetOrganizationSpaces(orgGUID string) ([]Space, Warnings, err
 
 // GetSpaceByOrganizationAndName returns an Space based on the org and name.
 func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName string) (Space, Warnings, error) {
-	query := []ccv2.Query{
-		{
+	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+		ccv2.Query{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{spaceName},
 		},
-		{
+		ccv2.Query{
 			Filter:   ccv2.OrganizationGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{orgGUID},
 		},
-	}
-
-	ccv2Spaces, warnings, err := actor.CloudControllerClient.GetSpaces(query)
+	)
 	if err != nil {
 		return Space{}, Warnings(warnings), err
 	}

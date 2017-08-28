@@ -347,11 +347,11 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetRoutes([]Query{{
+				routes, warnings, err := client.GetRoutes(Query{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-org-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
@@ -407,7 +407,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an error", func() {
-				_, _, err := client.GetRoutes(nil)
+				_, _, err := client.GetRoutes()
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V2ErrorResponse: ccerror.V2ErrorResponse{
@@ -500,11 +500,11 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", []Query{{
+				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", Query{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-org-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
@@ -559,7 +559,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an empty list of routes", func() {
-				routes, _, err := client.GetApplicationRoutes("some-app-guid", nil)
+				routes, _, err := client.GetApplicationRoutes("some-app-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(BeEmpty())
 			})
@@ -581,7 +581,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an error", func() {
-				routes, _, err := client.GetApplicationRoutes("some-app-guid", nil)
+				routes, _, err := client.GetApplicationRoutes("some-app-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The app could not be found: some-app-guid",
 				}))
@@ -670,11 +670,11 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", []Query{{
+				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", Query{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
@@ -729,7 +729,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an empty list of routes", func() {
-				routes, _, err := client.GetSpaceRoutes("some-space-guid", nil)
+				routes, _, err := client.GetSpaceRoutes("some-space-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(BeEmpty())
 			})
@@ -751,7 +751,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an error", func() {
-				routes, _, err := client.GetSpaceRoutes("some-space-guid", nil)
+				routes, _, err := client.GetSpaceRoutes("some-space-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The app space could not be found: some-space-guid",
 				}))

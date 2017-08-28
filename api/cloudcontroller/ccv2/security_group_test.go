@@ -170,11 +170,11 @@ var _ = Describe("Security Groups", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					securityGroups, warnings, err := client.GetSecurityGroups([]Query{{
+					securityGroups, warnings, err := client.GetSecurityGroups(Query{
 						Filter:   "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
-					}})
+					})
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(securityGroups).To(Equal([]SecurityGroup{
@@ -213,7 +213,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns an error and all warnings", func() {
-				_, warnings, err := client.GetSecurityGroups(nil)
+				_, warnings, err := client.GetSecurityGroups()
 
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
@@ -325,11 +325,11 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the running security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", []Query{{
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", Query{
 					Filter:   "some-query",
 					Operator: EqualOperator,
 					Values:   []string{"some-value"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
@@ -407,7 +407,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", nil)
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
@@ -514,11 +514,11 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the staging security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", []Query{{
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", Query{
 					Filter:   "some-query",
 					Operator: EqualOperator,
 					Values:   []string{"some-value"},
-				}})
+				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning", "this is another warning"))
 				Expect(securityGroups).To(ConsistOf(
@@ -596,7 +596,7 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", nil)
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid")
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The space could not be found: some-space-guid",
 				}))
