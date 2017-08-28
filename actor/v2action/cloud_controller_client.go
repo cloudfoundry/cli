@@ -37,7 +37,7 @@ type CloudControllerClient interface {
 	GetServiceInstance(serviceInstanceGUID string) (ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetServiceInstances(queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetSharedDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
-	GetSharedDomains() ([]ccv2.Domain, ccv2.Warnings, error)
+	GetSharedDomains(queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
 	GetSpaceQuota(guid string) (ccv2.SpaceQuota, ccv2.Warnings, error)
 	GetSpaceRoutes(spaceGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries []ccv2.Query) ([]ccv2.SecurityGroup, ccv2.Warnings, error)

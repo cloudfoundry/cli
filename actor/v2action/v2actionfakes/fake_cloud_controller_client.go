@@ -475,10 +475,12 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
-	GetSharedDomainsStub        func() ([]ccv2.Domain, ccv2.Warnings, error)
+	GetSharedDomainsStub        func(queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
 	getSharedDomainsMutex       sync.RWMutex
-	getSharedDomainsArgsForCall []struct{}
-	getSharedDomainsReturns     struct {
+	getSharedDomainsArgsForCall []struct {
+		queries []ccv2.Query
+	}
+	getSharedDomainsReturns struct {
 		result1 []ccv2.Domain
 		result2 ccv2.Warnings
 		result3 error
@@ -2528,14 +2530,21 @@ func (fake *FakeCloudControllerClient) GetSharedDomainReturnsOnCall(i int, resul
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetSharedDomains() ([]ccv2.Domain, ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetSharedDomains(queries []ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error) {
+	var queriesCopy []ccv2.Query
+	if queries != nil {
+		queriesCopy = make([]ccv2.Query, len(queries))
+		copy(queriesCopy, queries)
+	}
 	fake.getSharedDomainsMutex.Lock()
 	ret, specificReturn := fake.getSharedDomainsReturnsOnCall[len(fake.getSharedDomainsArgsForCall)]
-	fake.getSharedDomainsArgsForCall = append(fake.getSharedDomainsArgsForCall, struct{}{})
-	fake.recordInvocation("GetSharedDomains", []interface{}{})
+	fake.getSharedDomainsArgsForCall = append(fake.getSharedDomainsArgsForCall, struct {
+		queries []ccv2.Query
+	}{queriesCopy})
+	fake.recordInvocation("GetSharedDomains", []interface{}{queriesCopy})
 	fake.getSharedDomainsMutex.Unlock()
 	if fake.GetSharedDomainsStub != nil {
-		return fake.GetSharedDomainsStub()
+		return fake.GetSharedDomainsStub(queries)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -2547,6 +2556,12 @@ func (fake *FakeCloudControllerClient) GetSharedDomainsCallCount() int {
 	fake.getSharedDomainsMutex.RLock()
 	defer fake.getSharedDomainsMutex.RUnlock()
 	return len(fake.getSharedDomainsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetSharedDomainsArgsForCall(i int) []ccv2.Query {
+	fake.getSharedDomainsMutex.RLock()
+	defer fake.getSharedDomainsMutex.RUnlock()
+	return fake.getSharedDomainsArgsForCall[i].queries
 }
 
 func (fake *FakeCloudControllerClient) GetSharedDomainsReturns(result1 []ccv2.Domain, result2 ccv2.Warnings, result3 error) {

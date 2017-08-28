@@ -96,7 +96,7 @@ func (actor Actor) GetOrganizationDomains(orgGUID string) ([]Domain, Warnings, e
 	var allWarnings Warnings
 	var allDomains []Domain
 
-	domains, warnings, err := actor.CloudControllerClient.GetSharedDomains()
+	domains, warnings, err := actor.CloudControllerClient.GetSharedDomains(nil)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
