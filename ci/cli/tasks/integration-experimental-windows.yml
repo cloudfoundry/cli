@@ -2,7 +2,7 @@
 platform: windows
 
 inputs:
-- name: cli-integration
+- name: cli
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lite-lock
