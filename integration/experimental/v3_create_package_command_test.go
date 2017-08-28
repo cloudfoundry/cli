@@ -28,7 +28,9 @@ var _ = Describe("v3-create-package command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("v3-create-package - \\*\\*EXPERIMENTAL\\*\\* Uploads a V3 Package"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf v3-create-package APP_NAME"))
+				Eventually(session).Should(Say("cf v3-create-package APP_NAME \\[--docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]\\]"))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("--docker-image, -o\\s+Docker-image to be used \\(e.g. user/docker-image-name\\)"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -110,7 +112,7 @@ var _ = Describe("v3-create-package command", func() {
 			It("returns a not found error", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Uploading V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Uploading and creating bits package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -125,10 +127,23 @@ var _ = Describe("v3-create-package command", func() {
 			It("creates the package", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Uploading V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Uploading and creating bits package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+			})
+
+			Context("when the --docker-image flag is provided", func() {
+				Context("when the docker-image exists", func() {
+					It("creates the package", func() {
+						session := helpers.CF("v3-create-package", appName, "--docker-image", PublicDockerImage)
+						userName, _ := helpers.GetCredentials()
+						Eventually(session).Should(Say("Creating docker package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+						Eventually(session).Should(Say("OK"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 	})

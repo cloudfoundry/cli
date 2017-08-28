@@ -13,12 +13,14 @@ import (
 //go:generate counterfeiter . V3CreatePackageActor
 
 type V3CreatePackageActor interface {
-	CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerPath string) (v3action.Package, v3action.Warnings, error)
 }
 
 type V3CreatePackageCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-create-package APP_NAME"`
+	RequiredArgs flag.AppName     `positional-args:"yes"`
+	DockerImage  flag.DockerImage `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
+	usage        interface{}      `usage:"CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
 
 	UI          command.UI
 	Config      command.Config
@@ -54,19 +56,35 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayTextWithFlavor("Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-		"AppName":      cmd.RequiredArgs.AppName,
-		"CurrentSpace": cmd.Config.TargetedSpace().Name,
-		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-		"CurrentUser":  user.Name,
-	})
+	var (
+		pkg      v3action.Package
+		warnings v3action.Warnings
+	)
 
-	pwd, err := os.Getwd()
-	if err != nil {
-		return shared.HandleError(err)
+	if cmd.DockerImage.Path != "" {
+		cmd.UI.DisplayTextWithFlavor("Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+			"AppName":      cmd.RequiredArgs.AppName,
+			"CurrentSpace": cmd.Config.TargetedSpace().Name,
+			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+			"CurrentUser":  user.Name,
+		})
+
+		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DockerImage.Path)
+	} else {
+		cmd.UI.DisplayTextWithFlavor("Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+			"AppName":      cmd.RequiredArgs.AppName,
+			"CurrentSpace": cmd.Config.TargetedSpace().Name,
+			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+			"CurrentUser":  user.Name,
+		})
+
+		pwd, osErr := os.Getwd()
+		if osErr != nil {
+			return shared.HandleError(osErr)
+		}
+		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
 	}
 
-	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

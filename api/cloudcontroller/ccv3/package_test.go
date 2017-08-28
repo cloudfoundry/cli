@@ -110,8 +110,72 @@ var _ = Describe("Package", func() {
 
 	Describe("CreatePackage", func() {
 		Context("when the package successfully is created", func() {
-			BeforeEach(func() {
-				response := `{
+			Context("when creating a docker package", func() {
+				BeforeEach(func() {
+					response := `{
+					"data": {
+						"image": "some-docker-image"
+					},
+					"guid": "some-pkg-guid",
+					"type": "docker",
+					"state": "PROCESSING_UPLOAD",
+					"links": {
+						"upload": {
+							"href": "some-package-upload-url",
+							"method": "POST"
+						}
+					}
+				}`
+
+					expectedBody := map[string]interface{}{
+						"type": "docker",
+						"data": map[string]string{
+							"image": "some-docker-image",
+						},
+						"relationships": map[string]interface{}{
+							"app": map[string]interface{}{
+								"data": map[string]string{
+									"guid": "some-app-guid",
+								},
+							},
+						},
+					}
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/packages"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the created package and warnings", func() {
+					pkg, warnings, err := client.CreatePackage(Package{
+						Type: PackageTypeDocker,
+						Relationships: Relationships{
+							ApplicationRelationship: Relationship{GUID: "some-app-guid"},
+						},
+						DockerImage: "some-docker-image",
+					})
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+
+					expectedPackage := Package{
+						GUID:  "some-pkg-guid",
+						Type:  PackageTypeDocker,
+						State: PackageStateProcessingUpload,
+						Links: map[string]APILink{
+							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+						},
+						DockerImage: "some-docker-image",
+					}
+					Expect(pkg).To(Equal(expectedPackage))
+				})
+			})
+			Context("when creating a bits package", func() {
+				BeforeEach(func() {
+					response := `{
 					"guid": "some-pkg-guid",
 					"type": "bits",
 					"state": "PROCESSING_UPLOAD",
@@ -123,45 +187,46 @@ var _ = Describe("Package", func() {
 					}
 				}`
 
-				expectedBody := map[string]interface{}{
-					"type": "bits",
-					"relationships": map[string]interface{}{
-						"app": map[string]interface{}{
-							"data": map[string]string{
-								"guid": "some-app-guid",
+					expectedBody := map[string]interface{}{
+						"type": "bits",
+						"relationships": map[string]interface{}{
+							"app": map[string]interface{}{
+								"data": map[string]string{
+									"guid": "some-app-guid",
+								},
 							},
 						},
-					},
-				}
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/packages"),
-						VerifyJSONRepresenting(expectedBody),
-						RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
-
-			It("returns the created package and warnings", func() {
-				pkg, warnings, err := client.CreatePackage(Package{
-					Type: PackageTypeBits,
-					Relationships: Relationships{
-						ApplicationRelationship: Relationship{GUID: "some-app-guid"},
-					},
+					}
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/packages"),
+							VerifyJSONRepresenting(expectedBody),
+							RespondWith(http.StatusCreated, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
 				})
 
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
+				It("omits data, and returns the created package and warnings", func() {
+					pkg, warnings, err := client.CreatePackage(Package{
+						Type: PackageTypeBits,
+						Relationships: Relationships{
+							ApplicationRelationship: Relationship{GUID: "some-app-guid"},
+						},
+					})
 
-				expectedPackage := Package{
-					GUID:  "some-pkg-guid",
-					Type:  PackageTypeBits,
-					State: PackageStateProcessingUpload,
-					Links: map[string]APILink{
-						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
-					},
-				}
-				Expect(pkg).To(Equal(expectedPackage))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+
+					expectedPackage := Package{
+						GUID:  "some-pkg-guid",
+						Type:  PackageTypeBits,
+						State: PackageStateProcessingUpload,
+						Links: map[string]APILink{
+							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
+						},
+					}
+					Expect(pkg).To(Equal(expectedPackage))
+				})
 			})
 		})
 

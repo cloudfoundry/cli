@@ -1752,7 +1752,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-package APP_NAME",
+    "id": "CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]",
     "translation": ""
   },
   {
@@ -2154,6 +2154,10 @@
   {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "Erstellen von Buildpack {{.BuildpackName}}..."
+  },
+  {
+    "id": "Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
@@ -6552,7 +6556,7 @@
     "translation": "Aktualisieren des 'health_check_type' der App {{.AppName}} auf '{{.HealthCheckType}}'"
   },
   {
-    "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "id": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {

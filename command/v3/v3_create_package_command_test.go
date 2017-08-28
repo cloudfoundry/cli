@@ -80,47 +80,76 @@ var _ = Describe("v3-create-package Command", func() {
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		Context("when the create is successful", func() {
-			BeforeEach(func() {
-				myPackage := v3action.Package{GUID: "1234"}
-				fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+		Context("when no flags are set", func() {
+			Context("when the create is successful", func() {
+				BeforeEach(func() {
+					myPackage := v3action.Package{GUID: "1234"}
+					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				})
+
+				It("displays the header and ok", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(testUI.Out).To(Say("Uploading and creating bits package for V3 app some-app in org some-org / space some-space as banana..."))
+					Expect(testUI.Out).To(Say("package guid: 1234"))
+					Expect(testUI.Out).To(Say("OK"))
+
+					Expect(testUI.Err).To(Say("I am a warning"))
+					Expect(testUI.Err).To(Say("I am also a warning"))
+
+					Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+
+					appName, spaceGUID, bitsPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
+					Expect(appName).To(Equal(app))
+					Expect(spaceGUID).To(Equal("some-space-guid"))
+					Expect(bitsPath).To(Equal(path))
+				})
 			})
 
-			It("displays the header and ok", func() {
+			Context("when the create is unsuccessful", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("I am an error")
+					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+				})
+
+				It("displays the header and error", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+
+					Expect(testUI.Out).To(Say("Uploading and creating bits package for V3 app some-app in org some-org / space some-space as banana..."))
+
+					Expect(testUI.Err).To(Say("I am a warning"))
+					Expect(testUI.Err).To(Say("I am also a warning"))
+				})
+			})
+		})
+
+		Context("when the --docker-image flag is set", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+			})
+
+			It("creates the docker package", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(testUI.Out).To(Say("Uploading V3 app some-app in org some-org / space some-space as banana..."))
+				Expect(testUI.Out).To(Say("Creating docker package for V3 app some-app in org some-org / space some-space as banana..."))
 				Expect(testUI.Out).To(Say("package guid: 1234"))
 				Expect(testUI.Out).To(Say("OK"))
 
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
-				Expect(fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(0))
+				Expect(fakeActor.CreateDockerPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
 
-				appName, spaceGUID, bitsPath := fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceArgsForCall(0)
+				appName, spaceGUID, dockerImage := fakeActor.CreateDockerPackageByApplicationNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal(app))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
-				Expect(bitsPath).To(Equal(path))
-			})
-		})
-
-		Context("when the create is unsuccessful", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("I am an error")
-				fakeActor.CreateAndUploadPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+				Expect(dockerImage).To(Equal("some-docker-image"))
 			})
 
-			It("displays the header and error", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-
-				Expect(testUI.Out).To(Say("Uploading V3 app some-app in org some-org / space some-space as banana..."))
-
-				Expect(testUI.Err).To(Say("I am a warning"))
-				Expect(testUI.Err).To(Say("I am also a warning"))
-			})
 		})
 	})
 })

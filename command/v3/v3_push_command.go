@@ -23,7 +23,7 @@ type V2PushActor interface {
 //go:generate counterfeiter . V3PushActor
 
 type V3PushActor interface {
-	CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
@@ -285,7 +285,7 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 		}
 	}
 
-	pkg, warnings, err := cmd.Actor.CreateAndUploadPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, appPath)
+	pkg, warnings, err := cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, appPath)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err

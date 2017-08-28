@@ -33,12 +33,67 @@ const (
 )
 
 type Package struct {
-	GUID          string        `json:"guid,omitempty"`
-	CreatedAt     string        `json:"created_at,omitempty"`
-	Links         APILinks      `json:"links,omitempty"`
-	Relationships Relationships `json:"relationships,omitempty"`
-	State         PackageState  `json:"state,omitempty"`
-	Type          PackageType   `json:"type,omitempty"`
+	GUID          string
+	CreatedAt     string
+	Links         APILinks
+	Relationships Relationships
+	State         PackageState
+	Type          PackageType
+	DockerImage   string
+}
+
+func (p Package) MarshalJSON() ([]byte, error) {
+	type ccPackageData struct {
+		Image string `json:"image,omitempty"`
+	}
+	var ccPackage struct {
+		GUID          string         `json:"guid,omitempty"`
+		CreatedAt     string         `json:"created_at,omitempty"`
+		Links         APILinks       `json:"links,omitempty"`
+		Relationships Relationships  `json:"relationships,omitempty"`
+		State         PackageState   `json:"state,omitempty"`
+		Type          PackageType    `json:"type,omitempty"`
+		Data          *ccPackageData `json:"data,omitempty"`
+	}
+
+	ccPackage.GUID = p.GUID
+	ccPackage.CreatedAt = p.CreatedAt
+	ccPackage.Links = p.Links
+	ccPackage.Relationships = p.Relationships
+	ccPackage.State = p.State
+	ccPackage.Type = p.Type
+	if p.DockerImage != "" {
+		ccPackage.Data = &ccPackageData{Image: p.DockerImage}
+	}
+
+	return json.Marshal(ccPackage)
+}
+
+func (p *Package) UnmarshalJSON(data []byte) error {
+	var ccPackage struct {
+		GUID          string        `json:"guid,omitempty"`
+		CreatedAt     string        `json:"created_at,omitempty"`
+		Links         APILinks      `json:"links,omitempty"`
+		Relationships Relationships `json:"relationships,omitempty"`
+		State         PackageState  `json:"state,omitempty"`
+		Type          PackageType   `json:"type,omitempty"`
+		Data          struct {
+			Image string `json:"image"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(data, &ccPackage); err != nil {
+		return err
+	}
+
+	p.GUID = ccPackage.GUID
+	p.CreatedAt = ccPackage.CreatedAt
+	p.Links = ccPackage.Links
+	p.Relationships = ccPackage.Relationships
+	p.State = ccPackage.State
+	p.Type = ccPackage.Type
+	p.DockerImage = ccPackage.Data.Image
+
+	return nil
 }
 
 // GetPackage returns the package with the given GUID.

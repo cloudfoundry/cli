@@ -44,7 +44,27 @@ func (e EmptyDirectoryError) Error() string {
 	return fmt.Sprint(e.Path, "is empty")
 }
 
-func (actor Actor) CreateAndUploadPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {
+func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerPath string) (Package, Warnings, error) {
+	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+	inputPackage := ccv3.Package{
+		Type: ccv3.PackageTypeDocker,
+		Relationships: ccv3.Relationships{
+			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
+		},
+		DockerImage: dockerPath,
+	}
+	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return Package{}, allWarnings, err
+	}
+	return Package(pkg), allWarnings, err
+}
+
+func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return Package{}, allWarnings, err

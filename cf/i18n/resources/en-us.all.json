@@ -1752,8 +1752,8 @@
     "translation": "CF_NAME v3-create-app APP_NAME"
   },
   {
-    "id": "CF_NAME v3-create-package APP_NAME",
-    "translation": "CF_NAME v3-create-package APP_NAME"
+    "id": "CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]",
+    "translation": "CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"
   },
   {
     "id": "CF_NAME v3-delete APP_NAME [-f]",
@@ -2154,6 +2154,10 @@
   {
     "id": "Creating buildpack {{.BuildpackName}}...",
     "translation": "Creating buildpack {{.BuildpackName}}..."
+  },
+  {
+    "id": "Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
@@ -6552,8 +6556,8 @@
     "translation": "Updating {{.AppName}} health_check_type to '{{.HealthCheckType}}'"
   },
   {
-    "id": "Uploading V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
+    "id": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
   },
   {
     "id": "Uploading app files from: {{.Path}}",
