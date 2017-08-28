@@ -10,8 +10,10 @@ import (
 
 // Domain represents a Cloud Controller Domain.
 type Domain struct {
-	GUID string
-	Name string
+	GUID            string
+	Name            string
+	RouterGroupGUID string
+	RouterGroupType string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Domain response.
@@ -19,7 +21,9 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 	var ccDomain struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Name string `json:"name"`
+			Name            string `json:"name"`
+			RouterGroupGUID string `json:"router_group_guid"`
+			RouterGroupType string `json:"router_group_type"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccDomain); err != nil {
@@ -28,6 +32,8 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 
 	domain.GUID = ccDomain.Metadata.GUID
 	domain.Name = ccDomain.Entity.Name
+	domain.RouterGroupGUID = ccDomain.Entity.RouterGroupGUID
+	domain.RouterGroupType = ccDomain.Entity.RouterGroupType
 	return nil
 }
 
@@ -80,9 +86,10 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 }
 
 // GetSharedDomains returns the global shared domains.
-func (client *Client) GetSharedDomains() ([]Domain, Warnings, error) {
+func (client *Client) GetSharedDomains(queries []Query) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSharedDomainsRequest,
+		Query:       FormatQueryParameters(queries),
 	})
 	if err != nil {
 		return []Domain{}, nil, err

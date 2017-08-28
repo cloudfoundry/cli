@@ -26,7 +26,9 @@ var _ = Describe("Domain", func() {
 							"updated_at": null
 						},
 						"entity": {
-							"name": "shared-domain-1.com"
+							"name": "shared-domain-1.com",
+							"router_group_guid": "some-router-group-guid",
+							"router_group_type": "some-router-group-type"
 						}
 				}`
 				server.AppendHandlers(
@@ -40,7 +42,12 @@ var _ = Describe("Domain", func() {
 			It("returns the shared domain and all warnings", func() {
 				domain, warnings, err := client.GetSharedDomain("shared-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(domain).To(Equal(Domain{Name: "shared-domain-1.com", GUID: "shared-domain-guid"}))
+				Expect(domain).To(Equal(Domain{
+					Name:            "shared-domain-1.com",
+					GUID:            "shared-domain-guid",
+					RouterGroupGUID: "some-router-group-guid",
+					RouterGroupType: "some-router-group-type",
+				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
@@ -127,80 +134,100 @@ var _ = Describe("Domain", func() {
 		Context("when the cloud controller does not return an error", func() {
 			BeforeEach(func() {
 				response1 := `{
-				"next_url": "/v2/shared_domains?page=2",
-				"resources": [
-					{
-						"metadata": {
-							"guid": "domain-guid-1"
+					"next_url": "/v2/shared_domains?q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "domain-guid-1"
+							},
+							"entity": {
+								"name": "domain-name-1",
+								"router_group_guid": "some-router-group-guid-1",
+								"router_group_type": "some-router-group-type-1"
+							}
 						},
-						"entity": {
-							"name": "domain-name-1"
+						{
+							"metadata": {
+								"guid": "domain-guid-2"
+							},
+							"entity": {
+								"name": "domain-name-2",
+								"router_group_guid": "some-router-group-guid-2",
+								"router_group_type": "some-router-group-type-2"
+							}
 						}
-					},
-					{
-						"metadata": {
-							"guid": "domain-guid-2"
-						},
-						"entity": {
-							"name": "domain-name-2"
-						}
-					}
-				]
-			}`
+					]
+				}`
 				response2 := `{
-				"next_url": null,
-				"resources": [
-					{
-						"metadata": {
-							"guid": "domain-guid-3"
+					"next_url": null,
+					"resources": [
+						{
+							"metadata": {
+								"guid": "domain-guid-3"
+							},
+							"entity": {
+								"name": "domain-name-3",
+								"router_group_guid": "some-router-group-guid-3",
+								"router_group_type": "some-router-group-type-3"
+							}
 						},
-						"entity": {
-							"name": "domain-name-3"
+						{
+							"metadata": {
+								"guid": "domain-guid-4"
+							},
+							"entity": {
+								"name": "domain-name-4",
+								"router_group_guid": "some-router-group-guid-4",
+								"router_group_type": "some-router-group-type-4"
+							}
 						}
-					},
-					{
-						"metadata": {
-							"guid": "domain-guid-4"
-						},
-						"entity": {
-							"name": "domain-name-4"
-						}
-					}
-				]
-			}`
+					]
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/shared_domains"),
+						VerifyRequest(http.MethodGet, "/v2/shared_domains", "q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/shared_domains", "page=2"),
+						VerifyRequest(http.MethodGet, "/v2/shared_domains", "q=name%20IN%20domain-name-1,domain-name-2,domain-name-3,domain-name-4&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
 			It("returns the shared domain and warnings", func() {
-				domains, warnings, err := client.GetSharedDomains()
+				domains, warnings, err := client.GetSharedDomains([]Query{{
+					Filter:   NameFilter,
+					Operator: InOperator,
+					Values:   []string{"domain-name-1", "domain-name-2", "domain-name-3", "domain-name-4"},
+				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domains).To(Equal([]Domain{
 					{
-						GUID: "domain-guid-1",
-						Name: "domain-name-1",
+						GUID:            "domain-guid-1",
+						Name:            "domain-name-1",
+						RouterGroupGUID: "some-router-group-guid-1",
+						RouterGroupType: "some-router-group-type-1",
 					},
 					{
-						GUID: "domain-guid-2",
-						Name: "domain-name-2",
+						GUID:            "domain-guid-2",
+						Name:            "domain-name-2",
+						RouterGroupGUID: "some-router-group-guid-2",
+						RouterGroupType: "some-router-group-type-2",
 					},
 					{
-						GUID: "domain-guid-3",
-						Name: "domain-name-3",
+						GUID:            "domain-guid-3",
+						Name:            "domain-name-3",
+						RouterGroupGUID: "some-router-group-guid-3",
+						RouterGroupType: "some-router-group-type-3",
 					},
 					{
-						GUID: "domain-guid-4",
-						Name: "domain-name-4",
+						GUID:            "domain-guid-4",
+						Name:            "domain-name-4",
+						RouterGroupGUID: "some-router-group-guid-4",
+						RouterGroupType: "some-router-group-type-4",
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
@@ -223,7 +250,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				domains, warnings, err := client.GetSharedDomains()
+				domains, warnings, err := client.GetSharedDomains(nil)
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					V2ErrorResponse: ccerror.V2ErrorResponse{
 						Code:        1,
