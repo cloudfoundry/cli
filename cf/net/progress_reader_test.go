@@ -1,3 +1,5 @@
+// +build windows
+
 package net_test
 
 import (
