@@ -61,6 +61,9 @@ applications:
   disk_quota: 1G
   instances: 0
   memory: 2G
+  routes:
+  - route: foo.bar.com
+  - route: baz.qux.com
   services:
   - service_1
   - service_2
@@ -109,6 +112,7 @@ applications:
 						Value: 0,
 					},
 					Memory:   2048,
+					Routes:   []string{"foo.bar.com", "baz.qux.com"},
 					Services: []string{"service_1", "service_2"},
 				},
 				Application{
