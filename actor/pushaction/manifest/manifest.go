@@ -38,13 +38,14 @@ type Application struct {
 	Memory    uint64
 	Name      string
 	Path      string
+	Routes    []string
 	Services  []string
 	StackName string
 }
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -59,6 +60,7 @@ func (app Application) String() string {
 		app.Instances.Value,
 		app.Memory,
 		app.Path,
+		strings.Join(app.Routes, ", "),
 		strings.Join(app.Services, ", "),
 		app.StackName,
 	)
@@ -76,9 +78,12 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 		Memory                  string            `yaml:"memory"`
 		Name                    string            `yaml:"name"`
 		Path                    string            `yaml:"path"`
-		Services                []string          `yaml:"services"`
-		StackName               string            `yaml:"stack"`
-		Timeout                 int               `yaml:"timeout"`
+		Routes                  []struct {
+			Route string `json:"route"`
+		} `json:"routes"`
+		Services  []string `yaml:"services"`
+		StackName string   `yaml:"stack"`
+		Timeout   int      `yaml:"timeout"`
 	}
 
 	err := unmarshaller(&manifestApp)
@@ -117,6 +122,10 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 			return err
 		}
 		app.Memory = memory
+	}
+
+	for _, route := range manifestApp.Routes {
+		app.Routes = append(app.Routes, route.Route)
 	}
 
 	return nil
