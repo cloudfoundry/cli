@@ -62,6 +62,12 @@ var HelpCategoryList = []HelpCategory{
 		},
 	},
 	{
+		CategoryName: "NETWORK POLICIES:",
+		CommandList: [][]string{
+			{"network-policies", "add-network-policy", "remove-network-policy"},
+		},
+	},
+	{
 		CategoryName: "BUILDPACKS:",
 		CommandList: [][]string{
 			{"buildpacks", "create-buildpack", "update-buildpack", "rename-buildpack", "delete-buildpack"},

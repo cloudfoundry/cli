@@ -531,6 +531,11 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   routes\\s+List all routes in the current space or the current organization"))
 				Expect(testUI.Out).To(Say("   unmap-route\\s+Remove a url route from an app"))
 
+				Expect(testUI.Out).To(Say("NETWORK POLICIES:"))
+				Expect(testUI.Out).To(Say("   network-policies\\s+List direct network traffic policies"))
+				Expect(testUI.Out).To(Say("   add-network-policy\\s+Allow direct network traffic from one app to another"))
+				Expect(testUI.Out).To(Say("   remove-network-policy\\s+Remove direct network traffic from one app to another"))
+
 				Expect(testUI.Out).To(Say("BUILDPACKS:"))
 				Expect(testUI.Out).To(Say("   buildpacks\\s+List all buildpacks"))
 				Expect(testUI.Out).To(Say("   delete-buildpack\\s+Delete a buildpack"))
