@@ -115,9 +115,8 @@ var _ = Describe("network-policies Command", func() {
 				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
 
 				Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
-				Expect(testUI.Out).To(Say("OK"))
 				Expect(testUI.Out).To(Say("\n\n"))
-				Expect(testUI.Out).To(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Expect(testUI.Out).To(Say("source\\s+destination\\s+protocol\\s+ports"))
 				Expect(testUI.Out).To(Say("app1\\s+app2\\s+tcp\\s+8080-8090"))
 				Expect(testUI.Out).To(Say("app2\\s+app1\\s+udp\\s+1234-2345"))
 
@@ -153,9 +152,8 @@ var _ = Describe("network-policies Command", func() {
 					Expect(passedSrcAppName).To(Equal("some-app"))
 
 					Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
-					Expect(testUI.Out).To(Say("OK"))
 					Expect(testUI.Out).To(Say("\n\n"))
-					Expect(testUI.Out).To(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+					Expect(testUI.Out).To(Say("source\\s+destination\\s+protocol\\s+ports"))
 					Expect(testUI.Out).To(Say("app1\\s+app2\\s+tcp\\s+8080-8090"))
 					Expect(testUI.Out).To(Say("app2\\s+app1\\s+udp\\s+1234-2345"))
 
@@ -176,7 +174,6 @@ var _ = Describe("network-policies Command", func() {
 				Expect(testUI.Out).To(Say(`Listing network traffic as some-user\.\.\.`))
 				Expect(testUI.Err).To(Say("some-warning-1"))
 				Expect(testUI.Err).To(Say("some-warning-2"))
-				Expect(testUI.Out).ToNot(Say("OK"))
 			})
 		})
 	})

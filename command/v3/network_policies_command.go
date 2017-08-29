@@ -77,15 +77,14 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
 	table := [][]string{
 		{
-			cmd.UI.TranslateText("Source"),
-			cmd.UI.TranslateText("Destination"),
-			cmd.UI.TranslateText("Protocol"),
-			cmd.UI.TranslateText("Ports"),
+			cmd.UI.TranslateText("source"),
+			cmd.UI.TranslateText("destination"),
+			cmd.UI.TranslateText("protocol"),
+			cmd.UI.TranslateText("ports"),
 		},
 	}
 
