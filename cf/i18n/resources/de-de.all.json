@@ -348,7 +348,15 @@
     "translation": "SSH-Zugriff für den Bereich ermöglichen"
   },
   {
+    "id": "Allow direct network traffic from one app to another",
+    "translation": ""
+  },
+  {
     "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
+    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -645,6 +653,10 @@
   },
   {
     "id": "CANCELING",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1208,6 +1220,10 @@
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\\n\\nWARNUNG: Diese Operation ist eine interne Operation in Cloud Foundry; Service-Broker werden nicht kontaktiert und Ressourcen für Serviceinstanzen werden nicht geändert. Der wichtigste Anwendungsfall für diese Operation ist das Ersetzen eines Service-Brokers, wobei die V1 Service Broker-API auf einem Broker implementiert wird, der die V2 API durch eine erneute Zuordnung von Serviceinstanzen von V1-Plänen auf V2-Pläne implementiert.  Wir empfehlen den V1-Plan privat zu erstellen oder den V1-Broker zu beenden, um zu verhindern, dass weitere Instanzen erstellt werden. Sobald die Serviceinstanzen migriert wurden, können die V1-Services und -Pläne aus Cloud Foundry entfernt werden."
   },
   {
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -1262,6 +1278,10 @@
   {
     "id": "CF_NAME quotas",
     "translation": "CF_NAME quotas"
+  },
+  {
+    "id": "CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
   },
   {
     "id": "CF_NAME remove-plugin-repo PrivateRepo",
@@ -2440,8 +2460,16 @@
     "translation": "Löschen von Benutzer {{.TargetUser}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "Beschreibung: {{.ServiceDescription}}"
+  },
+  {
+    "id": "Destination",
+    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -3960,6 +3988,10 @@
     "translation": ""
   },
   {
+    "id": "List direct network traffic policies",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "Domänen in der Zielorganisation auflisten"
   },
@@ -4005,6 +4037,10 @@
   },
   {
     "id": "Listing installed plugins...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network traffic as {{.User}}...",
     "translation": ""
   },
   {
@@ -4142,6 +4178,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "Name eines registrierten Repositorys, in dem sich das angegebene Plug-in befindet"
+  },
+  {
+    "id": "Name of app to connect to",
+    "translation": ""
   },
   {
     "id": "Name to give the task (generated if omitted)",
@@ -4488,7 +4528,19 @@
     "translation": "PORT"
   },
   {
+    "id": "PORT must be a positive integer",
+    "translation": ""
+  },
+  {
+    "id": "PORT syntax must match integer[-integer]",
+    "translation": ""
+  },
+  {
     "id": "POSITION",
+    "translation": ""
+  },
+  {
+    "id": "PROTOCOL must be \"tcp\" or \"udp\"",
     "translation": ""
   },
   {
@@ -4720,6 +4772,10 @@
     "translation": ""
   },
   {
+    "id": "Policy does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Port for the TCP route",
     "translation": "Port für die TCP-Route"
   },
@@ -4728,8 +4784,16 @@
     "translation": "Port in HTTP-Route {{.RouteName}} nicht zulässig"
   },
   {
+    "id": "Port or range to connect to destination app with",
+    "translation": ""
+  },
+  {
     "id": "Port used to identify the TCP route",
     "translation": "Für Ermittlung der TCP-Route verwendeter Port"
+  },
+  {
+    "id": "Ports",
+    "translation": ""
   },
   {
     "id": "Prevent use of a feature",
@@ -4770,6 +4834,14 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Eigenschaft '{{.PropertyName}}' wurde im Manifest gefunden. Dieses Feature wird nicht mehr unterstützt. Bitte entfernen Sie es und versuchen Sie es erneut."
+  },
+  {
+    "id": "Protocol",
+    "translation": ""
+  },
+  {
+    "id": "Protocol to connect apps with",
+    "translation": ""
   },
   {
     "id": "Provider",
@@ -4930,6 +5002,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "Eine Organisationsrolle von einem Benutzer entfernen"
+  },
+  {
+    "id": "Remove direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5612,6 +5688,14 @@
     "translation": "Verifizierung des API-Endpunkts überspringen. Nicht empfehlenswert!"
   },
   {
+    "id": "Source",
+    "translation": ""
+  },
+  {
+    "id": "Source app to filter results by (optional)",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "Bereich"
   },
@@ -6124,6 +6208,10 @@
     "translation": "Der Serviceplan, den die Serviceinstanz verwenden wird"
   },
   {
+    "id": "The source app",
+    "translation": ""
+  },
+  {
     "id": "The space",
     "translation": "Der Bereich"
   },
@@ -6213,6 +6301,10 @@
   },
   {
     "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
+    "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
   {
@@ -7549,6 +7641,10 @@
   },
   {
     "id": "uaa",
+    "translation": ""
+  },
+  {
+    "id": "udp",
     "translation": ""
   },
   {

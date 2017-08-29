@@ -74,6 +74,23 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	return Application(apps[0]), Warnings(warnings), nil
 }
 
+// GetApplicationsBySpace returns all applications in a space.
+func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
+	ccv3Apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
+		"space_guids": []string{spaceGUID},
+	})
+
+	if err != nil {
+		return []Application{}, Warnings(warnings), err
+	}
+
+	apps := make([]Application, len(ccv3Apps))
+	for i, ccv3App := range ccv3Apps {
+		apps[i] = Application(ccv3App)
+	}
+	return apps, Warnings(warnings), nil
+}
+
 type CreateApplicationInput struct {
 	AppName    string
 	SpaceGUID  string

@@ -313,3 +313,11 @@ type ResetSpaceIsolationArgs struct {
 type ResetOrgDefaultIsolationArgs struct {
 	OrgName string `positional-arg-name:"ORG_NAME" required:"true" description:"The organization name"`
 }
+
+type AddNetworkPolicyArgs struct {
+	SourceApp string `positional-arg-name:"SOURCE_APP" required:"true" description:"The source app"`
+}
+
+type RemoveNetworkPolicyArgs struct {
+	SourceApp string
+}
