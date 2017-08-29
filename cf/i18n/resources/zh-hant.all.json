@@ -348,7 +348,15 @@
     "translation": "容許空間的 SSH 存取權"
   },
   {
+    "id": "Allow direct network traffic from one app to another",
+    "translation": ""
+  },
+  {
     "id": "Allow use of a feature",
+    "translation": ""
+  },
+  {
+    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -645,6 +653,10 @@
   },
   {
     "id": "CANCELING",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\\n\\nEXAMPLES:\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
     "translation": ""
   },
   {
@@ -1208,6 +1220,10 @@
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\\n\\n警告: 這是 Cloud Foundry 的內部作業；不會聯絡服務分配管理系統，而且不會變更服務實例的資源。此作業的主要用途是透過將服務實例從第 1 版方案重新對映至第 2 版方案，以將實作第 1 版「服務分配管理系統 API」的服務分配管理系統，取代為實作第 2 版 API 的分配管理系統。建議您將第 1 版方案設為專用，或關閉第 1 版分配管理系統，以防止建立其他實例。移轉服務實例之後，即可從 Cloud Foundry 中移除第 1 版服務和方案。"
   },
   {
+    "id": "CF_NAME network-policies [--source SOURCE_APP]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -1262,6 +1278,10 @@
   {
     "id": "CF_NAME quotas",
     "translation": "CF_NAME quotas"
+  },
+  {
+    "id": "CF_NAME remove-network-policy SOURCE_APP --destination-app DESTINATION_APP --protocol (tcp | udp) --port RANGE\\n\\nEXAMPLES:\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8081\\n   CF_NAME remove-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090",
+    "translation": ""
   },
   {
     "id": "CF_NAME remove-plugin-repo PrivateRepo",
@@ -2440,8 +2460,16 @@
     "translation": "正在以 {{.CurrentUser}} 身分刪除使用者 {{.TargetUser}}..."
   },
   {
+    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "說明: {{.ServiceDescription}}"
+  },
+  {
+    "id": "Destination",
+    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -3960,6 +3988,10 @@
     "translation": ""
   },
   {
+    "id": "List direct network traffic policies",
+    "translation": ""
+  },
+  {
     "id": "List domains in the target org",
     "translation": "列出目標組織中的網域"
   },
@@ -4005,6 +4037,10 @@
   },
   {
     "id": "Listing installed plugins...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network traffic as {{.User}}...",
     "translation": ""
   },
   {
@@ -4142,6 +4178,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "所指定外掛程式所在的已登錄儲存庫名稱"
+  },
+  {
+    "id": "Name of app to connect to",
+    "translation": ""
   },
   {
     "id": "Name to give the task (generated if omitted)",
@@ -4488,7 +4528,19 @@
     "translation": "PORT"
   },
   {
+    "id": "PORT must be a positive integer",
+    "translation": ""
+  },
+  {
+    "id": "PORT syntax must match integer[-integer]",
+    "translation": ""
+  },
+  {
     "id": "POSITION",
+    "translation": ""
+  },
+  {
+    "id": "PROTOCOL must be \"tcp\" or \"udp\"",
     "translation": ""
   },
   {
@@ -4720,6 +4772,10 @@
     "translation": ""
   },
   {
+    "id": "Policy does not exist.",
+    "translation": ""
+  },
+  {
     "id": "Port for the TCP route",
     "translation": "TCP 路徑的埠"
   },
@@ -4728,8 +4784,16 @@
     "translation": "HTTP 路徑 {{.RouteName}} 中不接受埠"
   },
   {
+    "id": "Port or range to connect to destination app with",
+    "translation": ""
+  },
+  {
     "id": "Port used to identify the TCP route",
     "translation": "用來識別 TCP 路徑 (route) 的埠"
+  },
+  {
+    "id": "Ports",
+    "translation": ""
   },
   {
     "id": "Prevent use of a feature",
@@ -4770,6 +4834,14 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "在資訊清單中找到內容 '{{.PropertyName}}'。不再支援此特性。請將其移除，然後再試一次。"
+  },
+  {
+    "id": "Protocol",
+    "translation": ""
+  },
+  {
+    "id": "Protocol to connect apps with",
+    "translation": ""
   },
   {
     "id": "Provider",
@@ -4930,6 +5002,10 @@
   {
     "id": "Remove an org role from a user",
     "translation": "從使用者中移除組織角色"
+  },
+  {
+    "id": "Remove direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5612,6 +5688,14 @@
     "translation": "跳過驗證 API 端點。不建議使用！"
   },
   {
+    "id": "Source",
+    "translation": ""
+  },
+  {
+    "id": "Source app to filter results by (optional)",
+    "translation": ""
+  },
+  {
     "id": "Space",
     "translation": "空間"
   },
@@ -6124,6 +6208,10 @@
     "translation": "服務實例將使用的服務方案"
   },
   {
+    "id": "The source app",
+    "translation": ""
+  },
+  {
     "id": "The space",
     "translation": "空間"
   },
@@ -6213,6 +6301,10 @@
   },
   {
     "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
+    "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
   {
@@ -7549,6 +7641,10 @@
   },
   {
     "id": "uaa",
+    "translation": ""
+  },
+  {
+    "id": "udp",
     "translation": ""
   },
   {
