@@ -76,7 +76,7 @@ func (actor Actor) NetworkPoliciesBySpace(spaceGUID string) ([]Policy, Warnings,
 	for _, v1Policy := range v1Policies {
 		policy := actor.transformPolicy(appNameByGuid, v1Policy)
 		if policy != emptyPolicy {
-			policies = append(policies, actor.transformPolicy(appNameByGuid, v1Policy))
+			policies = append(policies, policy)
 		}
 	}
 
@@ -118,7 +118,7 @@ func (actor Actor) NetworkPoliciesBySpaceAndAppName(spaceGUID string, srcAppName
 		if v1Policy.Source.ID == appGUID {
 			policy := actor.transformPolicy(appNameByGuid, v1Policy)
 			if policy != emptyPolicy {
-				policies = append(policies, actor.transformPolicy(appNameByGuid, v1Policy))
+				policies = append(policies, policy)
 			}
 		}
 	}
