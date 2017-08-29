@@ -17,6 +17,7 @@ const (
 )
 
 type Build struct {
+	CreatedAt   string
 	GUID        string
 	Error       string
 	PackageGUID string
@@ -38,9 +39,10 @@ func (b Build) MarshalJSON() ([]byte, error) {
 
 func (b *Build) UnmarshalJSON(data []byte) error {
 	var ccBuild struct {
-		GUID    string `json:"guid,omitempty"`
-		Error   string `json:"error"`
-		Package struct {
+		CreatedAt string `json:"created_at,omitempty"`
+		GUID      string `json:"guid,omitempty"`
+		Error     string `json:"error"`
+		Package   struct {
 			GUID string `json:"guid"`
 		} `json:"package"`
 		State   BuildState `json:"state,omitempty"`
@@ -54,6 +56,7 @@ func (b *Build) UnmarshalJSON(data []byte) error {
 	}
 
 	b.GUID = ccBuild.GUID
+	b.CreatedAt = ccBuild.CreatedAt
 	b.Error = ccBuild.Error
 	b.PackageGUID = ccBuild.Package.GUID
 	b.State = ccBuild.State

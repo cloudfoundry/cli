@@ -107,6 +107,7 @@ var _ = Describe("Build", func() {
 		Context("when the build exist", func() {
 			BeforeEach(func() {
 				response := `{
+					"created_at": "some-time",
 					"guid": "some-build-guid",
 					"state": "FAILED",
 					"error": "some error",
@@ -127,6 +128,7 @@ var _ = Describe("Build", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				expectedBuild := Build{
+					CreatedAt:   "some-time",
 					GUID:        "some-build-guid",
 					State:       BuildStateFailed,
 					Error:       "some error",

@@ -53,11 +53,19 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 			case ccv3.BuildStateStaging:
 				time.Sleep(actor.Config.PollingInterval())
 			default:
-				ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
-				warningsStream <- Warnings(warnings)
-				if err != nil {
-					errorStream <- err
-					return
+
+				//TODO: uncommend after #150569020
+				// ccv3Droplet, warnings, err := actor.CloudControllerClient.GetDroplet(build.DropletGUID)
+				// warningsStream <- Warnings(warnings)
+				// if err != nil {
+				// 	errorStream <- err
+				// 	return
+				// }
+
+				ccv3Droplet := ccv3.Droplet{
+					GUID:      build.DropletGUID,
+					State:     ccv3.DropletState(build.State),
+					CreatedAt: build.CreatedAt,
 				}
 
 				dropletStream <- actor.convertCCToActorDroplet(ccv3Droplet)
