@@ -22,7 +22,6 @@ const (
 	GetAppsRequest                                        = "GetApps"
 	GetBuildRequest                                       = "GetBuild"
 	GetDropletRequest                                     = "GetDroplet"
-	GetProcessInstancesRequest                            = "GetProcessInstances"
 	GetIsolationSegmentOrganizationsRequest               = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                            = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
