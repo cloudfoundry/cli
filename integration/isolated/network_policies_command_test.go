@@ -114,8 +114,8 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Consistently(session).ShouldNot(Say("OK"))
+				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
 				Eventually(session).Should(Exit(0))
 			})
@@ -138,8 +138,7 @@ var _ = Describe("network-policies command", func() {
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
-				Eventually(session).Should(Say("OK"))
-				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
 				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", srcAppName, appName))
 				Eventually(session).Should(Exit(0))
