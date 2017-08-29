@@ -55,50 +55,51 @@ var _ = Describe("Build Actions", func() {
 			Context("when the polling is successful", func() {
 				BeforeEach(func() {
 					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
-					fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaged}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
+					fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{CreatedAt: "some-time", GUID: buildGUID, State: ccv3.BuildStateStaged, DropletGUID: "some-droplet-guid"}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
 				})
 
-				Context("when looking up the droplet fails", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
-					})
+				//TODO: uncommend after #150569020
+				// FContext("when looking up the droplet fails", func() {
+				// 	BeforeEach(func() {
+				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, errors.New("some-droplet-error"))
+				// 	})
 
-					It("returns the warnings and the droplet error", func() {
-						Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
+				// 	It("returns the warnings and the droplet error", func() {
+				// 		Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+				// 		Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+				// 		Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+				// 		Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
 
-						Eventually(errorStream).Should(Receive(MatchError("some-droplet-error")))
-					})
+				// 		Eventually(errorStream).Should(Receive(MatchError("some-droplet-error")))
+				// 	})
+				// })
+
+				// Context("when looking up the droplet succeeds", func() {
+				// 	BeforeEach(func() {
+				// 		fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
+				// 	})
+
+				It("polls until build is finished and returns the final droplet", func() {
+					Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
+					// Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
+
+					Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: DropletState(ccv3.BuildStateStaged), CreatedAt: "some-time"})))
+					Consistently(errorStream).ShouldNot(Receive())
+
+					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.CreateBuildArgsForCall(0)).To(Equal(ccv3.Build{
+						PackageGUID: "some-package-guid",
+					}))
+
+					Expect(fakeCloudControllerClient.GetBuildCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
+					Expect(fakeCloudControllerClient.GetBuildArgsForCall(1)).To(Equal(buildGUID))
+
+					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 				})
-
-				Context("when looking up the droplet succeeds", func() {
-					BeforeEach(func() {
-						fakeCloudControllerClient.GetDropletReturns(ccv3.Droplet{GUID: dropletGUID, State: ccv3.DropletStateStaged}, ccv3.Warnings{"droplet-warnings-1", "droplet-warnings-2"}, nil)
-					})
-
-					It("polls until build is finished and returns the final droplet", func() {
-						Eventually(warningsStream).Should(Receive(ConsistOf("create-warnings-1", "create-warnings-2")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-1", "get-warnings-2")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
-						Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
-
-						Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: DropletStateStaged})))
-						Consistently(errorStream).ShouldNot(Receive())
-
-						Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.CreateBuildArgsForCall(0)).To(Equal(ccv3.Build{
-							PackageGUID: "some-package-guid",
-						}))
-
-						Expect(fakeCloudControllerClient.GetBuildCallCount()).To(Equal(2))
-						Expect(fakeCloudControllerClient.GetBuildArgsForCall(0)).To(Equal(buildGUID))
-						Expect(fakeCloudControllerClient.GetBuildArgsForCall(1)).To(Equal(buildGUID))
-
-						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-					})
-				})
+				// })
 
 				Context("when polling returns a failed build", func() {
 					BeforeEach(func() {
