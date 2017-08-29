@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cfnetworking"
 	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1/internal"
+	"strings"
 )
 
 type PolicyProtocol string
@@ -50,5 +51,54 @@ func (client Client) CreatePolicies(policies []Policy) error {
 		return err
 	}
 
+	return client.connection.Make(request, &cfnetworking.Response{})
+}
+
+// ListPolicies will list the policies
+func (client Client) ListPolicies(appGUIDs ...string) ([]Policy, error) {
+	var request *cfnetworking.Request
+	var err error
+	if len(appGUIDs) == 0 {
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.ListPolicies,
+		})
+	} else {
+		request, err = client.newHTTPRequest(requestOptions{
+			RequestName: internal.ListPolicies,
+			Query: map[string][]string{
+				"id": {strings.Join(appGUIDs, ",")},
+			},
+		})
+	}
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	policies := PolicyList{}
+	response := &cfnetworking.Response{}
+
+	err = client.connection.Make(request, response)
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	err = json.Unmarshal(response.RawResponse, &policies)
+	if err != nil {
+		return []Policy{}, err
+	}
+
+	return policies.Policies, nil
+}
+
+// RemovePolicies will remove the network policy with the given parameters.
+func (client Client) RemovePolicies(policies []Policy) error {
+	rawJSON, err := json.Marshal(PolicyList{Policies: policies})
+	if err != nil {
+		return err
+	}
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeletePolicies,
+		Body:        bytes.NewReader(rawJSON),
+	})
 	return client.connection.Make(request, &cfnetworking.Response{})
 }

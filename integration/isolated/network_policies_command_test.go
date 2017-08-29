@@ -1,0 +1,161 @@
+package isolated
+
+import (
+	"regexp"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
+)
+
+var _ = Describe("network-policies command", func() {
+	Describe("help", func() {
+		Context("when --help flag is set", func() {
+			It("Displays command usage to output", func() {
+				session := helpers.CF("network-policies", "--help")
+				Eventually(session).Should(Say("NAME:"))
+				Eventually(session).Should(Say("network-policies - List direct network traffic policies"))
+				Eventually(session).Should(Say("USAGE:"))
+				Eventually(session).Should(Say(regexp.QuoteMeta("cf network-policies [--source SOURCE_APP]")))
+				Eventually(session).Should(Say("OPTIONS:"))
+				Eventually(session).Should(Say("   --source      Source app to filter results by \\(optional\\)"))
+				Eventually(session).Should(Say("SEE ALSO:"))
+				Eventually(session).Should(Say("   add-network-policy, apps, remove-network-policy"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("when the environment is not setup correctly", func() {
+		Context("when no API endpoint is set", func() {
+			BeforeEach(func() {
+				helpers.UnsetAPI()
+			})
+
+			It("fails with no API endpoint set message", func() {
+				session := helpers.CF("network-policies")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when not logged in", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
+
+			It("fails with not logged in message", func() {
+				session := helpers.CF("network-policies")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no org and space set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+			})
+
+			It("fails with no targeted org error message", func() {
+				session := helpers.CF("network-policies")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no space set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+				helpers.TargetOrg(ReadOnlyOrg)
+			})
+
+			It("fails with no targeted space error message", func() {
+				session := helpers.CF("network-policies")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
+	Context("when the org and space are properly targetted", func() {
+		var (
+			orgName   string
+			spaceName string
+			appName   string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
+			appName = helpers.PrefixedRandomName("app")
+
+			setupCF(orgName, spaceName)
+
+			helpers.WithHelloWorldApp(func(appDir string) {
+				Eventually(helpers.CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+			})
+
+			session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
+			Eventually(session).Should(Exit(0))
+		})
+
+		Context("when policies exists", func() {
+			It("lists all the policies", func() {
+				session := helpers.CF("network-policies")
+
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when policies are filtered by a source app", func() {
+			var srcAppName string
+			BeforeEach(func() {
+				srcAppName = helpers.PrefixedRandomName("app")
+				helpers.WithHelloWorldApp(func(appDir string) {
+					Eventually(helpers.CF("push", srcAppName, "-p", appDir, "-b", "staticfile_buildpack", "--no-start")).Should(Exit(0))
+				})
+
+				session := helpers.CF("add-network-policy", srcAppName, "--destination-app", appName)
+				Eventually(session).Should(Exit(0))
+			})
+
+			It("lists only policies for which the app is a source", func() {
+				session := helpers.CF("network-policies", "--source", srcAppName)
+
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
+				Eventually(session).Should(Say("OK"))
+				Eventually(session).Should(Say("Source\\s+Destination\\s+Protocol\\s+Ports"))
+				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", srcAppName, appName))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when policies are filtered by a non-existent source app", func() {
+			It("returns an error", func() {
+				session := helpers.CF("network-policies", "--source", "pineapple")
+
+				username, _ := helpers.GetCredentials()
+				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
+				Eventually(session.Err).Should(Say("App pineapple not found"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+})
