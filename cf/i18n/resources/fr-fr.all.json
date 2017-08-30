@@ -2460,16 +2460,8 @@
     "translation": "Suppression de l'utilisateur {{.TargetUser}} en tant que {{.CurrentUser}}..."
   },
   {
-    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
-    "translation": ""
-  },
-  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "Description : {{.ServiceDescription}}"
-  },
-  {
-    "id": "Destination",
-    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -4164,6 +4156,10 @@
     "translation": "NOM :"
   },
   {
+    "id": "NETWORK POLICIES:",
+    "translation": ""
+  },
+  {
     "id": "NEW_NAME",
     "translation": "NOUVEAU_NOM"
   },
@@ -4792,10 +4788,6 @@
     "translation": "Port utilisé pour identifier la route TCP"
   },
   {
-    "id": "Ports",
-    "translation": ""
-  },
-  {
     "id": "Prevent use of a feature",
     "translation": ""
   },
@@ -4834,10 +4826,6 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Propriété '{{.PropertyName}}' trouvée dans le manifeste. Cette fonction n'est plus prise en charge. Supprimez-la et réessayez."
-  },
-  {
-    "id": "Protocol",
-    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -5014,6 +5002,10 @@
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Retrait de la variable d'environnement {{.VarName}} d'une application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.CurrentUser}}..."
+  },
+  {
+    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
@@ -5686,10 +5678,6 @@
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
     "translation": "Ignorer la vérification du noeud final d'API. Déconseillé."
-  },
-  {
-    "id": "Source",
-    "translation": ""
   },
   {
     "id": "Source app to filter results by (optional)",
@@ -6880,6 +6868,10 @@
     "translation": "acteur"
   },
   {
+    "id": "add-network-policy",
+    "translation": ""
+  },
+  {
     "id": "alias",
     "translation": ""
   },
@@ -7276,6 +7268,10 @@
     "translation": "nom :"
   },
   {
+    "id": "network-policies",
+    "translation": ""
+  },
+  {
     "id": "non basic services",
     "translation": "services avancés"
   },
@@ -7370,6 +7366,10 @@
   {
     "id": "quota:",
     "translation": "quota :"
+  },
+  {
+    "id": "remove-network-policy",
+    "translation": ""
   },
   {
     "id": "repo-plugins",
@@ -7498,6 +7498,10 @@
   {
     "id": "since",
     "translation": "depuis"
+  },
+  {
+    "id": "source",
+    "translation": ""
   },
   {
     "id": "space",

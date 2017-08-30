@@ -2460,16 +2460,8 @@
     "translation": "{{.CurrentUser}} としてユーザー {{.TargetUser}} を削除しています..."
   },
   {
-    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
-    "translation": ""
-  },
-  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "説明: {{.ServiceDescription}}"
-  },
-  {
-    "id": "Destination",
-    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -4164,6 +4156,10 @@
     "translation": "名前:"
   },
   {
+    "id": "NETWORK POLICIES:",
+    "translation": ""
+  },
+  {
     "id": "NEW_NAME",
     "translation": "新しい名前"
   },
@@ -4792,10 +4788,6 @@
     "translation": "TCP 経路を識別するために使用されるポート"
   },
   {
-    "id": "Ports",
-    "translation": ""
-  },
-  {
     "id": "Prevent use of a feature",
     "translation": ""
   },
@@ -4834,10 +4826,6 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "プロパティー '{{.PropertyName}}' がマニフェストで見つかりました。 このフィーチャーはサポートされなくなりました。 これを削除して、やり直してください。"
-  },
-  {
-    "id": "Protocol",
-    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -5014,6 +5002,10 @@
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} から環境変数 {{.VarName}} を削除しています..."
+  },
+  {
+    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
@@ -5686,10 +5678,6 @@
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
     "translation": "API エンドポイントの検証をスキップします。推奨されません"
-  },
-  {
-    "id": "Source",
-    "translation": ""
   },
   {
     "id": "Source app to filter results by (optional)",
@@ -6880,6 +6868,10 @@
     "translation": "アクター"
   },
   {
+    "id": "add-network-policy",
+    "translation": ""
+  },
+  {
     "id": "alias",
     "translation": ""
   },
@@ -7276,6 +7268,10 @@
     "translation": "名前:"
   },
   {
+    "id": "network-policies",
+    "translation": ""
+  },
+  {
     "id": "non basic services",
     "translation": "非基本サービス"
   },
@@ -7370,6 +7366,10 @@
   {
     "id": "quota:",
     "translation": "割り当て量:"
+  },
+  {
+    "id": "remove-network-policy",
+    "translation": ""
   },
   {
     "id": "repo-plugins",
@@ -7498,6 +7498,10 @@
   {
     "id": "since",
     "translation": "開始日時"
+  },
+  {
+    "id": "source",
+    "translation": ""
   },
   {
     "id": "space",
