@@ -328,6 +328,10 @@
     "translation": "앱에 URL 라우트 추가"
   },
   {
+    "id": "Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에 {{.URL}} 라우트 추가 중..."
   },
@@ -348,15 +352,7 @@
     "translation": "영역에 대한 SSH 액세스 허용"
   },
   {
-    "id": "Allow direct network traffic from one app to another",
-    "translation": ""
-  },
-  {
     "id": "Allow use of a feature",
-    "translation": ""
-  },
-  {
-    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -2146,6 +2142,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "서비스 인스턴스의 키 작성"
+  },
+  {
+    "id": "Create policy to allow direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -4032,7 +4032,11 @@
     "translation": ""
   },
   {
-    "id": "Listing network traffic as {{.User}}...",
+    "id": "Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network policies of app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -4780,7 +4784,11 @@
     "translation": "HTTP 라우트 {{.RouteName}}에서 포트가 허용되지 않음"
   },
   {
-    "id": "Port or range to connect to destination app with",
+    "id": "Port or range of ports for connection to destination app",
+    "translation": ""
+  },
+  {
+    "id": "Port or range of ports that destination app is connected with",
     "translation": ""
   },
   {
@@ -4826,6 +4834,10 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Manifest에서 '{{.PropertyName}}' 특성을 찾을 수 없습니다. 이 기능은 더 이상 지원되지 않습니다. 특성을 제거한 후 다시 시도하십시오."
+  },
+  {
+    "id": "Protocol that apps are connected with",
+    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -4992,7 +5004,7 @@
     "translation": "사용자에게서 조직 역할 제거"
   },
   {
-    "id": "Remove direct network traffic from one app to another",
+    "id": "Remove network traffic policy of an app",
     "translation": ""
   },
   {
@@ -5004,7 +5016,7 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에서 환경 변수 {{.VarName}} 제거 중..."
   },
   {
-    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "id": "Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -5680,7 +5692,7 @@
     "translation": "API 엔드포인트 유효성 검증 건너뛰기. 권장하지 않음!"
   },
   {
-    "id": "Source app to filter results by (optional)",
+    "id": "Source app to filter results by",
     "translation": ""
   },
   {
