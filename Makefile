@@ -6,7 +6,7 @@ LC_ALL = "en_US.UTF-8"
 CF_BUILD_VERSION ?= $$(cat ci/VERSION)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
-GOSRC = $(shell find . -name "*.go")
+GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*")
 
 all : test internationalization-binary build
 
@@ -27,12 +27,12 @@ internationalization-binary : internationalization
 integration-cleanup:
 	$(PWD)/bin/cleanup-integration
 
-integration-tests: integration-cleanup
+integration-tests: build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
-integration-tests-full: integration-cleanup
+integration-tests-full: build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push integration/plugin
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
