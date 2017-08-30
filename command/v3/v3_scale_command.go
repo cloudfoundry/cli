@@ -97,8 +97,6 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayText("Waiting for app to start...")
-
 	pollWarnings := make(chan v3action.Warnings)
 	done := make(chan bool)
 	go func() {

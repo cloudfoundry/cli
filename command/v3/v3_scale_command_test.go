@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("Scale Command", func() {
+var _ = Describe("v3-scale Command", func() {
 	var (
 		cmd             v3.V3ScaleCommand
 		input           *Buffer
@@ -158,6 +158,7 @@ var _ = Describe("Scale Command", func() {
 					Process: v3action.Process{
 						Type:       "web",
 						MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
+						DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 					},
 					InstanceDetails: []v3action.Instance{
 						v3action.Instance{
@@ -206,7 +207,12 @@ var _ = Describe("Scale Command", func() {
 
 				It("displays current scale properties and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
+
 					Expect(testUI.Out).ToNot(Say("Scaling"))
+					Expect(testUI.Out).ToNot(Say("This will cause the app to restart"))
+					Expect(testUI.Out).ToNot(Say("Stopping"))
+					Expect(testUI.Out).ToNot(Say("Starting"))
+					Expect(testUI.Out).ToNot(Say("Waiting"))
 					Expect(testUI.Out).To(Say("Showing current scale of app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 
 					firstAppTable := helpers.ParseV3AppTable(output.Contents())
@@ -279,149 +285,154 @@ var _ = Describe("Scale Command", func() {
 						nil)
 				})
 
-				Context("when the user chooses the default option", func() {
-					BeforeEach(func() {
-						_, err := input.Write([]byte("\n"))
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					It("does not scale the app", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).ToNot(Say("Showing"))
-						Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
-						Expect(testUI.Out).To(Say("Scaling cancelled"))
-
-						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
-					})
-				})
-
-				Context("when the user chooses no", func() {
-					BeforeEach(func() {
-						_, err := input.Write([]byte("n\n"))
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					It("does not scale the app", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
-
-						Expect(testUI.Out).ToNot(Say("Showing"))
-						Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
-						Expect(testUI.Out).To(Say("Scaling cancelled"))
-
-						Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
-					})
-				})
-
-				Context("when the user is prompted to confirm scaling and chooses yes", func() {
-					BeforeEach(func() {
-						_, err := input.Write([]byte("y\n"))
-						Expect(err).ToNot(HaveOccurred())
-					})
-
-					Context("when polling succeeds", func() {
+				Context("when given the choice to restart the app", func() {
+					Context("when the user chooses default", func() {
 						BeforeEach(func() {
-							fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-								warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-								return nil
-							}
+							_, err := input.Write([]byte("\n"))
+							Expect(err).ToNot(HaveOccurred())
 						})
 
-						It("scales the app, restarts the app, and displays scale properties", func() {
+						It("does not scale the app", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).ToNot(Say("Showing"))
 							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
-							Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-							Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
-							Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Scaling cancelled"))
+							Expect(testUI.Out).ToNot(Say("Stopping"))
+							Expect(testUI.Out).ToNot(Say("Starting"))
+							Expect(testUI.Out).ToNot(Say("Waiting"))
 
-							// Note that this does test that the disk quota was scaled to 96M,
-							// it is tested below when we check the arguments
-							// passed to ScaleProcessByApplication
-							firstAppTable := helpers.ParseV3AppTable(output.Contents())
-							Expect(len(firstAppTable.Processes)).To(Equal(1))
-
-							processSummary := firstAppTable.Processes[0]
-							Expect(processSummary.Title).To(Equal("web:3/3"))
-
-							Expect(processSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
-							Expect(processSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
-							Expect(processSummary.Instances[0].CPU).To(Equal("0.0%"))
-
-							Expect(processSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
-							Expect(processSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
-							Expect(processSummary.Instances[1].CPU).To(Equal("0.0%"))
-
-							Expect(processSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
-							Expect(processSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
-							Expect(processSummary.Instances[2].CPU).To(Equal("0.0%"))
-
-							Expect(testUI.Err).To(Say("get-app-warning"))
-							Expect(testUI.Err).To(Say("scale-warning"))
-							Expect(testUI.Err).To(Say("some-poll-warning-1"))
-							Expect(testUI.Err).To(Say("some-poll-warning-2"))
-							Expect(testUI.Err).To(Say("get-instances-warning"))
-
-							Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-							appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-							Expect(appNameArg).To(Equal(appName))
-							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
-
-							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
-							appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
-							Expect(appGUIDArg).To(Equal("some-app-guid"))
-							Expect(scaleProcess).To(Equal(v3action.Process{
-								Type:       "web",
-								Instances:  types.NullInt{Value: 2, IsSet: true},
-								DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
-								MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
-							}))
-
-							Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
-							Expect(fakeActor.StopApplicationArgsForCall(0)).To(Equal("some-app-guid"))
-
-							Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
-							Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
-
-							Expect(fakeActor.GetProcessSummaryByApplicationAndProcessTypeCallCount()).To(Equal(1))
-							appGUID, processType := fakeActor.GetProcessSummaryByApplicationAndProcessTypeArgsForCall(0)
-							Expect(appGUID).To(Equal("some-app-guid"))
-							Expect(processType).To(Equal("web"))
+							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 						})
 					})
 
-					Context("when polling the start fails", func() {
+					Context("when the user chooses no", func() {
 						BeforeEach(func() {
-							fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
-								warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
-								return errors.New("some-error")
-							}
+							_, err := input.Write([]byte("n\n"))
+							Expect(err).ToNot(HaveOccurred())
 						})
 
-						It("displays all warnings and fails", func() {
-							Expect(testUI.Out).To(Say("Waiting for app to start\\.\\.\\."))
+						It("does not scale the app", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(testUI.Err).To(Say("some-poll-warning-1"))
-							Expect(testUI.Err).To(Say("some-poll-warning-2"))
+							Expect(testUI.Out).ToNot(Say("Showing"))
+							Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
+							Expect(testUI.Out).To(Say("Scaling cancelled"))
+							Expect(testUI.Out).ToNot(Say("Stopping"))
+							Expect(testUI.Out).ToNot(Say("Starting"))
+							Expect(testUI.Out).ToNot(Say("Waiting"))
 
-							Expect(executeErr).To(MatchError("some-error"))
+							Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
 						})
 					})
 
-					Context("when polling times out", func() {
+					Context("when the user chooses yes", func() {
 						BeforeEach(func() {
-							fakeActor.PollStartReturns(v3action.StartupTimeoutError{})
+							_, err := input.Write([]byte("y\n"))
+							Expect(err).ToNot(HaveOccurred())
 						})
 
-						It("returns the StartupTimeoutError", func() {
-							Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
-								AppName:    "some-app",
-								BinaryName: binaryName,
-							}))
+						Context("when polling succeeds", func() {
+							BeforeEach(func() {
+								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+									return nil
+								}
+							})
+
+							It("scales, restarts, and displays scale properties", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).ToNot(Say("Showing"))
+								Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("This will cause the app to restart\\. Are you sure you want to scale some-app\\? \\[yN\\]:"))
+								Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+
+								// Note that this does test that the disk quota was scaled to 96M,
+								// it is tested below when we check the arguments
+								// passed to ScaleProcessByApplication
+								firstAppTable := helpers.ParseV3AppTable(output.Contents())
+								Expect(len(firstAppTable.Processes)).To(Equal(1))
+
+								processSummary := firstAppTable.Processes[0]
+								Expect(processSummary.Title).To(Equal("web:3/3"))
+
+								Expect(processSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
+								Expect(processSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
+								Expect(processSummary.Instances[0].CPU).To(Equal("0.0%"))
+
+								Expect(processSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
+								Expect(processSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
+								Expect(processSummary.Instances[1].CPU).To(Equal("0.0%"))
+
+								Expect(processSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
+								Expect(processSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
+								Expect(processSummary.Instances[2].CPU).To(Equal("0.0%"))
+
+								Expect(testUI.Err).To(Say("get-app-warning"))
+								Expect(testUI.Err).To(Say("scale-warning"))
+								Expect(testUI.Err).To(Say("some-poll-warning-1"))
+								Expect(testUI.Err).To(Say("some-poll-warning-2"))
+								Expect(testUI.Err).To(Say("get-instances-warning"))
+
+								Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+								appNameArg, spaceGUIDArg := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+								Expect(appNameArg).To(Equal(appName))
+								Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+								Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(1))
+								appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
+								Expect(appGUIDArg).To(Equal("some-app-guid"))
+								Expect(scaleProcess).To(Equal(v3action.Process{
+									Type:       "web",
+									Instances:  types.NullInt{Value: 2, IsSet: true},
+									DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
+									MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
+								}))
+
+								Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+								Expect(fakeActor.StopApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+
+								Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
+								Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
+
+								Expect(fakeActor.GetProcessSummaryByApplicationAndProcessTypeCallCount()).To(Equal(1))
+								appGUID, processType := fakeActor.GetProcessSummaryByApplicationAndProcessTypeArgsForCall(0)
+								Expect(appGUID).To(Equal("some-app-guid"))
+								Expect(processType).To(Equal("web"))
+							})
+						})
+
+						Context("when polling the start fails", func() {
+							BeforeEach(func() {
+								fakeActor.PollStartStub = func(appGUID string, warnings chan<- v3action.Warnings) error {
+									warnings <- v3action.Warnings{"some-poll-warning-1", "some-poll-warning-2"}
+									return errors.New("some-error")
+								}
+							})
+
+							It("displays all warnings and fails", func() {
+								Expect(testUI.Err).To(Say("some-poll-warning-1"))
+								Expect(testUI.Err).To(Say("some-poll-warning-2"))
+
+								Expect(executeErr).To(MatchError("some-error"))
+							})
+						})
+
+						Context("when polling times out", func() {
+							BeforeEach(func() {
+								fakeActor.PollStartReturns(v3action.StartupTimeoutError{})
+							})
+
+							It("returns the StartupTimeoutError", func() {
+								Expect(executeErr).To(MatchError(translatableerror.StartupTimeoutError{
+									AppName:    "some-app",
+									BinaryName: binaryName,
+								}))
+							})
 						})
 					})
 				})
@@ -444,7 +455,10 @@ var _ = Describe("Scale Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).ToNot(Say("Showing"))
-					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say("Scaling"))
+					Expect(testUI.Out).NotTo(Say("This will cause the app to restart"))
+					Expect(testUI.Out).NotTo(Say("Stopping"))
+					Expect(testUI.Out).NotTo(Say("Starting"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
@@ -489,11 +503,14 @@ var _ = Describe("Scale Command", func() {
 					Expect(err).ToNot(HaveOccurred())
 				})
 
-				It("scales the number of instances, displays scale properties, and restarts the application", func() {
+				It("scales, restarts, and displays scale properties", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).ToNot(Say("Showing"))
-					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say("Scaling"))
+					Expect(testUI.Out).To(Say("This will cause the app to restart"))
+					Expect(testUI.Out).To(Say("Stopping"))
+					Expect(testUI.Out).To(Say("Starting"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
@@ -529,7 +546,7 @@ var _ = Describe("Scale Command", func() {
 
 			Context("when only the disk flag option is provided", func() {
 				BeforeEach(func() {
-					cmd.DiskLimit.Value = 1024
+					cmd.DiskLimit.Value = 1025
 					cmd.DiskLimit.IsSet = true
 					fakeActor.ScaleProcessByApplicationReturns(
 						v3action.Warnings{"scale-warning"},
@@ -546,7 +563,10 @@ var _ = Describe("Scale Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).ToNot(Say("Showing"))
-					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say("Scaling"))
+					Expect(testUI.Out).To(Say("This will cause the app to restart"))
+					Expect(testUI.Out).To(Say("Stopping"))
+					Expect(testUI.Out).To(Say("Starting"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
@@ -562,7 +582,7 @@ var _ = Describe("Scale Command", func() {
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(scaleProcess).To(Equal(v3action.Process{
 						Type:     "web",
-						DiskInMB: types.NullUint64{Value: 1024, IsSet: true},
+						DiskInMB: types.NullUint64{Value: 1025, IsSet: true},
 					}))
 
 					Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
@@ -600,7 +620,7 @@ var _ = Describe("Scale Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(testUI.Out).ToNot(Say("Showing"))
-					Expect(testUI.Out).To(Say("Scaling app some-app in org some-org / space some-space as some-user\\.\\.\\."))
+					Expect(testUI.Out).To(Say("Scaling"))
 
 					Expect(testUI.Err).To(Say("get-app-warning"))
 					Expect(testUI.Err).To(Say("scale-warning"))
