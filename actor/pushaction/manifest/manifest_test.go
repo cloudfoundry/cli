@@ -73,6 +73,9 @@ applications:
     env_2: 182837403930483038
     env_3: true
     env_4: 1.00001
+- name: "app-4"
+  buildpack: null
+  command: null
 `
 		})
 
@@ -122,6 +125,17 @@ applications:
 						"env_2": "182837403930483038",
 						"env_3": "true",
 						"env_4": "1.00001",
+					},
+				},
+				Application{
+					Name: "app-4",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "",
+					},
+					Command: types.FilteredString{
+						IsSet: true,
+						Value: "",
 					},
 				},
 			))

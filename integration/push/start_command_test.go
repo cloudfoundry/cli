@@ -120,7 +120,7 @@ var _ = Describe("push with different start command values", func() {
 						{
 							"name":    appName,
 							"path":    dir,
-							"command": "null",
+							"command": nil,
 						},
 					},
 				})

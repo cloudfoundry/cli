@@ -100,32 +100,47 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.HealthCheckTimeout = manifestApp.Timeout
 	app.EnvironmentVariables = manifestApp.EnvironmentVariables
 
-	app.Buildpack.ParseValue(manifestApp.Buildpack)
-	app.Command.ParseValue(manifestApp.Command)
-
 	err = app.Instances.ParseFlagValue(manifestApp.Instances)
 	if err != nil {
 		return err
 	}
 
 	if manifestApp.DiskQuota != "" {
-		disk, err := bytefmt.ToMegabytes(manifestApp.DiskQuota)
-		if err != nil {
-			return err
+		disk, fmtErr := bytefmt.ToMegabytes(manifestApp.DiskQuota)
+		if fmtErr != nil {
+			return fmtErr
 		}
 		app.DiskQuota = disk
 	}
 
 	if manifestApp.Memory != "" {
-		memory, err := bytefmt.ToMegabytes(manifestApp.Memory)
-		if err != nil {
-			return err
+		memory, fmtErr := bytefmt.ToMegabytes(manifestApp.Memory)
+		if fmtErr != nil {
+			return fmtErr
 		}
 		app.Memory = memory
 	}
 
 	for _, route := range manifestApp.Routes {
 		app.Routes = append(app.Routes, route.Route)
+	}
+
+	// "null" values are identical to non-existant values in YAML. In order to
+	// detect if an explicit null is given, a manual existance check is required.
+	exists := map[string]interface{}{}
+	err = unmarshaller(&exists)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := exists["buildpack"]; ok {
+		app.Buildpack.ParseValue(manifestApp.Buildpack)
+		app.Buildpack.IsSet = true
+	}
+
+	if _, ok := exists["command"]; ok {
+		app.Command.ParseValue(manifestApp.Command)
+		app.Command.IsSet = true
 	}
 
 	return nil
