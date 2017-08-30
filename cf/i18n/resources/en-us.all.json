@@ -328,6 +328,10 @@
     "translation": "Add a url route to an app"
   },
   {
+    "id": "Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": "Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}..."
+  },
+  {
     "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
@@ -348,15 +352,7 @@
     "translation": "Allow SSH access for the space"
   },
   {
-    "id": "Allow direct network traffic from one app to another",
-    "translation": ""
-  },
-  {
     "id": "Allow use of a feature",
-    "translation": ""
-  },
-  {
-    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -2146,6 +2142,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "Create key for a service instance"
+  },
+  {
+    "id": "Create policy to allow direct network traffic from one app to another",
+    "translation": "Create policy to allow direct network traffic from one app to another"
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -4032,7 +4032,11 @@
     "translation": ""
   },
   {
-    "id": "Listing network traffic as {{.User}}...",
+    "id": "Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": "Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}..."
+  },
+  {
+    "id": "Listing network policies of app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -4780,7 +4784,11 @@
     "translation": "Port not allowed in HTTP route {{.RouteName}}"
   },
   {
-    "id": "Port or range to connect to destination app with",
+    "id": "Port or range of ports for connection to destination app",
+    "translation": "Port or range of ports for connection to destination app"
+  },
+  {
+    "id": "Port or range of ports that destination app is connected with",
     "translation": ""
   },
   {
@@ -4826,6 +4834,10 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again."
+  },
+  {
+    "id": "Protocol that apps are connected with",
+    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -4992,8 +5004,8 @@
     "translation": "Remove an org role from a user"
   },
   {
-    "id": "Remove direct network traffic from one app to another",
-    "translation": ""
+    "id": "Remove network traffic policy of an app",
+    "translation": "Remove network traffic policy of an app"
   },
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5004,8 +5016,8 @@
     "translation": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
-    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
-    "translation": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}..."
+    "id": "Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": "Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}..."
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
@@ -5680,8 +5692,8 @@
     "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
-    "id": "Source app to filter results by (optional)",
-    "translation": ""
+    "id": "Source app to filter results by",
+    "translation": "Source app to filter results by"
   },
   {
     "id": "Space",

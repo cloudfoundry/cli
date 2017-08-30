@@ -17,7 +17,7 @@ var _ = Describe("add-network-policy command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("add-network-policy", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("add-network-policy - Allow direct network traffic from one app to another"))
+				Eventually(session).Should(Say("add-network-policy - Create policy to allow direct network traffic from one app to another"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say(regexp.QuoteMeta("cf add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]")))
 				Eventually(session).Should(Say("EXAMPLES:"))
@@ -25,7 +25,7 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say("   cf add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("   --destination-app      Name of app to connect to"))
-				Eventually(session).Should(Say("   --port                 Port or range to connect to destination app with \\(Default: 8080\\)"))
+				Eventually(session).Should(Say("   --port                 Port or range of ports for connection to destination app \\(Default: 8080\\)"))
 				Eventually(session).Should(Say("   --protocol             Protocol to connect apps with \\(Default: tcp\\)"))
 				Eventually(session).Should(Say("SEE ALSO:"))
 				Eventually(session).Should(Say("   apps, network-policies"))
@@ -115,12 +115,12 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say(`Allowing network traffic from app %s to %s in org %s / space %s as %s\.\.\.`, appName, appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("network-policies")
-				Eventually(session).Should(Say(`Listing network traffic as %s\.\.\.`, username))
+				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
 				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
@@ -133,7 +133,7 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", "pineapple", "--destination-app", appName)
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say(`Allowing network traffic from app pineapple to %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Adding network policy to app pineapple in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -145,13 +145,11 @@ var _ = Describe("add-network-policy command", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", "pineapple")
 
 				username, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say(`Allowing network traffic from app %s to pineapple in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
+				Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
-
 		})
-
 	})
 })

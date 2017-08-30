@@ -328,6 +328,10 @@
     "translation": "向应用程序添加 URL 路径"
   },
   {
+    "id": "Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份向组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}} 添加路径 {{.URL}}..."
   },
@@ -348,15 +352,7 @@
     "translation": "允许对空间进行 SSH 访问"
   },
   {
-    "id": "Allow direct network traffic from one app to another",
-    "translation": ""
-  },
-  {
     "id": "Allow use of a feature",
-    "translation": ""
-  },
-  {
-    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -2146,6 +2142,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "为服务实例创建密钥"
+  },
+  {
+    "id": "Create policy to allow direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -4032,7 +4032,11 @@
     "translation": ""
   },
   {
-    "id": "Listing network traffic as {{.User}}...",
+    "id": "Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network policies of app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -4780,7 +4784,11 @@
     "translation": "HTTP 路径 {{.RouteName}} 中不允许端口"
   },
   {
-    "id": "Port or range to connect to destination app with",
+    "id": "Port or range of ports for connection to destination app",
+    "translation": ""
+  },
+  {
+    "id": "Port or range of ports that destination app is connected with",
     "translation": ""
   },
   {
@@ -4826,6 +4834,10 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "在清单中找到了属性 '{{.PropertyName}}'。此功能不再受支持。请将其除去，然后重试。"
+  },
+  {
+    "id": "Protocol that apps are connected with",
+    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -4992,7 +5004,7 @@
     "translation": "除去用户的组织角色"
   },
   {
-    "id": "Remove direct network traffic from one app to another",
+    "id": "Remove network traffic policy of an app",
     "translation": ""
   },
   {
@@ -5004,7 +5016,7 @@
     "translation": "正在以 {{.CurrentUser}} 身份从组织 {{.OrgName}}/空间 {{.SpaceName}} 的应用程序 {{.AppName}} 中除去环境变量 {{.VarName}}..."
   },
   {
-    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "id": "Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -5680,7 +5692,7 @@
     "translation": "跳过 API 端点的验证步骤。不建议使用！"
   },
   {
-    "id": "Source app to filter results by (optional)",
+    "id": "Source app to filter results by",
     "translation": ""
   },
   {
