@@ -50,6 +50,48 @@ func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	}
 }
 
+func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID string) ([]Domain, Warnings, error) {
+	var domains []Domain
+	var allWarnings Warnings
+
+	// TODO: If the following causes URI length problems, break domainNames into
+	// batched (based on character length?) and loop over them.
+
+	sharedDomains, warnings, err := actor.CloudControllerClient.GetSharedDomains(ccv2.Query{
+		Filter:   ccv2.NameFilter,
+		Operator: ccv2.InOperator,
+		Values:   domainNames,
+	})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, domain := range sharedDomains {
+		domains = append(domains, Domain(domain))
+		actor.saveDomain(domain)
+	}
+
+	privateDomains, warnings, err := actor.CloudControllerClient.GetOrganizationPrivateDomains(
+		orgGUID,
+		ccv2.Query{
+			Filter:   ccv2.NameFilter,
+			Operator: ccv2.InOperator,
+			Values:   domainNames,
+		})
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, domain := range privateDomains {
+		domains = append(domains, Domain(domain))
+		actor.saveDomain(domain)
+	}
+
+	return domains, allWarnings, err
+}
+
 // GetSharedDomain returns the shared domain associated with the provided
 // Domain GUID.
 func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {

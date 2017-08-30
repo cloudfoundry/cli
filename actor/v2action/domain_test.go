@@ -132,6 +132,103 @@ var _ = Describe("Domain Actions", func() {
 		)
 	})
 
+	Describe("GetDomainsByNameAndOrganization", func() {
+		var (
+			domainNames []string
+			orgGUID     string
+
+			domains    []Domain
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			domainNames = []string{"domain-1", "domain-2", "domain-3"}
+			orgGUID = "some-org-guid"
+		})
+
+		JustBeforeEach(func() {
+			domains, warnings, executeErr = actor.GetDomainsByNameAndOrganization(domainNames, orgGUID)
+		})
+
+		Context("when looking up the shared domains is successful", func() {
+			var sharedDomains []ccv2.Domain
+
+			BeforeEach(func() {
+				sharedDomains = []ccv2.Domain{
+					{Name: "domain-1", GUID: "shared-domain-1"},
+				}
+				fakeCloudControllerClient.GetSharedDomainsReturns(sharedDomains, ccv2.Warnings{"shared-warning-1", "shared-warning-2"}, nil)
+			})
+
+			Context("when looking up the private domains is successful", func() {
+				var privateDomains []ccv2.Domain
+
+				BeforeEach(func() {
+					privateDomains = []ccv2.Domain{
+						{Name: "domain-2", GUID: "private-domain-2"},
+						{Name: "domain-3", GUID: "private-domain-3"},
+					}
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(privateDomains, ccv2.Warnings{"private-warning-1", "private-warning-2"}, nil)
+				})
+
+				It("returns the domains and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("shared-warning-1", "shared-warning-2", "private-warning-1", "private-warning-2"))
+					Expect(domains).To(ConsistOf(
+						Domain{Name: "domain-1", GUID: "shared-domain-1"},
+						Domain{Name: "domain-2", GUID: "private-domain-2"},
+						Domain{Name: "domain-3", GUID: "private-domain-3"},
+					))
+
+					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSharedDomainsArgsForCall(0)).To(ConsistOf(ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.InOperator,
+						Values:   domainNames,
+					}))
+
+					Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+					passedOrgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+					Expect(queries).To(ConsistOf(ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.InOperator,
+						Values:   domainNames,
+					}))
+					Expect(passedOrgGUID).To(Equal(orgGUID))
+				})
+			})
+
+			Context("when looking up the private domains errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("foobar")
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(nil, ccv2.Warnings{"private-warning-1", "private-warning-2"}, expectedErr)
+				})
+
+				It("returns errors and warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("shared-warning-1", "shared-warning-2", "private-warning-1", "private-warning-2"))
+				})
+			})
+		})
+
+		Context("when looking up the shared domains errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("foobar")
+				fakeCloudControllerClient.GetSharedDomainsReturns(nil, ccv2.Warnings{"shared-warning-1", "shared-warning-2"}, expectedErr)
+			})
+
+			It("returns errors and warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("shared-warning-1", "shared-warning-2"))
+			})
+		})
+	})
+
 	Describe("GetSharedDomain", func() {
 		Context("when the shared domain exists", func() {
 			var expectedDomain ccv2.Domain
