@@ -34,7 +34,7 @@ type commandList struct {
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
-	AddNetworkPolicy                   v3.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Allow direct network traffic from one app to another"`
+	AddNetworkPolicy                   v3.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`
 	AllowSpaceSSH                      v2.AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
@@ -122,7 +122,7 @@ type commandList struct {
 	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v2.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v2.QuotaCommand                              `command:"quota" description:"Show quota info"`
-	RemoveNetworkPolicy                v3.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove direct network traffic from one app to another"`
+	RemoveNetworkPolicy                v3.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`
 	RemovePluginRepo                   plugin.RemovePluginRepoCommand               `command:"remove-plugin-repo" description:"Remove a plugin repository"`
 	RenameBuildpack                    v2.RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
 	RenameOrg                          v2.RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`

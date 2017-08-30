@@ -18,7 +18,7 @@ type AddNetworkPolicyActor interface {
 type AddNetworkPolicyCommand struct {
 	RequiredArgs   flag.AddNetworkPolicyArgs `positional-args:"yes"`
 	DestinationApp string                    `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port           flag.NetworkPort          `long:"port" description:"Port or range to connect to destination app with" default:"8080"`
+	Port           flag.NetworkPort          `long:"port" description:"Port or range of ports for connection to destination app" default:"8080"`
 	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
 
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
@@ -60,12 +60,11 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
-		"SrcAppName":  cmd.RequiredArgs.SourceApp,
-		"DestAppName": cmd.DestinationApp,
-		"Org":         cmd.Config.TargetedOrganization().Name,
-		"Space":       cmd.Config.TargetedSpace().Name,
-		"User":        user.Name,
+	cmd.UI.DisplayTextWithFlavor("Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+		"SrcAppName": cmd.RequiredArgs.SourceApp,
+		"Org":        cmd.Config.TargetedOrganization().Name,
+		"Space":      cmd.Config.TargetedSpace().Name,
+		"User":       user.Name,
 	})
 
 	warnings, err := cmd.Actor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)

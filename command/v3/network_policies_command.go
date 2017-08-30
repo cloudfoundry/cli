@@ -18,7 +18,7 @@ type NetworkPoliciesActor interface {
 }
 
 type NetworkPoliciesCommand struct {
-	SourceApp string `long:"source" required:"false" description:"Source app to filter results by (optional)"`
+	SourceApp string `long:"source" required:"false" description:"Source app to filter results by"`
 
 	usage           interface{} `usage:"CF_NAME network-policies [--source SOURCE_APP]"`
 	relatedCommands interface{} `related_commands:"add-network-policy, apps, remove-network-policy"`
@@ -59,16 +59,24 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.UI.DisplayTextWithFlavor("Listing network traffic as {{.User}}...", map[string]interface{}{
-		"User": user.Name,
-	})
 
 	var policies []cfnetworkingaction.Policy
 	var warnings cfnetworkingaction.Warnings
 
 	if cmd.SourceApp != "" {
+		cmd.UI.DisplayTextWithFlavor("Listing network policies of app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+			"SrcAppName": cmd.SourceApp,
+			"Org":        cmd.Config.TargetedOrganization().Name,
+			"Space":      cmd.Config.TargetedSpace().Name,
+			"User":       user.Name,
+		})
 		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpaceAndAppName(cmd.Config.TargetedSpace().GUID, cmd.SourceApp)
 	} else {
+		cmd.UI.DisplayTextWithFlavor("Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...", map[string]interface{}{
+			"Org":   cmd.Config.TargetedOrganization().Name,
+			"Space": cmd.Config.TargetedSpace().Name,
+			"User":  user.Name,
+		})
 		policies, warnings, err = cmd.Actor.NetworkPoliciesBySpace(cmd.Config.TargetedSpace().GUID)
 	}
 
