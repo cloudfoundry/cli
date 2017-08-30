@@ -533,8 +533,8 @@ var _ = Describe("help Command", func() {
 
 				Expect(testUI.Out).To(Say("NETWORK POLICIES:"))
 				Expect(testUI.Out).To(Say("   network-policies\\s+List direct network traffic policies"))
-				Expect(testUI.Out).To(Say("   add-network-policy\\s+Allow direct network traffic from one app to another"))
-				Expect(testUI.Out).To(Say("   remove-network-policy\\s+Remove direct network traffic from one app to another"))
+				Expect(testUI.Out).To(Say("   add-network-policy\\s+Create policy to allow direct network traffic from one app to another"))
+				Expect(testUI.Out).To(Say("   remove-network-policy\\s+Remove network traffic policy of an app"))
 
 				Expect(testUI.Out).To(Say("BUILDPACKS:"))
 				Expect(testUI.Out).To(Say("   buildpacks\\s+List all buildpacks"))

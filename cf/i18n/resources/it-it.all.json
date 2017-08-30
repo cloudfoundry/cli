@@ -328,6 +328,10 @@
     "translation": "Aggiungi una rotta URL a un'applicazione"
   },
   {
+    "id": "Adding network policy to app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
     "id": "Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Aggiunta della rotta {{.URL}} all'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
@@ -348,15 +352,7 @@
     "translation": "Consenti accesso SSH per lo spazio"
   },
   {
-    "id": "Allow direct network traffic from one app to another",
-    "translation": ""
-  },
-  {
     "id": "Allow use of a feature",
-    "translation": ""
-  },
-  {
-    "id": "Allowing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -2146,6 +2142,10 @@
   {
     "id": "Create key for a service instance",
     "translation": "Crea chiave per un'istanza del servizio"
+  },
+  {
+    "id": "Create policy to allow direct network traffic from one app to another",
+    "translation": ""
   },
   {
     "id": "Creating V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
@@ -4032,7 +4032,11 @@
     "translation": ""
   },
   {
-    "id": "Listing network traffic as {{.User}}...",
+    "id": "Listing network policies in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
+  },
+  {
+    "id": "Listing network policies of app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -4780,7 +4784,11 @@
     "translation": "Porta non consentita nella rotta HTTP {{.RouteName}}"
   },
   {
-    "id": "Port or range to connect to destination app with",
+    "id": "Port or range of ports for connection to destination app",
+    "translation": ""
+  },
+  {
+    "id": "Port or range of ports that destination app is connected with",
     "translation": ""
   },
   {
@@ -4826,6 +4834,10 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Proprietà '{{.PropertyName}}' trovata nel manifest. Questa funzione non è più supportata. Eliminarla e riprovare."
+  },
+  {
+    "id": "Protocol that apps are connected with",
+    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -4992,7 +5004,7 @@
     "translation": "Rimuovi un ruolo organizzazione da un utente"
   },
   {
-    "id": "Remove direct network traffic from one app to another",
+    "id": "Remove network traffic policy of an app",
     "translation": ""
   },
   {
@@ -5004,7 +5016,7 @@
     "translation": "Rimozione della variabile di ambiente {{.VarName}} dall'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.CurrentUser}} in corso..."
   },
   {
-    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "id": "Removing network policy for app {{.SrcAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
     "translation": ""
   },
   {
@@ -5680,7 +5692,7 @@
     "translation": "Tralascia la verifica dell'endpoint API. Non consigliato."
   },
   {
-    "id": "Source app to filter results by (optional)",
+    "id": "Source app to filter results by",
     "translation": ""
   },
   {
