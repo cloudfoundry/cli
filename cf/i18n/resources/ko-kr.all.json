@@ -2460,16 +2460,8 @@
     "translation": "{{.CurrentUser}}(으)로 사용자 {{.TargetUser}} 삭제 중..."
   },
   {
-    "id": "Deny network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
-    "translation": ""
-  },
-  {
     "id": "Description: {{.ServiceDescription}}",
     "translation": "설명: {{.ServiceDescription}}"
-  },
-  {
-    "id": "Destination",
-    "translation": ""
   },
   {
     "id": "Did you mean?",
@@ -4164,6 +4156,10 @@
     "translation": "이름:"
   },
   {
+    "id": "NETWORK POLICIES:",
+    "translation": ""
+  },
+  {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
   },
@@ -4792,10 +4788,6 @@
     "translation": "TCP 라우트를 식별하는 데 사용되는 포트"
   },
   {
-    "id": "Ports",
-    "translation": ""
-  },
-  {
     "id": "Prevent use of a feature",
     "translation": ""
   },
@@ -4834,10 +4826,6 @@
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
     "translation": "Manifest에서 '{{.PropertyName}}' 특성을 찾을 수 없습니다. 이 기능은 더 이상 지원되지 않습니다. 특성을 제거한 후 다시 시도하십시오."
-  },
-  {
-    "id": "Protocol",
-    "translation": ""
   },
   {
     "id": "Protocol to connect apps with",
@@ -5014,6 +5002,10 @@
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.AppName}} 앱에서 환경 변수 {{.VarName}} 제거 중..."
+  },
+  {
+    "id": "Removing network traffic from app {{.SrcAppName}} to {{.DestAppName}} in org {{.Org}} / space {{.Space}} as {{.User}}...",
+    "translation": ""
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
@@ -5686,10 +5678,6 @@
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
     "translation": "API 엔드포인트 유효성 검증 건너뛰기. 권장하지 않음!"
-  },
-  {
-    "id": "Source",
-    "translation": ""
   },
   {
     "id": "Source app to filter results by (optional)",
@@ -6880,6 +6868,10 @@
     "translation": "액터"
   },
   {
+    "id": "add-network-policy",
+    "translation": ""
+  },
+  {
     "id": "alias",
     "translation": ""
   },
@@ -7276,6 +7268,10 @@
     "translation": "이름:"
   },
   {
+    "id": "network-policies",
+    "translation": ""
+  },
+  {
     "id": "non basic services",
     "translation": "기본 서비스 없음"
   },
@@ -7370,6 +7366,10 @@
   {
     "id": "quota:",
     "translation": "할당량:"
+  },
+  {
+    "id": "remove-network-policy",
+    "translation": ""
   },
   {
     "id": "repo-plugins",
@@ -7498,6 +7498,10 @@
   {
     "id": "since",
     "translation": "이후"
+  },
+  {
+    "id": "source",
+    "translation": ""
   },
   {
     "id": "space",
