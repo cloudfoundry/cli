@@ -14,6 +14,7 @@ import (
 //go:generate counterfeiter . V3AppsActor
 
 type V3AppsActor interface {
+	CloudControllerAPIVersion() string
 	GetApplicationSummariesBySpace(spaceGUID string) ([]v3action.ApplicationSummary, v3action.Warnings, error)
 }
 
@@ -49,7 +50,12 @@ func (cmd *V3AppsCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3AppsCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

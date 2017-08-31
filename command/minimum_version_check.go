@@ -11,6 +11,7 @@ const (
 	MinVersionHTTPEndpointHealthCheckV2 = "2.68.0"
 	MinVersionProcessHealthCheckV2      = "2.47.0"
 
+	MinVersionV3                 = "3.27.0"
 	MinVersionRunTaskV3          = "3.0.0"
 	MinVersionIsolationSegmentV3 = "3.11.0"
 )

@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . V3RestartAppInstanceActor
 
 type V3RestartAppInstanceActor interface {
+	CloudControllerAPIVersion() string
 	DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (v3action.Warnings, error)
 }
 
@@ -41,7 +42,12 @@ func (cmd *V3RestartAppInstanceCommand) Setup(config command.Config, ui command.
 }
 
 func (cmd V3RestartAppInstanceCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

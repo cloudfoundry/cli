@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . V3SetDropletActor
 
 type V3SetDropletActor interface {
+	CloudControllerAPIVersion() string
 	SetApplicationDroplet(appName string, spaceGUID string, dropletGUID string) (v3action.Warnings, error)
 }
 
@@ -40,7 +41,12 @@ func (cmd *V3SetDropletCommand) Setup(config command.Config, ui command.UI) erro
 }
 
 func (cmd V3SetDropletCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

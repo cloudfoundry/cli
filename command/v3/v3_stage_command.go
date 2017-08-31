@@ -14,6 +14,7 @@ import (
 //go:generate counterfeiter . V3StageActor
 
 type V3StageActor interface {
+	CloudControllerAPIVersion() string
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 }
@@ -48,7 +49,12 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3StageCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

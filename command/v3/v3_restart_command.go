@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . V3RestartActor
 
 type V3RestartActor interface {
+	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
@@ -42,7 +43,12 @@ func (cmd *V3RestartCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3RestartCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}
