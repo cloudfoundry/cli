@@ -47,8 +47,6 @@ var _ = Describe("add-network-policy Command", func() {
 			Actor:          fakeActor,
 			RequiredArgs:   flag.AddNetworkPolicyArgs{SourceApp: srcApp},
 			DestinationApp: destApp,
-			Protocol:       flag.NetworkProtocol{Protocol: protocol},
-			Port:           flag.NetworkPort{StartPort: 8080, EndPort: 8081},
 		}
 
 		binaryName = "faceman"
@@ -75,51 +73,89 @@ var _ = Describe("add-network-policy Command", func() {
 		})
 	})
 
-	Context("when the user is logged in", func() {
+	Context("when the user is logged in, an org is targeted, and a space is targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
 			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org"})
 		})
 
-		It("outputs flavor text", func() {
-			Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
-		})
-
-		Context("when the policy creation is successful", func() {
+		Context("when protocol is specified but port is not", func() {
 			BeforeEach(func() {
-				fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				cmd.Protocol = flag.NetworkProtocol{Protocol: protocol}
 			})
 
-			It("displays OK when no error occurs", func() {
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.NetworkPolicyProtocolOrPortNotProvidedError{}))
+				Expect(testUI.Out).NotTo(Say(`Adding network policy`))
+			})
+		})
+
+		Context("when port is specified but protocol is not", func() {
+			BeforeEach(func() {
+				cmd.Port = flag.NetworkPort{StartPort: 8080, EndPort: 8081}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.NetworkPolicyProtocolOrPortNotProvidedError{}))
+				Expect(testUI.Out).NotTo(Say(`Adding network policy`))
+			})
+		})
+
+		Context("when both protocol and port are specificed", func() {
+			BeforeEach(func() {
+				cmd.Protocol = flag.NetworkProtocol{Protocol: protocol}
+				cmd.Port = flag.NetworkPort{StartPort: 8080, EndPort: 8081}
+			})
+
+			Context("when the policy creation is successful", func() {
+				BeforeEach(func() {
+					fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, nil)
+				})
+
+				It("displays OK when no error occurs", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
+					passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
+					Expect(passedSpaceGuid).To(Equal("some-space-guid"))
+					Expect(passedSrcAppName).To(Equal("some-app"))
+					Expect(passedDestAppName).To(Equal("some-other-app"))
+					Expect(passedProtocol).To(Equal("tcp"))
+					Expect(passedStartPort).To(Equal(8080))
+					Expect(passedEndPort).To(Equal(8081))
+
+					Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+					Expect(testUI.Out).To(Say("OK"))
+				})
+			})
+
+			Context("when the policy creation is not successful", func() {
+				BeforeEach(func() {
+					fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
+				})
+
+				It("does not display OK when an error occurs", func() {
+					Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
+
+					Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
+					Expect(testUI.Err).To(Say("some-warning-1"))
+					Expect(testUI.Err).To(Say("some-warning-2"))
+					Expect(testUI.Out).ToNot(Say("OK"))
+				})
+			})
+		})
+
+		Context("when both protocol and port are not specified", func() {
+			It("defaults protocol to 'tcp' and port to '8080'", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
+
 				Expect(fakeActor.AddNetworkPolicyCallCount()).To(Equal(1))
-				passedSpaceGuid, passedSrcAppName, passedDestAppName, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
-				Expect(passedSpaceGuid).To(Equal("some-space-guid"))
-				Expect(passedSrcAppName).To(Equal("some-app"))
-				Expect(passedDestAppName).To(Equal("some-other-app"))
+				_, _, _, passedProtocol, passedStartPort, passedEndPort := fakeActor.AddNetworkPolicyArgsForCall(0)
 				Expect(passedProtocol).To(Equal("tcp"))
 				Expect(passedStartPort).To(Equal(8080))
-				Expect(passedEndPort).To(Equal(8081))
-
-				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
-				Expect(testUI.Err).To(Say("some-warning-1"))
-				Expect(testUI.Err).To(Say("some-warning-2"))
-				Expect(testUI.Out).To(Say("OK"))
-			})
-		})
-		Context("when the policy creation is not successful", func() {
-			BeforeEach(func() {
-				fakeActor.AddNetworkPolicyReturns(cfnetworkingaction.Warnings{"some-warning-1", "some-warning-2"}, v3action.ApplicationNotFoundError{Name: srcApp})
-			})
-
-			It("does not display OK when an error occurs", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
-
-				Expect(testUI.Out).To(Say(`Adding network policy to app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
-				Expect(testUI.Err).To(Say("some-warning-1"))
-				Expect(testUI.Err).To(Say("some-warning-2"))
-				Expect(testUI.Out).ToNot(Say("OK"))
+				Expect(passedEndPort).To(Equal(8080))
 			})
 		})
 	})

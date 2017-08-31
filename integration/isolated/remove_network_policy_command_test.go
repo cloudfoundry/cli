@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"net/http"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -9,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("remove-network-policy command", func() {
@@ -123,7 +125,7 @@ var _ = Describe("remove-network-policy command", func() {
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
-				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080[^-]", appName, appName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -139,7 +141,7 @@ var _ = Describe("remove-network-policy command", func() {
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
-				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).ShouldNot(Say("%s\\s+%s\\s+tcp\\s+8080[^-]", appName, appName))
 				Eventually(session).Should(Exit(0))
 			})
 
@@ -173,6 +175,37 @@ var _ = Describe("remove-network-policy command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
+			})
+
+			Context("when the v3 api does not exist", func() {
+				var server *Server
+
+				BeforeEach(func() {
+					server = NewTLSServer()
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/info"),
+							RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
+						),
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/"),
+							RespondWith(http.StatusNotFound, `{}`),
+						),
+					)
+
+					Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					server.Close()
+				})
+
+				It("fails with no networking api error message", func() {
+					session := helpers.CF("remove-network-policy", appName, "--destination-app", appName, "--protocol", "tcp", "--port", "8080")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))
+					Eventually(session).Should(Exit(1))
+				})
 			})
 		})
 

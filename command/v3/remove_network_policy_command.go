@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -37,6 +38,9 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); ok {
+			return translatableerror.CFNetworkingEndpointNotFoundError{}
+		}
 		return err
 	}
 

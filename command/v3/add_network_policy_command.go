@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -18,8 +19,8 @@ type AddNetworkPolicyActor interface {
 type AddNetworkPolicyCommand struct {
 	RequiredArgs   flag.AddNetworkPolicyArgs `positional-args:"yes"`
 	DestinationApp string                    `long:"destination-app" required:"true" description:"Name of app to connect to"`
-	Port           flag.NetworkPort          `long:"port" description:"Port or range of ports for connection to destination app" default:"8080"`
-	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with" default:"tcp"`
+	Port           flag.NetworkPort          `long:"port" description:"Port or range of ports for connection to destination app (Default: 8080)"`
+	Protocol       flag.NetworkProtocol      `long:"protocol" description:"Protocol to connect apps with (Default: tcp)"`
 
 	usage           interface{} `usage:"CF_NAME add-network-policy SOURCE_APP --destination-app DESTINATION_APP [(--protocol (tcp | udp) --port RANGE)]\n\nEXAMPLES:\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8081\n   CF_NAME add-network-policy frontend --destination-app backend --protocol tcp --port 8080-8090"`
 	relatedCommands interface{} `related_commands:"apps, network-policies"`
@@ -37,6 +38,9 @@ func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) 
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); ok {
+			return translatableerror.CFNetworkingEndpointNotFoundError{}
+		}
 		return err
 	}
 
@@ -51,6 +55,17 @@ func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) 
 }
 
 func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
+	switch {
+	case cmd.Protocol.Protocol != "" && cmd.Port.StartPort == 0 && cmd.Port.EndPort == 0:
+		return translatableerror.NetworkPolicyProtocolOrPortNotProvidedError{}
+	case cmd.Protocol.Protocol == "" && (cmd.Port.StartPort != 0 || cmd.Port.EndPort != 0):
+		return translatableerror.NetworkPolicyProtocolOrPortNotProvidedError{}
+	case cmd.Protocol.Protocol == "" && cmd.Port.StartPort == 0 && cmd.Port.EndPort == 0:
+		cmd.Protocol.Protocol = "tcp"
+		cmd.Port.StartPort = 8080
+		cmd.Port.EndPort = 8080
+	}
+
 	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
