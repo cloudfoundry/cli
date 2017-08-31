@@ -23,6 +23,7 @@ type V2PushActor interface {
 //go:generate counterfeiter . V3PushActor
 
 type V3PushActor interface {
+	CloudControllerAPIVersion() string
 	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
@@ -89,10 +90,10 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	var (
-		app v3action.Application
-		err error
-	)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
 
 	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
@@ -104,6 +105,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return err
 	}
 
+	var app v3action.Application
 	app, err = cmd.getApplication()
 	if _, ok := err.(v3action.ApplicationNotFoundError); ok {
 		app, err = cmd.createApplication(user.Name)

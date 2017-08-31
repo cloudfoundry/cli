@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -57,10 +58,24 @@ var _ = Describe("v3-droplets Command", func() {
 		})
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
+		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionV3)
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when the API version is below the minimum", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+		})
+
+		It("returns a MinimumAPIVersionNotMetError", func() {
+			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
+				CurrentVersion: "0.0.0",
+				MinimumVersion: command.MinVersionV3,
+			}))
+		})
 	})
 
 	Context("when checking target fails", func() {

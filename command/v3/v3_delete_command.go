@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . V3DeleteActor
 
 type V3DeleteActor interface {
+	CloudControllerAPIVersion() string
 	DeleteApplicationByNameAndSpace(name string, spaceGUID string) (v3action.Warnings, error)
 }
 
@@ -40,7 +41,12 @@ func (cmd *V3DeleteCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3DeleteCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

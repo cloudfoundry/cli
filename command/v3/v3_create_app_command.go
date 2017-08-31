@@ -11,6 +11,7 @@ import (
 //go:generate counterfeiter . V3CreateAppActor
 
 type V3CreateAppActor interface {
+	CloudControllerAPIVersion() string
 	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
 }
 
@@ -42,7 +43,12 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

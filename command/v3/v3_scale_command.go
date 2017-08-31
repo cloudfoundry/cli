@@ -14,6 +14,7 @@ import (
 type V3ScaleActor interface {
 	shared.V3AppSummaryActor
 
+	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
@@ -65,7 +66,12 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	if err != nil {
+		return err
+	}
+
+	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}
