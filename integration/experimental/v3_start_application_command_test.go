@@ -129,7 +129,7 @@ var _ = Describe("v3-start-application command", func() {
 				stageSession := helpers.CF("v3-stage", appName, "--package-guid", packageGUID)
 				Eventually(stageSession).Should(Exit(0))
 
-				regex, err := regexp.Compile(`droplet: (.+)`)
+				regex, err := regexp.Compile(`droplet guid:\s+(.+)`)
 				Expect(err).ToNot(HaveOccurred())
 				matches := regex.FindStringSubmatch(string(stageSession.Out.Contents()))
 				Expect(matches).To(HaveLen(2))
