@@ -62,6 +62,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JSONSyntaxError", JSONSyntaxError{Err: errors.New("some-error")}),
 		Entry("LifecycleMinimumAPIVersionNotMetError", LifecycleMinimumAPIVersionNotMetError{}),
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
+		Entry("NetworkPolicyProtocolOrPortNotProvidedError", NetworkPolicyProtocolOrPortNotProvidedError{}),
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NoCompatibleBinaryError", NoCompatibleBinaryError{}),
 		Entry("NoDomainsFoundError", NoDomainsFoundError{}),

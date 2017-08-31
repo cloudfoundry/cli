@@ -2,11 +2,13 @@ package v3
 
 import (
 	"fmt"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -36,6 +38,9 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if _, ok := err.(translatableerror.V3APIDoesNotExistError); ok {
+			return translatableerror.CFNetworkingEndpointNotFoundError{}
+		}
 		return err
 	}
 
@@ -97,11 +102,17 @@ func (cmd NetworkPoliciesCommand) Execute(args []string) error {
 	}
 
 	for _, policy := range policies {
+		var portEntry string
+		if policy.StartPort == policy.EndPort {
+			portEntry = strconv.Itoa(policy.StartPort)
+		} else {
+			portEntry = fmt.Sprintf("%d-%d", policy.StartPort, policy.EndPort)
+		}
 		table = append(table, []string{
 			policy.SourceName,
 			policy.DestinationName,
 			policy.Protocol,
-			fmt.Sprintf("%d-%d", policy.StartPort, policy.EndPort),
+			portEntry,
 		})
 	}
 

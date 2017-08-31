@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"net/http"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -9,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("add-network-policy command", func() {
@@ -110,9 +112,40 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
+		Context("when the v3 api does not exist", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = NewTLSServer()
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/info"),
+						RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
+					),
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/"),
+						RespondWith(http.StatusNotFound, `{}`),
+					),
+				)
+
+				Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with no networking api error message", func() {
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
 		Context("when an app exists", func() {
 			It("creates a policy", func() {
-				session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080-8090", "--protocol", "udp")
 
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
@@ -123,8 +156,26 @@ var _ = Describe("add-network-policy command", func() {
 				Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
 				Consistently(session).ShouldNot(Say("OK"))
 				Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
-				Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080-8080", appName, appName))
+				Eventually(session).Should(Say("%s\\s+%s\\s+udp\\s+8080-8090", appName, appName))
 				Eventually(session).Should(Exit(0))
+			})
+
+			Context("when port and protocol are not specified", func() {
+				It("creates a policy with the default values", func() {
+					session := helpers.CF("add-network-policy", appName, "--destination-app", appName)
+
+					username, _ := helpers.GetCredentials()
+					Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("network-policies")
+					Eventually(session).Should(Say(`Listing network policies in org %s / space %s as %s\.\.\.`, orgName, spaceName, username))
+					Consistently(session).ShouldNot(Say("OK"))
+					Eventually(session).Should(Say("source\\s+destination\\s+protocol\\s+ports"))
+					Eventually(session).Should(Say("%s\\s+%s\\s+tcp\\s+8080[^-]", appName, appName))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
@@ -147,6 +198,26 @@ var _ = Describe("add-network-policy command", func() {
 				username, _ := helpers.GetCredentials()
 				Eventually(session).Should(Say(`Adding network policy to app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, username))
 				Eventually(session.Err).Should(Say("App pineapple not found"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when port is specified but protocol is not", func() {
+			It("returns an error", func() {
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080")
+
+				Eventually(session.Err).Should(Say("--protocol and --port flags must be specified together"))
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when protocol is specified but port is not", func() {
+			It("returns an error", func() {
+				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--protocol", "tcp")
+
+				Eventually(session.Err).Should(Say("--protocol and --port flags must be specified together"))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

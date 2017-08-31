@@ -4784,7 +4784,7 @@
     "translation": "Port non autorisé dans la route HTTP {{.RouteName}}"
   },
   {
-    "id": "Port or range of ports for connection to destination app",
+    "id": "Port or range of ports for connection to destination app (Default: 8080)",
     "translation": ""
   },
   {
@@ -4840,7 +4840,7 @@
     "translation": ""
   },
   {
-    "id": "Protocol to connect apps with",
+    "id": "Protocol to connect apps with (Default: tcp)",
     "translation": ""
   },
   {
