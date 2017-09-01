@@ -93,6 +93,19 @@ func (ps ProcessSummaries) String() string {
 	return strings.Join(summaries, ", ")
 }
 
+func (actor Actor) GetProcessByApplicationAndProcessType(appGUID string, processType string) (Process, Warnings, error) {
+	ccv3Process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, processType)
+	if err != nil {
+		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
+			return Process{}, Warnings(warnings), ProcessNotFoundError{ProcessType: processType}
+		}
+
+		return Process{}, Warnings(warnings), err
+	}
+
+	return Process(ccv3Process), Warnings(warnings), nil
+}
+
 func (actor Actor) ScaleProcessByApplication(appGUID string, process Process) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3.Process(process))
 	allWarnings := Warnings(warnings)
