@@ -35,6 +35,7 @@ var _ = Describe("v3-scale command", func() {
 				Eventually(session.Out).Should(Say("cf v3-scale APP_NAME \\[--process PROCESS\\] \\[-i INSTANCES\\] \\[-k DISK\\] \\[-m MEMORY\\]"))
 
 				Eventually(session.Out).Should(Say("OPTIONS:"))
+				Eventually(session.Out).Should(Say("-f\\s+Force restart of app without prompt"))
 				Eventually(session.Out).Should(Say("--process\\s+App process to scale \\(Default: web\\)"))
 				Eventually(session.Out).Should(Say("-i\\s+Number of instances"))
 				Eventually(session.Out).Should(Say("-k\\s+Disk limit \\(e\\.g\\. 256M, 1024M, 1G\\)"))
