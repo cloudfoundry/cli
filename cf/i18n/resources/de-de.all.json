@@ -3696,6 +3696,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: --protocol and --port flags must be specified together",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
     "translation": "Falsche Verwendung: Befehlszeilenflags (außer -f) können nicht bei Push-Operationen angewendet werden, bei denen mehrere Apps von einer Manifestdatei mit einer Push-Operation übertragen werden."
   },

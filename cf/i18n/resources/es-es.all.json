@@ -3696,6 +3696,10 @@
     "translation": ""
   },
   {
+    "id": "Incorrect Usage: --protocol and --port flags must be specified together",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
     "translation": "Uso incorrecto: Los distintivos de línea de mandatos (excepto -f) no se pueden aplicar al enviar por push varias apps desde un archivo de manifiesto."
   },
