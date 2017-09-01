@@ -29,6 +29,7 @@ type V3ScaleActor interface {
 
 type V3ScaleCommand struct {
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
+	Force               bool           `short:"f" description:"Force restart of app without prompt"`
 	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
 	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
 	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
@@ -158,7 +159,7 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 	})
 
 	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
-	if shouldRestart {
+	if shouldRestart && !cmd.Force {
 		cmd.UI.DisplayNewline()
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
 			false,
