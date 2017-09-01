@@ -5,7 +5,7 @@ type V3APIDoesNotExistError struct {
 }
 
 func (V3APIDoesNotExistError) Error() string {
-	return "{{.Message}}\nNote that this command requires CF API version 3.0.0 or higher."
+	return "{{.Message}}\nThis command requires CF API version 3.0.0 or higher."
 }
 
 func (e V3APIDoesNotExistError) Translate(translate func(string, ...interface{}) string) string {
