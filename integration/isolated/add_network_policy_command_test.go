@@ -207,8 +207,9 @@ var _ = Describe("add-network-policy command", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080")
 
-				Eventually(session.Err).Should(Say("--protocol and --port flags must be specified together"))
+				Eventually(session.Err).Should(Say("Incorrect Usage: --protocol and --port flags must be specified together"))
 				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -217,8 +218,9 @@ var _ = Describe("add-network-policy command", func() {
 			It("returns an error", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--protocol", "tcp")
 
-				Eventually(session.Err).Should(Say("--protocol and --port flags must be specified together"))
+				Eventually(session.Err).Should(Say("Incorrect Usage: --protocol and --port flags must be specified together"))
 				Eventually(session).Should(Say("FAILED"))
+				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Exit(1))
 			})
 		})
