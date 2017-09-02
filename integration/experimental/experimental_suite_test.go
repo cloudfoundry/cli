@@ -44,8 +44,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	helpers.TurnOffColors()
 
+	// Enable Experimental Flag
+	helpers.TurnOnExperimental()
+
 	helpers.EnableDockerSupport()
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
+
 })
 
 var _ = BeforeEach(func() {

@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . V3RestartAppInstanceActor
@@ -42,7 +43,7 @@ func (cmd *V3RestartAppInstanceCommand) Setup(config command.Config, ui command.
 }
 
 func (cmd V3RestartAppInstanceCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionV3)
 	if err != nil {
 		return err
 	}

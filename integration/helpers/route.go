@@ -71,3 +71,7 @@ func (d Domain) Share() {
 func (d Domain) Delete() {
 	Eventually(CF("delete-domain", d.Name, "-f")).Should(Exit(0))
 }
+
+func (d Domain) DeleteShared() {
+	Eventually(CF("delete-shared-domain", d.Name, "-f")).Should(Exit(0))
+}

@@ -10,16 +10,18 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/version"
 )
 
 // Route represents a Cloud Controller Route.
 type Route struct {
-	GUID       string `json:"-"`
-	Host       string `json:"host,omitempty"`
-	Path       string `json:"path,omitempty"`
-	Port       int    `json:"port,omitempty"`
-	DomainGUID string `json:"domain_guid"`
-	SpaceGUID  string `json:"space_guid"`
+	GUID       string        `json:"-"`
+	Host       string        `json:"host,omitempty"`
+	Path       string        `json:"path,omitempty"`
+	Port       types.NullInt `json:"port,omitempty"`
+	DomainGUID string        `json:"domain_guid"`
+	SpaceGUID  string        `json:"space_guid"`
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Route response.
@@ -27,11 +29,11 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	var ccRoute struct {
 		Metadata internal.Metadata `json:"metadata"`
 		Entity   struct {
-			Host       string `json:"host"`
-			Path       string `json:"path"`
-			Port       int    `json:"port"`
-			DomainGUID string `json:"domain_guid"`
-			SpaceGUID  string `json:"space_guid"`
+			Host       string        `json:"host"`
+			Path       string        `json:"path"`
+			Port       types.NullInt `json:"port"`
+			DomainGUID string        `json:"domain_guid"`
+			SpaceGUID  string        `json:"space_guid"`
 		} `json:"entity"`
 	}
 	if err := json.Unmarshal(data, &ccRoute); err != nil {
@@ -203,6 +205,18 @@ func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 // CheckRoute returns true if the route exists in the CF instance. DomainGUID
 // is required for check. This call will only work for CC API 2.55 or higher.
 func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
+	currentVersion := client.APIVersion()
+	switch {
+	case version.MinimumAPIVersionCheck(currentVersion, version.MinVersionNoHostInReservedRouteEndpoint) == nil:
+		return client.checkRoute(route)
+	case version.MinimumAPIVersionCheck(currentVersion, version.MinVersionHTTPRoutePath) == nil:
+		return client.checkRouteDeprecated(route.DomainGUID, route.Host, route.Path)
+	default:
+		return client.checkRouteDeprecated(route.DomainGUID, route.Host, "")
+	}
+}
+
+func (client *Client) checkRoute(route Route) (bool, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteReservedRequest,
 		URIParams:   map[string]string{"domain_guid": route.DomainGUID},
@@ -218,8 +232,32 @@ func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
 	if route.Path != "" {
 		queryParams.Add("path", route.Path)
 	}
-	if route.Port != 0 {
-		queryParams.Add("port", fmt.Sprint(route.Port))
+	if route.Port.IsSet {
+		queryParams.Add("port", fmt.Sprint(route.Port.Value))
+	}
+	request.URL.RawQuery = queryParams.Encode()
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
+		return false, response.Warnings, nil
+	}
+
+	return response.HTTPResponse.StatusCode == http.StatusNoContent, response.Warnings, err
+}
+
+func (client *Client) checkRouteDeprecated(domainGUID string, host string, path string) (bool, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetRouteReservedDeprecatedRequest,
+		URIParams:   map[string]string{"domain_guid": domainGUID, "host": host},
+	})
+	if err != nil {
+		return false, nil, err
+	}
+
+	queryParams := url.Values{}
+	if path != "" {
+		queryParams.Add("path", path)
 	}
 	request.URL.RawQuery = queryParams.Encode()
 

@@ -36,6 +36,7 @@ const (
 	GetPrivateDomainRequest                = "GetPrivateDomain"
 	GetRouteAppsRequest                    = "GetRouteApps"
 	GetRouteReservedRequest                = "GetRouteReserved"
+	GetRouteReservedDeprecatedRequest      = "GetRouteReservedDeprecated"
 	GetRouteRouteMappingsRequest           = "GetRouteRouteMappings"
 	GetRoutesRequest                       = "GetRoutes"
 	GetSecurityGroupRunningSpacesRequest   = "GetSecurityGroupRunningSpaces"
@@ -96,6 +97,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodPut, Name: PutBindRouteAppRequest},
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
+	{Path: "/v2/routes/reserved/domain/:domain_guid/host/:host", Method: http.MethodGet, Name: GetRouteReservedDeprecatedRequest},
 	{Path: "/v2/security_groups", Method: http.MethodGet, Name: GetSecurityGroupsRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces", Method: http.MethodGet, Name: GetSecurityGroupRunningSpacesRequest},
 	{Path: "/v2/security_groups/:security_group_guid/spaces/:space_guid", Method: http.MethodDelete, Name: DeleteRunningSecurityGroupSpaceRequest},

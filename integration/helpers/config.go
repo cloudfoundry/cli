@@ -11,7 +11,11 @@ import (
 )
 
 func TurnOffColors() {
-	os.Setenv("CF_COLOR", "false")
+	Expect(os.Setenv("CF_COLOR", "false")).To(Succeed())
+}
+
+func TurnOnExperimental() {
+	Expect(os.Setenv("CF_CLI_EXPERIMENTAL", "true")).To(Succeed())
 }
 
 func SetHomeDir() string {
@@ -19,14 +23,14 @@ func SetHomeDir() string {
 	homeDir, err := ioutil.TempDir("", "cli-integration-test")
 	Expect(err).NotTo(HaveOccurred())
 
-	os.Setenv("CF_HOME", homeDir)
-	os.Setenv("CF_PLUGIN_HOME", homeDir)
+	Expect(os.Setenv("CF_HOME", homeDir)).To(Succeed())
+	Expect(os.Setenv("CF_PLUGIN_HOME", homeDir)).To(Succeed())
 	return homeDir
 }
 
 func DestroyHomeDir(homeDir string) {
 	if homeDir != "" {
-		os.RemoveAll(homeDir)
+		Expect(os.RemoveAll(homeDir)).To(Succeed())
 	}
 }
 

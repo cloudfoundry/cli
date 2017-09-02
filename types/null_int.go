@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
@@ -51,4 +52,11 @@ func (n *NullInt) UnmarshalJSON(rawJSON []byte) error {
 	n.IsSet = true
 
 	return nil
+}
+
+func (n NullInt) MarshalJSON() ([]byte, error) {
+	if n.IsSet {
+		return []byte(fmt.Sprint(n.Value)), nil
+	}
+	return []byte("null"), nil
 }

@@ -117,7 +117,8 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 				Context("when the '-f' flag is not provided", func() {
 					Context("when user is prompted for confirmation", func() {
 						BeforeEach(func() {
-							input.Write([]byte("\n"))
+							_, err := input.Write([]byte("\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("displays the interactive prompt", func() {
@@ -129,7 +130,8 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 					Context("when the user inputs no", func() {
 						BeforeEach(func() {
-							input.Write([]byte("n\n"))
+							_, err := input.Write([]byte("n\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("does not delete orphaned routes", func() {
@@ -142,7 +144,8 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 					Context("when the user input is invalid", func() {
 						BeforeEach(func() {
-							input.Write([]byte("e\n"))
+							_, err := input.Write([]byte("e\n"))
+							Expect(err).NotTo(HaveOccurred())
 						})
 
 						It("returns an error", func() {
@@ -157,7 +160,8 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 						var routes []v2action.Route
 
 						BeforeEach(func() {
-							input.Write([]byte("y\n"))
+							_, err := input.Write([]byte("y\n"))
+							Expect(err).NotTo(HaveOccurred())
 
 							routes = []v2action.Route{
 								{
@@ -223,12 +227,21 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 							Context("when the error is a DomainNotFoundError", func() {
 								BeforeEach(func() {
-									expectedErr = v2action.DomainNotFoundError{}
-									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
+									fakeActor.GetOrphanedRoutesBySpaceReturns(
+										nil,
+										nil,
+										v2action.DomainNotFoundError{
+											Name: "some-domain",
+											GUID: "some-domain-guid",
+										},
+									)
 								})
 
-								It("returns DomainNotFoundError", func() {
-									Expect(executeErr).To(MatchError(expectedErr))
+								It("returns translatableerror.DomainNotFoundError", func() {
+									Expect(executeErr).To(MatchError(translatableerror.DomainNotFoundError{
+										Name: "some-domain",
+										GUID: "some-domain-guid",
+									}))
 								})
 							})
 

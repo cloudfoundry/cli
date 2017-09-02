@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . SecurityGroupsActor
@@ -54,7 +55,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 
 	includeStaging := true
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionLifecyleStagingV2)
+	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionLifecyleStagingV2)
 	if err != nil {
 		switch err.(type) {
 		case translatableerror.MinimumAPIVersionNotMetError:

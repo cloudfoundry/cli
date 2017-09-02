@@ -40,7 +40,7 @@ var _ = Describe("pushing a path with the -p flag", func() {
 		It("tells the user that they cannot be used together, displays usage and fails", func() {
 			session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage, "-p", path)
 
-			Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '-p' cannot be used together\\."))
+			Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
 			Eventually(session).Should(Say("FAILED"))
 			Eventually(session).Should(Say("USAGE:"))
 

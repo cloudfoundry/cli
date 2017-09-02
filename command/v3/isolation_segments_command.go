@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . IsolationSegmentsActor
@@ -41,7 +42,7 @@ func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI)
 }
 
 func (cmd IsolationSegmentsCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
+	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionIsolationSegmentV3)
 	if err != nil {
 		return err
 	}

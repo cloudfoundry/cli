@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -14,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -421,7 +421,7 @@ var _ = Describe("bind-security-group Command", func() {
 			It("returns a MinimumAPIVersionNotMetError", func() {
 				Expect(executeErr).To(MatchError(translatableerror.LifecycleMinimumAPIVersionNotMetError{
 					CurrentVersion: "2.34.0",
-					MinimumVersion: command.MinVersionLifecyleStagingV2,
+					MinimumVersion: version.MinVersionLifecyleStagingV2,
 				}))
 				Expect(fakeActor.CloudControllerAPIVersionCallCount()).To(Equal(1))
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(0))
@@ -430,7 +430,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 		Context("when the version check succeeds", func() {
 			BeforeEach(func() {
-				fakeActor.CloudControllerAPIVersionReturns(command.MinVersionLifecyleStagingV2)
+				fakeActor.CloudControllerAPIVersionReturns(version.MinVersionLifecyleStagingV2)
 			})
 
 			Context("when a space is provided", func() {

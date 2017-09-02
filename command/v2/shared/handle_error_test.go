@@ -104,6 +104,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.EmptyDirectoryError{Path: "some-filename"},
 		),
 
+		Entry("v2action.DomainNotFoundError -> DomainNotFoundError",
+			v2action.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
+			translatableerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
+		),
+
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
 			uaa.BadCredentialsError{},
 			translatableerror.BadCredentialsError{},

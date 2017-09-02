@@ -1,6 +1,8 @@
 package v2action
 
 import (
+	"fmt"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
@@ -12,11 +14,21 @@ type Domain ccv2.Domain
 
 // DomainNotFoundError is an error wrapper that represents the case
 // when the domain is not found.
-type DomainNotFoundError struct{}
+type DomainNotFoundError struct {
+	Name string
+	GUID string
+}
 
 // Error method to display the error message.
-func (DomainNotFoundError) Error() string {
-	return "Domain not found."
+func (e DomainNotFoundError) Error() string {
+	switch {
+	case e.Name != "":
+		return fmt.Sprintf("Domain %s not found", e.Name)
+	case e.GUID != "":
+		return fmt.Sprintf("Domain with GUID %s not found", e.GUID)
+	default:
+		return "Domain not found"
+	}
 }
 
 // TODO: Move into own file or add function to CCV2/3
@@ -105,7 +117,7 @@ func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) 
 
 	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
 	if isResourceNotFoundError(err) {
-		return Domain{}, Warnings(warnings), DomainNotFoundError{}
+		return Domain{}, Warnings(warnings), DomainNotFoundError{GUID: domainGUID}
 	}
 
 	actor.saveDomain(domain)
@@ -125,7 +137,7 @@ func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error)
 
 	domain, warnings, err := actor.CloudControllerClient.GetPrivateDomain(domainGUID)
 	if isResourceNotFoundError(err) {
-		return Domain{}, Warnings(warnings), DomainNotFoundError{}
+		return Domain{}, Warnings(warnings), DomainNotFoundError{GUID: domainGUID}
 	}
 
 	actor.saveDomain(domain)
@@ -135,8 +147,10 @@ func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error)
 // GetOrganizationDomains returns the shared and private domains associated
 // with an organization.
 func (actor Actor) GetOrganizationDomains(orgGUID string) ([]Domain, Warnings, error) {
-	var allWarnings Warnings
-	var allDomains []Domain
+	var (
+		allWarnings Warnings
+		allDomains  []Domain
+	)
 
 	domains, warnings, err := actor.CloudControllerClient.GetSharedDomains()
 	allWarnings = append(allWarnings, warnings...)

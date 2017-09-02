@@ -3,6 +3,7 @@ package types_test
 import (
 	. "code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -56,4 +57,16 @@ var _ = Describe("NullInt", func() {
 			})
 		})
 	})
+
+	DescribeTable("MarshalJSON",
+		func(nullInt NullInt, expectedBytes []byte) {
+			bytes, err := nullInt.MarshalJSON()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(bytes).To(Equal(expectedBytes))
+		},
+		Entry("negative number", NullInt{IsSet: true, Value: -1}, []byte("-1")),
+		Entry("positive number", NullInt{IsSet: true, Value: 1}, []byte("1")),
+		Entry("0", NullInt{IsSet: true, Value: 0}, []byte("0")),
+		Entry("no value", NullInt{IsSet: false}, []byte("null")),
+	)
 })
