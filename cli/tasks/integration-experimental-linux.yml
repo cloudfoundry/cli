@@ -13,9 +13,6 @@ inputs:
 - name: bosh-lite-lock
 - name: vars-store
 
-params:
-  CF_CLI_EXPERIMENTAL: false
-
 run:
   path: bash
   args:
