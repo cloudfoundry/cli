@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . V3StageActor
@@ -49,7 +50,7 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3StageCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionV3)
+	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionV3)
 	if err != nil {
 		return err
 	}

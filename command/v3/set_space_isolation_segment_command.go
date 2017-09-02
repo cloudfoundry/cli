@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . SetSpaceIsolationSegmentActor
@@ -56,7 +57,7 @@ func (cmd *SetSpaceIsolationSegmentCommand) Setup(config command.Config, ui comm
 }
 
 func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
-	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
+	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionIsolationSegmentV3)
 	if err != nil {
 		return err
 	}

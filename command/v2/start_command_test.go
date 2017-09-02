@@ -281,7 +281,7 @@ var _ = Describe("Start Command", func() {
 										Domain: v2action.Domain{
 											Name: "foobar.com",
 										},
-										Port: 13,
+										Port: types.NullInt{IsSet: true, Value: 13},
 									},
 								},
 							}
@@ -521,7 +521,7 @@ var _ = Describe("Start Command", func() {
 									Domain: v2action.Domain{
 										Name: "foobar.com",
 									},
-									Port: 13,
+									Port: types.NullInt{IsSet: true, Value: 13},
 								},
 							},
 						}

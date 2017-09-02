@@ -231,7 +231,7 @@ var _ = Describe("v2-push Command", func() {
 									Domain: v2action.Domain{
 										Name: "foobar.com",
 									},
-									Port: 13,
+									Port: types.NullInt{IsSet: true, Value: 13},
 								},
 							},
 						}
@@ -497,7 +497,7 @@ var _ = Describe("v2-push Command", func() {
 											Domain: v2action.Domain{
 												Name: "foobar.com",
 											},
-											Port: 13,
+											Port: types.NullInt{IsSet: true, Value: 13},
 										},
 									},
 								}
@@ -547,7 +547,7 @@ var _ = Describe("v2-push Command", func() {
 										Domain: v2action.Domain{
 											Name: "foobar.com",
 										},
-										Port: 13,
+										Port: types.NullInt{IsSet: true, Value: 13},
 									},
 								},
 							}
@@ -678,8 +678,7 @@ var _ = Describe("v2-push Command", func() {
 
 			It("returns an error", func() {
 				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-					Arg1: "--docker-image, -o",
-					Arg2: "-p",
+					Args: []string{"--docker-image, -o", "-p"},
 				}))
 			})
 		})
@@ -692,8 +691,7 @@ var _ = Describe("v2-push Command", func() {
 
 			It("returns an ArgumentCombinationError", func() {
 				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-					Arg1: "-f",
-					Arg2: "--no-manifest",
+					Args: []string{"-f", "--no-manifest"},
 				}))
 			})
 		})

@@ -2204,6 +2204,10 @@
     "translation": "{{.Hostname}} 라우트 작성 중..."
   },
   {
+    "id": "Creating route {{.Route}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.URL}} 라우트 작성 중..."
   },
@@ -2574,6 +2578,18 @@
   {
     "id": "Domain (e.g. example.com)",
     "translation": "도메인(예: example.com)"
+  },
+  {
+    "id": "Domain not found",
+    "translation": ""
+  },
+  {
+    "id": "Domain with GUID {{.DomainGUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Domain {{.DomainName}} not found",
+    "translation": ""
   },
   {
     "id": "Domains:",
@@ -3688,10 +3704,6 @@
     "translation": "올바르지 않은 사용법:"
   },
   {
-    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together.",
-    "translation": ""
-  },
-  {
     "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' must be used together.",
     "translation": ""
   },
@@ -3702,6 +3714,10 @@
   {
     "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
     "translation": "올바르지 않은 사용법입니다: Manifest 파일에서 여러 앱을 푸시하는 경우 명령행 플래그(-f 제외)를 적용할 수 없습니다."
+  },
+  {
+    "id": "Incorrect Usage: The following arguments cannot be used together: {{.Args}}",
+    "translation": ""
   },
   {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
@@ -5268,6 +5284,14 @@
     "translation": "라우트 {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Route {{.Route}} already exists.",
+    "translation": ""
+  },
+  {
+    "id": "Route {{.Route}} has been created.",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} has been registered to another space.",
     "translation": ""
   },
@@ -6304,10 +6328,6 @@
     "translation": ""
   },
   {
-    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
-    "translation": ""
-  },
-  {
     "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
@@ -7208,6 +7228,10 @@
     "translation": ""
   },
   {
+    "id": "invalid argument for flag '--port' (expected int \u003e 0)",
+    "translation": ""
+  },
+  {
     "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
@@ -7733,6 +7757,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
     "translation": ""
   },
   {

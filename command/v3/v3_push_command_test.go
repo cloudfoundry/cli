@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
-	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -20,6 +19,7 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
+	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -75,7 +75,7 @@ var _ = Describe("v3-push Command", func() {
 			NOAAClient:          fakeNOAAClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
 		}
-		fakeActor.CloudControllerAPIVersionReturns(command.MinVersionV3)
+		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionV3)
 	})
 
 	JustBeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("v3-push Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: command.MinVersionV3,
+				MinimumVersion: version.MinVersionV3,
 			}))
 		})
 	})

@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . OrgActor
@@ -118,7 +119,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	if cmd.ActorV3 != nil {
-		apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), command.MinVersionIsolationSegmentV3)
+		apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), version.MinVersionIsolationSegmentV3)
 		if apiCheck == nil {
 			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
 			cmd.UI.DisplayWarnings(v3Warnings)

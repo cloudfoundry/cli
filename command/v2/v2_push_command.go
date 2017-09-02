@@ -353,8 +353,7 @@ func (cmd V2PushCommand) validateArgs() error {
 	switch {
 	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{
-			Arg1: "--docker-image, -o",
-			Arg2: "-p",
+			Args: []string{"--docker-image, -o", "-p"},
 		}
 	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
 		return translatableerror.RequiredFlagsError{
@@ -365,8 +364,7 @@ func (cmd V2PushCommand) validateArgs() error {
 		return translatableerror.DockerPasswordNotSetError{}
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{
-			Arg1: "-f",
-			Arg2: "--no-manifest",
+			Args: []string{"-f", "--no-manifest"},
 		}
 	}
 

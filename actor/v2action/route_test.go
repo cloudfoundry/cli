@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,7 @@ var _ = Describe("Route Actions", func() {
 	})
 
 	Describe("Route", func() {
-		DescribeTable("String", func(host string, domain string, path string, port int, expectedValue string) {
+		DescribeTable("String", func(host string, domain string, path string, port types.NullInt, expectedValue string) {
 			route := Route{
 				Host: host,
 				Domain: Domain{
@@ -36,12 +37,13 @@ var _ = Describe("Route Actions", func() {
 			Expect(route.String()).To(Equal(expectedValue))
 		},
 
-			Entry("has domain", "", "domain.com", "", 0, "domain.com"),
-			Entry("has host, domain", "host", "domain.com", "", 0, "host.domain.com"),
-			Entry("has domain, path", "", "domain.com", "/path", 0, "domain.com/path"),
-			Entry("has host, domain, path", "host", "domain.com", "/path", 0, "host.domain.com/path"),
-			Entry("has domain, port", "", "domain.com", "", 3333, "domain.com:3333"),
-			Entry("has host, domain, path, port", "host", "domain.com", "/path", 3333, "domain.com:3333"),
+			Entry("has domain", "", "domain.com", "", types.NullInt{IsSet: false}, "domain.com"),
+			Entry("has host, domain", "host", "domain.com", "", types.NullInt{IsSet: false}, "host.domain.com"),
+			Entry("has domain, path", "", "domain.com", "/path", types.NullInt{IsSet: false}, "domain.com/path"),
+			Entry("has domain, path", "", "domain.com", "path", types.NullInt{IsSet: false}, "domain.com/path"),
+			Entry("has host, domain, path", "host", "domain.com", "/path", types.NullInt{IsSet: false}, "host.domain.com/path"),
+			Entry("has domain, port", "", "domain.com", "", types.NullInt{IsSet: true, Value: 3333}, "domain.com:3333"),
+			Entry("has host, domain, path, port", "host", "domain.com", "/path", types.NullInt{IsSet: true, Value: 3333}, "host.domain.com:3333/path"),
 		)
 	})
 
@@ -110,7 +112,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:       "some-route-guid",
 						Host:       "some-host",
 						Path:       "some-path",
-						Port:       3333,
+						Port:       types.NullInt{IsSet: true, Value: 3333},
 						DomainGUID: "some-domain-guid",
 						SpaceGUID:  "some-space-guid",
 					},
@@ -119,17 +121,16 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("creates the route and returns all warnings", func() {
-				route, warnings, err := actor.CreateRoute(
-					Route{
-						Domain: Domain{
-							Name: "some-domain",
-							GUID: "some-domain-guid",
-						},
-						Host:      "some-host",
-						Path:      "some-path",
-						Port:      3333,
-						SpaceGUID: "some-space-guid",
+				route, warnings, err := actor.CreateRoute(Route{
+					Domain: Domain{
+						Name: "some-domain",
+						GUID: "some-domain-guid",
 					},
+					Host:      "some-host",
+					Path:      "/some-path",
+					Port:      types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID: "some-space-guid",
+				},
 					true)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("create route warning"))
@@ -141,7 +142,7 @@ var _ = Describe("Route Actions", func() {
 					GUID:      "some-route-guid",
 					Host:      "some-host",
 					Path:      "some-path",
-					Port:      3333,
+					Port:      types.NullInt{IsSet: true, Value: 3333},
 					SpaceGUID: "some-space-guid",
 				}))
 
@@ -150,11 +151,65 @@ var _ = Describe("Route Actions", func() {
 				Expect(passedRoute).To(Equal(ccv2.Route{
 					DomainGUID: "some-domain-guid",
 					Host:       "some-host",
-					Path:       "some-path",
-					Port:       3333,
+					Path:       "/some-path",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
 					SpaceGUID:  "some-space-guid",
 				}))
 				Expect(generatePort).To(BeTrue())
+			})
+		})
+
+		Context("when path does not start with /", func() {
+			It("prepends / to path", func() {
+				_, _, err := actor.CreateRoute(
+					Route{
+						Domain: Domain{
+							Name: "some-domain",
+							GUID: "some-domain-guid",
+						},
+						Host:      "some-host",
+						Path:      "some-path",
+						Port:      types.NullInt{IsSet: true, Value: 3333},
+						SpaceGUID: "some-space-guid",
+					},
+					true,
+				)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+				passedRoute, _ := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+				Expect(passedRoute).To(Equal(ccv2.Route{
+					DomainGUID: "some-domain-guid",
+					Host:       "some-host",
+					Path:       "/some-path",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID:  "some-space-guid",
+				}))
+			})
+		})
+
+		Context("when is not provided", func() {
+			It("passes empty path", func() {
+				_, _, err := actor.CreateRoute(
+					Route{
+						Domain: Domain{
+							Name: "some-domain",
+							GUID: "some-domain-guid",
+						},
+						Host:      "some-host",
+						Port:      types.NullInt{IsSet: true, Value: 3333},
+						SpaceGUID: "some-space-guid",
+					},
+					true,
+				)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+				passedRoute, _ := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+				Expect(passedRoute).To(Equal(ccv2.Route{
+					DomainGUID: "some-domain-guid",
+					Host:       "some-host",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID:  "some-space-guid",
+				}))
 			})
 		})
 
@@ -173,6 +228,271 @@ var _ = Describe("Route Actions", func() {
 				_, warnings, err := actor.CreateRoute(Route{}, true)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("create route warning"))
+			})
+		})
+	})
+
+	Describe("CreateRouteWithExistenceCheck", func() {
+		var (
+			route               Route
+			createdRoute        Route
+			createRouteWarnings Warnings
+			createRouteErr      error
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient.GetSpacesReturns(
+				[]ccv2.Space{
+					{
+						GUID:                     "some-space-guid",
+						Name:                     "some-space",
+						AllowSSH:                 true,
+						SpaceQuotaDefinitionGUID: "some-space-quota-guid",
+					},
+				},
+				ccv2.Warnings{"get-space-warning"},
+				nil)
+
+			fakeCloudControllerClient.CreateRouteReturns(
+				ccv2.Route{
+					GUID:       "some-route-guid",
+					Host:       "some-host",
+					Path:       "some-path",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
+					DomainGUID: "some-domain-guid",
+					SpaceGUID:  "some-space-guid",
+				},
+				ccv2.Warnings{"create-route-warning"},
+				nil)
+			fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, nil)
+			route = Route{
+				Domain: Domain{
+					Name: "some-domain",
+					GUID: "some-domain-guid",
+				},
+				Host: "some-host",
+				Path: "some-path",
+				Port: types.NullInt{IsSet: true, Value: 3333},
+			}
+		})
+
+		JustBeforeEach(func() {
+			createdRoute, createRouteWarnings, createRouteErr = actor.CreateRouteWithExistenceCheck(
+				"some-org-guid",
+				"some-space",
+				route,
+				true)
+		})
+
+		Context("when route does not exist", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, nil)
+			})
+
+			It("creates the route and returns all warnings", func() {
+				Expect(createRouteErr).ToNot(HaveOccurred())
+				Expect(createRouteWarnings).To(ConsistOf(
+					"get-space-warning",
+					"get-routes-warning",
+					"create-route-warning",
+				))
+
+				Expect(createdRoute).To(Equal(Route{
+					Domain: Domain{
+						Name: "some-domain",
+						GUID: "some-domain-guid",
+					},
+					GUID:      "some-route-guid",
+					Host:      "some-host",
+					Path:      "some-path",
+					Port:      types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID: "some-space-guid",
+				}))
+
+				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+					ccv2.Query{
+						Filter:   ccv2.OrganizationGUIDFilter,
+						Operator: ccv2.EqualOperator,
+						Values:   []string{"some-org-guid"},
+					},
+					ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.EqualOperator,
+						Values:   []string{"some-space"},
+					}))
+
+				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
+				passedRoute, generatePort := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+				Expect(passedRoute).To(Equal(ccv2.Route{
+					DomainGUID: "some-domain-guid",
+					Host:       "some-host",
+					Path:       "/some-path",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID:  "some-space-guid",
+				}))
+				Expect(generatePort).To(BeTrue())
+			})
+
+			Context("when creating route errors", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("bind route failed")
+					fakeCloudControllerClient.CreateRouteReturns(
+						ccv2.Route{},
+						ccv2.Warnings{"create-route-warning"},
+						expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(createRouteErr).To(MatchError(expectedErr))
+					Expect(createRouteWarnings).To(ConsistOf("get-space-warning", "get-routes-warning", "create-route-warning"))
+				})
+			})
+		})
+
+		Context("when route already exists", func() {
+			var foundRoute ccv2.Route
+
+			BeforeEach(func() {
+				foundRoute = ccv2.Route{
+					DomainGUID: "some-domain-guid",
+					Host:       "some-host",
+					Path:       "some-path",
+					Port:       types.NullInt{IsSet: true, Value: 3333},
+					SpaceGUID:  "some-space-guid",
+				}
+				fakeCloudControllerClient.GetRoutesReturns(
+					[]ccv2.Route{foundRoute},
+					ccv2.Warnings{"get-routes-warning"},
+					nil)
+				fakeCloudControllerClient.GetSharedDomainReturns(
+					ccv2.Domain{Name: "some-domain", GUID: "some-domain-guid"},
+					ccv2.Warnings{"get-domain-warning"},
+					nil)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(createRouteErr).To(MatchError(RouteAlreadyExistsError{
+					Route: CCToActorRoute(foundRoute, Domain{Name: "some-domain", GUID: "some-domain-guid"}),
+				}))
+				Expect(createRouteWarnings).To(ConsistOf("get-space-warning", "get-routes-warning", "get-domain-warning"))
+			})
+		})
+
+		Context("when route domain does not have GUID", func() {
+			BeforeEach(func() {
+				route = Route{
+					Domain: Domain{
+						Name: "some-domain",
+					},
+					Host: "some-host",
+					Path: "some-path",
+					Port: types.NullInt{IsSet: true, Value: 3333},
+				}
+			})
+
+			Context("when the domain exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSharedDomainsReturns(
+						[]ccv2.Domain{},
+						ccv2.Warnings{"get-shared-domains-warning"},
+						nil,
+					)
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(
+						[]ccv2.Domain{{Name: "some-domain", GUID: "some-requested-domain-guid"}},
+						ccv2.Warnings{"get-private-domains-warning"},
+						nil,
+					)
+				})
+
+				It("gets domain and finds route with fully instantiated domain", func() {
+					Expect(createRouteErr).ToNot(HaveOccurred())
+					Expect(createRouteWarnings).To(ConsistOf(
+						"get-space-warning",
+						"get-shared-domains-warning",
+						"get-private-domains-warning",
+						"get-routes-warning",
+						"create-route-warning",
+					))
+					Expect(createdRoute).To(Equal(Route{
+						Domain: Domain{
+							Name: "some-domain",
+							GUID: "some-requested-domain-guid",
+						},
+						GUID:      "some-route-guid",
+						Host:      "some-host",
+						Path:      "some-path",
+						Port:      types.NullInt{IsSet: true, Value: 3333},
+						SpaceGUID: "some-space-guid",
+					}))
+					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+					orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+					Expect(orgGUID).To(Equal("some-org-guid"))
+					Expect(queries).To(HaveLen(1))
+					Expect(queries[0]).To(Equal(ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.InOperator,
+						Values:   []string{"some-domain"},
+					}))
+				})
+			})
+
+			Context("when the domain doesn't exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSharedDomainsReturns(
+						[]ccv2.Domain{},
+						ccv2.Warnings{"get-shared-domains-warning"},
+						nil,
+					)
+					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(
+						[]ccv2.Domain{},
+						ccv2.Warnings{"get-private-domains-warning"},
+						nil,
+					)
+				})
+
+				It("returns all warnings and domain not found err", func() {
+					Expect(createRouteErr).To(Equal(DomainNotFoundError{Name: "some-domain"}))
+					Expect(createRouteWarnings).To(ConsistOf(
+						"get-space-warning",
+						"get-shared-domains-warning",
+						"get-private-domains-warning",
+					))
+				})
+			})
+		})
+
+		Context("when getting space errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("bind route failed")
+				fakeCloudControllerClient.GetSpacesReturns(
+					[]ccv2.Space{},
+					ccv2.Warnings{"get-space-warning"},
+					expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(createRouteErr).To(MatchError(expectedErr))
+				Expect(createRouteWarnings).To(ConsistOf("get-space-warning"))
+			})
+		})
+
+		Context("when getting routes errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("bind route failed")
+				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(createRouteErr).To(MatchError(expectedErr))
+				Expect(createRouteWarnings).To(ConsistOf("get-space-warning", "get-routes-warning"))
 			})
 		})
 	})
@@ -394,7 +714,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-1-guid",
 					},
 					ccv2.Route{
@@ -402,7 +722,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-2-guid",
 					},
 				}, ccv2.Warnings{"get-application-routes-warning"}, nil)
@@ -429,7 +749,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "route-guid-1",
 						Host:      "host",
 						Path:      "/path",
-						Port:      1234,
+						Port:      types.NullInt{IsSet: true, Value: 1234},
 						SpaceGUID: "some-space-guid",
 					},
 					{
@@ -439,7 +759,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "route-guid-2",
 						Host:      "host",
 						Path:      "/path",
-						Port:      1234,
+						Port:      types.NullInt{IsSet: true, Value: 1234},
 						SpaceGUID: "some-space-guid",
 					},
 				}))
@@ -469,7 +789,7 @@ var _ = Describe("Route Actions", func() {
 							SpaceGUID:  "some-space-guid",
 							Host:       "host",
 							Path:       "/path",
-							Port:       1234,
+							Port:       types.NullInt{IsSet: true, Value: 1234},
 							DomainGUID: "domain-1-guid",
 						},
 					}, nil, nil)
@@ -496,7 +816,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-1-guid",
 					},
 				}, ccv2.Warnings{"application-routes-warning"}, nil)
@@ -519,7 +839,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-1-guid",
 					},
 					ccv2.Route{
@@ -527,7 +847,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-2-guid",
 					},
 				}, ccv2.Warnings{"get-space-routes-warning"}, nil)
@@ -553,7 +873,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "route-guid-1",
 						Host:      "host",
 						Path:      "/path",
-						Port:      1234,
+						Port:      types.NullInt{IsSet: true, Value: 1234},
 						SpaceGUID: "some-space-guid",
 					},
 					{
@@ -563,7 +883,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "route-guid-2",
 						Host:      "host",
 						Path:      "/path",
-						Port:      1234,
+						Port:      types.NullInt{IsSet: true, Value: 1234},
 						SpaceGUID: "some-space-guid",
 					},
 				}))
@@ -593,7 +913,7 @@ var _ = Describe("Route Actions", func() {
 							SpaceGUID:  "some-space-guid",
 							Host:       "host",
 							Path:       "/path",
-							Port:       1234,
+							Port:       types.NullInt{IsSet: true, Value: 1234},
 							DomainGUID: "domain-1-guid",
 						},
 					}, nil, nil)
@@ -620,7 +940,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-1-guid",
 					},
 				}, ccv2.Warnings{"space-routes-warning"}, nil)
@@ -661,7 +981,7 @@ var _ = Describe("Route Actions", func() {
 						SpaceGUID:  "some-space-guid",
 						Host:       "host",
 						Path:       "/path",
-						Port:       1234,
+						Port:       types.NullInt{IsSet: true, Value: 1234},
 						DomainGUID: "domain-1-guid",
 					},
 				}, ccv2.Warnings{"get-routes-warning"}, nil)
@@ -685,7 +1005,7 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "route-guid-1",
 						Host:      "host",
 						Path:      "/path",
-						Port:      1234,
+						Port:      types.NullInt{IsSet: true, Value: 1234},
 						SpaceGUID: "some-space-guid",
 					}))
 
@@ -754,7 +1074,7 @@ var _ = Describe("Route Actions", func() {
 						GUID: "some-domain-guid",
 					},
 					Path: "some-path",
-					Port: 42,
+					Port: types.NullInt{IsSet: true, Value: 42},
 				})
 
 				Expect(err).ToNot(HaveOccurred())
@@ -766,7 +1086,7 @@ var _ = Describe("Route Actions", func() {
 					Host:       "some-host",
 					DomainGUID: "some-domain-guid",
 					Path:       "some-path",
-					Port:       42,
+					Port:       types.NullInt{IsSet: true, Value: 42},
 				}))
 			})
 		})

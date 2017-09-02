@@ -2204,6 +2204,10 @@
     "translation": "Creating route {{.Hostname}}..."
   },
   {
+    "id": "Creating route {{.Route}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
@@ -2574,6 +2578,18 @@
   {
     "id": "Domain (e.g. example.com)",
     "translation": "Domain (e.g. example.com)"
+  },
+  {
+    "id": "Domain not found",
+    "translation": ""
+  },
+  {
+    "id": "Domain with GUID {{.DomainGUID}} not found",
+    "translation": ""
+  },
+  {
+    "id": "Domain {{.DomainName}} not found",
+    "translation": ""
   },
   {
     "id": "Domains:",
@@ -3688,10 +3704,6 @@
     "translation": "Incorrect Usage:"
   },
   {
-    "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' cannot be used together.",
-    "translation": ""
-  },
-  {
     "id": "Incorrect Usage: '{{.Arg1}}' and '{{.Arg2}}' must be used together.",
     "translation": ""
   },
@@ -3702,6 +3714,10 @@
   {
     "id": "Incorrect Usage: Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
     "translation": ""
+  },
+  {
+    "id": "Incorrect Usage: The following arguments cannot be used together: {{.Args}}",
+    "translation": "Incorrect Usage: The following arguments cannot be used together: {{.Args}}"
   },
   {
     "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
@@ -5268,6 +5284,14 @@
     "translation": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
+    "id": "Route {{.Route}} already exists.",
+    "translation": ""
+  },
+  {
+    "id": "Route {{.Route}} has been created.",
+    "translation": ""
+  },
+  {
     "id": "Route {{.Route}} has been registered to another space.",
     "translation": "Route {{.Route}} has been registered to another space."
   },
@@ -6304,10 +6328,6 @@
     "translation": ""
   },
   {
-    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
-    "translation": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
-  },
-  {
     "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
@@ -7208,6 +7228,10 @@
     "translation": ""
   },
   {
+    "id": "invalid argument for flag '--port' (expected int \u003e 0)",
+    "translation": ""
+  },
+  {
     "id": "invalid argument for flag '-i' (expected int \u003e 0)",
     "translation": ""
   },
@@ -7734,6 +7758,10 @@
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
     "translation": ""
+  },
+  {
+    "id": "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
   },
   {
     "id": "{{.CountOfServices}} migrated.",

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . TerminateTaskActor
@@ -52,7 +53,7 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		}
 	}
 
-	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), command.MinVersionRunTaskV3)
+	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionRunTaskV3)
 	if err != nil {
 		return err
 	}

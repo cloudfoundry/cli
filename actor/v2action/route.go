@@ -2,10 +2,12 @@ package v2action
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,6 +40,15 @@ func (e RouteNotFoundError) Error() string {
 	return fmt.Sprintf("Route with host %s and domain guid %s not found", e.Host, e.DomainGUID)
 }
 
+// RouteAlreadyExistsError is returned when a route already exists
+type RouteAlreadyExistsError struct {
+	Route Route
+}
+
+func (e RouteAlreadyExistsError) Error() string {
+	return fmt.Sprintf("Route %s already exists", e.Route)
+}
+
 type Routes []Route
 
 func (rs Routes) Summary() string {
@@ -54,7 +65,7 @@ type Route struct {
 	GUID      string
 	Host      string
 	Path      string
-	Port      int
+	Port      types.NullInt
 	SpaceGUID string
 }
 
@@ -62,9 +73,8 @@ type Route struct {
 func (r Route) String() string {
 	routeString := r.Domain.Name
 
-	if r.Port != 0 {
-		routeString = fmt.Sprintf("%s:%d", routeString, r.Port)
-		return routeString
+	if r.Port.IsSet {
+		routeString = fmt.Sprintf("%s:%d", routeString, r.Port.Value)
 	}
 
 	if r.Host != "" {
@@ -72,7 +82,7 @@ func (r Route) String() string {
 	}
 
 	if r.Path != "" {
-		routeString = fmt.Sprintf("%s%s", routeString, r.Path)
+		routeString = path.Join(routeString, r.Path)
 	}
 
 	return routeString
@@ -87,8 +97,51 @@ func (actor Actor) BindRouteToApplication(routeGUID string, appGUID string) (War
 }
 
 func (actor Actor) CreateRoute(route Route, generatePort bool) (Route, Warnings, error) {
+	if route.Path != "" && !strings.HasPrefix(route.Path, "/") {
+		route.Path = fmt.Sprintf("/%s", route.Path)
+	}
 	returnedRoute, warnings, err := actor.CloudControllerClient.CreateRoute(ActorToCCRoute(route), generatePort)
 	return CCToActorRoute(returnedRoute, route.Domain), Warnings(warnings), err
+}
+
+func (actor Actor) CreateRouteWithExistenceCheck(orgGUID string, spaceName string, route Route, generatePort bool) (Route, Warnings, error) {
+	space, warnings, spaceErr := actor.GetSpaceByOrganizationAndName(orgGUID, spaceName)
+	if spaceErr != nil {
+		return Route{}, Warnings(warnings), spaceErr
+	}
+	route.SpaceGUID = space.GUID
+
+	if route.Domain.GUID == "" {
+		domains, orgDomainWarnings, getDomainErr := actor.GetDomainsByNameAndOrganization([]string{route.Domain.Name}, orgGUID)
+		warnings = append(warnings, orgDomainWarnings...)
+		if getDomainErr != nil {
+			return Route{}, warnings, getDomainErr
+		} else if len(domains) == 0 {
+			return Route{}, warnings, DomainNotFoundError{Name: route.Domain.Name}
+		}
+		route.Domain.GUID = domains[0].GUID
+	}
+
+	foundRoute, spaceRouteWarnings, findErr := actor.FindRouteBoundToSpaceWithSettings(route)
+	warnings = append(warnings, spaceRouteWarnings...)
+	routeAlreadyExists := true
+	if _, ok := findErr.(RouteNotFoundError); ok {
+		routeAlreadyExists = false
+	} else if findErr != nil {
+		return Route{}, Warnings(warnings), findErr
+	}
+
+	if routeAlreadyExists {
+		return Route{}, Warnings(warnings), RouteAlreadyExistsError{Route: foundRoute}
+	}
+
+	createdRoute, createRouteWarnings, createErr := actor.CreateRoute(route, generatePort)
+	warnings = append(warnings, createRouteWarnings...)
+	if createErr != nil {
+		return Route{}, Warnings(warnings), createErr
+	}
+
+	return createdRoute, Warnings(warnings), nil
 }
 
 // GetOrphanedRoutesBySpace returns a list of orphaned routes associated with
@@ -175,13 +228,15 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 	if routeNotFoundErr, ok := err.(RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
 		// false for anything below that.
-		log.Infoln("checking route existance for:", route.String())
+		log.Infoln("checking route existence for: %s", route)
 		exists, checkRouteWarnings, chkErr := actor.CheckRoute(route)
 		if chkErr != nil {
 			log.Errorln("check route:", err)
 			return Route{}, append(Warnings(warnings), checkRouteWarnings...), chkErr
 		}
 
+		// This will happen if the route exists in a space to which the user does
+		// not have access.
 		if exists {
 			log.Errorf("unable to find route %s in current space", route.String())
 			return Route{}, append(Warnings(warnings), checkRouteWarnings...), RouteInDifferentSpaceError{Route: route.String()}

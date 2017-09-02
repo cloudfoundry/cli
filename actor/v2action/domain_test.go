@@ -23,6 +23,39 @@ var _ = Describe("Domain Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
+	Describe("DomainNotFoundError", func() {
+		var err DomainNotFoundError
+		Context("when the name is provided", func() {
+			BeforeEach(func() {
+				err = DomainNotFoundError{Name: "some-domain-name"}
+			})
+
+			It("returns the correct message", func() {
+				Expect(err.Error()).To(Equal("Domain some-domain-name not found"))
+			})
+		})
+
+		Context("when the name is not provided but the guid is", func() {
+			BeforeEach(func() {
+				err = DomainNotFoundError{GUID: "some-domain-guid"}
+			})
+
+			It("returns the correct message", func() {
+				Expect(err.Error()).To(Equal("Domain with GUID some-domain-guid not found"))
+			})
+		})
+
+		Context("when neither the name nor the guid is provided", func() {
+			BeforeEach(func() {
+				err = DomainNotFoundError{}
+			})
+
+			It("returns the correct message", func() {
+				Expect(err.Error()).To(Equal("Domain not found"))
+			})
+		})
+	})
+
 	Describe("GetDomain", func() {
 		Context("when the domain exists and is a shared domain", func() {
 			var expectedDomain ccv2.Domain
@@ -32,12 +65,13 @@ var _ = Describe("Domain Actions", func() {
 					GUID: "shared-domain-guid",
 					Name: "shared-domain",
 				}
-				fakeCloudControllerClient.GetSharedDomainReturns(expectedDomain, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturns(expectedDomain, ccv2.Warnings{"get-domain-warning"}, nil)
 			})
 
 			It("returns the shared domain", func() {
-				domain, _, err := actor.GetDomain("shared-domain-guid")
+				domain, warnings, err := actor.GetDomain("shared-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(Equal(Warnings{"get-domain-warning"}))
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 
 				Expect(fakeCloudControllerClient.GetSharedDomainCallCount()).To(Equal(1))
@@ -73,6 +107,7 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
+				expectedErr = DomainNotFoundError{GUID: "private-domain-guid"}
 				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccerror.ResourceNotFoundError{})
 				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, ccerror.ResourceNotFoundError{})
 			})
@@ -272,6 +307,7 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
+				expectedErr = DomainNotFoundError{GUID: "shared-domain-guid"}
 				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, ccerror.ResourceNotFoundError{})
 			})
 
@@ -343,6 +379,7 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
+				expectedErr = DomainNotFoundError{GUID: "private-domain-guid"}
 				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, ccerror.ResourceNotFoundError{})
 			})
 

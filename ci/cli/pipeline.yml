@@ -385,8 +385,6 @@ jobs:
       file: cli-ci/ci/cli/tasks/integration-experimental-windows.yml
       input_mapping:
         cf-credentials: cleanup-integration-outputs
-      params:
-        CF_CLI_EXPERIMENTAL: true
       on_failure:
         put: slack-alert
         params:
@@ -397,8 +395,6 @@ jobs:
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
-      params:
-        CF_CLI_EXPERIMENTAL: true
       on_failure:
         put: slack-alert
         params:
