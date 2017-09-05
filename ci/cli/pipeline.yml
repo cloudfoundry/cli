@@ -174,10 +174,25 @@ resources:
     branch: master
     paths: [ci/Dockerfile]
 
+- name: cli-ci-base-dockerfile
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths: [ci/cli-base/Dockerfile]
+
 - name: cf-cli-image
   type: docker-image
   source:
     repository: cloudfoundry/cli-ci
+    username: {{dockerhub-username}}
+    email: {{dockerhub-email}}
+    password: {{dockerhub-password}}
+
+- name: cf-cli-base-image
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
     username: {{dockerhub-username}}
     email: {{dockerhub-email}}
     password: {{dockerhub-password}}
@@ -206,6 +221,7 @@ groups:
 - name: images
   jobs:
   - create-cli-ci-image
+  - create-cli-base-image
 
 jobs:
 - name: units
@@ -502,3 +518,17 @@ jobs:
     params:
       load_base: golang
       build: cli-ci-dockerfile/ci
+
+- name: create-cli-base-image
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci-base-dockerfile
+      trigger: true
+    - get: golang
+      trigger: true
+      params: {save: true}
+  - put: cf-cli-base-image
+    params:
+      load_base: golang
+      build: cli-ci-base-dockerfile/ci/cli-base
