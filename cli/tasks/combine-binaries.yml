@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cloudfoundry/cli-ci
+    repository: cfcli/cli-package
 
 inputs:
 - name: cross-compiled
