@@ -35,7 +35,12 @@ run:
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
 
-    go get -u github.com/onsi/ginkgo/ginkgo
+    if [ ! $(which ginkgo) ];then
+      echo -e "\n Building ginkgo..."
+      pushd vendor/github.com/onsi/ginkgo/ginkgo
+      go install
+      popd
+    fi
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
