@@ -167,6 +167,12 @@ resources:
     repository: golang
     tag: latest
 
+- name: baseimage
+  type: docker-image
+  source:
+    repository: phusion/baseimage
+    tag: latest
+
 - name: cli-ci-dockerfile
   type: git
   source:
@@ -181,6 +187,13 @@ resources:
     branch: master
     paths: [ci/cli-base/Dockerfile]
 
+- name: cli-ci-package-dockerfile
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths: [ci/cli-package/Dockerfile]
+
 - name: cf-cli-image
   type: docker-image
   source:
@@ -193,6 +206,14 @@ resources:
   type: docker-image
   source:
     repository: cfcli/cli-base
+    username: {{dockerhub-username}}
+    email: {{dockerhub-email}}
+    password: {{dockerhub-password}}
+
+- name: cf-cli-package-image
+  type: docker-image
+  source:
+    repository: cfcli/cli-package
     username: {{dockerhub-username}}
     email: {{dockerhub-email}}
     password: {{dockerhub-password}}
@@ -222,6 +243,7 @@ groups:
   jobs:
   - create-cli-ci-image
   - create-cli-base-image
+  - create-cli-package-image
 
 jobs:
 - name: units
@@ -532,3 +554,17 @@ jobs:
     params:
       load_base: golang
       build: cli-ci-base-dockerfile/ci/cli-base
+
+- name: create-cli-package-image
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci-package-dockerfile
+      trigger: true
+    - get: baseimage
+      trigger: true
+      params: {save: true}
+  - put: cf-cli-package-image
+    params:
+      load_base: baseimage
+      build: cli-ci-package-dockerfile/ci/cli-package
