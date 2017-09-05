@@ -11,3 +11,6 @@ RUN apt update
 
 # used in CATs tests
 RUN apt install -y zip
+
+# install bosh
+RUN curl -L https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.35-linux-amd64 --output /usr/local/bin/bosh && chmod 0755 /usr/local/bin/bosh
