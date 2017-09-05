@@ -35,13 +35,6 @@ run:
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
 
-    if [ ! $(which ginkgo) ];then
-      echo -e "\n Building ginkgo..."
-      pushd vendor/github.com/onsi/ginkgo/ginkgo
-      go install
-      popd
-    fi
-
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
       chmod +x cf-cli_linux_x86-64
@@ -49,5 +42,13 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
+
+    if [ ! $(which ginkgo) ];then
+      echo -e "\n Building ginkgo..."
+      pushd vendor/github.com/onsi/ginkgo/ginkgo
+      go install
+      popd
+    fi
+
     ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
     ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global
