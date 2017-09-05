@@ -301,6 +301,16 @@ jobs:
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration-linux
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-firehose'
+          text: "linux integration failed :("
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
     - task: integration-windows
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       input_mapping:
@@ -310,16 +320,6 @@ jobs:
         params:
           channel: '#cli-firehose'
           text: "windows integration failed :("
-      ensure:
-        task: cleanup-integration
-        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: integration-linux
-      file: cli-ci/ci/cli/tasks/integration-linux.yml
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-firehose'
-          text: "linux integration failed :("
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
