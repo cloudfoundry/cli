@@ -27,11 +27,13 @@ var _ = Describe("Config", func() {
 		It("displays json warning for a refactored command", func() {
 			session := helpers.CF("api")
 			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s\n", helpers.ConvertPathToRegularExpression(filepath.Join(configDir, "config.json"))))
+			Eventually(session).Should(Exit())
 		})
 
 		It("displays json warning for an unrefactored command", func() {
 			session := helpers.CF("curl", "/v2/info")
 			Eventually(session.Err).Should(Say("Warning: Error read/writing config: unexpected end of JSON input for %s\n", helpers.ConvertPathToRegularExpression(filepath.Join(configDir, "config.json"))))
+			Eventually(session).Should(Exit())
 		})
 	})
 
@@ -84,6 +86,7 @@ var _ = Describe("Config", func() {
 			It("prints colors", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_COLOR": "true"}, "help")
 				Eventually(session).Should(Say("\x1b\\[1m"))
+				Eventually(session).Should(Exit())
 			})
 		})
 
@@ -111,6 +114,7 @@ var _ = Describe("Config", func() {
 			It("times out connection attempts after the dial timeout has passed", func() {
 				session := helpers.CFWithEnv(map[string]string{"CF_DIAL_TIMEOUT": "1"}, "unbind-service", "banana", "pants")
 				Eventually(session.Err).Should(Say("dial tcp 1.2.3.4:80: i/o timeout"))
+				Eventually(session).Should(Exit())
 			})
 		})
 	})
