@@ -10,8 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/types"
-	"code.cloudfoundry.org/cli/version"
 )
 
 // Route represents a Cloud Controller Route.
@@ -207,9 +207,9 @@ func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
 func (client *Client) CheckRoute(route Route) (bool, Warnings, error) {
 	currentVersion := client.APIVersion()
 	switch {
-	case version.MinimumAPIVersionCheck(currentVersion, version.MinVersionNoHostInReservedRouteEndpoint) == nil:
+	case cloudcontroller.MinimumAPIVersionCheck(currentVersion, ccversion.MinVersionNoHostInReservedRouteEndpoint) == nil:
 		return client.checkRoute(route)
-	case version.MinimumAPIVersionCheck(currentVersion, version.MinVersionHTTPRoutePath) == nil:
+	case cloudcontroller.MinimumAPIVersionCheck(currentVersion, ccversion.MinVersionHTTPRoutePath) == nil:
 		return client.checkRouteDeprecated(route.DomainGUID, route.Host, route.Path)
 	default:
 		return client.checkRouteDeprecated(route.DomainGUID, route.Host, "")
