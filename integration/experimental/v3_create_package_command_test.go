@@ -112,7 +112,7 @@ var _ = Describe("v3-create-package command", func() {
 			It("returns a not found error", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Uploading and creating bits package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -127,7 +127,7 @@ var _ = Describe("v3-create-package command", func() {
 			It("creates the package", func() {
 				session := helpers.CF("v3-create-package", appName)
 				userName, _ := helpers.GetCredentials()
-				Eventually(session).Should(Say("Uploading and creating bits package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+				Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 				Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -138,7 +138,7 @@ var _ = Describe("v3-create-package command", func() {
 					It("creates the package", func() {
 						session := helpers.CF("v3-create-package", appName, "--docker-image", PublicDockerImage)
 						userName, _ := helpers.GetCredentials()
-						Eventually(session).Should(Say("Creating docker package for V3 app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Say("Creating docker package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
