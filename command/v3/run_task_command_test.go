@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -14,7 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -49,7 +49,7 @@ var _ = Describe("run-task Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionRunTaskV3)
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionRunTaskV3)
 	})
 
 	JustBeforeEach(func() {
@@ -64,7 +64,7 @@ var _ = Describe("run-task Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: version.MinVersionRunTaskV3,
+				MinimumVersion: ccversion.MinVersionRunTaskV3,
 			}))
 		})
 	})

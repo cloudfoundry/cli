@@ -12,7 +12,7 @@ all : test internationalization-binary build
 
 build : out/cf
 
-clean:
+clean :
 	rm $(wildcard out/*)
 
 format :
@@ -24,15 +24,18 @@ internationalization :
 internationalization-binary : internationalization
 	$(PWD)/bin/generate-language-resources
 
-integration-cleanup:
+integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
-integration-tests: build integration-cleanup
+integration-experimental : build integration-cleanup
+	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/experimental
+
+integration-tests : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
-integration-tests-full: build integration-cleanup
+integration-tests-full : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push integration/plugin integration/experimental
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
@@ -80,5 +83,5 @@ vet :
 		| xargs -r -L 1 -P 5 go tool vet -all -shadow=true
 
 
-.PHONY: all build clean internationalization format version vet
-.PHONY: test units units-full integration integration-tests-full integration-cleanup
+.PHONY : all build clean internationalization format version vet
+.PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental

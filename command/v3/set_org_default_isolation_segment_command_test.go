@@ -6,13 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -52,7 +52,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		org = "some-org"
 		isolationSegment = "segment1"
 
-		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionIsolationSegmentV3)
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionIsolationSegmentV3)
 	})
 
 	JustBeforeEach(func() {
@@ -67,7 +67,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		It("returns a MinimumAPIVersionNotMetError", func() {
 			Expect(executeErr).To(MatchError(translatableerror.MinimumAPIVersionNotMetError{
 				CurrentVersion: "0.0.0",
-				MinimumVersion: version.MinVersionIsolationSegmentV3,
+				MinimumVersion: ccversion.MinVersionIsolationSegmentV3,
 			}))
 		})
 	})

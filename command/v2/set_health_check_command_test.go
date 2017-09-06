@@ -6,13 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -54,7 +54,7 @@ var _ = Describe("set-health-check Command", func() {
 
 		fakeConfig.CurrentUserReturns(configv3.User{Name: "some-user"}, nil)
 
-		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionHTTPEndpointHealthCheckV2)
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionHTTPEndpointHealthCheckV2)
 	})
 
 	JustBeforeEach(func() {

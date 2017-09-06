@@ -6,13 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -99,7 +99,7 @@ var _ = Describe("security-groups Command", func() {
 
 	Context("when the API version is high enough to support fetching staging", func() {
 		BeforeEach(func() {
-			fakeActor.CloudControllerAPIVersionReturns(version.MinVersionLifecyleStagingV2)
+			fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionLifecyleStagingV2)
 		})
 
 		Context("when the list of security groups is returned", func() {
