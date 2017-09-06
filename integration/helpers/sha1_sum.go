@@ -9,10 +9,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// Calculate the SHA1 sum of a file.
+// Sha1Sum calculates the SHA1 sum of a file.
 func Sha1Sum(path string) string {
 	f, err := os.Open(path)
 	Expect(err).ToNot(HaveOccurred())
+	defer f.Close()
 
 	hash := sha1.New()
 	_, err = io.Copy(hash, f)
