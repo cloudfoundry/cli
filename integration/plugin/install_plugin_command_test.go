@@ -19,7 +19,10 @@ import (
 )
 
 var _ = Describe("install-plugin command", func() {
-	var buffer *Buffer
+	var (
+		buffer     *Buffer
+		pluginPath string
+	)
 
 	AfterEach(func() {
 		pluginsHomeDirContents, err := ioutil.ReadDir(filepath.Join(homeDir, ".cf", "plugins"))
@@ -70,8 +73,6 @@ var _ = Describe("install-plugin command", func() {
 	})
 
 	Describe("installing a plugin from a local file", func() {
-		var pluginPath string
-
 		Context("when the file is compiled for a different os and architecture", func() {
 			BeforeEach(func() {
 				goos := os.Getenv("GOOS")
@@ -239,8 +240,6 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when there is a command conflict", func() {
 					Context("when the plugin has a command that is the same as a built-in command", func() {
-						var pluginPath string
-
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
 								"configurable_plugin", "some-plugin", "1.1.1",
@@ -341,7 +340,6 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("alias conflict", func() {
 					Context("when the plugin has an alias that is the same as a built-in command", func() {
-						var pluginPath string
 
 						BeforeEach(func() {
 							pluginPath = helpers.BuildConfigurablePlugin(
@@ -573,7 +571,8 @@ var _ = Describe("install-plugin command", func() {
 
 						Eventually(session.Out).Should(Say("FAILED"))
 
-						Eventually(session).Should(Exit(1))
+						// There is a timing issue -- the exit code may be either 1 (processed error), 2 (config writing error), or 130 (Ctrl-C)
+						Eventually(session).Should(SatisfyAny(Exit(1), Exit(2), Exit(130)))
 
 						// make sure cf plugins did not break
 						Eventually(helpers.CF("plugins", "--checksum")).Should(Exit(0))
@@ -590,9 +589,7 @@ var _ = Describe("install-plugin command", func() {
 
 	Describe("installing a plugin from a URL", func() {
 		var (
-			server     *Server
-			pluginPath string
-			err        error
+			server *Server
 		)
 
 		BeforeEach(func() {
@@ -618,6 +615,7 @@ var _ = Describe("install-plugin command", func() {
 						},
 					)
 
+					var err error
 					pluginData, err = ioutil.ReadFile(pluginPath)
 					Expect(err).ToNot(HaveOccurred())
 					server.AppendHandlers(
@@ -629,7 +627,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				AfterEach(func() {
-					err = os.Remove(pluginPath)
+					err := os.Remove(pluginPath)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -738,7 +736,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				AfterEach(func() {
-					err = os.Remove(pluginPath)
+					err := os.Remove(pluginPath)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -766,6 +764,7 @@ var _ = Describe("install-plugin command", func() {
 					},
 				)
 
+				var err error
 				pluginData, err = ioutil.ReadFile(pluginPath)
 				Expect(err).ToNot(HaveOccurred())
 				server.AppendHandlers(
@@ -777,7 +776,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			AfterEach(func() {
-				err = os.Remove(pluginPath)
+				err := os.Remove(pluginPath)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
@@ -864,8 +863,8 @@ var _ = Describe("install-plugin command", func() {
 
 					Eventually(session.Out).Should(Say("FAILED"))
 
-					// There is a timing issue -- the exit code may be either 1 (processed error) or 130 (Ctrl-C)
-					Eventually(session).Should(SatisfyAny(Exit(1), Exit(130)))
+					// There is a timing issue -- the exit code may be either 1 (processed error), 2 (config writing error), or 130 (Ctrl-C)
+					Eventually(session).Should(SatisfyAny(Exit(1), Exit(2), Exit(130)))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(0))
 
