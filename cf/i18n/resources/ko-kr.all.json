@@ -5428,11 +5428,11 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 스케일링 중..."
   },
   {
-    "id": "Scaling cancelled",
+    "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
-    "id": "Scaling process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Scaling cancelled",
     "translation": ""
   },
   {
@@ -5700,7 +5700,7 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 현재 스케일 표시 중..."
   },
   {
-    "id": "Showing current scale of process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
