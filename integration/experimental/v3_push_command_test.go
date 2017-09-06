@@ -16,10 +16,11 @@ import (
 
 var _ = Describe("v3-push command", func() {
 	var (
-		orgName   string
-		spaceName string
-		appName   string
-		userName  string
+		orgName           string
+		spaceName         string
+		appName           string
+		userName          string
+		PublicDockerImage = "cloudfoundry/diego-docker-app-custom"
 	)
 
 	BeforeEach(func() {
@@ -37,9 +38,11 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("v3-push - Push a new app or sync changes to an existing app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK\\]\\.\\.\\. \\[-p APP_PATH\\] \\[--no-route\\]"))
+				Eventually(session.Out).Should(Say("cf v3-push APP_NAME --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
-				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
+				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e\\.g\\. my-buildpack\\) or Git URL \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack\\.git#v3.3.0' for 'v3.3.0' tag\\)\\. To use built-in buildpacks only, specify 'default' or 'null'"))
 				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
+				Eventually(session.Out).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
 				Eventually(session.Out).Should(Say("ENVIRONMENT:"))
 				Eventually(session.Out).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
 				Eventually(session.Out).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
@@ -172,7 +175,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("Updating app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("Uploading app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("Staging package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -220,7 +223,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("Creating app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
-				Eventually(session.Out).Should(Say("Uploading app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("Staging package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -460,6 +463,52 @@ var _ = Describe("v3-push command", func() {
 					Eventually(session.Out).Should(Say("web:1/1"))
 					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+				})
+			})
+		})
+
+		Context("when the -o flag is set", func() {
+			Context("when the docker image is valid", func() {
+				It("uses the specified docker image", func() {
+					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage)
+
+					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session.Out).Should(Say("requested state:\\s+started"))
+					Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+					Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
+					Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					// TODO: we will change the display logic in this upcoming story #150657849
+					Eventually(session.Out).Should(Say("stack:"))
+					Eventually(session.Out).Should(Say("buildpacks:"))
+					// Eventually(session.Out).ShouldNot(Say("stack:"))
+					// Eventually(session.Out).ShouldNot(Say("buildpacks:"))
+					// Eventually(session.Out).Should(Say("docker image:\\s+%s", PublicDockerImage))
+					Eventually(session.Out).Should(Say(""))
+					Eventually(session.Out).Should(Say("web:1/1"))
+					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the docker image is invalid", func() {
+				It("displays an error and exits 1", func() {
+					session := helpers.CF("v3-push", appName, "-o", "some-invalid-docker-image")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("StagingError - Staging error: staging failed"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
+
+		Context("when the -o and -p flags are provided together", func() {
+			It("displays an error and exits 1", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-p", appDir)
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '-p' cannot be used together\\."))
+					Eventually(session.Out).Should(Say("NAME:"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})

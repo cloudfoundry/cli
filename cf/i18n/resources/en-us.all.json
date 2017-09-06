@@ -2176,8 +2176,8 @@
     "translation": "Creating buildpack {{.BuildpackName}}..."
   },
   {
-    "id": "Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
+    "id": "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
   },
   {
     "id": "Creating domain {{.DomainName}} for org {{.OrgName}} as {{.Username}}...",
@@ -2561,6 +2561,10 @@
   },
   {
     "id": "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?",
+    "translation": ""
+  },
+  {
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": ""
   },
   {
@@ -6676,16 +6680,12 @@
     "translation": "Updating {{.AppName}} health_check_type to '{{.HealthCheckType}}'"
   },
   {
-    "id": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
+    "id": "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "translation": "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "Uploading app files from: {{.Path}}"
-  },
-  {
-    "id": "Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
@@ -7008,8 +7008,8 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]",
-    "translation": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]"
+    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]",
+    "translation": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]"
   },
   {
     "id": "command help",

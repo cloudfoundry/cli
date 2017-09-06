@@ -38,6 +38,9 @@ var _ = Describe("v3-push Command", func() {
 		binaryName      string
 		executeErr      error
 		app             string
+		userName        string
+		spaceName       string
+		orgName         string
 	)
 
 	BeforeEach(func() {
@@ -54,6 +57,9 @@ var _ = Describe("v3-push Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
+		userName = "banana"
+		spaceName = "some-space"
+		orgName = "some-org"
 
 		appSummaryDisplayer := shared.AppSummaryDisplayer{
 			UI:              testUI,
@@ -112,9 +118,9 @@ var _ = Describe("v3-push Command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
-			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: "some-space", GUID: "some-space-guid"})
-			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: "some-org", GUID: "some-org-guid"})
+			fakeConfig.CurrentUserReturns(configv3.User{Name: userName}, nil)
+			fakeConfig.TargetedSpaceReturns(configv3.Space{Name: spaceName, GUID: "some-space-guid"})
+			fakeConfig.TargetedOrganizationReturns(configv3.Organization{Name: orgName, GUID: "some-org-guid"})
 
 			// we stub out StagePackage out here so the happy paths below don't hang
 			fakeActor.StagePackageStub = func(_ string, _ string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error) {
@@ -154,7 +160,7 @@ var _ = Describe("v3-push Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am an error")
-					fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
 				})
 
 				It("displays the warnings and error", func() {
@@ -168,16 +174,19 @@ var _ = Describe("v3-push Command", func() {
 
 			Context("when creating the application does not error", func() {
 				BeforeEach(func() {
-					fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{Name: "some-app", GUID: "some-app-guid"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{Name: "some-app", GUID: "some-app-guid"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 				})
 
 				It("calls CreateApplication", func() {
-					Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(1), "Expected CreateApplicationByNameAndSpace to be called once")
-					createApplicationInput := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
-					Expect(createApplicationInput).To(Equal(v3action.CreateApplicationInput{
-						AppName:   "some-app",
-						SpaceGUID: "some-space-guid",
+					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
+					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+					Expect(createApp).To(Equal(v3action.Application{
+						Name: "some-app",
+						Lifecycle: v3action.AppLifecycle{
+							Type: v3action.BuildpackAppLifecycleType,
+						},
 					}))
+					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
 
 				Context("when creating the package fails", func() {
@@ -185,13 +194,13 @@ var _ = Describe("v3-push Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("I am an error")
-						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
+						fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
 					})
 
 					It("displays the header and error", func() {
 						Expect(executeErr).To(MatchError(expectedErr))
 
-						Expect(testUI.Out).To(Say("Uploading app some-app in org some-org / space some-space as banana..."))
+						Expect(testUI.Out).To(Say("Uploading and creating bits package for app some-app in org some-org / space some-space as banana..."))
 
 						Expect(testUI.Err).To(Say("I am a package warning"))
 						Expect(testUI.Err).To(Say("I am also a package warning"))
@@ -202,7 +211,7 @@ var _ = Describe("v3-push Command", func() {
 
 				Context("when creating the package succeeds", func() {
 					BeforeEach(func() {
-						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
+						fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
 					})
 
 					Context("when the -p flag is provided", func() {
@@ -211,19 +220,63 @@ var _ = Describe("v3-push Command", func() {
 						})
 
 						It("creates the package with the provided path", func() {
-							_, _, appPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
+							Expect(testUI.Out).To(Say("Uploading and creating bits package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
+							Expect(testUI.Err).To(Say("I am a package warning"))
+							Expect(testUI.Err).To(Say("I am also a package warning"))
+							Expect(testUI.Out).To(Say("OK"))
+							Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
+
+							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, appPath, dockerImage := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
 
 							Expect(appPath).To(Equal("some-app-path"))
+							Expect(dockerImage).To(BeEmpty())
 						})
 					})
 
-					It("displays the header and OK", func() {
-						Expect(testUI.Out).To(Say("Uploading app some-app in org some-org / space some-space as banana..."))
+					Context("when the -o flag is provided", func() {
+						BeforeEach(func() {
+							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+						})
 
-						Expect(testUI.Err).To(Say("I am a package warning"))
-						Expect(testUI.Err).To(Say("I am also a package warning"))
-						Expect(testUI.Out).To(Say("OK"))
-						Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
+						It("creates a docker package with the provided image path", func() {
+
+							Expect(testUI.Out).To(Say("Creating docker package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
+							Expect(testUI.Err).To(Say("I am a package warning"))
+							Expect(testUI.Err).To(Say("I am also a package warning"))
+							Expect(testUI.Out).To(Say("OK"))
+							Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
+
+							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, bitsPath, dockerImage := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+
+							Expect(bitsPath).To(BeEmpty())
+							Expect(dockerImage).To(Equal("example.com/docker/docker/docker:docker"))
+						})
+					})
+
+					Context("when both the -o and -p flags are provided", func() {
+						BeforeEach(func() {
+							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+							cmd.AppPath = `/tmp/my-app.bash`
+						})
+						It("returns an error", func() {
+							Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+								Arg1: "--docker-image, -o",
+								Arg2: "-p",
+							}))
+						})
+					})
+
+					Context("when neither -p nor -o flags are provided", func() {
+						It("passes empty strings for both dockerImage and bitsPath", func() {
+							Expect(testUI.Out).To(Say("Uploading and creating bits package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
+							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, appPath, dockerImage := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+
+							Expect(appPath).To(BeEmpty())
+							Expect(dockerImage).To(BeEmpty())
+						})
 					})
 
 					Context("when getting streaming logs fails", func() {
@@ -406,19 +459,43 @@ var _ = Describe("v3-push Command", func() {
 									})
 								})
 
-								Context("when -b flag is set", func() {
+								Context("when buildpack(s) are provided via -b flag", func() {
 									BeforeEach(func() {
 										cmd.Buildpacks = []string{"some-buildpack"}
 									})
 
 									It("creates the app with the specified buildpack and prints the buildpack name in the summary", func() {
-										Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(1), "Expected CreateApplicationByNameAndSpace to be called once")
-										createApplicationInput := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
-										Expect(createApplicationInput).To(Equal(v3action.CreateApplicationInput{
-											AppName:    "some-app",
-											SpaceGUID:  "some-space-guid",
-											Buildpacks: []string{"some-buildpack"},
+										Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
+										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+										Expect(createApp).To(Equal(v3action.Application{
+											Name: "some-app",
+											Lifecycle: v3action.AppLifecycle{
+												Type: v3action.BuildpackAppLifecycleType,
+												Data: v3action.AppLifecycleData{
+													Buildpacks: []string{"some-buildpack"},
+												},
+											},
 										}))
+										Expect(createSpaceGUID).To(Equal("some-space-guid"))
+									})
+								})
+
+								Context("when a docker image is specified", func() {
+									BeforeEach(func() {
+										cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+									})
+
+									It("creates the app with a docker lifecycle", func() {
+										Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
+										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+										Expect(createApp).To(Equal(v3action.Application{
+											Name: "some-app",
+											Lifecycle: v3action.AppLifecycle{
+												Type: v3action.DockerAppLifecycleType,
+												Data: v3action.AppLifecycleData{},
+											},
+										}))
+										Expect(createSpaceGUID).To(Equal("some-space-guid"))
 									})
 								})
 
@@ -675,10 +752,27 @@ var _ = Describe("v3-push Command", func() {
 			})
 
 			It("updates the application", func() {
-				Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(0))
+				Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(0))
 				Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
 			})
 
+			Context("when a docker image is provided", func() {
+				BeforeEach(func() {
+					cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+				})
+
+				It("updates the app with a docker lifecycle", func() {
+					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1), "Expected UpdateApplication to be called once")
+					updateApp := fakeActor.UpdateApplicationArgsForCall(0)
+					Expect(updateApp).To(Equal(v3action.Application{
+						GUID: "some-app-guid",
+						Lifecycle: v3action.AppLifecycle{
+							Type: v3action.DockerAppLifecycleType,
+							Data: v3action.AppLifecycleData{},
+						},
+					}))
+				})
+			})
 			Context("when updating the application fails", func() {
 				BeforeEach(func() {
 					fakeActor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"update-warning-1"}, errors.New("some-error"))
@@ -692,62 +786,83 @@ var _ = Describe("v3-push Command", func() {
 				})
 			})
 
-			Context("when a buildpack was not provided", func() {
-				BeforeEach(func() {
-					cmd.Buildpacks = []string{}
-				})
-
-				It("does not update the buildpack", func() {
-					appGUIDArg, buildpackArg := fakeActor.UpdateApplicationArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(buildpackArg).To(BeEmpty())
-				})
-			})
-
-			Context("when a buildpack was provided", func() {
-				BeforeEach(func() {
-					cmd.Buildpacks = []string{"some-buildpack"}
-				})
-
-				It("updates the buildpack", func() {
-					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
-					appGUIDArg, buildpackArg := fakeActor.UpdateApplicationArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(buildpackArg).To(ConsistOf("some-buildpack"))
-				})
-			})
-
-			Context("when multiple buildpacks are provided", func() {
-				BeforeEach(func() {
-					cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
-				})
-
-				It("updates the buildpacks", func() {
-					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
-					appGUIDArg, buildpackArg := fakeActor.UpdateApplicationArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(buildpackArg).To(ConsistOf("some-buildpack-1", "some-buildpack-2"))
-				})
-
-				Context("when default was also provided", func() {
+			Context("when the app has a buildpack lifecycle", func() {
+				Context("when a buildpack was not provided", func() {
 					BeforeEach(func() {
-						cmd.Buildpacks = []string{"default", "some-buildpack-2"}
+						cmd.Buildpacks = []string{}
 					})
 
-					It("returns the ConflictingBuildpacksError", func() {
-						Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
-						Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+					It("does not update the buildpack", func() {
+						appArg := fakeActor.UpdateApplicationArgsForCall(0)
+						Expect(appArg).To(Equal(v3action.Application{
+							GUID: "some-app-guid",
+							Lifecycle: v3action.AppLifecycle{
+								Type: v3action.BuildpackAppLifecycleType,
+								Data: v3action.AppLifecycleData{
+									Buildpacks: []string{},
+								},
+							},
+						}))
 					})
 				})
 
-				Context("when null was also provided", func() {
+				Context("when a buildpack was provided", func() {
 					BeforeEach(func() {
-						cmd.Buildpacks = []string{"null", "some-buildpack-2"}
+						cmd.Buildpacks = []string{"some-buildpack"}
 					})
 
-					It("returns the ConflictingBuildpacksError", func() {
-						Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
-						Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+					It("updates the buildpack", func() {
+						appArg := fakeActor.UpdateApplicationArgsForCall(0)
+						Expect(appArg).To(Equal(v3action.Application{
+							GUID: "some-app-guid",
+							Lifecycle: v3action.AppLifecycle{
+								Type: v3action.BuildpackAppLifecycleType,
+								Data: v3action.AppLifecycleData{
+									Buildpacks: []string{"some-buildpack"},
+								},
+							},
+						}))
+					})
+				})
+
+				Context("when multiple buildpacks are provided", func() {
+					BeforeEach(func() {
+						cmd.Buildpacks = []string{"some-buildpack-1", "some-buildpack-2"}
+					})
+
+					It("updates the buildpacks", func() {
+						appArg := fakeActor.UpdateApplicationArgsForCall(0)
+						Expect(appArg).To(Equal(v3action.Application{
+							GUID: "some-app-guid",
+							Lifecycle: v3action.AppLifecycle{
+								Type: v3action.BuildpackAppLifecycleType,
+								Data: v3action.AppLifecycleData{
+									Buildpacks: []string{"some-buildpack-1", "some-buildpack-2"},
+								},
+							},
+						}))
+					})
+
+					Context("when default was also provided", func() {
+						BeforeEach(func() {
+							cmd.Buildpacks = []string{"default", "some-buildpack-2"}
+						})
+
+						It("returns the ConflictingBuildpacksError", func() {
+							Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
+							Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when null was also provided", func() {
+						BeforeEach(func() {
+							cmd.Buildpacks = []string{"null", "some-buildpack-2"}
+						})
+
+						It("returns the ConflictingBuildpacksError", func() {
+							Expect(executeErr).To(Equal(translatableerror.ConflictingBuildpacksError{}))
+							Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(0))
+						})
 					})
 				})
 			})

@@ -23,7 +23,15 @@ func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]Applicati
 		}
 
 		appSummaries = append(appSummaries, ApplicationSummary{
-			Application:      Application(app),
+			Application: Application{
+				Name:  app.Name,
+				GUID:  app.GUID,
+				State: app.State,
+				Lifecycle: AppLifecycle{
+					Type: AppLifecycleType(app.Lifecycle.Type),
+					Data: AppLifecycleData(app.Lifecycle.Data),
+				},
+			},
 			ProcessSummaries: processSummaries,
 		})
 	}

@@ -1,8 +1,6 @@
 package v3
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
@@ -15,8 +13,7 @@ import (
 
 type V3CreatePackageActor interface {
 	CloudControllerAPIVersion() string
-	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
-	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerPath string) (v3action.Package, v3action.Warnings, error)
+	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error)
 }
 
 type V3CreatePackageCommand struct {
@@ -63,34 +60,21 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	var (
-		pkg      v3action.Package
-		warnings v3action.Warnings
-	)
-
+	var flavorTextTemplate string
 	if cmd.DockerImage.Path != "" {
-		cmd.UI.DisplayTextWithFlavor("Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-			"AppName":      cmd.RequiredArgs.AppName,
-			"CurrentSpace": cmd.Config.TargetedSpace().Name,
-			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-			"CurrentUser":  user.Name,
-		})
-
-		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.DockerImage.Path)
+		flavorTextTemplate = "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
 	} else {
-		cmd.UI.DisplayTextWithFlavor("Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
-			"AppName":      cmd.RequiredArgs.AppName,
-			"CurrentSpace": cmd.Config.TargetedSpace().Name,
-			"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-			"CurrentUser":  user.Name,
-		})
-
-		pwd, osErr := os.Getwd()
-		if osErr != nil {
-			return shared.HandleError(osErr)
-		}
-		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, pwd)
+		flavorTextTemplate = "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
 	}
+
+	cmd.UI.DisplayTextWithFlavor(flavorTextTemplate, map[string]interface{}{
+		"AppName":      cmd.RequiredArgs.AppName,
+		"CurrentSpace": cmd.Config.TargetedSpace().Name,
+		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
+		"CurrentUser":  user.Name,
+	})
+
+	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "", cmd.DockerImage.Path)
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

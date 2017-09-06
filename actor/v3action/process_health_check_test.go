@@ -307,7 +307,9 @@ var _ = Describe("Process Health Check Actions", func() {
 							Expect(err).NotTo(HaveOccurred())
 							Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
 
-							Expect(app).To(Equal(Application(ccv3App)))
+							Expect(app).To(Equal(Application{
+								GUID: ccv3App.GUID,
+							}))
 
 							Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
 							appGUID, processType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)
@@ -327,7 +329,9 @@ var _ = Describe("Process Health Check Actions", func() {
 							Expect(err).NotTo(HaveOccurred())
 							Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-health-check-warning"}))
 
-							Expect(app).To(Equal(Application(ccv3App)))
+							Expect(app).To(Equal(Application{
+								GUID: ccv3App.GUID,
+							}))
 
 							Expect(fakeCloudControllerClient.GetApplicationProcessByTypeCallCount()).To(Equal(1))
 							appGUID, processType := fakeCloudControllerClient.GetApplicationProcessByTypeArgsForCall(0)

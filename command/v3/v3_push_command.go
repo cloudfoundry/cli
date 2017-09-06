@@ -1,8 +1,6 @@
 package v3
 
 import (
-	"os"
-
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -25,8 +23,8 @@ type V2PushActor interface {
 
 type V3PushActor interface {
 	CloudControllerAPIVersion() string
-	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
-	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
+	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error)
+	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
 	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v3action.NOAAClient) (<-chan *v3action.LogMessage, <-chan error, v3action.Warnings, error)
@@ -35,7 +33,7 @@ type V3PushActor interface {
 	StagePackage(packageGUID string, appName string) (<-chan v3action.Droplet, <-chan v3action.Warnings, <-chan error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
-	UpdateApplication(appGUID string, buildpacks []string) (v3action.Application, v3action.Warnings, error)
+	UpdateApplication(app v3action.Application) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3PushCommand struct {
@@ -43,7 +41,8 @@ type V3PushCommand struct {
 	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
 	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]"`
+	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
+	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
@@ -91,7 +90,12 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionV3)
+	err := cmd.validateArgs()
+	if err != nil {
+		return err
+	}
+
+	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionV3)
 	if err != nil {
 		return err
 	}
@@ -104,6 +108,10 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		return err
+	}
+
+	if !verifyBuildpacks(cmd.Buildpacks) {
+		return translatableerror.ConflictingBuildpacksError{}
 	}
 
 	var app v3action.Application
@@ -180,27 +188,47 @@ func (cmd V3PushCommand) Execute(args []string) error {
 				AppName:    cmd.RequiredArgs.AppName,
 				BinaryName: cmd.Config.BinaryName(),
 			}
-		} else {
-			return shared.HandleError(err)
 		}
+
+		return shared.HandleError(err)
 	}
 
 	return cmd.AppSummaryDisplayer.DisplayAppInfo()
 }
 
+func (cmd V3PushCommand) validateArgs() error {
+	switch {
+	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
+		return translatableerror.ArgumentCombinationError{
+			Arg1: "--docker-image, -o",
+			Arg2: "-p",
+		}
+	}
+	return nil
+}
+
 func (cmd V3PushCommand) createApplication(userName string) (v3action.Application, error) {
-	createInput := v3action.CreateApplicationInput{
-		AppName:   cmd.RequiredArgs.AppName,
-		SpaceGUID: cmd.Config.TargetedSpace().GUID,
+	appToCreate := v3action.Application{
+		Name: cmd.RequiredArgs.AppName,
 	}
 
-	if verifyBuildpacks(cmd.Buildpacks) {
-		createInput.Buildpacks = cmd.Buildpacks
+	if cmd.DockerImage.Path != "" {
+		appToCreate.Lifecycle = v3action.AppLifecycle{
+			Type: v3action.DockerAppLifecycleType,
+		}
 	} else {
-		return v3action.Application{}, translatableerror.ConflictingBuildpacksError{}
+		appToCreate.Lifecycle = v3action.AppLifecycle{
+			Type: v3action.BuildpackAppLifecycleType,
+			Data: v3action.AppLifecycleData{
+				Buildpacks: cmd.Buildpacks,
+			},
+		}
 	}
 
-	app, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(createInput)
+	app, warnings, err := cmd.Actor.CreateApplicationInSpace(
+		appToCreate,
+		cmd.Config.TargetedSpace().GUID,
+	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err
@@ -229,8 +257,6 @@ func (cmd V3PushCommand) getApplication() (v3action.Application, error) {
 }
 
 func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3action.Application, error) {
-	var buildpacks []string
-
 	cmd.UI.DisplayTextWithFlavor("Updating app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
@@ -238,13 +264,24 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 		"CurrentUser":  userName,
 	})
 
-	if verifyBuildpacks(cmd.Buildpacks) {
-		buildpacks = cmd.Buildpacks
-	} else {
-		return v3action.Application{}, translatableerror.ConflictingBuildpacksError{}
+	appToUpdate := v3action.Application{
+		GUID: appGUID,
 	}
 
-	app, warnings, err := cmd.Actor.UpdateApplication(appGUID, buildpacks)
+	if cmd.DockerImage.Path != "" {
+		appToUpdate.Lifecycle = v3action.AppLifecycle{
+			Type: v3action.DockerAppLifecycleType,
+		}
+	} else {
+		appToUpdate.Lifecycle = v3action.AppLifecycle{
+			Type: v3action.BuildpackAppLifecycleType,
+			Data: v3action.AppLifecycleData{
+				Buildpacks: cmd.Buildpacks,
+			},
+		}
+	}
+
+	app, warnings, err := cmd.Actor.UpdateApplication(appToUpdate)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Application{}, err
@@ -269,26 +306,21 @@ func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
 }
 
 func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error) {
-	cmd.UI.DisplayTextWithFlavor("Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...", map[string]interface{}{
+	var flavorTextTemplate string
+	if cmd.DockerImage.Path != "" {
+		flavorTextTemplate = "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
+	} else {
+		flavorTextTemplate = "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
+	}
+
+	cmd.UI.DisplayTextWithFlavor(flavorTextTemplate, map[string]interface{}{
 		"AppName":      cmd.RequiredArgs.AppName,
 		"CurrentSpace": cmd.Config.TargetedSpace().Name,
 		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
 		"CurrentUser":  userName,
 	})
 
-	var appPath string
-
-	if cmd.AppPath != "" {
-		appPath = string(cmd.AppPath)
-	} else {
-		var err error
-		appPath, err = os.Getwd()
-		if err != nil {
-			return v3action.Package{}, err
-		}
-	}
-
-	pkg, warnings, err := cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, appPath)
+	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath), cmd.DockerImage.Path)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err
