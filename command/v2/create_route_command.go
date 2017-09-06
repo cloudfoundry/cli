@@ -11,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . CreateRouteActor
@@ -116,13 +115,13 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 func (cmd CreateRouteCommand) minimumFlagVersions() error {
 	ccVersion := cmd.Actor.CloudControllerAPIVersion()
-	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionHTTPRoutePath, "Option '--path'"); cmd.Path != "" && err != nil {
+	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionHTTPRoutePath, "Option '--path'"); cmd.Path != "" && err != nil {
 		return err
 	}
-	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--port'"); cmd.Port.IsSet && err != nil {
+	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--port'"); cmd.Port.IsSet && err != nil {
 		return err
 	}
-	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--random-port'"); cmd.RandomPort && err != nil {
+	if err := command.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--random-port'"); cmd.RandomPort && err != nil {
 		return err
 	}
 	return nil
