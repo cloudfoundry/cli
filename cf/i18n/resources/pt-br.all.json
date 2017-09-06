@@ -5428,11 +5428,11 @@
     "translation": "Ajustando a escala do app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },
   {
-    "id": "Scaling cancelled",
+    "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
-    "id": "Scaling process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Scaling cancelled",
     "translation": ""
   },
   {
@@ -5700,7 +5700,7 @@
     "translation": "Mostrando escala atual do app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },
   {
-    "id": "Showing current scale of process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {

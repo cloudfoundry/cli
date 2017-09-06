@@ -5428,11 +5428,11 @@
     "translation": "正在以 {{.CurrentUser}} 身份扩展组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
   {
-    "id": "Scaling cancelled",
+    "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {
-    "id": "Scaling process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Scaling cancelled",
     "translation": ""
   },
   {
@@ -5700,7 +5700,7 @@
     "translation": "正在以 {{.CurrentUser}} 身份显示组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 的当前扩展..."
   },
   {
-    "id": "Showing current scale of process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "id": "Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": ""
   },
   {

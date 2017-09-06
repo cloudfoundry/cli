@@ -1,10 +1,6 @@
 package v3
 
 import (
-	"strconv"
-
-	"github.com/cloudfoundry/bytefmt"
-
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -21,7 +17,7 @@ type V3ScaleActor interface {
 
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	GetProcessByApplicationAndProcessType(appGUID string, processType string) (v3action.Process, v3action.Warnings, error)
+	GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
@@ -39,10 +35,11 @@ type V3ScaleCommand struct {
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
-	UI          command.UI
-	Config      command.Config
-	Actor       V3ScaleActor
-	SharedActor command.SharedActor
+	UI                  command.UI
+	Config              command.Config
+	Actor               V3ScaleActor
+	SharedActor         command.SharedActor
+	AppSummaryDisplayer shared.AppSummaryDisplayer
 }
 
 func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
@@ -55,6 +52,14 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config)
+
+	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
+		UI:              ui,
+		Config:          config,
+		Actor:           cmd.Actor,
+		V2AppRouteActor: nil,
+		AppName:         cmd.RequiredArgs.AppName,
+	}
 
 	return nil
 }
@@ -85,8 +90,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
-		cmd.UI.DisplayTextWithFlavor("Showing current scale of process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-			"Process":   cmd.ProcessType,
+		cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 			"AppName":   cmd.RequiredArgs.AppName,
 			"OrgName":   cmd.Config.TargetedOrganization().Name,
 			"SpaceName": cmd.Config.TargetedSpace().Name,
@@ -132,27 +136,18 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 }
 
 func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string) error {
-	cmd.UI.DisplayNewline()
-	process, warnings, err := cmd.Actor.GetProcessByApplicationAndProcessType(appGUID, cmd.ProcessType)
+	process, warnings, err := cmd.Actor.GetProcessSummaryByApplicationAndProcessType(appGUID, cmd.ProcessType)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
-	keyValueTable := [][]string{
-		{cmd.UI.TranslateText("memory:"), bytefmt.ByteSize(process.MemoryInMB.Value * bytefmt.MEGABYTE)},
-		{cmd.UI.TranslateText("disk:"), bytefmt.ByteSize(process.DiskInMB.Value * bytefmt.MEGABYTE)},
-		{cmd.UI.TranslateText("instances:"), strconv.Itoa(process.Instances.Value)},
-	}
-
-	cmd.UI.DisplayKeyValueTable("", keyValueTable, 3)
-
+	cmd.AppSummaryDisplayer.DisplayAppInstancesTable(process)
 	return nil
 }
 
 func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
-	cmd.UI.DisplayTextWithFlavor("Scaling process {{.Process}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"Process":   cmd.ProcessType,
+	cmd.UI.DisplayTextWithFlavor("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,

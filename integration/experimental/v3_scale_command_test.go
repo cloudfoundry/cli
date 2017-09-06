@@ -1,6 +1,9 @@
 package experimental
 
 import (
+	"fmt"
+	"strings"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -142,95 +145,119 @@ var _ = Describe("v3-scale command", func() {
 				It("displays the current scale properties for default process", func() {
 					session := helpers.CF("v3-scale", appName)
 
-					Eventually(session.Out).Should(Say("Showing current scale of process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say("Scaling"))
 					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session.Out).ShouldNot(Say("Stopping"))
 					Consistently(session.Out).ShouldNot(Say("Starting"))
 					Consistently(session.Out).ShouldNot(Say("Waiting"))
-
-					Eventually(session.Out).Should(Say("memory:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("instances:\\s+1"))
-
 					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(len(appTable.Processes)).To(Equal(1))
+
+					processSummary := appTable.Processes[0]
+					instanceSummary := processSummary.Instances[0]
+					Expect(processSummary.Title).To(Equal("web:1/1"))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 				})
 
 				It("displays the current scale properties for requested process", func() {
 					session := helpers.CF("v3-scale", appName, "--process", "console")
 
-					Eventually(session.Out).Should(Say("Showing current scale of process console of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say("Scaling"))
 					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session.Out).ShouldNot(Say("Stopping"))
 					Consistently(session.Out).ShouldNot(Say("Starting"))
 					Consistently(session.Out).ShouldNot(Say("Waiting"))
-
-					Eventually(session.Out).Should(Say("memory:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("instances:\\s+0"))
-
 					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(len(appTable.Processes)).To(Equal(1))
+
+					processSummary := appTable.Processes[0]
+					Expect(processSummary.Title).To(Equal("console:0/0"))
 				})
 			})
 
 			Context("when only one scale option flag is provided", func() {
 				It("scales the app accordingly", func() {
+					By("verifying we start with a single instance")
+					session := helpers.CF("v3-scale", appName)
+					Eventually(session).Should(Exit(0))
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(appTable.Processes).To(HaveLen(1))
+
 					By("scaling to 3 instances")
-					session := helpers.CF("v3-scale", appName, "-i", "3")
-					Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					session = helpers.CF("v3-scale", appName, "-i", "3")
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session.Out).ShouldNot(Say("Stopping"))
 					Consistently(session.Out).ShouldNot(Say("Starting"))
-
-					Eventually(session.Out).Should(Say("memory:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("instances:\\s+3"))
-
 					Eventually(session).Should(Exit(0))
+
+					updatedAppTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary := updatedAppTable.Processes[0]
+					instanceSummary := processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 
 					By("scaling memory to 64M")
 					buffer := NewBuffer()
 					buffer.Write([]byte("y\n"))
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-m", "64M")
-					Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
 					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-
-					Eventually(session.Out).Should(Say("memory:\\s+64M"))
-					Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("instances:\\s+3"))
-
 					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					instanceSummary = processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 
 					By("scaling disk to 92M")
 					buffer = NewBuffer()
 					buffer.Write([]byte("y\n"))
 					session = helpers.CFWithStdin(buffer, "v3-scale", appName, "-k", "92M")
-					Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
 					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-
-					Eventually(session.Out).Should(Say("memory:\\s+64M"))
-					Eventually(session.Out).Should(Say("disk:\\s+92M"))
-					Eventually(session.Out).Should(Say("instances:\\s+3"))
-
 					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					instanceSummary = processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/3`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 64M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 92M`))
 
 					By("scaling to 0 instances")
 					session = helpers.CF("v3-scale", appName, "-i", "0")
-					Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
 					Consistently(session.Out).ShouldNot(Say("Stopping"))
 					Consistently(session.Out).ShouldNot(Say("Starting"))
-
-					Eventually(session.Out).Should(Say("memory:\\s+64M"))
-					Eventually(session.Out).Should(Say("disk:\\s+92M"))
-					Eventually(session.Out).Should(Say("instances:\\s+0"))
-
 					Eventually(session).Should(Exit(0))
+
+					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(updatedAppTable.Processes).To(HaveLen(1))
+
+					processSummary = updatedAppTable.Processes[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:0/0`))
 				})
 
 				Context("when the user chooses not to restart the app", func() {
@@ -238,20 +265,16 @@ var _ = Describe("v3-scale command", func() {
 						buffer := NewBuffer()
 						buffer.Write([]byte("n\n"))
 						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "90M")
-						Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session.Out).Should(Say("This will cause the app to restart"))
-
-						Eventually(session.Out).Should(Say("Scaling cancelled"))
-
 						Consistently(session.Out).ShouldNot(Say("Stopping"))
 						Consistently(session.Out).ShouldNot(Say("Starting"))
+						Eventually(session.Out).Should(Say("Scaling cancelled"))
 						Consistently(session.Out).ShouldNot(Say("Waiting for app to start\\.\\.\\."))
-
-						Eventually(session.Out).Should(Say("memory:\\s+\\d+[KMG]"))
-						Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-						Eventually(session.Out).Should(Say("instances:\\s+1"))
-
 						Eventually(session).Should(Exit(0))
+
+						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						Expect(appTable.Processes).To(HaveLen(1))
+						Expect(appTable.Processes[0].Title).To(MatchRegexp(`web:\d/1`))
 					})
 				})
 			})
@@ -261,29 +284,77 @@ var _ = Describe("v3-scale command", func() {
 					buffer := NewBuffer()
 					buffer.Write([]byte("y\n"))
 					session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "60M")
-					Eventually(session.Out).Should(Say("Scaling process web of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
 					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-
-					Eventually(session.Out).Should(Say("memory:\\s+60M"))
-					Eventually(session.Out).Should(Say("disk:\\s+120M"))
-					Eventually(session.Out).Should(Say("instances:\\s+2"))
-
 					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(appTable.Processes).To(HaveLen(1))
+
+					processSummary := appTable.Processes[0]
+					instanceSummary := processSummary.Instances[0]
+					Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 60M`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+				})
+			})
+
+			PContext("when the provided scale options are the same as the existing scale properties", func() {
+				var (
+					session          *Session
+					currentInstances string
+					maxMemory        string
+					maxDiskSize      string
+				)
+
+				BeforeEach(func() {
+					session = helpers.CF("v3-scale", appName)
+					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					instanceSummary := appTable.Processes[0].Instances[0]
+					currentInstances = string(len(appTable.Processes[0].Instances))
+					maxMemory = strings.Fields(instanceSummary.Memory)[2]
+					maxDiskSize = strings.Fields(instanceSummary.Disk)[2]
+				})
+
+				It("the action should be a no-op", func() {
+					session = helpers.CF("v3-scale", appName, "-i", currentInstances, "-m", maxMemory, "-k", maxDiskSize)
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
+					Consistently(session.Out).ShouldNot(Say("Stopping"))
+					Consistently(session.Out).ShouldNot(Say("Starting"))
+					Consistently(session.Out).ShouldNot(Say("Waiting for app to start"))
+					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(appTable.Processes).To(HaveLen(1))
+
+					newProcessSummary := appTable.Processes[0]
+					newInstanceSummary := newProcessSummary.Instances[0]
+					Expect(newProcessSummary.Title).To(MatchRegexp(fmt.Sprintf(`web:\d/%s`, currentInstances)))
+					Expect(newInstanceSummary.Memory).To(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, maxMemory)))
+					Expect(newInstanceSummary.Disk).To(MatchRegexp(fmt.Sprintf(`\d+(\.\d+)?[KMG]? of %s`, maxDiskSize)))
 				})
 			})
 
 			Context("when the process flag is provided", func() {
 				It("scales the requested process", func() {
 					session := helpers.CF("v3-scale", appName, "-i", "2", "--process", "console")
-					Eventually(session.Out).Should(Say("Scaling process console of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-
-					Eventually(session.Out).Should(Say("memory:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("disk:\\s+\\d+[KMG]"))
-					Eventually(session.Out).Should(Say("instances:\\s+2"))
-
+					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
+
+					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					Expect(appTable.Processes).To(HaveLen(1))
+
+					processSummary := appTable.Processes[0]
+					instanceSummary := processSummary.Instances[0]
+					Expect(processSummary.Instances).To(HaveLen(2))
+					Expect(processSummary.Title).To(MatchRegexp(`console:\d/2`))
+					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
+					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 				})
 			})
 		})
