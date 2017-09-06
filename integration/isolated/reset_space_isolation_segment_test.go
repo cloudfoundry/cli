@@ -1,8 +1,6 @@
 package isolated
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -114,25 +112,20 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
 					Eventually(session).Should(Exit(0))
 
-					Eventually(helpers.CF("space", spaceName)).Should(Say("(?m)isolation segment:\\s*$"))
+					session = helpers.CF("space", spaceName)
+					Eventually(session).Should(Say("(?m)isolation segment:\\s*$"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when there is a default org isolation segment", func() {
-				var orgGUID string
 				var orgIsolationSegmentName string
-				var orgIsolationSegmentGUID string
 
 				BeforeEach(func() {
 					orgIsolationSegmentName = helpers.NewIsolationSegmentName()
 					Eventually(helpers.CF("create-isolation-segment", orgIsolationSegmentName)).Should(Exit(0))
 					Eventually(helpers.CF("enable-org-isolation", organizationName, orgIsolationSegmentName)).Should(Exit(0))
-					orgIsolationSegmentGUID = helpers.GetIsolationSegmentGUID(orgIsolationSegmentName)
-					orgGUID = helpers.GetOrgGUID(organizationName)
-
-					Eventually(helpers.CF("curl", "-X", "PATCH",
-						fmt.Sprintf("/v3/organizations/%s/relationships/default_isolation_segment", orgGUID),
-						"-d", fmt.Sprintf(`{"data":{"guid":"%s"}`, orgIsolationSegmentGUID))).Should(Exit(0))
+					Eventually(helpers.CF("set-org-default-isolation-segment", organizationName, orgIsolationSegmentName)).Should(Exit(0))
 				})
 
 				It("resets the space isolation segment to the default org isolation segment", func() {
@@ -144,7 +137,9 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 					Eventually(session).Should(Say("Running applications need a restart to be moved there."))
 					Eventually(session).Should(Exit(0))
 
-					Eventually(helpers.CF("space", spaceName)).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
+					session = helpers.CF("space", spaceName)
+					Eventually(session).Should(Say("isolation segment:\\s+%s", orgIsolationSegmentName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
