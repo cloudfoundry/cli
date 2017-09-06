@@ -31,43 +31,94 @@ var _ = Describe("Application", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		Context("when no buildpacks are provided", func() {
+		Context("when no lifecycle is provided", func() {
 			BeforeEach(func() {
 				app = Application{}
 			})
 
-			It("omits the Lifecycle from the JSON", func() {
+			It("omits the lifecycle from the JSON", func() {
 				Expect(string(appBytes)).To(Equal("{}"))
 			})
 		})
 
-		Context("when default buildpack is provided", func() {
+		Context("when lifecycle type docker is provided", func() {
 			BeforeEach(func() {
-				app = Application{Buildpacks: []string{"default"}}
+				app = Application{
+					Lifecycle: AppLifecycle{
+						Type: DockerAppLifecycleType,
+					},
+				}
 			})
 
-			It("sets the Lifecycle buildpack to be empty in the JSON", func() {
-				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+			It("sets lifecycle type to docker with empty data", func() {
+				Expect(string(appBytes)).To(MatchJSON(`{"lifecycle":{"type":"docker","data":{}}}`))
 			})
 		})
 
-		Context("when null buildpack is provided", func() {
-			BeforeEach(func() {
-				app = Application{Buildpacks: []string{"null"}}
+		Context("when lifecycle type buildpack is provided", func() {
+			Context("when no buildpacks are provided", func() {
+				BeforeEach(func() {
+					app = Application{
+						Lifecycle: AppLifecycle{
+							Type: BuildpackAppLifecycleType,
+						},
+					}
+				})
+
+				It("omits the lifecycle from the JSON", func() {
+					Expect(string(appBytes)).To(Equal("{}"))
+				})
 			})
 
-			It("sets the Lifecycle buildpack to be empty in the JSON", func() {
-				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
-			})
-		})
+			Context("when default buildpack is provided", func() {
+				BeforeEach(func() {
+					app = Application{
+						Lifecycle: AppLifecycle{
+							Type: BuildpackAppLifecycleType,
+							Data: AppLifecycleData{
+								Buildpacks: []string{"default"},
+							},
+						},
+					}
+				})
 
-		Context("when other buildpacks are provided", func() {
-			BeforeEach(func() {
-				app = Application{Buildpacks: []string{"some-buildpack"}}
+				It("sets the lifecycle buildpack to be empty in the JSON", func() {
+					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+				})
 			})
 
-			It("sets them in the JSON", func() {
-				Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+			Context("when null buildpack is provided", func() {
+				BeforeEach(func() {
+					app = Application{
+						Lifecycle: AppLifecycle{
+							Type: BuildpackAppLifecycleType,
+							Data: AppLifecycleData{
+								Buildpacks: []string{"null"},
+							},
+						},
+					}
+				})
+
+				It("sets the Lifecycle buildpack to be empty in the JSON", func() {
+					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":null},"type":"buildpack"}}`))
+				})
+			})
+
+			Context("when other buildpacks are provided", func() {
+				BeforeEach(func() {
+					app = Application{
+						Lifecycle: AppLifecycle{
+							Type: BuildpackAppLifecycleType,
+							Data: AppLifecycleData{
+								Buildpacks: []string{"some-buildpack"},
+							},
+						},
+					}
+				})
+
+				It("sets them in the JSON", func() {
+					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+				})
 			})
 		})
 	})
@@ -133,9 +184,14 @@ var _ = Describe("Application", func() {
 
 				Expect(apps).To(ConsistOf(
 					Application{
-						Name:       "app-name-1",
-						GUID:       "app-guid-1",
-						Buildpacks: []string{"some-buildpack"},
+						Name: "app-name-1",
+						GUID: "app-guid-1",
+						Lifecycle: AppLifecycle{
+							Type: BuildpackAppLifecycleType,
+							Data: AppLifecycleData{
+								Buildpacks: []string{"some-buildpack"},
+							},
+						},
 					},
 					Application{Name: "app-name-2", GUID: "app-guid-2"},
 					Application{Name: "app-name-3", GUID: "app-guid-3"},
@@ -227,9 +283,14 @@ var _ = Describe("Application", func() {
 
 			It("returns the updated app and warnings", func() {
 				app, warnings, err := client.UpdateApplication(Application{
-					GUID:       "some-app-guid",
-					Name:       "some-app-name",
-					Buildpacks: []string{"some-buildpack"},
+					GUID: "some-app-guid",
+					Name: "some-app-name",
+					Lifecycle: AppLifecycle{
+						Type: BuildpackAppLifecycleType,
+						Data: AppLifecycleData{
+							Buildpacks: []string{"some-buildpack"},
+						},
+					},
 					Relationships: Relationships{
 						SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
@@ -378,8 +439,13 @@ var _ = Describe("Application", func() {
 
 			It("returns the created app and warnings", func() {
 				app, warnings, err := client.CreateApplication(Application{
-					Name:       "some-app-name",
-					Buildpacks: []string{"some-buildpack"},
+					Name: "some-app-name",
+					Lifecycle: AppLifecycle{
+						Type: BuildpackAppLifecycleType,
+						Data: AppLifecycleData{
+							Buildpacks: []string{"some-buildpack"},
+						},
+					},
 					Relationships: Relationships{
 						SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
@@ -389,9 +455,14 @@ var _ = Describe("Application", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
 				Expect(app).To(Equal(Application{
-					Name:       "some-app-name",
-					GUID:       "some-app-guid",
-					Buildpacks: []string{"some-buildpack"},
+					Name: "some-app-name",
+					GUID: "some-app-guid",
+					Lifecycle: AppLifecycle{
+						Type: BuildpackAppLifecycleType,
+						Data: AppLifecycleData{
+							Buildpacks: []string{"some-buildpack"},
+						},
+					},
 				}))
 			})
 		})

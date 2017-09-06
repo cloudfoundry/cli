@@ -13,7 +13,7 @@ import (
 
 type V3CreateAppActor interface {
 	CloudControllerAPIVersion() string
-	CreateApplicationByNameAndSpace(createApplicationInput v3action.CreateApplicationInput) (v3action.Application, v3action.Warnings, error)
+	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 }
 
 type V3CreateAppCommand struct {
@@ -66,10 +66,12 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 		"CurrentUser":  user.Name,
 	})
 
-	_, warnings, err := cmd.Actor.CreateApplicationByNameAndSpace(v3action.CreateApplicationInput{
-		AppName:   cmd.RequiredArgs.AppName,
-		SpaceGUID: cmd.Config.TargetedSpace().GUID,
-	})
+	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
+		v3action.Application{
+			Name: cmd.RequiredArgs.AppName,
+		},
+		cmd.Config.TargetedSpace().GUID,
+	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {

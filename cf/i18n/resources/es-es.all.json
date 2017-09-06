@@ -2176,7 +2176,7 @@
     "translation": "Creando el paquete de compilación {{.BuildpackName}}..."
   },
   {
-    "id": "Creating docker package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "id": "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -2561,6 +2561,10 @@
   },
   {
     "id": "Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?",
+    "translation": ""
+  },
+  {
+    "id": "Docker image to use (e.g. user/docker-image-name)",
     "translation": ""
   },
   {
@@ -6676,16 +6680,12 @@
     "translation": "Actualizando {{.AppName}} health_check_type a '{{.HealthCheckType}}'"
   },
   {
-    "id": "Uploading and creating bits package for V3 app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
+    "id": "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
     "id": "Uploading app files from: {{.Path}}",
     "translation": "Subiendo archivos de app desde: {{.Path}}"
-  },
-  {
-    "id": "Uploading app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}...",
-    "translation": ""
   },
   {
     "id": "Uploading buildpack {{.BuildpackName}}...",
@@ -7008,7 +7008,7 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]",
+    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]",
     "translation": ""
   },
   {

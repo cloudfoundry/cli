@@ -10,13 +10,29 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+type AppLifecycleType string
+
+const (
+	BuildpackAppLifecycleType AppLifecycleType = "buildpack"
+	DockerAppLifecycleType    AppLifecycleType = "docker"
+)
+
 // Application represents a Cloud Controller V3 Application.
 type Application struct {
-	Name          string
-	Relationships Relationships
-	GUID          string
-	State         string
-	Buildpacks    []string
+	Name          string        `json:"name,omitempty"`
+	Relationships Relationships `json:"relationships,omitempty"`
+	GUID          string        `json:"guid,omitempty"`
+	State         string        `json:"state,omitempty"`
+	Lifecycle     AppLifecycle  `json:"lifecycle,omitempty"`
+}
+
+type AppLifecycle struct {
+	Type AppLifecycleType `json:"type,omitempty"`
+	Data AppLifecycleData `json:"data,omitempty"`
+}
+
+type AppLifecycleData struct {
+	Buildpacks []string `json:"buildpacks,omitempty"`
 }
 
 func (a Application) MarshalJSON() ([]byte, error) {
@@ -28,53 +44,35 @@ func (a Application) MarshalJSON() ([]byte, error) {
 
 	ccApp.Name = a.Name
 	ccApp.Relationships = a.Relationships
-	if len(a.Buildpacks) > 0 {
-		switch a.Buildpacks[0] {
-		case "default", "null":
-			ccApp.Lifecycle = map[string]interface{}{
-				"type": "buildpack",
-				"data": map[string]interface{}{
-					"buildpacks": nil,
-				},
+
+	switch a.Lifecycle.Type {
+	case BuildpackAppLifecycleType:
+		if len(a.Lifecycle.Data.Buildpacks) > 0 {
+			switch a.Lifecycle.Data.Buildpacks[0] {
+			case "default", "null":
+				ccApp.Lifecycle = map[string]interface{}{
+					"type": a.Lifecycle.Type,
+					"data": map[string]interface{}{
+						"buildpacks": nil,
+					},
+				}
+			default:
+				ccApp.Lifecycle = map[string]interface{}{
+					"type": a.Lifecycle.Type,
+					"data": map[string]interface{}{
+						"buildpacks": a.Lifecycle.Data.Buildpacks,
+					},
+				}
 			}
-		default:
-			ccApp.Lifecycle = map[string]interface{}{
-				"type": "buildpack",
-				"data": map[string]interface{}{
-					"buildpacks": a.Buildpacks,
-				},
-			}
+		}
+	case DockerAppLifecycleType:
+		ccApp.Lifecycle = map[string]interface{}{
+			"type": a.Lifecycle.Type,
+			"data": map[string]interface{}{},
 		}
 	}
 
 	return json.Marshal(ccApp)
-}
-
-// UnmarshalJSON helps unmarshal a Cloud Controller V3 Application response
-func (a *Application) UnmarshalJSON(data []byte) error {
-	// TODO: do we care about rebuilding the Relationships object?
-	var ccApp struct {
-		Name      string `json:"name"`
-		GUID      string `json:"guid"`
-		State     string `json:"state,omitempty"`
-		Lifecycle struct {
-			Type string `json:"type"`
-			Data struct {
-				Buildpacks []string `json:"buildpacks"`
-			} `json:"data"`
-		} `json:"lifecycle,omitempty"`
-	}
-
-	if err := json.Unmarshal(data, &ccApp); err != nil {
-		return err
-	}
-
-	a.Name = ccApp.Name
-	a.GUID = ccApp.GUID
-	a.State = ccApp.State
-	a.Buildpacks = ccApp.Lifecycle.Data.Buildpacks
-
-	return nil
 }
 
 // DropletRelationship represents the relationship between a V3 Droplet and its

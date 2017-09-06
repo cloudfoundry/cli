@@ -44,7 +44,21 @@ func (e EmptyDirectoryError) Error() string {
 	return fmt.Sprint(e.Path, "is empty")
 }
 
-func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerPath string) (Package, Warnings, error) {
+func (actor Actor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (Package, Warnings, error) {
+	if dockerImage == "" {
+		if bitsPath == "" {
+			var err error
+			bitsPath, err = os.Getwd()
+			if err != nil {
+				return Package{}, nil, err
+			}
+		}
+		return actor.createAndUploadBitsPackageByApplicationNameAndSpace(appName, spaceGUID, bitsPath)
+	}
+	return actor.createDockerPackageByApplicationNameAndSpace(appName, spaceGUID, dockerImage)
+}
+
+func (actor Actor) createDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImage string) (Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return Package{}, allWarnings, err
@@ -54,7 +68,7 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 		Relationships: ccv3.Relationships{
 			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
-		DockerImage: dockerPath,
+		DockerImage: dockerImage,
 	}
 	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
 	allWarnings = append(allWarnings, warnings...)
@@ -64,7 +78,7 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 	return Package(pkg), allWarnings, err
 }
 
-func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {
+func (actor Actor) createAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return Package{}, allWarnings, err

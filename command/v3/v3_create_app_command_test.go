@@ -91,7 +91,7 @@ var _ = Describe("v3-create-app Command", func() {
 
 		Context("when the create is successful", func() {
 			BeforeEach(func() {
-				fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("displays the header and ok", func() {
@@ -103,13 +103,13 @@ var _ = Describe("v3-create-app Command", func() {
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
-				Expect(fakeActor.CreateApplicationByNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
 
-				createAppInput := fakeActor.CreateApplicationByNameAndSpaceArgsForCall(0)
-				Expect(createAppInput).To(Equal(v3action.CreateApplicationInput{
-					AppName:   app,
-					SpaceGUID: "some-space-guid",
+				createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+				Expect(createApp).To(Equal(v3action.Application{
+					Name: app,
 				}))
+				Expect(createSpaceGUID).To(Equal("some-space-guid"))
 			})
 		})
 
@@ -119,7 +119,7 @@ var _ = Describe("v3-create-app Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am an error")
-					fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
 				})
 
 				It("displays the header and error", func() {
@@ -134,7 +134,7 @@ var _ = Describe("v3-create-app Command", func() {
 
 			Context("due to an ApplicationAlreadyExistsError", func() {
 				BeforeEach(func() {
-					fakeActor.CreateApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.ApplicationAlreadyExistsError{})
+					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.ApplicationAlreadyExistsError{})
 				})
 
 				It("displays the header and ok", func() {

@@ -240,7 +240,7 @@ var _ = Describe("Application Actions", func() {
 		})
 	})
 
-	Describe("CreateApplicationByNameAndSpace", func() {
+	Describe("CreateApplicationInSpace", func() {
 		var (
 			application Application
 			warnings    Warnings
@@ -248,20 +248,29 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			application, warnings, err = actor.CreateApplicationByNameAndSpace(CreateApplicationInput{
-				AppName:    "some-app-name",
-				SpaceGUID:  "some-space-guid",
-				Buildpacks: []string{"buildpack-1", "buildpack-2"},
-			})
+			application, warnings, err = actor.CreateApplicationInSpace(Application{
+				Name: "some-app-name",
+				Lifecycle: AppLifecycle{
+					Type: "buildpack",
+					Data: AppLifecycleData{
+						Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					},
+				},
+			}, "some-space-guid")
 		})
 
 		Context("when the app successfully gets created", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.CreateApplicationReturns(
 					ccv3.Application{
-						Name:       "some-app-name",
-						GUID:       "some-app-guid",
-						Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						Name: "some-app-name",
+						GUID: "some-app-guid",
+						Lifecycle: ccv3.AppLifecycle{
+							Type: ccv3.BuildpackAppLifecycleType,
+							Data: ccv3.AppLifecycleData{
+								Buildpacks: []string{"buildpack-1", "buildpack-2"},
+							},
+						},
 					},
 					ccv3.Warnings{"some-warning"},
 					nil,
@@ -271,9 +280,14 @@ var _ = Describe("Application Actions", func() {
 			It("creates and returns the application and warnings", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(application).To(Equal(Application{
-					Name:       "some-app-name",
-					GUID:       "some-app-guid",
-					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					Name: "some-app-name",
+					GUID: "some-app-guid",
+					Lifecycle: AppLifecycle{
+						Type: "buildpack",
+						Data: AppLifecycleData{
+							Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						},
+					},
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
@@ -283,7 +297,12 @@ var _ = Describe("Application Actions", func() {
 					Relationships: ccv3.Relationships{
 						ccv3.SpaceRelationship: ccv3.Relationship{GUID: "some-space-guid"},
 					},
-					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					Lifecycle: ccv3.AppLifecycle{
+						Type: ccv3.BuildpackAppLifecycleType,
+						Data: ccv3.AppLifecycleData{
+							Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						},
+					},
 				}
 				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(expectedApp))
 			})
@@ -331,15 +350,28 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			application, warnings, err = actor.UpdateApplication("some-app-guid", []string{"buildpack-1", "buildpack-2"})
+			application, warnings, err = actor.UpdateApplication(Application{
+				GUID: "some-app-guid",
+				Lifecycle: AppLifecycle{
+					Type: "buildpack",
+					Data: AppLifecycleData{
+						Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					},
+				},
+			})
 		})
 
 		Context("when the app successfully gets updated", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.UpdateApplicationReturns(
 					ccv3.Application{
-						GUID:       "some-app-guid",
-						Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						GUID: "some-app-guid",
+						Lifecycle: ccv3.AppLifecycle{
+							Type: ccv3.BuildpackAppLifecycleType,
+							Data: ccv3.AppLifecycleData{
+								Buildpacks: []string{"buildpack-1", "buildpack-2"},
+							},
+						},
 					},
 					ccv3.Warnings{"some-warning"},
 					nil,
@@ -349,15 +381,25 @@ var _ = Describe("Application Actions", func() {
 			It("creates and returns the application and warnings", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(application).To(Equal(Application{
-					GUID:       "some-app-guid",
-					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					GUID: "some-app-guid",
+					Lifecycle: AppLifecycle{
+						Type: "buildpack",
+						Data: AppLifecycleData{
+							Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						},
+					},
 				}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
 				expectedApp := ccv3.Application{
-					GUID:       "some-app-guid",
-					Buildpacks: []string{"buildpack-1", "buildpack-2"},
+					GUID: "some-app-guid",
+					Lifecycle: ccv3.AppLifecycle{
+						Type: ccv3.BuildpackAppLifecycleType,
+						Data: ccv3.AppLifecycleData{
+							Buildpacks: []string{"buildpack-1", "buildpack-2"},
+						},
+					},
 				}
 				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(expectedApp))
 			})
