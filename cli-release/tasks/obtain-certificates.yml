@@ -1,8 +1,6 @@
 ---
 platform: darwin
 
-rootfs_uri: docker:///cloudfoundry/cli-ci
-
 params:
   CERT_PATH:
 
