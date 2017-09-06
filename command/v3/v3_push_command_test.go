@@ -262,8 +262,7 @@ var _ = Describe("v3-push Command", func() {
 						})
 						It("returns an error", func() {
 							Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-								Arg1: "--docker-image, -o",
-								Arg2: "-p",
+								Args: []string{"--docker-image", "-o", "-p"},
 							}))
 						})
 					})

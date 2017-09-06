@@ -200,8 +200,7 @@ func (cmd V3PushCommand) validateArgs() error {
 	switch {
 	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{
-			Arg1: "--docker-image, -o",
-			Arg2: "-p",
+			Args: []string{"--docker-image", "-o", "-p"},
 		}
 	}
 	return nil
