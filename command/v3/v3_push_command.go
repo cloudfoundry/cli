@@ -53,6 +53,7 @@ type V3PushCommand struct {
 	Actor               V3PushActor
 	V2PushActor         V2PushActor
 	AppSummaryDisplayer shared.AppSummaryDisplayer
+	PackageDisplayer    shared.PackageDisplayer
 }
 
 func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
@@ -83,6 +84,8 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 		V2AppRouteActor: v2AppActor,
 		AppName:         cmd.RequiredArgs.AppName,
 	}
+	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
+
 	return nil
 }
 
@@ -305,19 +308,11 @@ func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
 }
 
 func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error) {
-	var flavorTextTemplate string
-	if cmd.DockerImage.Path != "" {
-		flavorTextTemplate = "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
-	} else {
-		flavorTextTemplate = "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
+	isDockerImage := (cmd.DockerImage.Path != "")
+	err := cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
+	if err != nil {
+		return v3action.Package{}, err
 	}
-
-	cmd.UI.DisplayTextWithFlavor(flavorTextTemplate, map[string]interface{}{
-		"AppName":      cmd.RequiredArgs.AppName,
-		"CurrentSpace": cmd.Config.TargetedSpace().Name,
-		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-		"CurrentUser":  userName,
-	})
 
 	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath), cmd.DockerImage.Path)
 	cmd.UI.DisplayWarnings(warnings)
