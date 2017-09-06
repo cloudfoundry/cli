@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . V3AppActor
@@ -61,7 +60,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3AppCommand) Execute(args []string) error {
-	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err
 	}

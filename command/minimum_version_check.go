@@ -1,12 +1,13 @@
-package version
+package command
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
 
 func MinimumAPIVersionCheck(current string, minimum string, customCommand ...string) error {
-	if current == DefaultVersion || minimum == "" {
+	if current == version.DefaultVersion || minimum == "" {
 		return nil
 	}
 

@@ -2,12 +2,11 @@ package command
 
 import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/version"
 )
 
 func WarnAPIVersionCheck(config Config, ui UI) error {
 	// TODO: make private and refactor commands that use
-	err := version.MinimumAPIVersionCheck(config.BinaryVersion(), config.MinCLIVersion())
+	err := MinimumAPIVersionCheck(config.BinaryVersion(), config.MinCLIVersion())
 
 	if _, ok := err.(translatableerror.MinimumAPIVersionNotMetError); ok {
 		ui.DisplayWarning("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",

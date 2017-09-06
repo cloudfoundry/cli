@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . V3DropletsActor
@@ -48,7 +47,7 @@ func (cmd V3DropletsCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err
 	}

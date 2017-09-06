@@ -12,7 +12,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . V3ScaleActor
@@ -64,7 +63,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err
 	}

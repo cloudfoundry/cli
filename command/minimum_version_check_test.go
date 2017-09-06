@@ -1,8 +1,9 @@
-package version_test
+package command_test
 
 import (
+	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	. "code.cloudfoundry.org/cli/version"
+	"code.cloudfoundry.org/cli/version"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -44,7 +45,7 @@ var _ = Describe("Minimum Version Check", func() {
 
 		Context("current version is the default version", func() {
 			It("does not return an error", func() {
-				err := MinimumAPIVersionCheck(DefaultVersion, minimumVersion)
+				err := MinimumAPIVersionCheck(version.DefaultVersion, minimumVersion)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})

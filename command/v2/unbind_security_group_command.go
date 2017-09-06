@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . UnbindSecurityGroupActor
@@ -49,7 +48,7 @@ func (cmd *UnbindSecurityGroupCommand) Setup(config command.Config, ui command.U
 func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	var err error
 	if ccv2.SecurityGroupLifecycle(cmd.Lifecycle) == ccv2.SecurityGroupLifecycleStaging {
-		err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
+		err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
 		if err != nil {
 			switch e := err.(type) {
 			case translatableerror.MinimumAPIVersionNotMetError:

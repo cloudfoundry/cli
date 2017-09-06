@@ -13,7 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
-	"code.cloudfoundry.org/cli/version"
 )
 
 //go:generate counterfeiter . SpaceActor
@@ -107,7 +106,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
 	includeStagingSecurityGroupsRules := err == nil
 
 	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
@@ -187,7 +186,7 @@ func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) 
 		return nil, nil
 	}
 
-	apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
+	apiCheck := command.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
 	if apiCheck != nil {
 		return nil, nil
 	}
