@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -13,7 +14,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
-	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -28,7 +28,6 @@ var _ = Describe("Create Route Command", func() {
 		fakeSharedActor *commandfakes.FakeSharedActor
 		fakeActor       *v2fakes.FakeCreateRouteActor
 		binaryName      string
-		executeErr      error
 	)
 
 	BeforeEach(func() {
@@ -49,7 +48,7 @@ var _ = Describe("Create Route Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionTCPRouting)
+		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionTCPRouting)
 		fakeConfig.ExperimentalReturns(true)
 	})
 
@@ -67,18 +66,18 @@ var _ = Describe("Create Route Command", func() {
 				Expect(executeErr).To(Equal(expectedErr))
 			}
 		},
-		Entry("hostname", nil, "some-hostname", "", flag.Port{types.NullInt{IsSet: false}}, false),
-		Entry("path", nil, "", "some-path", flag.Port{types.NullInt{IsSet: false}}, false),
-		Entry("hostname and path", nil, "some-hostname", "some-path", flag.Port{types.NullInt{IsSet: false}}, false),
-		Entry("hostname and port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--port"}}, "some-hostname", "", flag.Port{types.NullInt{IsSet: true}}, false),
-		Entry("path and port", translatableerror.ArgumentCombinationError{Args: []string{"--path", "--port"}}, "", "some-path", flag.Port{types.NullInt{IsSet: true}}, false),
-		Entry("hostname, path, and port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--path", "--port"}}, "some-hostname", "some-path", flag.Port{types.NullInt{IsSet: true}}, false),
-		Entry("hostname and random port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--random-port"}}, "some-hostname", "", flag.Port{types.NullInt{IsSet: false}}, true),
-		Entry("path and random port", translatableerror.ArgumentCombinationError{Args: []string{"--path", "--random-port"}}, "", "some-path", flag.Port{types.NullInt{IsSet: false}}, true),
-		Entry("hostname, path, and random port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--path", "--random-port"}}, "some-hostname", "some-path", flag.Port{types.NullInt{IsSet: false}}, true),
-		Entry("port", nil, "", "", flag.Port{types.NullInt{IsSet: true}}, false),
-		Entry("random port", nil, "", "", flag.Port{types.NullInt{IsSet: false}}, true),
-		Entry("port and random port", translatableerror.ArgumentCombinationError{Args: []string{"--port", "--random-port"}}, "", "", flag.Port{types.NullInt{IsSet: true}}, true),
+		Entry("hostname", nil, "some-hostname", "", flag.Port{NullInt: types.NullInt{IsSet: false}}, false),
+		Entry("path", nil, "", "some-path", flag.Port{NullInt: types.NullInt{IsSet: false}}, false),
+		Entry("hostname and path", nil, "some-hostname", "some-path", flag.Port{NullInt: types.NullInt{IsSet: false}}, false),
+		Entry("hostname and port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--port"}}, "some-hostname", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, false),
+		Entry("path and port", translatableerror.ArgumentCombinationError{Args: []string{"--path", "--port"}}, "", "some-path", flag.Port{NullInt: types.NullInt{IsSet: true}}, false),
+		Entry("hostname, path, and port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--path", "--port"}}, "some-hostname", "some-path", flag.Port{NullInt: types.NullInt{IsSet: true}}, false),
+		Entry("hostname and random port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--random-port"}}, "some-hostname", "", flag.Port{NullInt: types.NullInt{IsSet: false}}, true),
+		Entry("path and random port", translatableerror.ArgumentCombinationError{Args: []string{"--path", "--random-port"}}, "", "some-path", flag.Port{NullInt: types.NullInt{IsSet: false}}, true),
+		Entry("hostname, path, and random port", translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--path", "--random-port"}}, "some-hostname", "some-path", flag.Port{NullInt: types.NullInt{IsSet: false}}, true),
+		Entry("port", nil, "", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, false),
+		Entry("random port", nil, "", "", flag.Port{NullInt: types.NullInt{IsSet: false}}, true),
+		Entry("port and random port", translatableerror.ArgumentCombinationError{Args: []string{"--port", "--random-port"}}, "", "", flag.Port{NullInt: types.NullInt{IsSet: true}}, true),
 	)
 
 	DescribeTable("minimum api version checks",
@@ -99,29 +98,31 @@ var _ = Describe("Create Route Command", func() {
 		Entry("port, CC Version 2.52.0", translatableerror.MinimumAPIVersionNotMetError{
 			Command:        "Option '--port'",
 			CurrentVersion: "2.52.0",
-			MinimumVersion: version.MinVersionTCPRouting,
-		}, flag.Port{types.NullInt{IsSet: true}}, false, "", "2.52.0"),
+			MinimumVersion: ccversion.MinVersionTCPRouting,
+		}, flag.Port{NullInt: types.NullInt{IsSet: true}}, false, "", "2.52.0"),
 
-		Entry("port, CC Version 2.53.0", nil, flag.Port{types.NullInt{IsSet: true}}, false, "", version.MinVersionTCPRouting),
+		Entry("port, CC Version 2.53.0", nil, flag.Port{NullInt: types.NullInt{IsSet: true}}, false, "", ccversion.MinVersionTCPRouting),
 
 		Entry("random-port, CC Version 2.52.0", translatableerror.MinimumAPIVersionNotMetError{
 			Command:        "Option '--random-port'",
 			CurrentVersion: "2.52.0",
-			MinimumVersion: version.MinVersionTCPRouting,
+			MinimumVersion: ccversion.MinVersionTCPRouting,
 		}, flag.Port{}, true, "", "2.52.0"),
 
-		Entry("random-port, CC Version 2.53.0", nil, flag.Port{}, true, "", version.MinVersionTCPRouting),
+		Entry("random-port, CC Version 2.53.0", nil, flag.Port{}, true, "", ccversion.MinVersionTCPRouting),
 
 		Entry("path, CC Version 2.35.0", translatableerror.MinimumAPIVersionNotMetError{
 			Command:        "Option '--path'",
 			CurrentVersion: "2.35.0",
-			MinimumVersion: version.MinVersionHTTPRoutePath,
+			MinimumVersion: ccversion.MinVersionHTTPRoutePath,
 		}, flag.Port{}, false, "some-path", "2.35.0"),
 
-		Entry("path, CC Version 2.36.0", nil, flag.Port{}, false, "some-path", version.MinVersionHTTPRoutePath),
+		Entry("path, CC Version 2.36.0", nil, flag.Port{}, false, "some-path", ccversion.MinVersionHTTPRoutePath),
 	)
 
 	Context("when all the arguments check out", func() {
+		var executeErr error
+
 		JustBeforeEach(func() {
 			executeErr = cmd.Execute(nil)
 		})

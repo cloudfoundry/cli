@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -119,7 +120,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	}
 
 	if cmd.ActorV3 != nil {
-		apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), version.MinVersionIsolationSegmentV3)
+		apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
 		if apiCheck == nil {
 			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
 			cmd.UI.DisplayWarnings(v3Warnings)

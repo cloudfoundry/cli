@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -115,13 +116,13 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 
 func (cmd CreateRouteCommand) minimumFlagVersions() error {
 	ccVersion := cmd.Actor.CloudControllerAPIVersion()
-	if err := version.MinimumAPIVersionCheck(ccVersion, version.MinVersionHTTPRoutePath, "Option '--path'"); cmd.Path != "" && err != nil {
+	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionHTTPRoutePath, "Option '--path'"); cmd.Path != "" && err != nil {
 		return err
 	}
-	if err := version.MinimumAPIVersionCheck(ccVersion, version.MinVersionTCPRouting, "Option '--port'"); cmd.Port.IsSet && err != nil {
+	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--port'"); cmd.Port.IsSet && err != nil {
 		return err
 	}
-	if err := version.MinimumAPIVersionCheck(ccVersion, version.MinVersionTCPRouting, "Option '--random-port'"); cmd.RandomPort && err != nil {
+	if err := version.MinimumAPIVersionCheck(ccVersion, ccversion.MinVersionTCPRouting, "Option '--random-port'"); cmd.RandomPort && err != nil {
 		return err
 	}
 	return nil

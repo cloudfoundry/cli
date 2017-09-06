@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -106,7 +107,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 	})
 	cmd.UI.DisplayNewline()
 
-	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), version.MinVersionLifecyleStagingV2)
+	err = version.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionLifecyleStagingV2)
 	includeStagingSecurityGroupsRules := err == nil
 
 	spaceSummary, warnings, err := cmd.Actor.GetSpaceSummaryByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, includeStagingSecurityGroupsRules)
@@ -186,7 +187,7 @@ func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) 
 		return nil, nil
 	}
 
-	apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), version.MinVersionIsolationSegmentV3)
+	apiCheck := version.MinimumAPIVersionCheck(cmd.ActorV3.CloudControllerAPIVersion(), ccversion.MinVersionIsolationSegmentV3)
 	if apiCheck != nil {
 		return nil, nil
 	}
