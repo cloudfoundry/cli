@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3"
+	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -40,12 +41,18 @@ var _ = Describe("v3-create-package Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 		app = "some-app"
 
+		packageDisplayer := shared.NewPackageDisplayer(
+			testUI,
+			fakeConfig,
+		)
+
 		cmd = v3.V3CreatePackageCommand{
-			UI:           testUI,
-			Config:       fakeConfig,
-			SharedActor:  fakeSharedActor,
-			Actor:        fakeActor,
-			RequiredArgs: flag.AppName{AppName: app},
+			UI:               testUI,
+			Config:           fakeConfig,
+			SharedActor:      fakeSharedActor,
+			Actor:            fakeActor,
+			RequiredArgs:     flag.AppName{AppName: app},
+			PackageDisplayer: packageDisplayer,
 		}
 
 		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionV3)

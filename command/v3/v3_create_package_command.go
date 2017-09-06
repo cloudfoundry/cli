@@ -25,6 +25,8 @@ type V3CreatePackageCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       V3CreatePackageActor
+
+	PackageDisplayer shared.PackageDisplayer
 }
 
 func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) error {
@@ -37,6 +39,8 @@ func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) e
 		return err
 	}
 	cmd.Actor = v3action.NewActor(client, config)
+
+	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
 
 	return nil
 }
@@ -55,24 +59,11 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	user, err := cmd.Config.CurrentUser()
+	isDockerImage := (cmd.DockerImage.Path != "")
+	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
 	if err != nil {
 		return shared.HandleError(err)
 	}
-
-	var flavorTextTemplate string
-	if cmd.DockerImage.Path != "" {
-		flavorTextTemplate = "Creating docker package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
-	} else {
-		flavorTextTemplate = "Uploading and creating bits package for app {{.AppName}} in org {{.CurrentOrg}} / space {{.CurrentSpace}} as {{.CurrentUser}}..."
-	}
-
-	cmd.UI.DisplayTextWithFlavor(flavorTextTemplate, map[string]interface{}{
-		"AppName":      cmd.RequiredArgs.AppName,
-		"CurrentSpace": cmd.Config.TargetedSpace().Name,
-		"CurrentOrg":   cmd.Config.TargetedOrganization().Name,
-		"CurrentUser":  user.Name,
-	})
 
 	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "", cmd.DockerImage.Path)
 

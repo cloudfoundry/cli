@@ -68,6 +68,10 @@ var _ = Describe("v3-push Command", func() {
 			V2AppRouteActor: fakeV2AppActor,
 			AppName:         app,
 		}
+		packageDisplayer := shared.NewPackageDisplayer(
+			testUI,
+			fakeConfig,
+		)
 
 		cmd = v3.V3PushCommand{
 			RequiredArgs: flag.AppName{AppName: app},
@@ -80,6 +84,7 @@ var _ = Describe("v3-push Command", func() {
 
 			NOAAClient:          fakeNOAAClient,
 			AppSummaryDisplayer: appSummaryDisplayer,
+			PackageDisplayer:    packageDisplayer,
 		}
 		fakeActor.CloudControllerAPIVersionReturns(version.MinVersionV3)
 	})
