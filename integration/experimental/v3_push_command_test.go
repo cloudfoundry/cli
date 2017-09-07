@@ -506,7 +506,7 @@ var _ = Describe("v3-push command", func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
 					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-p", appDir)
 					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '-p' cannot be used together\\."))
+					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
 					Eventually(session.Out).Should(Say("NAME:"))
 					Eventually(session).Should(Exit(1))
 				})
