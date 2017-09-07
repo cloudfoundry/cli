@@ -212,8 +212,8 @@ var _ = Describe("plugins command", func() {
 					})
 
 					AfterEach(func() {
-						helpers.CF("uninstall-plugin", "plugin-1")
-						helpers.CF("uninstall-plugin", "plugin-2")
+						Eventually(helpers.CF("uninstall-plugin", "plugin-1")).Should(Exit(0))
+						Eventually(helpers.CF("uninstall-plugin", "plugin-2")).Should(Exit(0))
 					})
 
 					It("displays an empty table", func() {
@@ -236,8 +236,8 @@ var _ = Describe("plugins command", func() {
 					})
 
 					AfterEach(func() {
-						helpers.CF("uninstall-plugin", "plugin-1")
-						helpers.CF("uninstall-plugin", "plugin-2")
+						Eventually(helpers.CF("uninstall-plugin", "plugin-1")).Should(Exit(0))
+						Eventually(helpers.CF("uninstall-plugin", "plugin-2")).Should(Exit(0))
 					})
 
 					It("displays the table with outdated plugin and new version", func() {

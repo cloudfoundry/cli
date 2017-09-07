@@ -13,13 +13,11 @@ import (
 var _ = Describe("running plugins", func() {
 	Describe("panic handling", func() {
 		BeforeEach(func() {
-			session := helpers.CF("install-plugin", "-f", panicTestPluginPath)
-			Eventually(session).Should(Exit(0))
+			Eventually(helpers.CF("install-plugin", "-f", panicTestPluginPath)).Should(Exit(0))
 		})
 
 		It("will exit 1 if the plugin panics", func() {
-			session := helpers.CF("freak-out")
-			Eventually(session).Should(Exit(1))
+			Eventually(helpers.CF("freak-out")).Should(Exit(1))
 		})
 	})
 
