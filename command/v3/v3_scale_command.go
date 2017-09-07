@@ -2,11 +2,13 @@ package v3
 
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -17,7 +19,6 @@ type V3ScaleActor interface {
 
 	CloudControllerAPIVersion() string
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
-	GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (v3action.ProcessSummary, v3action.Warnings, error)
 	ScaleProcessByApplication(appGUID string, process v3action.Process) (v3action.Warnings, error)
 	StopApplication(appGUID string) (v3action.Warnings, error)
 	StartApplication(appGUID string) (v3action.Application, v3action.Warnings, error)
@@ -53,11 +54,17 @@ func (cmd *V3ScaleCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config)
 
+	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
+
 	cmd.AppSummaryDisplayer = shared.AppSummaryDisplayer{
 		UI:              ui,
 		Config:          config,
 		Actor:           cmd.Actor,
-		V2AppRouteActor: nil,
+		V2AppRouteActor: v2Actor,
 		AppName:         cmd.RequiredArgs.AppName,
 	}
 
@@ -90,19 +97,15 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
-		cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-			"AppName":   cmd.RequiredArgs.AppName,
-			"OrgName":   cmd.Config.TargetedOrganization().Name,
-			"SpaceName": cmd.Config.TargetedSpace().Name,
-			"Username":  user.Name,
-		})
-
-		return cmd.getAndDisplayProcess(app.GUID)
+		return cmd.showCurrentScale(user.Name)
 	}
 
-	err = cmd.scaleProcess(app.GUID, user.Name)
+	scalled, err := cmd.scaleProcess(app.GUID, user.Name)
 	if err != nil {
 		return shared.HandleError(err)
+	}
+	if !scalled {
+		return nil
 	}
 
 	pollWarnings := make(chan v3action.Warnings)
@@ -132,43 +135,33 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 		}
 	}
 
-	return cmd.getAndDisplayProcess(app.GUID)
+	return cmd.showCurrentScale(user.Name)
 }
 
-func (cmd V3ScaleCommand) getAndDisplayProcess(appGUID string) error {
-	process, warnings, err := cmd.Actor.GetProcessSummaryByApplicationAndProcessType(appGUID, cmd.ProcessType)
-	cmd.UI.DisplayWarnings(warnings)
-	if err != nil {
-		return shared.HandleError(err)
-	}
-
-	cmd.AppSummaryDisplayer.DisplayAppInstancesTable(process)
-	return nil
-}
-
-func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
+func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) (bool, error) {
 	cmd.UI.DisplayTextWithFlavor("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  username,
 	})
+	cmd.UI.DisplayNewline()
 
 	shouldRestart := cmd.DiskLimit.IsSet || cmd.MemoryLimit.IsSet
 	if shouldRestart && !cmd.Force {
-		cmd.UI.DisplayNewline()
 		shouldScale, err := cmd.UI.DisplayBoolPrompt(
 			false,
 			"This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
 			map[string]interface{}{"AppName": cmd.RequiredArgs.AppName})
 		if err != nil {
-			return err
+			return false, err
 		}
 
 		if !shouldScale {
 			cmd.UI.DisplayText("Scaling cancelled")
-			return nil
+			return false, nil
 		}
+		cmd.UI.DisplayNewline()
 	}
 
 	warnings, err := cmd.Actor.ScaleProcessByApplication(appGUID, v3action.Process{
@@ -179,27 +172,27 @@ func (cmd V3ScaleCommand) scaleProcess(appGUID string, username string) error {
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if shouldRestart {
 		err := cmd.restartApplication(appGUID, username)
 		if err != nil {
-			return err
+			return false, err
 		}
 	}
 
-	return nil
+	return true, nil
 }
 
 func (cmd V3ScaleCommand) restartApplication(appGUID string, username string) error {
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTextWithFlavor("Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  username,
 	})
+	cmd.UI.DisplayNewline()
 
 	warnings, err := cmd.Actor.StopApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
@@ -207,13 +200,13 @@ func (cmd V3ScaleCommand) restartApplication(appGUID string, username string) er
 		return err
 	}
 
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayTextWithFlavor("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  username,
 	})
+	cmd.UI.DisplayNewline()
 
 	_, warnings, err = cmd.Actor.StartApplication(appGUID)
 	cmd.UI.DisplayWarnings(warnings)
@@ -222,4 +215,16 @@ func (cmd V3ScaleCommand) restartApplication(appGUID string, username string) er
 	}
 
 	return nil
+}
+
+func (cmd V3ScaleCommand) showCurrentScale(userName string) error {
+	cmd.UI.DisplayTextWithFlavor("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"AppName":   cmd.RequiredArgs.AppName,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  userName,
+	})
+	cmd.UI.DisplayNewline()
+
+	return cmd.AppSummaryDisplayer.DisplayAppInfo()
 }

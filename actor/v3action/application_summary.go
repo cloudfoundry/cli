@@ -49,32 +49,6 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 	return summary, allWarnings, nil
 }
 
-func (actor Actor) GetProcessSummaryByApplicationAndProcessType(appGUID string, processType string) (ProcessSummary, Warnings, error) {
-	var allWarnings Warnings
-
-	ccv3Process, warnings, err := actor.CloudControllerClient.GetApplicationProcessByType(appGUID, processType)
-	allWarnings = Warnings(warnings)
-	if err != nil {
-		return ProcessSummary{}, allWarnings, err
-	}
-
-	processGUID := ccv3Process.GUID
-	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
-	allWarnings = append(allWarnings, Warnings(warnings)...)
-	if err != nil {
-		return ProcessSummary{}, allWarnings, err
-	}
-
-	processSummary := ProcessSummary{
-		Process: Process(ccv3Process),
-	}
-	for _, instance := range instances {
-		processSummary.InstanceDetails = append(processSummary.InstanceDetails, Instance(instance))
-	}
-
-	return processSummary, allWarnings, nil
-}
-
 func (actor Actor) getProcessSummariesForApp(appGUID string) (ProcessSummaries, Warnings, error) {
 	var allWarnings Warnings
 

@@ -33,19 +33,6 @@ type V3AppSummaryActor interface {
 }
 
 func (display AppSummaryDisplayer) DisplayAppInfo() error {
-	user, err := display.Config.CurrentUser()
-	if err != nil {
-		return HandleError(err)
-	}
-
-	display.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":   display.AppName,
-		"OrgName":   display.Config.TargetedOrganization().Name,
-		"SpaceName": display.Config.TargetedSpace().Name,
-		"Username":  user.Name,
-	})
-	display.UI.DisplayNewline()
-
 	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
 	display.UI.DisplayWarnings(warnings)
 	if err != nil {

@@ -142,7 +142,7 @@ var _ = Describe("v3-scale command", func() {
 			})
 
 			Context("when scale option flags are not provided", func() {
-				It("displays the current scale properties for default process", func() {
+				It("displays the current scale properties for all processes", func() {
 					session := helpers.CF("v3-scale", appName)
 
 					Eventually(session.Out).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
@@ -154,31 +154,17 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(len(appTable.Processes)).To(Equal(1))
+					Expect(len(appTable.Processes)).To(Equal(3))
 
 					processSummary := appTable.Processes[0]
-					instanceSummary := processSummary.Instances[0]
 					Expect(processSummary.Title).To(Equal("web:1/1"))
+
+					instanceSummary := processSummary.Instances[0]
 					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
 					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of \d+[KMG]`))
-				})
 
-				It("displays the current scale properties for requested process", func() {
-					session := helpers.CF("v3-scale", appName, "--process", "console")
-
-					Eventually(session.Out).Should(Say("Showing current scale of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Consistently(session.Out).ShouldNot(Say("Scaling"))
-					Consistently(session.Out).ShouldNot(Say("This will cause the app to restart"))
-					Consistently(session.Out).ShouldNot(Say("Stopping"))
-					Consistently(session.Out).ShouldNot(Say("Starting"))
-					Consistently(session.Out).ShouldNot(Say("Waiting"))
-					Eventually(session).Should(Exit(0))
-
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(len(appTable.Processes)).To(Equal(1))
-
-					processSummary := appTable.Processes[0]
-					Expect(processSummary.Title).To(Equal("console:0/0"))
+					Expect(appTable.Processes[1].Title).To(Equal("console:0/0"))
+					Expect(appTable.Processes[2].Title).To(Equal("rake:0/0"))
 				})
 			})
 
@@ -188,7 +174,7 @@ var _ = Describe("v3-scale command", func() {
 					session := helpers.CF("v3-scale", appName)
 					Eventually(session).Should(Exit(0))
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(appTable.Processes).To(HaveLen(1))
+					Expect(appTable.Processes).To(HaveLen(3))
 
 					By("scaling to 3 instances")
 					session = helpers.CF("v3-scale", appName, "-i", "3")
@@ -199,7 +185,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					updatedAppTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(updatedAppTable.Processes).To(HaveLen(1))
+					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary := updatedAppTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
@@ -218,7 +204,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(updatedAppTable.Processes).To(HaveLen(1))
+					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary = updatedAppTable.Processes[0]
 					instanceSummary = processSummary.Instances[0]
@@ -237,7 +223,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(updatedAppTable.Processes).To(HaveLen(1))
+					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary = updatedAppTable.Processes[0]
 					instanceSummary = processSummary.Instances[0]
@@ -254,10 +240,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(updatedAppTable.Processes).To(HaveLen(1))
-
-					processSummary = updatedAppTable.Processes[0]
-					Expect(processSummary.Title).To(MatchRegexp(`web:0/0`))
+					Expect(updatedAppTable.Processes).To(BeEmpty())
 				})
 
 				Context("when the user chooses not to restart the app", func() {
@@ -273,8 +256,7 @@ var _ = Describe("v3-scale command", func() {
 						Eventually(session).Should(Exit(0))
 
 						appTable := helpers.ParseV3AppTable(session.Out.Contents())
-						Expect(appTable.Processes).To(HaveLen(1))
-						Expect(appTable.Processes[0].Title).To(MatchRegexp(`web:\d/1`))
+						Expect(appTable.Processes).To(BeEmpty())
 					})
 				})
 			})
@@ -291,7 +273,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(appTable.Processes).To(HaveLen(1))
+					Expect(appTable.Processes).To(HaveLen(3))
 
 					processSummary := appTable.Processes[0]
 					instanceSummary := processSummary.Instances[0]
@@ -347,9 +329,9 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session).Should(Exit(0))
 
 					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(appTable.Processes).To(HaveLen(1))
+					Expect(appTable.Processes).To(HaveLen(3))
 
-					processSummary := appTable.Processes[0]
+					processSummary := appTable.Processes[1]
 					instanceSummary := processSummary.Instances[0]
 					Expect(processSummary.Instances).To(HaveLen(2))
 					Expect(processSummary.Title).To(MatchRegexp(`console:\d/2`))

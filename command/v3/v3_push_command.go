@@ -196,6 +196,14 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
+	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"AppName":   cmd.RequiredArgs.AppName,
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	})
+	cmd.UI.DisplayNewline()
+
 	return cmd.AppSummaryDisplayer.DisplayAppInfo()
 }
 
