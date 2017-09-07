@@ -13,7 +13,7 @@ all : test internationalization-binary build
 build : out/cf
 
 clean :
-	rm $(wildcard out/*)
+	rm -r $(wildcard out/*)
 
 format :
 	go fmt ./...
