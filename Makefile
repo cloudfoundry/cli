@@ -18,10 +18,10 @@ clean :
 format :
 	go fmt ./...
 
-internationalization :
+i18n :
 	$(PWD)/bin/i18n-checkup
 
-internationalization-binary : internationalization
+i18n-binary : internationalization
 	$(PWD)/bin/generate-language-resources
 
 integration-cleanup :
@@ -29,6 +29,9 @@ integration-cleanup :
 
 integration-experimental : build integration-cleanup
 	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/experimental
+
+integration-plugin : build integration-cleanup
+	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/plugin
 
 integration-tests : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push
@@ -68,7 +71,7 @@ version :
 
 vet :
 	@echo  "Vetting packages for potential issues..."
-	@echo  "Be sure to do this prior to commiting!!!"
+	@echo  "Be sure to do this prior to committing!!!"
 	@git status -s \
 		| grep -i -e "^ *N" -e "^ *M" \
 		| grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ \
@@ -83,5 +86,5 @@ vet :
 		| xargs -r -L 1 -P 5 go tool vet -all -shadow=true
 
 
-.PHONY : all build clean internationalization format version vet
-.PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental
+.PHONY : all build clean i18n format version vet
+.PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin
