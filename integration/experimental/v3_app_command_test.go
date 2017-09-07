@@ -157,6 +157,7 @@ var _ = Describe("v3-app command", func() {
 					Eventually(session.Out).Should(Say(`Showing health and status for app %s in org %s / space %s as %s\.\.\.`, appName, orgName, spaceName, userName))
 					Consistently(session.Out).ShouldNot(Say(`state\s+since\s+cpu\s+memory\s+disk`))
 					Eventually(session.Out).Should(Say("There are no running instances of this app"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
