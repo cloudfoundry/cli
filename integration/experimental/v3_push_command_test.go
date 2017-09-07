@@ -551,5 +551,17 @@ var _ = Describe("v3-push command", func() {
 				})
 			})
 		})
+
+		Context("when the -o and -b flags are provided together", func() {
+			It("displays an error and exits 1", func() {
+				helpers.WithHelloWorldApp(func(appDir string) {
+					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-b", "some-buildpack")
+					Eventually(session.Out).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o"))
+					Eventually(session.Out).Should(Say("NAME:"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
 	})
 })

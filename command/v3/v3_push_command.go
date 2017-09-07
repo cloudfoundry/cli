@@ -41,10 +41,10 @@ type V3PushActor interface {
 
 type V3PushCommand struct {
 	RequiredArgs        flag.AppName                `positional-args:"yes"`
-	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
 	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
+	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
+	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]"`
 	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
@@ -219,6 +219,10 @@ func (cmd V3PushCommand) validateArgs() error {
 	case cmd.DockerImage.Path != "" && cmd.AppPath != "":
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--docker-image", "-o", "-p"},
+		}
+	case cmd.DockerImage.Path != "" && len(cmd.Buildpacks) > 0:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-b", "--docker-image", "-o"},
 		}
 	}
 	return nil
