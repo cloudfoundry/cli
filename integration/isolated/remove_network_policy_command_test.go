@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"net/http"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -46,6 +45,25 @@ var _ = Describe("remove-network-policy command", func() {
 				session := helpers.CF("remove-network-policy", "some-app", "--destination-app", "some-other-app", "--port", "8080", "--protocol", "tcp")
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the v3 api does not exist", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = helpers.StartAndTargetServerWithoutV3API()
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with no networking api error message", func() {
+				session := helpers.CF("remove-network-policy", "some-app", "--destination-app", "some-app", "--protocol", "tcp", "--port", "8080")
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -175,37 +193,6 @@ var _ = Describe("remove-network-policy command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 
-			})
-
-			Context("when the v3 api does not exist", func() {
-				var server *Server
-
-				BeforeEach(func() {
-					server = NewTLSServer()
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v2/info"),
-							RespondWith(http.StatusOK, `{"api_version":"2.34.0"}`),
-						),
-						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/"),
-							RespondWith(http.StatusNotFound, `{}`),
-						),
-					)
-
-					Eventually(helpers.CF("api", server.URL(), "--skip-ssl-validation")).Should(Exit(0))
-				})
-
-				AfterEach(func() {
-					server.Close()
-				})
-
-				It("fails with no networking api error message", func() {
-					session := helpers.CF("remove-network-policy", appName, "--destination-app", appName, "--protocol", "tcp", "--port", "8080")
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("This command requires Network Policy API V1. Your targeted endpoint does not expose it."))
-					Eventually(session).Should(Exit(1))
-				})
 			})
 		})
 
