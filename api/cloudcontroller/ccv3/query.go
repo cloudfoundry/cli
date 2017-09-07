@@ -11,4 +11,9 @@ const (
 	OrganizationGUIDFilter = "organization_guids"
 	// SpaceGUIDFilter is a query paramater for listing objects by Space GUID.
 	SpaceGUIDFilter = "space_guids"
+
+	// OrderBy is a query paramater to specify how to order objects.
+	OrderBy = "order_by"
+	// NameOrder is value for a query paramater when ordering by name.
+	NameOrder = "name"
 )
