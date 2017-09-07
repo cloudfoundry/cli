@@ -31,6 +31,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 				session := helpers.CF("install-plugin", "-f", "some-plugin", "-r", "kaka", "-k")
 
 				Eventually(session.Err).Should(Say("Plugin some-plugin not found in repository kaka\\."))
+				Eventually(session).Should(Exit(1))
 			})
 		})
 
@@ -198,6 +199,7 @@ var _ = Describe("install-plugin (from repo) command", func() {
 							Eventually(session.Out).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Downloaded plugin binary's checksum does not match repo metadata\\."))
 							Eventually(session.Err).Should(Say("Please try again or contact the plugin author\\."))
+							Eventually(session).Should(Exit(1))
 						})
 					})
 				})
