@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("set-env command", func() {
@@ -19,6 +20,7 @@ var _ = Describe("set-env command", func() {
 			Eventually(session).Should(Say("se"))
 			Eventually(session).Should(Say("SEE ALSO:"))
 			Eventually(session).Should(Say("apps, env, restart, set-running-environment-variable-group, set-staging-environment-variable-group, unset-env"))
+			Eventually(session).Should(Exit(0))
 		})
 	})
 })
