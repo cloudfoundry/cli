@@ -60,6 +60,8 @@ jobs:
   serial_groups: [hardknox]
   build_logs_to_retain: 100
   plan:
+  - get: freshen-hardnox
+    trigger: true
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
@@ -89,8 +91,6 @@ jobs:
   serial_groups: [hardknox]
   build_logs_to_retain: 100
   plan:
-  - get: freshen-hardnox
-    trigger: true
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
