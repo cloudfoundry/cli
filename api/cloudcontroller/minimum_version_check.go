@@ -5,6 +5,8 @@ import (
 	"github.com/blang/semver"
 )
 
+// MinimumAPIVersionCheck compares `current` to `minimum`.  If `current` is
+// older than `minimum` then an error is returned; otherwise, nil is returned.
 func MinimumAPIVersionCheck(current string, minimum string) error {
 	if minimum == "" {
 		return nil
