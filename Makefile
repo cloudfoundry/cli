@@ -8,7 +8,7 @@ CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*")
 
-all : test internationalization-binary build
+all : test i18n-binary build
 
 build : out/cf
 
@@ -21,7 +21,7 @@ format :
 i18n :
 	$(PWD)/bin/i18n-checkup
 
-i18n-binary : internationalization
+i18n-binary : i18n
 	$(PWD)/bin/generate-language-resources
 
 integration-cleanup :
@@ -55,12 +55,12 @@ out/cf : $(GOSRC)
 
 test : units
 
-units : format vet internationalization build
+units : format vet i18n build
 	ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites \
 		api actor command types util
 	@echo "\nSWEET SUITE SUCCESS"
 
-units-full : format vet internationalization
+units-full : format vet i18n
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration
