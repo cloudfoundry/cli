@@ -1,12 +1,17 @@
 package v3action
 
-import "net/url"
+import (
+	"net/url"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+)
 
 func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]ApplicationSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
-		"space_guids": []string{spaceGUID},
+		ccv3.SpaceGUIDFilter: []string{spaceGUID},
+		ccv3.OrderBy:         []string{ccv3.NameOrder},
 	})
 	allWarnings = Warnings(warnings)
 	if err != nil {

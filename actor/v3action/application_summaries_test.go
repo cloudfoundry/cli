@@ -130,6 +130,7 @@ var _ = Describe("Application Summaries Actions", func() {
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				expectedQuery := url.Values{
 					"space_guids": []string{"some-space-guid"},
+					"order_by":    []string{"name"},
 				}
 				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 				Expect(query).To(Equal(expectedQuery))
