@@ -265,6 +265,7 @@ var _ = Describe("v3-push Command", func() {
 							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
 							cmd.AppPath = `/tmp/my-app.bash`
 						})
+
 						It("returns an error", func() {
 							Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
 								Args: []string{"--docker-image", "-o", "-p"},
@@ -280,6 +281,19 @@ var _ = Describe("v3-push Command", func() {
 
 							Expect(appPath).To(BeEmpty())
 							Expect(dockerImage).To(BeEmpty())
+						})
+					})
+
+					Context("when both the -o and -b flags are provided", func() {
+						BeforeEach(func() {
+							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+							cmd.Buildpacks = []string{"some-buildpack"}
+						})
+
+						It("returns an error", func() {
+							Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+								Args: []string{"-b", "--docker-image", "-o"},
+							}))
 						})
 					})
 
