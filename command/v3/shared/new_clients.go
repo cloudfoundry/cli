@@ -1,9 +1,6 @@
 package shared
 
 import (
-	"net/http"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	ccWrapper "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -54,10 +51,6 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
-		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
-			return nil, nil, translatableerror.V3APIDoesNotExistError{Message: err.Error()}
-		}
-
 		return nil, nil, HandleError(err)
 	}
 

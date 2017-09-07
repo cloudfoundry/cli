@@ -6,17 +6,28 @@ type MinimumAPIVersionNotMetError struct {
 	MinimumVersion string
 }
 
-func (MinimumAPIVersionNotMetError) Error() string {
-	return "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
+func (e MinimumAPIVersionNotMetError) Error() string {
+	switch {
+	case e.Command != "" && e.CurrentVersion != "":
+		return "{{.Command}} requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
+	case e.Command != "" && e.CurrentVersion == "":
+		return "{{.Command}} requires CF API version {{.MinimumVersion}} or higher."
+	case e.Command == "" && e.CurrentVersion != "":
+		return "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}."
+	default:
+		return "This command requires CF API version {{.MinimumVersion}} or higher."
+	}
 }
 
 func (e MinimumAPIVersionNotMetError) Translate(translate func(string, ...interface{}) string) string {
-	if e.Command == "" {
-		e.Command = "This command"
-	}
-	return translate(e.Error(), map[string]interface{}{
-		"Command":        e.Command,
-		"CurrentVersion": e.CurrentVersion,
+	vars := map[string]interface{}{
 		"MinimumVersion": e.MinimumVersion,
-	})
+	}
+	if e.CurrentVersion != "" {
+		vars["CurrentVersion"] = e.CurrentVersion
+	}
+	if e.Command != "" {
+		vars["Command"] = e.Command
+	}
+	return translate(e.Error(), vars)
 }

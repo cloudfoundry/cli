@@ -8,9 +8,18 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("tasks command", func() {
+	var (
+		appName string
+	)
+
+	BeforeEach(func() {
+		appName = helpers.PrefixedRandomName("APP")
+	})
+
 	Context("when --help flag is set", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("tasks", "--help")
@@ -23,6 +32,7 @@ var _ = Describe("tasks command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
@@ -30,9 +40,28 @@ var _ = Describe("tasks command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("run-task", "app-name", "some command")
+				session := helpers.CF("tasks", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the v3 api does not exist", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = helpers.StartAndTargetServerWithoutV3API()
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with error message that the minimum version is not met", func() {
+				session := helpers.CF("tasks", appName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.0\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -43,7 +72,7 @@ var _ = Describe("tasks command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("run-task", "app-name", "some command")
+				session := helpers.CF("tasks", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
@@ -57,7 +86,7 @@ var _ = Describe("tasks command", func() {
 			})
 
 			It("fails with no targeted org error message", func() {
-				session := helpers.CF("run-task", "app-name", "some command")
+				session := helpers.CF("tasks", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 				Eventually(session).Should(Exit(1))
@@ -72,7 +101,7 @@ var _ = Describe("tasks command", func() {
 			})
 
 			It("fails with no space targeted error message", func() {
-				session := helpers.CF("run-task", "app-name", "some command")
+				session := helpers.CF("tasks", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 				Eventually(session).Should(Exit(1))
@@ -84,20 +113,18 @@ var _ = Describe("tasks command", func() {
 		var (
 			orgName   string
 			spaceName string
-			appName   string
 		)
 
 		BeforeEach(func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
-			appName = helpers.PrefixedRandomName("APP")
 
 			setupCF(orgName, spaceName)
 		})
 
 		Context("when the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
-				session := helpers.CF("run-task", appName, "echo hi")
+				session := helpers.CF("tasks", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say(fmt.Sprintf("App %s not found", appName)))
 				Eventually(session).Should(Exit(1))

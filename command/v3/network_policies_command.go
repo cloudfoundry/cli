@@ -2,11 +2,13 @@ package v3
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
@@ -38,9 +40,10 @@ func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) e
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {
-		if _, ok := err.(translatableerror.V3APIDoesNotExistError); ok {
+		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
 			return translatableerror.CFNetworkingEndpointNotFoundError{}
 		}
+
 		return err
 	}
 

@@ -1,12 +1,16 @@
 package v3
 
 import (
+	"net/http"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
@@ -38,8 +42,13 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
+		}
+
 		return err
 	}
+
 	cmd.Actor = v3action.NewActor(ccClient, config)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)

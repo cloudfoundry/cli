@@ -6332,6 +6332,14 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}} or higher.",
+    "translation": ""
+  },
+  {
+    "id": "This command requires CF API version {{.MinimumVersion}} or higher. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This command requires Network Policy API V1. Your targeted endpoint does not expose it.",
     "translation": ""
   },
@@ -7757,6 +7765,10 @@
   },
   {
     "id": "{{.BinaryName}} version {{.VersionString}}",
+    "translation": ""
+  },
+  {
+    "id": "{{.Command}} requires CF API version {{.MinimumVersion}} or higher.",
     "translation": ""
   },
   {

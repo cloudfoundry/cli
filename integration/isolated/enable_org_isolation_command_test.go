@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("enable-org-isolation command", func() {
@@ -42,6 +43,44 @@ var _ = Describe("enable-org-isolation command", func() {
 				session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the v3 api does not exist", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = helpers.StartAndTargetServerWithoutV3API()
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with error message that the minimum version is not met", func() {
+				session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when the v3 api version is lower than the minimum version", func() {
+			var server *Server
+
+			BeforeEach(func() {
+				server = helpers.StartAndTargetServerWithV3Version("3.0.0")
+			})
+
+			AfterEach(func() {
+				server.Close()
+			})
+
+			It("fails with error message that the minimum version is not met", func() {
+				session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
+				Eventually(session).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

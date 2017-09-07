@@ -1,14 +1,17 @@
 package v3
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
@@ -36,6 +39,10 @@ func (cmd *V3DropletsCommand) Setup(config command.Config, ui command.UI) error 
 
 	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
+		}
+
 		return err
 	}
 	cmd.Actor = v3action.NewActor(ccClient, config)
