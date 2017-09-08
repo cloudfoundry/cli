@@ -1,0 +1,3 @@
+[submodule "api/cfnetworking"]
+	path = api/cfnetworking
+	url = https://github.com/cloudfoundry-incubator/cfnetworking-cli-api
