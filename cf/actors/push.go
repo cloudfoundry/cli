@@ -202,6 +202,14 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'", map[string]interface{}{"AppName": appName})))
 			}
 		}
+
+		if app.BuildpackURL != nil && app.DockerImage != nil {
+			errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'buildpack' and 'docker'", map[string]interface{}{"AppName": appName})))
+		}
+
+		if app.Path != nil && app.DockerImage != nil {
+			errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'docker' and 'path'", map[string]interface{}{"AppName": appName})))
+		}
 	}
 
 	if len(errs) > 0 {

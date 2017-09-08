@@ -120,87 +120,87 @@ type AppParams struct {
 	Routes                  []ManifestRoute
 }
 
-func (app *AppParams) Merge(other *AppParams) {
-	if other.AppPorts != nil {
-		app.AppPorts = other.AppPorts
+func (app *AppParams) Merge(flagContext *AppParams) {
+	if flagContext.AppPorts != nil {
+		app.AppPorts = flagContext.AppPorts
 	}
-	if other.BuildpackURL != nil {
-		app.BuildpackURL = other.BuildpackURL
+	if flagContext.BuildpackURL != nil {
+		app.BuildpackURL = flagContext.BuildpackURL
 	}
-	if other.Command != nil {
-		app.Command = other.Command
+	if flagContext.Command != nil {
+		app.Command = flagContext.Command
 	}
-	if other.DiskQuota != nil {
-		app.DiskQuota = other.DiskQuota
+	if flagContext.DiskQuota != nil {
+		app.DiskQuota = flagContext.DiskQuota
 	}
-	if other.DockerImage != nil {
-		app.DockerImage = other.DockerImage
+	if flagContext.DockerImage != nil {
+		app.DockerImage = flagContext.DockerImage
 	}
-	if other.DockerUsername != nil {
-		app.DockerUsername = other.DockerUsername
+	if flagContext.DockerUsername != nil {
+		app.DockerUsername = flagContext.DockerUsername
 	}
-	if other.DockerPassword != nil {
-		app.DockerPassword = other.DockerPassword
+	if flagContext.DockerPassword != nil {
+		app.DockerPassword = flagContext.DockerPassword
 	}
-	if other.Domains != nil {
-		app.Domains = other.Domains
+	if flagContext.Domains != nil {
+		app.Domains = flagContext.Domains
 	}
-	if other.EnableSSH != nil {
-		app.EnableSSH = other.EnableSSH
+	if flagContext.EnableSSH != nil {
+		app.EnableSSH = flagContext.EnableSSH
 	}
-	if other.EnvironmentVars != nil {
-		app.EnvironmentVars = other.EnvironmentVars
+	if flagContext.EnvironmentVars != nil {
+		app.EnvironmentVars = flagContext.EnvironmentVars
 	}
-	if other.GUID != nil {
-		app.GUID = other.GUID
+	if flagContext.GUID != nil {
+		app.GUID = flagContext.GUID
 	}
-	if other.HealthCheckType != nil {
-		app.HealthCheckType = other.HealthCheckType
+	if flagContext.HealthCheckType != nil {
+		app.HealthCheckType = flagContext.HealthCheckType
 	}
-	if other.HealthCheckHTTPEndpoint != nil {
-		app.HealthCheckHTTPEndpoint = other.HealthCheckHTTPEndpoint
+	if flagContext.HealthCheckHTTPEndpoint != nil {
+		app.HealthCheckHTTPEndpoint = flagContext.HealthCheckHTTPEndpoint
 	}
-	if other.HealthCheckTimeout != nil {
-		app.HealthCheckTimeout = other.HealthCheckTimeout
+	if flagContext.HealthCheckTimeout != nil {
+		app.HealthCheckTimeout = flagContext.HealthCheckTimeout
 	}
-	if other.Hosts != nil {
-		app.Hosts = other.Hosts
+	if flagContext.Hosts != nil {
+		app.Hosts = flagContext.Hosts
 	}
-	if other.InstanceCount != nil {
-		app.InstanceCount = other.InstanceCount
+	if flagContext.InstanceCount != nil {
+		app.InstanceCount = flagContext.InstanceCount
 	}
-	if other.Memory != nil {
-		app.Memory = other.Memory
+	if flagContext.Memory != nil {
+		app.Memory = flagContext.Memory
 	}
-	if other.Name != nil {
-		app.Name = other.Name
+	if flagContext.Name != nil {
+		app.Name = flagContext.Name
 	}
-	if other.Path != nil {
-		app.Path = other.Path
+	if flagContext.Path != nil {
+		app.Path = flagContext.Path
 	}
-	if other.RoutePath != nil {
-		app.RoutePath = other.RoutePath
+	if flagContext.RoutePath != nil {
+		app.RoutePath = flagContext.RoutePath
 	}
-	if other.ServicesToBind != nil {
-		app.ServicesToBind = other.ServicesToBind
+	if flagContext.ServicesToBind != nil {
+		app.ServicesToBind = flagContext.ServicesToBind
 	}
-	if other.SpaceGUID != nil {
-		app.SpaceGUID = other.SpaceGUID
+	if flagContext.SpaceGUID != nil {
+		app.SpaceGUID = flagContext.SpaceGUID
 	}
-	if other.StackGUID != nil {
-		app.StackGUID = other.StackGUID
+	if flagContext.StackGUID != nil {
+		app.StackGUID = flagContext.StackGUID
 	}
-	if other.StackName != nil {
-		app.StackName = other.StackName
+	if flagContext.StackName != nil {
+		app.StackName = flagContext.StackName
 	}
-	if other.State != nil {
-		app.State = other.State
+	if flagContext.State != nil {
+		app.State = flagContext.State
 	}
 
-	app.NoRoute = app.NoRoute || other.NoRoute
-	noHostBool := app.IsNoHostnameTrue() || other.IsNoHostnameTrue()
+	app.NoRoute = app.NoRoute || flagContext.NoRoute
+	noHostBool := app.IsNoHostnameTrue() || flagContext.IsNoHostnameTrue()
 	app.NoHostname = &noHostBool
-	app.UseRandomRoute = app.UseRandomRoute || other.UseRandomRoute
+	app.UseRandomRoute = app.UseRandomRoute || flagContext.UseRandomRoute
 }
 
 func (app *AppParams) IsEmpty() bool {

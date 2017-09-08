@@ -428,6 +428,46 @@ var _ = Describe("Push Actor", func() {
 			})
 		})
 
+		Context("when docker and buildpack is provided", func() {
+			BeforeEach(func() {
+				appName := "my-app"
+				dockerImage := "some-image"
+				buildpackURL := "some-build-pack.url"
+				apps = []models.AppParams{
+					models.AppParams{
+						Name:         &appName,
+						BuildpackURL: &buildpackURL,
+						DockerImage:  &dockerImage,
+					},
+				}
+			})
+			It("displays error", func() {
+				errs := actor.ValidateAppParams(apps)
+				Expect(errs).To(HaveLen(1))
+				Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'buildpack' and 'docker'"))
+			})
+		})
+
+		Context("when docker and path is provided", func() {
+			BeforeEach(func() {
+				appName := "my-app"
+				dockerImage := "some-image"
+				path := "some-path"
+				apps = []models.AppParams{
+					models.AppParams{
+						Name:        &appName,
+						DockerImage: &dockerImage,
+						Path:        &path,
+					},
+				}
+			})
+			It("displays error", func() {
+				errs := actor.ValidateAppParams(apps)
+				Expect(errs).To(HaveLen(1))
+				Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'docker' and 'path'"))
+			})
+		})
+
 		Context("when 'routes' is provided", func() {
 			BeforeEach(func() {
 				appName := "my-app"

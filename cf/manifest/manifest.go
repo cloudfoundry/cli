@@ -209,6 +209,9 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
 	appParams.Routes = parseRoutes(yamlMap, &errs)
 
+	docker := parseDocker(yamlMap, &errs)
+	appParams.DockerImage = &docker.Image
+
 	if appParams.Path != nil {
 		path := *appParams.Path
 		if filepath.IsAbs(path) {
@@ -526,4 +529,30 @@ func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
 	}
 
 	return manifestRoutes
+}
+
+func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
+	if !input.Has("docker") {
+		return models.ManifestDocker{}
+	}
+
+	docker, ok := input.Get("docker").(map[interface{}]interface{})
+	if !ok {
+		*errs = append(*errs, fmt.Errorf(T("'docker' must have at least an 'image' property")))
+		return models.ManifestDocker{}
+	}
+
+	image, imageExists := docker["image"]
+	if !imageExists {
+		*errs = append(*errs, fmt.Errorf(T("'docker' must have an 'image' property")))
+		return models.ManifestDocker{}
+	}
+
+	imageValue, ok := image.(string)
+	if !ok {
+		*errs = append(*errs, fmt.Errorf(T("'docker.image' must be a string")))
+		return models.ManifestDocker{}
+	}
+
+	return models.ManifestDocker{Image: imageValue}
 }
