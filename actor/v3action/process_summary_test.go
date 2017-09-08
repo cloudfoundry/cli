@@ -3,6 +3,7 @@ package v3action_test
 import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -68,7 +69,7 @@ var _ = Describe("Process Actions", func() {
 				},
 				{
 					Process: Process{
-						Type: "web",
+						Type: constant.ProcessTypeWeb,
 					},
 					InstanceDetails: []Instance{
 						{State: "RUNNING"},
@@ -82,7 +83,7 @@ var _ = Describe("Process Actions", func() {
 		Describe("Sort", func() {
 			It("sorts processes with web first and then alphabetically sorted", func() {
 				summaries.Sort()
-				Expect(summaries[0].Type).To(Equal("web"))
+				Expect(summaries[0].Type).To(Equal(constant.ProcessTypeWeb))
 				Expect(summaries[1].Type).To(Equal("console"))
 				Expect(summaries[2].Type).To(Equal("worker"))
 			})

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // ProcessSummary represents a process with instance details.
@@ -35,14 +37,14 @@ func (ps ProcessSummaries) Sort() {
 		var jScore int
 
 		switch ps[i].Type {
-		case "web":
+		case constant.ProcessTypeWeb:
 			iScore = 0
 		default:
 			iScore = 1
 		}
 
 		switch ps[j].Type {
-		case "web":
+		case constant.ProcessTypeWeb:
 			jScore = 0
 		default:
 			jScore = 1

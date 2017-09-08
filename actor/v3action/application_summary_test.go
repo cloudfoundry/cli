@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -267,7 +268,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetApplicationProcessesReturns(
-					[]ccv3.Process{{Type: "web"}},
+					[]ccv3.Process{{Type: constant.ProcessTypeWeb}},
 					ccv3.Warnings{"some-process-warning"},
 					expectedErr,
 				)

@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ProcessHealthCheck struct {
@@ -20,14 +21,14 @@ func (phs ProcessHealthChecks) Sort() {
 		var jScore int
 
 		switch phs[i].ProcessType {
-		case "web":
+		case constant.ProcessTypeWeb:
 			iScore = 0
 		default:
 			iScore = 1
 		}
 
 		switch phs[j].ProcessType {
-		case "web":
+		case constant.ProcessTypeWeb:
 			jScore = 0
 		default:
 			jScore = 1
