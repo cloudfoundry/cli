@@ -48,34 +48,3 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 	}
 	return summary, allWarnings, nil
 }
-
-func (actor Actor) getProcessSummariesForApp(appGUID string) (ProcessSummaries, Warnings, error) {
-	var allWarnings Warnings
-
-	ccv3Processes, warnings, err := actor.CloudControllerClient.GetApplicationProcesses(appGUID)
-	allWarnings = Warnings(warnings)
-	if err != nil {
-		return nil, allWarnings, err
-	}
-
-	var processSummaries ProcessSummaries
-	for _, ccv3Process := range ccv3Processes {
-		processGUID := ccv3Process.GUID
-		instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(processGUID)
-		allWarnings = append(allWarnings, Warnings(warnings)...)
-		if err != nil {
-			return nil, allWarnings, err
-		}
-
-		processSummary := ProcessSummary{
-			Process: Process(ccv3Process),
-		}
-		for _, instance := range instances {
-			processSummary.InstanceDetails = append(processSummary.InstanceDetails, Instance(instance))
-		}
-
-		processSummaries = append(processSummaries, processSummary)
-	}
-
-	return processSummaries, allWarnings, nil
-}
