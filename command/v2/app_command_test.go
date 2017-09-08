@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -129,7 +130,7 @@ var _ = Describe("App Command", func() {
 						fakeActor.GetApplicationByNameAndSpaceReturns(
 							v2action.Application{},
 							v2action.Warnings{"warning-1", "warning-2"},
-							v2action.ApplicationNotFoundError{Name: "some-app"})
+							actionerror.ApplicationNotFoundError{Name: "some-app"})
 					})
 
 					It("returns a translatable error and all warnings", func() {
@@ -349,7 +350,7 @@ var _ = Describe("App Command", func() {
 						fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 							v2action.ApplicationSummary{},
 							nil,
-							v2action.ApplicationNotFoundError{Name: "some-app"})
+							actionerror.ApplicationNotFoundError{Name: "some-app"})
 					})
 
 					It("returns a translatable error", func() {

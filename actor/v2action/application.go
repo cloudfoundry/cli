@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
@@ -15,87 +16,6 @@ const (
 	ApplicationStateStaging  ApplicationStateChange = "staging"
 	ApplicationStateStarting ApplicationStateChange = "starting"
 )
-
-// ApplicationInstanceCrashedError is returned when an instance crashes.
-type ApplicationInstanceCrashedError struct {
-	Name string
-}
-
-func (e ApplicationInstanceCrashedError) Error() string {
-	return fmt.Sprintf("Application '%s' crashed", e.Name)
-}
-
-// ApplicationInstanceFlappingError is returned when an instance crashes.
-type ApplicationInstanceFlappingError struct {
-	Name string
-}
-
-func (e ApplicationInstanceFlappingError) Error() string {
-	return fmt.Sprintf("Application '%s' crashed", e.Name)
-}
-
-// ApplicationNotFoundError is returned when a requested application is not
-// found.
-type ApplicationNotFoundError struct {
-	GUID string
-	Name string
-}
-
-func (e ApplicationNotFoundError) Error() string {
-	if e.GUID != "" {
-		return fmt.Sprintf("Application with GUID '%s' not found.", e.GUID)
-	}
-
-	return fmt.Sprintf("Application '%s' not found.", e.Name)
-}
-
-// HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a
-// health check type that is not HTTP.
-type HTTPHealthCheckInvalidError struct {
-}
-
-func (e HTTPHealthCheckInvalidError) Error() string {
-	return "Health check type must be 'http' to set a health check HTTP endpoint"
-}
-
-// StagingFailedError is returned when staging an application fails.
-type StagingFailedError struct {
-	Reason string
-}
-
-func (e StagingFailedError) Error() string {
-	return e.Reason
-}
-
-// StagingFailedNoAppDetectedError is returned when staging an application fails.
-type StagingFailedNoAppDetectedError struct {
-	Reason string
-}
-
-func (e StagingFailedNoAppDetectedError) Error() string {
-	return e.Reason
-}
-
-// StagingTimeoutError is returned when staging timeout is reached waiting for
-// an application to stage.
-type StagingTimeoutError struct {
-	Name    string
-	Timeout time.Duration
-}
-
-func (e StagingTimeoutError) Error() string {
-	return fmt.Sprintf("Timed out waiting for application '%s' to stage", e.Name)
-}
-
-// StartupTimeoutError is returned when startup timeout is reached waiting for
-// an application to start.
-type StartupTimeoutError struct {
-	Name string
-}
-
-func (e StartupTimeoutError) Error() string {
-	return fmt.Sprintf("Timed out waiting for application '%s' to start", e.Name)
-}
 
 // Application represents an application.
 type Application ccv2.Application
@@ -201,7 +121,7 @@ func (actor Actor) GetApplication(guid string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplication(guid)
 
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-		return Application{}, Warnings(warnings), ApplicationNotFoundError{GUID: guid}
+		return Application{}, Warnings(warnings), actionerror.ApplicationNotFoundError{GUID: guid}
 	}
 
 	return Application(app), Warnings(warnings), err
@@ -228,7 +148,7 @@ func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (
 	}
 
 	if len(app) == 0 {
-		return Application{}, Warnings(warnings), ApplicationNotFoundError{
+		return Application{}, Warnings(warnings), actionerror.ApplicationNotFoundError{
 			Name: name,
 		}
 	}
@@ -276,7 +196,7 @@ func (actor Actor) GetRouteApplications(routeGUID string) ([]Application, Warnin
 // check type if it is not already the desired type.
 func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
 	if httpEndpoint != "/" && healthCheckType != "http" {
-		return Application{}, nil, HTTPHealthCheckInvalidError{}
+		return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
 	}
 
 	var allWarnings Warnings
@@ -290,15 +210,15 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 
 	if app.HealthCheckType != healthCheckType ||
 		healthCheckType == "http" && app.HealthCheckHTTPEndpoint != httpEndpoint {
-		var healthCheckHttpEndpoint string
+		var healthCheckEndpoint string
 		if healthCheckType == "http" {
-			healthCheckHttpEndpoint = httpEndpoint
+			healthCheckEndpoint = httpEndpoint
 		}
 
 		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:                    app.GUID,
 			HealthCheckType:         healthCheckType,
-			HealthCheckHTTPEndpoint: healthCheckHttpEndpoint,
+			HealthCheckHTTPEndpoint: healthCheckEndpoint,
 		})
 
 		allWarnings = append(allWarnings, Warnings(apiWarnings)...)
@@ -451,13 +371,13 @@ func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<
 			return nil
 		case currentApplication.StagingFailed():
 			if currentApplication.StagingFailedNoAppDetected() {
-				return StagingFailedNoAppDetectedError{Reason: currentApplication.StagingFailedMessage()}
+				return actionerror.StagingFailedNoAppDetectedError{Reason: currentApplication.StagingFailedMessage()}
 			}
-			return StagingFailedError{Reason: currentApplication.StagingFailedMessage()}
+			return actionerror.StagingFailedError{Reason: currentApplication.StagingFailedMessage()}
 		}
 		time.Sleep(config.PollingInterval())
 	}
-	return StagingTimeoutError{Name: app.Name, Timeout: config.StagingTimeout()}
+	return actionerror.StagingTimeoutError{Name: app.Name, Timeout: config.StagingTimeout()}
 }
 
 func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<- string) error {
@@ -476,15 +396,15 @@ func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<
 			case instance.Running():
 				return nil
 			case instance.Crashed():
-				return ApplicationInstanceCrashedError{Name: app.Name}
+				return actionerror.ApplicationInstanceCrashedError{Name: app.Name}
 			case instance.Flapping():
-				return ApplicationInstanceFlappingError{Name: app.Name}
+				return actionerror.ApplicationInstanceFlappingError{Name: app.Name}
 			}
 		}
 		time.Sleep(config.PollingInterval())
 	}
 
-	return StartupTimeoutError{Name: app.Name}
+	return actionerror.StartupTimeoutError{Name: app.Name}
 }
 
 func (actor Actor) waitForApplicationStageAndStart(app Application, client NOAAClient, config Config, appState chan ApplicationStateChange, allWarnings chan string, errs chan error) {

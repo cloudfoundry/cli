@@ -3,6 +3,7 @@ package v2_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -139,7 +140,7 @@ var _ = Describe("bind-service Command", func() {
 					BeforeEach(func() {
 						fakeActor.BindServiceBySpaceReturns(
 							nil,
-							v2action.ApplicationNotFoundError{Name: "some-app"})
+							actionerror.ApplicationNotFoundError{Name: "some-app"})
 					})
 
 					It("should return the error", func() {

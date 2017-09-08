@@ -3,6 +3,7 @@ package shared_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -41,7 +42,7 @@ var _ = Describe("HandleError", func() {
 			translatableerror.APINotFoundError{URL: "some-url"}),
 
 		Entry("v2action.ApplicationNotFoundError -> ApplicationNotFoundError",
-			v2action.ApplicationNotFoundError{Name: "some-app"},
+			actionerror.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
 		Entry("v2action.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
@@ -85,7 +86,7 @@ var _ = Describe("HandleError", func() {
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
 		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
-			v2action.HTTPHealthCheckInvalidError{},
+			actionerror.HTTPHealthCheckInvalidError{},
 			translatableerror.HTTPHealthCheckInvalidError{},
 		),
 

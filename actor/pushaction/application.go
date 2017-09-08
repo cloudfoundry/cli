@@ -3,6 +3,7 @@ package pushaction
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	log "github.com/sirupsen/logrus"
 )
@@ -57,7 +58,7 @@ func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfi
 
 func (actor Actor) FindOrReturnPartialApp(appName string, spaceGUID string) (bool, Application, v2action.Warnings, error) {
 	foundApp, appWarnings, err := actor.V2Actor.GetApplicationByNameAndSpace(appName, spaceGUID)
-	if _, ok := err.(v2action.ApplicationNotFoundError); ok {
+	if _, ok := err.(actionerror.ApplicationNotFoundError); ok {
 		log.Warnf("unable to find app %s in current space (GUID: %s)", appName, spaceGUID)
 		return false, Application{
 			Application: v2action.Application{

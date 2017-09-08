@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -56,7 +57,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			It("returns an ApplicationNotFoundError and all warnings", func() {
 				_, warnings, err := actor.GetApplicationSummaryByNameAndSpace("some-app", "some-space-guid")
-				Expect(err).To(MatchError(ApplicationNotFoundError{Name: "some-app"}))
+				Expect(err).To(MatchError(actionerror.ApplicationNotFoundError{Name: "some-app"}))
 				Expect(warnings).To(ConsistOf("app-warning"))
 			})
 		})

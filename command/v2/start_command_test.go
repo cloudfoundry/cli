@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -438,7 +439,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("staging failed", func() {
 						BeforeEach(func() {
-							apiErr = v2action.StagingFailedError{Reason: "Something, but not nothing"}
+							apiErr = actionerror.StagingFailedError{Reason: "Something, but not nothing"}
 						})
 
 						It("stops logging and returns StagingFailedError", func() {
@@ -448,7 +449,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("staging timed out", func() {
 						BeforeEach(func() {
-							apiErr = v2action.StagingTimeoutError{Name: "some-app", Timeout: time.Nanosecond}
+							apiErr = actionerror.StagingTimeoutError{Name: "some-app", Timeout: time.Nanosecond}
 						})
 
 						It("stops logging and returns StagingTimeoutError", func() {
@@ -458,7 +459,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("when the app instance crashes", func() {
 						BeforeEach(func() {
-							apiErr = v2action.ApplicationInstanceCrashedError{Name: "some-app"}
+							apiErr = actionerror.ApplicationInstanceCrashedError{Name: "some-app"}
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
@@ -468,7 +469,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("when the app instance flaps", func() {
 						BeforeEach(func() {
-							apiErr = v2action.ApplicationInstanceFlappingError{Name: "some-app"}
+							apiErr = actionerror.ApplicationInstanceFlappingError{Name: "some-app"}
 						})
 
 						It("stops logging and returns UnsuccessfulStartError", func() {
@@ -478,7 +479,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("starting timeout", func() {
 						BeforeEach(func() {
-							apiErr = v2action.StartupTimeoutError{Name: "some-app"}
+							apiErr = actionerror.StartupTimeoutError{Name: "some-app"}
 						})
 
 						It("stops logging and returns StartupTimeoutError", func() {
@@ -608,7 +609,7 @@ var _ = Describe("Start Command", func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v2action.Application{},
 					v2action.Warnings{"warning-1", "warning-2"},
-					v2action.ApplicationNotFoundError{Name: "some-app"},
+					actionerror.ApplicationNotFoundError{Name: "some-app"},
 				)
 			})
 

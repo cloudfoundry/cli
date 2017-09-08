@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -294,7 +295,7 @@ var _ = Describe("Application Actions", func() {
 
 			It("returns an ApplicationNotFoundError", func() {
 				_, _, err := actor.GetApplication("some-app-guid")
-				Expect(err).To(MatchError(ApplicationNotFoundError{GUID: "some-app-guid"}))
+				Expect(err).To(MatchError(actionerror.ApplicationNotFoundError{GUID: "some-app-guid"}))
 			})
 		})
 	})
@@ -346,7 +347,7 @@ var _ = Describe("Application Actions", func() {
 
 			It("returns an ApplicationNotFoundError", func() {
 				_, _, err := actor.GetApplicationByNameAndSpace("some-app", "some-space-guid")
-				Expect(err).To(MatchError(ApplicationNotFoundError{Name: "some-app"}))
+				Expect(err).To(MatchError(actionerror.ApplicationNotFoundError{Name: "some-app"}))
 			})
 		})
 
@@ -479,7 +480,7 @@ var _ = Describe("Application Actions", func() {
 			It("returns an http health check invalid error", func() {
 				_, _, err := actor.SetApplicationHealthCheckTypeByNameAndSpace(
 					"some-app", "some-space-guid", "some-health-check-type", "/foo")
-				Expect(err).To(MatchError(HTTPHealthCheckInvalidError{}))
+				Expect(err).To(MatchError(actionerror.HTTPHealthCheckInvalidError{}))
 			})
 		})
 
@@ -781,7 +782,7 @@ var _ = Describe("Application Actions", func() {
 							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 							Eventually(warnings).Should(Receive(Equal("state-warning")))
 							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-							Eventually(errs).Should(Receive(MatchError(StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
+							Eventually(errs).Should(Receive(MatchError(actionerror.StagingFailedNoAppDetectedError{Reason: "NoAppDetectedError"})))
 
 							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
@@ -807,7 +808,7 @@ var _ = Describe("Application Actions", func() {
 							Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 							Eventually(warnings).Should(Receive(Equal("state-warning")))
 							Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
-							Eventually(errs).Should(Receive(MatchError(StagingFailedError{Reason: "OhNoes"})))
+							Eventually(errs).Should(Receive(MatchError(actionerror.StagingFailedError{Reason: "OhNoes"})))
 
 							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
@@ -826,7 +827,7 @@ var _ = Describe("Application Actions", func() {
 					It("sends a timeout error and stops polling", func() {
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
-						Eventually(errs).Should(Receive(MatchError(StagingTimeoutError{Name: "some-app", Timeout: 0})))
+						Eventually(errs).Should(Receive(MatchError(actionerror.StagingTimeoutError{Name: "some-app", Timeout: 0})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))
@@ -873,7 +874,7 @@ var _ = Describe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("app-warnings-1")))
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
-						Eventually(errs).Should(Receive(MatchError(StartupTimeoutError{Name: "some-app"})))
+						Eventually(errs).Should(Receive(MatchError(actionerror.StartupTimeoutError{Name: "some-app"})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
@@ -897,7 +898,7 @@ var _ = Describe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceCrashedError{Name: "some-app"})))
+						Eventually(errs).Should(Receive(MatchError(actionerror.ApplicationInstanceCrashedError{Name: "some-app"})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
@@ -921,7 +922,7 @@ var _ = Describe("Application Actions", func() {
 						Eventually(warnings).Should(Receive(Equal("app-warnings-2")))
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 						Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
-						Eventually(errs).Should(Receive(MatchError(ApplicationInstanceFlappingError{Name: "some-app"})))
+						Eventually(errs).Should(Receive(MatchError(actionerror.ApplicationInstanceFlappingError{Name: "some-app"})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
