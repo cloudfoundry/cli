@@ -3,6 +3,7 @@ package v3action_test
 import (
 	"errors"
 	"net/url"
+	"time"
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -21,6 +22,15 @@ var _ = Describe("instance actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil)
+	})
+
+	Describe("Instance", func() {
+		Describe("StartTime", func() {
+			It("returns the time that the instance started", func() {
+				instance := Instance{Uptime: 86400}
+				Expect(instance.StartTime()).To(BeTemporally("~", time.Now().Add(-24*time.Hour), 10*time.Second))
+			})
+		})
 	})
 
 	Describe("DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex", func() {

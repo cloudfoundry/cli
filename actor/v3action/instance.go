@@ -2,9 +2,21 @@ package v3action
 
 import (
 	"fmt"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
+
+// Instance represents a V3 actor instance.
+type Instance ccv3.Instance
+
+// StartTime returns the time that the instance started.
+func (instance *Instance) StartTime() time.Time {
+	uptimeDuration := time.Duration(instance.Uptime) * time.Second
+
+	return time.Now().Add(-uptimeDuration)
+}
 
 // ProcessInstanceNotFoundError is returned when the proccess type or process instance cannot be found
 type ProcessInstanceNotFoundError struct {
