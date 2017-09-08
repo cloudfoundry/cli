@@ -156,6 +156,18 @@
     "translation": ""
   },
   {
+    "id": "'docker' must have an 'image' property",
+    "translation": ""
+  },
+  {
+    "id": "'docker' must have at least an 'image' property",
+    "translation": ""
+  },
+  {
+    "id": "'docker.image' must be a string",
+    "translation": ""
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes'는 목록이어야 함"
   },
@@ -449,6 +461,14 @@
   },
   {
     "id": "Application lifecycle:",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'buildpack' and 'docker'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'docker' and 'path'",
     "translation": ""
   },
   {
@@ -7090,6 +7110,10 @@
   {
     "id": "disk:",
     "translation": "디스크:"
+  },
+  {
+    "id": "docker",
+    "translation": ""
   },
   {
     "id": "docker image:",
