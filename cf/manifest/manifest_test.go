@@ -292,6 +292,9 @@ var _ = Describe("Manifests", func() {
 					"no-route":          true,
 					"no-hostname":       true,
 					"random-route":      true,
+					"docker": map[interface{}]interface{}{
+						"image": "docker.com:3333/docker/docker:some-tag",
+					},
 				},
 			},
 		}))
@@ -313,6 +316,7 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(*apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomRoute).To(BeTrue())
+		Expect(*apps[0].DockerImage).To(Equal("docker.com:3333/docker/docker:some-tag"))
 	})
 
 	Context("when the health-check-type is 'http'", func() {
@@ -743,6 +747,86 @@ var _ = Describe("Manifests", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(apps).To(HaveLen(1))
 					Expect(*apps[0].NoHostname).To(BeFalse())
+				})
+			})
+		})
+	})
+
+	Context("when docker is provided", func() {
+		var manifest *manifest.Manifest
+
+		Context("when the 'docker' property is not a map", func() {
+			BeforeEach(func() {
+				manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						generic.NewMap(map[interface{}]interface{}{
+							"docker": "hello",
+						}),
+					},
+				}))
+			})
+
+			It("returns an error", func() {
+				_, err := manifest.Applications()
+				Expect(err.Error()).To(MatchRegexp("'docker' must have at least an 'image' property"))
+			})
+		})
+
+		Context("when 'docker' does not contain an 'image' property", func() {
+			BeforeEach(func() {
+				manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						generic.NewMap(map[interface{}]interface{}{
+							"docker": map[interface{}]interface{}{},
+						}),
+					},
+				}))
+			})
+
+			It("returns an error", func() {
+				_, err := manifest.Applications()
+				Expect(err.Error()).To(MatchRegexp("'docker' must have an 'image' property"))
+			})
+		})
+
+		Context("when 'docker' does contain an 'image' property", func() {
+			Context("when the 'image' property is not a string", func() {
+				BeforeEach(func() {
+					manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+						"applications": []interface{}{
+							generic.NewMap(map[interface{}]interface{}{
+								"docker": map[interface{}]interface{}{
+									"image": []interface{}{},
+								},
+							}),
+						},
+					}))
+				})
+
+				It("returns an error", func() {
+					_, err := manifest.Applications()
+					Expect(err.Error()).To(MatchRegexp("'docker.image' must be a string"))
+				})
+			})
+
+			Context("when 'docker.image' is a string", func() {
+				BeforeEach(func() {
+					manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+						"applications": []interface{}{
+							generic.NewMap(map[interface{}]interface{}{
+								"docker": map[interface{}]interface{}{
+									"image": "docker.com:3333/docker/docker:tag",
+								},
+							}),
+						},
+					}))
+				})
+
+				It("parses docker into app params", func() {
+					apps, err := manifest.Applications()
+					Expect(err).NotTo(HaveOccurred())
+					Expect(apps).To(HaveLen(1))
+					Expect(*apps[0].DockerImage).To(Equal("docker.com:3333/docker/docker:tag"))
 				})
 			})
 		})
