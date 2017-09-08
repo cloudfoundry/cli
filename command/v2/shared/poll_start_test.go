@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -113,7 +114,7 @@ var _ = Describe("Poll Start", func() {
 		},
 
 		Entry("StagingFailedNoAppDetectedError",
-			v2action.StagingFailedNoAppDetectedError{
+			actionerror.StagingFailedNoAppDetectedError{
 				Reason: "some staging failure reason",
 			},
 			translatableerror.StagingFailedNoAppDetectedError{
@@ -123,7 +124,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("StagingFailedError",
-			v2action.StagingFailedError{
+			actionerror.StagingFailedError{
 				Reason: "some staging failure reason",
 			},
 			translatableerror.StagingFailedError{
@@ -132,7 +133,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("StagingTimeoutError",
-			v2action.StagingTimeoutError{
+			actionerror.StagingTimeoutError{
 				Name:    "some staging timeout name",
 				Timeout: time.Second,
 			},
@@ -143,7 +144,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("ApplicationInstanceCrashedError",
-			v2action.ApplicationInstanceCrashedError{
+			actionerror.ApplicationInstanceCrashedError{
 				Name: "some application crashed name",
 			},
 			translatableerror.UnsuccessfulStartError{
@@ -153,7 +154,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("ApplicationInstanceFlappingError",
-			v2action.ApplicationInstanceFlappingError{
+			actionerror.ApplicationInstanceFlappingError{
 				Name: "some application flapping name",
 			},
 			translatableerror.UnsuccessfulStartError{
@@ -163,7 +164,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("StartupTimeoutError",
-			v2action.StartupTimeoutError{
+			actionerror.StartupTimeoutError{
 				Name: "some application timeout name",
 			},
 			translatableerror.StartupTimeoutError{
@@ -173,7 +174,7 @@ var _ = Describe("Poll Start", func() {
 		),
 
 		Entry("any other error",
-			v2action.HTTPHealthCheckInvalidError{},
+			actionerror.HTTPHealthCheckInvalidError{},
 			translatableerror.HTTPHealthCheckInvalidError{},
 		),
 	)

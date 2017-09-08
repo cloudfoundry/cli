@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -37,7 +38,7 @@ func HandleError(err error) error {
 	case sharedaction.NoSpaceTargetedError:
 		return translatableerror.NoSpaceTargetedError(e)
 
-	case v2action.ApplicationNotFoundError:
+	case actionerror.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
 	case v2action.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError{Name: e.Name}
@@ -49,7 +50,7 @@ func HandleError(err error) error {
 		return translatableerror.SpaceNotFoundError{Name: e.Name}
 	case v2action.StackNotFoundError:
 		return translatableerror.StackNotFoundError(e)
-	case v2action.HTTPHealthCheckInvalidError:
+	case actionerror.HTTPHealthCheckInvalidError:
 		return translatableerror.HTTPHealthCheckInvalidError{}
 	case v2action.RouteInDifferentSpaceError:
 		return translatableerror.RouteInDifferentSpaceError(e)
