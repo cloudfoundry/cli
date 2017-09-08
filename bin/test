@@ -40,17 +40,17 @@ go fmt ./...
 echo -e "\n Vetting packages for potential issues..."
 git status -s \
   | grep -i -e ^N -e ^M \
-  | grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ \
+  | grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ -e vendor/code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking \
   | grep -e .go$ \
   | awk '{print $2}' \
-  | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
+  | xargs -L 1 -P 5 go tool vet -all -shadow=true
 
 git status -s \
   | grep -i -e ^R \
-  | grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ \
+  | grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ -e vendor/code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking \
   | grep -e .go$ \
   | awk '{print $4}' \
-  | xargs -r -L 1 -P 5 go tool vet -all -shadow=true
+  | xargs -L 1 -P 5 go tool vet -all -shadow=true
 
 ginkgo version
 

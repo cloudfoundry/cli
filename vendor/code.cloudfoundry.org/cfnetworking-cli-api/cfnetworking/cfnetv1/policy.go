@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking"
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1/internal"
 	"strings"
+
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1/internal"
 )
 
 type PolicyProtocol string

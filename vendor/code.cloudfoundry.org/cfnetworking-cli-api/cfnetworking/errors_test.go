@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cfnetworking"
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetworkingfakes"
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	. "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetworkingfakes"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

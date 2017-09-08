@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking",
+			"repository": "https://github.com/cloudfoundry-incubator/cfnetworking-cli-api",
+			"vcs": "git",
+			"revision": "2fd9a2b57bbcc40c644f5c4ac5a79d98f1883a61",
+			"branch": "master",
+			"notests": false
+		},
+		{
 			"importpath": "code.cloudfoundry.org/clock",
 			"repository": "https://github.com/cloudfoundry/clock",
 			"vcs": "git",

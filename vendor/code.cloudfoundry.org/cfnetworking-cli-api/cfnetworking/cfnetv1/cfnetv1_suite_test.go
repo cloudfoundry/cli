@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 
-	. "code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
+	. "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -3,8 +3,8 @@ package cfnetv1_test
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	. "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
