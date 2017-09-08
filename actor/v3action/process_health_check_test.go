@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -36,7 +37,7 @@ var _ = Describe("Process Health Check Actions", func() {
 					HealthCheckType: "process",
 				},
 				{
-					ProcessType:     "web",
+					ProcessType:     constant.ProcessTypeWeb,
 					HealthCheckType: "http",
 					Endpoint:        "/",
 				},
@@ -46,7 +47,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		Describe("Sort", func() {
 			It("sorts healthchecks with web first and then alphabetically sorted", func() {
 				healthchecks.Sort()
-				Expect(healthchecks[0].ProcessType).To(Equal("web"))
+				Expect(healthchecks[0].ProcessType).To(Equal(constant.ProcessTypeWeb))
 				Expect(healthchecks[1].ProcessType).To(Equal("console"))
 				Expect(healthchecks[2].ProcessType).To(Equal("worker"))
 			})

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -258,7 +259,7 @@ var _ = Describe("v3-app Command", func() {
 						State: "STARTED",
 					},
 					ProcessSummaries: []v3action.ProcessSummary{
-						{Process: v3action.Process{Type: "web"}},
+						{Process: v3action.Process{Type: constant.ProcessTypeWeb}},
 					},
 				}
 				fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
@@ -325,7 +326,7 @@ var _ = Describe("v3-app Command", func() {
 							},
 							{
 								Process: v3action.Process{
-									Type:       "web",
+									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								},
 							},
@@ -384,7 +385,7 @@ var _ = Describe("v3-app Command", func() {
 							},
 							{
 								Process: v3action.Process{
-									Type:       "web",
+									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								},
 								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
@@ -456,7 +457,7 @@ var _ = Describe("v3-app Command", func() {
 							},
 							{
 								Process: v3action.Process{
-									Type:       "web",
+									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								},
 								InstanceDetails: []v3action.Instance{

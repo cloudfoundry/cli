@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -153,7 +154,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 	Context("when app has processes", func() {
 		BeforeEach(func() {
 			appProcessHealthChecks := []v3action.ProcessHealthCheck{
-				{ProcessType: "web", HealthCheckType: "http", Endpoint: "/foo"},
+				{ProcessType: constant.ProcessTypeWeb, HealthCheckType: "http", Endpoint: "/foo"},
 				{ProcessType: "queue", HealthCheckType: "port", Endpoint: ""},
 				{ProcessType: "timer", HealthCheckType: "process", Endpoint: ""},
 			}

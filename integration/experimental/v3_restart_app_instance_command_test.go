@@ -3,6 +3,7 @@ package experimental
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -274,7 +275,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 
 					Context("when instance index does not exist", func() {
 						It("fails with error", func() {
-							session := helpers.CF("v3-restart-app-instance", appName, "42", "--process", "web")
+							session := helpers.CF("v3-restart-app-instance", appName, "42", "--process", constant.ProcessTypeWeb)
 							Eventually(session.Out).Should(Say("Restarting instance 42 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
 							Eventually(session.Err).Should(Say("Instance 42 of process web not found"))
 							Eventually(session).Should(Exit(1))

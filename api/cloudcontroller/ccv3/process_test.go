@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -97,7 +98,7 @@ var _ = Describe("Process", func() {
 				Expect(processes).To(ConsistOf(
 					Process{
 						GUID:        "process-1-guid",
-						Type:        "web",
+						Type:        constant.ProcessTypeWeb,
 						MemoryInMB:  types.NullUint64{Value: 32, IsSet: true},
 						HealthCheck: ProcessHealthCheck{Type: "port"},
 					},
@@ -413,7 +414,7 @@ var _ = Describe("Process", func() {
 		Context("when providing all scale options", func() {
 			BeforeEach(func() {
 				passedProcess = Process{
-					Type:       "web",
+					Type:       constant.ProcessTypeWeb,
 					Instances:  types.NullInt{Value: 2, IsSet: true},
 					MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
 					DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
@@ -445,7 +446,7 @@ var _ = Describe("Process", func() {
 		Context("when providing all scale options with 0 values", func() {
 			BeforeEach(func() {
 				passedProcess = Process{
-					Type:       "web",
+					Type:       constant.ProcessTypeWeb,
 					Instances:  types.NullInt{Value: 0, IsSet: true},
 					MemoryInMB: types.NullUint64{Value: 0, IsSet: true},
 					DiskInMB:   types.NullUint64{Value: 0, IsSet: true},
@@ -476,7 +477,7 @@ var _ = Describe("Process", func() {
 
 		Context("when providing only one scale option", func() {
 			BeforeEach(func() {
-				passedProcess = Process{Type: "web", Instances: types.NullInt{Value: 2, IsSet: true}}
+				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
 				expectedBody := `{
 					"instances": 2
 				}`
@@ -501,7 +502,7 @@ var _ = Describe("Process", func() {
 
 		Context("when an error is encountered", func() {
 			BeforeEach(func() {
-				passedProcess = Process{Type: "web", Instances: types.NullInt{Value: 2, IsSet: true}}
+				passedProcess = Process{Type: constant.ProcessTypeWeb, Instances: types.NullInt{Value: 2, IsSet: true}}
 				response := `{
 						"errors": [
 							{

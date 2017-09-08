@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -65,7 +66,7 @@ var _ = Describe("v3-scale Command", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd.RequiredArgs.AppName = appName
-		cmd.ProcessType = "web"
+		cmd.ProcessType = constant.ProcessTypeWeb
 
 		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionV3)
 	})
@@ -177,7 +178,7 @@ var _ = Describe("v3-scale Command", func() {
 					ProcessSummaries: v3action.ProcessSummaries{
 						{
 							Process: v3action.Process{
-								Type:       "web",
+								Type:       constant.ProcessTypeWeb,
 								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 							},
@@ -285,8 +286,8 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(testUI.Err).To(Say("get-app-summary-warning"))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceName := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
+					passedAppName, spaceName := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceName).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.ScaleProcessByApplicationCallCount()).To(Equal(0))
@@ -436,7 +437,7 @@ var _ = Describe("v3-scale Command", func() {
 								appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 								Expect(appGUIDArg).To(Equal("some-app-guid"))
 								Expect(scaleProcess).To(Equal(v3action.Process{
-									Type:       "web",
+									Type:       constant.ProcessTypeWeb,
 									Instances:  types.NullInt{Value: 2, IsSet: true},
 									DiskInMB:   types.NullUint64{Value: 50, IsSet: true},
 									MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
@@ -449,8 +450,8 @@ var _ = Describe("v3-scale Command", func() {
 								Expect(fakeActor.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
 
 								Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-								appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-								Expect(appName).To(Equal("some-app"))
+								passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+								Expect(passedAppName).To(Equal("some-app"))
 								Expect(spaceGUID).To(Equal("some-space-guid"))
 							})
 						})
@@ -542,7 +543,7 @@ var _ = Describe("v3-scale Command", func() {
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(scaleProcess).To(Equal(v3action.Process{
-						Type:      "web",
+						Type:      constant.ProcessTypeWeb,
 						Instances: types.NullInt{Value: 3, IsSet: true},
 					}))
 
@@ -550,8 +551,8 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
+					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
@@ -593,7 +594,7 @@ var _ = Describe("v3-scale Command", func() {
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(scaleProcess).To(Equal(v3action.Process{
-						Type:       "web",
+						Type:       constant.ProcessTypeWeb,
 						MemoryInMB: types.NullUint64{Value: 256, IsSet: true},
 					}))
 
@@ -606,8 +607,8 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(appGUID).To(Equal("some-app-guid"))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
+					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
@@ -648,7 +649,7 @@ var _ = Describe("v3-scale Command", func() {
 					appGUIDArg, scaleProcess := fakeActor.ScaleProcessByApplicationArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
 					Expect(scaleProcess).To(Equal(v3action.Process{
-						Type:     "web",
+						Type:     constant.ProcessTypeWeb,
 						DiskInMB: types.NullUint64{Value: 1025, IsSet: true},
 					}))
 
@@ -661,8 +662,8 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(appGUID).To(Equal("some-app-guid"))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
+					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})
@@ -706,8 +707,8 @@ var _ = Describe("v3-scale Command", func() {
 					}))
 
 					Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app"))
+					passedAppName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+					Expect(passedAppName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
 			})

@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -218,7 +219,7 @@ var _ = Describe("v3-apps Command", func() {
 							},
 							{
 								Process: v3action.Process{
-									Type: "web",
+									Type: constant.ProcessTypeWeb,
 								},
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
@@ -242,7 +243,7 @@ var _ = Describe("v3-apps Command", func() {
 						ProcessSummaries: []v3action.ProcessSummary{
 							{
 								Process: v3action.Process{
-									Type: "web",
+									Type: constant.ProcessTypeWeb,
 								},
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{

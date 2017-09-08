@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	. "github.com/onsi/ginkgo"
@@ -29,7 +30,7 @@ var _ = Describe("Process Actions", func() {
 
 		BeforeEach(func() {
 			passedProcess = Process{
-				Type:       "web",
+				Type:       constant.ProcessTypeWeb,
 				Instances:  types.NullInt{Value: 2, IsSet: true},
 				MemoryInMB: types.NullUint64{Value: 100, IsSet: true},
 				DiskInMB:   types.NullUint64{Value: 200, IsSet: true},
@@ -53,7 +54,7 @@ var _ = Describe("Process Actions", func() {
 				appGUIDArg, processArg := fakeCloudControllerClient.CreateApplicationProcessScaleArgsForCall(0)
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
 				Expect(processArg).To(Equal(ccv3.Process{
-					Type:       "web",
+					Type:       constant.ProcessTypeWeb,
 					Instances:  passedProcess.Instances,
 					MemoryInMB: passedProcess.MemoryInMB,
 					DiskInMB:   passedProcess.DiskInMB,
@@ -88,7 +89,7 @@ var _ = Describe("Process Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
-				Expect(err).To(Equal(ProcessNotFoundError{ProcessType: "web"}))
+				Expect(err).To(Equal(ProcessNotFoundError{ProcessType: constant.ProcessTypeWeb}))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})
 		})
