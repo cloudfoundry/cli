@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"strings"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking"
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetworkingfakes"
-	. "code.cloudfoundry.org/cli/api/cfnetworking/wrapper"
-	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper/util"
-	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper/wrapperfakes"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetworkingfakes"
+	. "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper/util"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper/wrapperfakes"
 	"code.cloudfoundry.org/cli/api/uaa"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

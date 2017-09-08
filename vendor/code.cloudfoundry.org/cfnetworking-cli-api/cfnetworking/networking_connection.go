@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 )
 
 // NetworkingConnection represents a connection to the Cloud Controller

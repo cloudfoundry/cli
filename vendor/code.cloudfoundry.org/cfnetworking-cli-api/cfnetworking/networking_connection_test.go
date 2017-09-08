@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
-	. "code.cloudfoundry.org/cli/api/cfnetworking"
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	. "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
