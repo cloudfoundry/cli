@@ -114,7 +114,7 @@ var _ = Describe("v3-apps Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationSummariesBySpaceReturns([]v3action.ApplicationSummary{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
+			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v3action.ApplicationWithProcessSummary{}, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
 		It("returns the error and prints warnings", func() {
@@ -132,7 +132,7 @@ var _ = Describe("v3-apps Command", func() {
 
 		BeforeEach(func() {
 			expectedErr = ccerror.RequestError{}
-			fakeActor.GetApplicationSummariesBySpaceReturns([]v3action.ApplicationSummary{
+			fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v3action.ApplicationWithProcessSummary{
 				{
 					Application: v3action.Application{
 						GUID:  "app-guid",
@@ -192,7 +192,7 @@ var _ = Describe("v3-apps Command", func() {
 
 		Context("with existing apps", func() {
 			BeforeEach(func() {
-				appSummaries := []v3action.ApplicationSummary{
+				appSummaries := []v3action.ApplicationWithProcessSummary{
 					{
 						Application: v3action.Application{
 							GUID:  "app-guid-1",
@@ -259,7 +259,7 @@ var _ = Describe("v3-apps Command", func() {
 						},
 					},
 				}
-				fakeActor.GetApplicationSummariesBySpaceReturns(appSummaries, v3action.Warnings{"warning-1", "warning-2"}, nil)
+				fakeActor.GetApplicationsWithProcessesBySpaceReturns(appSummaries, v3action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			It("prints the application summary and outputs warnings", func() {
@@ -279,8 +279,8 @@ var _ = Describe("v3-apps Command", func() {
 				Expect(testUI.Err).To(Say("route-warning-3"))
 				Expect(testUI.Err).To(Say("route-warning-4"))
 
-				Expect(fakeActor.GetApplicationSummariesBySpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetApplicationSummariesBySpaceArgsForCall(0)
+				Expect(fakeActor.GetApplicationsWithProcessesBySpaceCallCount()).To(Equal(1))
+				spaceGUID := fakeActor.GetApplicationsWithProcessesBySpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 
 				Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(2))
@@ -293,7 +293,7 @@ var _ = Describe("v3-apps Command", func() {
 
 		Context("when app does not have processes", func() {
 			BeforeEach(func() {
-				appSummaries := []v3action.ApplicationSummary{
+				appSummaries := []v3action.ApplicationWithProcessSummary{
 					{
 						Application: v3action.Application{
 							GUID:  "app-guid",
@@ -303,7 +303,7 @@ var _ = Describe("v3-apps Command", func() {
 						ProcessSummaries: []v3action.ProcessSummary{},
 					},
 				}
-				fakeActor.GetApplicationSummariesBySpaceReturns(appSummaries, v3action.Warnings{"warning"}, nil)
+				fakeActor.GetApplicationsWithProcessesBySpaceReturns(appSummaries, v3action.Warnings{"warning"}, nil)
 			})
 
 			It("it does not request or display routes information for app", func() {
@@ -315,8 +315,8 @@ var _ = Describe("v3-apps Command", func() {
 				Expect(testUI.Out).To(Say("some-app\\s+started\\s+$"))
 				Expect(testUI.Err).To(Say("warning"))
 
-				Expect(fakeActor.GetApplicationSummariesBySpaceCallCount()).To(Equal(1))
-				spaceGUID := fakeActor.GetApplicationSummariesBySpaceArgsForCall(0)
+				Expect(fakeActor.GetApplicationsWithProcessesBySpaceCallCount()).To(Equal(1))
+				spaceGUID := fakeActor.GetApplicationsWithProcessesBySpaceArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 
 				Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(0))
@@ -325,7 +325,7 @@ var _ = Describe("v3-apps Command", func() {
 
 		Context("with no apps", func() {
 			BeforeEach(func() {
-				fakeActor.GetApplicationSummariesBySpaceReturns([]v3action.ApplicationSummary{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
+				fakeActor.GetApplicationsWithProcessesBySpaceReturns([]v3action.ApplicationWithProcessSummary{}, v3action.Warnings{"warning-1", "warning-2"}, nil)
 			})
 
 			It("displays there are no apps", func() {

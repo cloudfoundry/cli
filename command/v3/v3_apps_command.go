@@ -19,7 +19,7 @@ import (
 
 type V3AppsActor interface {
 	CloudControllerAPIVersion() string
-	GetApplicationSummariesBySpace(spaceGUID string) ([]v3action.ApplicationSummary, v3action.Warnings, error)
+	GetApplicationsWithProcessesBySpace(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)
 }
 
 type V3AppsCommand struct {
@@ -80,7 +80,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 	})
 	cmd.UI.DisplayNewline()
 
-	summaries, warnings, err := cmd.Actor.GetApplicationSummariesBySpace(cmd.Config.TargetedSpace().GUID)
+	summaries, warnings, err := cmd.Actor.GetApplicationsWithProcessesBySpace(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)

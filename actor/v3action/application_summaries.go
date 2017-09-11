@@ -6,7 +6,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
-func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]ApplicationSummary, Warnings, error) {
+type ApplicationWithProcessSummary struct {
+	Application
+	ProcessSummaries ProcessSummaries
+}
+
+func (actor Actor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]ApplicationWithProcessSummary, Warnings, error) {
 	var allWarnings Warnings
 
 	apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
@@ -18,7 +23,7 @@ func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]Applicati
 		return nil, allWarnings, err
 	}
 
-	var appSummaries []ApplicationSummary
+	var appSummaries []ApplicationWithProcessSummary
 
 	for _, app := range apps {
 		processSummaries, processWarnings, err := actor.getProcessSummariesForApp(app.GUID)
@@ -27,7 +32,7 @@ func (actor Actor) GetApplicationSummariesBySpace(spaceGUID string) ([]Applicati
 			return nil, allWarnings, err
 		}
 
-		appSummaries = append(appSummaries, ApplicationSummary{
+		appSummaries = append(appSummaries, ApplicationWithProcessSummary{
 			Application: Application{
 				Name:  app.Name,
 				GUID:  app.GUID,
