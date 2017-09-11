@@ -41,7 +41,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *uaa.Respo
 		}
 	}
 
-	for i := 0; i < retry.maxRetries+1; i += 1 {
+	for i := 0; i < retry.maxRetries+1; i++ {
 		if rawRequestBody != nil {
 			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 		}
@@ -50,16 +50,20 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *uaa.Respo
 			return nil
 		}
 
-		// do not retry if the request method is POST, or not one of the following
-		// http status codes: 500, 502, 503, 504
-		if request.Method == http.MethodPost ||
-			passedResponse.HTTPResponse != nil &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusInternalServerError &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusBadGateway &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusServiceUnavailable &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusGatewayTimeout {
+		if retry.skipRetry(request.Method, passedResponse.HTTPResponse) {
 			break
 		}
 	}
 	return err
+}
+
+// skipRetry if the request method is POST, or not one of the following http
+// status codes: 500, 502, 503, 504.
+func (*RetryRequest) skipRetry(httpMethod string, response *http.Response) bool {
+	return httpMethod == http.MethodPost ||
+		response != nil &&
+			response.StatusCode != http.StatusInternalServerError &&
+			response.StatusCode != http.StatusBadGateway &&
+			response.StatusCode != http.StatusServiceUnavailable &&
+			response.StatusCode != http.StatusGatewayTimeout
 }
