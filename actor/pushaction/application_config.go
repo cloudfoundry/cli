@@ -92,15 +92,13 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			return nil, warnings, err
 		}
 
-		defaultRoute, routeWarnings, err := actor.GetRouteWithDefaultDomain(app.Name, orgGUID, spaceGUID, config.CurrentRoutes)
+		var routeWarnings Warnings
+		config, routeWarnings, err = actor.configureRoutes(app.Routes, orgGUID, spaceGUID, config)
 		warnings = append(warnings, routeWarnings...)
 		if err != nil {
-			log.Errorln("getting default route:", err)
+			log.Errorln("determining routes:", err)
 			return nil, warnings, err
 		}
-
-		// TODO: when working with all of routes, append to current route
-		config.DesiredRoutes = []v2action.Route{defaultRoute}
 
 		config, err = actor.configureResources(config, app.DockerImage)
 		if err != nil {
@@ -112,6 +110,25 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 	}
 
 	return configs, warnings, nil
+}
+
+func (actor Actor) configureRoutes(routesInManifest []string, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
+	if len(routesInManifest) > 0 {
+		var warnings Warnings
+		var err error
+		config.DesiredRoutes, warnings, err = actor.CalculateRoutes(routesInManifest, orgGUID, spaceGUID, config.CurrentRoutes)
+		return config, warnings, err
+	}
+
+	defaultRoute, warnings, err := actor.GetRouteWithDefaultDomain(config.DesiredApplication.Name, orgGUID, spaceGUID, config.CurrentRoutes)
+	if err != nil {
+		log.Errorln("getting default route:", err)
+		return config, warnings, err
+	}
+
+	// TODO: when working with all of routes, append to current route
+	config.DesiredRoutes = []v2action.Route{defaultRoute}
+	return config, warnings, nil
 }
 
 func (actor Actor) getDesiredServices(currentServices map[string]v2action.ServiceInstance, requestedServices []string, spaceGUID string) (map[string]v2action.ServiceInstance, Warnings, error) {

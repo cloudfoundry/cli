@@ -18,6 +18,7 @@ type V2Actor interface {
 	GatherDirectoryResources(sourceDir string) ([]v2action.Resource, error)
 	GetApplicationByNameAndSpace(name string, spaceGUID string) (v2action.Application, v2action.Warnings, error)
 	GetApplicationRoutes(applicationGUID string) (v2action.Routes, v2action.Warnings, error)
+	GetDomainsByNameAndOrganization(domainNames []string, orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
 	GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
 	GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (v2action.ServiceInstance, v2action.Warnings, error)
 	GetServiceInstancesByApplication(appGUID string) ([]v2action.ServiceInstance, v2action.Warnings, error)
