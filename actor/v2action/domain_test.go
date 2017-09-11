@@ -249,6 +249,21 @@ var _ = Describe("Domain Actions", func() {
 			})
 		})
 
+		Context("when no domains are provided", func() {
+			BeforeEach(func() {
+				domainNames = nil
+			})
+
+			It("immediately returns", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(BeEmpty())
+				Expect(domains).To(BeEmpty())
+
+				Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(0))
+				Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(0))
+			})
+		})
+
 		Context("when looking up the shared domains errors", func() {
 			var expectedErr error
 

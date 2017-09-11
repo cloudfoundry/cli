@@ -141,6 +141,22 @@ type FakeV2Actor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
+	GetDomainsByNameAndOrganizationStub        func(domainNames []string, orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
+	getDomainsByNameAndOrganizationMutex       sync.RWMutex
+	getDomainsByNameAndOrganizationArgsForCall []struct {
+		domainNames []string
+		orgGUID     string
+	}
+	getDomainsByNameAndOrganizationReturns struct {
+		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}
+	getDomainsByNameAndOrganizationReturnsOnCall map[int]struct {
+		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}
 	GetOrganizationDomainsStub        func(orgGUID string) ([]v2action.Domain, v2action.Warnings, error)
 	getOrganizationDomainsMutex       sync.RWMutex
 	getOrganizationDomainsArgsForCall []struct {
@@ -790,6 +806,66 @@ func (fake *FakeV2Actor) GetApplicationRoutesReturnsOnCall(i int, result1 v2acti
 	}{result1, result2, result3}
 }
 
+func (fake *FakeV2Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID string) ([]v2action.Domain, v2action.Warnings, error) {
+	var domainNamesCopy []string
+	if domainNames != nil {
+		domainNamesCopy = make([]string, len(domainNames))
+		copy(domainNamesCopy, domainNames)
+	}
+	fake.getDomainsByNameAndOrganizationMutex.Lock()
+	ret, specificReturn := fake.getDomainsByNameAndOrganizationReturnsOnCall[len(fake.getDomainsByNameAndOrganizationArgsForCall)]
+	fake.getDomainsByNameAndOrganizationArgsForCall = append(fake.getDomainsByNameAndOrganizationArgsForCall, struct {
+		domainNames []string
+		orgGUID     string
+	}{domainNamesCopy, orgGUID})
+	fake.recordInvocation("GetDomainsByNameAndOrganization", []interface{}{domainNamesCopy, orgGUID})
+	fake.getDomainsByNameAndOrganizationMutex.Unlock()
+	if fake.GetDomainsByNameAndOrganizationStub != nil {
+		return fake.GetDomainsByNameAndOrganizationStub(domainNames, orgGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getDomainsByNameAndOrganizationReturns.result1, fake.getDomainsByNameAndOrganizationReturns.result2, fake.getDomainsByNameAndOrganizationReturns.result3
+}
+
+func (fake *FakeV2Actor) GetDomainsByNameAndOrganizationCallCount() int {
+	fake.getDomainsByNameAndOrganizationMutex.RLock()
+	defer fake.getDomainsByNameAndOrganizationMutex.RUnlock()
+	return len(fake.getDomainsByNameAndOrganizationArgsForCall)
+}
+
+func (fake *FakeV2Actor) GetDomainsByNameAndOrganizationArgsForCall(i int) ([]string, string) {
+	fake.getDomainsByNameAndOrganizationMutex.RLock()
+	defer fake.getDomainsByNameAndOrganizationMutex.RUnlock()
+	return fake.getDomainsByNameAndOrganizationArgsForCall[i].domainNames, fake.getDomainsByNameAndOrganizationArgsForCall[i].orgGUID
+}
+
+func (fake *FakeV2Actor) GetDomainsByNameAndOrganizationReturns(result1 []v2action.Domain, result2 v2action.Warnings, result3 error) {
+	fake.GetDomainsByNameAndOrganizationStub = nil
+	fake.getDomainsByNameAndOrganizationReturns = struct {
+		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV2Actor) GetDomainsByNameAndOrganizationReturnsOnCall(i int, result1 []v2action.Domain, result2 v2action.Warnings, result3 error) {
+	fake.GetDomainsByNameAndOrganizationStub = nil
+	if fake.getDomainsByNameAndOrganizationReturnsOnCall == nil {
+		fake.getDomainsByNameAndOrganizationReturnsOnCall = make(map[int]struct {
+			result1 []v2action.Domain
+			result2 v2action.Warnings
+			result3 error
+		})
+	}
+	fake.getDomainsByNameAndOrganizationReturnsOnCall[i] = struct {
+		result1 []v2action.Domain
+		result2 v2action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeV2Actor) GetOrganizationDomains(orgGUID string) ([]v2action.Domain, v2action.Warnings, error) {
 	fake.getOrganizationDomainsMutex.Lock()
 	ret, specificReturn := fake.getOrganizationDomainsReturnsOnCall[len(fake.getOrganizationDomainsArgsForCall)]
@@ -1425,6 +1501,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.getApplicationRoutesMutex.RLock()
 	defer fake.getApplicationRoutesMutex.RUnlock()
+	fake.getDomainsByNameAndOrganizationMutex.RLock()
+	defer fake.getDomainsByNameAndOrganizationMutex.RUnlock()
 	fake.getOrganizationDomainsMutex.RLock()
 	defer fake.getOrganizationDomainsMutex.RUnlock()
 	fake.getServiceInstanceByNameAndSpaceMutex.RLock()
