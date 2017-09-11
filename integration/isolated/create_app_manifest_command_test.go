@@ -7,27 +7,18 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
 
-type Manifest struct {
-	Applications []struct {
-		HealthCheckType         string `yaml:"health-check-type"`
-		HealthCheckHTTPEndpoint string `yaml:"health-check-http-endpoint"`
-		Routes                  []struct {
-			Route string `yaml:"route"`
-		} `yaml:"routes"`
-	} `yaml:"applications"`
-}
-
-func createManifest(appName string) (*Manifest, error) {
+func createManifest(appName string) (manifest.Manifest, error) {
 	tmpDir, err := ioutil.TempDir("", "")
 	defer os.RemoveAll(tmpDir)
 	if err != nil {
-		return nil, err
+		return manifest.Manifest{}, err
 	}
 
 	manifestPath := filepath.Join(tmpDir, "manifest.yml")
@@ -35,16 +26,16 @@ func createManifest(appName string) (*Manifest, error) {
 
 	manifestContents, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
-		return nil, err
+		return manifest.Manifest{}, err
 	}
 
-	manifest := new(Manifest)
-	err = yaml.Unmarshal(manifestContents, manifest)
+	var appsManifest manifest.Manifest
+	err = yaml.Unmarshal(manifestContents, appsManifest)
 	if err != nil {
-		return nil, err
+		return manifest.Manifest{}, err
 	}
 
-	return manifest, nil
+	return appsManifest, nil
 }
 
 var _ = Describe("create-app-manifest command", func() {
@@ -81,7 +72,7 @@ var _ = Describe("create-app-manifest command", func() {
 
 			Expect(manifest.Applications).To(HaveLen(1))
 			Expect(manifest.Applications[0].Routes).To(HaveLen(1))
-			Expect(manifest.Applications[0].Routes[0].Route).To(Equal(domain.Name))
+			Expect(manifest.Applications[0].Routes[0]).To(Equal(domain.Name))
 		})
 	})
 

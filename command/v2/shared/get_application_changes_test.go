@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -296,9 +297,9 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 
 		DescribeTable("non-empty values",
-			func(existingType int, newType int, currentValue int, newValue int) {
-				appConfig.CurrentApplication.HealthCheckTimeout = existingType
-				appConfig.DesiredApplication.HealthCheckTimeout = newType
+			func(existingTimeout int, newTimeout int, currentValue int, newValue int) {
+				appConfig.CurrentApplication.HealthCheckTimeout = existingTimeout
+				appConfig.DesiredApplication.HealthCheckTimeout = newTimeout
 
 				changes = GetApplicationChanges(appConfig)
 
@@ -324,7 +325,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 
 		DescribeTable("non-empty values",
-			func(existingType string, newType string, currentValue string, newValue string) {
+			func(existingType ccv2.ApplicationHealthCheckType, newType ccv2.ApplicationHealthCheckType, currentValue ccv2.ApplicationHealthCheckType, newValue ccv2.ApplicationHealthCheckType) {
 				appConfig.CurrentApplication.HealthCheckType = existingType
 				appConfig.DesiredApplication.HealthCheckType = newType
 
@@ -336,9 +337,9 @@ var _ = Describe("GetApplicationChanges", func() {
 					NewValue:     newValue,
 				}))
 			},
-			Entry("new app with health-check-type specified", "", "some-new-health-check-type", "", "some-new-health-check-type"),
-			Entry("existing health-check-type with no health-check-type specified", "some-old-health-check-type", "", "some-old-health-check-type", ""),
-			Entry("existing health-check-type with new health-check-type specified", "some-old-health-check-type", "some-new-health-check-type", "some-old-health-check-type", "some-new-health-check-type"),
+			Entry("new app with health-check-type specified", ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-new-health-check-type")),
+			Entry("existing health-check-type with no health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("")),
+			Entry("existing health-check-type with new health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("some-new-health-check-type")),
 		)
 	})
 

@@ -13,6 +13,14 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+type ManifestCreationError struct {
+	Err error
+}
+
+func (ManifestCreationError) Error() string {
+	return "Failed to create manifest: {{.Error}}"
+}
+
 type Manifest struct {
 	Applications []Application `yaml:"applications"`
 }
@@ -66,62 +74,93 @@ func (app Application) String() string {
 	)
 }
 
+type manifestApp struct {
+	Name                    string            `yaml:"name,omitempty"`
+	Buildpack               string            `yaml:"buildpack,omitempty"`
+	Command                 string            `yaml:"command,omitempty"`
+	DiskQuota               string            `yaml:"disk_quota,omitempty"`
+	EnvironmentVariables    map[string]string `yaml:"env,omitempty"`
+	HealthCheckHTTPEndpoint string            `yaml:"health-check-http-endpoint,omitempty"`
+	HealthCheckType         string            `yaml:"health-check-type,omitempty"`
+	Instances               *int              `yaml:"instances,omitempty"`
+	Memory                  string            `yaml:"memory,omitempty"`
+	Path                    string            `yaml:"path,omitempty"`
+	Routes                  []manifestRoute   `yaml:"routes,omitempty"`
+	Services                []string          `yaml:"services,omitempty"`
+	StackName               string            `yaml:"stack,omitempty"`
+	Timeout                 int               `yaml:"timeout,omitempty"`
+}
+
+type manifestRoute struct {
+	Route string `yaml:"route"`
+}
+
+func (app Application) MarshalYAML() (interface{}, error) {
+	var m = manifestApp{
+		Buildpack:               app.Buildpack.Value,
+		Command:                 app.Command.Value,
+		EnvironmentVariables:    app.EnvironmentVariables,
+		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
+		HealthCheckType:         app.HealthCheckType,
+		Name:                    app.Name,
+		Path:                    app.Path,
+		Services:                app.Services,
+		StackName:               app.StackName,
+		Timeout:                 app.HealthCheckTimeout,
+	}
+	if app.DiskQuota != 0 {
+		m.DiskQuota = bytefmt.ByteSize(app.DiskQuota * bytefmt.MEGABYTE)
+	}
+
+	if app.Memory != 0 {
+		m.Memory = bytefmt.ByteSize(app.Memory * bytefmt.MEGABYTE)
+	}
+	if app.Instances.IsSet {
+		m.Instances = &app.Instances.Value
+	}
+	for _, route := range app.Routes {
+		m.Routes = append(m.Routes, manifestRoute{Route: route})
+	}
+
+	return m, nil
+}
+
 func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) error {
-	var manifestApp struct {
-		Buildpack               string            `yaml:"buildpack"`
-		Command                 string            `yaml:"command"`
-		DiskQuota               string            `yaml:"disk_quota"`
-		EnvironmentVariables    map[string]string `yaml:"env"`
-		HealthCheckHTTPEndpoint string            `yaml:"health-check-http-endpoint"`
-		HealthCheckType         string            `yaml:"health-check-type"`
-		Instances               string            `yaml:"instances"`
-		Memory                  string            `yaml:"memory"`
-		Name                    string            `yaml:"name"`
-		Path                    string            `yaml:"path"`
-		Routes                  []struct {
-			Route string `json:"route"`
-		} `json:"routes"`
-		Services  []string `yaml:"services"`
-		StackName string   `yaml:"stack"`
-		Timeout   int      `yaml:"timeout"`
-	}
+	var m manifestApp
 
-	err := unmarshaller(&manifestApp)
+	err := unmarshaller(&m)
 	if err != nil {
 		return err
 	}
 
-	app.HealthCheckHTTPEndpoint = manifestApp.HealthCheckHTTPEndpoint
-	app.HealthCheckType = manifestApp.HealthCheckType
-	app.Name = manifestApp.Name
-	app.Path = manifestApp.Path
-	app.Services = manifestApp.Services
-	app.StackName = manifestApp.StackName
-	app.HealthCheckTimeout = manifestApp.Timeout
-	app.EnvironmentVariables = manifestApp.EnvironmentVariables
+	app.HealthCheckHTTPEndpoint = m.HealthCheckHTTPEndpoint
+	app.HealthCheckType = m.HealthCheckType
+	app.Name = m.Name
+	app.Path = m.Path
+	app.Services = m.Services
+	app.StackName = m.StackName
+	app.HealthCheckTimeout = m.Timeout
+	app.EnvironmentVariables = m.EnvironmentVariables
 
-	err = app.Instances.ParseFlagValue(manifestApp.Instances)
-	if err != nil {
-		return err
-	}
+	app.Instances.ParseIntValue(m.Instances)
 
-	if manifestApp.DiskQuota != "" {
-		disk, fmtErr := bytefmt.ToMegabytes(manifestApp.DiskQuota)
+	if m.DiskQuota != "" {
+		disk, fmtErr := bytefmt.ToMegabytes(m.DiskQuota)
 		if fmtErr != nil {
 			return fmtErr
 		}
 		app.DiskQuota = disk
 	}
 
-	if manifestApp.Memory != "" {
-		memory, fmtErr := bytefmt.ToMegabytes(manifestApp.Memory)
+	if m.Memory != "" {
+		memory, fmtErr := bytefmt.ToMegabytes(m.Memory)
 		if fmtErr != nil {
 			return fmtErr
 		}
 		app.Memory = memory
 	}
 
-	for _, route := range manifestApp.Routes {
+	for _, route := range m.Routes {
 		app.Routes = append(app.Routes, route.Route)
 	}
 
@@ -134,12 +173,12 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	}
 
 	if _, ok := exists["buildpack"]; ok {
-		app.Buildpack.ParseValue(manifestApp.Buildpack)
+		app.Buildpack.ParseValue(m.Buildpack)
 		app.Buildpack.IsSet = true
 	}
 
 	if _, ok := exists["command"]; ok {
-		app.Command.ParseValue(manifestApp.Command)
+		app.Command.ParseValue(m.Command)
 		app.Command.IsSet = true
 	}
 
@@ -167,4 +206,21 @@ func ReadAndMergeManifests(pathToManifest string) ([]Application, error) {
 
 	// Merge all manifest files
 	return manifest.Applications, err
+}
+
+// filepath will be created if it doesn't exist
+func WriteApplicationManifest(application Application, filePath string) error {
+	manifest := Manifest{Applications: []Application{application}}
+	manifestBytes, err := yaml.Marshal(manifest)
+	if err != nil {
+		return ManifestCreationError{Err: err}
+	}
+
+	err = ioutil.WriteFile(filePath, manifestBytes, 0644)
+	if err != nil {
+		return ManifestCreationError{Err: err}
+	}
+
+	return nil
+
 }

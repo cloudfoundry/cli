@@ -306,7 +306,7 @@ var _ = Describe("Application Config", func() {
 					manifestApps[0].DockerPassword = "some-docker-password"
 					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
 					manifestApps[0].HealthCheckTimeout = 5
-					manifestApps[0].HealthCheckType = "some-buildpack"
+					manifestApps[0].HealthCheckType = "port"
 					manifestApps[0].Instances = types.NullInt{Value: 1, IsSet: true}
 					manifestApps[0].DiskQuota = 2
 					manifestApps[0].Memory = 3
@@ -338,7 +338,7 @@ var _ = Describe("Application Config", func() {
 					}))
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
-					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
 					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 1, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
@@ -372,9 +372,9 @@ var _ = Describe("Application Config", func() {
 							"env3": "9",
 						},
 						GUID: "some-app-guid",
-						HealthCheckHTTPEndpoint: "some-buildpack",
+						HealthCheckHTTPEndpoint: "/some-endpoint",
 						HealthCheckTimeout:      5,
-						HealthCheckType:         "some-buildpack",
+						HealthCheckType:         "port",
 						Instances:               types.NullInt{Value: 3, IsSet: true},
 						Memory:                  3,
 						Name:                    appName,
@@ -393,9 +393,9 @@ var _ = Describe("Application Config", func() {
 						"env2": "2",
 						"env3": "9",
 					}))
-					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
-					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal("some-buildpack"))
+					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
 					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 3, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))

@@ -70,7 +70,7 @@ func (cmd GetHealthCheckCommand) Execute(args []string) error {
 	cmd.UI.DisplayNewline()
 
 	table := [][]string{
-		{cmd.UI.TranslateText("health check type:"), app.HealthCheckType},
+		{cmd.UI.TranslateText("health check type:"), string(app.HealthCheckType)},
 		{cmd.UI.TranslateText("endpoint (for http type):"), app.CalculatedHealthCheckEndpoint()},
 	}
 

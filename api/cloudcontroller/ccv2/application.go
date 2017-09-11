@@ -30,6 +30,15 @@ const (
 	ApplicationPackageUnknown ApplicationPackageState = "UNKNOWN"
 )
 
+// ApplicationHealthCheckType is the method to reach the applications health check
+type ApplicationHealthCheckType string
+
+const (
+	ApplicationHealthCheckPort    ApplicationHealthCheckType = "port"
+	ApplicationHealthCheckHTTP    ApplicationHealthCheckType = "http"
+	ApplicationHealthCheckProcess ApplicationHealthCheckType = "process"
+)
+
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
@@ -65,7 +74,7 @@ type Application struct {
 	HealthCheckTimeout int
 
 	// HealthCheckType is the type of health check that will be done to the app.
-	HealthCheckType string
+	HealthCheckType ApplicationHealthCheckType
 
 	// HealthCheckHTTPEndpoint is the url of the http health check endpoint.
 	HealthCheckHTTPEndpoint string
@@ -116,21 +125,21 @@ type DockerCredentials struct {
 // MarshalJSON converts an application into a Cloud Controller Application.
 func (application Application) MarshalJSON() ([]byte, error) {
 	ccApp := struct {
-		Buildpack               *string            `json:"buildpack,omitempty"`
-		Command                 *string            `json:"command,omitempty"`
-		DiskQuota               uint64             `json:"disk_quota,omitempty"`
-		DockerCredentials       *DockerCredentials `json:"docker_credentials,omitempty"`
-		DockerImage             string             `json:"docker_image,omitempty"`
-		EnvironmentVariables    map[string]string  `json:"environment_json,omitempty"`
-		HealthCheckHTTPEndpoint string             `json:"health_check_http_endpoint,omitempty"`
-		HealthCheckTimeout      int                `json:"health_check_timeout,omitempty"`
-		HealthCheckType         string             `json:"health_check_type,omitempty"`
-		Instances               *int               `json:"instances,omitempty"`
-		Memory                  uint64             `json:"memory,omitempty"`
-		Name                    string             `json:"name,omitempty"`
-		SpaceGUID               string             `json:"space_guid,omitempty"`
-		StackGUID               string             `json:"stack_guid,omitempty"`
-		State                   ApplicationState   `json:"state,omitempty"`
+		Buildpack               *string                    `json:"buildpack,omitempty"`
+		Command                 *string                    `json:"command,omitempty"`
+		DiskQuota               uint64                     `json:"disk_quota,omitempty"`
+		DockerCredentials       *DockerCredentials         `json:"docker_credentials,omitempty"`
+		DockerImage             string                     `json:"docker_image,omitempty"`
+		EnvironmentVariables    map[string]string          `json:"environment_json,omitempty"`
+		HealthCheckHTTPEndpoint string                     `json:"health_check_http_endpoint,omitempty"`
+		HealthCheckTimeout      int                        `json:"health_check_timeout,omitempty"`
+		HealthCheckType         ApplicationHealthCheckType `json:"health_check_type,omitempty"`
+		Instances               *int                       `json:"instances,omitempty"`
+		Memory                  uint64                     `json:"memory,omitempty"`
+		Name                    string                     `json:"name,omitempty"`
+		SpaceGUID               string                     `json:"space_guid,omitempty"`
+		StackGUID               string                     `json:"stack_guid,omitempty"`
+		State                   ApplicationState           `json:"state,omitempty"`
 	}{
 		DiskQuota:               application.DiskQuota,
 		DockerImage:             application.DockerImage,
@@ -210,7 +219,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.GUID = ccApp.Metadata.GUID
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.HealthCheckTimeout = ccApp.Entity.HealthCheckTimeout
-	application.HealthCheckType = ccApp.Entity.HealthCheckType
+	application.HealthCheckType = ApplicationHealthCheckType(ccApp.Entity.HealthCheckType)
 	application.Memory = ccApp.Entity.Memory
 	application.Name = ccApp.Entity.Name
 	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)

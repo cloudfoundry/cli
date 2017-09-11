@@ -17,6 +17,8 @@ const (
 	ApplicationStateStarting ApplicationStateChange = "starting"
 )
 
+type ApplicationHealthCheckType ccv2.ApplicationHealthCheckType
+
 // Application represents an application.
 type Application ccv2.Application
 
@@ -194,8 +196,8 @@ func (actor Actor) GetRouteApplications(routeGUID string) ([]Application, Warnin
 
 // SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
 // check type if it is not already the desired type.
-func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (Application, Warnings, error) {
-	if httpEndpoint != "/" && healthCheckType != "http" {
+func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType ApplicationHealthCheckType, httpEndpoint string) (Application, Warnings, error) {
+	if httpEndpoint != "/" && healthCheckType != ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) {
 		return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
 	}
 
@@ -208,16 +210,16 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 		return Application{}, allWarnings, err
 	}
 
-	if app.HealthCheckType != healthCheckType ||
-		healthCheckType == "http" && app.HealthCheckHTTPEndpoint != httpEndpoint {
+	if app.HealthCheckType != ccv2.ApplicationHealthCheckType(healthCheckType) ||
+		healthCheckType == ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) && app.HealthCheckHTTPEndpoint != httpEndpoint {
 		var healthCheckEndpoint string
-		if healthCheckType == "http" {
+		if healthCheckType == ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) {
 			healthCheckEndpoint = httpEndpoint
 		}
 
 		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:                    app.GUID,
-			HealthCheckType:         healthCheckType,
+			HealthCheckType:         ccv2.ApplicationHealthCheckType(healthCheckType),
 			HealthCheckHTTPEndpoint: healthCheckEndpoint,
 		})
 

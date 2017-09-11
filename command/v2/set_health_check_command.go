@@ -13,7 +13,7 @@ import (
 
 //go:generate counterfeiter . SetHealthCheckActor
 type SetHealthCheckActor interface {
-	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType v2action.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
@@ -82,7 +82,7 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 	app, warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
-		cmd.RequiredArgs.HealthCheck.Type,
+		v2action.ApplicationHealthCheckType(cmd.RequiredArgs.HealthCheck.Type),
 		cmd.HTTPEndpoint,
 	)
 	cmd.UI.DisplayWarnings(warnings)
