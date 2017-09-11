@@ -9,12 +9,12 @@ import (
 )
 
 type FakeSetHealthCheckActor struct {
-	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpaceStub        func(name string, spaceGUID string, healthCheckType v2action.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
 	setApplicationHealthCheckTypeByNameAndSpaceMutex       sync.RWMutex
 	setApplicationHealthCheckTypeByNameAndSpaceArgsForCall []struct {
 		name            string
 		spaceGUID       string
-		healthCheckType string
+		healthCheckType v2action.ApplicationHealthCheckType
 		httpEndpoint    string
 	}
 	setApplicationHealthCheckTypeByNameAndSpaceReturns struct {
@@ -40,13 +40,13 @@ type FakeSetHealthCheckActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType string, httpEndpoint string) (v2action.Application, v2action.Warnings, error) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType v2action.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.setApplicationHealthCheckTypeByNameAndSpaceReturnsOnCall[len(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall)]
 	fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall = append(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall, struct {
 		name            string
 		spaceGUID       string
-		healthCheckType string
+		healthCheckType v2action.ApplicationHealthCheckType
 		httpEndpoint    string
 	}{name, spaceGUID, healthCheckType, httpEndpoint})
 	fake.recordInvocation("SetApplicationHealthCheckTypeByNameAndSpace", []interface{}{name, spaceGUID, healthCheckType, httpEndpoint})
@@ -66,7 +66,7 @@ func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpace
 	return len(fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeSetHealthCheckActor) SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(i int) (string, string, v2action.ApplicationHealthCheckType, string) {
 	fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RLock()
 	defer fake.setApplicationHealthCheckTypeByNameAndSpaceMutex.RUnlock()
 	return fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].name, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].spaceGUID, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].healthCheckType, fake.setApplicationHealthCheckTypeByNameAndSpaceArgsForCall[i].httpEndpoint

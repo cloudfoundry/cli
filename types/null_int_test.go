@@ -14,6 +14,23 @@ var _ = Describe("NullInt", func() {
 		nullInt = NullInt{}
 	})
 
+	Describe("ParseIntValue", func() {
+		Context("when nil is provided", func() {
+			It("sets IsSet to false", func() {
+				nullInt.ParseIntValue(nil)
+				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
+			})
+		})
+
+		Context("when non-nil pointer is provided", func() {
+			It("sets IsSet to true and Value to provided value", func() {
+				n := 5
+				nullInt.ParseIntValue(&n)
+				Expect(nullInt).To(Equal(NullInt{Value: 5, IsSet: true}))
+			})
+		})
+	})
+
 	Describe("ParseFlagValue", func() {
 		Context("when the empty string is provided", func() {
 			It("sets IsSet to false", func() {

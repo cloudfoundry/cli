@@ -30,6 +30,18 @@ func (n *NullInt) ParseFlagValue(val string) error {
 	return nil
 }
 
+// ParseIntValue is used to parse a user provided *int argument.
+func (n *NullInt) ParseIntValue(val *int) {
+	if val == nil {
+		n.IsSet = false
+		n.Value = 0
+		return
+	}
+
+	n.Value = *val
+	n.IsSet = true
+}
+
 func (n *NullInt) UnmarshalJSON(rawJSON []byte) error {
 	var value json.Number
 	err := json.Unmarshal(rawJSON, &value)

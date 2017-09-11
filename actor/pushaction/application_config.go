@@ -234,7 +234,7 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 		application.HealthCheckTimeout = manifest.HealthCheckTimeout
 	}
 	if manifest.HealthCheckType != "" {
-		application.HealthCheckType = manifest.HealthCheckType
+		application.HealthCheckType = ccv2.ApplicationHealthCheckType(manifest.HealthCheckType)
 	}
 	if manifest.Instances.IsSet {
 		application.Instances = manifest.Instances

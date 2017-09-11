@@ -184,7 +184,7 @@ var _ = Describe("set-health-check Command", func() {
 			name, spaceGUID, healthCheckType, healthCheckHTTPEndpoint := fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceArgsForCall(0)
 			Expect(name).To(Equal("some-app"))
 			Expect(spaceGUID).To(Equal("some-space-guid"))
-			Expect(healthCheckType).To(Equal("some-health-check-type"))
+			Expect(healthCheckType).To(Equal(v2action.ApplicationHealthCheckType("some-health-check-type")))
 			Expect(healthCheckHTTPEndpoint).To(Equal("/"))
 		})
 	})

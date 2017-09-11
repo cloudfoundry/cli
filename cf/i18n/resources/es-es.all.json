@@ -804,7 +804,7 @@
     "translation": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]"
   },
   {
-    "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml]",
+    "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e_manifest.yml]",
     "translation": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]"
   },
   {
@@ -2174,6 +2174,10 @@
   {
     "id": "Creating an app manifest from current settings of app ",
     "translation": "Creación de un manifiesto de app de valores actuales de la app "
+  },
+  {
+    "id": "Creating an app manifest from current settings of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Creating app with these attributes...",
@@ -4130,6 +4134,10 @@
   {
     "id": "Manifest file created successfully at ",
     "translation": "Se ha creado correctamente el archivo de manifiesto en "
+  },
+  {
+    "id": "Manifest file created successfully at {{.FilePath}}",
+    "translation": ""
   },
   {
     "id": "Map a TCP route",
