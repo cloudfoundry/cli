@@ -23,7 +23,7 @@ var _ = Describe("Application Summaries Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil)
 	})
 
-	Describe("GetApplicationSummariesBySpace", func() {
+	Describe("GetApplicationsWithProcessesBySpace", func() {
 		Context("when there are apps", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
@@ -91,9 +91,9 @@ var _ = Describe("Application Summaries Actions", func() {
 			})
 
 			It("returns app summaries and warnings", func() {
-				summaries, warnings, err := actor.GetApplicationSummariesBySpace("some-space-guid")
+				summaries, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(summaries).To(Equal([]ApplicationSummary{
+				Expect(summaries).To(Equal([]ApplicationWithProcessSummary{
 					{
 						Application: Application{
 							Name:  "some-app-name-1",
@@ -176,7 +176,7 @@ var _ = Describe("Application Summaries Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.GetApplicationSummariesBySpace("some-space-guid")
+				_, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
 			})
@@ -218,7 +218,7 @@ var _ = Describe("Application Summaries Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, warnings, err := actor.GetApplicationSummariesBySpace("some-space-guid")
+				_, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-process-stats-warning"}))
 			})

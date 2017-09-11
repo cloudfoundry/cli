@@ -18,18 +18,18 @@ type FakeV3AppsActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	GetApplicationSummariesBySpaceStub        func(spaceGUID string) ([]v3action.ApplicationSummary, v3action.Warnings, error)
-	getApplicationSummariesBySpaceMutex       sync.RWMutex
-	getApplicationSummariesBySpaceArgsForCall []struct {
+	GetApplicationsWithProcessesBySpaceStub        func(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error)
+	getApplicationsWithProcessesBySpaceMutex       sync.RWMutex
+	getApplicationsWithProcessesBySpaceArgsForCall []struct {
 		spaceGUID string
 	}
-	getApplicationSummariesBySpaceReturns struct {
-		result1 []v3action.ApplicationSummary
+	getApplicationsWithProcessesBySpaceReturns struct {
+		result1 []v3action.ApplicationWithProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}
-	getApplicationSummariesBySpaceReturnsOnCall map[int]struct {
-		result1 []v3action.ApplicationSummary
+	getApplicationsWithProcessesBySpaceReturnsOnCall map[int]struct {
+		result1 []v3action.ApplicationWithProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}
@@ -77,55 +77,55 @@ func (fake *FakeV3AppsActor) CloudControllerAPIVersionReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeV3AppsActor) GetApplicationSummariesBySpace(spaceGUID string) ([]v3action.ApplicationSummary, v3action.Warnings, error) {
-	fake.getApplicationSummariesBySpaceMutex.Lock()
-	ret, specificReturn := fake.getApplicationSummariesBySpaceReturnsOnCall[len(fake.getApplicationSummariesBySpaceArgsForCall)]
-	fake.getApplicationSummariesBySpaceArgsForCall = append(fake.getApplicationSummariesBySpaceArgsForCall, struct {
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]v3action.ApplicationWithProcessSummary, v3action.Warnings, error) {
+	fake.getApplicationsWithProcessesBySpaceMutex.Lock()
+	ret, specificReturn := fake.getApplicationsWithProcessesBySpaceReturnsOnCall[len(fake.getApplicationsWithProcessesBySpaceArgsForCall)]
+	fake.getApplicationsWithProcessesBySpaceArgsForCall = append(fake.getApplicationsWithProcessesBySpaceArgsForCall, struct {
 		spaceGUID string
 	}{spaceGUID})
-	fake.recordInvocation("GetApplicationSummariesBySpace", []interface{}{spaceGUID})
-	fake.getApplicationSummariesBySpaceMutex.Unlock()
-	if fake.GetApplicationSummariesBySpaceStub != nil {
-		return fake.GetApplicationSummariesBySpaceStub(spaceGUID)
+	fake.recordInvocation("GetApplicationsWithProcessesBySpace", []interface{}{spaceGUID})
+	fake.getApplicationsWithProcessesBySpaceMutex.Unlock()
+	if fake.GetApplicationsWithProcessesBySpaceStub != nil {
+		return fake.GetApplicationsWithProcessesBySpaceStub(spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.getApplicationSummariesBySpaceReturns.result1, fake.getApplicationSummariesBySpaceReturns.result2, fake.getApplicationSummariesBySpaceReturns.result3
+	return fake.getApplicationsWithProcessesBySpaceReturns.result1, fake.getApplicationsWithProcessesBySpaceReturns.result2, fake.getApplicationsWithProcessesBySpaceReturns.result3
 }
 
-func (fake *FakeV3AppsActor) GetApplicationSummariesBySpaceCallCount() int {
-	fake.getApplicationSummariesBySpaceMutex.RLock()
-	defer fake.getApplicationSummariesBySpaceMutex.RUnlock()
-	return len(fake.getApplicationSummariesBySpaceArgsForCall)
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceCallCount() int {
+	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
+	return len(fake.getApplicationsWithProcessesBySpaceArgsForCall)
 }
 
-func (fake *FakeV3AppsActor) GetApplicationSummariesBySpaceArgsForCall(i int) string {
-	fake.getApplicationSummariesBySpaceMutex.RLock()
-	defer fake.getApplicationSummariesBySpaceMutex.RUnlock()
-	return fake.getApplicationSummariesBySpaceArgsForCall[i].spaceGUID
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceArgsForCall(i int) string {
+	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
+	return fake.getApplicationsWithProcessesBySpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeV3AppsActor) GetApplicationSummariesBySpaceReturns(result1 []v3action.ApplicationSummary, result2 v3action.Warnings, result3 error) {
-	fake.GetApplicationSummariesBySpaceStub = nil
-	fake.getApplicationSummariesBySpaceReturns = struct {
-		result1 []v3action.ApplicationSummary
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceReturns(result1 []v3action.ApplicationWithProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.GetApplicationsWithProcessesBySpaceStub = nil
+	fake.getApplicationsWithProcessesBySpaceReturns = struct {
+		result1 []v3action.ApplicationWithProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3AppsActor) GetApplicationSummariesBySpaceReturnsOnCall(i int, result1 []v3action.ApplicationSummary, result2 v3action.Warnings, result3 error) {
-	fake.GetApplicationSummariesBySpaceStub = nil
-	if fake.getApplicationSummariesBySpaceReturnsOnCall == nil {
-		fake.getApplicationSummariesBySpaceReturnsOnCall = make(map[int]struct {
-			result1 []v3action.ApplicationSummary
+func (fake *FakeV3AppsActor) GetApplicationsWithProcessesBySpaceReturnsOnCall(i int, result1 []v3action.ApplicationWithProcessSummary, result2 v3action.Warnings, result3 error) {
+	fake.GetApplicationsWithProcessesBySpaceStub = nil
+	if fake.getApplicationsWithProcessesBySpaceReturnsOnCall == nil {
+		fake.getApplicationsWithProcessesBySpaceReturnsOnCall = make(map[int]struct {
+			result1 []v3action.ApplicationWithProcessSummary
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.getApplicationSummariesBySpaceReturnsOnCall[i] = struct {
-		result1 []v3action.ApplicationSummary
+	fake.getApplicationsWithProcessesBySpaceReturnsOnCall[i] = struct {
+		result1 []v3action.ApplicationWithProcessSummary
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -136,8 +136,8 @@ func (fake *FakeV3AppsActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.getApplicationSummariesBySpaceMutex.RLock()
-	defer fake.getApplicationSummariesBySpaceMutex.RUnlock()
+	fake.getApplicationsWithProcessesBySpaceMutex.RLock()
+	defer fake.getApplicationsWithProcessesBySpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
