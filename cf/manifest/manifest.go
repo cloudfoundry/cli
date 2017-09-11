@@ -210,7 +210,9 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.Routes = parseRoutes(yamlMap, &errs)
 
 	docker := parseDocker(yamlMap, &errs)
-	appParams.DockerImage = &docker.Image
+	if docker.Image != "" {
+		appParams.DockerImage = &docker.Image
+	}
 
 	if appParams.Path != nil {
 		path := *appParams.Path
