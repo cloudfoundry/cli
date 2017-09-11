@@ -517,7 +517,9 @@ var _ = Describe("Job", func() {
 						defer GinkgoRecover() // Since this will be running in a thread
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
-							defer request.Body.Close()
+							_, err := ioutil.ReadAll(request.Body)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(request.Body.Close()).ToNot(HaveOccurred())
 							return request.ResetBody()
 						}
 						return connection.Make(request, response)
