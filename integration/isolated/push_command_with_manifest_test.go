@@ -32,7 +32,6 @@ var _ = Describe("Push with manifest", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(f.Close()).To(Succeed())
 		tempFile = f.Name()
-
 	})
 
 	AfterEach(func() {
@@ -41,8 +40,8 @@ var _ = Describe("Push with manifest", func() {
 
 	Context("when the specified manifest file does not exist", func() {
 		It("displays a path does not exist error, help, and exits 1", func() {
-			session := helpers.CF("push", "-f", "./non-existant-file")
-			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path './non-existant-file' does not exist."))
+			session := helpers.CF("push", "-f", "./non-existent-file")
+			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path './non-existent-file' does not exist."))
 			Eventually(session.Out).Should(Say("NAME:"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session).Should(Exit(1))
@@ -63,9 +62,13 @@ applications:
 
 		It("overrides 'docker' in the manifest with the '-o' flag value", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
-				session := helpers.CF("push", "-o", dockerImage, "-f", tempFile)
-				Eventually(session).Should(Say(dockerImage))
-				Eventually(session).Should(Exit())
+				Eventually(helpers.CF("push", "-o", dockerImage, "-f", tempFile)).Should(Exit(0))
+
+				appGUID := helpers.AppGUID(appName)
+				// TODO: replace this with 'cf app' once #146661157 is complete
+				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
