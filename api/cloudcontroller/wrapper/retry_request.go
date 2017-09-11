@@ -31,20 +31,13 @@ func (retry *RetryRequest) Wrap(innerconnection cloudcontroller.Connection) clou
 func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	var err error
 
-	for i := 0; i < retry.maxRetries+1; i += 1 {
+	for i := 0; i < retry.maxRetries+1; i++ {
 		err = retry.connection.Make(request, passedResponse)
 		if err == nil {
 			return nil
 		}
 
-		// do not retry if the request method is POST, or not one of the following
-		// http status codes: 500, 502, 503, 504
-		if request.Method == http.MethodPost ||
-			passedResponse.HTTPResponse != nil &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusInternalServerError &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusBadGateway &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusServiceUnavailable &&
-				passedResponse.HTTPResponse.StatusCode != http.StatusGatewayTimeout {
+		if retry.skipRetry(request.Method, passedResponse.HTTPResponse) {
 			break
 		}
 
@@ -58,4 +51,15 @@ func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse
 		}
 	}
 	return err
+}
+
+// skipRetry if the request method is POST, or not one of the following http
+// status codes: 500, 502, 503, 504.
+func (*RetryRequest) skipRetry(httpMethod string, response *http.Response) bool {
+	return httpMethod == http.MethodPost ||
+		response != nil &&
+			response.StatusCode != http.StatusInternalServerError &&
+			response.StatusCode != http.StatusBadGateway &&
+			response.StatusCode != http.StatusServiceUnavailable &&
+			response.StatusCode != http.StatusGatewayTimeout
 }

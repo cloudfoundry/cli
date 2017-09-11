@@ -56,7 +56,7 @@ var _ = Describe("Retry Request", func() {
 		Entry("1 for Post (503) Service Unavailable", http.MethodPost, http.StatusServiceUnavailable, 1),
 		Entry("1 for Post (504) Gateway Timeout", http.MethodPost, http.StatusGatewayTimeout, 1),
 
-		Entry("1 for Post 4XX Errors", http.MethodGet, http.StatusNotFound, 1),
+		Entry("1 for Get 4XX Errors", http.MethodGet, http.StatusNotFound, 1),
 	)
 
 	It("does not retry on success", func() {
