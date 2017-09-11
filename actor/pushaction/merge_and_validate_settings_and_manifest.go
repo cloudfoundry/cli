@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
+	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
 

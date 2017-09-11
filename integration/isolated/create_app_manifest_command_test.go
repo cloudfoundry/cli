@@ -7,8 +7,8 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"

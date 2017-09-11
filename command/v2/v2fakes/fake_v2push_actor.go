@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actor/pushaction"
-	"code.cloudfoundry.org/cli/actor/pushaction/manifest"
 	"code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 type FakeV2PushActor struct {
