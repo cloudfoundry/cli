@@ -240,7 +240,9 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
 				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
 				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
-				Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
+
+				// TODO: Uncomment when capi sorts out droplet buildpack name/detectoutput
+				// Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("web:1/1"))
 				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
@@ -497,7 +499,9 @@ var _ = Describe("v3-push command", func() {
 					Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
 					Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
 					Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
-					Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
+
+					// TODO: Uncomment when capi sorts out droplet buildpack name/detectoutput
+					// Eventually(session.Out).Should(Say("buildpacks:\\s+https://github.com/cloudfoundry/staticfile-buildpack"))
 					Eventually(session.Out).Should(Say(""))
 					Eventually(session.Out).Should(Say("web:1/1"))
 					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
