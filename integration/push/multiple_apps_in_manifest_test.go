@@ -2,7 +2,6 @@ package push
 
 import (
 	"path/filepath"
-	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
@@ -44,14 +43,12 @@ var _ = Describe("pushes multiple apps with a single manifest file", func() {
 					// firstApp
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", firstApp))
-					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", firstApp, defaultSharedDomain()))
 
 					// secondApp
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", secondApp))
-					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", secondApp, defaultSharedDomain()))
 

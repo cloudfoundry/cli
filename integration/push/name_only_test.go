@@ -1,7 +1,6 @@
 package push
 
 import (
-	"regexp"
 	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -29,7 +28,6 @@ var _ = Describe("push with only an app name", func() {
 					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
@@ -63,7 +61,6 @@ var _ = Describe("push with only an app name", func() {
 					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 					Eventually(session).Should(Say("Updating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("(?m)^\\s+name:\\s+%s$", appName))
-					Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 					Eventually(session).Should(Say("\\s+routes:"))
 					Eventually(session).Should(Say("(?mi)^\\s+%s.%s$", strings.ToLower(appName), defaultSharedDomain()))
 					Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
