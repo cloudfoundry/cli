@@ -3,6 +3,7 @@ package pushaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -245,7 +246,7 @@ var _ = Describe("Routes", func() {
 					})
 
 					It("returns back warnings and error", func() {
-						Expect(executeErr).To(MatchError(v2action.DomainNotFoundError{Name: "a.com"}))
+						Expect(executeErr).To(MatchError(actionerror.NoMatchingDomainError{Route: "a.com"}))
 						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
 					})
 				})

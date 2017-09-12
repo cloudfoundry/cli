@@ -60,6 +60,8 @@ func HandleError(err error) error {
 		return translatableerror.EmptyDirectoryError(e)
 	case v2action.DomainNotFoundError:
 		return translatableerror.DomainNotFoundError(e)
+	case actionerror.NoMatchingDomainError:
+		return translatableerror.NoMatchingDomainError(e)
 
 	case pushaction.AppNotFoundInManifestError:
 		return translatableerror.AppNotFoundInManifestError(e)

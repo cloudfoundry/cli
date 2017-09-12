@@ -66,6 +66,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NoCompatibleBinaryError", NoCompatibleBinaryError{}),
 		Entry("NoDomainsFoundError", NoDomainsFoundError{}),
+		Entry("NoMatchingDomainError", NoMatchingDomainError{}),
 		Entry("NoOrganizationTargetedError", NoOrganizationTargetedError{}),
 		Entry("NoPluginRepositoriesError", NoPluginRepositoriesError{}),
 		Entry("NoSpaceTargetedError", NoSpaceTargetedError{}),
