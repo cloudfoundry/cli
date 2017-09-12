@@ -10,7 +10,7 @@ type Port struct {
 }
 
 func (i *Port) UnmarshalFlag(val string) error {
-	err := i.ParseFlagValue(val)
+	err := i.ParseStringValue(val)
 	if err != nil || i.Value < 0 {
 		return &flags.Error{
 			Type:    flags.ErrRequired,

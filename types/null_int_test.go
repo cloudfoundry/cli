@@ -31,10 +31,10 @@ var _ = Describe("NullInt", func() {
 		})
 	})
 
-	Describe("ParseFlagValue", func() {
+	Describe("ParseStringValue", func() {
 		Context("when the empty string is provided", func() {
 			It("sets IsSet to false", func() {
-				err := nullInt.ParseFlagValue("")
+				err := nullInt.ParseStringValue("")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})
@@ -42,7 +42,7 @@ var _ = Describe("NullInt", func() {
 
 		Context("when an invalid integer is provided", func() {
 			It("returns an error", func() {
-				err := nullInt.ParseFlagValue("abcdef")
+				err := nullInt.ParseStringValue("abcdef")
 				Expect(err).To(HaveOccurred())
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: false}))
 			})
@@ -50,7 +50,7 @@ var _ = Describe("NullInt", func() {
 
 		Context("when a valid integer is provided", func() {
 			It("stores the integer and sets IsSet to true", func() {
-				err := nullInt.ParseFlagValue("0")
+				err := nullInt.ParseStringValue("0")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(nullInt).To(Equal(NullInt{Value: 0, IsSet: true}))
 			})
