@@ -23,6 +23,7 @@ type Droplet struct {
 	CreatedAt  string             `json:"created_at"`
 	Stack      string             `json:"stack,omitempty"`
 	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
+	Image      string             `json:"image"`
 }
 
 type DropletBuildpack struct {

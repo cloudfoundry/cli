@@ -173,6 +173,7 @@ var _ = Describe("Droplet", func() {
 							"detect_output": "detected-buildpack"
 						}
 					],
+					"image": "docker/some-image",
 					"stack": "some-stack",
 					"created_at": "2016-03-28T23:39:34Z",
 					"updated_at": "2016-03-28T23:39:47Z"
@@ -199,6 +200,7 @@ var _ = Describe("Droplet", func() {
 							DetectOutput: "detected-buildpack",
 						},
 					},
+					Image:     "docker/some-image",
 					CreatedAt: "2016-03-28T23:39:34Z",
 				}))
 				Expect(warnings).To(ConsistOf("warning-1"))

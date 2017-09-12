@@ -227,6 +227,34 @@ var _ = Describe("v3-app command", func() {
 			})
 		})
 
+		Context("when the app is a docker app", func() {
+			var domainName string
+
+			BeforeEach(func() {
+				Eventually(helpers.CF("v3-push", appName, "-o", PublicDockerImage)).Should(Exit(0))
+				domainName = defaultSharedDomain()
+			})
+
+			It("displays the app summary", func() {
+				userName, _ := helpers.GetCredentials()
+
+				session := helpers.CF("v3-app", appName)
+				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+
+				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+				Eventually(session.Out).Should(Say("requested state:\\s+started"))
+				Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+[KMG] x 1"))
+				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session.Out).Should(Say("stack:\\s+"))
+				Eventually(session.Out).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
+				Eventually(session.Out).Should(Say("web:1/1"))
+				Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"
