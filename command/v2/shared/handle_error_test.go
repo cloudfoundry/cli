@@ -110,6 +110,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 		),
 
+		Entry("actionerror.NoMatchingDomainError -> NoMatchingDomainError",
+			actionerror.NoMatchingDomainError{Route: "some-route.com"},
+			translatableerror.NoMatchingDomainError{Route: "some-route.com"},
+		),
+
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
 			uaa.BadCredentialsError{},
 			translatableerror.BadCredentialsError{},

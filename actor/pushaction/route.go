@@ -3,6 +3,7 @@ package pushaction
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	log "github.com/sirupsen/logrus"
 )
@@ -41,17 +42,23 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 	foundDomains, warnings, err := actor.V2Actor.GetDomainsByNameAndOrganization(possibleDomains, orgGUID)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
+		log.Errorln("domain lookup:", err)
 		return nil, allWarnings, err
 	}
 	nameToFoundDomain := map[string]v2action.Domain{}
 	for _, foundDomain := range foundDomains {
+		log.WithField("domain", foundDomain.Name).Debug("found domain")
 		nameToFoundDomain[foundDomain.Name] = foundDomain
 	}
 
 	for _, route := range unknownRoutes {
 		log.WithField("route", route).Debug("generating route")
 		host, domain, domainErr := actor.calculateRoute(route, nameToFoundDomain)
-		if domainErr != nil {
+		if _, ok := domainErr.(v2action.DomainNotFoundError); ok {
+			log.Error("no matching domains")
+			return nil, allWarnings, actionerror.NoMatchingDomainError{Route: route}
+		} else if domainErr != nil {
+			log.Errorln("matching domains:", domainErr)
 			return nil, allWarnings, domainErr
 		}
 
@@ -62,6 +69,7 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 		})
 		allWarnings = append(allWarnings, routeWarnings...)
 		if routeErr != nil {
+			log.Errorln("route lookup:", routeErr)
 			return nil, allWarnings, routeErr
 		}
 
@@ -122,7 +130,7 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 
 	for _, route := range config.DesiredRoutes {
 		if route.GUID == "" {
-			log.Debugf("creating route: %#v", route)
+			log.WithField("route", route).Debug("creating route")
 
 			createdRoute, warnings, err := actor.V2Actor.CreateRoute(route, false)
 			allWarnings = append(allWarnings, warnings...)
@@ -192,7 +200,6 @@ func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.
 	hosts = append([]string{host}, hosts...)
 
 	return hosts, foundDomain, err
-
 }
 
 func (actor Actor) findOrReturnPartialRouteWithSettings(route v2action.Route) (v2action.Route, Warnings, error) {
@@ -219,6 +226,8 @@ func (actor Actor) generatePossibleDomains(routes []string) []string {
 	for domain := range possibleDomains {
 		domains = append(domains, domain)
 	}
+
+	log.Debugln("domain brakedown:", strings.Join(domains, ","))
 	return domains
 }
 
@@ -233,7 +242,6 @@ func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName str
 		Domain:    defaultDomain,
 		SpaceGUID: spaceGUID,
 	}, domainWarnings, nil
-
 }
 
 func (Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
@@ -271,6 +279,7 @@ func (actor Actor) spitExistingRoutes(existingRoutes []v2action.Route, routes []
 	var unknownRoutes []string
 	for _, route := range routes {
 		if cachedRoute, found := actor.routeInListByName(route, existingRoutes); found {
+			log.WithField("route", cachedRoute).Debug("using cached route")
 			calculatedRoutes = append(calculatedRoutes, cachedRoute)
 		} else {
 			unknownRoutes = append(unknownRoutes, route)
