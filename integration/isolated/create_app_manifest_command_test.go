@@ -1,17 +1,18 @@
 package isolated
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	yaml "gopkg.in/yaml.v2"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func createManifest(appName string) (manifest.Manifest, error) {
@@ -22,7 +23,7 @@ func createManifest(appName string) (manifest.Manifest, error) {
 	}
 
 	manifestPath := filepath.Join(tmpDir, "manifest.yml")
-	Eventually(helpers.CF("create-app-manifest", appName, "-p", manifestPath)).Should(Exit(0))
+	Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tmpDir}, "create-app-manifest", appName, "-p", manifestPath)).Should(Exit(0))
 
 	manifestContents, err := ioutil.ReadFile(manifestPath)
 	if err != nil {
@@ -30,7 +31,7 @@ func createManifest(appName string) (manifest.Manifest, error) {
 	}
 
 	var appsManifest manifest.Manifest
-	err = yaml.Unmarshal(manifestContents, appsManifest)
+	err = yaml.Unmarshal(manifestContents, &appsManifest)
 	if err != nil {
 		return manifest.Manifest{}, err
 	}
@@ -39,121 +40,270 @@ func createManifest(appName string) (manifest.Manifest, error) {
 }
 
 var _ = Describe("create-app-manifest command", func() {
-	var (
-		orgName   string
-		spaceName string
-		appName   string
-	)
+	var appName string
+	var manifestFilePath string
+	var tempDir string
 
 	BeforeEach(func() {
-		orgName = helpers.NewOrgName()
-		spaceName = helpers.NewSpaceName()
+		appName = helpers.NewAppName()
+		var err error
+		tempDir, err = ioutil.TempDir("", "create-manifest")
+		Expect(err).ToNot(HaveOccurred())
 
-		appName = helpers.PrefixedRandomName("app")
-
-		setupCF(orgName, spaceName)
+		manifestFilePath = filepath.Join(tempDir, fmt.Sprintf("%s_manifest.yml", appName))
 	})
 
-	Context("when app has no hostname", func() {
-		var domain helpers.Domain
+	AfterEach(func() {
+		os.RemoveAll(tempDir)
+	})
+
+	Context("Help", func() {
+		It("displays the help information", func() {
+			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", "--help")
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session.Out).Should(Say("create-app-manifest - Create an app manifest for an app that has been pushed successfully"))
+			Eventually(session.Out).Should(Say("USAGE:"))
+			Eventually(session.Out).Should(Say("cf create-app-manifest APP_NAME \\[-p \\/path\\/to\\/<app-name>_manifest\\.yml\\]"))
+			Eventually(session.Out).Should(Say(""))
+			Eventually(session.Out).Should(Say("OPTIONS:"))
+			Eventually(session.Out).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
+			Eventually(session.Out).Should(Say("SEE ALSO:"))
+			Eventually(session.Out).Should(Say("apps, push"))
+
+		})
+	})
+
+	Context("when the environment is not setup correctly", func() {
+		Context("when no API endpoint is set", func() {
+			BeforeEach(func() {
+				helpers.UnsetAPI()
+			})
+
+			It("fails with no API endpoint set message", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when not logged in", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+			})
+
+			It("fails with not logged in message", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no org set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+			})
+
+			It("fails with no targeted org error message", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+
+		Context("when there is no space set", func() {
+			BeforeEach(func() {
+				helpers.LogoutCF()
+				helpers.LoginCF()
+				helpers.TargetOrg(ReadOnlyOrg)
+			})
+
+			It("fails with no targeted space error message", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
+	Context("when app name not provided", func() {
+		It("displays a usage error", func() {
+			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest")
+			Eventually(session.Out).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+			Eventually(session.Out).Should(Say("USAGE:"))
+		})
+	})
+
+	FContext("when the environment is setup correctly", func() {
+		var (
+			orgName   string
+			spaceName string
+			userName  string
+
+			domainName string
+		)
 
 		BeforeEach(func() {
-			domain = helpers.NewDomain(orgName, helpers.DomainName(""))
-			domain.Create()
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.NewSpaceName()
 
-			helpers.WithHelloWorldApp(func(appDir string) {
-				Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-hostname", "-d", domain.Name)).Should(Exit(0))
+			setupCF(orgName, spaceName)
+			userName, _ = helpers.GetCredentials()
+			domainName = defaultSharedDomain()
+		})
+
+		Context("when the app does not exist", func() {
+			It("displays a usage error", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("App %s not found", appName))
 			})
 		})
 
-		It("contains routes without hostnames", func() {
-			manifest, err := createManifest(appName)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(manifest.Applications).To(HaveLen(1))
-			Expect(manifest.Applications[0].Routes).To(HaveLen(1))
-			Expect(manifest.Applications[0].Routes[0]).To(Equal(domain.Name))
-		})
-	})
-
-	Context("health check type", func() {
-		Context("when the health check type is port", func() {
+		Context("when the app exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "port")).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v2-push", appName)).Should(Exit(0))
 				})
 			})
 
-			It("does not write the type or endpoint to the manifest", func() {
-				manifest, err := createManifest(appName)
+			It("creates the manifest", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+				Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Manifest file created successfully at ./%s_manifest.yml", appName))
+
+				expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, appName, domainName)
+
+				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
-
-				Expect(manifest.Applications).To(HaveLen(1))
-				Expect(manifest.Applications[0].HealthCheckType).To(BeEmpty())
-				Expect(manifest.Applications[0].HealthCheckHTTPEndpoint).To(BeEmpty())
+				Expect(string(createdFile)).To(Equal(expectedFile))
 			})
 
-			Context("when the health check http endpoint is not /", func() {
-				BeforeEach(func() {
-					Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
-					Eventually(helpers.CF("set-health-check", appName, "port")).Should(Exit(0))
+			Context("when the -p flag is provided", func() {
+				Context("when the specified file is a directory", func() {
+					It("displays a file creation error", func() {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
+						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", tempDir))
+					})
 				})
 
-				It("still does not write the endpoint to the manifest", func() {
-					manifest, err := createManifest(appName)
-					Expect(err).ToNot(HaveOccurred())
+				Context("when you don't have permissions to write the specified file", func() {
+					var tempFile string
 
-					Expect(manifest.Applications).To(HaveLen(1))
-					Expect(manifest.Applications[0].HealthCheckHTTPEndpoint).To(BeEmpty())
+					BeforeEach(func() {
+						tempFile = filepath.Join(tempDir, "some-file")
+						f, err := os.OpenFile(tempFile, os.O_CREATE, 0000)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(f.Close()).To(Succeed())
+					})
+
+					It("displays a file creation error", func() {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempFile)
+						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: permission denied", tempFile))
+					})
+				})
+
+				Context("when the specified file does not exist", func() {
+					var newFile string
+
+					BeforeEach(func() {
+						newFile = filepath.Join(tempDir, "new-file.yml")
+					})
+
+					It("creates the manifest in the file", func() {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", newFile)
+						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("Manifest file created successfully at %s", newFile))
+
+						expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, appName, domainName)
+
+						createdFile, err := ioutil.ReadFile(newFile)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(string(createdFile)).To(Equal(expectedFile))
+					})
+				})
+
+				Context("when the specified file exists", func() {
+					var existingFile string
+
+					BeforeEach(func() {
+						existingFile = filepath.Join(tempDir, "some-file")
+						f, err := os.Create(existingFile)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(f.Close()).To(Succeed())
+					})
+
+					It("overrides the previous file with the new manifest", func() {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", existingFile)
+						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("Manifest file created successfully at %s", existingFile))
+
+						expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, appName, domainName)
+
+						createdFile, err := ioutil.ReadFile(existingFile)
+						Expect(err).ToNot(HaveOccurred())
+						Expect(string(createdFile)).To(Equal(expectedFile))
+					})
 				})
 			})
+
 		})
 
-		Context("when the health check type is not port", func() {
+		Context("when app has no hostname", func() {
+			var domain helpers.Domain
+
 			BeforeEach(func() {
+				domain = helpers.NewDomain(orgName, helpers.DomainName(""))
+				domain.Create()
+
 				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
+					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-start", "-b", "staticfile_buildpack", "--no-hostname", "-d", domain.Name)).Should(Exit(0))
 				})
 			})
 
-			It("writes it to the manifest", func() {
-				manifest, err := createManifest(appName)
+			It("contains routes without hostnames", func() {
+				appManifest, err := createManifest(appName)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(manifest.Applications).To(HaveLen(1))
-				Expect(manifest.Applications[0].HealthCheckType).To(Equal("http"))
-			})
-		})
-	})
-
-	Context("health check http endpoint", func() {
-		BeforeEach(func() {
-			helpers.WithHelloWorldApp(func(appDir string) {
-				Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "-u", "http")).Should(Exit(0))
-			})
-		})
-
-		Context("when the health check http endpoint is /", func() {
-			It("does not write it to the manifest", func() {
-				manifest, err := createManifest(appName)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(manifest.Applications).To(HaveLen(1))
-				Expect(manifest.Applications[0].HealthCheckHTTPEndpoint).To(BeEmpty())
-			})
-		})
-
-		Context("when the health check endpoint is not /", func() {
-			BeforeEach(func() {
-				Eventually(helpers.CF("set-health-check", appName, "http", "--endpoint", "/some-endpoint")).Should(Exit(0))
-			})
-
-			It("writes it to the manifest", func() {
-				manifest, err := createManifest(appName)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(manifest.Applications).To(HaveLen(1))
-				Expect(manifest.Applications[0].HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
+				Expect(appManifest.Applications).To(HaveLen(1))
+				Expect(appManifest.Applications[0].Routes).To(HaveLen(1))
+				Expect(appManifest.Applications[0].Routes[0]).To(Equal(domain.Name))
 			})
 		})
 	})

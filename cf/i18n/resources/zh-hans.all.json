@@ -2756,6 +2756,10 @@
     "translation": "创建清单文件时出错: "
   },
   {
+    "id": "Error creating manifest file: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error creating request:\n{{.Err}}",
     "translation": "创建请求时出错: \n{{.Err}}"
   },

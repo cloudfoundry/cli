@@ -329,7 +329,7 @@ var _ = Describe("Manifest Actions", func() {
 
 					It("returns an ManifestCreationError", func() {
 						Expect(createErr).To(HaveOccurred())
-						Expect(createErr.Error()).To(ContainSubstring("Failed to create manifest"))
+						Expect(createErr.Error()).To(ContainSubstring("Error creating manifest file:"))
 						Expect(createWarnings).To(ConsistOf("some-app-warning", "some-routes-warning", "some-domain-warning", "some-stack-warning", "some-service-warning", "some-service-1-warning", "some-service-2-warning"))
 					})
 				})

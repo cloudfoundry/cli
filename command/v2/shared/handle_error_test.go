@@ -11,6 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -153,6 +154,11 @@ var _ = Describe("HandleError", func() {
 		Entry("pushaction.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
 			pushaction.CommandLineOptionsWithMultipleAppsError{},
 			translatableerror.CommandLineArgsWithMultipleAppsError{},
+		),
+
+		Entry("manifest.ManifestCreationError -> ManifestCreationError",
+			manifest.ManifestCreationError{Err: errors.New("some-error")},
+			translatableerror.ManifestCreationError{Err: errors.New("some-error")},
 		),
 
 		Entry("default case -> original error",

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/util/manifest"
 )
 
 func HandleError(err error) error {
@@ -75,6 +76,9 @@ func HandleError(err error) error {
 		return translatableerror.RequiredNameForPushError{}
 	case pushaction.UploadFailedError:
 		return translatableerror.UploadFailedError{Err: HandleError(e.Err)}
+
+	case manifest.ManifestCreationError:
+		return translatableerror.ManifestCreationError(e)
 	}
 
 	return err
