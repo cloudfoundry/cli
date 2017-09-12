@@ -27,11 +27,10 @@ var _ = Describe("enable-service-access command", func() {
 		tokenRefresher      *authenticationfakes.FakeRepository
 		deps                commandregistry.Dependency
 
-		serviceName            string
-		servicePlanName        string
-		publicServicePlanName  string
-		privateServicePlanName string
-		orgName                string
+		serviceName           string
+		servicePlanName       string
+		publicServicePlanName string
+		orgName               string
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -76,7 +75,6 @@ var _ = Describe("enable-service-access command", func() {
 			serviceName = "service"
 			servicePlanName = "service-plan"
 			publicServicePlanName = "public-service-plan"
-			privateServicePlanName = "private-service-plan"
 			orgName = "my-org"
 		})
 

@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	"code.cloudfoundry.org/cli/plugin"
 
 	"code.cloudfoundry.org/cli/cf/flags"
@@ -24,10 +23,9 @@ var _ = Describe("Help", func() {
 	commandsloader.Load()
 
 	var (
-		fakeFactory *requirementsfakes.FakeFactory
-		fakeUI      *terminalfakes.FakeUI
-		fakeConfig  *pluginconfigfakes.FakePluginConfiguration
-		deps        commandregistry.Dependency
+		fakeUI     *terminalfakes.FakeUI
+		fakeConfig *pluginconfigfakes.FakePluginConfiguration
+		deps       commandregistry.Dependency
 
 		cmd         *commands.Help
 		flagContext flags.FlagContext
@@ -50,7 +48,6 @@ var _ = Describe("Help", func() {
 		cmd.SetDependency(deps, false)
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-		fakeFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	AfterEach(func() {

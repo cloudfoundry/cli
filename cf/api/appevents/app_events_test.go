@@ -20,10 +20,9 @@ import (
 
 var _ = Describe("App Events Repo", func() {
 	var (
-		server  *httptest.Server
-		handler *testnet.TestHandler
-		config  coreconfig.ReadWriter
-		repo    Repository
+		server *httptest.Server
+		config coreconfig.ReadWriter
+		repo   Repository
 	)
 
 	BeforeEach(func() {
@@ -42,7 +41,7 @@ var _ = Describe("App Events Repo", func() {
 	})
 
 	setupTestServer := func(requests ...testnet.TestRequest) {
-		server, handler = testnet.NewServer(requests)
+		server, _ = testnet.NewServer(requests)
 		config.SetAPIEndpoint(server.URL)
 	}
 

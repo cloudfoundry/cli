@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/commands/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
@@ -22,19 +21,17 @@ import (
 
 var _ = Describe("repo-plugins", func() {
 	var (
-		ui                  *testterm.FakeUI
-		config              coreconfig.Repository
-		requirementsFactory *requirementsfakes.FakeFactory
-		fakePluginRepo      *pluginrepofakes.FakePluginRepo
-		deps                commandregistry.Dependency
-		cmd                 *pluginrepo.RepoPlugins
-		flagContext         flags.FlagContext
+		ui             *testterm.FakeUI
+		config         coreconfig.Repository
+		fakePluginRepo *pluginrepofakes.FakePluginRepo
+		deps           commandregistry.Dependency
+		cmd            *pluginrepo.RepoPlugins
+		flagContext    flags.FlagContext
 	)
 
 	BeforeEach(func() {
 		fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
 		ui = &testterm.FakeUI{}
-		requirementsFactory = new(requirementsfakes.FakeFactory)
 		config = testconfig.NewRepositoryWithDefaults()
 
 		deps = commandregistry.Dependency{

@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors/errorsfakes"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	"code.cloudfoundry.org/cli/util/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -23,7 +22,6 @@ var _ = Describe("Routes", func() {
 
 		expectedRoute  models.Route
 		expectedDomain models.DomainFields
-		wordGenerator  *generatorfakes.FakeWordGenerator
 	)
 
 	BeforeEach(func() {
@@ -31,7 +29,6 @@ var _ = Describe("Routes", func() {
 		fakeRouteRepository = new(apifakes.FakeRouteRepository)
 		fakeDomainRepository = new(apifakes.FakeDomainRepository)
 		routeActor = NewRouteActor(fakeUI, fakeRouteRepository, fakeDomainRepository)
-		wordGenerator = new(generatorfakes.FakeWordGenerator)
 	})
 
 	Describe("CreateRandomTCPRoute", func() {

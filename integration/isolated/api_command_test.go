@@ -33,12 +33,11 @@ var _ = Describe("api command", func() {
 			})
 
 			Context("when the user is logged in", func() {
-				var target, apiVersion, user, org, space string
+				var target, apiVersion, org, space string
 
 				BeforeEach(func() {
 					target = "https://api.fake.com"
 					apiVersion = "2.59.0"
-					user = "admin"
 					org = "the-org"
 					space = "the-space"
 

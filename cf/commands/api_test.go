@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
-	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -22,15 +21,14 @@ import (
 
 var _ = Describe("Api", func() {
 	var (
-		config              coreconfig.Repository
-		endpointRepo        *coreconfigfakes.FakeEndpointRepository
-		deps                commandregistry.Dependency
-		requirementsFactory *requirementsfakes.FakeFactory
-		ui                  *testterm.FakeUI
-		cmd                 commands.API
-		flagContext         flags.FlagContext
-		repoLocator         api.RepositoryLocator
-		runCLIErr           error
+		config       coreconfig.Repository
+		endpointRepo *coreconfigfakes.FakeEndpointRepository
+		deps         commandregistry.Dependency
+		ui           *testterm.FakeUI
+		cmd          commands.API
+		flagContext  flags.FlagContext
+		repoLocator  api.RepositoryLocator
+		runCLIErr    error
 	)
 
 	callApi := func(args []string) {
@@ -42,7 +40,6 @@ var _ = Describe("Api", func() {
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		requirementsFactory = new(requirementsfakes.FakeFactory)
 		config = testconfig.NewRepository()
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 
