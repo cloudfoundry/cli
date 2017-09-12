@@ -36,6 +36,9 @@ integration-isolated : build integration-cleanup
 integration-plugin : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/plugin
 
+integration-push : build integration-cleanup
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/push
+
 integration-tests : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
@@ -90,4 +93,4 @@ vet :
 
 
 .PHONY : all build clean i18n format version vet
-.PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated
+.PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
