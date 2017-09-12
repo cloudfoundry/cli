@@ -25,10 +25,9 @@ import (
 
 var _ = Describe("create-space-quota", func() {
 	var (
-		ui                  *testterm.FakeUI
-		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		requirementsFactory *requirementsfakes.FakeFactory
-		config              *coreconfigfakes.FakeRepository
+		ui        *testterm.FakeUI
+		quotaRepo *spacequotasfakes.FakeSpaceQuotaRepository
+		config    *coreconfigfakes.FakeRepository
 
 		loginReq         *requirementsfakes.FakeRequirement
 		targetedOrgReq   *requirementsfakes.FakeTargetedOrgRequirement
@@ -43,7 +42,6 @@ var _ = Describe("create-space-quota", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		requirementsFactory = new(requirementsfakes.FakeFactory)
 		config = new(coreconfigfakes.FakeRepository)
 
 		repoLocator := api.RepositoryLocator{}

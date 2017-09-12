@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
@@ -10,16 +9,6 @@ import (
 )
 
 var _ = Describe("Process Actions", func() {
-	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
-	)
-
-	BeforeEach(func() {
-		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
-	})
-
 	Describe("ProcessSummary", func() {
 		var summary ProcessSummary
 		BeforeEach(func() {
