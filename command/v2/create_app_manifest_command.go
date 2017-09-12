@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -28,7 +29,17 @@ type CreateAppManifestCommand struct {
 	Actor       CreateAppManifestActor
 }
 
-func (CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.UI = ui
+	cmd.Config = config
+	cmd.SharedActor = sharedaction.NewActor()
+
+	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
+
 	return nil
 }
 

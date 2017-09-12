@@ -17,8 +17,8 @@ type ManifestCreationError struct {
 	Err error
 }
 
-func (ManifestCreationError) Error() string {
-	return "Failed to create manifest: {{.Error}}"
+func (e ManifestCreationError) Error() string {
+	return fmt.Sprintf("Error creating manifest file: %s", e.Err.Error())
 }
 
 type Manifest struct {

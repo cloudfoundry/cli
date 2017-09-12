@@ -2756,6 +2756,10 @@
     "translation": "Erreur lors de la création du fichier manifeste : "
   },
   {
+    "id": "Error creating manifest file: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error creating request:\n{{.Err}}",
     "translation": "Erreur lors de la création de la demande :\n{{.Err}}"
   },

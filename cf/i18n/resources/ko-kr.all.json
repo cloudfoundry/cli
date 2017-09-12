@@ -2756,6 +2756,10 @@
     "translation": "Manifest 파일 작성 중에 오류 발생: "
   },
   {
+    "id": "Error creating manifest file: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error creating request:\n{{.Err}}",
     "translation": "요청 작성 중에 오류 발생:\n{{.Err}}"
   },

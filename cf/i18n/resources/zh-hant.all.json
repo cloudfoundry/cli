@@ -2756,6 +2756,10 @@
     "translation": "建立資訊清單檔時發生錯誤: "
   },
   {
+    "id": "Error creating manifest file: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error creating request:\n{{.Err}}",
     "translation": "建立要求時發生錯誤:\n{{.Err}}"
   },
