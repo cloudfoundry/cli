@@ -148,6 +148,7 @@ var _ = Describe("Droplet Actions", func() {
 								{Name: "ruby"},
 								{Name: "nodejs"},
 							},
+							Image: "docker/some-image",
 							Stack: "penguin",
 						},
 						{
@@ -179,6 +180,7 @@ var _ = Describe("Droplet Actions", func() {
 							{Name: "ruby"},
 							{Name: "nodejs"},
 						},
+						Image: "docker/some-image",
 						Stack: "penguin",
 					},
 					{

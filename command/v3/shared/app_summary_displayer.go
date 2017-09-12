@@ -65,8 +65,17 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
 		{display.UI.TranslateText("routes:"), routes.Summary()},
 		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-		{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)},
 	}
+
+	var lifecycleInfo []string
+
+	if summary.Lifecycle.Type == v3action.DockerAppLifecycleType {
+		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
+	} else {
+		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
+	}
+
+	keyValueTable = append(keyValueTable, lifecycleInfo)
 
 	crashedProcesses := []string{}
 	for i := range summary.ProcessSummaries {

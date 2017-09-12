@@ -36,6 +36,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(appName string,
 
 	if len(ccv3Droplets) == 1 {
 		droplet.Stack = ccv3Droplets[0].Stack
+		droplet.Image = ccv3Droplets[0].Image
 		for _, ccv3Buildpack := range ccv3Droplets[0].Buildpacks {
 			droplet.Buildpacks = append(droplet.Buildpacks, Buildpack(ccv3Buildpack))
 		}

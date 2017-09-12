@@ -209,6 +209,48 @@ var _ = Describe("v3-app Command", func() {
 
 	})
 
+	Context("when the app is a docker app", func() {
+		BeforeEach(func() {
+			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
+				v3action.ApplicationSummary{
+					Application: v3action.Application{
+						GUID:      "some-guid",
+						Name:      "some-app",
+						State:     "STARTED",
+						Lifecycle: v3action.AppLifecycle{Type: v3action.DockerAppLifecycleType},
+					},
+					CurrentDroplet: v3action.Droplet{
+						Image: "docker/some-image",
+					},
+				},
+				v3action.Warnings{"warning-1", "warning-2"},
+				nil)
+		})
+
+		It("displays app information without routes", func() {
+			Expect(executeErr).ToNot(HaveOccurred())
+
+			Expect(testUI.Out).To(Say("(?m)Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\.\n\n"))
+			Expect(testUI.Out).To(Say("name:\\s+some-app"))
+			Expect(testUI.Out).To(Say("requested state:\\s+started"))
+			Expect(testUI.Out).To(Say("processes:\\s+\\n"))
+			Expect(testUI.Out).To(Say("memory usage:\\s+\\n"))
+			Expect(testUI.Out).To(Say("routes:\\s+\\n"))
+			Expect(testUI.Out).To(Say("stack:\\s+\\n"))
+			Expect(testUI.Out).To(Say("(?m)docker image:\\s+docker/some-image$\\n"))
+
+			Expect(testUI.Err).To(Say("warning-1"))
+			Expect(testUI.Err).To(Say("warning-2"))
+
+			Expect(fakeActor.GetApplicationSummaryByNameAndSpaceCallCount()).To(Equal(1))
+			appName, spaceGUID := fakeActor.GetApplicationSummaryByNameAndSpaceArgsForCall(0)
+			Expect(appName).To(Equal("some-app"))
+			Expect(spaceGUID).To(Equal("some-space-guid"))
+
+			Expect(fakeV2Actor.GetApplicationRoutesCallCount()).To(Equal(0))
+		})
+	})
+
 	Context("when app has no processes", func() {
 		BeforeEach(func() {
 			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(

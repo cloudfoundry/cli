@@ -80,6 +80,7 @@ var _ = Describe("Application Summary Actions", func() {
 										Name: "some-buildpack",
 									},
 								},
+								Image: "docker/some-image",
 							},
 						},
 						ccv3.Warnings{"some-droplet-warning"},
@@ -98,6 +99,7 @@ var _ = Describe("Application Summary Actions", func() {
 						},
 						CurrentDroplet: Droplet{
 							Stack: "some-stack",
+							Image: "docker/some-image",
 							Buildpacks: []Buildpack{
 								{
 									Name: "some-buildpack",

@@ -22,6 +22,7 @@ type Droplet struct {
 	State      DropletState
 	CreatedAt  string
 	Stack      string
+	Image      string
 	Buildpacks []Buildpack
 }
 
@@ -92,5 +93,6 @@ func (actor Actor) convertCCToActorDroplet(ccv3Droplet ccv3.Droplet) Droplet {
 		CreatedAt:  ccv3Droplet.CreatedAt,
 		Stack:      ccv3Droplet.Stack,
 		Buildpacks: buildpacks,
+		Image:      ccv3Droplet.Image,
 	}
 }
