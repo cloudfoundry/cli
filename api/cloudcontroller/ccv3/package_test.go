@@ -114,7 +114,9 @@ var _ = Describe("Package", func() {
 				BeforeEach(func() {
 					response := `{
 					"data": {
-						"image": "some-docker-image"
+						"image": "some-docker-image",
+						"username": "some-username",
+						"password": "some-password"
 					},
 					"guid": "some-pkg-guid",
 					"type": "docker",
@@ -130,7 +132,9 @@ var _ = Describe("Package", func() {
 					expectedBody := map[string]interface{}{
 						"type": "docker",
 						"data": map[string]string{
-							"image": "some-docker-image",
+							"image":    "some-docker-image",
+							"username": "some-username",
+							"password": "some-password",
 						},
 						"relationships": map[string]interface{}{
 							"app": map[string]interface{}{
@@ -155,7 +159,9 @@ var _ = Describe("Package", func() {
 						Relationships: Relationships{
 							ApplicationRelationship: Relationship{GUID: "some-app-guid"},
 						},
-						DockerImage: "some-docker-image",
+						DockerImage:    "some-docker-image",
+						DockerUsername: "some-username",
+						DockerPassword: "some-password",
 					})
 
 					Expect(err).NotTo(HaveOccurred())
@@ -168,7 +174,9 @@ var _ = Describe("Package", func() {
 						Links: map[string]APILink{
 							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 						},
-						DockerImage: "some-docker-image",
+						DockerImage:    "some-docker-image",
+						DockerUsername: "some-username",
+						DockerPassword: "some-password",
 					}
 					Expect(pkg).To(Equal(expectedPackage))
 				})

@@ -44,8 +44,14 @@ func (e EmptyDirectoryError) Error() string {
 	return fmt.Sprint(e.Path, "is empty")
 }
 
-func (actor Actor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (Package, Warnings, error) {
-	if dockerImage == "" {
+type DockerImageCredentials struct {
+	Path     string
+	Username string
+	Password string
+}
+
+func (actor Actor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
+	if dockerImageCredentials.Path == "" {
 		if bitsPath == "" {
 			var err error
 			bitsPath, err = os.Getwd()
@@ -55,10 +61,10 @@ func (actor Actor) CreatePackageByApplicationNameAndSpace(appName string, spaceG
 		}
 		return actor.createAndUploadBitsPackageByApplicationNameAndSpace(appName, spaceGUID, bitsPath)
 	}
-	return actor.createDockerPackageByApplicationNameAndSpace(appName, spaceGUID, dockerImage)
+	return actor.createDockerPackageByApplicationNameAndSpace(appName, spaceGUID, dockerImageCredentials)
 }
 
-func (actor Actor) createDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImage string) (Package, Warnings, error) {
+func (actor Actor) createDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials DockerImageCredentials) (Package, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return Package{}, allWarnings, err
@@ -68,7 +74,9 @@ func (actor Actor) createDockerPackageByApplicationNameAndSpace(appName string, 
 		Relationships: ccv3.Relationships{
 			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
-		DockerImage: dockerImage,
+		DockerImage:    dockerImageCredentials.Path,
+		DockerUsername: dockerImageCredentials.Username,
+		DockerPassword: dockerImageCredentials.Password,
 	}
 	pkg, warnings, err := actor.CloudControllerClient.CreatePackage(inputPackage)
 	allWarnings = append(allWarnings, warnings...)

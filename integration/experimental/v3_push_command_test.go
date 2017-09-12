@@ -42,9 +42,12 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("cf v3-push APP_NAME --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e\\.g\\. my-buildpack\\) or Git URL \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack\\.git#v3.3.0' for 'v3.3.0' tag\\)\\. To use built-in buildpacks only, specify 'default' or 'null'"))
-				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
 				Eventually(session.Out).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
+				Eventually(session.Out).Should(Say("--docker-username\\s+Repository username; used with password from environment variable CF_DOCKER_PASSWORD"))
+				Eventually(session.Out).Should(Say("--no-route\\s+Do not map a route to this app"))
+				Eventually(session.Out).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
 				Eventually(session.Out).Should(Say("ENVIRONMENT:"))
+				Eventually(session.Out).Should(Say("CF_DOCKER_PASSWORD=\\s+Password used for private docker repository"))
 				Eventually(session.Out).Should(Say("CF_STAGING_TIMEOUT=15\\s+Max wait time for buildpack staging, in minutes"))
 				Eventually(session.Out).Should(Say("CF_STARTUP_TIMEOUT=5\\s+Max wait time for app instance startup, in minutes"))
 
@@ -542,28 +545,122 @@ var _ = Describe("v3-push command", func() {
 					Eventually(session).Should(Exit(1))
 				})
 			})
-		})
 
-		Context("when the -o and -p flags are provided together", func() {
-			It("displays an error and exits 1", func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-p", appDir)
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
-					Eventually(session.Out).Should(Say("NAME:"))
-					Eventually(session).Should(Exit(1))
+			Context("when a docker username and password are provided with a private image", func() {
+				var (
+					privateDockerImage    string
+					privateDockerUsername string
+					privateDockerPassword string
+				)
+
+				BeforeEach(func() {
+					privateDockerImage = os.Getenv("CF_INT_DOCKER_IMAGE")
+					privateDockerUsername = os.Getenv("CF_INT_DOCKER_USERNAME")
+					privateDockerPassword = os.Getenv("CF_INT_DOCKER_PASSWORD")
+
+					if privateDockerImage == "" || privateDockerUsername == "" || privateDockerPassword == "" {
+						Skip("CF_INT_DOCKER_IMAGE, CF_INT_DOCKER_USERNAME, or CF_INT_DOCKER_PASSWORD is not set")
+					}
+				})
+
+				It("uses the specified private docker image", func() {
+					session := helpers.CustomCF(
+						helpers.CFEnv{
+							EnvVars: map[string]string{"CF_DOCKER_PASSWORD": privateDockerPassword},
+						},
+						"v3-push", "--docker-username", privateDockerUsername, "--docker-image", privateDockerImage, appName,
+					)
+
+					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session.Out).Should(Say("requested state:\\s+started"))
+					Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+					Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
+					Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					// TODO: we will change the display logic in this upcoming story #150657849
+					Eventually(session.Out).Should(Say("stack:"))
+					Eventually(session.Out).Should(Say("buildpacks:"))
+					// Eventually(session.Out).ShouldNot(Say("stack:"))
+					// Eventually(session.Out).ShouldNot(Say("buildpacks:"))
+					// Eventually(session.Out).Should(Say("docker image:\\s+%s", PublicDockerImage))
+					Eventually(session.Out).Should(Say(""))
+					Eventually(session.Out).Should(Say("web:1/1"))
+					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
 
-		Context("when the -o and -b flags are provided together", func() {
-			It("displays an error and exits 1", func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-b", "some-buildpack")
-					Eventually(session.Out).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o"))
-					Eventually(session.Out).Should(Say("NAME:"))
-					Eventually(session).Should(Exit(1))
+		Describe("argument combination errors", func() {
+			Context("when the --docker-username is provided without the -o flag", func() {
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-push", appName, "--docker-username", "some-username")
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '--docker-username' must be used together."))
+						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the --docker-username and -p flags are provided together", func() {
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-push", appName, "--docker-username", "some-username", "-p", appDir)
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '--docker-username' must be used together."))
+						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the --docker-username is provided without a password", func() {
+				var oldPassword string
+
+				BeforeEach(func() {
+					oldPassword = os.Getenv("CF_DOCKER_PASSWORD")
+					err := os.Unsetenv("CF_DOCKER_PASSWORD")
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				AfterEach(func() {
+					err := os.Setenv("CF_DOCKER_PASSWORD", oldPassword)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-push", appName, "--docker-username", "some-username", "--docker-image", "some-image")
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the -o and -p flags are provided together", func() {
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-p", appDir)
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
+						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+			})
+
+			Context("when the -o and -b flags are provided together", func() {
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-push", appName, "-o", PublicDockerImage, "-b", "some-buildpack")
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o"))
+						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Exit(1))
+					})
 				})
 			})
 		})

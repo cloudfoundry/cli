@@ -33,18 +33,22 @@ const (
 )
 
 type Package struct {
-	GUID          string
-	CreatedAt     string
-	Links         APILinks
-	Relationships Relationships
-	State         PackageState
-	Type          PackageType
-	DockerImage   string
+	GUID           string
+	CreatedAt      string
+	Links          APILinks
+	Relationships  Relationships
+	State          PackageState
+	Type           PackageType
+	DockerImage    string
+	DockerUsername string
+	DockerPassword string
 }
 
 func (p Package) MarshalJSON() ([]byte, error) {
 	type ccPackageData struct {
-		Image string `json:"image,omitempty"`
+		Image    string `json:"image,omitempty"`
+		Username string `json:"username,omitempty"`
+		Password string `json:"password,omitempty"`
 	}
 	var ccPackage struct {
 		GUID          string         `json:"guid,omitempty"`
@@ -63,7 +67,11 @@ func (p Package) MarshalJSON() ([]byte, error) {
 	ccPackage.State = p.State
 	ccPackage.Type = p.Type
 	if p.DockerImage != "" {
-		ccPackage.Data = &ccPackageData{Image: p.DockerImage}
+		ccPackage.Data = &ccPackageData{
+			Image:    p.DockerImage,
+			Username: p.DockerUsername,
+			Password: p.DockerPassword,
+		}
 	}
 
 	return json.Marshal(ccPackage)
@@ -78,7 +86,9 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 		State         PackageState  `json:"state,omitempty"`
 		Type          PackageType   `json:"type,omitempty"`
 		Data          struct {
-			Image string `json:"image"`
+			Image    string `json:"image"`
+			Username string `json:"username"`
+			Password string `json:"password"`
 		} `json:"data"`
 	}
 	if err := json.Unmarshal(data, &ccPackage); err != nil {
@@ -92,6 +102,8 @@ func (p *Package) UnmarshalJSON(data []byte) error {
 	p.State = ccPackage.State
 	p.Type = ccPackage.Type
 	p.DockerImage = ccPackage.Data.Image
+	p.DockerUsername = ccPackage.Data.Username
+	p.DockerPassword = ccPackage.Data.Password
 
 	return nil
 }

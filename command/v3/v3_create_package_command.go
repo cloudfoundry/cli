@@ -17,7 +17,7 @@ import (
 
 type V3CreatePackageActor interface {
 	CloudControllerAPIVersion() string
-	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error)
+	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 }
 
 type V3CreatePackageCommand struct {
@@ -73,7 +73,7 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "", cmd.DockerImage.Path)
+	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "", v3action.DockerImageCredentials{Path: cmd.DockerImage.Path})
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

@@ -26,7 +26,7 @@ type V2PushActor interface {
 
 type V3PushActor interface {
 	CloudControllerAPIVersion() string
-	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error)
+	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
@@ -40,14 +40,17 @@ type V3PushActor interface {
 }
 
 type V3PushCommand struct {
-	RequiredArgs        flag.AppName                `positional-args:"yes"`
-	Buildpacks          []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
-	DockerImage         flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
-	NoRoute             bool                        `long:"no-route" description:"Do not map a route to this app"`
-	AppPath             flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	usage               interface{}                 `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]"`
-	envCFStagingTimeout interface{}                 `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{}                 `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs   flag.AppName                `positional-args:"yes"`
+	Buildpacks     []string                    `short:"b" description:"Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"`
+	DockerImage    flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
+	DockerUsername string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
+	NoRoute        bool                        `long:"no-route" description:"Do not map a route to this app"`
+	AppPath        flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	dockerPassword interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
+
+	usage               interface{} `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]"`
+	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
 	UI                  command.UI
 	Config              command.Config
@@ -224,6 +227,20 @@ func (cmd V3PushCommand) validateArgs() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-b", "--docker-image", "-o"},
 		}
+	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
+		return translatableerror.RequiredFlagsError{
+			Arg1: "--docker-image, -o", Arg2: "--docker-username",
+		}
+	case cmd.DockerUsername != "" && cmd.AppPath != "":
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--docker-username", "-p"},
+		}
+	case cmd.DockerUsername != "" && len(cmd.Buildpacks) > 0:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-b", "--docker-username"},
+		}
+	case cmd.DockerUsername != "" && cmd.Config.DockerPassword() == "":
+		return translatableerror.DockerPasswordNotSetError{}
 	}
 	return nil
 }
@@ -333,7 +350,7 @@ func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error
 		return v3action.Package{}, err
 	}
 
-	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath), cmd.DockerImage.Path)
+	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath), v3action.DockerImageCredentials{Path: cmd.DockerImage.Path, Username: cmd.DockerUsername, Password: cmd.Config.DockerPassword()})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err
