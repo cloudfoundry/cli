@@ -5316,10 +5316,6 @@
     "translation": ""
   },
   {
-    "id": "Route {{.Route}} has been registered to another space.",
-    "translation": "Route {{.Route}} has been registered to another space."
-  },
-  {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
     "translation": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}."
   },
