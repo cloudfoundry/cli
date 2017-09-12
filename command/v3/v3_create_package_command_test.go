@@ -116,11 +116,11 @@ var _ = Describe("v3-create-package Command", func() {
 
 					Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
 
-					appName, spaceGUID, bitsPath, dockerImage := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+					appName, spaceGUID, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
 					Expect(appName).To(Equal(app))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(bitsPath).To(BeEmpty())
-					Expect(dockerImage).To(BeEmpty())
+					Expect(dockerImageCredentials).To(Equal(v3action.DockerImageCredentials{}))
 				})
 			})
 
@@ -161,11 +161,11 @@ var _ = Describe("v3-create-package Command", func() {
 
 				Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
 
-				appName, spaceGUID, bitsPath, dockerImage := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+				appName, spaceGUID, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal(app))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(bitsPath).To(BeEmpty())
-				Expect(dockerImage).To(Equal("some-docker-image"))
+				Expect(dockerImageCredentials.Path).To(Equal("some-docker-image"))
 			})
 		})
 	})

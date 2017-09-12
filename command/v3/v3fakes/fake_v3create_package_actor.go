@@ -18,13 +18,13 @@ type FakeV3CreatePackageActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	CreatePackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error)
+	CreatePackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	createPackageByApplicationNameAndSpaceMutex       sync.RWMutex
 	createPackageByApplicationNameAndSpaceArgsForCall []struct {
-		appName     string
-		spaceGUID   string
-		bitsPath    string
-		dockerImage string
+		appName                string
+		spaceGUID              string
+		bitsPath               string
+		dockerImageCredentials v3action.DockerImageCredentials
 	}
 	createPackageByApplicationNameAndSpaceReturns struct {
 		result1 v3action.Package
@@ -80,19 +80,19 @@ func (fake *FakeV3CreatePackageActor) CloudControllerAPIVersionReturnsOnCall(i i
 	}{result1}
 }
 
-func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImage string) (v3action.Package, v3action.Warnings, error) {
+func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error) {
 	fake.createPackageByApplicationNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.createPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createPackageByApplicationNameAndSpaceArgsForCall)]
 	fake.createPackageByApplicationNameAndSpaceArgsForCall = append(fake.createPackageByApplicationNameAndSpaceArgsForCall, struct {
-		appName     string
-		spaceGUID   string
-		bitsPath    string
-		dockerImage string
-	}{appName, spaceGUID, bitsPath, dockerImage})
-	fake.recordInvocation("CreatePackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath, dockerImage})
+		appName                string
+		spaceGUID              string
+		bitsPath               string
+		dockerImageCredentials v3action.DockerImageCredentials
+	}{appName, spaceGUID, bitsPath, dockerImageCredentials})
+	fake.recordInvocation("CreatePackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath, dockerImageCredentials})
 	fake.createPackageByApplicationNameAndSpaceMutex.Unlock()
 	if fake.CreatePackageByApplicationNameAndSpaceStub != nil {
-		return fake.CreatePackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath, dockerImage)
+		return fake.CreatePackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath, dockerImageCredentials)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -106,10 +106,10 @@ func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpaceCall
 	return len(fake.createPackageByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string, v3action.DockerImageCredentials) {
 	fake.createPackageByApplicationNameAndSpaceMutex.RLock()
 	defer fake.createPackageByApplicationNameAndSpaceMutex.RUnlock()
-	return fake.createPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].dockerImage
+	return fake.createPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].dockerImageCredentials
 }
 
 func (fake *FakeV3CreatePackageActor) CreatePackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
