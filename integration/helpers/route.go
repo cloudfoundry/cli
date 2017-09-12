@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"path"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -9,10 +10,11 @@ import (
 )
 
 type Route struct {
-	Space  string
-	Host   string
 	Domain string
+	Host   string
 	Path   string
+	Port   int
+	Space  string
 }
 
 func NewRoute(space string, domain string, hostname string, path string) Route {
@@ -30,6 +32,24 @@ func (r Route) Create() {
 
 func (r Route) Delete() {
 	Eventually(CF("delete-route", r.Domain, "--hostname", r.Host, "--path", r.Path, "-f")).Should(Exit(0))
+}
+
+func (r Route) String() string {
+	routeString := r.Domain
+
+	if r.Port != 0 {
+		routeString = fmt.Sprintf("%s:%d", routeString, r.Port)
+	}
+
+	if r.Host != "" {
+		routeString = fmt.Sprintf("%s.%s", r.Host, routeString)
+	}
+
+	if r.Path != "" {
+		routeString = path.Join(routeString, r.Path)
+	}
+
+	return routeString
 }
 
 func DomainName(prefix ...string) string {
