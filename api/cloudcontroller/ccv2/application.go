@@ -242,7 +242,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		application.EnvironmentVariables = envVariableValues
 	}
 
-	err = application.Instances.ParseFlagValue(ccApp.Entity.Instances.String())
+	err = application.Instances.ParseStringValue(ccApp.Entity.Instances.String())
 	if err != nil {
 		return err
 	}

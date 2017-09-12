@@ -13,8 +13,8 @@ type NullInt struct {
 	Value int
 }
 
-// ParseFlagValue is used to parse a user provided flag argument.
-func (n *NullInt) ParseFlagValue(val string) error {
+// ParseStringValue is used to parse a user provided flag argument.
+func (n *NullInt) ParseStringValue(val string) error {
 	if val == "" {
 		return nil
 	}

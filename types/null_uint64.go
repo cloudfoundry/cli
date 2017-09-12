@@ -12,8 +12,8 @@ type NullUint64 struct {
 	Value uint64
 }
 
-// ParseFlagValue is used to parse a user provided flag argument.
-func (n *NullUint64) ParseFlagValue(val string) error {
+// ParseStringValue is used to parse a user provided flag argument.
+func (n *NullUint64) ParseStringValue(val string) error {
 	if val == "" {
 		return nil
 	}
