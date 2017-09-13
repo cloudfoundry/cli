@@ -61,6 +61,11 @@ var _ = Describe("Manifest Actions", func() {
 						IsSet: true,
 						Value: "some-detected-buildpack",
 					},
+					DockerImage: "some-docker-image",
+					DockerCredentials: ccv2.DockerCredentials{
+						Username: "some-docker-username",
+						Password: "some-docker-password", // CC currently always returns an empty string
+					},
 					Command: types.FilteredString{
 						IsSet: true,
 						Value: "some-command",
@@ -177,6 +182,9 @@ var _ = Describe("Manifest Actions", func() {
   buildpack: some-buildpack
   command: some-command
   disk_quota: 1G
+  docker:
+    image: some-docker-image
+    username: some-docker-username
   env:
     env_1: foo
     env_2: "182837403930483038"
@@ -195,6 +203,45 @@ var _ = Describe("Manifest Actions", func() {
   stack: some-stack
   timeout: 120
 `))
+					})
+
+					Context("when docker image and username are not provided", func() {
+						BeforeEach(func() {
+							app.DockerImage = ""
+							app.DockerCredentials = ccv2.DockerCredentials{}
+							fakeCloudControllerClient.GetApplicationsReturns(
+								[]ccv2.Application{app},
+								ccv2.Warnings{"some-app-warning"},
+								nil)
+						})
+
+						It("does not include it in manifest", func() {
+							manifestBytes, err := ioutil.ReadFile(manifestFilePath)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(string(manifestBytes)).To(Equal(`applications:
+- name: some-app
+  buildpack: some-buildpack
+  command: some-command
+  disk_quota: 1G
+  env:
+    env_1: foo
+    env_2: "182837403930483038"
+    env_3: "true"
+    env_4: "1.00001"
+  health-check-http-endpoint: \some-endpoint
+  health-check-type: http
+  instances: 10
+  memory: 200M
+  routes:
+  - route: host-1.some-domain
+  - route: host-2.some-domain
+  services:
+  - service-1
+  - service-2
+  stack: some-stack
+  timeout: 120
+`))
+						})
 					})
 
 					Describe("default CC values", func() {
@@ -218,6 +265,9 @@ var _ = Describe("Manifest Actions", func() {
   buildpack: some-buildpack
   command: some-command
   disk_quota: 1G
+  docker:
+    image: some-docker-image
+    username: some-docker-username
   env:
     env_1: foo
     env_2: "182837403930483038"
@@ -256,6 +306,9 @@ var _ = Describe("Manifest Actions", func() {
   buildpack: some-buildpack
   command: some-command
   disk_quota: 1G
+  docker:
+    image: some-docker-image
+    username: some-docker-username
   env:
     env_1: foo
     env_2: "182837403930483038"
@@ -293,6 +346,9 @@ var _ = Describe("Manifest Actions", func() {
   buildpack: some-buildpack
   command: some-command
   disk_quota: 1G
+  docker:
+    image: some-docker-image
+    username: some-docker-username
   env:
     env_1: foo
     env_2: "182837403930483038"

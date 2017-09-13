@@ -133,7 +133,7 @@ var _ = Describe("create-app-manifest command", func() {
 	Context("when app name not provided", func() {
 		It("displays a usage error", func() {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest")
-			Eventually(session.Out).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("USAGE:"))
 		})
 	})
@@ -281,6 +281,50 @@ var _ = Describe("create-app-manifest command", func() {
 						Expect(string(createdFile)).To(Equal(expectedFile))
 					})
 				})
+			})
+
+		})
+
+		Context("when app was created with docker image", func() {
+			var (
+				dockerImage       string
+				oldDockerPassword string
+			)
+
+			BeforeEach(func() {
+				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
+				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
+
+				dockerImage = "cloudfoundry/diego-docker-app-custom"
+				Eventually(helpers.CF("v2-push", appName, "-o", dockerImage, "--docker-username", "some-docker-username")).Should(Exit())
+			})
+
+			AfterEach(func() {
+				Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).To(Succeed())
+			})
+
+			It("creates the manifest", func() {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-v")
+				Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Manifest file created successfully at ./%s_manifest.yml", appName))
+
+				expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  docker:
+    image: %s
+    username: some-docker-username
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, dockerImage, appName, domainName)
+
+				createdFile, err := ioutil.ReadFile(manifestFilePath)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(createdFile)).To(Equal(expectedFile))
 			})
 
 		})

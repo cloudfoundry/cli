@@ -77,6 +77,7 @@ type manifestApp struct {
 	Buildpack               string            `yaml:"buildpack,omitempty"`
 	Command                 string            `yaml:"command,omitempty"`
 	DiskQuota               string            `yaml:"disk_quota,omitempty"`
+	Docker                  dockerInfo        `yaml:"docker,omitempty"`
 	EnvironmentVariables    map[string]string `yaml:"env,omitempty"`
 	HealthCheckHTTPEndpoint string            `yaml:"health-check-http-endpoint,omitempty"`
 	HealthCheckType         string            `yaml:"health-check-type,omitempty"`
@@ -93,10 +94,16 @@ type manifestRoute struct {
 	Route string `yaml:"route"`
 }
 
+type dockerInfo struct {
+	Image    string `yaml:"image,omitempty"`
+	Username string `yaml:"username,omitempty"`
+}
+
 func (app Application) MarshalYAML() (interface{}, error) {
 	var m = manifestApp{
 		Buildpack:               app.Buildpack.Value,
 		Command:                 app.Command.Value,
+		Docker:                  dockerInfo{Image: app.DockerImage, Username: app.DockerUsername},
 		EnvironmentVariables:    app.EnvironmentVariables,
 		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
 		HealthCheckType:         app.HealthCheckType,
@@ -127,6 +134,8 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 		return err
 	}
 
+	app.DockerImage = m.Docker.Image
+	app.DockerUsername = m.Docker.Username
 	app.HealthCheckHTTPEndpoint = m.HealthCheckHTTPEndpoint
 	app.HealthCheckType = m.HealthCheckType
 	app.Name = m.Name
