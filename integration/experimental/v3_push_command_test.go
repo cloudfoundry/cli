@@ -39,7 +39,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("v3-push - Push a new app or sync changes to an existing app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-push APP_NAME \\[-b BUILDPACK\\]\\.\\.\\. \\[-p APP_PATH\\] \\[--no-route\\]"))
-				Eventually(session.Out).Should(Say("cf v3-push APP_NAME --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]"))
+				Eventually(session.Out).Should(Say("cf v3-push APP_NAME --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\] \\[--no-route\\]"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))
 				Eventually(session.Out).Should(Say("-b\\s+Custom buildpack by name \\(e\\.g\\. my-buildpack\\) or Git URL \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e\\.g\\. 'https://github.com/cloudfoundry/java-buildpack\\.git#v3.3.0' for 'v3.3.0' tag\\)\\. To use built-in buildpacks only, specify 'default' or 'null'"))
 				Eventually(session.Out).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
