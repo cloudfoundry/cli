@@ -26,12 +26,28 @@ func NewRoute(space string, domain string, hostname string, path string) Route {
 	}
 }
 
+func NewTCPRoute(space string, domain string, port int) Route {
+	return Route{
+		Space:  space,
+		Domain: domain,
+		Port:   port,
+	}
+}
+
 func (r Route) Create() {
-	Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path)).Should(Exit(0))
+	if r.Port != 0 {
+		Eventually(CF("create-route", r.Space, r.Domain, "--port", fmt.Sprint(r.Port))).Should(Exit(0))
+	} else {
+		Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path)).Should(Exit(0))
+	}
 }
 
 func (r Route) Delete() {
-	Eventually(CF("delete-route", r.Domain, "--hostname", r.Host, "--path", r.Path, "-f")).Should(Exit(0))
+	if r.Port != 0 {
+		Eventually(CF("delete-route", r.Domain, "--port", fmt.Sprint(r.Port))).Should(Exit(0))
+	} else {
+		Eventually(CF("delete-route", r.Domain, "--hostname", r.Host, "--path", r.Path, "-f")).Should(Exit(0))
+	}
 }
 
 func (r Route) String() string {
