@@ -156,15 +156,11 @@
     "translation": ""
   },
   {
-    "id": "'docker' must have an 'image' property",
-    "translation": ""
-  },
-  {
-    "id": "'docker' must have at least an 'image' property",
-    "translation": ""
-  },
-  {
     "id": "'docker.image' must be a string",
+    "translation": ""
+  },
+  {
+    "id": "'docker.username' must be a string",
     "translation": ""
   },
   {
@@ -4257,6 +4253,10 @@
   },
   {
     "id": "No Authorization Endpoint Found",
+    "translation": ""
+  },
+  {
+    "id": "No Docker password was provided. Please provide the password by setting the CF_DOCKER_PASSWORD environment variable.",
     "translation": ""
   },
   {

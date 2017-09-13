@@ -198,7 +198,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return err
 		}
 
-		if c.IsSet("docker-image") {
+		if appParams.DockerImage != nil {
 			diego := true
 			appParams.Diego = &diego
 		}
@@ -271,7 +271,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return err
 		}
 
-		if c.String("docker-image") == "" {
+		if appParams.DockerImage == nil {
 			err = cmd.actor.ProcessPath(*appParams.Path, cmd.processPathCallback(*appParams.Path, app))
 			if err != nil {
 				return errors.New(
@@ -611,6 +611,11 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 		}
 		err = addApp(&apps, contextApp)
 	case 1:
+		err = checkCombinedDockerProperties(contextApp, manifestApps[0])
+		if err != nil {
+			return nil, err
+		}
+
 		manifestApps[0].Merge(&contextApp)
 		err = addApp(&apps, manifestApps[0])
 	default:
@@ -645,6 +650,21 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 	}
 
 	return apps, nil
+}
+
+func checkCombinedDockerProperties(flagContext models.AppParams, manifestApp models.AppParams) error {
+	if manifestApp.DockerUsername != nil || flagContext.DockerUsername != nil {
+		if manifestApp.DockerImage == nil && flagContext.DockerImage == nil {
+			return errors.New(T("'--docker-username' requires '--docker-image' to be specified"))
+		}
+	}
+
+	dockerPassword := os.Getenv("CF_DOCKER_PASSWORD")
+	if flagContext.DockerUsername == nil && manifestApp.DockerUsername != nil && dockerPassword == "" {
+		return errors.New(T("No Docker password was provided. Please provide the password by setting the CF_DOCKER_PASSWORD environment variable."))
+	}
+
+	return nil
 }
 
 func addApp(apps *[]models.AppParams, app models.AppParams) error {
@@ -756,10 +776,6 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	}
 
 	if c.String("docker-username") != "" {
-		if appParams.DockerImage == nil {
-			return models.AppParams{}, errors.New(T("'--docker-username' requires '--docker-image' to be specified"))
-		}
-
 		username := c.String("docker-username")
 		appParams.DockerUsername = &username
 
