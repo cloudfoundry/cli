@@ -203,24 +203,6 @@ var _ = Describe("create-app-manifest command", func() {
 					})
 				})
 
-				Context("when you don't have permissions to write the specified file", func() {
-					var tempFile string
-
-					BeforeEach(func() {
-						tempFile = filepath.Join(tempDir, "some-file")
-						f, err := os.OpenFile(tempFile, os.O_CREATE, 0000)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(f.Close()).To(Succeed())
-					})
-
-					It("displays a file creation error", func() {
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempFile)
-						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: permission denied", tempFile))
-					})
-				})
-
 				Context("when the specified file does not exist", func() {
 					var newFile string
 
