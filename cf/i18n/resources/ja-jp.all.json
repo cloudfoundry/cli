@@ -4836,6 +4836,10 @@
     "translation": "TCP 経路用のポート"
   },
   {
+    "id": "Port not allowed in HTTP domain {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
     "translation": "ポートは HTTP 経路 {{.RouteName}} で許可されません"
   },

@@ -4836,6 +4836,10 @@
     "translation": "TCP 라우트에 대한 포트"
   },
   {
+    "id": "Port not allowed in HTTP domain {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
     "translation": "HTTP 라우트 {{.RouteName}}에서 포트가 허용되지 않음"
   },

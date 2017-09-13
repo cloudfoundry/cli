@@ -4836,6 +4836,10 @@
     "translation": "TCP 路径的端口"
   },
   {
+    "id": "Port not allowed in HTTP domain {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
     "translation": "HTTP 路径 {{.RouteName}} 中不允许端口"
   },
