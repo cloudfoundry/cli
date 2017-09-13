@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -21,6 +22,63 @@ var _ = Describe("Domain Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
+	})
+
+	Describe("Domain", func() {
+		var domain Domain
+		Describe("IsHTTP", func() {
+			Context("when the RouterGroupType = 'http'", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.HTTPRouterGroup
+				})
+
+				It("returns true", func() {
+					Expect(domain.IsHTTP()).To(BeTrue())
+				})
+			})
+
+			Context("when the RouterGroupType is anything other than 'tcp'", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = ""
+				})
+
+				It("returns true", func() {
+					Expect(domain.IsHTTP()).To(BeTrue())
+				})
+			})
+
+			Context("when the RouterGroupType = 'http'", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.TCPRouterGroup
+				})
+
+				It("returns false", func() {
+					Expect(domain.IsHTTP()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("IsTCP", func() {
+			Context("when the RouterGroupType = 'tcp'", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.TCPRouterGroup
+				})
+
+				It("returns true", func() {
+					Expect(domain.IsTCP()).To(BeTrue())
+				})
+			})
+
+			Context("when the RouterGroupType is anything else", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.HTTPRouterGroup
+				})
+
+				It("returns false", func() {
+					Expect(domain.IsTCP()).To(BeFalse())
+				})
+			})
+		})
 	})
 
 	Describe("DomainNotFoundError", func() {
