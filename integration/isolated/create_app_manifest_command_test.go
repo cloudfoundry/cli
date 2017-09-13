@@ -138,7 +138,7 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 	})
 
-	FContext("when the environment is setup correctly", func() {
+	Context("when the environment is setup correctly", func() {
 		var (
 			orgName   string
 			spaceName string
