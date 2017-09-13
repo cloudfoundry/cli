@@ -127,7 +127,7 @@ func (actor Actor) configureRoutes(routesInManifest []string, orgGUID string, sp
 	}
 
 	// TODO: when working with all of routes, append to current route
-	config.DesiredRoutes = []v2action.Route{defaultRoute}
+	config.DesiredRoutes = append(config.CurrentRoutes, defaultRoute)
 	return config, warnings, nil
 }
 
