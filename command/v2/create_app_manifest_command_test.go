@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"errors"
+	"os"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -120,7 +121,7 @@ var _ = Describe("create-app-manifest Command", func() {
 					Expect(testUI.Out).To(Say("Creating an app manifest from current settings of app some-app in org some-org / space some-space as some-user..."))
 					Expect(testUI.Err).To(Say("some-warning"))
 					Expect(testUI.Out).To(Say("OK"))
-					Expect(testUI.Out).To(Say("Manifest file created successfully at ./some-app_manifest.yml"))
+					Expect(testUI.Out).To(Say("Manifest file created successfully at .%ssome-app_manifest.yml", string(os.PathSeparator)))
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(fakeActor.CreateApplicationManifestByNameAndSpaceCallCount()).To(Equal(1))
