@@ -196,7 +196,7 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 	for time.Now().Before(timeout) {
 		readyProcs := 0
 		for _, process := range processes {
-			ready, err := actor.processReady(process, warningsChannel)
+			ready, err := actor.processStatus(process, warningsChannel)
 			if err != nil {
 				return err
 			}
@@ -250,7 +250,7 @@ func (e StartupTimeoutError) Error() string {
 	return fmt.Sprintf("Timed out waiting for application to start")
 }
 
-func (actor Actor) processReady(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
+func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
 	instances, warnings, err := actor.CloudControllerClient.GetProcessInstances(process.GUID)
 	warningsChannel <- Warnings(warnings)
 	if err != nil {
@@ -266,5 +266,12 @@ func (actor Actor) processReady(process ccv3.Process, warningsChannel chan<- War
 		}
 	}
 
-	return false, nil
+	for _, instance := range instances {
+		if instance.State != "CRASHED" {
+			return false, nil
+		}
+	}
+
+	// all of the instances are crashed at this point
+	return true, nil
 }

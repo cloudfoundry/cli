@@ -71,6 +71,36 @@ BUNDLED WITH
 	f(dir)
 }
 
+func WithCrashingApp(f func(dir string)) {
+	dir, err := ioutil.TempDir("", "crashing-ruby-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Procfile"), []byte(`---
+web: bogus bogus`,
+	), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile"), nil, 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	err = ioutil.WriteFile(filepath.Join(dir, "Gemfile.lock"), []byte(`
+GEM
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+
+BUNDLED WITH
+   1.15.0
+	`), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	f(dir)
+}
+
 // WithBananaPantsApp creates a simple application to use with your CLI command
 // (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the

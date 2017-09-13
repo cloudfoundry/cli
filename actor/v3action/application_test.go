@@ -610,6 +610,26 @@ var _ = Describe("Application Actions", func() {
 							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
 						})
 					})
+
+					Context("when all of the instances have crashed by the second call", func() {
+						BeforeEach(func() {
+							initialInstanceStates = []ccv3.Instance{{State: "STARTING"}, {State: "STARTING"}, {State: "STARTING"}}
+							eventualInstanceStates = []ccv3.Instance{{State: "CRASHED"}, {State: "CRASHED"}, {State: "CRASHED"}}
+						})
+
+						It("should not return an error", func() {
+							Expect(pollStartErr).NotTo(HaveOccurred())
+						})
+
+						It("should call GetProcessInstances twice", func() {
+							Expect(processInstanceCallCount).To(Equal(2))
+						})
+
+						It("should return correct warnings", func() {
+							Expect(len(allWarnings)).To(Equal(4))
+							Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2", "get-process-warning-3"))
+						})
+					})
 				})
 			})
 
