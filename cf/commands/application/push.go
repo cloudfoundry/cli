@@ -198,7 +198,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return err
 		}
 
-		if c.IsSet("docker-image") {
+		if c.IsSet("docker-image") || appParams.DockerImage != nil {
 			diego := true
 			appParams.Diego = &diego
 		}
@@ -271,7 +271,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return err
 		}
 
-		if c.String("docker-image") == "" {
+		if c.String("docker-image") == "" || appParams.DockerImage == nil {
 			err = cmd.actor.ProcessPath(*appParams.Path, cmd.processPathCallback(*appParams.Path, app))
 			if err != nil {
 				return errors.New(
