@@ -12,7 +12,7 @@ type Plugin interface {
 
 //go:generate counterfeiter . CliConnection
 /**
-	List of commands avaiable to CliConnection variable passed into run
+	List of commands available to CliConnection variable passed into run
 **/
 type CliConnection interface {
 	CliCommandWithoutTerminalOutput(args ...string) ([]string, error)
@@ -23,6 +23,9 @@ type CliConnection interface {
 	UserGuid() (string, error)
 	UserEmail() (string, error)
 	IsLoggedIn() (bool, error)
+	// IsSSLDisabled returns true if and only if the user is connected to the Cloud Controller API with the
+	// `--skip-ssl-validation` flag set unless the CLI configuration file cannot be read, in which case it
+	// returns an error.
 	IsSSLDisabled() (bool, error)
 	HasOrganization() (bool, error)
 	HasSpace() (bool, error)
