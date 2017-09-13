@@ -42,7 +42,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	}
 
 	if settings.DiskQuota != 0 {
-		app.DiskQuota = settings.DiskQuota
+		app.DiskQuota.ParseUint64Value(&settings.DiskQuota)
 	}
 
 	if settings.DockerImage != "" {
@@ -70,7 +70,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	}
 
 	if settings.Memory != 0 {
-		app.Memory = settings.Memory
+		app.Memory.ParseUint64Value(&settings.Memory)
 	}
 
 	if settings.Name != "" {
