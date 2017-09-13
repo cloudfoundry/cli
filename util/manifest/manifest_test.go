@@ -42,6 +42,9 @@ applications:
   health-check-type: "http"
   instances: 10
   disk_quota: 100M
+  docker:
+    image: "some-docker-image"
+    username: "some-docker-username"
   memory: 200M
   stack: "some-stack"
   timeout: 120
@@ -99,6 +102,8 @@ applications:
 						Value: 100,
 						IsSet: true,
 					},
+					DockerImage:    "some-docker-image",
+					DockerUsername: "some-docker-username",
 					Memory: types.NullByteSizeInMb{
 						Value: 200,
 						IsSet: true,
@@ -187,6 +192,9 @@ applications:
 						IsSet: true,
 						Value: "some-command",
 					},
+					DockerImage:    "some-docker-image",
+					DockerUsername: "some-docker-username",
+					DockerPassword: "",
 					EnvironmentVariables: map[string]string{
 						"env_1": "foo",
 						"env_2": "182837403930483038",
@@ -223,6 +231,9 @@ applications:
   buildpack: some-buildpack
   command: some-command
   disk_quota: 1G
+  docker:
+    image: some-docker-image
+    username: some-docker-username
   env:
     env_1: foo
     env_2: "182837403930483038"

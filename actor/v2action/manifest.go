@@ -33,6 +33,8 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 	manifestApp := manifest.Application{
 		Buildpack:            applicationSummary.Buildpack,
 		Command:              applicationSummary.Command,
+		DockerImage:          applicationSummary.DockerImage,
+		DockerUsername:       applicationSummary.DockerCredentials.Username,
 		EnvironmentVariables: applicationSummary.EnvironmentVariables,
 		HealthCheckTimeout:   applicationSummary.HealthCheckTimeout,
 		Instances:            applicationSummary.Instances,
