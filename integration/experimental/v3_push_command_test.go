@@ -299,6 +299,51 @@ var _ = Describe("v3-push command", func() {
 			})
 		})
 
+		Context("when the app crashes", func() {
+			var session *Session
+
+			BeforeEach(func() {
+				helpers.WithCrashingApp(func(appDir string) {
+					session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			It("pushes the app", func() {
+				Eventually(session.Out).Should(Say("Creating app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Staging package for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Consistently(session.Out).ShouldNot(Say("Stopping"))
+				Eventually(session.Out).Should(Say("Setting app %s to droplet .+ in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Mapping routes\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
+				Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+				Eventually(session.Out).Should(Say("requested state:\\s+started"))
+				Eventually(session.Out).Should(Say("processes:\\s+web:0/1"))
+				Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
+				Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+				Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+				Eventually(session.Out).Should(Say("buildpacks:\\s+ruby"))
+				Eventually(session.Out).Should(Say(""))
+				Eventually(session.Out).Should(Say("web:0/1"))
+				Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+				Eventually(session.Out).Should(Say("#0\\s+crashed\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+			})
+		})
 		Context("when the -p flag is provided", func() {
 			Context("when the path is a directory", func() {
 				Context("when the directory contains files", func() {

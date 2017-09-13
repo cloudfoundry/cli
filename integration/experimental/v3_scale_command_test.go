@@ -301,24 +301,50 @@ var _ = Describe("v3-scale command", func() {
 			})
 
 			Context("when all scale option flags are provided", func() {
-				It("scales the app accordingly", func() {
-					buffer := NewBuffer()
-					buffer.Write([]byte("y\n"))
-					session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "60M")
-					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
-					Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-					Eventually(session).Should(Exit(0))
+				Context("when the app starts successfully", func() {
+					It("scales the app accordingly", func() {
+						buffer := NewBuffer()
+						buffer.Write([]byte("y\n"))
+						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "60M")
+						Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
+						Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Exit(0))
 
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
-					Expect(appTable.Processes).To(HaveLen(3))
+						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						Expect(appTable.Processes).To(HaveLen(3))
 
-					processSummary := appTable.Processes[0]
-					instanceSummary := processSummary.Instances[0]
-					Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
-					Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 60M`))
-					Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+						processSummary := appTable.Processes[0]
+						instanceSummary := processSummary.Instances[0]
+						Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
+						Expect(instanceSummary.State).To(MatchRegexp(`running`))
+						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 60M`))
+						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+					})
+				})
+
+				Context("when the app does not start successfully", func() {
+					It("scales the app and displays the app summary", func() {
+						buffer := NewBuffer()
+						buffer.Write([]byte("y\n"))
+						session := helpers.CFWithStdin(buffer, "v3-scale", appName, "-i", "2", "-k", "120M", "-m", "6M")
+						Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("This will cause the app to restart\\. Are you sure you want to scale %s\\? \\[yN\\]:", appName))
+						Eventually(session.Out).Should(Say("Stopping app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session).Should(Exit(0))
+
+						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						Expect(appTable.Processes).To(HaveLen(3))
+
+						processSummary := appTable.Processes[0]
+						instanceSummary := processSummary.Instances[0]
+						Expect(processSummary.Title).To(MatchRegexp(`web:\d/2`))
+						Expect(instanceSummary.State).To(MatchRegexp(`crashed`))
+						Expect(instanceSummary.Memory).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 6M`))
+						Expect(instanceSummary.Disk).To(MatchRegexp(`\d+(\.\d+)?[KMG]? of 120M`))
+					})
 				})
 			})
 
