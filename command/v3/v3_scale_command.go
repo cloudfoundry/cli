@@ -31,10 +31,10 @@ type V3ScaleActor interface {
 type V3ScaleCommand struct {
 	RequiredArgs        flag.AppName   `positional-args:"yes"`
 	Force               bool           `short:"f" description:"Force restart of app without prompt"`
-	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
 	Instances           flag.Instances `short:"i" required:"false" description:"Number of instances"`
 	DiskLimit           flag.Megabytes `short:"k" required:"false" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit         flag.Megabytes `short:"m" required:"false" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	ProcessType         string         `long:"process" default:"web" description:"App process to scale"`
 	usage               interface{}    `usage:"CF_NAME v3-scale APP_NAME [--process PROCESS] [-i INSTANCES] [-k DISK] [-m MEMORY]"`
 	relatedCommands     interface{}    `related_commands:"v3-push"`
 	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
