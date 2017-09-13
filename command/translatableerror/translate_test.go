@@ -82,6 +82,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("PluginNotFoundError", PluginNotFoundError{}),
 		Entry("PluginNotFoundInRepositoryError", PluginNotFoundInRepositoryError{}),
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),
+		Entry("PortNotAllowedWithHTTPDomainError", PortNotAllowedWithHTTPDomainError{}),
 		Entry("RepositoryNameTakenError", RepositoryNameTakenError{}),
 		Entry("RequiredArgumentError", RequiredArgumentError{}),
 		Entry("RequiredFlagsError", RequiredFlagsError{}),

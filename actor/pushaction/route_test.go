@@ -250,6 +250,17 @@ var _ = Describe("Routes", func() {
 						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
 					})
 				})
+
+				Context("when TCP properties are being set on a HTTP domain", func() {
+					BeforeEach(func() {
+						routes = []string{"a.com", "b.a.com", "c.b.a.com:1234"}
+					})
+
+					It("returns back warnings and error", func() {
+						Expect(executeErr).To(MatchError(actionerror.InvalidHTTPRouteSettings{Domain: "b.a.com"}))
+						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
+					})
+				})
 			})
 
 			Context("when looking up a domain returns an error", func() {

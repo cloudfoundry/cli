@@ -63,6 +63,8 @@ func HandleError(err error) error {
 		return translatableerror.DomainNotFoundError(e)
 	case actionerror.NoMatchingDomainError:
 		return translatableerror.NoMatchingDomainError(e)
+	case actionerror.InvalidHTTPRouteSettings:
+		return translatableerror.PortNotAllowedWithHTTPDomainError(e)
 
 	case pushaction.AppNotFoundInManifestError:
 		return translatableerror.AppNotFoundInManifestError(e)
