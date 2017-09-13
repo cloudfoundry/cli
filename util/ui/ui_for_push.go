@@ -3,6 +3,7 @@ package ui
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -51,45 +52,33 @@ func (ui *UI) DisplayChangeForPush(header string, stringTypePadding int, hiddenV
 	ui.terminalLock.Lock()
 	defer ui.terminalLock.Unlock()
 
+	originalType := reflect.ValueOf(originalValue).Type()
+	newType := reflect.ValueOf(newValue).Type()
+	if originalType != newType {
+		return ErrValueMissmatch
+	}
+
 	offset := strings.Repeat(" ", stringTypePadding)
+
 	switch oVal := originalValue.(type) {
 	case int:
-		nVal, ok := newValue.(int)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
+		nVal := newValue.(int)
 		ui.displayDiffForInt(offset, header, oVal, nVal)
 	case types.NullInt:
-		nVal, ok := newValue.(types.NullInt)
-		if !ok {
-			return ErrValueMissmatch
-		}
+		nVal := newValue.(types.NullInt)
 		ui.displayDiffForNullInt(offset, header, oVal, nVal)
 	case string:
-		nVal, ok := newValue.(string)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
+		nVal := newValue.(string)
 		ui.displayDiffForString(offset, header, hiddenValue, oVal, nVal)
 	case []string:
-		nVal, ok := newValue.([]string)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
+		nVal := newValue.([]string)
 		if len(oVal) == 0 && len(nVal) == 0 {
 			return nil
 		}
 
 		ui.displayDiffForStrings(offset, header, oVal, nVal)
 	case map[string]string:
-		nVal, ok := newValue.(map[string]string)
-		if !ok {
-			return ErrValueMissmatch
-		}
-
+		nVal := newValue.(map[string]string)
 		if len(oVal) == 0 && len(nVal) == 0 {
 			return nil
 		}
