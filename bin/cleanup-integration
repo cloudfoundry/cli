@@ -37,7 +37,7 @@ cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func
 
 cf create-org temp-org
 cf target -o temp-org
-cf domains | grep -i ^integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
+cf domains | egrep -i ^\(sub.\)?integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
 
 cf security-groups | grep -i "^#.* integration-sec-group" | awk '{print $2}' | xargs_func cf delete-security-group -f
 
