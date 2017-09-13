@@ -96,25 +96,6 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 	return calculatedRoutes, allWarnings, nil
 }
 
-func (Actor) parseURL(route string) (string, types.NullInt, string, error) {
-	if !(strings.HasPrefix(route, "http://") || strings.HasPrefix(route, "https://")) {
-		route = fmt.Sprintf("http://%s", route)
-	}
-	parsedURL, err := url.Parse(route)
-	if err != nil {
-		return "", types.NullInt{}, "", err
-	}
-
-	path := parsedURL.RequestURI()
-	if path == "/" {
-		path = ""
-	}
-
-	var port types.NullInt
-	err = port.ParseStringValue(parsedURL.Port())
-	return parsedURL.Hostname(), port, path, err
-}
-
 func (actor Actor) CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
 	var warnings Warnings
 	defaultRoute, domainWarnings, err := actor.getDefaultRoute(orgGUID, spaceGUID, app.Name)
@@ -199,7 +180,7 @@ func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceG
 
 	defaultRoute := v2action.Route{
 		Domain:    defaultDomain,
-		Host:      host,
+		Host:      strings.ToLower(host),
 		SpaceGUID: spaceGUID,
 	}
 
@@ -280,6 +261,25 @@ func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName str
 	}, domainWarnings, nil
 }
 
+func (Actor) parseURL(route string) (string, types.NullInt, string, error) {
+	if !(strings.HasPrefix(route, "http://") || strings.HasPrefix(route, "https://")) {
+		route = fmt.Sprintf("http://%s", route)
+	}
+	parsedURL, err := url.Parse(route)
+	if err != nil {
+		return "", types.NullInt{}, "", err
+	}
+
+	path := parsedURL.RequestURI()
+	if path == "/" {
+		path = ""
+	}
+
+	var port types.NullInt
+	err = port.ParseStringValue(parsedURL.Port())
+	return parsedURL.Hostname(), port, path, err
+}
+
 func (Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bool {
 	for _, r := range routes {
 		if r.GUID == route.GUID {
@@ -311,17 +311,19 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 }
 
 func (actor Actor) spitExistingRoutes(existingRoutes []v2action.Route, routes []string) ([]v2action.Route, []string) {
-	var calculatedRoutes []v2action.Route
+	var cachedRoutes []v2action.Route
+	for _, route := range existingRoutes {
+		cachedRoutes = append(cachedRoutes, route)
+	}
+
 	var unknownRoutes []string
 	for _, route := range routes {
-		if cachedRoute, found := actor.routeInListByName(route, existingRoutes); found {
-			log.WithField("route", cachedRoute).Debug("using cached route")
-			calculatedRoutes = append(calculatedRoutes, cachedRoute)
-		} else {
+		if _, found := actor.routeInListByName(route, existingRoutes); !found {
+			log.WithField("route", route).Debug("unable to find route in cache")
 			unknownRoutes = append(unknownRoutes, route)
 		}
 	}
-	return calculatedRoutes, unknownRoutes
+	return cachedRoutes, unknownRoutes
 }
 
 func (Actor) splitHost(url string) (string, string) {

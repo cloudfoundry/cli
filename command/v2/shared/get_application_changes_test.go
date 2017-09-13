@@ -325,7 +325,7 @@ var _ = Describe("GetApplicationChanges", func() {
 		})
 
 		DescribeTable("non-empty values",
-			func(existingType ccv2.ApplicationHealthCheckType, newType ccv2.ApplicationHealthCheckType, currentValue ccv2.ApplicationHealthCheckType, newValue ccv2.ApplicationHealthCheckType) {
+			func(existingType ccv2.ApplicationHealthCheckType, newType ccv2.ApplicationHealthCheckType, currentValue string, newValue string) {
 				appConfig.CurrentApplication.HealthCheckType = existingType
 				appConfig.DesiredApplication.HealthCheckType = newType
 
@@ -337,9 +337,9 @@ var _ = Describe("GetApplicationChanges", func() {
 					NewValue:     newValue,
 				}))
 			},
-			Entry("new app with health-check-type specified", ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-new-health-check-type")),
-			Entry("existing health-check-type with no health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("")),
-			Entry("existing health-check-type with new health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("some-new-health-check-type")),
+			Entry("new app with health-check-type specified", ccv2.ApplicationHealthCheckType(""), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), "", "some-new-health-check-type"),
+			Entry("existing health-check-type with no health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType(""), "some-old-health-check-type", ""),
+			Entry("existing health-check-type with new health-check-type specified", ccv2.ApplicationHealthCheckType("some-old-health-check-type"), ccv2.ApplicationHealthCheckType("some-new-health-check-type"), "some-old-health-check-type", "some-new-health-check-type"),
 		)
 	})
 

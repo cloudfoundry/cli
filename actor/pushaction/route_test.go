@@ -2,6 +2,7 @@ package pushaction_test
 
 import (
 	"errors"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
@@ -118,10 +119,10 @@ var _ = Describe("Routes", func() {
 
 	Describe("CalculateRoutes", func() {
 		var (
-			routes      []string
-			orgGUID     string
-			spaceGUID   string
-			knownRoutes []v2action.Route
+			routes         []string
+			orgGUID        string
+			spaceGUID      string
+			existingRoutes []v2action.Route
 
 			calculatedRoutes []v2action.Route
 			warnings         Warnings
@@ -140,12 +141,20 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			calculatedRoutes, warnings, executeErr = actor.CalculateRoutes(routes, orgGUID, spaceGUID, knownRoutes)
+			calculatedRoutes, warnings, executeErr = actor.CalculateRoutes(routes, orgGUID, spaceGUID, existingRoutes)
 		})
 
 		Context("when there are no known routes", func() {
 			BeforeEach(func() {
-				knownRoutes = []v2action.Route{}
+				existingRoutes = []v2action.Route{{
+					GUID: "some-route-5",
+					Host: "banana",
+					Domain: v2action.Domain{
+						GUID: "domain-guid-1",
+						Name: "a.com",
+					},
+					SpaceGUID: spaceGUID,
+				}}
 			})
 
 			Context("when a route looking up the domains is succuessful", func() {
@@ -205,7 +214,15 @@ var _ = Describe("Routes", func() {
 								},
 								SpaceGUID: spaceGUID,
 							},
-						))
+							v2action.Route{
+								GUID: "some-route-5",
+								Host: "banana",
+								Domain: v2action.Domain{
+									GUID: "domain-guid-1",
+									Name: "a.com",
+								},
+								SpaceGUID: spaceGUID,
+							}))
 
 						Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))
 						domains, passedOrgGUID := fakeV2Actor.GetDomainsByNameAndOrganizationArgsForCall(0)
@@ -280,7 +297,7 @@ var _ = Describe("Routes", func() {
 
 		Context("when there are known routes", func() {
 			BeforeEach(func() {
-				knownRoutes = []v2action.Route{{
+				existingRoutes = []v2action.Route{{
 					GUID: "route-guid-4",
 					Host: "d.c",
 					Domain: v2action.Domain{
@@ -712,7 +729,7 @@ var _ = Describe("Routes", func() {
 		)
 
 		BeforeEach(func() {
-			host = "some-app"
+			host = "Some-App"
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
 			knownRoutes = nil
@@ -742,7 +759,7 @@ var _ = Describe("Routes", func() {
 					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{
 						Domain:    domain,
 						GUID:      "some-route-guid",
-						Host:      host,
+						Host:      strings.ToLower(host),
 						SpaceGUID: spaceGUID,
 					}, v2action.Warnings{"get-route-warnings"}, nil)
 				})
@@ -754,7 +771,7 @@ var _ = Describe("Routes", func() {
 					Expect(defaultRoute).To(Equal(v2action.Route{
 						Domain:    domain,
 						GUID:      "some-route-guid",
-						Host:      host,
+						Host:      strings.ToLower(host),
 						SpaceGUID: spaceGUID,
 					}))
 
@@ -762,7 +779,7 @@ var _ = Describe("Routes", func() {
 					Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
 
 					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: host, SpaceGUID: spaceGUID}))
+					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(host), SpaceGUID: spaceGUID}))
 				})
 
 				Context("when the route has been found", func() {
@@ -770,7 +787,7 @@ var _ = Describe("Routes", func() {
 						knownRoutes = []v2action.Route{{
 							Domain:    domain,
 							GUID:      "some-route-guid",
-							Host:      host,
+							Host:      strings.ToLower(host),
 							SpaceGUID: spaceGUID,
 						}}
 					})
@@ -782,7 +799,7 @@ var _ = Describe("Routes", func() {
 						Expect(defaultRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							GUID:      "some-route-guid",
-							Host:      host,
+							Host:      strings.ToLower(host),
 							SpaceGUID: spaceGUID,
 						}))
 
@@ -800,7 +817,7 @@ var _ = Describe("Routes", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 
-					Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: host, SpaceGUID: spaceGUID}))
+					Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(host), SpaceGUID: spaceGUID}))
 				})
 			})
 

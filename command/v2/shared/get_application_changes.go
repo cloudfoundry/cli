@@ -99,8 +99,8 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 		changes = append(changes,
 			ui.Change{
 				Header:       "health check type:",
-				CurrentValue: appConfig.CurrentApplication.HealthCheckType,
-				NewValue:     appConfig.DesiredApplication.HealthCheckType,
+				CurrentValue: string(appConfig.CurrentApplication.HealthCheckType),
+				NewValue:     string(appConfig.DesiredApplication.HealthCheckType),
 			})
 	}
 
