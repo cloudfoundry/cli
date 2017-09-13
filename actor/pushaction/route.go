@@ -1,10 +1,13 @@
 package pushaction
 
 import (
+	"fmt"
+	"net/url"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/types"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -53,7 +56,14 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 
 	for _, route := range unknownRoutes {
 		log.WithField("route", route).Debug("generating route")
-		host, domain, domainErr := actor.calculateRoute(route, nameToFoundDomain)
+
+		root, port, path, parseErr := actor.parseURL(route)
+		if parseErr != nil {
+			log.Errorln("parse route:", parseErr)
+			return nil, allWarnings, parseErr
+		}
+
+		host, domain, domainErr := actor.calculateRoute(root, nameToFoundDomain)
 		if _, ok := domainErr.(v2action.DomainNotFoundError); ok {
 			log.Error("no matching domains")
 			return nil, allWarnings, actionerror.NoMatchingDomainError{Route: route}
@@ -62,9 +72,16 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 			return nil, allWarnings, domainErr
 		}
 
+		// TODO: redo once TCP routing has been completed
+		if port.IsSet && domain.IsHTTP() {
+			return nil, allWarnings, actionerror.InvalidHTTPRouteSettings{Domain: domain.Name}
+		}
+
 		calculatedRoute, routeWarnings, routeErr := actor.findOrReturnPartialRouteWithSettings(v2action.Route{
 			Host:      strings.Join(host, "."),
 			Domain:    domain,
+			Path:      path,
+			Port:      port,
 			SpaceGUID: spaceGUID,
 		})
 		allWarnings = append(allWarnings, routeWarnings...)
@@ -77,6 +94,25 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 	}
 
 	return calculatedRoutes, allWarnings, nil
+}
+
+func (Actor) parseURL(route string) (string, types.NullInt, string, error) {
+	if !(strings.HasPrefix(route, "http://") || strings.HasPrefix(route, "https://")) {
+		route = fmt.Sprintf("http://%s", route)
+	}
+	parsedURL, err := url.Parse(route)
+	if err != nil {
+		return "", types.NullInt{}, "", err
+	}
+
+	path := parsedURL.RequestURI()
+	if path == "/" {
+		path = ""
+	}
+
+	var port types.NullInt
+	err = port.ParseStringValue(parsedURL.Port())
+	return parsedURL.Hostname(), port, path, err
 }
 
 func (actor Actor) CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
