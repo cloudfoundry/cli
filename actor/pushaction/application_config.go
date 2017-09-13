@@ -224,9 +224,15 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 			application.DockerCredentials.Password = manifest.DockerPassword
 		}
 	}
-	if manifest.DiskQuota != 0 {
-		application.DiskQuota = manifest.DiskQuota
+
+	if manifest.DiskQuota.IsSet {
+		application.DiskQuota = manifest.DiskQuota.Value
 	}
+
+	if manifest.Memory.IsSet {
+		application.Memory = manifest.Memory.Value
+	}
+
 	if manifest.HealthCheckHTTPEndpoint != "" {
 		application.HealthCheckHTTPEndpoint = manifest.HealthCheckHTTPEndpoint
 	}
@@ -238,9 +244,6 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 	if manifest.Instances.IsSet {
 		application.Instances = manifest.Instances
-	}
-	if manifest.Memory != 0 {
-		application.Memory = manifest.Memory
 	}
 
 	if noStart {

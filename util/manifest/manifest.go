@@ -8,8 +8,6 @@ import (
 
 	"code.cloudfoundry.org/cli/types"
 
-	"github.com/cloudfoundry/bytefmt"
-
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -29,7 +27,7 @@ type Application struct {
 	Buildpack types.FilteredString
 	Command   types.FilteredString
 	// DiskQuota is the disk size in megabytes.
-	DiskQuota      uint64
+	DiskQuota      types.NullByteSizeInMb
 	DockerImage    string
 	DockerUsername string
 	DockerPassword string
@@ -43,7 +41,7 @@ type Application struct {
 	HealthCheckType    string
 	Instances          types.NullInt
 	// Memory is the amount of memory in megabytes.
-	Memory    uint64
+	Memory    types.NullByteSizeInMb
 	Name      string
 	Path      string
 	Routes    []string
@@ -53,7 +51,7 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -108,13 +106,9 @@ func (app Application) MarshalYAML() (interface{}, error) {
 		StackName:               app.StackName,
 		Timeout:                 app.HealthCheckTimeout,
 	}
-	if app.DiskQuota != 0 {
-		m.DiskQuota = bytefmt.ByteSize(app.DiskQuota * bytefmt.MEGABYTE)
-	}
+	m.DiskQuota = app.DiskQuota.String()
+	m.Memory = app.Memory.String()
 
-	if app.Memory != 0 {
-		m.Memory = bytefmt.ByteSize(app.Memory * bytefmt.MEGABYTE)
-	}
 	if app.Instances.IsSet {
 		m.Instances = &app.Instances.Value
 	}
@@ -144,20 +138,12 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 
 	app.Instances.ParseIntValue(m.Instances)
 
-	if m.DiskQuota != "" {
-		disk, fmtErr := bytefmt.ToMegabytes(m.DiskQuota)
-		if fmtErr != nil {
-			return fmtErr
-		}
-		app.DiskQuota = disk
+	if fmtErr := app.DiskQuota.ParseStringValue(m.DiskQuota); fmtErr != nil {
+		return fmtErr
 	}
 
-	if m.Memory != "" {
-		memory, fmtErr := bytefmt.ToMegabytes(m.Memory)
-		if fmtErr != nil {
-			return fmtErr
-		}
-		app.Memory = memory
+	if fmtErr := app.Memory.ParseStringValue(m.Memory); fmtErr != nil {
+		return fmtErr
 	}
 
 	for _, route := range m.Routes {

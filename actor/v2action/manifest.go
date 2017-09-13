@@ -33,16 +33,16 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 	manifestApp := manifest.Application{
 		Buildpack:            applicationSummary.Buildpack,
 		Command:              applicationSummary.Command,
-		DiskQuota:            applicationSummary.DiskQuota,
 		EnvironmentVariables: applicationSummary.EnvironmentVariables,
 		HealthCheckTimeout:   applicationSummary.HealthCheckTimeout,
 		Instances:            applicationSummary.Instances,
-		Memory:               applicationSummary.Memory,
 		Name:                 applicationSummary.Name,
 		Routes:               routes,
 		Services:             services,
 		StackName:            applicationSummary.Stack.Name,
 	}
+	manifestApp.DiskQuota.ParseUint64Value(&applicationSummary.DiskQuota)
+	manifestApp.Memory.ParseUint64Value(&applicationSummary.Memory)
 
 	if applicationSummary.HealthCheckType != ccv2.ApplicationHealthCheckPort {
 		manifestApp.HealthCheckType = string(applicationSummary.HealthCheckType)

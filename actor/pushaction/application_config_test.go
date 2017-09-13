@@ -308,8 +308,8 @@ var _ = Describe("Application Config", func() {
 					manifestApps[0].HealthCheckTimeout = 5
 					manifestApps[0].HealthCheckType = "port"
 					manifestApps[0].Instances = types.NullInt{Value: 1, IsSet: true}
-					manifestApps[0].DiskQuota = 2
-					manifestApps[0].Memory = 3
+					manifestApps[0].DiskQuota = types.NullByteSizeInMb{Value: 2, IsSet: true}
+					manifestApps[0].Memory = types.NullByteSizeInMb{Value: 3, IsSet: true}
 					manifestApps[0].StackName = "some-stack"
 					manifestApps[0].EnvironmentVariables = map[string]string{
 						"env1": "1",
