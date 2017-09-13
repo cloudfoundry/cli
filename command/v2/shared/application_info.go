@@ -36,7 +36,12 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 		{ui.TranslateText("routes:"), routes},
 		{ui.TranslateText("last uploaded:"), ui.UserFriendlyDate(appSummary.PackageUpdatedAt)},
 		{ui.TranslateText("stack:"), appSummary.Stack.Name},
-		{ui.TranslateText("buildpack:"), appSummary.Application.CalculatedBuildpack()},
+	}
+
+	if appSummary.DockerImage == "" {
+		table = append(table, []string{ui.TranslateText("buildpack:"), appSummary.Application.CalculatedBuildpack()})
+	} else {
+		table = append(table, []string{ui.TranslateText("docker image:"), appSummary.DockerImage})
 	}
 
 	if displayStartCommand {
