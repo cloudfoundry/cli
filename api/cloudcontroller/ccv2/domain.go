@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -13,7 +14,7 @@ type Domain struct {
 	GUID            string
 	Name            string
 	RouterGroupGUID string
-	RouterGroupType string
+	RouterGroupType constant.RouterGroupType
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Domain response.
@@ -33,7 +34,7 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 	domain.GUID = ccDomain.Metadata.GUID
 	domain.Name = ccDomain.Entity.Name
 	domain.RouterGroupGUID = ccDomain.Entity.RouterGroupGUID
-	domain.RouterGroupType = ccDomain.Entity.RouterGroupType
+	domain.RouterGroupType = constant.RouterGroupType(ccDomain.Entity.RouterGroupType)
 	return nil
 }
 

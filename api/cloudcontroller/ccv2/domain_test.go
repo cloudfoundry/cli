@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -28,7 +29,7 @@ var _ = Describe("Domain", func() {
 						"entity": {
 							"name": "shared-domain-1.com",
 							"router_group_guid": "some-router-group-guid",
-							"router_group_type": "some-router-group-type"
+							"router_group_type": "http"
 						}
 				}`
 				server.AppendHandlers(
@@ -46,7 +47,7 @@ var _ = Describe("Domain", func() {
 					Name:            "shared-domain-1.com",
 					GUID:            "shared-domain-guid",
 					RouterGroupGUID: "some-router-group-guid",
-					RouterGroupType: "some-router-group-type",
+					RouterGroupType: constant.HTTPRouterGroup,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -143,7 +144,7 @@ var _ = Describe("Domain", func() {
 							"entity": {
 								"name": "domain-name-1",
 								"router_group_guid": "some-router-group-guid-1",
-								"router_group_type": "some-router-group-type-1"
+								"router_group_type": "http"
 							}
 						},
 						{
@@ -153,7 +154,7 @@ var _ = Describe("Domain", func() {
 							"entity": {
 								"name": "domain-name-2",
 								"router_group_guid": "some-router-group-guid-2",
-								"router_group_type": "some-router-group-type-2"
+								"router_group_type": "http"
 							}
 						}
 					]
@@ -168,7 +169,7 @@ var _ = Describe("Domain", func() {
 							"entity": {
 								"name": "domain-name-3",
 								"router_group_guid": "some-router-group-guid-3",
-								"router_group_type": "some-router-group-type-3"
+								"router_group_type": "http"
 							}
 						},
 						{
@@ -178,7 +179,7 @@ var _ = Describe("Domain", func() {
 							"entity": {
 								"name": "domain-name-4",
 								"router_group_guid": "some-router-group-guid-4",
-								"router_group_type": "some-router-group-type-4"
+								"router_group_type": "http"
 							}
 						}
 					]
@@ -209,25 +210,25 @@ var _ = Describe("Domain", func() {
 						GUID:            "domain-guid-1",
 						Name:            "domain-name-1",
 						RouterGroupGUID: "some-router-group-guid-1",
-						RouterGroupType: "some-router-group-type-1",
+						RouterGroupType: constant.HTTPRouterGroup,
 					},
 					{
 						GUID:            "domain-guid-2",
 						Name:            "domain-name-2",
 						RouterGroupGUID: "some-router-group-guid-2",
-						RouterGroupType: "some-router-group-type-2",
+						RouterGroupType: constant.HTTPRouterGroup,
 					},
 					{
 						GUID:            "domain-guid-3",
 						Name:            "domain-name-3",
 						RouterGroupGUID: "some-router-group-guid-3",
-						RouterGroupType: "some-router-group-type-3",
+						RouterGroupType: constant.HTTPRouterGroup,
 					},
 					{
 						GUID:            "domain-guid-4",
 						Name:            "domain-name-4",
 						RouterGroupGUID: "some-router-group-guid-4",
-						RouterGroupType: "some-router-group-type-4",
+						RouterGroupType: constant.HTTPRouterGroup,
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))

@@ -5,12 +5,23 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 
 	log "github.com/sirupsen/logrus"
 )
 
 // Domain represents a CLI Domain.
 type Domain ccv2.Domain
+
+// IsHTTP returns true for any router group type that is not 'tcp'.
+func (domain Domain) IsHTTP() bool {
+	return !domain.IsTCP()
+}
+
+// IsTCP returns true only when the router group type equals 'tcp'.
+func (domain Domain) IsTCP() bool {
+	return domain.RouterGroupType == constant.TCPRouterGroup
+}
 
 // DomainNotFoundError is an error wrapper that represents the case
 // when the domain is not found.
