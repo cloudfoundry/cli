@@ -213,6 +213,9 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	if docker.Image != "" {
 		appParams.DockerImage = &docker.Image
 	}
+	if docker.Username != "" {
+		appParams.DockerUsername = &docker.Username
+	}
 
 	if appParams.Path != nil {
 		path := *appParams.Path
@@ -540,21 +543,31 @@ func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
 
 	docker, ok := input.Get("docker").(map[interface{}]interface{})
 	if !ok {
-		*errs = append(*errs, fmt.Errorf(T("'docker' must have at least an 'image' property")))
 		return models.ManifestDocker{}
 	}
 
+	imageValue := ""
 	image, imageExists := docker["image"]
-	if !imageExists {
-		*errs = append(*errs, fmt.Errorf(T("'docker' must have an 'image' property")))
-		return models.ManifestDocker{}
+	if imageExists {
+		imageValue, ok = image.(string)
+		if !ok {
+			*errs = append(*errs, fmt.Errorf(T("'docker.image' must be a string")))
+			return models.ManifestDocker{}
+		}
 	}
 
-	imageValue, ok := image.(string)
-	if !ok {
-		*errs = append(*errs, fmt.Errorf(T("'docker.image' must be a string")))
-		return models.ManifestDocker{}
+	usernameValue := ""
+	username, usernameExists := docker["username"]
+	if usernameExists {
+		usernameValue, ok = username.(string)
+		if !ok {
+			*errs = append(*errs, fmt.Errorf(T("'docker.username' must be a string")))
+			return models.ManifestDocker{}
+		}
 	}
 
-	return models.ManifestDocker{Image: imageValue}
+	return models.ManifestDocker{
+		Image:    imageValue,
+		Username: usernameValue,
+	}
 }

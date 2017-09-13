@@ -1,6 +1,7 @@
 package models
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -136,12 +137,18 @@ func (app *AppParams) Merge(flagContext *AppParams) {
 	if flagContext.DockerImage != nil {
 		app.DockerImage = flagContext.DockerImage
 	}
-	if flagContext.DockerUsername != nil {
+
+	switch {
+	case flagContext.DockerUsername != nil:
 		app.DockerUsername = flagContext.DockerUsername
-	}
-	if flagContext.DockerPassword != nil {
+		// the password is always non-nil after we parse the flag context
 		app.DockerPassword = flagContext.DockerPassword
+	case app.DockerUsername != nil:
+		password := os.Getenv("CF_DOCKER_PASSWORD")
+		// if the password is empty, we will get a CC error
+		app.DockerPassword = &password
 	}
+
 	if flagContext.Domains != nil {
 		app.Domains = flagContext.Domains
 	}

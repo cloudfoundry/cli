@@ -857,14 +857,15 @@ var _ = Describe("Push Command", func() {
 						})
 
 						Context("when CF_DOCKER_PASSWORD is set", func() {
+							var oldDockerPassword string
+
 							BeforeEach(func() {
-								err := os.Setenv("CF_DOCKER_PASSWORD", "some-docker-pass")
-								Expect(err).ToNot(HaveOccurred())
+								oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
+								Expect(os.Setenv("CF_DOCKER_PASSWORD", "some-docker-pass")).ToNot(HaveOccurred())
 							})
 
 							AfterEach(func() {
-								err := os.Unsetenv("CF_DOCKER_PASSWORD")
-								Expect(err).ToNot(HaveOccurred())
+								Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).ToNot(HaveOccurred())
 							})
 
 							It("it passes the credentials to create call", func() {
@@ -927,13 +928,85 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				Context("when pushing with --docker-username and not --docker-image", func() {
+				Context("when the docker password is not set in the env", func() {
+					var oldDockerPassword string
+
 					BeforeEach(func() {
-						deps.UI = uiWithContents
-						args = []string{"testApp", "--docker-username", "some-docker-username"}
+						m := &manifest.Manifest{
+							Path: "manifest.yml",
+							Data: generic.NewMap(map[interface{}]interface{}{
+								"applications": []interface{}{
+									map[interface{}]interface{}{
+										"docker": map[interface{}]interface{}{
+											"username": "user",
+										},
+									},
+								},
+							}),
+						}
+						manifestRepo.ReadManifestReturns(m, nil)
+
+						oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
+						Expect(os.Unsetenv("CF_DOCKER_PASSWORD")).To(Succeed())
 					})
 
-					It("it returns an error", func() {
+					AfterEach(func() {
+						Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).To(Succeed())
+					})
+
+					Context("when docker username is provided via the manifest only", func() {
+						BeforeEach(func() {
+							deps.UI = uiWithContents
+							args = []string{"testApp", "--docker-image", "some-docker-image"}
+						})
+
+						It("returns an error", func() {
+							Expect(executeErr).To(MatchError("No Docker password was provided. Please provide the password by setting the CF_DOCKER_PASSWORD environment variable."))
+						})
+					})
+				})
+
+				Context("when the docker username is provided via the command line and the docker image is not provided", func() {
+					var oldDockerPassword string
+
+					BeforeEach(func() {
+						oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
+						Expect(os.Setenv("CF_DOCKER_PASSWORD", "docker-pass")).To(Succeed())
+
+						deps.UI = uiWithContents
+						args = []string{"testApp", "--docker-username", "user"}
+					})
+
+					AfterEach(func() {
+						Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).To(Succeed())
+					})
+
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError("'--docker-username' requires '--docker-image' to be specified"))
+					})
+				})
+
+				Context("when docker username is provided via the manifest but docker image is not provided", func() {
+					BeforeEach(func() {
+						m := &manifest.Manifest{
+							Path: "manifest.yml",
+							Data: generic.NewMap(map[interface{}]interface{}{
+								"applications": []interface{}{
+									map[interface{}]interface{}{
+										"docker": map[interface{}]interface{}{
+											"username": "user",
+										},
+									},
+								},
+							}),
+						}
+						manifestRepo.ReadManifestReturns(m, nil)
+
+						deps.UI = uiWithContents
+						args = []string{"testApp"}
+					})
+
+					It("returns an error", func() {
 						Expect(executeErr).To(MatchError("'--docker-username' requires '--docker-image' to be specified"))
 					})
 				})

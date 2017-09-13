@@ -1,5 +1,6 @@
 package models
 
 type ManifestDocker struct {
-	Image string
+	Image    string
+	Username string
 }

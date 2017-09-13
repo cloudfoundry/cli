@@ -14,8 +14,9 @@ import (
 
 var _ = Describe("Push with manifest", func() {
 	var (
-		appName  string
-		tempFile string
+		appName           string
+		tempFile          string
+		oldDockerPassword string
 	)
 
 	const (
@@ -32,9 +33,13 @@ var _ = Describe("Push with manifest", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(f.Close()).To(Succeed())
 		tempFile = f.Name()
+
+		oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
+		Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 	})
 
 	AfterEach(func() {
+		Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).To(Succeed())
 		Expect(os.Remove(tempFile)).ToNot(HaveOccurred())
 	})
 
@@ -48,46 +53,170 @@ var _ = Describe("Push with manifest", func() {
 		})
 	})
 
-	Context("manifest contains 'docker' and the '-o' flag is provided", func() {
-		BeforeEach(func() {
-			manifestContents := []byte(fmt.Sprintf(`
+	Context("when the same docker property is provided via both manifest and command line", func() {
+		Context("when manifest contains 'docker.image' and the '--docker-image' flag is provided", func() {
+			BeforeEach(func() {
+				manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   docker:
     image: some-image
 `, appName))
-			Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
-		})
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
 
-		It("overrides 'docker' in the manifest with the '-o' flag value", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
+			It("overrides 'docker.image' in the manifest with the '-o' flag value", func() {
 				Eventually(helpers.CF("push", "-o", dockerImage, "-f", tempFile)).Should(Exit(0))
 
 				appGUID := helpers.AppGUID(appName)
-				// TODO: replace this with 'cf app' once #146661157 is complete
 				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
 				Eventually(session.Out).Should(Say(dockerImage))
 				Eventually(session).Should(Exit(0))
 			})
 		})
+
+		Context("when manifest contains 'docker.username' and the '--docker-username' flag is provided", func() {
+			var buffer *Buffer
+
+			BeforeEach(func() {
+				buffer = NewBuffer()
+				_, err := buffer.Write([]byte("n\n"))
+				Expect(err).NotTo(HaveOccurred())
+
+				manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: some-image
+    username: some-user
+`, appName))
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
+
+			It("overrides 'docker.username' in the manifest with the '--docker-username' flag value", func() {
+				Eventually(helpers.CFWithStdin(buffer, "push", "--docker-username", "some-other-user", "-f", tempFile)).Should(Exit())
+
+				appGUID := helpers.AppGUID(appName)
+				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+				Eventually(session.Out).Should(Say("some-other-user"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 
-	Context("manifest contains both 'buildpack' and 'docker'", func() {
+	Context("when the docker password is set in the environment", func() {
+		Context("when the docker image is provided via the command line and docker username is provided via the manifest", func() {
+			BeforeEach(func() {
+				manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    username: some-other-user
+`, appName))
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
+
+			It("pushes the app using the docker image from command line and username from manifest", func() {
+				Eventually(helpers.CF("push", "-o", dockerImage, "-f", tempFile)).Should(Exit())
+
+				appGUID := helpers.AppGUID(appName)
+				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session.Out).Should(Say("some-other-user"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the docker image is provided via the manifest and docker username is provided via the command line", func() {
+			var buffer *Buffer
+
+			BeforeEach(func() {
+				buffer = NewBuffer()
+				_, err := buffer.Write([]byte("my-voice-is-my-passport\n"))
+				Expect(err).NotTo(HaveOccurred())
+
+				manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: %s
+`, appName, dockerImage))
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
+
+			It("pushes the app using the docker image from manifest and username from command line", func() {
+				Eventually(helpers.CFWithStdin(buffer, "push", "--docker-username", "some-user", "-f", tempFile)).Should(Exit())
+
+				appGUID := helpers.AppGUID(appName)
+				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
+				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session.Out).Should(Say("some-user"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+
+	Context("when the docker password is not set in the environment", func() {
 		BeforeEach(func() {
-			manifestContents := []byte(fmt.Sprintf(`
+			Expect(os.Unsetenv("CF_DOCKER_PASSWORD")).To(Succeed())
+		})
+
+		Context("when the docker username is provided via the command line", func() {
+			var buffer *Buffer
+
+			BeforeEach(func() {
+				buffer = NewBuffer()
+				_, err := buffer.Write([]byte("my-voice-is-my-passport\n"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("prompts the user for the docker password", func() {
+				session := helpers.CFWithStdin(buffer, "push", appName, "--docker-image", dockerImage, "--docker-username", "some-user")
+				Eventually(session).Should(Say("Docker password"))
+				Eventually(session).Should(Exit())
+			})
+		})
+
+		Context("when the docker username is provided via the manifest", func() {
+			BeforeEach(func() {
+				manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: some-image
+    username: some-user
+`, appName))
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
+
+			It("displays an error and exits 1", func() {
+				session := helpers.CF("push", "-f", tempFile)
+				Eventually(session).Should(Say("No Docker password was provided\\. Please provide the password by setting the CF_DOCKER_PASSWORD environment variable\\."))
+				Eventually(session).Should(Exit(1))
+			})
+		})
+	})
+
+	Context("when invalid manifest properties are provided together", func() {
+		Context("manifest contains both 'buildpack' and 'docker.image'", func() {
+			BeforeEach(func() {
+				manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   buildpack: staticfile_buildpack
   docker:
-   image: %s
+    image: %s
 `, appName, dockerImage))
-			Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
-		})
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
 
-		It("displays an error and exits 1", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
+			It("displays an error and exits 1", func() {
 				session := helpers.CF("push", appName, "-f", tempFile)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Say("Invalid application configuration:"))
@@ -95,23 +224,21 @@ applications:
 				Eventually(session).Should(Exit(1))
 			})
 		})
-	})
 
-	Context("manifest contains both 'docker' and 'path'", func() {
-		BeforeEach(func() {
-			manifestContents := []byte(fmt.Sprintf(`
+		Context("manifest contains both 'docker.image' and 'path'", func() {
+			BeforeEach(func() {
+				manifestContents := []byte(fmt.Sprintf(`
 ---
 applications:
 - name: %s
   path: .
   docker:
-   image: %s
+    image: %s
 `, appName, dockerImage))
-			Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
-		})
+				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
+			})
 
-		It("displays an error and exits 1", func() {
-			helpers.WithHelloWorldApp(func(dir string) {
+			It("displays an error and exits 1", func() {
 				session := helpers.CF("push", appName, "-f", tempFile)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session).Should(Say("Invalid application configuration:"))
