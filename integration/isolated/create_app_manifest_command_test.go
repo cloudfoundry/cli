@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -69,7 +70,6 @@ var _ = Describe("create-app-manifest command", func() {
 			Eventually(session.Out).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
 			Eventually(session.Out).Should(Say("SEE ALSO:"))
 			Eventually(session.Out).Should(Say("apps, push"))
-
 		})
 	})
 
@@ -186,7 +186,7 @@ var _ = Describe("create-app-manifest command", func() {
   routes:
   - route: %s.%s
   stack: cflinuxfs2
-`, appName, appName, domainName)
+`, appName, strings.ToLower(appName), domainName)
 
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
@@ -224,7 +224,7 @@ var _ = Describe("create-app-manifest command", func() {
   routes:
   - route: %s.%s
   stack: cflinuxfs2
-`, appName, appName, domainName)
+`, appName, strings.ToLower(appName), domainName)
 
 						createdFile, err := ioutil.ReadFile(newFile)
 						Expect(err).ToNot(HaveOccurred())
@@ -256,7 +256,7 @@ var _ = Describe("create-app-manifest command", func() {
   routes:
   - route: %s.%s
   stack: cflinuxfs2
-`, appName, appName, domainName)
+`, appName, strings.ToLower(appName), domainName)
 
 						createdFile, err := ioutil.ReadFile(existingFile)
 						Expect(err).ToNot(HaveOccurred())
@@ -264,7 +264,6 @@ var _ = Describe("create-app-manifest command", func() {
 					})
 				})
 			})
-
 		})
 
 		Context("when app was created with docker image", func() {
@@ -302,13 +301,12 @@ var _ = Describe("create-app-manifest command", func() {
   routes:
   - route: %s.%s
   stack: cflinuxfs2
-`, appName, dockerImage, appName, domainName)
+`, appName, dockerImage, strings.ToLower(appName), domainName)
 
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(createdFile)).To(Equal(expectedFile))
 			})
-
 		})
 
 		Context("when app has no hostname", func() {
