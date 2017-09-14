@@ -46,7 +46,8 @@ var _ = Describe("update-buildpack command", func() {
 		BeforeEach(func() {
 			LoginCF()
 
-			dir, err := ioutil.TempDir("", "bp")
+			var err error
+			dir, err = ioutil.TempDir("", "update-buildpack-test")
 			Expect(err).ToNot(HaveOccurred())
 
 			filename := "some-file"
