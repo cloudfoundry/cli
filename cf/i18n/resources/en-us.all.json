@@ -7048,8 +7048,8 @@
     "translation": ""
   },
   {
-    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--no-route]",
-    "translation": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--no-route]"
+    "id": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route]",
+    "translation": "cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route]"
   },
   {
     "id": "command help",
