@@ -15,7 +15,7 @@ run:
   args:
   - -c
   - |
-    set -ex
+    set -e
 
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
@@ -24,11 +24,9 @@ run:
 
     export LC_ALL="en_US.UTF-8"
 
-    pushd vendor/github.com/onsi/ginkgo/ginkgo
-    go install
-    popd
-
     go version
+
+    go install ./vendor/github.com/onsi/ginkgo/ginkgo
     ginkgo version
 
     echo -e "\n Vetting packages for potential issues..."
