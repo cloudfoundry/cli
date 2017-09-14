@@ -54,7 +54,7 @@ func (cmd CreateAppManifestCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayText("Creating an app manifest from current settings of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Creating an app manifest from current settings of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
 		"AppName":   cmd.RequiredArgs.AppName,
 		"OrgName":   cmd.Config.TargetedOrganization().Name,
 		"SpaceName": cmd.Config.TargetedSpace().Name,
