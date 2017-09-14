@@ -32,7 +32,7 @@ set +e
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
-cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $1}' | xargs_func cf delete-service-broker -f
+cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $}' | xargs_func cf delete-service-broker -f
 
 cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func cf delete-quota -f
 
