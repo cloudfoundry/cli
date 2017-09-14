@@ -39,7 +39,11 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 
 func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID string, existingRoutes []v2action.Route) ([]v2action.Route, Warnings, error) {
 	calculatedRoutes, unknownRoutes := actor.spitExistingRoutes(existingRoutes, routes)
-	possibleDomains := actor.generatePossibleDomains(unknownRoutes)
+	possibleDomains, err := actor.generatePossibleDomains(unknownRoutes)
+	if err != nil {
+		log.Errorln("domain breakdown:", err)
+		return nil, nil, err
+	}
 
 	var allWarnings Warnings
 	foundDomains, warnings, err := actor.V2Actor.GetDomainsByNameAndOrganization(possibleDomains, orgGUID)
@@ -227,9 +231,18 @@ func (actor Actor) findOrReturnPartialRouteWithSettings(route v2action.Route) (v
 	return cachedRoute, Warnings(warnings), err
 }
 
-func (actor Actor) generatePossibleDomains(routes []string) []string {
-	possibleDomains := map[string]interface{}{}
+func (actor Actor) generatePossibleDomains(routes []string) ([]string, error) {
+	var hostnames []string
 	for _, route := range routes {
+		host, _, _, err := actor.parseURL(route)
+		if err != nil {
+			return nil, err
+		}
+		hostnames = append(hostnames, host)
+	}
+
+	possibleDomains := map[string]interface{}{}
+	for _, route := range hostnames {
 		count := strings.Count(route, ".")
 		domains := strings.SplitN(route, ".", count)
 
@@ -245,7 +258,7 @@ func (actor Actor) generatePossibleDomains(routes []string) []string {
 	}
 
 	log.Debugln("domain brakedown:", strings.Join(domains, ","))
-	return domains
+	return domains, nil
 }
 
 func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName string) (v2action.Route, Warnings, error) {
