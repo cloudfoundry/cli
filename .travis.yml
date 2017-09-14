@@ -2,8 +2,11 @@ language: go
 go:
   - 1.9
 go_import_path: code.cloudfoundry.org/cli
-install: true # no-op; install ginkgo from vendor using bin/test
-script:  bin/test -nodes=2 -compilers=2
+install:
+- go install ./vendor/github.com/onsi/ginkgo/ginkgo
+script:
+- go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
+- CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage -race integration
 branches:
   only:
   - master
