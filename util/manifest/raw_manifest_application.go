@@ -1,0 +1,28 @@
+package manifest
+
+type rawManifestApplication struct {
+	Name                    string             `yaml:"name,omitempty"`
+	Buildpack               string             `yaml:"buildpack,omitempty"`
+	Command                 string             `yaml:"command,omitempty"`
+	DiskQuota               string             `yaml:"disk_quota,omitempty"`
+	Docker                  rawDockerInfo      `yaml:"docker,omitempty"`
+	EnvironmentVariables    map[string]string  `yaml:"env,omitempty"`
+	HealthCheckHTTPEndpoint string             `yaml:"health-check-http-endpoint,omitempty"`
+	HealthCheckType         string             `yaml:"health-check-type,omitempty"`
+	Instances               *int               `yaml:"instances,omitempty"`
+	Memory                  string             `yaml:"memory,omitempty"`
+	Path                    string             `yaml:"path,omitempty"`
+	Routes                  []rawManifestRoute `yaml:"routes,omitempty"`
+	Services                []string           `yaml:"services,omitempty"`
+	StackName               string             `yaml:"stack,omitempty"`
+	Timeout                 int                `yaml:"timeout,omitempty"`
+}
+
+type rawManifestRoute struct {
+	Route string `yaml:"route"`
+}
+
+type rawDockerInfo struct {
+	Image    string `yaml:"image,omitempty"`
+	Username string `yaml:"username,omitempty"`
+}
