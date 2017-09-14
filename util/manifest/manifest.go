@@ -1,23 +1,29 @@
 package manifest
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-type ManifestCreationError struct {
-	Err error
-}
-
-func (e ManifestCreationError) Error() string {
-	return fmt.Sprintf("Error creating manifest file: %s", e.Err.Error())
-}
-
 type Manifest struct {
 	Applications []Application `yaml:"applications"`
+}
+
+func (manifest *Manifest) UnmarshalYAML(unmarshaller func(interface{}) error) error {
+	var raw rawManifest
+	err := unmarshaller(&raw)
+	if err != nil {
+		return err
+	}
+
+	if raw.containsDeprecatedFields() {
+		return UnsupportedFieldsError{}
+	}
+
+	manifest.Applications = raw.Applications
+	return nil
 }
 
 // ReadAndMergeManifests reads the manifest at provided path and returns a
@@ -60,5 +66,4 @@ func WriteApplicationManifest(application Application, filePath string) error {
 	}
 
 	return nil
-
 }
