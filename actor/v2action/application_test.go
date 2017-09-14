@@ -946,8 +946,8 @@ var _ = Describe("Application Actions", func() {
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
 
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
@@ -976,8 +976,8 @@ var _ = Describe("Application Actions", func() {
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
@@ -1035,9 +1035,10 @@ var _ = Describe("Application Actions", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
@@ -1078,14 +1079,14 @@ var _ = Describe("Application Actions", func() {
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
 
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(2))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStopped,
 					}))
 
-					app = fakeCloudControllerClient.UpdateApplicationArgsForCall(1)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp = fakeCloudControllerClient.UpdateApplicationArgsForCall(1)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
@@ -1139,9 +1140,10 @@ var _ = Describe("Application Actions", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
@@ -1161,9 +1163,10 @@ var _ = Describe("Application Actions", func() {
 					Eventually(appState).Should(Receive(Equal(ApplicationStateStarting)))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-1")))
 					Eventually(warnings).Should(Receive(Equal("app-instance-warnings-2")))
+
 					Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-					app := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
-					Expect(app).To(Equal(ccv2.Application{
+					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
+					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
 						State: ccv2.ApplicationStarted,
 					}))
