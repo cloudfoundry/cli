@@ -5,9 +5,10 @@
 			"importpath": "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking",
 			"repository": "https://github.com/cloudfoundry-incubator/cfnetworking-cli-api",
 			"vcs": "git",
-			"revision": "3d304400d008686455d360816f990f0c5b113beb",
+			"revision": "5afba465c43acecf72889250309774f76a259c3a",
 			"branch": "master",
-			"notests": false
+			"path": "/cfnetworking",
+			"notests": true
 		},
 		{
 			"importpath": "code.cloudfoundry.org/clock",
