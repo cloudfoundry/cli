@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Application Summaries Actions", func() {
+var _ = Describe("Application with ProcessSummary Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
