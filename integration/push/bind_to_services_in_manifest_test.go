@@ -54,7 +54,7 @@ var _ = Describe("bind app to provided services from manifest", func() {
 		BeforeEach(func() {
 			domain := defaultSharedDomain()
 
-			broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, serviceName, servicePlan)
+			broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, serviceName, servicePlan)
 			broker.Push()
 			broker.Configure()
 			broker.Create()
