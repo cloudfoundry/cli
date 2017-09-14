@@ -80,7 +80,7 @@ var _ = Describe("Isolation Segments", func() {
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -184,7 +184,7 @@ var _ = Describe("Isolation Segments", func() {
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -285,7 +285,7 @@ var _ = Describe("Isolation Segments", func() {
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",
@@ -351,7 +351,7 @@ var _ = Describe("Isolation Segments", func() {
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{
-						[]ccerror.V3Error{
+						Errors: []ccerror.V3Error{
 							{
 								Code:   10008,
 								Detail: "The request is semantically invalid: command presence",

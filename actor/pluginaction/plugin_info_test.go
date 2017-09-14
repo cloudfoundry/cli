@@ -149,7 +149,7 @@ var _ = Describe("plugin info actions", func() {
 			Context("when no compatible binaries are found for the plugin", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
-						return plugin.PluginRepository{[]plugin.Plugin{
+						return plugin.PluginRepository{Plugins: []plugin.Plugin{
 							{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 								{Platform: "incompatible-platform", URL: "some-url", Checksum: "some-checksum"},
 							}},
@@ -167,13 +167,13 @@ var _ = Describe("plugin info actions", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						if repoURL == "url1" {
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "incompatible-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
 							}}, nil
 						} else {
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
@@ -200,7 +200,7 @@ var _ = Describe("plugin info actions", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						if repoURL == "url1" {
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
@@ -228,7 +228,7 @@ var _ = Describe("plugin info actions", func() {
 			Context("when the plugin is found in many repositories", func() {
 				BeforeEach(func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
-						return plugin.PluginRepository{[]plugin.Plugin{
+						return plugin.PluginRepository{Plugins: []plugin.Plugin{
 							{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 								{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 							}},
@@ -255,19 +255,19 @@ var _ = Describe("plugin info actions", func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						switch repoURL {
 						case "url1":
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
 							}}, nil
 						case "url2":
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "2.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
 							}}, nil
 						default:
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "0.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
@@ -295,13 +295,13 @@ var _ = Describe("plugin info actions", func() {
 					fakeClient.GetPluginRepositoryStub = func(repoURL string) (plugin.PluginRepository, error) {
 						switch repoURL {
 						case "url1", "url2":
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "1.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},
 							}}, nil
 						default:
-							return plugin.PluginRepository{[]plugin.Plugin{
+							return plugin.PluginRepository{Plugins: []plugin.Plugin{
 								{Name: "some-plugin", Version: "0.2.3", Binaries: []plugin.PluginBinary{
 									{Platform: "some-platform", URL: "some-url", Checksum: "some-checksum"},
 								}},

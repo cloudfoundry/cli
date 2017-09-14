@@ -322,7 +322,8 @@ Origin: wss://doppler.bosh-lite.com:443`
 		var pathName string
 
 		BeforeEach(func() {
-			tmpdir, err := ioutil.TempDir("", "request_logger")
+			var err error
+			tmpdir, err = ioutil.TempDir("", "request_logger")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathName = filepath.Join(tmpdir, "foo")

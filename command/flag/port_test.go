@@ -19,7 +19,7 @@ var _ = Describe("Port", func() {
 			It("sets IsSet to false", func() {
 				err := port.UnmarshalFlag("")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(port).To(Equal(Port{types.NullInt{Value: 0, IsSet: false}}))
+				Expect(port).To(Equal(Port{NullInt: types.NullInt{Value: 0, IsSet: false}}))
 			})
 		})
 
@@ -30,7 +30,7 @@ var _ = Describe("Port", func() {
 					Type:    flags.ErrRequired,
 					Message: "invalid argument for flag '--port' (expected int > 0)",
 				}))
-				Expect(port).To(Equal(Port{types.NullInt{Value: 0, IsSet: false}}))
+				Expect(port).To(Equal(Port{NullInt: types.NullInt{Value: 0, IsSet: false}}))
 			})
 		})
 
@@ -41,7 +41,7 @@ var _ = Describe("Port", func() {
 					Type:    flags.ErrRequired,
 					Message: "invalid argument for flag '--port' (expected int > 0)",
 				}))
-				Expect(port).To(Equal(Port{types.NullInt{Value: -10, IsSet: true}}))
+				Expect(port).To(Equal(Port{NullInt: types.NullInt{Value: -10, IsSet: true}}))
 			})
 		})
 
@@ -49,7 +49,7 @@ var _ = Describe("Port", func() {
 			It("stores the integer and sets IsSet to true", func() {
 				err := port.UnmarshalFlag("0")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(port).To(Equal(Port{types.NullInt{Value: 0, IsSet: true}}))
+				Expect(port).To(Equal(Port{NullInt: types.NullInt{Value: 0, IsSet: true}}))
 			})
 		})
 	})
