@@ -56,6 +56,7 @@ func (zipper ApplicationZipper) IsZipFile(name string) bool {
 	if err != nil {
 		return false
 	}
+	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
@@ -66,10 +67,11 @@ func (zipper ApplicationZipper) IsZipFile(name string) bool {
 		return false
 	}
 
-	_, err = zip.OpenReader(name)
+	z, err := zip.OpenReader(name)
 	if err != nil && err == zip.ErrFormat {
 		return zipper.isZipWithOffsetFileHeaderLocation(name)
 	}
+	defer z.Close()
 
 	return err == nil
 }
