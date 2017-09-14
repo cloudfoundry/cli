@@ -22,4 +22,15 @@ run:
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
 
-    bin/test -race
+    export LC_ALL="en_US.UTF-8"
+
+    pushd vendor/github.com/onsi/ginkgo/ginkgo
+    go install
+    popd
+
+    go version
+    ginkgo version
+
+    echo -e "\n Vetting packages for potential issues..."
+    go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
+    CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage -race integration

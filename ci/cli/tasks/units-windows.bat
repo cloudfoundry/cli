@@ -7,7 +7,7 @@ powershell -command set-executionpolicy remotesigned
 
 go version
 
-go get github.com/onsi/ginkgo/ginkgo
+go get -u github.com/onsi/ginkgo/ginkgo
 
 ginkgo version
 
