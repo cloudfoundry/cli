@@ -152,7 +152,7 @@ var _ = Describe("plugin API", func() {
 			servicePlan := helpers.PrefixedRandomName("SERVICE-PLAN")
 			serviceInstance1 = helpers.PrefixedRandomName("SI1")
 			serviceInstance2 = helpers.PrefixedRandomName("SI2")
-			broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+			broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 			broker.Push()
 			broker.Configure()
 			broker.Create()

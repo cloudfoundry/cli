@@ -16,6 +16,10 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+func NewServiceBrokerName() string {
+	return PrefixedRandomName("INTEGRATION-SERVICE-BROKER")
+}
+
 func NewPassword() string {
 	return PrefixedRandomName("password")
 }

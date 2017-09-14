@@ -34,7 +34,7 @@ var _ = Describe("service-key command", func() {
 
 	Context("when the service key is not found", func() {
 		BeforeEach(func() {
-			broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, domain, service, servicePlan)
+			broker = NewServiceBroker(NewServiceBrokerName(), NewAssets().ServiceBroker, domain, service, servicePlan)
 			broker.Push()
 			broker.Configure()
 			broker.Create()

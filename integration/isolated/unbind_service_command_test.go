@@ -168,7 +168,7 @@ var _ = Describe("unbind-service command", func() {
 
 		Context("when the service is provided by a broker", func() {
 			BeforeEach(func() {
-				broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 				broker.Push()
 				broker.Configure()
 				broker.Create()

@@ -324,7 +324,7 @@ var _ = Describe("bind-service command", func() {
 				var broker helpers.ServiceBroker
 
 				BeforeEach(func() {
-					broker = helpers.NewServiceBroker(helpers.PrefixedRandomName("SERVICE-BROKER"), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+					broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
 					broker.Push()
 					broker.Configure()
 					broker.Create()

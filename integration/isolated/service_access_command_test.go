@@ -23,7 +23,7 @@ var _ = Describe("service-access command", func() {
 			setupCF(orgName, spaceName)
 
 			serviceBroker = NewServiceBroker(
-				PrefixedRandomName("broker"),
+				NewServiceBrokerName(),
 				NewAssets().ServiceBroker,
 				defaultSharedDomain(),
 				PrefixedRandomName("service"),
@@ -33,6 +33,10 @@ var _ = Describe("service-access command", func() {
 			serviceBroker.Push()
 			serviceBroker.Configure()
 			serviceBroker.Create()
+		})
+
+		AfterEach(func() {
+			serviceBroker.Destroy()
 		})
 
 		It("sets visibility", func() {
