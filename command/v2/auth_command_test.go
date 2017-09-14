@@ -83,7 +83,7 @@ var _ = Describe("auth Command", func() {
 
 			fakeConfig.TargetReturns("some-api-target")
 
-			fakeActor.AuthenticateReturns(uaa.BadCredentialsError{"some message"})
+			fakeActor.AuthenticateReturns(uaa.BadCredentialsError{Message: "some message"})
 		})
 
 		It("returns a BadCredentialsError", func() {
