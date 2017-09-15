@@ -772,6 +772,28 @@ var _ = Describe("Manifests", func() {
 		})
 	})
 
+	Context("when the 'docker' property is specified but contains no properties", func() {
+		var manifest *manifest.Manifest
+
+		BeforeEach(func() {
+			manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					generic.NewMap(map[interface{}]interface{}{
+						"docker": map[interface{}]interface{}{},
+					}),
+				},
+			}))
+		})
+
+		It("returns a parsed manifest that does not contain any docker fields", func() {
+			apps, err := manifest.Applications()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(apps).To(HaveLen(1))
+			Expect(apps[0].DockerImage).To(BeNil())
+			Expect(apps[0].DockerUsername).To(BeNil())
+		})
+	})
+
 	Context("when the 'docker' property is specified", func() {
 		var manifest *manifest.Manifest
 
