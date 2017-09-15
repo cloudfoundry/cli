@@ -1,7 +1,7 @@
 FROM phusion/baseimage
 
 RUN apt update && apt upgrade -y -o Dpkg::Options::="--force-confold"
-RUN apt install -y fakeroot rpm cpio zip python-pip
+RUN apt install -y fakeroot git rpm cpio zip python-pip
 
 RUN curl -L https://github.com/hogliux/bomutils/tarball/master | tar xz && cd hogliux-bomutils-* && make install
 
