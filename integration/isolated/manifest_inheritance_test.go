@@ -301,9 +301,10 @@ FOO: global
 
 	Context("when there are two manifests", func() {
 		Context("when the child has applications properties; and the parent has applications properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 applications:
@@ -328,7 +329,7 @@ applications:
     BAR: child-app
     BAZ: child-app
 `, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 applications:
 - name: %s
@@ -356,52 +357,82 @@ applications:
     BAZ: parent-app
     FOO: parent-app
 `, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
+					})
+				})
+
+				It("pushes with child application properties taking precedence; values are overwritten, lists are appended, and maps are merged", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-app-1\.%s",
+   "parent-app-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: child-app
+FOO: parent-app
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-app-1\.%s",
+   "parent-app-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: child-app
+FOO: parent-app
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with child application properties taking precedence; values are overwritten, lists are appended, and maps are merged", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-app-1\.%s",
-   "parent-app-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: child-app
-FOO: parent-app
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: %s
+`, app1Name, DockerImage),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-app-1\.%s",
-   "parent-app-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: child-app
-FOO: parent-app
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has applications properties; and the parent has global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 applications:
@@ -426,7 +457,7 @@ applications:
     BAR: child-app
     BAZ: child-app
 `, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 memory: 64M
@@ -440,53 +471,81 @@ env:
   BAZ: parent-global
   FOO: parent-global
 `, domainName, domainName),
+					})
+					SetDefaultEventuallyTimeout(300 * time.Second)
 				})
-				SetDefaultEventuallyTimeout(300 * time.Second)
+
+				It("pushes with child application properties taking precedence", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: child-app
+FOO: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: child-app
+FOO: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
-			It("pushes with child application properties taking precedence", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: child-app
-FOO: parent-global
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+docker:
+  image: parent-global-image
+`),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: child-app
-FOO: parent-global
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has global properties; and the parent has applications properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 buildpack: staticfile_buildpack
@@ -500,7 +559,7 @@ env:
   BAR: child-global
   BAZ: child-global
 `, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 applications:
 - name: %s
@@ -526,51 +585,79 @@ applications:
     BAZ: parent-app
     FOO: parent-app
 `, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
+					})
+					SetDefaultEventuallyTimeout(300 * time.Second)
 				})
-				SetDefaultEventuallyTimeout(300 * time.Second)
+
+				It("pushes with parent application properties taking precedence", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s"\,
+   "child-global-2\.%s",
+   "parent-app-1\.%s",
+   "parent-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: parent-app
+BAZ: parent-app
+FOO: parent-app
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s"\,
+   "child-global-2\.%s",
+   "parent-app-1\.%s",
+   "parent-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: parent-app
+BAZ: parent-app
+FOO: parent-app
+`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 
-			It("pushes with parent application properties taking precedence", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "child-global-1\.%s"\,
-   "child-global-2\.%s",
-   "parent-app-1\.%s",
-   "parent-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: parent-app
-BAZ: parent-app
-FOO: parent-app
-`))
-				Eventually(session).Should(Exit(0))
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+docker:
+  image: child-global-image
+`),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: parent-application-image
+`, app1Name),
+					})
+				})
 
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "child-global-1\.%s"\,
-   "child-global-2\.%s",
-   "parent-app-1\.%s",
-   "parent-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: parent-app
-BAZ: parent-app
-FOO: parent-app
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with parent application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*parent-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has global properties; and the parent has global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 memory: %dM
@@ -583,7 +670,7 @@ env:
   BAR: child-global
   FOO: child-global
 `, app1MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 memory: 64M
@@ -600,78 +687,80 @@ applications:
 - name: %s
 - name: %s
 `, domainName, domainName, app1Name, app2Name),
+					})
+				})
+
+				It("pushes with child global properties taking precedence;", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s"\,
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-global
+BAZ: parent-global
+FOO: child-global
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s"\,
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s"
+  \]`, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 128`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-global
+BAZ: parent-global
+FOO: child-global
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with child global properties taking precedence;", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s"\,
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-global
-BAZ: parent-global
-FOO: child-global
-
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s"\,
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s"
-  \]`, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 128`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-global
-BAZ: parent-global
-FOO: child-global
-
-`))
-				Eventually(session).Should(Exit(0))
-			})
-		})
-
-		Context("when the child has docker image properties; and the parent has global docker image properties", func() {
-			BeforeEach(func() {
-				pushDockerWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
-applications:
-- name: %s
-  docker:
-    image: some-image
-`, app1Name),
-					fmt.Sprintf(`
+docker:
+  image: child-global-image
+`),
+						fmt.Sprintf(`
 ---
 docker:
-  image: some-parent-docker-image
-`),
+  image: %s
+applications:
+- name: %s
+`, DockerImage, app1Name),
+					})
 				})
-			})
 
-			It("pushes with child docker image properties taking precedence;", func() {
-				session := helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say(`docker image:\s*some-image`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child global docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-global-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has applications and global properties; and the parent has global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 memory: 128M
@@ -705,7 +794,7 @@ applications:
     BAR: child-app
     FOO: child-app
 `, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 memory: 256M
@@ -723,58 +812,88 @@ applications:
 - name: %s
 - name: %s
 `, domainName, domainName, app1Name, app2Name),
+					})
+				})
+
+				It("pushes with child application taking precedence over child global over parent global", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s"\,
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-global
+FIZ: child-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s"\,
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-global
+FIZ: child-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with child application taking precedence over child global over parent global", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s"\,
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-global
-FIZ: child-global
-FOO: child-app
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+docker:
+  image: child-global-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+docker:
+  image: parent-image
+`),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s"\,
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-global
-FIZ: child-global
-FOO: child-app
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has applications and global properties; and the parent has applications properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 memory: %dM
@@ -806,7 +925,7 @@ applications:
     BAR: child-app
     FOO: child-app
 `, app1MemSize, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 applications:
@@ -835,58 +954,90 @@ applications:
     FIZ: parent-app
     BAZ: parent-app
 `, app1Name, domainName, domainName, app2Name, domainName, domainName),
+					})
+				})
+
+				It("pushes with child application taking precedence over child global over parent application", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with child application taking precedence over child global over parent application", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: child-global
-FOO: child-app
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+docker:
+  image: child-global-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: %s
+`, app1Name, DockerImage),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: child-global
-FOO: child-app
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has applications properties; and the parent has applications and global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 applications:
@@ -911,7 +1062,7 @@ applications:
     BAR: child-app
     FOO: child-app
 `, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 memory: 128M
@@ -949,58 +1100,90 @@ applications:
     FIZ: parent-app
     BAZ: parent-app
 `, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+					})
+				})
+
+				It("pushes with child application taking precedence over parent application over child global", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: parent-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s",
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: parent-global
+FOO: child-app
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with child application taking precedence over parent application over child global", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: parent-global
-FOO: child-app
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: %s
+docker:
+  image: %s
+`, app1Name, DockerImage, DockerImage),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s",
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: parent-global
-FOO: child-app
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has global properties; and the parent has applications and global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 memory: 128M
@@ -1013,7 +1196,7 @@ env:
   FOO: child-global
   FIZ: child-global
 `, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 routes:
@@ -1044,58 +1227,88 @@ applications:
     FOO: parent-app
     BAZ: parent-app
 `, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
+					})
+				})
+
+				It("pushes with parent application taking precedence over child global over parent global", func() {
+					session := helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 256`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAZ: parent-app
+FIZ: child-global
+FOO: parent-app
+ZOOM: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 256`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAZ: parent-app
+FIZ: child-global
+FOO: parent-app
+ZOOM: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with parent application taking precedence over child global over parent global", func() {
-				session := helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAZ: parent-app
-FIZ: child-global
-FOO: parent-app
-ZOOM: parent-global
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+docker:
+  image: child-global-image
+`),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: parent-application-image
+docker:
+  image: parent-global-image
+`, app1Name),
+					})
+				})
 
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 256`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAZ: parent-app
-FIZ: child-global
-FOO: parent-app
-ZOOM: parent-global
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with parent application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*parent-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 
 		Context("when the child has applications and global properties; and the parent has applications and global properties", func() {
-			BeforeEach(func() {
-				pushHelloWorldAppWithManifests([]string{
-					fmt.Sprintf(`
+			Context("when the app is a buildpack app", func() {
+				BeforeEach(func() {
+					pushHelloWorldAppWithManifests([]string{
+						fmt.Sprintf(`
 ---
 inherit: {some-parent}
 instances: 2
@@ -1129,7 +1342,7 @@ applications:
     FOO: child-app
     BAR: child-app
 `, domainName, domainName, app1Name, app1MemSize, domainName, domainName, app2Name, app2MemSize, domainName, domainName),
-					fmt.Sprintf(`
+						fmt.Sprintf(`
 ---
 buildpack: staticfile_buildpack
 memory: 256M
@@ -1163,65 +1376,98 @@ applications:
     FIZ: parent-app
     BAZ: parent-app
 `, domainName, domainName, app1Name, domainName, domainName, app2Name, domainName, domainName),
+					})
+				})
+
+				It("pushes with parent application taking precedence over child global", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say("instances.*2"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app1Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+ZOOM: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("app", app2Name)
+					Eventually(session.Out).Should(Say("instances.*2"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", app2Name)
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say(`"application_uris": \[
+   "parent-global-1\.%s",
+   "parent-global-2\.%s",
+   "child-global-1\.%s",
+   "child-global-2\.%s",
+   "parent-app-1\.%s"\,
+   "parent-app-2\.%s",
+   "child-app-1\.%s"\,
+   "child-app-2\.%s"
+  \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
+					Eventually(session.Out).Should(Say(`"disk": 64`))
+					Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
+					Eventually(session.Out).Should(Say(`User-Provided:
+BAR: child-app
+BAZ: parent-app
+FIZ: child-global
+FOO: child-app
+ZOOM: parent-global
+
+`))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			It("pushes with parent application taking precedence over child global", func() {
-				session := helpers.CF("app", app1Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
-				Eventually(session).Should(Exit(0))
+			Context("when the app is a Docker app", func() {
+				BeforeEach(func() {
+					pushDockerWithManifests([]string{
+						fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: child-application-image
+docker:
+  image: child-global-image
+`, app1Name),
+						fmt.Sprintf(`
+---
+applications:
+- name: %s
+  docker:
+    image: %s
+docker:
+  image: %s
+`, app1Name, DockerImage, DockerImage),
+					})
+				})
 
-				session = helpers.CF("env", app1Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app1MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: child-global
-FOO: child-app
-ZOOM: parent-global
-
-`))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("app", app2Name)
-				Eventually(session.Out).Should(Say("instances.*2"))
-				Eventually(session).Should(Exit(0))
-
-				session = helpers.CF("env", app2Name)
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say(`"application_uris": \[
-   "parent-global-1\.%s",
-   "parent-global-2\.%s",
-   "child-global-1\.%s",
-   "child-global-2\.%s",
-   "parent-app-1\.%s"\,
-   "parent-app-2\.%s",
-   "child-app-1\.%s"\,
-   "child-app-2\.%s"
-  \]`, domainName, domainName, domainName, domainName, domainName, domainName, domainName, domainName))
-				Eventually(session.Out).Should(Say(`"disk": 64`))
-				Eventually(session.Out).Should(Say(`"mem": %d`, app2MemSize))
-				Eventually(session.Out).Should(Say(`User-Provided:
-BAR: child-app
-BAZ: parent-app
-FIZ: child-global
-FOO: child-app
-ZOOM: parent-global
-
-`))
-				Eventually(session).Should(Exit(0))
+				It("pushes with child application docker image properties taking precedence", func() {
+					session := helpers.CF("app", app1Name)
+					Eventually(session.Out).Should(Say(`docker image:\s*child-application-image`))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})
