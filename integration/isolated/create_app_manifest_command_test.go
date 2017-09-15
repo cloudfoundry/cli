@@ -166,58 +166,50 @@ var _ = Describe("create-app-manifest command", func() {
 		})
 
 		Context("when the app exists", func() {
-			BeforeEach(func() {
-				helpers.WithHelloWorldApp(func(appDir string) {
-					Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v2-push", appName)).Should(Exit(0))
+			Context("when the app does not have routes", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName, "--no-route")).Should(Exit(0))
+					})
+				})
+
+				It("creates the manifest with no-route set to true", func() {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+					Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("OK"))
+					expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
+					Eventually(session.Out).Should(Say("Manifest file created successfully at %s", expectedFilePath))
+
+					expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  instances: 1
+  memory: 32M
+  no-route: true
+  stack: cflinuxfs2
+`, appName)
+
+					createdFile, err := ioutil.ReadFile(manifestFilePath)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(createdFile)).To(Equal(expectedFile))
 				})
 			})
 
-			It("creates the manifest", func() {
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
-				Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-				Eventually(session.Out).Should(Say("OK"))
-				expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
-				Eventually(session.Out).Should(Say("Manifest file created successfully at %s", expectedFilePath))
-
-				expectedFile := fmt.Sprintf(`applications:
-- name: %s
-  disk_quota: 1G
-  instances: 1
-  memory: 32M
-  routes:
-  - route: %s.%s
-  stack: cflinuxfs2
-`, appName, strings.ToLower(appName), domainName)
-
-				createdFile, err := ioutil.ReadFile(manifestFilePath)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(string(createdFile)).To(Equal(expectedFile))
-			})
-
-			Context("when the -p flag is provided", func() {
-				Context("when the specified file is a directory", func() {
-					It("displays a file creation error", func() {
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
-						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say("FAILED"))
-						Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", helpers.ConvertPathToRegularExpression(tempDir)))
+			Context("when the app has routes", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v2-push", appName)).Should(Exit(0))
 					})
 				})
 
-				Context("when the specified file does not exist", func() {
-					var newFile string
+				It("creates the manifest", func() {
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
+					Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("OK"))
+					expectedFilePath := helpers.ConvertPathToRegularExpression(fmt.Sprintf(".%s%s_manifest.yml", string(os.PathSeparator), appName))
+					Eventually(session.Out).Should(Say("Manifest file created successfully at %s", expectedFilePath))
 
-					BeforeEach(func() {
-						newFile = filepath.Join(tempDir, "new-file.yml")
-					})
-
-					It("creates the manifest in the file", func() {
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", newFile)
-						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(newFile)))
-
-						expectedFile := fmt.Sprintf(`applications:
+					expectedFile := fmt.Sprintf(`applications:
 - name: %s
   disk_quota: 1G
   instances: 1
@@ -227,29 +219,35 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs2
 `, appName, strings.ToLower(appName), domainName)
 
-						createdFile, err := ioutil.ReadFile(newFile)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(string(createdFile)).To(Equal(expectedFile))
-					})
+					createdFile, err := ioutil.ReadFile(manifestFilePath)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(createdFile)).To(Equal(expectedFile))
 				})
 
-				Context("when the specified file exists", func() {
-					var existingFile string
-
-					BeforeEach(func() {
-						existingFile = filepath.Join(tempDir, "some-file")
-						f, err := os.Create(existingFile)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(f.Close()).To(Succeed())
+				Context("when the -p flag is provided", func() {
+					Context("when the specified file is a directory", func() {
+						It("displays a file creation error", func() {
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", tempDir)
+							Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say("FAILED"))
+							Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", helpers.ConvertPathToRegularExpression(tempDir)))
+						})
 					})
 
-					It("overrides the previous file with the new manifest", func() {
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", existingFile)
-						Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say("OK"))
-						Eventually(session.Out).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(existingFile)))
+					Context("when the specified file does not exist", func() {
+						var newFile string
 
-						expectedFile := fmt.Sprintf(`applications:
+						BeforeEach(func() {
+							newFile = filepath.Join(tempDir, "new-file.yml")
+						})
+
+						It("creates the manifest in the file", func() {
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", newFile)
+							Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(newFile)))
+
+							expectedFile := fmt.Sprintf(`applications:
 - name: %s
   disk_quota: 1G
   instances: 1
@@ -259,9 +257,42 @@ var _ = Describe("create-app-manifest command", func() {
   stack: cflinuxfs2
 `, appName, strings.ToLower(appName), domainName)
 
-						createdFile, err := ioutil.ReadFile(existingFile)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(string(createdFile)).To(Equal(expectedFile))
+							createdFile, err := ioutil.ReadFile(newFile)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(string(createdFile)).To(Equal(expectedFile))
+						})
+					})
+
+					Context("when the specified file exists", func() {
+						var existingFile string
+
+						BeforeEach(func() {
+							existingFile = filepath.Join(tempDir, "some-file")
+							f, err := os.Create(existingFile)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(f.Close()).To(Succeed())
+						})
+
+						It("overrides the previous file with the new manifest", func() {
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName, "-p", existingFile)
+							Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say("OK"))
+							Eventually(session.Out).Should(Say("Manifest file created successfully at %s", helpers.ConvertPathToRegularExpression(existingFile)))
+
+							expectedFile := fmt.Sprintf(`applications:
+- name: %s
+  disk_quota: 1G
+  instances: 1
+  memory: 32M
+  routes:
+  - route: %s.%s
+  stack: cflinuxfs2
+`, appName, strings.ToLower(appName), domainName)
+
+							createdFile, err := ioutil.ReadFile(existingFile)
+							Expect(err).ToNot(HaveOccurred())
+							Expect(string(createdFile)).To(Equal(expectedFile))
+						})
 					})
 				})
 			})

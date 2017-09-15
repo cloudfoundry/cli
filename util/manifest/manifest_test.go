@@ -60,6 +60,7 @@ applications:
   - service_1
   - service_2
 - name: "app-3"
+  no-route: true
   env:
     env_1: 'foo'
     env_2: 182837403930483038
@@ -140,6 +141,7 @@ applications:
 						"env_3": "true",
 						"env_4": "1.00001",
 					},
+					NoRoute: true,
 				},
 				Application{
 					Name: "app-4",
@@ -215,6 +217,7 @@ applications:
 						Value: 200,
 						IsSet: true,
 					},
+					NoRoute:            true,
 					Routes:             []string{"foo.bar.com", "baz.qux.com"},
 					Services:           []string{"service_1", "service_2"},
 					StackName:          "some-stack",
@@ -243,6 +246,7 @@ applications:
   health-check-type: http
   instances: 10
   memory: 200M
+  no-route: true
   routes:
   - route: foo.bar.com
   - route: baz.qux.com
