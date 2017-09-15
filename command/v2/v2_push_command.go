@@ -355,6 +355,10 @@ func (cmd V2PushCommand) validateArgs() error {
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--docker-image, -o", "-p"},
 		}
+	case cmd.DockerImage.Path != "" && cmd.Buildpack.IsSet:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-b", "--docker-image, -o"},
+		}
 	case cmd.DockerUsername != "" && cmd.DockerImage.Path == "":
 		return translatableerror.RequiredFlagsError{
 			Arg1: "--docker-image, -o",

@@ -102,22 +102,5 @@ var _ = Describe("pushing a docker image", func() {
 			})
 		})
 
-		Context("when CF_DOCKER_PASSWORD is *not* set", func() {
-			It("errors with usage", func() {
-				session := helpers.CF(PushCommandName, "--docker-username", privateDockerUsername, "--docker-image", privateDockerImage, appName)
-				Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when the --docker-username is provided without an image", func() {
-			It("errors with usage", func() {
-				session := helpers.CF(PushCommandName, "--docker-username", privateDockerUsername, appName)
-				Eventually(session.Err).Should(Say("Incorrect Usage: '--docker-image, -o' and '--docker-username' must be used together."))
-				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("Push a new app or sync changes to an existing app"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
 	})
 })

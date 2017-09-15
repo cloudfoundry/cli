@@ -22,32 +22,6 @@ var _ = Describe("pushing a path with the -p flag", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the -p and -o flags are used together", func() {
-		var path string
-
-		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile("", "integration-push-path")
-			Expect(err).ToNot(HaveOccurred())
-			path = tempFile.Name()
-			Expect(tempFile.Close())
-		})
-
-		AfterEach(func() {
-			err := os.Remove(path)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("tells the user that they cannot be used together, displays usage and fails", func() {
-			session := helpers.CF(PushCommandName, appName, "-o", PublicDockerImage, "-p", path)
-
-			Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
-			Eventually(session).Should(Say("FAILED"))
-			Eventually(session).Should(Say("USAGE:"))
-
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	Context("pushing a directory", func() {
 		Context("when the directory contains files", func() {
 			It("pushes the app from the directory", func() {
