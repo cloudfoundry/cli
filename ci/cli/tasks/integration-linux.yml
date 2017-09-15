@@ -8,6 +8,7 @@ image_resource:
 
 inputs:
 - name: cli
+- name: cli-integration
   path: go/src/code.cloudfoundry.org/cli
 - name: cf-cli-binaries
 - name: bosh-lite-lock
