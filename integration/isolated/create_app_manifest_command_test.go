@@ -300,7 +300,6 @@ var _ = Describe("create-app-manifest command", func() {
 
 		Context("when app was created with docker image", func() {
 			var (
-				dockerImage       string
 				oldDockerPassword string
 			)
 
@@ -308,8 +307,7 @@ var _ = Describe("create-app-manifest command", func() {
 				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 
-				dockerImage = "cloudfoundry/diego-docker-app-custom"
-				Eventually(helpers.CF("v2-push", appName, "-o", dockerImage, "--docker-username", "some-docker-username")).Should(Exit())
+				Eventually(helpers.CF("v2-push", appName, "-o", DockerImage, "--docker-username", "some-docker-username")).Should(Exit())
 			})
 
 			AfterEach(func() {
@@ -334,7 +332,7 @@ var _ = Describe("create-app-manifest command", func() {
   routes:
   - route: %s.%s
   stack: cflinuxfs2
-`, appName, dockerImage, strings.ToLower(appName), domainName)
+`, appName, DockerImage, strings.ToLower(appName), domainName)
 
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())

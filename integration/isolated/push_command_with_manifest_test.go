@@ -19,10 +19,6 @@ var _ = Describe("Push with manifest", func() {
 		oldDockerPassword string
 	)
 
-	const (
-		dockerImage = "cloudfoundry/diego-docker-app-custom"
-	)
-
 	BeforeEach(func() {
 		orgName := helpers.NewOrgName()
 		spaceName := helpers.NewSpaceName()
@@ -67,11 +63,11 @@ applications:
 			})
 
 			It("overrides 'docker.image' in the manifest with the '-o' flag value", func() {
-				Eventually(helpers.CF("push", "-o", dockerImage, "-f", tempFile)).Should(Exit(0))
+				Eventually(helpers.CF("push", "-o", DockerImage, "-f", tempFile)).Should(Exit(0))
 
 				appGUID := helpers.AppGUID(appName)
 				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session.Out).Should(Say(DockerImage))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -120,11 +116,11 @@ applications:
 			})
 
 			It("pushes the app using the docker image from command line and username from manifest", func() {
-				Eventually(helpers.CF("push", "-o", dockerImage, "-f", tempFile)).Should(Exit())
+				Eventually(helpers.CF("push", "-o", DockerImage, "-f", tempFile)).Should(Exit())
 
 				appGUID := helpers.AppGUID(appName)
 				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session.Out).Should(Say(DockerImage))
 				Eventually(session.Out).Should(Say("some-other-user"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -144,7 +140,7 @@ applications:
 - name: %s
   docker:
     image: %s
-`, appName, dockerImage))
+`, appName, DockerImage))
 				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
 			})
 
@@ -153,7 +149,7 @@ applications:
 
 				appGUID := helpers.AppGUID(appName)
 				session := helpers.CF("curl", fmt.Sprintf("/v2/apps/%s", appGUID))
-				Eventually(session.Out).Should(Say(dockerImage))
+				Eventually(session.Out).Should(Say(DockerImage))
 				Eventually(session.Out).Should(Say("some-user"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -175,7 +171,7 @@ applications:
 			})
 
 			It("prompts the user for the docker password", func() {
-				session := helpers.CFWithStdin(buffer, "push", appName, "--docker-image", dockerImage, "--docker-username", "some-user")
+				session := helpers.CFWithStdin(buffer, "push", appName, "--docker-image", DockerImage, "--docker-username", "some-user")
 				Eventually(session).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
 				Eventually(session).Should(Exit())
 			})
@@ -212,7 +208,7 @@ applications:
   buildpack: staticfile_buildpack
   docker:
     image: %s
-`, appName, dockerImage))
+`, appName, DockerImage))
 				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
 			})
 
@@ -234,7 +230,7 @@ applications:
   path: .
   docker:
     image: %s
-`, appName, dockerImage))
+`, appName, DockerImage))
 				Expect(ioutil.WriteFile(tempFile, manifestContents, 0666)).To(Succeed())
 			})
 

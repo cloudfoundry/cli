@@ -281,7 +281,7 @@ applications:
 					domainName = defaultSharedDomain()
 					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
 					tcpDomain.CreateWithRouterGroup("default-tcp")
-					Eventually(helpers.CF("push", appName, "-o", "cloudfoundry/diego-docker-app-custom")).Should(Exit())
+					Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
 				})
 
 				AfterEach(func() {
@@ -292,7 +292,7 @@ applications:
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Say("name:\\s+%s", appName))
 					Consistently(session).ShouldNot(Say("buildpack:"))
-					Eventually(session).Should(Say("docker image:\\s+cloudfoundry/diego-docker-app-custom"))
+					Eventually(session).Should(Say("docker image:\\s+%s", DockerImage))
 					Consistently(session).ShouldNot(Say("buildpack:"))
 					Eventually(session).Should(Exit(0))
 				})
