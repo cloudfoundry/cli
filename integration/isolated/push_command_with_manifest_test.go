@@ -176,7 +176,7 @@ applications:
 
 			It("prompts the user for the docker password", func() {
 				session := helpers.CFWithStdin(buffer, "push", appName, "--docker-image", dockerImage, "--docker-username", "some-user")
-				Eventually(session).Should(Say("Docker password"))
+				Eventually(session).Should(Say("Environment variable CF_DOCKER_PASSWORD not set\\."))
 				Eventually(session).Should(Exit())
 			})
 		})
