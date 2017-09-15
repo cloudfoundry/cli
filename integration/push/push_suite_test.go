@@ -38,7 +38,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 }, func(_ []byte) {
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
-
+	SetDefaultConsistentlyDuration(CFEventuallyTimeout)
 	// Setup common environment variables
 	helpers.TurnOffColors()
 

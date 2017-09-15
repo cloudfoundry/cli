@@ -231,14 +231,6 @@ func (cmd V3PushCommand) validateArgs() error {
 		return translatableerror.RequiredFlagsError{
 			Arg1: "--docker-image, -o", Arg2: "--docker-username",
 		}
-	case cmd.DockerUsername != "" && cmd.AppPath != "":
-		return translatableerror.ArgumentCombinationError{
-			Args: []string{"--docker-username", "-p"},
-		}
-	case cmd.DockerUsername != "" && len(cmd.Buildpacks) > 0:
-		return translatableerror.ArgumentCombinationError{
-			Args: []string{"-b", "--docker-username"},
-		}
 	case cmd.DockerUsername != "" && cmd.Config.DockerPassword() == "":
 		return translatableerror.DockerPasswordNotSetError{}
 	}

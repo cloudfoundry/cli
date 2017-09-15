@@ -759,5 +759,18 @@ var _ = Describe("v2-push Command", func() {
 				Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
 			})
 		})
+
+		Context("when -o and -b flags are passed", func() {
+			BeforeEach(func() {
+				cmd.DockerImage.Path = "some-docker-image"
+				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
+					Args: []string{"-b", "--docker-image, -o"},
+				}))
+			})
+		})
 	})
 })
