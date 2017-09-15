@@ -27,6 +27,7 @@ type Application struct {
 	// Memory is the amount of memory in megabytes.
 	Memory    types.NullByteSizeInMb
 	Name      string
+	NoRoute   bool
 	Path      string
 	Routes    []string
 	Services  []string
@@ -35,7 +36,7 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-route: %t, Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -49,6 +50,7 @@ func (app Application) String() string {
 		app.Instances.IsSet,
 		app.Instances.Value,
 		app.Memory,
+		app.NoRoute,
 		app.Path,
 		strings.Join(app.Routes, ", "),
 		strings.Join(app.Services, ", "),
@@ -65,6 +67,7 @@ func (app Application) MarshalYAML() (interface{}, error) {
 		HealthCheckHTTPEndpoint: app.HealthCheckHTTPEndpoint,
 		HealthCheckType:         app.HealthCheckType,
 		Name:                    app.Name,
+		NoRoute:                 app.NoRoute,
 		Path:                    app.Path,
 		Services:                app.Services,
 		StackName:               app.StackName,
@@ -76,6 +79,7 @@ func (app Application) MarshalYAML() (interface{}, error) {
 	if app.Instances.IsSet {
 		m.Instances = &app.Instances.Value
 	}
+
 	for _, route := range app.Routes {
 		m.Routes = append(m.Routes, rawManifestRoute{Route: route})
 	}
@@ -96,6 +100,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.HealthCheckHTTPEndpoint = m.HealthCheckHTTPEndpoint
 	app.HealthCheckType = m.HealthCheckType
 	app.Name = m.Name
+	app.NoRoute = m.NoRoute
 	app.Path = m.Path
 	app.Services = m.Services
 	app.StackName = m.StackName

@@ -11,6 +11,7 @@ type rawManifestApplication struct {
 	HealthCheckType         string             `yaml:"health-check-type,omitempty"`
 	Instances               *int               `yaml:"instances,omitempty"`
 	Memory                  string             `yaml:"memory,omitempty"`
+	NoRoute                 bool               `yaml:"no-route,omitempty"`
 	Path                    string             `yaml:"path,omitempty"`
 	Routes                  []rawManifestRoute `yaml:"routes,omitempty"`
 	Services                []string           `yaml:"services,omitempty"`

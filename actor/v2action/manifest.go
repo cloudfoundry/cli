@@ -45,6 +45,9 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 	}
 	manifestApp.DiskQuota.ParseUint64Value(&applicationSummary.DiskQuota)
 	manifestApp.Memory.ParseUint64Value(&applicationSummary.Memory)
+	if len(routes) < 1 {
+		manifestApp.NoRoute = true
+	}
 
 	if applicationSummary.HealthCheckType != ccv2.ApplicationHealthCheckPort {
 		manifestApp.HealthCheckType = string(applicationSummary.HealthCheckType)
