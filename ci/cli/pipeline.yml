@@ -14,6 +14,7 @@ resources:
     branch: master
     ignore_paths:
     - ci
+    - integration
 
 - name: cli-ci
   type: git
@@ -23,6 +24,14 @@ resources:
     paths:
     - bin
     - ci
+
+- name: cli-integration
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths:
+    - integration
 
 - name: cf-acceptance-tests
   type: git
@@ -299,6 +308,7 @@ jobs:
       passed: [build-binaries]
       trigger: true
     - get: cli-ci
+    - get: cli-integration
     - get: vars-store
     - put: bosh-lite-lock
       resource: gcp-bosh-pool
