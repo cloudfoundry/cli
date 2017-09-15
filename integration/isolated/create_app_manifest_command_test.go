@@ -70,6 +70,8 @@ var _ = Describe("create-app-manifest command", func() {
 			Eventually(session.Out).Should(Say("-p      Specify a path for file creation. If path not specified, manifest file is created in current working directory."))
 			Eventually(session.Out).Should(Say("SEE ALSO:"))
 			Eventually(session.Out).Should(Say("apps, push"))
+
+			Eventually(session).Should(Exit(0))
 		})
 	})
 
@@ -83,6 +85,7 @@ var _ = Describe("create-app-manifest command", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -96,6 +99,7 @@ var _ = Describe("create-app-manifest command", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
+
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -110,6 +114,7 @@ var _ = Describe("create-app-manifest command", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
+
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -125,6 +130,7 @@ var _ = Describe("create-app-manifest command", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -135,6 +141,8 @@ var _ = Describe("create-app-manifest command", func() {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
 			Eventually(session.Out).Should(Say("USAGE:"))
+
+			Eventually(session).Should(Exit(1))
 		})
 	})
 
@@ -162,6 +170,8 @@ var _ = Describe("create-app-manifest command", func() {
 				Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("App %s not found", appName))
+
+				Eventually(session).Should(Exit(1))
 			})
 		})
 
@@ -192,6 +202,8 @@ var _ = Describe("create-app-manifest command", func() {
 					createdFile, err := ioutil.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(createdFile)).To(Equal(expectedFile))
+
+					Eventually(session).Should(Exit(0))
 				})
 			})
 
@@ -222,6 +234,8 @@ var _ = Describe("create-app-manifest command", func() {
 					createdFile, err := ioutil.ReadFile(manifestFilePath)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(string(createdFile)).To(Equal(expectedFile))
+
+					Eventually(session).Should(Exit(0))
 				})
 
 				Context("when the -p flag is provided", func() {
@@ -231,6 +245,8 @@ var _ = Describe("create-app-manifest command", func() {
 							Eventually(session.Out).Should(Say("Creating an app manifest from current settings of app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 							Eventually(session.Out).Should(Say("FAILED"))
 							Eventually(session.Err).Should(Say("Error creating manifest file: open %s: is a directory", helpers.ConvertPathToRegularExpression(tempDir)))
+
+							Eventually(session).Should(Exit(1))
 						})
 					})
 
@@ -260,6 +276,8 @@ var _ = Describe("create-app-manifest command", func() {
 							createdFile, err := ioutil.ReadFile(newFile)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(string(createdFile)).To(Equal(expectedFile))
+
+							Eventually(session).Should(Exit(0))
 						})
 					})
 
@@ -292,6 +310,8 @@ var _ = Describe("create-app-manifest command", func() {
 							createdFile, err := ioutil.ReadFile(existingFile)
 							Expect(err).ToNot(HaveOccurred())
 							Expect(string(createdFile)).To(Equal(expectedFile))
+
+							Eventually(session).Should(Exit(0))
 						})
 					})
 				})
@@ -337,6 +357,8 @@ var _ = Describe("create-app-manifest command", func() {
 				createdFile, err := ioutil.ReadFile(manifestFilePath)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(createdFile)).To(Equal(expectedFile))
+
+				Eventually(session).Should(Exit(0))
 			})
 		})
 
