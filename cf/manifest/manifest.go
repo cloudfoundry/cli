@@ -541,15 +541,12 @@ func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
 		return models.ManifestDocker{}
 	}
 
-	docker, ok := input.Get("docker").(map[interface{}]interface{})
-	if !ok {
-		return models.ManifestDocker{}
-	}
+	dockerMap := generic.NewMap(input.Get("docker"))
 
 	imageValue := ""
-	image, imageExists := docker["image"]
-	if imageExists {
-		imageValue, ok = image.(string)
+	if dockerMap.Has("image") {
+		var ok bool
+		imageValue, ok = dockerMap.Get("image").(string)
 		if !ok {
 			*errs = append(*errs, fmt.Errorf(T("'docker.image' must be a string")))
 			return models.ManifestDocker{}
@@ -557,9 +554,9 @@ func parseDocker(input generic.Map, errs *[]error) models.ManifestDocker {
 	}
 
 	usernameValue := ""
-	username, usernameExists := docker["username"]
-	if usernameExists {
-		usernameValue, ok = username.(string)
+	if dockerMap.Has("username") {
+		var ok bool
+		usernameValue, ok = dockerMap.Get("username").(string)
 		if !ok {
 			*errs = append(*errs, fmt.Errorf(T("'docker.username' must be a string")))
 			return models.ManifestDocker{}

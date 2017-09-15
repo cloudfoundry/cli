@@ -30,6 +30,20 @@ func pushHelloWorldAppWithManifests(manifests []string) {
 	})
 }
 
+func pushDockerWithManifests(manifests []string) {
+	helpers.WithHelloWorldApp(func(appDir string) {
+		pushPath := filepath.Join(appDir, "manifest-0.yml")
+		for i, manifest := range manifests {
+			manifestPath := filepath.Join(appDir, fmt.Sprintf("manifest-%d.yml", i))
+			manifest = strings.Replace(manifest, "inherit: {some-parent}", fmt.Sprintf("inherit: manifest-%d.yml", i+1), 1)
+			manifest = strings.Replace(manifest, "path: {some-dir}", fmt.Sprintf("path: %s", appDir), -1)
+			err := ioutil.WriteFile(manifestPath, []byte(manifest), 0666)
+			Expect(err).ToNot(HaveOccurred())
+		}
+		Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", "-f", pushPath)).Should(Exit())
+	})
+}
+
 // CASE 1: child manifest (no inheritance)
 //
 // APPLICATION params:
@@ -624,6 +638,32 @@ BAZ: parent-global
 FOO: child-global
 
 `))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("when the child has docker image properties; and the parent has global docker image properties", func() {
+			BeforeEach(func() {
+				pushDockerWithManifests([]string{
+					fmt.Sprintf(`
+---
+inherit: {some-parent}
+applications:
+- name: %s
+  docker:
+    image: some-image
+`, app1Name),
+					fmt.Sprintf(`
+---
+docker:
+  image: some-parent-docker-image
+`),
+				})
+			})
+
+			It("pushes with child docker image properties taking precedence;", func() {
+				session := helpers.CF("app", app1Name)
+				Eventually(session.Out).Should(Say(`docker image:\s*some-image`))
 				Eventually(session).Should(Exit(0))
 			})
 		})
