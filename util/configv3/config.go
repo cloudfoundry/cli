@@ -233,15 +233,15 @@ func WriteConfig(c *Config) error {
 	if err != nil {
 		return err
 	}
-
-	go catchSignal(sig, tempConfigFile)
-
+	tempConfigFile.Close()
 	tempConfigFileName := tempConfigFile.Name()
+
+	go catchSignal(sig, tempConfigFileName)
+
 	err = ioutil.WriteFile(tempConfigFileName, rawConfig, 0600)
 	if err != nil {
 		return err
 	}
-	tempConfigFile.Close()
 
 	return os.Rename(tempConfigFileName, ConfigFilePath())
 }
@@ -250,11 +250,10 @@ func WriteConfig(c *Config) error {
 // Interrupt for removing temporarily created config files before the program
 // ends.  Note:  we cannot intercept a `kill -9`, so a well-timed `kill -9`
 // will allow a temp config file to linger.
-func catchSignal(sig chan os.Signal, tempConfigFile *os.File) {
+func catchSignal(sig chan os.Signal, tempConfigFileName string) {
 	select {
 	case <-sig:
-		tempConfigFile.Close()
-		_ = os.Remove(tempConfigFile.Name())
+		_ = os.Remove(tempConfigFileName)
 		os.Exit(2)
 	}
 }
