@@ -73,7 +73,7 @@ var _ = Describe("pushes specified app from single manifest file", func() {
 				Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 				Eventually(session).Should(Say("100.00%"))
 				Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-				Eventually(session).Should(Say("Staging complete"))
+				helpers.ConfirmStagingLogs(session)
 				Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 				Eventually(session).Should(Say("requested state:\\s+started"))
 

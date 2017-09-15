@@ -73,7 +73,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("Uploading files\\.\\.\\."))
 						Eventually(session).Should(Say("100.00%"))
 						Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-						Eventually(session).Should(Say("Staging complete"))
+						helpers.ConfirmStagingLogs(session)
 						Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 						Eventually(session).Should(Say("requested state:\\s+started"))
 						Eventually(session).Should(Say("start command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
