@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 )
 
@@ -134,10 +135,15 @@ func WriteManifest(path string, manifest map[string]interface{}) {
 	Expect(err).ToNot(HaveOccurred())
 }
 
-// Thanks to Svett Ralchev
-// http://blog.ralch.com/tutorial/golang-working-with-zip/
+func ConfirmStagingLogs(session *gexec.Session) {
+	Eventually(session).Should(Say("(?i)Creating container|Successfully created container|Staging\\.\\.\\.|Staging process started \\.\\.\\.|Staging Complete"))
+}
+
 // Zipit zips the source into a .zip file in the target dir
 func Zipit(source, target, prefix string) error {
+	// Thanks to Svett Ralchev
+	// http://blog.ralch.com/tutorial/golang-working-with-zip/
+
 	zipfile, err := os.Create(target)
 	if err != nil {
 		return err

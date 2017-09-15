@@ -11,9 +11,9 @@ type Manifest struct {
 	Applications []Application `yaml:"applications"`
 }
 
-func (manifest *Manifest) UnmarshalYAML(unmarshaller func(interface{}) error) error {
+func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var raw rawManifest
-	err := unmarshaller(&raw)
+	err := unmarshal(&raw)
 	if err != nil {
 		return err
 	}
