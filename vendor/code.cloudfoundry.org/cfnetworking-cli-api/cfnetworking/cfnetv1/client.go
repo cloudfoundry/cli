@@ -69,8 +69,8 @@ import (
 	"runtime"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking"
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1/internal"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1/internal"
 
 	"github.com/tedsuo/rata"
 )

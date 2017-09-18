@@ -4,7 +4,7 @@ package wrapperfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
 )
 
 type FakeTokenCache struct {

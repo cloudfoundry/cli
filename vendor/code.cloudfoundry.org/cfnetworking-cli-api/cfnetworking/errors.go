@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking/networkerror"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/networkerror"
 )
 
 // errorWrapper is the wrapper that converts responses with 4xx and 5xx status

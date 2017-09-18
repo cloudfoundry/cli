@@ -1,6 +1,6 @@
 package cfnetv1
 
-import "code.cloudfoundry.org/cli/api/cfnetworking"
+import "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
 
 //go:generate counterfeiter . ConnectionWrapper
 
