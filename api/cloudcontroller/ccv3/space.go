@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-// Space represents a Clodu Controller V3 Space.
+// Space represents a Cloud Controller V3 Space.
 type Space struct {
 	Name string `json:"name"`
 	GUID string `json:"guid"`
