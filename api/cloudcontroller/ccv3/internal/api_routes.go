@@ -27,6 +27,7 @@ const (
 	GetIsolationSegmentsRequest                           = "GetIsolationSegments"
 	GetOrganizationDefaultIsolationSegmentRequest         = "GetOrganizationDefaultIsolationSegment"
 	GetOrgsRequest                                        = "GetOrgs"
+	GetSpacesRequest                                      = "GetSpaces"
 	GetPackageRequest                                     = "GetPackage"
 	GetPackagesRequest                                    = "GetPackages"
 	GetProcessInstancesRequest                            = "GetProcessInstances"
@@ -65,6 +66,7 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetAppsRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
+	{Path: "/", Method: http.MethodGet, Name: GetSpacesRequest, Resource: SpacesResource},
 	{Path: "/", Method: http.MethodGet, Name: GetPackagesRequest, Resource: PackagesResource},
 	{Path: "/", Method: http.MethodPost, Name: PostApplicationRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostBuildRequest, Resource: BuildsResource},
