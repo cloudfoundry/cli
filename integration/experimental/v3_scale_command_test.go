@@ -192,7 +192,7 @@ var _ = Describe("v3-scale command", func() {
 					Consistently(session.Out).ShouldNot(Say("Waiting"))
 					Eventually(session).Should(Exit(0))
 
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(len(appTable.Processes)).To(Equal(3))
 
 					processSummary := appTable.Processes[0]
@@ -212,7 +212,7 @@ var _ = Describe("v3-scale command", func() {
 					By("verifying we start with a single instance")
 					session := helpers.CF("v3-scale", appName)
 					Eventually(session).Should(Exit(0))
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(appTable.Processes).To(HaveLen(3))
 
 					By("scaling to 3 instances")
@@ -223,7 +223,7 @@ var _ = Describe("v3-scale command", func() {
 					Consistently(session.Out).ShouldNot(Say("Starting"))
 					Eventually(session).Should(Exit(0))
 
-					updatedAppTable := helpers.ParseV3AppTable(session.Out.Contents())
+					updatedAppTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary := updatedAppTable.Processes[0]
@@ -242,7 +242,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
 
-					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					updatedAppTable = helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary = updatedAppTable.Processes[0]
@@ -261,7 +261,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
 
-					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					updatedAppTable = helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(updatedAppTable.Processes).To(HaveLen(3))
 
 					processSummary = updatedAppTable.Processes[0]
@@ -278,7 +278,7 @@ var _ = Describe("v3-scale command", func() {
 					Consistently(session.Out).ShouldNot(Say("Starting"))
 					Eventually(session).Should(Exit(0))
 
-					updatedAppTable = helpers.ParseV3AppTable(session.Out.Contents())
+					updatedAppTable = helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(updatedAppTable.Processes).To(BeEmpty())
 				})
 
@@ -294,7 +294,7 @@ var _ = Describe("v3-scale command", func() {
 						Consistently(session.Out).ShouldNot(Say("Waiting for app to start\\.\\.\\."))
 						Eventually(session).Should(Exit(0))
 
-						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(BeEmpty())
 					})
 				})
@@ -312,7 +312,7 @@ var _ = Describe("v3-scale command", func() {
 						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
 
-						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(HaveLen(3))
 
 						processSummary := appTable.Processes[0]
@@ -335,7 +335,7 @@ var _ = Describe("v3-scale command", func() {
 						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 						Eventually(session).Should(Exit(0))
 
-						appTable := helpers.ParseV3AppTable(session.Out.Contents())
+						appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 						Expect(appTable.Processes).To(HaveLen(3))
 
 						processSummary := appTable.Processes[0]
@@ -360,7 +360,7 @@ var _ = Describe("v3-scale command", func() {
 					session = helpers.CF("v3-scale", appName)
 					Eventually(session).Should(Exit(0))
 
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					instanceSummary := appTable.Processes[0].Instances[0]
 					currentInstances = string(len(appTable.Processes[0].Instances))
 					maxMemory = strings.Fields(instanceSummary.Memory)[2]
@@ -376,7 +376,7 @@ var _ = Describe("v3-scale command", func() {
 					Consistently(session.Out).ShouldNot(Say("Waiting for app to start"))
 					Eventually(session).Should(Exit(0))
 
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(appTable.Processes).To(HaveLen(1))
 
 					newProcessSummary := appTable.Processes[0]
@@ -393,7 +393,7 @@ var _ = Describe("v3-scale command", func() {
 					Eventually(session.Out).Should(Say("Scaling app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
 					Eventually(session).Should(Exit(0))
 
-					appTable := helpers.ParseV3AppTable(session.Out.Contents())
+					appTable := helpers.ParseV3AppProcessTable(session.Out.Contents())
 					Expect(appTable.Processes).To(HaveLen(3))
 
 					processSummary := appTable.Processes[1]

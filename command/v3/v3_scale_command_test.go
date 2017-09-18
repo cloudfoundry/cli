@@ -257,7 +257,7 @@ var _ = Describe("v3-scale Command", func() {
 					Expect(testUI.Out).ToNot(Say("Waiting"))
 					Expect(testUI.Out).To(Say("Showing current scale of app some-app in org some-org / space some-space as some-user\\.\\.\\."))
 
-					firstAppTable := helpers.ParseV3AppTable(output.Contents())
+					firstAppTable := helpers.ParseV3AppProcessTable(output.Contents())
 					Expect(len(firstAppTable.Processes)).To(Equal(2))
 
 					webProcessSummary := firstAppTable.Processes[0]
@@ -397,7 +397,7 @@ var _ = Describe("v3-scale Command", func() {
 								// Note that this does test that the disk quota was scaled to 96M,
 								// it is tested below when we check the arguments
 								// passed to ScaleProcessByApplication
-								firstAppTable := helpers.ParseV3AppTable(output.Contents())
+								firstAppTable := helpers.ParseV3AppProcessTable(output.Contents())
 								Expect(len(firstAppTable.Processes)).To(Equal(2))
 
 								webProcessSummary := firstAppTable.Processes[0]

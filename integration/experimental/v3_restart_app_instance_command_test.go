@@ -181,7 +181,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 				It("defaults to web process", func() {
 					appOutputSession := helpers.CF("v3-app", appName)
 					Eventually(appOutputSession).Should(Exit(0))
-					firstAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+					firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 					session := helpers.CF("v3-restart-app-instance", appName, "0")
 					Eventually(session.Out).Should(Say("Restarting instance 0 of process web of app %s in org %s / space %s as %s", appName, orgName, spaceName, userName))
@@ -193,7 +193,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 						Eventually(func() string {
 							appOutputSession := helpers.CF("v3-app", appName)
 							Eventually(appOutputSession).Should(Exit(0))
-							restartedAppTable = helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+							restartedAppTable = helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 							if len(restartedAppTable.Processes) > 0 {
 								return restartedAppTable.Processes[0].Title
@@ -238,7 +238,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 							Eventually(func() string {
 								appOutputSession := helpers.CF("v3-app", appName)
 								Eventually(appOutputSession).Should(Exit(0))
-								firstAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+								firstAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 
 								var found bool
 								firstAppTableConsoleProcess, found = findConsoleProcess(firstAppTable)
@@ -260,7 +260,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 									appOutputSession := helpers.CF("v3-app", appName)
 									Eventually(appOutputSession).Should(Exit(0))
 
-									restartedAppTable := helpers.ParseV3AppTable(appOutputSession.Out.Contents())
+									restartedAppTable := helpers.ParseV3AppProcessTable(appOutputSession.Out.Contents())
 									var found bool
 									restartedAppTableConsoleProcess, found = findConsoleProcess(restartedAppTable)
 									Expect(found).To(BeTrue())

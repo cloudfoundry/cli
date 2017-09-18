@@ -23,7 +23,7 @@ type AppTable struct {
 	Processes []AppProcessTable
 }
 
-func ParseV3AppTable(input []byte) AppTable {
+func ParseV3AppProcessTable(input []byte) AppTable {
 	appTable := AppTable{}
 
 	rows := strings.Split(string(input), "\n")
