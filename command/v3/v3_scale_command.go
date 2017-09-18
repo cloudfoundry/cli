@@ -231,7 +231,6 @@ func (cmd V3ScaleCommand) showCurrentScale(userName string) error {
 		"SpaceName": cmd.Config.TargetedSpace().Name,
 		"Username":  userName,
 	})
-	cmd.UI.DisplayNewline()
 
-	return cmd.AppSummaryDisplayer.DisplayAppInfo()
+	return cmd.AppSummaryDisplayer.DisplayAppProcessInfo()
 }

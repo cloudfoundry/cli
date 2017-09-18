@@ -38,6 +38,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	if err != nil {
 		return HandleError(err)
 	}
+	summary.ProcessSummaries.Sort()
 
 	var routes v2action.Routes
 	if len(summary.ProcessSummaries) > 0 {
@@ -54,59 +55,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	return nil
 }
 
-// Sort processes alphabetically and put web first.
-func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
-	summary.ProcessSummaries.Sort()
-
-	keyValueTable := [][]string{
-		{display.UI.TranslateText("name:"), summary.Application.Name},
-		{display.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
-		{display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
-		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
-		{display.UI.TranslateText("routes:"), routes.Summary()},
-		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
-	}
-
-	var lifecycleInfo []string
-
-	if summary.Lifecycle.Type == v3action.DockerAppLifecycleType {
-		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
-	} else {
-		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
-	}
-
-	keyValueTable = append(keyValueTable, lifecycleInfo)
-
-	crashedProcesses := []string{}
-	for i := range summary.ProcessSummaries {
-		if display.processInstancesAreAllCrashed(&summary.ProcessSummaries[i]) {
-			crashedProcesses = append(crashedProcesses, summary.ProcessSummaries[i].Type)
-		}
-	}
-
-	display.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
-
-	appHasARunningInstance := false
-
-	for processIdx := range summary.ProcessSummaries {
-		if display.processHasAnInstance(&summary.ProcessSummaries[processIdx]) {
-			appHasARunningInstance = true
-			break
-		}
-	}
-
-	if !appHasARunningInstance {
-		display.UI.DisplayNewline()
-		display.UI.DisplayText("There are no running instances of this app.")
-		return
-	}
-
-	for _, process := range summary.ProcessSummaries {
-		display.DisplayAppInstancesTable(process)
-	}
-}
-
-func (display AppSummaryDisplayer) DisplayAppInstancesTable(processSummary v3action.ProcessSummary) {
+func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3action.ProcessSummary) {
 	display.UI.DisplayNewline()
 
 	display.UI.DisplayTextWithBold("{{.ProcessType}}:{{.HealthyInstanceCount}}/{{.TotalInstanceCount}}", map[string]interface{}{
@@ -148,6 +97,71 @@ func (display AppSummaryDisplayer) DisplayAppInstancesTable(processSummary v3act
 	}
 
 	display.UI.DisplayInstancesTableForApp(table)
+}
+
+func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
+	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
+	display.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return HandleError(err)
+	}
+	summary.ProcessSummaries.Sort()
+
+	display.displayProcessTable(summary)
+	return nil
+}
+
+func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
+	keyValueTable := [][]string{
+		{display.UI.TranslateText("name:"), summary.Application.Name},
+		{display.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
+		{display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
+		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
+		{display.UI.TranslateText("routes:"), routes.Summary()},
+		{display.UI.TranslateText("stack:"), summary.CurrentDroplet.Stack},
+	}
+
+	var lifecycleInfo []string
+
+	if summary.Lifecycle.Type == v3action.DockerAppLifecycleType {
+		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
+	} else {
+		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
+	}
+
+	keyValueTable = append(keyValueTable, lifecycleInfo)
+
+	crashedProcesses := []string{}
+	for i := range summary.ProcessSummaries {
+		if display.processInstancesAreAllCrashed(&summary.ProcessSummaries[i]) {
+			crashedProcesses = append(crashedProcesses, summary.ProcessSummaries[i].Type)
+		}
+	}
+
+	display.UI.DisplayKeyValueTableForV3App(keyValueTable, crashedProcesses)
+
+	display.displayProcessTable(summary)
+}
+
+func (display AppSummaryDisplayer) displayProcessTable(summary v3action.ApplicationSummary) {
+	appHasARunningInstance := false
+
+	for processIdx := range summary.ProcessSummaries {
+		if display.processHasAnInstance(&summary.ProcessSummaries[processIdx]) {
+			appHasARunningInstance = true
+			break
+		}
+	}
+
+	if !appHasARunningInstance {
+		display.UI.DisplayNewline()
+		display.UI.DisplayText("There are no running instances of this app.")
+		return
+	}
+
+	for _, process := range summary.ProcessSummaries {
+		display.displayAppInstancesTable(process)
+	}
 }
 
 func (AppSummaryDisplayer) usageSummary(processSummaries v3action.ProcessSummaries) string {

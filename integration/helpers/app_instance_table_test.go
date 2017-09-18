@@ -31,7 +31,7 @@ worker:1/1
      state     since                    cpu    memory      disk
 #0   stopped   2017-08-02 17:12:10 PM   0.0%   0M of 32M   0M of 1G
 `
-		appInstanceTable := ParseV3AppTable([]byte(input))
+		appInstanceTable := ParseV3AppProcessTable([]byte(input))
 		Expect(appInstanceTable).To(Equal(AppTable{
 			Processes: []AppProcessTable{
 				{
@@ -64,7 +64,7 @@ web:4/4
 #2   running   2017-08-03 03:29:25 AM   0.1%   22.8M of 32M   84.5M of 1G
 #3   running   2017-08-02 17:12:10 PM   0.2%   22.9M of 32M   84.5M of 1G
 `
-		appInstanceTable := ParseV3AppTable([]byte(input))
+		appInstanceTable := ParseV3AppProcessTable([]byte(input))
 		Expect(appInstanceTable).To(Equal(AppTable{
 			Processes: []AppProcessTable{
 				{
