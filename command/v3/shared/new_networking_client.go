@@ -1,8 +1,8 @@
 package shared
 
 import (
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
-	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/translatableerror"

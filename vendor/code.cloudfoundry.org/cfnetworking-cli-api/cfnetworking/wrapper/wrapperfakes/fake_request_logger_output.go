@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking/wrapper"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/wrapper"
 )
 
 type FakeRequestLoggerOutput struct {

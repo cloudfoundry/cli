@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
 )
 
 // Params represents URI parameters for a request.
