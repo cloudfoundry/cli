@@ -1,7 +1,7 @@
 package cfnetworkingaction
 
 import (
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 )
 
 type PolicyDoesNotExistError struct{}

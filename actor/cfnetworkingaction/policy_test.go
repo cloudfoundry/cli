@@ -3,10 +3,10 @@ package cfnetworkingaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
 	. "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction/cfnetworkingactionfakes"
 	"code.cloudfoundry.org/cli/actor/v3action"
-	"code.cloudfoundry.org/cli/api/cfnetworking/cfnetv1"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
