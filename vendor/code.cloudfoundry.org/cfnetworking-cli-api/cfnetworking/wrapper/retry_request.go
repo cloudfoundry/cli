@@ -3,7 +3,7 @@ package wrapper
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cfnetworking"
+	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking"
 )
 
 // RetryRequest is a wrapper that retries failed requests if they contain a 5XX
