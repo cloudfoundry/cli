@@ -7248,6 +7248,10 @@
     "translation": "host"
   },
   {
+    "id": "image",
+    "translation": ""
+  },
+  {
     "id": "instance memory",
     "translation": "memória da instância"
   },
