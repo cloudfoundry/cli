@@ -176,6 +176,10 @@
     "translation": ") は既に存在しています。"
   },
   {
+    "id": "*** Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push ***",
+    "translation": ""
+  },
+  {
     "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}?",
     "translation": "**注意: プラグインは必ずしも信頼できない作成者によって書かれたバイナリーです。 プラグインのインストールと使用は自らの責任で行ってください。**\n\nプラグイン {{.Plugin}} をインストールしますか?"
   },
