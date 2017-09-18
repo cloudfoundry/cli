@@ -299,10 +299,10 @@ var _ = Describe("create-route command", func() {
 					domain.Delete()
 				})
 
-				It("warns the user that it has already been registered to another space and then fails", func() {
+				It("warns the user that the route is already in use and then fails", func() {
 					session := helpers.CF("create-route", spaceName, domainName)
 					Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say(`Route %s has been registered to another space\.`, domainName))
+					Eventually(session.Err).Should(Say(`The route %s is already in use\.`, domainName))
 					Eventually(session.Out).Should(Say(`FAILED`))
 					Eventually(session).Should(Exit(1))
 				})
