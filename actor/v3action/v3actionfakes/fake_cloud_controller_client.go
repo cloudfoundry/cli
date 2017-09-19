@@ -542,6 +542,22 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateApplicationEnvironmentVariablesStub        func(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	updateApplicationEnvironmentVariablesMutex       sync.RWMutex
+	updateApplicationEnvironmentVariablesArgsForCall []struct {
+		appGUID string
+		envVars ccv3.EnvironmentVariables
+	}
+	updateApplicationEnvironmentVariablesReturns struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}
+	updateApplicationEnvironmentVariablesReturnsOnCall map[int]struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}
 	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	updateTaskMutex       sync.RWMutex
 	updateTaskArgsForCall []struct {
@@ -2502,6 +2518,61 @@ func (fake *FakeCloudControllerClient) UpdateApplicationReturnsOnCall(i int, res
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error) {
+	fake.updateApplicationEnvironmentVariablesMutex.Lock()
+	ret, specificReturn := fake.updateApplicationEnvironmentVariablesReturnsOnCall[len(fake.updateApplicationEnvironmentVariablesArgsForCall)]
+	fake.updateApplicationEnvironmentVariablesArgsForCall = append(fake.updateApplicationEnvironmentVariablesArgsForCall, struct {
+		appGUID string
+		envVars ccv3.EnvironmentVariables
+	}{appGUID, envVars})
+	fake.recordInvocation("UpdateApplicationEnvironmentVariables", []interface{}{appGUID, envVars})
+	fake.updateApplicationEnvironmentVariablesMutex.Unlock()
+	if fake.UpdateApplicationEnvironmentVariablesStub != nil {
+		return fake.UpdateApplicationEnvironmentVariablesStub(appGUID, envVars)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.updateApplicationEnvironmentVariablesReturns.result1, fake.updateApplicationEnvironmentVariablesReturns.result2, fake.updateApplicationEnvironmentVariablesReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariablesCallCount() int {
+	fake.updateApplicationEnvironmentVariablesMutex.RLock()
+	defer fake.updateApplicationEnvironmentVariablesMutex.RUnlock()
+	return len(fake.updateApplicationEnvironmentVariablesArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariablesArgsForCall(i int) (string, ccv3.EnvironmentVariables) {
+	fake.updateApplicationEnvironmentVariablesMutex.RLock()
+	defer fake.updateApplicationEnvironmentVariablesMutex.RUnlock()
+	return fake.updateApplicationEnvironmentVariablesArgsForCall[i].appGUID, fake.updateApplicationEnvironmentVariablesArgsForCall[i].envVars
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariablesReturns(result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationEnvironmentVariablesStub = nil
+	fake.updateApplicationEnvironmentVariablesReturns = struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) UpdateApplicationEnvironmentVariablesReturnsOnCall(i int, result1 ccv3.EnvironmentVariables, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateApplicationEnvironmentVariablesStub = nil
+	if fake.updateApplicationEnvironmentVariablesReturnsOnCall == nil {
+		fake.updateApplicationEnvironmentVariablesReturnsOnCall = make(map[int]struct {
+			result1 ccv3.EnvironmentVariables
+			result2 ccv3.Warnings
+			result3 error
+		})
+	}
+	fake.updateApplicationEnvironmentVariablesReturnsOnCall[i] = struct {
+		result1 ccv3.EnvironmentVariables
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
 	fake.updateTaskMutex.Lock()
 	ret, specificReturn := fake.updateTaskReturnsOnCall[len(fake.updateTaskArgsForCall)]
@@ -2686,6 +2757,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.stopApplicationMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
+	fake.updateApplicationEnvironmentVariablesMutex.RLock()
+	defer fake.updateApplicationEnvironmentVariablesMutex.RUnlock()
 	fake.updateTaskMutex.RLock()
 	defer fake.updateTaskMutex.RUnlock()
 	fake.uploadPackageMutex.RLock()
