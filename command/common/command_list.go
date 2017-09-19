@@ -18,16 +18,17 @@ type commandList struct {
 	V3App                v3.V3AppCommand                `command:"v3-app" description:"Display health and status for an app"`
 	V3Apps               v3.V3AppsCommand               `command:"v3-apps" description:"List all apps in the target space"`
 	V3CreateApp          v3.V3CreateAppCommand          `command:"v3-create-app" description:"**EXPERIMENTAL** Create a V3 App"`
-	V3DeleteApp          v3.V3DeleteCommand             `command:"v3-delete" description:"**EXPERIMENTAL** Delete a V3 App"`
 	V3CreatePackage      v3.V3CreatePackageCommand      `command:"v3-create-package" description:"**EXPERIMENTAL** Uploads a V3 Package"`
-	V3GetHealthCheck     v3.V3GetHealthCheckCommand     `command:"v3-get-health-check" description:"**EXPERIMENTAL** Show the type of health check performed on an app"`
+	V3DeleteApp          v3.V3DeleteCommand             `command:"v3-delete" description:"**EXPERIMENTAL** Delete a V3 App"`
 	V3Droplets           v3.V3DropletsCommand           `command:"v3-droplets" description:"**EXPERIMENTAL** List droplets of an app"`
+	V3GetHealthCheck     v3.V3GetHealthCheckCommand     `command:"v3-get-health-check" description:"**EXPERIMENTAL** Show the type of health check performed on an app"`
 	V3Packages           v3.V3PackagesCommand           `command:"v3-packages" description:"**EXPERIMENTAL** List packages of an app"`
 	V3Push               v3.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
 	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
 	V3RestartAppInstance v3.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"**EXPERIMENTAL** Terminate, then instantiate an app instance"`
 	V3Scale              v3.V3ScaleCommand              `command:"v3-scale" description:"**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app"`
 	V3SetDroplet         v3.V3SetDropletCommand         `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
+	V3SetEnv             v3.V3SetEnvCommand             `command:"v3-set-env" description:"**EXPERIMENTAL** Set an env variable for an app"`
 	V3SetHealthCheck     v3.V3SetHealthCheckCommand     `command:"v3-set-health-check" description:"**EXPERIMENTAL** Change type of health check performed on an app's process"`
 	V3Stage              v3.V3StageCommand              `command:"v3-stage" description:"**EXPERIMENTAL** Create a new droplet for an app"`
 	V3Start              v3.V3StartCommand              `command:"v3-start" description:"Start an app"`

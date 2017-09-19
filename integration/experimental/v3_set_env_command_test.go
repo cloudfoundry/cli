@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("v3-set-env command", func() {
+var _ = Describe("v3-set-env command", func() {
 	var (
 		orgName     string
 		spaceName   string
@@ -37,8 +37,6 @@ var _ = PDescribe("v3-set-env command", func() {
 				Eventually(session.Out).Should(Say("v3-set-env - \\*\\*EXPERIMENTAL\\*\\* Set an env variable for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"))
-				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("v3-apps, v3-env, v3-restart, v3-set-running-environment-variable-group, v3-set-staging-environment-variable-group, v3-unset-env"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -206,7 +204,7 @@ var _ = PDescribe("v3-set-env command", func() {
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s": "%s"`), envVarName, envVarValue)
+					Eventually(session).Should(Say(`"%s": "%s"`, envVarName, envVarValue))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -221,7 +219,7 @@ var _ = PDescribe("v3-set-env command", func() {
 					Eventually(helpers.CF("v3-set-env", appName, envVarName, someOtherValue)).Should(Exit(0))
 
 					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s": "%s"`), envVarName, someOtherValue)
+					Eventually(session).Should(Say(`"%s": "%s"`, envVarName, someOtherValue))
 					Eventually(session).Should(Exit(0))
 				})
 			})

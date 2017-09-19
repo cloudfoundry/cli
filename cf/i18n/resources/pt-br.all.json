@@ -212,6 +212,10 @@
     "translation": ""
   },
   {
+    "id": "**EXPERIMENTAL** Set an env variable for an app",
+    "translation": ""
+  },
+  {
     "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
     "translation": ""
   },
@@ -1821,6 +1825,10 @@
   },
   {
     "id": "CF_NAME v3-set-droplet APP_NAME -d DROPLET_GUID",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
     "translation": ""
   },
   {
@@ -5640,6 +5648,10 @@
     "translation": ""
   },
   {
+    "id": "Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
+  },
+  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Configurando a variável de ambiente '{{.VarName}}' como '{{.VarValue}}' para o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.CurrentUser}}..."
   },
@@ -5946,6 +5958,10 @@
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "DICA: nenhum espaço destinado, use '{{.CfTargetCommand}}' para destinar um espaço."
+  },
+  {
+    "id": "TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.",
+    "translation": ""
   },
   {
     "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
