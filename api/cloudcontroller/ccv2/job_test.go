@@ -537,6 +537,7 @@ var _ = Describe("Job", func() {
 
 		Context("when an http error occurs mid-transfer", func() {
 			var expectedErr error
+			const UploadSize = 33 * 1024
 
 			BeforeEach(func() {
 				expectedErr = errors.New("some read error")
@@ -547,8 +548,9 @@ var _ = Describe("Job", func() {
 
 						if strings.HasSuffix(request.URL.String(), "/v2/apps/some-app-guid/bits?async=true") {
 							defer request.Body.Close()
-							_, err := request.Body.Read(make([]byte, 32*1024))
+							readBytes, err := ioutil.ReadAll(request.Body)
 							Expect(err).ToNot(HaveOccurred())
+							Expect(len(readBytes)).To(BeNumerically(">", UploadSize))
 							return expectedErr
 						}
 						return connection.Make(request, response)
@@ -559,7 +561,7 @@ var _ = Describe("Job", func() {
 			})
 
 			It("returns the http error", func() {
-				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, strings.NewReader(strings.Repeat("a", 33*1024)), 3)
+				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, strings.NewReader(strings.Repeat("a", UploadSize)), 3)
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
