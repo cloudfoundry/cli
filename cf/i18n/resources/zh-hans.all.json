@@ -3436,6 +3436,10 @@
     "translation": "正在以 {{.Username}} 身份获取空间配额..."
   },
   {
+    "id": "Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.TargetOrgName}} 中的空间...\n"
   },
@@ -4406,6 +4410,10 @@
   {
     "id": "No spaces found",
     "translation": "找不到空间"
+  },
+  {
+    "id": "No spaces found.",
+    "translation": ""
   },
   {
     "id": "No staging env variables have been set",

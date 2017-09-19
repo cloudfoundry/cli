@@ -3436,6 +3436,10 @@
     "translation": "{{.Username}}(으)로 영역 할당량을 가져오는 중..."
   },
   {
+    "id": "Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
     "translation": "{{.CurrentUser}}(으)로 {{.TargetOrgName}} 조직의 영역을 가져오는 중...\n"
   },
@@ -4406,6 +4410,10 @@
   {
     "id": "No spaces found",
     "translation": "영역을 찾을 수 없음"
+  },
+  {
+    "id": "No spaces found.",
+    "translation": ""
   },
   {
     "id": "No staging env variables have been set",
