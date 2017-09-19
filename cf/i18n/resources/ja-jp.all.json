@@ -3436,6 +3436,10 @@
     "translation": "{{.Username}} としてスペース割り当て量を取得しています..."
   },
   {
+    "id": "Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
     "translation": "{{.CurrentUser}} として組織 {{.TargetOrgName}} 内のスペースを取得しています...\n"
   },
@@ -4406,6 +4410,10 @@
   {
     "id": "No spaces found",
     "translation": "スペースが見つかりませんでした"
+  },
+  {
+    "id": "No spaces found.",
+    "translation": ""
   },
   {
     "id": "No staging env variables have been set",

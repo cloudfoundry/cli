@@ -3436,6 +3436,10 @@
     "translation": "Getting space quotas as {{.Username}}..."
   },
   {
+    "id": "Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
     "translation": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n"
   },
@@ -4406,6 +4410,10 @@
   {
     "id": "No spaces found",
     "translation": "No spaces found"
+  },
+  {
+    "id": "No spaces found.",
+    "translation": ""
   },
   {
     "id": "No staging env variables have been set",

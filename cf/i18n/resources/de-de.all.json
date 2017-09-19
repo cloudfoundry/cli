@@ -3436,6 +3436,10 @@
     "translation": "Abrufen der Bereichsgrößenbeschränkungen als {{.Username}}..."
   },
   {
+    "id": "Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
     "translation": "Abrufen von Bereichen in Organisation {{.TargetOrgName}} als {{.CurrentUser}}...\n"
   },
@@ -4406,6 +4410,10 @@
   {
     "id": "No spaces found",
     "translation": "Keine Bereiche gefunden"
+  },
+  {
+    "id": "No spaces found.",
+    "translation": ""
   },
   {
     "id": "No staging env variables have been set",
