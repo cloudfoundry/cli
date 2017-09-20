@@ -43,6 +43,7 @@
 //   GET -> Get
 //   PUT -> Update
 //   DELETE -> Delete
+//   PATCH -> Patch
 //
 // Method Locations
 //
