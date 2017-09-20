@@ -128,6 +128,10 @@ var _ = Describe("network-policies command", func() {
 			Eventually(session).Should(Exit(0))
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when policies exists", func() {
 			It("lists all the policies", func() {
 				session := helpers.CF("network-policies")

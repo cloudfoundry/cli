@@ -96,6 +96,10 @@ var _ = Describe("unbind-service command", func() {
 			domain = defaultSharedDomain()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(org)
+		})
+
 		Context("when the service is provided by a user", func() {
 			BeforeEach(func() {
 				Eventually(helpers.CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))

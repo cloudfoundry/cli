@@ -142,6 +142,10 @@ var _ = Describe("v3-apps command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("with no apps", func() {
 			It("displays empty list", func() {
 				session := helpers.CF("v3-apps")

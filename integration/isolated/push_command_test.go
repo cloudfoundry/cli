@@ -29,6 +29,10 @@ var _ = Describe("Push", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when manifest contains non-string env values", func() {
 			var appName string
 

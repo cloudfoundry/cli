@@ -47,6 +47,10 @@ var _ = Describe("Push with health check", func() {
 			appName = helpers.PrefixedRandomName("app")
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when displaying help in the old code", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("push")

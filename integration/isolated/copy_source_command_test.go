@@ -13,10 +13,18 @@ import (
 )
 
 var _ = Describe("copy-source command", func() {
-	var appName1, appName2 string
+	var (
+		appName1  string
+		appName2  string
+		orgName   string
+		spaceName string
+	)
 
 	BeforeEach(func() {
-		setupCF(helpers.NewOrgName(), helpers.NewSpaceName())
+		orgName = helpers.NewOrgName()
+		spaceName = helpers.NewSpaceName()
+
+		setupCF(orgName, spaceName)
 
 		appName1 = helpers.PrefixedRandomName("hello")
 		appName2 = helpers.PrefixedRandomName("banana")
@@ -28,6 +36,10 @@ var _ = Describe("copy-source command", func() {
 		helpers.WithBananaPantsApp(func(appDir string) {
 			Eventually(helpers.CF("push", appName2, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 		})
+	})
+
+	AfterEach(func() {
+		helpers.QuickDeleteOrg(orgName)
 	})
 
 	It("copies the app", func() {

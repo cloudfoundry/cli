@@ -52,6 +52,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.DestroyHomeDir(homeDir)
 })
 
+var _ = SynchronizedAfterSuite(func() {
+	helpers.SetAPI()
+	helpers.LoginCF()
+	helpers.QuickDeleteOrg(organization)
+}, func() {
+})
+
 var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()

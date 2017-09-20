@@ -122,6 +122,10 @@ var _ = Describe("reset-space-isolation-segment command", func() {
 			helpers.TargetOrg(organizationName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(organizationName)
+		})
+
 		Context("when the space does not exist", func() {
 			It("fails with space not found message", func() {
 				session := helpers.CF("reset-space-isolation-segment", spaceName)

@@ -147,6 +147,10 @@ var _ = Describe("v3-create-package command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("returns a not found error", func() {
 				session := helpers.CF("v3-create-package", appName)

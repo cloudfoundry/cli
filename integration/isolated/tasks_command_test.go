@@ -122,6 +122,11 @@ var _ = Describe("tasks command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.LoginCF()
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the application does not exist", func() {
 			It("fails and outputs an app not found message", func() {
 				session := helpers.CF("tasks", appName)

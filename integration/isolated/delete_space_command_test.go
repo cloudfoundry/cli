@@ -9,11 +9,6 @@ import (
 )
 
 var _ = Describe("delete-space command", func() {
-	var (
-		orgName   string
-		spaceName string
-	)
-
 	Describe("help", func() {
 		It("shows usage", func() {
 			session := helpers.CF("help", "delete-space")
@@ -66,11 +61,17 @@ var _ = Describe("delete-space command", func() {
 	})
 
 	Context("when the space does not exist", func() {
+		var orgName string
+
 		BeforeEach(func() {
 			helpers.LoginCF()
 
 			orgName = helpers.NewOrgName()
 			helpers.CreateOrg(orgName)
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		It("fails and displays space not found", func() {
@@ -84,6 +85,8 @@ var _ = Describe("delete-space command", func() {
 	})
 
 	Context("when the space exists", func() {
+		var orgName string
+		var spaceName string
 
 		BeforeEach(func() {
 			helpers.LoginCF()
@@ -91,6 +94,10 @@ var _ = Describe("delete-space command", func() {
 			orgName = helpers.NewOrgName()
 			spaceName = helpers.NewSpaceName()
 			helpers.CreateOrgAndSpace(orgName, spaceName)
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		Context("when the -f flag not is provided", func() {
@@ -208,24 +215,6 @@ var _ = Describe("delete-space command", func() {
 			Eventually(session.Err).Should(Say("Organization 'please-do-not-exist-in-real-life' not found\\."))
 			Eventually(session.Out).Should(Say("FAILED"))
 			Eventually(session).Should(Exit(1))
-		})
-	})
-
-	Context("when the -o organzation does not exist", func() {
-		BeforeEach(func() {
-			helpers.LoginCF()
-			orgName = helpers.NewOrgName()
-			spaceName = helpers.NewSpaceName()
-			helpers.CreateOrgAndSpace(orgName, spaceName)
-		})
-
-		It("fails and displays org not found", func() {
-			username, _ := helpers.GetCredentials()
-			session := helpers.CF("delete-space", "-f", "-o", orgName, spaceName)
-			Eventually(session.Out).Should(Say("Deleting space %s in org %s as %s...", spaceName, orgName, username))
-			Eventually(session.Out).Should(Say("OK"))
-			Eventually(session).Should(Exit(0))
-			Eventually(helpers.CF("space", spaceName)).Should(Exit(1))
 		})
 	})
 })

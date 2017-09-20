@@ -162,6 +162,10 @@ var _ = Describe("v3-stage command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app exists", func() {
 			var packageGUID string
 

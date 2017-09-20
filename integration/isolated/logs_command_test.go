@@ -96,6 +96,10 @@ var _ = Describe("Logs Command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when input is invalid", func() {
 			Context("because no app name is provided", func() {
 				It("gives an incorrect usage message", func() {

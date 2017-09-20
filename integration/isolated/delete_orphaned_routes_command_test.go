@@ -88,6 +88,10 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			domain.Create()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when there are orphaned routes", func() {
 			var (
 				orphanedRoute1 helpers.Route

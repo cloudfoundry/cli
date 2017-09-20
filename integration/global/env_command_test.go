@@ -14,6 +14,7 @@ import (
 var _ = Describe("env command", func() {
 	var (
 		appName string
+		orgName string
 
 		key1 string
 		key2 string
@@ -31,7 +32,9 @@ var _ = Describe("env command", func() {
 	)
 
 	BeforeEach(func() {
-		setupCF(helpers.NewOrgName(), helpers.NewSpaceName())
+		spaceName := helpers.NewSpaceName()
+		orgName = helpers.NewOrgName()
+		setupCF(orgName, spaceName)
 
 		appName = helpers.PrefixedRandomName("app")
 
@@ -70,6 +73,8 @@ var _ = Describe("env command", func() {
 		Eventually(session).Should(Exit(0))
 		session = helpers.CF("set-running-environment-variable-group", "{}")
 		Eventually(session).Should(Exit(0))
+
+		helpers.QuickDeleteOrg(orgName)
 	})
 
 	It("displays all environment variables", func() {

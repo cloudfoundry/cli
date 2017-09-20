@@ -83,6 +83,7 @@ applications:
 		AfterEach(func() {
 			Eventually(helpers.CF("delete", appName, "-f", "-r")).Should(Exit(0))
 			Expect(os.RemoveAll(appDirForCleanup)).NotTo(HaveOccurred())
+			helpers.QuickDeleteOrg(orgName)
 		})
 
 		Context("when the app index is specified", func() {

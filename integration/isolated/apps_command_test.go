@@ -106,6 +106,10 @@ var _ = XDescribe("apps command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("with no apps", func() {
 			It("displays empty list", func() {
 				session := helpers.CF("apps")

@@ -103,6 +103,10 @@ var _ = Describe("terminate-task command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := helpers.CF("terminate-task", appName, "1")

@@ -153,6 +153,10 @@ var _ = Describe("v3-app command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app exists", func() {
 			var domainName string
 

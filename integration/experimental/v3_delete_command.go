@@ -145,6 +145,10 @@ var _ = Describe("v3-delete command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			Context("when the -f flag is provided", func() {
 				It("it displays the app does not exist", func() {

@@ -153,6 +153,10 @@ var _ = Describe("v3-scale command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app name is not provided", func() {
 			It("tells the user that the app name is required, prints help text, and exits 1", func() {
 				session := helpers.CF("v3-scale")

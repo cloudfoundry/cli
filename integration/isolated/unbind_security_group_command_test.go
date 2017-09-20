@@ -110,6 +110,10 @@ var _ = Describe("unbind-security-group command", func() {
 				helpers.TargetOrg(orgName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			It("fails with no space targeted error", func() {
 				session := helpers.CF("unbind-security-group", securityGroupName)
 				Eventually(session.Out).Should(Say("FAILED"))
@@ -178,6 +182,10 @@ var _ = Describe("unbind-security-group command", func() {
 			helpers.CreateOrgAndSpace(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		It("fails with a 'security group not found' message", func() {
 			session := helpers.CF("unbind-security-group", "some-other-security-group", orgName, spaceName)
 			Eventually(session.Out).Should(Say("FAILED"))
@@ -209,6 +217,10 @@ var _ = Describe("unbind-security-group command", func() {
 
 				helpers.CreateOrg(orgName)
 				helpers.TargetOrg(orgName)
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			Context("when the space doesn't exist", func() {

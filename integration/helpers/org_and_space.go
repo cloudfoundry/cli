@@ -55,6 +55,18 @@ func QuickDeleteOrg(orgName string) {
 	Eventually(session).Should(Exit(0))
 }
 
+func QuickDeleteOrgIfExists(orgName string) {
+	session := CF("org", "--guid", orgName)
+	Eventually(session).Should(Exit())
+	if session.ExitCode() != 0 {
+		return
+	}
+	guid := strings.TrimSpace(string(session.Out.Contents()))
+	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
+	session = CF("curl", "-X", "DELETE", url)
+	Eventually(session).Should(Exit())
+}
+
 func QuickDeleteSpace(spaceName string) {
 	guid := GetSpaceGUID(spaceName)
 	url := fmt.Sprintf("/v2/spaces/%s?recursive=true&async=true", guid)

@@ -27,6 +27,10 @@ var _ = Describe("unset-space-quota command", func() {
 		Eventually(session).Should(Exit(0))
 	})
 
+	AfterEach(func() {
+		helpers.QuickDeleteOrg(orgName)
+	})
+
 	It("unsets the space quota on a space", func() {
 		session := helpers.CF("unset-space-quota", spaceName, quotaName)
 		Eventually(session).Should(Say("Unassigning space quota %s from space %s", quotaName, spaceName))

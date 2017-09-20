@@ -71,6 +71,10 @@ var _ = Describe("delete-org command", func() {
 			helpers.CreateOrgAndSpace(orgName, helpers.NewSpaceName())
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrgIfExists(orgName)
+		})
+
 		Context("when the -f flag not is provided", func() {
 			var buffer *Buffer
 
@@ -163,6 +167,10 @@ var _ = Describe("delete-org command", func() {
 			spaceName := helpers.NewSpaceName()
 			helpers.CreateOrgAndSpace(orgName, spaceName)
 			helpers.TargetOrgAndSpace(orgName, spaceName)
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrgIfExists(orgName)
 		})
 
 		It("clears the targeted org and space", func() {
