@@ -14,7 +14,7 @@ After reaching out to the CLI team and the conclusion is to make a PR, please fo
 
 If you have a CLA on file, your contribution will be analyzed for product fit and engineering quality prior to merging.  
 Note: All contributions must be sent using GitHub Pull Requests.  
-**Your pull request is much more likely to be accepted if it is small and focused with a clear message that conveys the intent of your change.** Tests are required for any changes.
+**Your pull request is much more likely to be accepted if it is small and focused with a clear message that conveys the intent of your change. Please make sure to squash commits into meaningful chunks of work.** Tests are required for any changes.
 
 # Development Environment Setup
 
