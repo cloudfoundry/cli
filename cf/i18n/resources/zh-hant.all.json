@@ -5656,12 +5656,12 @@
     "translation": ""
   },
   {
-    "id": "Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分，針對組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 將環境變數 '{{.VarName}}' 設定為 '{{.VarValue}}'..."
+  },
+  {
+    "id": "Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5968,7 +5968,7 @@
     "translation": "提示: 未將目標設為任何空間，使用 '{{.CfTargetCommand}}' 以將目標設為空間。"
   },
   {
-    "id": "TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.",
+    "id": "TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.",
     "translation": ""
   },
   {

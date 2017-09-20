@@ -5656,12 +5656,12 @@
     "translation": ""
   },
   {
-    "id": "Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Estableciendo una variable de entorno '{{.VarName}}' a '{{.VarValue}}' para la app {{.AppName}} en la organización {{.OrgName}} / espacio {{.SpaceName}} como {{.CurrentUser}}..."
+  },
+  {
+    "id": "Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5968,7 +5968,7 @@
     "translation": "CONSEJO: No se ha establecido ningún espacio como destino, utilice '{{.CfTargetCommand}}' para establecer un espacio como destino."
   },
   {
-    "id": "TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.",
+    "id": "TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.",
     "translation": ""
   },
   {
