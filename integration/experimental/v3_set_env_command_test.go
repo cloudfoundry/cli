@@ -37,6 +37,8 @@ var _ = Describe("v3-set-env command", func() {
 				Eventually(session.Out).Should(Say("v3-set-env - \\*\\*EXPERIMENTAL\\*\\* Set an env variable for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"))
+				Eventually(session.Out).Should(Say("SEE ALSO:"))
+				Eventually(session.Out).Should(Say("v3-apps, v3-env, v3-restart, v3-stage, v3-unset-env"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -184,7 +186,7 @@ var _ = Describe("v3-set-env command", func() {
 				invalidAppName := "invalid-app-name"
 				session := helpers.CF("v3-set-env", invalidAppName, envVarName, envVarValue)
 
-				Eventually(session.Out).Should(Say("Setting env variable '%s' to '%s' for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, envVarValue, invalidAppName, orgName, spaceName, userName))
+				Eventually(session.Out).Should(Say("Setting env variable %s for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, invalidAppName, orgName, spaceName, userName))
 				Eventually(session.Err).Should(Say("App %s not found", invalidAppName))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
@@ -202,13 +204,13 @@ var _ = Describe("v3-set-env command", func() {
 				It("sets the environment variable value pair", func() {
 					session := helpers.CF("v3-set-env", appName, envVarName, envVarValue)
 
-					Eventually(session).Should(Say("Setting env variable '%s' to '%s' for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, envVarValue, appName, orgName, spaceName, userName))
-					Eventually(session).Should(Say("OK"))
-					Eventually(session).Should(Say("TIP: Use 'cf v3-restage %s' to ensure your env variable changes take effect\\.", appName))
+					Eventually(session.Out).Should(Say("Setting env variable %s for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say("TIP: Use 'cf v3-stage %s' to ensure your env variable changes take effect\\.", appName))
 					Eventually(session).Should(Exit(0))
 
 					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s": "%s"`, envVarName, envVarValue))
+					Eventually(session.Out).Should(Say(`"%s": "%s"`, envVarName, envVarValue))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -220,10 +222,15 @@ var _ = Describe("v3-set-env command", func() {
 
 				It("overrides the value of the existing environment variable", func() {
 					someOtherValue := "some-other-value"
-					Eventually(helpers.CF("v3-set-env", appName, envVarName, someOtherValue)).Should(Exit(0))
+					session := helpers.CF("v3-set-env", appName, envVarName, someOtherValue)
 
-					session := helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
-					Eventually(session).Should(Say(`"%s": "%s"`, envVarName, someOtherValue))
+					Eventually(session.Out).Should(Say("Setting env variable %s for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("OK"))
+					Eventually(session.Out).Should(Say("TIP: Use 'cf v3-stage %s' to ensure your env variable changes take effect\\.", appName))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
+					Eventually(session.Out).Should(Say(`"%s": "%s"`, envVarName, someOtherValue))
 					Eventually(session).Should(Exit(0))
 				})
 			})

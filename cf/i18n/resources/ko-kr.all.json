@@ -5656,12 +5656,12 @@
     "translation": ""
   },
   {
-    "id": "Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 환경 변수 {{.VarName}}을(를) '{{.VarValue}}'(으)로 설정 중..."
+  },
+  {
+    "id": "Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5968,7 +5968,7 @@
     "translation": "팁: 대상 지정된 영역이 없습니다. 영역을 대상으로 지정하려면 '{{.CfTargetCommand}}'을(를) 사용하십시오. "
   },
   {
-    "id": "TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.",
+    "id": "TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.",
     "translation": ""
   },
   {

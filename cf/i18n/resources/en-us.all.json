@@ -5656,12 +5656,12 @@
     "translation": ""
   },
   {
-    "id": "Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
-  },
-  {
     "id": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Setting env variable '{{.VarName}}' to '{{.VarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": "Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
   {
     "id": "Setting isolation segment {{.IsolationSegmentName}} to default on org {{.OrgName}} as {{.CurrentUser}}...",
@@ -5968,8 +5968,8 @@
     "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space."
   },
   {
-    "id": "TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.",
-    "translation": ""
+    "id": "TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.",
+    "translation": "TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect."
   },
   {
     "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",

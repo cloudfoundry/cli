@@ -21,8 +21,9 @@ type V3SetEnvActor interface {
 }
 
 type V3SetEnvCommand struct {
-	RequiredArgs flag.SetEnvironmentArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`
+	RequiredArgs    flag.SetEnvironmentArgs `positional-args:"yes"`
+	usage           interface{}             `usage:"CF_NAME v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`
+	relatedCommands interface{}             `related_commands:"v3-apps, v3-env, v3-restart, v3-stage, v3-unset-env"`
 
 	UI          command.UI
 	Config      command.Config
@@ -68,15 +69,13 @@ func (cmd V3SetEnvCommand) Execute(args []string) error {
 	}
 
 	appName := cmd.RequiredArgs.AppName
-	cmd.UI.DisplayTextWithFlavor("Setting env variable '{{.EnvVarName}}' to '{{.EnvVarValue}}' for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
-		"AppName":     appName,
-		"EnvVarName":  cmd.RequiredArgs.EnvironmentVariableName,
-		"EnvVarValue": cmd.RequiredArgs.EnvironmentVariableValue,
-		"OrgName":     cmd.Config.TargetedOrganization().Name,
-		"SpaceName":   cmd.Config.TargetedSpace().Name,
-		"Username":    user.Name,
+	cmd.UI.DisplayTextWithFlavor("Setting env variable {{.EnvVarName}} for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"AppName":    appName,
+		"EnvVarName": cmd.RequiredArgs.EnvironmentVariableName,
+		"OrgName":    cmd.Config.TargetedOrganization().Name,
+		"SpaceName":  cmd.Config.TargetedSpace().Name,
+		"Username":   user.Name,
 	})
-	cmd.UI.DisplayNewline()
 
 	warnings, err := cmd.Actor.SetEnvironmentVariableByApplicationNameAndSpace(
 		appName,
@@ -91,7 +90,7 @@ func (cmd V3SetEnvCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
-	cmd.UI.DisplayText("TIP: Use 'cf v3-restage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
+	cmd.UI.DisplayText("TIP: Use 'cf v3-stage {{.AppName}}' to ensure your env variable changes take effect.", map[string]interface{}{
 		"AppName": appName,
 	})
 
