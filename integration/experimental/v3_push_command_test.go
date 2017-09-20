@@ -200,6 +200,10 @@ var _ = Describe("v3-push command", func() {
 			domainName = defaultSharedDomain()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app exists", func() {
 			var session *Session
 			BeforeEach(func() {

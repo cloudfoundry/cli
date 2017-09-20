@@ -130,6 +130,10 @@ var _ = Describe("add-network-policy command", func() {
 			})
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when an app exists", func() {
 			It("creates a policy", func() {
 				session := helpers.CF("add-network-policy", appName, "--destination-app", appName, "--port", "8080-8090", "--protocol", "udp")

@@ -15,12 +15,13 @@ import (
 var _ = Describe("Push with manifest", func() {
 	var (
 		appName           string
+		orgName           string
 		tempFile          string
 		oldDockerPassword string
 	)
 
 	BeforeEach(func() {
-		orgName := helpers.NewOrgName()
+		orgName = helpers.NewOrgName()
 		spaceName := helpers.NewSpaceName()
 		setupCF(orgName, spaceName)
 
@@ -37,6 +38,8 @@ var _ = Describe("Push with manifest", func() {
 	AfterEach(func() {
 		Expect(os.Setenv("CF_DOCKER_PASSWORD", oldDockerPassword)).To(Succeed())
 		Expect(os.Remove(tempFile)).ToNot(HaveOccurred())
+
+		helpers.QuickDeleteOrg(orgName)
 	})
 
 	Context("when the specified manifest file does not exist", func() {

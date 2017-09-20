@@ -150,6 +150,10 @@ var _ = Describe("v3-droplets command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				session := helpers.CF("v3-droplets", appName)

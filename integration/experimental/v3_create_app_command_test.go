@@ -145,6 +145,10 @@ var _ = Describe("v3-create-app command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("creates the app", func() {
 				session := helpers.CF("v3-create-app", appName)

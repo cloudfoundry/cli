@@ -115,6 +115,10 @@ var _ = Describe("set-health-check command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("tells the user that the app is not found and exits 1", func() {
 				appName := helpers.PrefixedRandomName("app")

@@ -175,6 +175,10 @@ var _ = Describe("v3-set-env command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("displays app not found and exits 1", func() {
 				invalidAppName := "invalid-app-name"

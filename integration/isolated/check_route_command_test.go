@@ -22,6 +22,10 @@ var _ = Describe("check-route command", func() {
 		route = helpers.NewRoute(spaceName, defaultSharedDomain(), "integration", "")
 	})
 
+	AfterEach(func() {
+		helpers.QuickDeleteOrg(orgName)
+	})
+
 	It("checks routes", func() {
 		session := helpers.CF("check-route", route.Host, route.Domain)
 		Eventually(session).Should(Say("Route %s.%s does not exist", route.Host, route.Domain))

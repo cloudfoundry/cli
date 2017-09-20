@@ -148,6 +148,10 @@ var _ = Describe("target command", func() {
 				helpers.TargetOrg(orgName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			Context("when there are no spaces in the org", func() {
 				BeforeEach(func() {
 					helpers.ClearTarget()
@@ -285,6 +289,10 @@ var _ = Describe("target command", func() {
 		Context("when the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			Context("when the space exists", func() {

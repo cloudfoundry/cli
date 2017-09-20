@@ -212,6 +212,10 @@ var _ = Describe("create-route command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the space does not exist", func() {
 			It("displays 'space not found' and exits 1", func() {
 				badSpaceName := fmt.Sprintf("%s-1", spaceName)

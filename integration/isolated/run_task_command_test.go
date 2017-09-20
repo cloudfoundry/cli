@@ -126,6 +126,10 @@ var _ = Describe("run-task command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				helpers.WithHelloWorldApp(func(appDir string) {

@@ -48,6 +48,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 })
 
+var _ = SynchronizedAfterSuite(func() {
+	helpers.SetAPI()
+	helpers.LoginCF()
+	helpers.QuickDeleteOrg(ReadOnlyOrg)
+}, func() {
+})
+
 var _ = BeforeEach(func() {
 	homeDir = helpers.SetHomeDir()
 	apiURL, skipSSLValidation = helpers.SetAPI()

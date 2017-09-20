@@ -94,6 +94,7 @@ var _ = Describe("space command", func() {
 		})
 
 		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
 			helpers.ClearTarget()
 		})
 

@@ -98,6 +98,10 @@ var _ = Describe("get-health-check command", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the input is invalid", func() {
 			Context("when there are not enough arguments", func() {
 				It("outputs the usage and exits 1", func() {

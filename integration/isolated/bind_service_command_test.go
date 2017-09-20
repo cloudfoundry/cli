@@ -141,6 +141,10 @@ var _ = Describe("bind-service command", func() {
 			domain = defaultSharedDomain()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(org)
+		})
+
 		Context("when the app does not exist", func() {
 			It("displays FAILED and app not found", func() {
 				session := helpers.CF("bind-service", "does-not-exist", serviceInstance)

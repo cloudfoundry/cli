@@ -124,6 +124,10 @@ var _ = Describe("set-org-default-isolation-segment command", func() {
 				helpers.CreateOrg(orgName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			Context("when the isolation segment does not exist", func() {
 				It("fails with isolation segment not found message", func() {
 					session := helpers.CF("set-org-default-isolation-segment", orgName, isolationSegmentName)

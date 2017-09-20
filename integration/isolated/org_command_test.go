@@ -87,6 +87,10 @@ var _ = Describe("org command", func() {
 				setupCF(orgName, spaceName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			Context("when the --guid flag is used", func() {
 				It("displays the org guid", func() {
 					session := helpers.CF("org", "--guid", orgName)

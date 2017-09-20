@@ -99,13 +99,18 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 
 	Context("when the environment is set-up correctly", func() {
 		var userName string
+		var userOrgName string
 
 		BeforeEach(func() {
 			helpers.LoginCF()
 			userName, _ = helpers.GetCredentials()
-			userOrgName := helpers.NewOrgName()
+			userOrgName = helpers.NewOrgName()
 			helpers.CreateOrg(userOrgName)
 			helpers.TargetOrg(userOrgName)
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(userOrgName)
 		})
 
 		Context("when the org does not exist", func() {
@@ -121,6 +126,10 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		Context("when the org exists", func() {
 			BeforeEach(func() {
 				helpers.CreateOrg(orgName)
+			})
+
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
 			})
 
 			Context("when the isolation segment is set as the org's default", func() {

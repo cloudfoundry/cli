@@ -160,6 +160,15 @@ var _ = Describe("security-groups command", func() {
 				Eventually(helpers.CF("bind-staging-security-group", securityGroup7.Name)).Should(Exit(0))
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(org11)
+				helpers.QuickDeleteOrg(org12)
+				helpers.QuickDeleteOrg(org13)
+				helpers.QuickDeleteOrg(org21)
+				helpers.QuickDeleteOrg(org23)
+				helpers.QuickDeleteOrg(org33)
+			})
+
 			It("lists the security groups", func() {
 				Eventually(session.Out).Should(Say("Getting security groups as admin"))
 				Eventually(session.Out).Should(Say("OK\\n\\n"))

@@ -181,6 +181,10 @@ var _ = Describe("bind-security-group command", func() {
 				helpers.TargetOrg(orgName)
 			})
 
+			AfterEach(func() {
+				helpers.QuickDeleteOrg(orgName)
+			})
+
 			Context("when the space doesn't exist", func() {
 				It("fails with a space not found message", func() {
 					session := helpers.CF("bind-security-group", secGroupName, orgName, "space-doesnt-exist")

@@ -24,6 +24,10 @@ var _ = Describe("set-space-quota command", func() {
 		Eventually(session).Should(Exit(0))
 	})
 
+	AfterEach(func() {
+		helpers.QuickDeleteOrg(orgName)
+	})
+
 	It("sets the space quota on a space", func() {
 		session := helpers.CF("set-space-quota", spaceName, quotaName)
 		Eventually(session).Should(Say("Assigning space quota %s to space %s", quotaName, spaceName))

@@ -161,6 +161,10 @@ var _ = Describe("v3-restart-app-instance command", func() {
 			userName, _ = helpers.GetCredentials()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when app does not exist", func() {
 			It("fails with error", func() {
 				session := helpers.CF("v3-restart-app-instance", appName, "0", "--process", "some-process")

@@ -49,7 +49,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	helpers.EnableDockerSupport()
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
+})
 
+var _ = SynchronizedAfterSuite(func() {
+	helpers.SetAPI()
+	helpers.LoginCF()
+	helpers.QuickDeleteOrg(ReadOnlyOrg)
+}, func() {
 })
 
 var _ = BeforeEach(func() {

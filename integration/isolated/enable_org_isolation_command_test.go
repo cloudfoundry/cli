@@ -138,6 +138,10 @@ var _ = Describe("enable-org-isolation command", func() {
 					helpers.TargetOrg(organizationName)
 				})
 
+				AfterEach(func() {
+					helpers.QuickDeleteOrg(organizationName)
+				})
+
 				It("displays OK", func() {
 					session := helpers.CF("enable-org-isolation", organizationName, isolationSegmentName)
 					Eventually(session).Should(Say("Enabling isolation segment %s for org %s as %s...", isolationSegmentName, organizationName, userName))

@@ -30,6 +30,10 @@ var _ = Describe("update-quota command", func() {
 		Eventually(session).Should(Exit(0))
 	})
 
+	AfterEach(func() {
+		helpers.QuickDeleteOrg(orgName)
+	})
+
 	It("updates a quota", func() {
 		totalMemory := "25M"
 		instanceMemory := "5M"

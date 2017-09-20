@@ -164,6 +164,10 @@ var _ = Describe("create-app-manifest command", func() {
 			domainName = defaultSharedDomain()
 		})
 
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
 		Context("when the app does not exist", func() {
 			It("displays a usage error", func() {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: tempDir}, "create-app-manifest", appName)
