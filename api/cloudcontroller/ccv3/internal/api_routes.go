@@ -18,6 +18,7 @@ const (
 	GetAppDropletsRequest                                 = "GetAppDroplets"
 	GetAppProcessesRequest                                = "GetAppProcesses"
 	GetAppTasksRequest                                    = "GetAppTasks"
+	GetApplicationEnvironmentVariables                    = "GetApplicationEnvironmentVariables"
 	GetApplicationProcessByTypeRequest                    = "GetApplicationProcessByType"
 	GetAppsRequest                                        = "GetApps"
 	GetBuildRequest                                       = "GetBuild"
@@ -78,6 +79,7 @@ var APIRoutes = []Route{
 	{Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationStartRequest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/stop", Method: http.MethodPost, Name: PostApplicationStopRequest, Resource: AppsResource},
 	{Path: "/:app_guid/droplets", Method: http.MethodGet, Name: GetAppDropletsRequest, Resource: AppsResource},
+	{Path: "/:app_guid/environment_variables", Method: http.MethodGet, Name: GetApplicationEnvironmentVariables, Resource: AppsResource},
 	{Path: "/:app_guid/environment_variables", Method: http.MethodPatch, Name: PatchApplicationEnvironmentVariablesRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes/:type", Method: http.MethodGet, Name: GetApplicationProcessByTypeRequest, Resource: AppsResource},
