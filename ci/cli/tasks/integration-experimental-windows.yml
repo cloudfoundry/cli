@@ -9,5 +9,10 @@ inputs:
 - name: cli-ci
 - name: cf-credentials
 
+params:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+
 run:
   path: cli-ci/ci/cli/tasks/integration-experimental-windows.bat
