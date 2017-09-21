@@ -327,6 +327,10 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
+        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
+        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
     - task: integration-windows
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       input_mapping:
@@ -339,6 +343,10 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
+        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
+        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
   ensure:
     put: gcp-bosh-pool
     params:
@@ -425,6 +433,10 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
+        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
+        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
       on_failure:
@@ -435,6 +447,10 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+      params:
+        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
+        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
+        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
   ensure:
     put: gcp-bosh-pool
     params:

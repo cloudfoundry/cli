@@ -11,6 +11,9 @@ params:
   CF_PASSWORD:
   CF_TEST_SUITE:
   CF_CLI_EXPERIMENTAL:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
 
 run:
   path: go/src/code.cloudfoundry.org/cli/ci/cli/tasks/integration-windows-oneoff.bat
