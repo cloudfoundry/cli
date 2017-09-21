@@ -52,15 +52,17 @@ func (cmd SpacesCommand) Execute([]string) error {
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"CurrentUser": user.Name,
 	})
+	cmd.UI.DisplayNewline()
 
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(cmd.Config.TargetedOrganization().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
-	cmd.UI.DisplayNewline()
 
+	cmd.UI.DisplayText("name")
 	if len(spaces) == 0 {
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("No spaces found.")
 	} else {
 		for _, space := range spaces {

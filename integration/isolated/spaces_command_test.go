@@ -84,6 +84,9 @@ var _ = Describe("spaces command", func() {
 			It("displays no spaces found", func() {
 				session := helpers.CF("spaces")
 				Eventually(session).Should(Say("Getting spaces in org %s as %s\\.\\.\\.", orgName, username))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("name"))
+				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("No spaces found\\."))
 				Eventually(session).Should(Exit(0))
 			})
@@ -103,6 +106,8 @@ var _ = Describe("spaces command", func() {
 			It("displays a list of all spaces in the org", func() {
 				session := helpers.CF("spaces")
 				Eventually(session).Should(Say("Getting spaces in org %s as %s\\.\\.\\.", orgName, username))
+				Eventually(session).Should(Say(""))
+				Eventually(session).Should(Say("name"))
 				Eventually(session).Should(Say("%s", spaceName1))
 				Eventually(session).Should(Say("%s", spaceName2))
 				Eventually(session).Should(Exit(0))
