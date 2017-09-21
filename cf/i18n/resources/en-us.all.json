@@ -1848,6 +1848,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-unset-env APP_NAME ENV_VAR_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME version",
     "translation": "CF_NAME version"
   },
@@ -5080,6 +5084,10 @@
     "translation": "Remove an env variable"
   },
   {
+    "id": "Remove an env variable from an app",
+    "translation": ""
+  },
+  {
     "id": "Remove an org role from a user",
     "translation": "Remove an org role from a user"
   },
@@ -5090,6 +5098,10 @@
   {
     "id": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}...",
     "translation": "Removing entitlement to isolation segment {{.SegmentName}} from org {{.OrgName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Removing env variable {{.EnvVarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
+    "translation": ""
   },
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",

@@ -7,11 +7,91 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Environment Variable Actions", func() {
+	Describe("GetEnvironmentVariableByApplicationNameAndSpace", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
+			appName                   string
+			spaceGUID                 string
+			fetchedEnvVariables       EnvironmentVariables
+			executeErr                error
+			warnings                  Warnings
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil)
+			appName = "some-app"
+			spaceGUID = "space-guid"
+		})
+
+		JustBeforeEach(func() {
+			fetchedEnvVariables, warnings, executeErr = actor.GetEnvironmentVariableByApplicationNameAndSpace(appName, spaceGUID)
+		})
+
+		Context("when finding the app fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-application-error"))
+				Expect(warnings).To(ConsistOf("get-application-warning"))
+			})
+		})
+
+		Context("when finding the app succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
+			})
+
+			Context("when getting the app environment variables fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
+				})
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("some-env-var-error"))
+					Expect(warnings).To(ConsistOf("get-application-warning", "some-env-var-warnings"))
+				})
+			})
+
+			Context("when getting the app environment variables succeeds", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationEnvironmentVariablesReturns(
+						ccv3.EnvironmentVariables{
+							Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+						},
+						ccv3.Warnings{"some-env-var-warnings"},
+						nil,
+					)
+				})
+				It("makes the API call to get the app environment variables and returns all warnings", func() {
+					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+					expectedQuery := url.Values{
+						"names":       []string{"some-app"},
+						"space_guids": []string{"space-guid"},
+					}
+					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+					Expect(query).To(Equal(expectedQuery))
+
+					Expect(fakeCloudControllerClient.GetApplicationEnvironmentVariablesCallCount()).To(Equal(1))
+					appGUIDArg := fakeCloudControllerClient.GetApplicationEnvironmentVariablesArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(fetchedEnvVariables).To(Equal(EnvironmentVariables{
+						Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+					}))
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("get-application-warning", "some-env-var-warnings"))
+				})
+			})
+		})
+	})
 	Describe("SetEnvironmentVariableByApplicationNameAndSpace", func() {
 		var (
 			actor                     *Actor
@@ -53,7 +133,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 			Context("when updating the app environment variables fails", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
+					fakeCloudControllerClient.PatchApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-env-var-warnings"}, errors.New("some-env-var-error"))
 				})
 				It("returns an error", func() {
 					Expect(executeErr).To(MatchError("some-env-var-error"))
@@ -63,8 +143,10 @@ var _ = Describe("Environment Variable Actions", func() {
 
 			Context("when updating the app environment variables succeeds", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesReturns(
-						ccv3.EnvironmentVariables{Variables: map[string]string{"my-var": "my-val"}},
+					fakeCloudControllerClient.PatchApplicationEnvironmentVariablesReturns(
+						ccv3.EnvironmentVariables{
+							Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+						},
 						ccv3.Warnings{"some-env-var-warnings"},
 						nil,
 					)
@@ -78,13 +160,131 @@ var _ = Describe("Environment Variable Actions", func() {
 					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(query).To(Equal(expectedQuery))
 
-					Expect(fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesCallCount()).To(Equal(1))
-					appGUIDArg, envVarsArg := fakeCloudControllerClient.UpdateApplicationEnvironmentVariablesArgsForCall(0)
+					Expect(fakeCloudControllerClient.PatchApplicationEnvironmentVariablesCallCount()).To(Equal(1))
+					appGUIDArg, envVarsArg := fakeCloudControllerClient.PatchApplicationEnvironmentVariablesArgsForCall(0)
 					Expect(appGUIDArg).To(Equal("some-app-guid"))
-					Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{Variables: map[string]string{"my-var": "my-val"}}))
-
+					Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
+						Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+					}))
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("get-application-warning", "some-env-var-warnings"))
+				})
+			})
+		})
+	})
+
+	Describe("UnsetEnvironmentVariableByApplicationNameAndSpace", func() {
+		var (
+			actor                     *Actor
+			fakeCloudControllerClient *v3actionfakes.FakeCloudControllerClient
+			appName                   string
+			spaceGUID                 string
+			envVariableName           string
+			executeErr                error
+			warnings                  Warnings
+		)
+
+		BeforeEach(func() {
+			fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
+			actor = NewActor(fakeCloudControllerClient, nil)
+			appName = "some-app"
+			spaceGUID = "space-guid"
+			envVariableName = "my-var"
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UnsetEnvironmentVariableByApplicationNameAndSpace(appName, spaceGUID, envVariableName)
+		})
+
+		Context("when finding the app fails", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns(nil, ccv3.Warnings{"get-application-warning"}, errors.New("get-application-error"))
+			})
+
+			It("returns an error", func() {
+				Expect(executeErr).To(MatchError("get-application-error"))
+				Expect(warnings).To(ConsistOf("get-application-warning"))
+			})
+		})
+
+		Context("when finding the app succeeds", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv3.Application{{Name: "some-app", GUID: "some-app-guid"}}, ccv3.Warnings{"get-application-warning"}, nil)
+			})
+
+			Context("when getting the app environment variables fails", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-get-env-var-warnings"}, errors.New("some-env-var-error"))
+				})
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError("some-env-var-error"))
+					Expect(warnings).To(ConsistOf("get-application-warning", "some-get-env-var-warnings"))
+				})
+			})
+
+			Context("when the variable doesn't exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationEnvironmentVariablesReturns(
+						ccv3.EnvironmentVariables{},
+						ccv3.Warnings{"some-get-env-var-warnings"},
+						nil,
+					)
+				})
+				It("returns an EnvironmentVariableNotSetError", func() {
+					Expect(executeErr).To(MatchError(EnvironmentVariableNotSetError{EnvironmentVariableName: "my-var"}))
+					Expect(warnings).To(ConsistOf("get-application-warning", "some-get-env-var-warnings"))
+				})
+			})
+
+			Context("when the variable exists", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationEnvironmentVariablesReturns(
+						ccv3.EnvironmentVariables{
+							Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+						},
+						ccv3.Warnings{"some-get-env-var-warnings"},
+						nil,
+					)
+				})
+				Context("when updating the app environment variables fails", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PatchApplicationEnvironmentVariablesReturns(ccv3.EnvironmentVariables{}, ccv3.Warnings{"some-patch-env-var-warnings"}, errors.New("some-env-var-error"))
+					})
+					It("returns an error", func() {
+						Expect(executeErr).To(MatchError("some-env-var-error"))
+						Expect(warnings).To(ConsistOf("get-application-warning", "some-get-env-var-warnings", "some-patch-env-var-warnings"))
+					})
+				})
+
+				Context("when updating the app environment variables succeeds", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.PatchApplicationEnvironmentVariablesReturns(
+							ccv3.EnvironmentVariables{
+								Variables: map[string]types.FilteredString{"my-var": {Value: "my-val", IsSet: true}},
+							},
+							ccv3.Warnings{"some-patch-env-var-warnings"},
+							nil,
+						)
+					})
+					It("makes the API call to update the app environment variables and returns all warnings", func() {
+						Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
+						expectedQuery := url.Values{
+							"names":       []string{"some-app"},
+							"space_guids": []string{"space-guid"},
+						}
+						query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+						Expect(query).To(Equal(expectedQuery))
+
+						Expect(fakeCloudControllerClient.PatchApplicationEnvironmentVariablesCallCount()).To(Equal(1))
+						appGUIDArg, envVarsArg := fakeCloudControllerClient.PatchApplicationEnvironmentVariablesArgsForCall(0)
+						Expect(appGUIDArg).To(Equal("some-app-guid"))
+						Expect(envVarsArg).To(Equal(ccv3.EnvironmentVariables{
+							Variables: map[string]types.FilteredString{"my-var": {Value: "", IsSet: false}},
+						}))
+
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("get-application-warning", "some-get-env-var-warnings", "some-patch-env-var-warnings"))
+					})
 				})
 			})
 		})
