@@ -13,6 +13,11 @@ inputs:
 - name: bosh-lite-lock
 - name: vars-store
 
+params:
+  CF_INT_DOCKER_IMAGE:
+  CF_INT_DOCKER_USERNAME:
+  CF_INT_DOCKER_PASSWORD:
+
 run:
   path: bash
   args:
