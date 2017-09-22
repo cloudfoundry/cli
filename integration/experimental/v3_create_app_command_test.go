@@ -27,7 +27,7 @@ var _ = Describe("v3-create-app command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-create-app", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("v3-create-app - \\*\\*EXPERIMENTAL\\*\\* Create a V3 App"))
+				Eventually(session).Should(Say("v3-create-app - Create a V3 App"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf v3-create-app APP_NAME"))
 				Eventually(session).Should(Exit(0))

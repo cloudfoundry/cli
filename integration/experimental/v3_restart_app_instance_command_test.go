@@ -29,7 +29,7 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-restart-app-instance", "--help")
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("v3-restart-app-instance - \\*\\*EXPERIMENTAL\\*\\* Terminate, then instantiate an app instance"))
+			Eventually(session).Should(Say("v3-restart-app-instance - Terminate, then instantiate an app instance"))
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say(`cf v3-restart-app-instance APP_NAME INDEX [--process PROCESS]`))
 			Eventually(session).Should(Say("SEE ALSO:"))

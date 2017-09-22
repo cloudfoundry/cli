@@ -28,7 +28,7 @@ var _ = Describe("v3-droplets command", func() {
 				session := helpers.CF("v3-droplets", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-droplets - \\*\\*EXPERIMENTAL\\*\\* List droplets of an app"))
+				Eventually(session.Out).Should(Say("v3-droplets - List droplets of an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-droplets APP_NAME"))
 

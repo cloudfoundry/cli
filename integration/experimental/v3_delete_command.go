@@ -26,7 +26,7 @@ var _ = Describe("v3-delete command", func() {
 		It("Displays command usage to output", func() {
 			session := helpers.CF("v3-delete", "--help")
 			Eventually(session).Should(Say("NAME:"))
-			Eventually(session).Should(Say("v3-delete - \\*\\*EXPERIMENTAL\\*\\* Delete a V3 App"))
+			Eventually(session).Should(Say("v3-delete - Delete a V3 App"))
 			Eventually(session).Should(Say("USAGE:"))
 			Eventually(session).Should(Say("cf v3-delete APP_NAME \\[-f\\]"))
 			Eventually(session).Should(Say("OPTIONS:"))

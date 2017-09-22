@@ -34,7 +34,7 @@ var _ = Describe("v3-set-env command", func() {
 				session := helpers.CF("v3-set-env", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-set-env - \\*\\*EXPERIMENTAL\\*\\* Set an env variable for an app"))
+				Eventually(session.Out).Should(Say("v3-set-env - Set an env variable for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"))
 				Eventually(session.Out).Should(Say("SEE ALSO:"))

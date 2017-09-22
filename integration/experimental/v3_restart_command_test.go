@@ -37,14 +37,6 @@ var _ = Describe("v3-restart command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 		})
-
-		Context("when 'help -a' is called", func() {
-			It("does not display v3-restart", func() {
-				session := helpers.CF("help", "-a")
-				Consistently(session.Out).ShouldNot(Say("v3-restart"))
-				Eventually(session).Should(Exit(0))
-			})
-		})
 	})
 
 	Context("when the app name is not provided", func() {

@@ -184,50 +184,6 @@
     "translation": "**주의: 플러그인은 잠재적으로 신뢰할 수 없는 작성자가 쓴 바이너리입니다. 플러그인 설치와 사용에 따른 위험은 사용자의 몫입니다.**\n\n{{.Plugin}} 플러그인을 설치하시겠습니까? "
   },
   {
-    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Create a V3 App",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Create a new droplet for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Delete a V3 App",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** List droplets of an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** List packages of an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Set an env variable for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Terminate, then instantiate an app instance",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Uploads a V3 Package",
-    "translation": ""
-  },
-  {
     "id": "2006-01-02 15:04:05 PM",
     "translation": ""
   },
@@ -1936,6 +1892,10 @@
     "translation": ""
   },
   {
+    "id": "Change type of health check performed on an app's process",
+    "translation": ""
+  },
+  {
     "id": "Change user password",
     "translation": "사용자 비밀번호 변경"
   },
@@ -2096,6 +2056,10 @@
     "translation": "TCP 라우트 작성"
   },
   {
+    "id": "Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "빌드팩 작성"
   },
@@ -2106,6 +2070,10 @@
   {
     "id": "Create a domain that can be used by all orgs (admin-only)",
     "translation": "모든 조직에서 사용할 수 있는 도메인 작성(관리 전용)"
+  },
+  {
+    "id": "Create a new droplet for an app",
+    "translation": ""
   },
   {
     "id": "Create a new user",
@@ -2346,6 +2314,10 @@
   {
     "id": "Delete a TCP route",
     "translation": "TCP 라우트 삭제"
+  },
+  {
+    "id": "Delete a V3 App",
+    "translation": ""
   },
   {
     "id": "Delete a buildpack",
@@ -4056,8 +4028,16 @@
     "translation": "대상 조직에 도메인 나열"
   },
   {
+    "id": "List droplets of an app",
+    "translation": ""
+  },
+  {
     "id": "List keys for a service instance",
     "translation": "서비스 인스턴스의 키 나열"
+  },
+  {
+    "id": "List packages of an app",
+    "translation": ""
   },
   {
     "id": "List router groups",
@@ -6044,6 +6024,10 @@
     "translation": "주어진 인덱스에서 실행 중인 애플리케이션 인스턴스를 종료하고 애플리케이션의 새 인스턴스를 동일한 인덱스로 인스턴스화합니다."
   },
   {
+    "id": "Terminate, then instantiate an app instance",
+    "translation": ""
+  },
+  {
     "id": "Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6788,6 +6772,10 @@
     "translation": "{{.ZipFileBytes}}, {{.FileCount}} 파일 업로드"
   },
   {
+    "id": "Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "Usage:",
     "translation": ""
   },
@@ -6854,6 +6842,10 @@
   {
     "id": "Using stack {{.StackName}}...",
     "translation": "{{.StackName}} 스택 사용 중..."
+  },
+  {
+    "id": "V3 APPS (experimental):",
+    "translation": ""
   },
   {
     "id": "VERSION:",
@@ -7822,6 +7814,82 @@
   {
     "id": "username",
     "translation": "사용자 이름"
+  },
+  {
+    "id": "v3-app",
+    "translation": ""
+  },
+  {
+    "id": "v3-apps",
+    "translation": ""
+  },
+  {
+    "id": "v3-create-app",
+    "translation": ""
+  },
+  {
+    "id": "v3-create-package",
+    "translation": ""
+  },
+  {
+    "id": "v3-delete",
+    "translation": ""
+  },
+  {
+    "id": "v3-droplets",
+    "translation": ""
+  },
+  {
+    "id": "v3-get-health-check",
+    "translation": ""
+  },
+  {
+    "id": "v3-packages",
+    "translation": ""
+  },
+  {
+    "id": "v3-push",
+    "translation": ""
+  },
+  {
+    "id": "v3-restart",
+    "translation": ""
+  },
+  {
+    "id": "v3-restart-app-instance",
+    "translation": ""
+  },
+  {
+    "id": "v3-scale",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-droplet",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-env",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-health-check",
+    "translation": ""
+  },
+  {
+    "id": "v3-stage",
+    "translation": ""
+  },
+  {
+    "id": "v3-start",
+    "translation": ""
+  },
+  {
+    "id": "v3-stop",
+    "translation": ""
+  },
+  {
+    "id": "v3-unset-env",
+    "translation": ""
   },
   {
     "id": "verbose and version flag",

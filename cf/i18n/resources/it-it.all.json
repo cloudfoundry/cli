@@ -184,50 +184,6 @@
     "translation": "**Attenzione: i plug-in sono binari scritti da autori potenzialmente non attendibili. L'installazione e l'utilizzo dei plug-in è a tuo proprio rischio.**\n\nVuoi installare il plug-in {{.Plugin}}?"
   },
   {
-    "id": "**EXPERIMENTAL** Change or view the instance count, disk space limit, and memory limit for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Change type of health check performed on an app's process",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Create a V3 App",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Create a new droplet for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Delete a V3 App",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** List droplets of an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** List packages of an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Set an env variable for an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Show the type of health check performed on an app",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Terminate, then instantiate an app instance",
-    "translation": ""
-  },
-  {
-    "id": "**EXPERIMENTAL** Uploads a V3 Package",
-    "translation": ""
-  },
-  {
     "id": "2006-01-02 15:04:05 PM",
     "translation": ""
   },
@@ -1936,6 +1892,10 @@
     "translation": ""
   },
   {
+    "id": "Change type of health check performed on an app's process",
+    "translation": ""
+  },
+  {
     "id": "Change user password",
     "translation": "Modifica password utente"
   },
@@ -2096,6 +2056,10 @@
     "translation": "Crea una rotta TCP"
   },
   {
+    "id": "Create a V3 App",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Crea un pacchetto di build"
   },
@@ -2106,6 +2070,10 @@
   {
     "id": "Create a domain that can be used by all orgs (admin-only)",
     "translation": "Crea un dominio che può essere utilizzato da tutte le organizzazioni (solo amministratore)"
+  },
+  {
+    "id": "Create a new droplet for an app",
+    "translation": ""
   },
   {
     "id": "Create a new user",
@@ -2346,6 +2314,10 @@
   {
     "id": "Delete a TCP route",
     "translation": "Elimina una rotta TCP"
+  },
+  {
+    "id": "Delete a V3 App",
+    "translation": ""
   },
   {
     "id": "Delete a buildpack",
@@ -4056,8 +4028,16 @@
     "translation": "Elenca i domini nell'organizzazione di destinazione"
   },
   {
+    "id": "List droplets of an app",
+    "translation": ""
+  },
+  {
     "id": "List keys for a service instance",
     "translation": "Elenca le chiavi per un'istanza del servizio"
+  },
+  {
+    "id": "List packages of an app",
+    "translation": ""
   },
   {
     "id": "List router groups",
@@ -6044,6 +6024,10 @@
     "translation": "Termina l'istanza dell'applicazione in esecuzione in corrispondenza dell'indice specificato e crea una nuova istanza dell'applicazione con lo stesso indice"
   },
   {
+    "id": "Terminate, then instantiate an app instance",
+    "translation": ""
+  },
+  {
     "id": "Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": ""
   },
@@ -6788,6 +6772,10 @@
     "translation": "Caricamento dei file {{.ZipFileBytes}}, {{.FileCount}}"
   },
   {
+    "id": "Uploads a V3 Package",
+    "translation": ""
+  },
+  {
     "id": "Usage:",
     "translation": ""
   },
@@ -6854,6 +6842,10 @@
   {
     "id": "Using stack {{.StackName}}...",
     "translation": "Utilizzo dello stack {{.StackName}} in corso..."
+  },
+  {
+    "id": "V3 APPS (experimental):",
+    "translation": ""
   },
   {
     "id": "VERSION:",
@@ -7822,6 +7814,82 @@
   {
     "id": "username",
     "translation": "username"
+  },
+  {
+    "id": "v3-app",
+    "translation": ""
+  },
+  {
+    "id": "v3-apps",
+    "translation": ""
+  },
+  {
+    "id": "v3-create-app",
+    "translation": ""
+  },
+  {
+    "id": "v3-create-package",
+    "translation": ""
+  },
+  {
+    "id": "v3-delete",
+    "translation": ""
+  },
+  {
+    "id": "v3-droplets",
+    "translation": ""
+  },
+  {
+    "id": "v3-get-health-check",
+    "translation": ""
+  },
+  {
+    "id": "v3-packages",
+    "translation": ""
+  },
+  {
+    "id": "v3-push",
+    "translation": ""
+  },
+  {
+    "id": "v3-restart",
+    "translation": ""
+  },
+  {
+    "id": "v3-restart-app-instance",
+    "translation": ""
+  },
+  {
+    "id": "v3-scale",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-droplet",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-env",
+    "translation": ""
+  },
+  {
+    "id": "v3-set-health-check",
+    "translation": ""
+  },
+  {
+    "id": "v3-stage",
+    "translation": ""
+  },
+  {
+    "id": "v3-start",
+    "translation": ""
+  },
+  {
+    "id": "v3-stop",
+    "translation": ""
+  },
+  {
+    "id": "v3-unset-env",
+    "translation": ""
   },
   {
     "id": "verbose and version flag",
