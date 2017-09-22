@@ -99,9 +99,7 @@ var _ = Describe("spaces Command", func() {
 				It("displays that there are no spaces", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting spaces in org %s as %s\\.\\.\\.", "some-org", "some-user"))
-					Expect(testUI.Out).To(Say(""))
-					Expect(testUI.Out).To(Say("name"))
+					Expect(testUI.Out).To(Say("Getting spaces in org some-org as some-user\\.\\.\\."))
 					Expect(testUI.Out).To(Say(""))
 					Expect(testUI.Out).To(Say("No spaces found\\."))
 
@@ -126,7 +124,7 @@ var _ = Describe("spaces Command", func() {
 				It("displays all the spaces in the org", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(testUI.Out).To(Say("Getting spaces in org %s as %s\\.\\.\\.", "some-org", "some-user"))
+					Expect(testUI.Out).To(Say("Getting spaces in org some-org as some-user\\.\\.\\."))
 					Expect(testUI.Out).To(Say(""))
 					Expect(testUI.Out).To(Say("name"))
 					Expect(testUI.Out).To(Say("space-1"))
@@ -150,7 +148,7 @@ var _ = Describe("spaces Command", func() {
 				It("returns a translatable error", func() {
 					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "not-found-org"}))
 
-					Expect(testUI.Out).To(Say("Getting spaces in org %s as %s\\.\\.\\.", "some-org", "some-user"))
+					Expect(testUI.Out).To(Say("Getting spaces in org some-org as some-user\\.\\.\\."))
 					Expect(testUI.Out).To(Say(""))
 
 					Expect(testUI.Err).To(Say("get-spaces-warning"))

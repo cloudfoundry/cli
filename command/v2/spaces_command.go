@@ -60,15 +60,19 @@ func (cmd SpacesCommand) Execute([]string) error {
 		return shared.HandleError(err)
 	}
 
-	cmd.UI.DisplayText("name")
 	if len(spaces) == 0 {
-		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("No spaces found.")
 	} else {
-		for _, space := range spaces {
-			cmd.UI.DisplayText(space.Name)
-		}
+		cmd.displaySpaces(spaces)
 	}
 
 	return nil
+}
+
+func (cmd SpacesCommand) displaySpaces(spaces []v2action.Space) {
+	table := [][]string{{cmd.UI.TranslateText("name")}}
+	for _, space := range spaces {
+		table = append(table, []string{space.Name})
+	}
+	cmd.UI.DisplayTableWithHeader("", table, 3)
 }
