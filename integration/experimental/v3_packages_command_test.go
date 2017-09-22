@@ -28,7 +28,7 @@ var _ = Describe("v3-packages command", func() {
 				session := helpers.CF("v3-packages", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-packages - \\*\\*EXPERIMENTAL\\*\\* List packages of an app"))
+				Eventually(session.Out).Should(Say("v3-packages - List packages of an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-packages APP_NAME"))
 

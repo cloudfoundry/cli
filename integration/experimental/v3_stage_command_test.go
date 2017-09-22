@@ -30,7 +30,7 @@ var _ = Describe("v3-stage command", func() {
 				session := helpers.CF("v3-stage", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("   v3-stage - \\*\\*EXPERIMENTAL\\*\\* Create a new droplet for an app"))
+				Eventually(session.Out).Should(Say("   v3-stage - Create a new droplet for an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("   cf v3-stage APP_NAME --package-guid PACKAGE_GUID"))
 				Eventually(session.Out).Should(Say("OPTIONS:"))

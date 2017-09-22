@@ -28,7 +28,7 @@ var _ = Describe("v3-get-health-check command", func() {
 				session := helpers.CF("v3-get-health-check", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-get-health-check - \\*\\*EXPERIMENTAL\\*\\* Show the type of health check performed on an app"))
+				Eventually(session.Out).Should(Say("v3-get-health-check - Show the type of health check performed on an app"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("cf v3-get-health-check APP_NAME"))
 

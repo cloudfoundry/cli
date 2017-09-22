@@ -27,7 +27,7 @@ var _ = Describe("v3-create-package command", func() {
 			It("Displays command usage to output", func() {
 				session := helpers.CF("v3-create-package", "--help")
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("v3-create-package - \\*\\*EXPERIMENTAL\\*\\* Uploads a V3 Package"))
+				Eventually(session).Should(Say("v3-create-package - Uploads a V3 Package"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf v3-create-package APP_NAME \\[--docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))

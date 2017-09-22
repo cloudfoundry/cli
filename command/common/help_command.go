@@ -61,9 +61,13 @@ func (cmd HelpCommand) Execute(args []string) error {
 
 func (cmd HelpCommand) displayFullHelp() {
 	if cmd.AllCommands {
+		pluginCommands := cmd.getSortedPluginCommands()
+		cmdInfo := cmd.Actor.CommandInfos(Commands)
+		longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
+
 		cmd.displayHelpPreamble()
-		cmd.displayAllCommands()
-		cmd.displayHelpFooter()
+		cmd.displayAllCommands(pluginCommands, cmdInfo, longestCmd)
+		cmd.displayHelpFooter(cmdInfo)
 	} else {
 		cmd.displayCommonCommands()
 	}
@@ -91,12 +95,22 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 }
 
-func (cmd HelpCommand) displayAllCommands() {
-	pluginCommands := cmd.getSortedPluginCommands()
-	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
+func (cmd HelpCommand) displayAllCommands(pluginCommands []configv3.PluginCommand, cmdInfo map[string]sharedaction.CommandInfo, longestCmd int) {
+	cmd.displayCommandGroups(internal.HelpCategoryList, cmdInfo, longestCmd)
 
-	for _, category := range internal.HelpCategoryList {
+	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
+	for _, pluginCommand := range pluginCommands {
+		cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
+			"CommandName":        pluginCommand.Name,
+			"CommandDescription": pluginCommand.HelpText,
+			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
+		})
+	}
+	cmd.UI.DisplayNewline()
+}
+
+func (cmd HelpCommand) displayCommandGroups(commandGroupList []internal.HelpCategory, cmdInfo map[string]sharedaction.CommandInfo, longestCmd int) {
+	for _, category := range commandGroupList {
 		cmd.UI.DisplayHeader(category.CategoryName)
 
 		for _, row := range category.CommandList {
@@ -112,19 +126,9 @@ func (cmd HelpCommand) displayAllCommands() {
 			cmd.UI.DisplayNewline()
 		}
 	}
-
-	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
-	for _, pluginCommand := range pluginCommands {
-		cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
-			"CommandName":        pluginCommand.Name,
-			"CommandDescription": pluginCommand.HelpText,
-			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
-		})
-	}
-	cmd.UI.DisplayNewline()
 }
 
-func (cmd HelpCommand) displayHelpFooter() {
+func (cmd HelpCommand) displayHelpFooter(cmdInfo map[string]sharedaction.CommandInfo) {
 	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
 	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.environmentalVariablesTableData(), 1)
 
@@ -132,6 +136,10 @@ func (cmd HelpCommand) displayHelpFooter() {
 
 	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
 	cmd.UI.DisplayNonWrappingTable(allCommandsIndent, cmd.globalOptionsTableData(), 25)
+
+	cmd.UI.DisplayNewline()
+
+	cmd.displayCommandGroups(internal.V3HelpCategoryList, cmdInfo, 34)
 }
 
 func (cmd HelpCommand) displayCommonCommands() {

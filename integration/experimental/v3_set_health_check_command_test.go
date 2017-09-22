@@ -28,7 +28,7 @@ var _ = Describe("v3-set-health-check command", func() {
 				session := helpers.CF("v3-set-health-check", "--help")
 
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("v3-set-health-check - \\*\\*EXPERIMENTAL\\*\\* Change type of health check performed on an app's process"))
+				Eventually(session.Out).Should(Say("v3-set-health-check - Change type of health check performed on an app's process"))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say(`cf v3-set-health-check APP_NAME \(process \| port \| http \[--endpoint PATH\]\) \[--process PROCESS\]`))
 
