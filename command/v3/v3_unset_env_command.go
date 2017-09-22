@@ -1,7 +1,6 @@
 package v3
 
 import (
-	"fmt"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -87,7 +86,6 @@ func (cmd V3UnsetEnvCommand) Execute(args []string) error {
 	if err != nil {
 		switch errVal := err.(type) {
 		case v3action.EnvironmentVariableNotSetError:
-			fmt.Println(errVal)
 			cmd.UI.DisplayText(errVal.Error())
 		default:
 			return shared.HandleError(err)
