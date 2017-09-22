@@ -80,12 +80,10 @@ var _ = Describe("spaces command", func() {
 			helpers.TargetOrg(orgName)
 		})
 
-		Context("when there are 0 spaces", func() {
+		Context("when there are no spaces", func() {
 			It("displays no spaces found", func() {
 				session := helpers.CF("spaces")
 				Eventually(session).Should(Say("Getting spaces in org %s as %s\\.\\.\\.", orgName, username))
-				Eventually(session).Should(Say(""))
-				Eventually(session).Should(Say("name"))
 				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("No spaces found\\."))
 				Eventually(session).Should(Exit(0))
