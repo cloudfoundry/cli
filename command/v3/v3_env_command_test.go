@@ -112,7 +112,7 @@ var _ = Describe("v3-env Command", func() {
 						RunningGroup:        map[string]interface{}{"running-name": "running-value"},
 						StagingGroup:        map[string]interface{}{"staging-name": "staging-value"},
 					}
-					fakeActor.EnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})
 
 				It("displays the environment variable and value pair", func() {
@@ -139,8 +139,8 @@ var _ = Describe("v3-env Command", func() {
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))
 
-					Expect(fakeActor.EnvironmentVariablesByApplicationNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.EnvironmentVariablesByApplicationNameAndSpaceArgsForCall(0)
+					Expect(fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceCallCount()).To(Equal(1))
+					appName, spaceGUID := fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceArgsForCall(0)
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
@@ -155,7 +155,7 @@ var _ = Describe("v3-env Command", func() {
 						RunningGroup:        map[string]interface{}{},
 						StagingGroup:        map[string]interface{}{},
 					}
-					fakeActor.EnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
+					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(envGroups, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
 				})
 
 				It("displays helpful messages", func() {
@@ -173,8 +173,8 @@ var _ = Describe("v3-env Command", func() {
 					Expect(testUI.Err).To(Say("get-warning-1"))
 					Expect(testUI.Err).To(Say("get-warning-2"))
 
-					Expect(fakeActor.EnvironmentVariablesByApplicationNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.EnvironmentVariablesByApplicationNameAndSpaceArgsForCall(0)
+					Expect(fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceCallCount()).To(Equal(1))
+					appName, spaceGUID := fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceArgsForCall(0)
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 				})
@@ -184,7 +184,7 @@ var _ = Describe("v3-env Command", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
-					fakeActor.EnvironmentVariablesByApplicationNameAndSpaceReturns(v3action.EnvironmentVariableGroups{}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
+					fakeActor.GetEnvironmentVariablesByApplicationNameAndSpaceReturns(v3action.EnvironmentVariableGroups{}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 				})
 
 				It("returns the error", func() {

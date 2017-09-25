@@ -18,18 +18,18 @@ type FakeV3EnvActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	EnvironmentVariablesByApplicationNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.EnvironmentVariableGroups, v3action.Warnings, error)
-	environmentVariablesByApplicationNameAndSpaceMutex       sync.RWMutex
-	environmentVariablesByApplicationNameAndSpaceArgsForCall []struct {
+	GetEnvironmentVariablesByApplicationNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.EnvironmentVariableGroups, v3action.Warnings, error)
+	getEnvironmentVariablesByApplicationNameAndSpaceMutex       sync.RWMutex
+	getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
 	}
-	environmentVariablesByApplicationNameAndSpaceReturns struct {
+	getEnvironmentVariablesByApplicationNameAndSpaceReturns struct {
 		result1 v3action.EnvironmentVariableGroups
 		result2 v3action.Warnings
 		result3 error
 	}
-	environmentVariablesByApplicationNameAndSpaceReturnsOnCall map[int]struct {
+	getEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v3action.EnvironmentVariableGroups
 		result2 v3action.Warnings
 		result3 error
@@ -78,55 +78,55 @@ func (fake *FakeV3EnvActor) CloudControllerAPIVersionReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeV3EnvActor) EnvironmentVariablesByApplicationNameAndSpace(appName string, spaceGUID string) (v3action.EnvironmentVariableGroups, v3action.Warnings, error) {
-	fake.environmentVariablesByApplicationNameAndSpaceMutex.Lock()
-	ret, specificReturn := fake.environmentVariablesByApplicationNameAndSpaceReturnsOnCall[len(fake.environmentVariablesByApplicationNameAndSpaceArgsForCall)]
-	fake.environmentVariablesByApplicationNameAndSpaceArgsForCall = append(fake.environmentVariablesByApplicationNameAndSpaceArgsForCall, struct {
+func (fake *FakeV3EnvActor) GetEnvironmentVariablesByApplicationNameAndSpace(appName string, spaceGUID string) (v3action.EnvironmentVariableGroups, v3action.Warnings, error) {
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.getEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall[len(fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall)]
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall = append(fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
 	}{appName, spaceGUID})
-	fake.recordInvocation("EnvironmentVariablesByApplicationNameAndSpace", []interface{}{appName, spaceGUID})
-	fake.environmentVariablesByApplicationNameAndSpaceMutex.Unlock()
-	if fake.EnvironmentVariablesByApplicationNameAndSpaceStub != nil {
-		return fake.EnvironmentVariablesByApplicationNameAndSpaceStub(appName, spaceGUID)
+	fake.recordInvocation("GetEnvironmentVariablesByApplicationNameAndSpace", []interface{}{appName, spaceGUID})
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.Unlock()
+	if fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub != nil {
+		return fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub(appName, spaceGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.environmentVariablesByApplicationNameAndSpaceReturns.result1, fake.environmentVariablesByApplicationNameAndSpaceReturns.result2, fake.environmentVariablesByApplicationNameAndSpaceReturns.result3
+	return fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns.result1, fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns.result2, fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns.result3
 }
 
-func (fake *FakeV3EnvActor) EnvironmentVariablesByApplicationNameAndSpaceCallCount() int {
-	fake.environmentVariablesByApplicationNameAndSpaceMutex.RLock()
-	defer fake.environmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
-	return len(fake.environmentVariablesByApplicationNameAndSpaceArgsForCall)
+func (fake *FakeV3EnvActor) GetEnvironmentVariablesByApplicationNameAndSpaceCallCount() int {
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3EnvActor) EnvironmentVariablesByApplicationNameAndSpaceArgsForCall(i int) (string, string) {
-	fake.environmentVariablesByApplicationNameAndSpaceMutex.RLock()
-	defer fake.environmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
-	return fake.environmentVariablesByApplicationNameAndSpaceArgsForCall[i].appName, fake.environmentVariablesByApplicationNameAndSpaceArgsForCall[i].spaceGUID
+func (fake *FakeV3EnvActor) GetEnvironmentVariablesByApplicationNameAndSpaceArgsForCall(i int) (string, string) {
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
+	return fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall[i].appName, fake.getEnvironmentVariablesByApplicationNameAndSpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeV3EnvActor) EnvironmentVariablesByApplicationNameAndSpaceReturns(result1 v3action.EnvironmentVariableGroups, result2 v3action.Warnings, result3 error) {
-	fake.EnvironmentVariablesByApplicationNameAndSpaceStub = nil
-	fake.environmentVariablesByApplicationNameAndSpaceReturns = struct {
+func (fake *FakeV3EnvActor) GetEnvironmentVariablesByApplicationNameAndSpaceReturns(result1 v3action.EnvironmentVariableGroups, result2 v3action.Warnings, result3 error) {
+	fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub = nil
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceReturns = struct {
 		result1 v3action.EnvironmentVariableGroups
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3EnvActor) EnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.EnvironmentVariableGroups, result2 v3action.Warnings, result3 error) {
-	fake.EnvironmentVariablesByApplicationNameAndSpaceStub = nil
-	if fake.environmentVariablesByApplicationNameAndSpaceReturnsOnCall == nil {
-		fake.environmentVariablesByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeV3EnvActor) GetEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.EnvironmentVariableGroups, result2 v3action.Warnings, result3 error) {
+	fake.GetEnvironmentVariablesByApplicationNameAndSpaceStub = nil
+	if fake.getEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.getEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
 			result1 v3action.EnvironmentVariableGroups
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.environmentVariablesByApplicationNameAndSpaceReturnsOnCall[i] = struct {
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v3action.EnvironmentVariableGroups
 		result2 v3action.Warnings
 		result3 error
@@ -138,8 +138,8 @@ func (fake *FakeV3EnvActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.environmentVariablesByApplicationNameAndSpaceMutex.RLock()
-	defer fake.environmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
+	fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RLock()
+	defer fake.getEnvironmentVariablesByApplicationNameAndSpaceMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
