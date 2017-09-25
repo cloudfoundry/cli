@@ -356,6 +356,10 @@
     "translation": ""
   },
   {
+    "id": "App lifecycle type to stage and run the app",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "앱 이름은 필수 필드임"
   },
@@ -1744,7 +1748,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-app APP_NAME",
+    "id": "CF_NAME v3-create-app APP_NAME [--app-type (buildpack | docker)]",
     "translation": ""
   },
   {

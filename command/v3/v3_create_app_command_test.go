@@ -111,6 +111,27 @@ var _ = Describe("v3-create-app Command", func() {
 				}))
 				Expect(createSpaceGUID).To(Equal("some-space-guid"))
 			})
+
+			Context("when app type is specified", func() {
+				BeforeEach(func() {
+					cmd.AppType = "docker"
+				})
+
+				It("creates an app with specified app type", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1))
+
+					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
+					Expect(createApp).To(Equal(v3action.Application{
+						Name: app,
+						Lifecycle: v3action.AppLifecycle{
+							Type: "docker",
+						},
+					}))
+					Expect(createSpaceGUID).To(Equal("some-space-guid"))
+				})
+			})
 		})
 
 		Context("when the create is unsuccessful", func() {
