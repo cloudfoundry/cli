@@ -23,7 +23,7 @@ type CloudControllerClient interface {
 	DeleteIsolationSegment(guid string) (ccv3.Warnings, error)
 	EntitleIsolationSegmentToOrganizations(isoGUID string, orgGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetApplicationDroplets(appGUID string, query url.Values) ([]ccv3.Droplet, ccv3.Warnings, error)
-	GetApplicationEnvironmentVariables(appGUID string) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	GetApplicationEnvironmentVariables(appGUID string) (ccv3.EnvironmentVariableGroups, ccv3.Warnings, error)
 	GetApplicationProcessByType(appGUID string, processType string) (ccv3.Process, ccv3.Warnings, error)
 	GetApplicationProcesses(appGUID string) ([]ccv3.Process, ccv3.Warnings, error)
 	GetApplicationTasks(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error)
@@ -47,7 +47,7 @@ type CloudControllerClient interface {
 	StartApplication(appGUID string) (ccv3.Application, ccv3.Warnings, error)
 	StopApplication(appGUID string) (ccv3.Warnings, error)
 	UpdateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)
-	PatchApplicationEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
+	PatchApplicationUserProvidedEnvironmentVariables(appGUID string, envVars ccv3.EnvironmentVariables) (ccv3.EnvironmentVariables, ccv3.Warnings, error)
 	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 	UploadPackage(pkg ccv3.Package, zipFilepath string) (ccv3.Package, ccv3.Warnings, error)
 }
