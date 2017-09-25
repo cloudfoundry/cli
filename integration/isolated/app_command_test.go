@@ -289,7 +289,7 @@ applications:
 				})
 
 				AfterEach(func() {
-					Eventually(helpers.CF("delete", appName, "-f", "-r")).Should(Exit(0))
+					helpers.CF("delete", appName, "-f", "-r")
 				})
 
 				It("displays the docker image and does not display buildpack", func() {
