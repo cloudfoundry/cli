@@ -22,7 +22,8 @@ type V3CreateAppActor interface {
 
 type V3CreateAppCommand struct {
 	RequiredArgs flag.AppName `positional-args:"yes"`
-	usage        interface{}  `usage:"CF_NAME v3-create-app APP_NAME"`
+	AppType      flag.AppType `long:"app-type" choice:"buildpack" choice:"docker" description:"App lifecycle type to stage and run the app" default:"buildpack"`
+	usage        interface{}  `usage:"CF_NAME v3-create-app APP_NAME [--app-type (buildpack | docker)]"`
 
 	UI          command.UI
 	Config      command.Config
@@ -77,6 +78,9 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
 		v3action.Application{
 			Name: cmd.RequiredArgs.AppName,
+			Lifecycle: v3action.AppLifecycle{
+				Type: v3action.AppLifecycleType(cmd.AppType),
+			},
 		},
 		cmd.Config.TargetedSpace().GUID,
 	)

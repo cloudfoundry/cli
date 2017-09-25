@@ -356,6 +356,10 @@
     "translation": ""
   },
   {
+    "id": "App lifecycle type to stage and run the app",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "App name is a required field"
   },
@@ -1744,8 +1748,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME v3-create-app APP_NAME",
-    "translation": "CF_NAME v3-create-app APP_NAME"
+    "id": "CF_NAME v3-create-app APP_NAME [--app-type (buildpack | docker)]",
+    "translation": ""
   },
   {
     "id": "CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]",
