@@ -3300,6 +3300,10 @@
     "translation": "Abrufen der Schlüssel für Serviceinstanz {{.ServiceInstanceName}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "Abrufen von Organisationen als {{.Username}}...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "Keine Organisationen gefunden"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",

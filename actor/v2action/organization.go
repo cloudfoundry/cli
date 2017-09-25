@@ -97,3 +97,12 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 
 	return allWarnings, err
 }
+
+func (actor Actor) GetOrganizations() ([]Organization, Warnings, error) {
+	var returnedOrgs []Organization
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations()
+	for _, org := range orgs {
+		returnedOrgs = append(returnedOrgs, Organization(org))
+	}
+	return returnedOrgs, Warnings(warnings), err
+}

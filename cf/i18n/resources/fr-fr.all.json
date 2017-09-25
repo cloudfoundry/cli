@@ -3300,6 +3300,10 @@
     "translation": "Obtention des clés pour l'instance de service {{.ServiceInstanceName}} en tant que {{.CurrentUser}}..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "Obtention des organisations en tant que {{.Username}}...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "Aucune organisation trouvée"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",

@@ -3300,6 +3300,10 @@
     "translation": "{{.CurrentUser}}(으)로 서비스 인스턴스 {{.ServiceInstanceName}}의 키를 가져오는 중..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "{{.Username}}(으)로 조직을 가져오는 중...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "조직을 찾을 수 없음"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",

@@ -3300,6 +3300,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分取得服務實例 {{.ServiceInstanceName}} 的金鑰..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "正在以 {{.Username}} 身分取得組織...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "找不到任何組織"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",

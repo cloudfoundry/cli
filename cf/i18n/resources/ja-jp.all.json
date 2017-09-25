@@ -3300,6 +3300,10 @@
     "translation": "{{.CurrentUser}} としてサービス・インスタンス {{.ServiceInstanceName}} のキーを取得しています..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "{{.Username}} として組織を取得しています...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "組織が見つかりませんでした"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",

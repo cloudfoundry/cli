@@ -3300,6 +3300,10 @@
     "translation": "Richiamo delle chiavi per l'istanza del servizio {{.ServiceInstanceName}} come {{.CurrentUser}} in corso..."
   },
   {
+    "id": "Getting orgs as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting orgs as {{.Username}}...\n",
     "translation": "Richiamo delle organizzazioni come {{.Username}} in corso...\n"
   },
@@ -4334,6 +4338,10 @@
   {
     "id": "No orgs found",
     "translation": "Nessuna organizzazione trovata"
+  },
+  {
+    "id": "No orgs found.",
+    "translation": ""
   },
   {
     "id": "No packages found",
