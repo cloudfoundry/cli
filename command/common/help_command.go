@@ -97,6 +97,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 
 func (cmd HelpCommand) displayAllCommands(pluginCommands []configv3.PluginCommand, cmdInfo map[string]sharedaction.CommandInfo, longestCmd int) {
 	cmd.displayCommandGroups(internal.HelpCategoryList, cmdInfo, longestCmd)
+	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
 	for _, pluginCommand := range pluginCommands {
@@ -110,10 +111,10 @@ func (cmd HelpCommand) displayAllCommands(pluginCommands []configv3.PluginComman
 }
 
 func (cmd HelpCommand) displayCommandGroups(commandGroupList []internal.HelpCategory, cmdInfo map[string]sharedaction.CommandInfo, longestCmd int) {
-	for _, category := range commandGroupList {
+	for i, category := range commandGroupList {
 		cmd.UI.DisplayHeader(category.CategoryName)
 
-		for _, row := range category.CommandList {
+		for j, row := range category.CommandList {
 			for _, command := range row {
 				cmd.UI.DisplayText(allCommandsIndent+"{{.CommandName}}{{.Gap}}{{.CommandDescription}}",
 					map[string]interface{}{
@@ -123,7 +124,9 @@ func (cmd HelpCommand) displayCommandGroups(commandGroupList []internal.HelpCate
 					})
 			}
 
-			cmd.UI.DisplayNewline()
+			if j < len(category.CommandList)-1 || i < len(commandGroupList)-1 {
+				cmd.UI.DisplayNewline()
+			}
 		}
 	}
 }
