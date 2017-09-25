@@ -300,4 +300,81 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetOrganizations", func() {
+		var (
+			orgs     []Organization
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			orgs, warnings, err = actor.GetOrganizations()
+		})
+
+		Context("when there are multiple organizations", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{
+						{
+							Name: "some-org-1",
+						},
+						{
+							Name: "some-org-2",
+						},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil)
+			})
+
+			It("returns the org and all warnings", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(orgs).To(HaveLen(2))
+				Expect(orgs[0].Name).To(Equal("some-org-1"))
+				Expect(orgs[1].Name).To(Equal("some-org-2"))
+
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				queriesArg := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(queriesArg).To(BeNil())
+			})
+		})
+
+		Context("when there are no orgs", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil,
+				)
+			})
+
+			It("returns warnings and an empty list of orgs", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(orgs).To(HaveLen(0))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+
+		Context("when client returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("some get org error")
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					expectedErr,
+				)
+			})
+
+			It("returns warnings and the error", func() {
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			})
+		})
+	})
 })

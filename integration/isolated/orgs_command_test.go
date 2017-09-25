@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = PDescribe("orgs command", func() {
+var _ = Describe("orgs command", func() {
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("displays command usage to output", func() {
