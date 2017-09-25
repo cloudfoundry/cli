@@ -1,7 +1,6 @@
 package isolated
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -22,6 +21,7 @@ var _ = Describe("delete-user command", func() {
 
 			BeforeEach(func() {
 				newUser = helpers.NewUsername()
+
 				Eventually(helpers.CF("create-user", newUser, "--origin", "ldap")).Should(Exit(0))
 				Eventually(helpers.CF("create-user", newUser, helpers.NewPassword())).Should(Exit(0))
 			})
@@ -29,28 +29,18 @@ var _ = Describe("delete-user command", func() {
 			AfterEach(func() {
 				// Doing the cleanup here because it can't easily be done in
 				// bin/cleanup-integration.
-				session := helpers.CF("curl", "/v2/users")
-				Eventually(session).Should(Exit(0))
+				users := helpers.GetUsers()
 
-				var usersResponse struct {
-					Resources []struct {
-						Metadata struct {
-							GUID string `json:"guid"`
-						} `json:"metadata"`
-						Entity struct {
-							UserName string `json:"username"`
-						} `json:"entity"`
-					} `json:"resources"`
-				}
-
-				err := json.Unmarshal(session.Out.Contents(), &usersResponse)
-				Expect(err).NotTo(HaveOccurred())
-
-				for _, user := range usersResponse.Resources {
-					if user.Entity.UserName == newUser {
-						Eventually(helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v2/users/%s", user.Metadata.GUID))).Should(Exit(0))
+				var usersDeleted int
+				for _, user := range users {
+					if user.Username == newUser {
+						fmt.Println("deleting : ", newUser)
+						Eventually(helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v2/users/%s", user.GUID))).Should(Exit(0))
+						usersDeleted++
 					}
 				}
+
+				Expect(usersDeleted).To(Equal(2), "some users were not deleted")
 			})
 
 			It("errors with DuplicateUsernameError", func() {
