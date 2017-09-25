@@ -20,7 +20,7 @@ var _ = Describe("EnvironmentVariables", func() {
 
 	Describe("GetApplicationEnvironmentVariables", func() {
 		var (
-			fetchedEnvVars EnvironmentVariables
+			fetchedEnvVars EnvironmentVariableGroups
 			warnings       Warnings
 			err            error
 		)
@@ -33,7 +33,7 @@ var _ = Describe("EnvironmentVariables", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/environment_variables"),
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/env"),
 						RespondWith(http.StatusTeapot, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -48,31 +48,67 @@ var _ = Describe("EnvironmentVariables", func() {
 		Context("when the request succeeds", func() {
 			BeforeEach(func() {
 				responseBody := `{
-	"var": {
-		"DEBUG": "false"
-	}
+  "staging_env_json": {
+    "staging-name": "staging-value"
+  },
+  "running_env_json": {
+    "running-name": "running-value"
+  },
+  "environment_variables": {
+    "user-name": "user-value"
+  },
+  "system_env_json": {
+    "VCAP_SERVICES": {
+      "mysql": [
+        {
+          "name": "db-for-my-app"
+        }
+      ]
+    }
+  },
+  "application_env_json": {
+    "VCAP_APPLICATION": {
+      "application_name": "my_app"
+    }
+  }
 }`
-
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/environment_variables"),
+						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/env"),
 						RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
-			It("returns the error and warnings", func() {
+			It("returns env variable groups", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(fetchedEnvVars).To(Equal(EnvironmentVariables{Variables: map[string]types.FilteredString{
-					"DEBUG": {Value: "false", IsSet: true},
-				}}))
+				Expect(fetchedEnvVars).To(Equal(EnvironmentVariableGroups{
+					SystemProvided: map[string]interface{}{
+						"VCAP_SERVICES": map[string]interface{}{
+							"mysql": []interface{}{map[string]interface{}{"name": "db-for-my-app"}},
+						},
+					},
+					ApplicationProvided: map[string]interface{}{
+						"VCAP_APPLICATION": map[string]interface{}{
+							"application_name": "my_app",
+						},
+					},
+					UserProvided: map[string]interface{}{
+						"user-name": "user-value",
+					},
+					RunningGroup: map[string]interface{}{
+						"running-name": "running-value",
+					},
+					StagingGroup: map[string]interface{}{
+						"staging-name": "staging-value",
+					},
+				}))
 			})
-
 		})
 	})
 
-	Describe("PatchApplicationEnvironmentVariables", func() {
+	Describe("PatchApplicationUserProvidedEnvironmentVariables", func() {
 		var (
 			envVars        EnvironmentVariables
 			patchedEnvVars EnvironmentVariables
@@ -82,7 +118,7 @@ var _ = Describe("EnvironmentVariables", func() {
 		)
 
 		JustBeforeEach(func() {
-			patchedEnvVars, warnings, err = client.PatchApplicationEnvironmentVariables("some-app-guid", envVars)
+			patchedEnvVars, warnings, err = client.PatchApplicationUserProvidedEnvironmentVariables("some-app-guid", envVars)
 		})
 
 		Context("when the request errors", func() {

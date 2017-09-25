@@ -146,6 +146,10 @@ type FilesArgs struct {
 	Path    string `positional-arg-name:"PATH" description:"The file path"`
 }
 
+type EnvironmentArgs struct {
+	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+}
+
 type SetEnvironmentArgs struct {
 	AppName                  string              `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	EnvironmentVariableName  string              `positional-arg-name:"ENV_VAR_NAME" required:"true" description:"The environment variable name"`

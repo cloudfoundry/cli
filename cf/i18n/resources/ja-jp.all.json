@@ -1760,6 +1760,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME v3-env APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME v3-get-health-check APP_NAME",
     "translation": ""
   },
@@ -4414,6 +4418,10 @@
   {
     "id": "No user-defined env variables have been set",
     "translation": "ユーザー定義の環境変数が設定されていません"
+  },
+  {
+    "id": "No user-provided env variables have been set",
+    "translation": ""
   },
   {
     "id": "No value provided for flag: ",
