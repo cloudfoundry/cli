@@ -5912,8 +5912,8 @@
     "translation": "Status: {{.State}}"
   },
   {
-    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
-    "translation": ""
+    "id": "Stop all instances of the app, then start them again. This causes downtime.",
+    "translation": "Stop all instances of the app, then start them again. This causes downtime."
   },
   {
     "id": "Stop an app",

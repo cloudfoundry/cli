@@ -616,7 +616,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   v3-delete\\s+Delete a V3 App"))
 				Expect(testUI.Out).To(Say("   v3-start\\s+Start an app"))
 				Expect(testUI.Out).To(Say("   v3-stop\\s+Stop an app"))
-				Expect(testUI.Out).To(Say("   v3-restart\\s+Stop all instances of the app, then start them again. This may cause downtime."))
+				Expect(testUI.Out).To(Say("   v3-restart\\s+Stop all instances of the app, then start them again. This causes downtime."))
 				Expect(testUI.Out).To(Say("   v3-stage\\s+Create a new droplet for an app"))
 				Expect(testUI.Out).To(Say("   v3-restart-app-instance\\s+Terminate, then instantiate an app instance"))
 				Expect(testUI.Out).To(Say("   v3-droplets\\s+List droplets of an app"))
