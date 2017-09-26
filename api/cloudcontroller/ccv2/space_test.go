@@ -22,7 +22,7 @@ var _ = Describe("Space", func() {
 			Context("when results are paginated", func() {
 				BeforeEach(func() {
 					response1 := `{
-						"next_url": "/v2/spaces?q=some-query:some-value&page=2",
+						"next_url": "/v2/spaces?q=some-query:some-value&page=2&order-by=name",
 						"resources": [
 							{
 								"metadata": {
@@ -77,12 +77,12 @@ var _ = Describe("Space", func() {
 					}`
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v2/spaces", "q=some-query:some-value"),
+							VerifyRequest(http.MethodGet, "/v2/spaces", "q=some-query:some-value&order-by=name"),
 							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 						))
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest(http.MethodGet, "/v2/spaces", "q=some-query:some-value&page=2"),
+							VerifyRequest(http.MethodGet, "/v2/spaces", "q=some-query:some-value&page=2&order-by=name"),
 							RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 						))
 				})
@@ -139,7 +139,7 @@ var _ = Describe("Space", func() {
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/spaces"),
+						VerifyRequest(http.MethodGet, "/v2/spaces", "order-by=name"),
 						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
 					))
 			})
