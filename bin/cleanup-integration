@@ -32,7 +32,7 @@ set +e
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf orgs | grep -i -e ^integration-org -e CATS- | xargs_func cf delete-org -f
 cf isolation-segments | grep -i ^integration-isolation-segment | xargs_func cf delete-isolation-segment -f
-cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $}' | xargs_func cf delete-service-broker -f
+cf service-brokers | grep -i -e ^integration-service-broker- -e CATS- | awk '{print $1}' | xargs_func cf delete-service-broker -f
 
 cf quotas | grep -i -e ^integration-quota -e CATS- | cut -d " " -f1 | xargs_func cf delete-quota -f
 
@@ -48,7 +48,7 @@ CF_USERS=$(cf curl /v2/users | grep total_results | grep -o '[0-9]\+')
 USER_PAGES=$(( $CF_USERS / 50 + 1))
 
 for ((i=1; i<=${USER_PAGES}; i++)) ; do
-  cf curl /v2/users?results-per-page=50&page=${i} | \
+  cf curl "/v2/users?results-per-page=50&page=${i}" | \
   jq -r .resources[].entity.username | \
   grep -i -e ^integration-user -e CATS- | \
   xargs_func cf delete-user -f || echo
