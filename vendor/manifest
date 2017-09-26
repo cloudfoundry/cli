@@ -5,7 +5,7 @@
 			"importpath": "code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking",
 			"repository": "https://github.com/cloudfoundry-incubator/cfnetworking-cli-api",
 			"vcs": "git",
-			"revision": "5afba465c43acecf72889250309774f76a259c3a",
+			"revision": "d500decdb202cc7669da28f388aa0fe6627e0281",
 			"branch": "master",
 			"path": "/cfnetworking",
 			"notests": true
