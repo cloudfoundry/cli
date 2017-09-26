@@ -2,10 +2,8 @@ package common_test
 
 import (
 	"errors"
-	"fmt"
-	"math/rand"
+	"io/ioutil"
 	"os"
-	"strconv"
 
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
@@ -48,8 +46,9 @@ var _ = Describe("install-plugin command", func() {
 			ProgressBar: fakeProgressBar,
 		}
 
-		tmpDirectorySeed := strconv.Itoa(int(rand.Int63()))
-		pluginHome = fmt.Sprintf("some-pluginhome-%s", tmpDirectorySeed)
+		pluginHome, err := ioutil.TempDir("", "some-pluginhome")
+		Expect(err).NotTo(HaveOccurred())
+
 		fakeConfig.PluginHomeReturns(pluginHome)
 		fakeConfig.BinaryNameReturns("faceman")
 	})
