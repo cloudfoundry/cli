@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = FDescribe("v3-create-app command", func() {
+var _ = Describe("v3-create-app command", func() {
 	var (
 		orgName   string
 		spaceName string
