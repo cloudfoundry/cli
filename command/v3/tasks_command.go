@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //These constants are only for filling in translations.
@@ -128,7 +129,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 		})
 	}
 
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
 }

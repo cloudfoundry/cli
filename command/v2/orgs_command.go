@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . OrgsActor
@@ -72,5 +73,5 @@ func (cmd OrgsCommand) displayOrgs(orgs []v2action.Organization) {
 	for _, org := range orgs {
 		table = append(table, []string{org.Name})
 	}
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 }

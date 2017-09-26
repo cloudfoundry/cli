@@ -5,6 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/shared"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . SpacesActor
@@ -74,5 +75,5 @@ func (cmd SpacesCommand) displaySpaces(spaces []v2action.Space) {
 	for _, space := range spaces {
 		table = append(table, []string{space.Name})
 	}
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 }

@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . V3AppsActor
@@ -119,7 +120,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 		})
 	}
 
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	return nil
 }

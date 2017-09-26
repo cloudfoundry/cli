@@ -15,7 +15,7 @@ func (ui *UI) DisplayInstancesTableForApp(table [][]string) {
 			table[i][1] = ui.modifyColor(row[1], redColor)
 		}
 	}
-	ui.DisplayTableWithHeader("", table, 3)
+	ui.DisplayTableWithHeader("", table, DefaultTableSpacePadding)
 }
 
 func (ui *UI) DisplayKeyValueTableForApp(table [][]string) {
