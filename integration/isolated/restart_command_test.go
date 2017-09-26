@@ -21,7 +21,7 @@ var _ = Describe("restart command", func() {
 				session := helpers.CF("restart", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("restart - Stop all instances of the app, then start them again. This may cause downtime."))
+				Eventually(session).Should(Say("restart - Stop all instances of the app, then start them again. This causes downtime."))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart APP_NAME"))
 				Eventually(session).Should(Say("ALIAS:"))
