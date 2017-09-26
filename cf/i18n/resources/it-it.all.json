@@ -5912,7 +5912,7 @@
     "translation": "Stato: {{.State}}"
   },
   {
-    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "id": "Stop all instances of the app, then start them again. This causes downtime.",
     "translation": ""
   },
   {
