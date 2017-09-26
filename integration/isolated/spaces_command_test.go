@@ -91,23 +91,29 @@ var _ = Describe("spaces command", func() {
 		})
 
 		Context("when there are multiple spaces", func() {
-			var spaceName1 string
-			var spaceName2 string
+			var spaceName1, spaceName2, spaceName3, spaceName4, spaceName5, spaceName6 string
 
 			BeforeEach(func() {
-				spaceName1 = helpers.NewSpaceName()
-				spaceName2 = helpers.NewSpaceName()
+				spaceName1 = helpers.PrefixedRandomName("INTEGRATION-SPACE-DEF")
+				spaceName2 = helpers.PrefixedRandomName("INTEGRATION-SPACE-XYZ")
+				spaceName3 = helpers.PrefixedRandomName("INTEGRATION-SPACE-jop")
+				spaceName4 = helpers.PrefixedRandomName("INTEGRATION-SPACE-ABC")
+				spaceName5 = helpers.PrefixedRandomName("INTEGRATION-SPACE-123")
+				spaceName6 = helpers.PrefixedRandomName("INTEGRATION-SPACE--")
 				helpers.CreateSpace(spaceName1)
 				helpers.CreateSpace(spaceName2)
+				helpers.CreateSpace(spaceName3)
+				helpers.CreateSpace(spaceName4)
+				helpers.CreateSpace(spaceName5)
+				helpers.CreateSpace(spaceName6)
 			})
 
-			It("displays a list of all spaces in the org", func() {
+			It("displays a list of all spaces in the org in alphabetical order", func() {
 				session := helpers.CF("spaces")
 				Eventually(session).Should(Say("Getting spaces in org %s as %s\\.\\.\\.", orgName, username))
 				Eventually(session).Should(Say(""))
 				Eventually(session).Should(Say("name"))
-				Eventually(session).Should(Say("%s", spaceName1))
-				Eventually(session).Should(Say("%s", spaceName2))
+				Eventually(session).Should(Say("%s\n%s\n%s\n%s\n%s\n%s", spaceName6, spaceName5, spaceName4, spaceName1, spaceName3, spaceName2))
 				Eventually(session).Should(Exit(0))
 			})
 		})
