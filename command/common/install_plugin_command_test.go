@@ -46,7 +46,8 @@ var _ = Describe("install-plugin command", func() {
 			ProgressBar: fakeProgressBar,
 		}
 
-		pluginHome, err := ioutil.TempDir("", "some-pluginhome")
+		var err error
+		pluginHome, err = ioutil.TempDir("", "some-pluginhome")
 		Expect(err).NotTo(HaveOccurred())
 
 		fakeConfig.PluginHomeReturns(pluginHome)
