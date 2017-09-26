@@ -25,7 +25,7 @@ type commandList struct {
 	V3GetHealthCheck     v3.V3GetHealthCheckCommand     `command:"v3-get-health-check" description:"Show the type of health check performed on an app"`
 	V3Packages           v3.V3PackagesCommand           `command:"v3-packages" description:"List packages of an app"`
 	V3Push               v3.V3PushCommand               `command:"v3-push" description:"Push a new app or sync changes to an existing app"`
-	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This may cause downtime."`
+	V3Restart            v3.V3RestartCommand            `command:"v3-restart" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	V3RestartAppInstance v3.V3RestartAppInstanceCommand `command:"v3-restart-app-instance" description:"Terminate, then instantiate an app instance"`
 	V3Scale              v3.V3ScaleCommand              `command:"v3-scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
 	V3SetDroplet         v3.V3SetDropletCommand         `command:"v3-set-droplet" description:"Set the droplet used to run an app"`
@@ -138,7 +138,7 @@ type commandList struct {
 	ResetSpaceIsolationSegment         v3.ResetSpaceIsolationSegmentCommand         `command:"reset-space-isolation-segment" description:"Reset the space's isolation segment to the org default"`
 	Restage                            v2.RestageCommand                            `command:"restage" alias:"rg" description:"Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"`
 	RestartAppInstance                 v2.RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
-	Restart                            v2.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This may cause downtime."`
+	Restart                            v2.RestartCommand                            `command:"restart" alias:"rs" description:"Stop all instances of the app, then start them again. This causes downtime."`
 	RouterGroups                       v2.RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
 	Routes                             v2.RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
 	RunningEnvironmentVariableGroup    v2.RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`
