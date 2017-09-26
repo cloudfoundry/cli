@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/command/plugin/shared"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . PluginsActor
@@ -54,7 +55,7 @@ func (cmd PluginsCommand) displayPluginChecksums(plugins []configv3.Plugin) erro
 	}
 
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	return nil
 }
 
@@ -84,7 +85,7 @@ func (cmd PluginsCommand) displayOutdatedPlugins() error {
 	}
 
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Use '{{.BinaryName}} install-plugin' to update a plugin to the latest version.", map[string]interface{}{
@@ -103,7 +104,7 @@ func (cmd PluginsCommand) displayPluginCommands(plugins []configv3.Plugin) error
 		}
 	}
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayTableWithHeader("", table, 3)
+	cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 
 	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Use '{{.BinaryName}} repo-plugins' to list plugins in registered repos available to install.",

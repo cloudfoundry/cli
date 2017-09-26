@@ -13,6 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2/shared"
 	sharedV3 "code.cloudfoundry.org/cli/command/v3/shared"
+	"code.cloudfoundry.org/cli/util/ui"
 )
 
 //go:generate counterfeiter . SpaceActor
@@ -175,7 +176,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 		}
 
 		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayTableWithHeader("", table, 3)
+		cmd.UI.DisplayTableWithHeader("", table, ui.DefaultTableSpacePadding)
 	}
 
 	return nil

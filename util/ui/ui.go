@@ -24,6 +24,9 @@ import (
 // LogTimestampFormat is the timestamp formatting for log lines.
 const LogTimestampFormat = "2006-01-02T15:04:05.00-0700"
 
+// DefaultTableSpacePadding is the default space padding in tables.
+const DefaultTableSpacePadding = 3
+
 //go:generate counterfeiter . Config
 
 // Config is the UI configuration.
