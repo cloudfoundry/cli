@@ -288,10 +288,6 @@ applications:
 					Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
 				})
 
-				AfterEach(func() {
-					helpers.CF("delete", appName, "-f", "-r")
-				})
-
 				It("displays the docker image and does not display buildpack", func() {
 					session := helpers.CF("app", appName)
 					Eventually(session).Should(Say("name:\\s+%s", appName))
