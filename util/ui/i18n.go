@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"code.cloudfoundry.org/cli/cf/resources"
+	"code.cloudfoundry.org/cli/cli-i18n/resources"
 )
 
 const (
