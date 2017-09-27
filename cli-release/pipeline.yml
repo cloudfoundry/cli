@@ -5,6 +5,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
+    submodules: true
     tag_filter: "v6*"
     ignore_paths:
     - ci
