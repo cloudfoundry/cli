@@ -77,7 +77,6 @@ out/cf : $(GOSRC)
 							-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
 							-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
 		.
-	git co cf/resources/i18n_resources.go
 
 test : units
 
