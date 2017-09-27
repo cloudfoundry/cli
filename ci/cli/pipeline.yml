@@ -12,6 +12,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
+    submodules: true
     ignore_paths:
     - ci
     - integration
