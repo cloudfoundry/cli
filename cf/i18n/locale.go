@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf/resources"
+	"code.cloudfoundry.org/cli/cli-i18n/resources"
 	"code.cloudfoundry.org/cli/util/ui"
 )
 
