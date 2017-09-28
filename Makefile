@@ -96,20 +96,7 @@ version :
 
 vet :
 	@echo  "Vetting packages for potential issues..."
-	@echo  "Be sure to do this prior to committing!!!"
-	@git status -s \
-		| grep -i -e "^ *N" -e "^ *M" \
-		| grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ \
-		| grep -e .go \
-		| awk '{print $$2}' \
-		| xargs -r -L 1 -P 5 go tool vet -all -shadow=true
-	@git status -s \
-		| grep -i -e "^ *R" \
-		| grep -e api/ -e actor/ -e command -e cf/ -e plugin/ -e util/ \
-		| grep -e .go \
-		| awk '{print $$4}' \
-		| xargs -r -L 1 -P 5 go tool vet -all -shadow=true
-
+	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
 
 .PHONY : all build clean i18n format version vet
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
