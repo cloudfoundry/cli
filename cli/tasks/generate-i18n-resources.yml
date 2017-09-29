@@ -7,7 +7,6 @@ image_resource:
 
 inputs:
 - name: cli-i18n
-  path: gopath/src/code.cloudfoundry.org/cli-i18n
 
 outputs:
 - name: i18n-data
@@ -25,6 +24,6 @@ run:
     export PATH=$GOPATH/bin:$PATH
 
     go version
-    ./bin/generate-language-resources
+    ./cli-i18n/bin/generate-language-resources
 
-    mv resources/i18n_resources.go i18n-data
+    mv ./cli-i18n/resources/i18n_resources.go i18n-data

@@ -285,7 +285,7 @@ jobs:
     - get: cli-ci
     - get: cli-i18n
   - task: build-i18n
-    file: cli/ci/cli/tasks/generate-i18n-resources.yml
+    file: cli-ci/ci/cli/tasks/generate-i18n-resources.yml
     on_failure:
        put: slack-alert
        params:
