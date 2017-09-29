@@ -85,7 +85,7 @@ units : format vet build
 		api actor command types util
 	@echo "\nSWEET SUITE SUCCESS"
 
-units-full : format vet
+units-full : format vet build
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
 	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration
