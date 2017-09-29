@@ -1,0 +1,37 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+- name: cli
+  path: gopath/src/code.cloudfoundry.org/cli
+- name: cli-i18n
+  path: gopath/src/code.cloudfoundry.org/cli-i18n
+
+outputs:
+- name: cli-with-i18n
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cwd=$PWD
+
+    export GOPATH=$PWD/gopath
+    export PATH=$GOPATH/bin:$PATH
+
+    go version
+
+    cp -r $GOPATH/src/code.cloudfoundry.org/cli-i18n/resources/*.json $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources/
+
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      ./bin/generate-language-resources
+    popd
+
+    mv $GOPATH/src/code.cloudfoundry.org/cli/* cli-with-i18n

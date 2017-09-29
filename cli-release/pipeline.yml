@@ -15,7 +15,6 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli
     branch: master
-    submodules: true
     paths:
     - ci
 
