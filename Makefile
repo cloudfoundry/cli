@@ -80,7 +80,7 @@ out/cf : $(GOSRC)
 
 test : units
 
-units : format vet i18n build
+units : format vet build
 	ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites \
 		api actor command types util
 	@echo "\nSWEET SUITE SUCCESS"

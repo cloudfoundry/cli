@@ -30,4 +30,4 @@ i18n4go -c merge-strings -d ${tmpdir}
 
 i18n4go -c fixup --source-language-file ${tmpdir}/en.all.json
 
-go run bin/reformat_translated_json.go cli-i18n/resources
+go run bin/reformat_translated_json.go i18n/resources

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "\nApp started\n",
+    "translation": "\nApp started\n"
+  },
+  {
+    "id": "\nTIP: Use '{{.Command}}' to target new org",
+    "translation": "\nTIP: Use '{{.Command}}' to target new org"
+  },
+  {
+    "id": "Name",
+    "translation": "Name"
+  },
+  {
+    "id": "App {{.AppName}} does not exist.",
+    "translation": "App {{.AppName}} does not exist."
+  },
+  {
+    "id": "FEATURE FLAGS",
+    "translation": "FEATURE FLAGS"
+  },
+  {
+    "id": "   View allowable quotas with 'CF_NAME quotas'",
+    "translation": "   View allowable quotas with 'CF_NAME quotas'"
+  },
+  {
+    "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
+    "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
+  },
+  {
+    "id": "Also delete any mapped routes",
+    "translation": "Also delete any mapped routes"
+  },
+  {
+    "id": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
+    "translation": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n"
+  },
+  {
+    "id": "api endpoint:",
+    "translation": "api endpoint:"
+  },
+  {
+    "id": "api version:",
+    "translation": "api version:"
+  },
+  {
+    "id": "user:",
+    "translation": "user:"
+  },
+  {
+    "id": "org:",
+    "translation": "org:"
+  },
+  {
+    "id": "space:api version:",
+    "translation": "space:api version:"
+  }
+]
