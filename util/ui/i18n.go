@@ -13,7 +13,7 @@ import (
 
 const (
 	// assetPath is the path of the translation file inside the asset loader.
-	assetPath = "i18n/resources/%s.all.json"
+	assetPath = "resources/%s.all.json"
 	// chineseBase is the language code for Chinese.
 	chineseBase = "zh"
 	// defaultLocale is the default locale used when one is not configured.
