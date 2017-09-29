@@ -1,5 +1,10 @@
 [
    {
+      "id": "\nApp started\n",
+      "translation": "\nApp gestartet\n",
+      "modified": false
+   },
+   {
       "id": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
       "translation": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
       "modified": false
@@ -22,11 +27,6 @@
    {
       "id": "Also delete any mapped routes",
       "translation": "Also delete any mapped routes",
-      "modified": false
-   },
-   {
-      "id": "\nApp started\n",
-      "translation": "\nApp gestartet\n",
       "modified": false
    },
    {

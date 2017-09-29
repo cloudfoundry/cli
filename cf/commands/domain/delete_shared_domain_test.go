@@ -82,8 +82,6 @@ var _ = Describe("delete-shared-domain command", func() {
 				[]string{"domain"},
 				[]string{"foo1.com"},
 				[]string{"is an owned domain, not a shared domain."},
-				[]string{"TIP"},
-				[]string{"Use `cf delete-domain` to delete owned domains."},
 			))
 		})
 	})
