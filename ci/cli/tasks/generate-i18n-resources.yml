@@ -24,6 +24,8 @@ run:
     export PATH=$GOPATH/bin:$PATH
 
     go version
-    ./cli-i18n/bin/generate-language-resources
 
-    mv ./cli-i18n/resources/i18n_resources.go i18n-data
+    cd cli-i18n
+    ./bin/generate-language-resources
+
+    mv resources/i18n_resources.go ../i18n-data
