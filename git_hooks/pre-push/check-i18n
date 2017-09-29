@@ -2,7 +2,7 @@
 
 bin/i18n-checkup
 
-if git status | grep 'cf/i18n/resources'; then
+if git status | grep 'i18n/resources'; then
   echo "Failed to push. Please commit i18n changes."
   exit 1
 fi

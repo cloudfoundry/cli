@@ -162,7 +162,7 @@
     "/Users",
     "/list",
     "/manifest.yml",
-    "cf/i18n/resources/",
+    "i18n/resources/",
     "CommandDescription",
     "CommandUsage",
     "ERR",
