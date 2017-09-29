@@ -6,13 +6,11 @@ image_resource:
     repository: cfcli/cli-base
 
 inputs:
-- name: cli
-  path: gopath/src/code.cloudfoundry.org/cli
 - name: cli-i18n
   path: gopath/src/code.cloudfoundry.org/cli-i18n
 
 outputs:
-- name: cli-with-i18n
+- name: i18n-data
 
 run:
   path: bash
@@ -27,11 +25,6 @@ run:
     export PATH=$GOPATH/bin:$PATH
 
     go version
+    ./bin/generate-language-resources
 
-    cp -r $GOPATH/src/code.cloudfoundry.org/cli-i18n/resources/*.json $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources/
-
-    pushd $GOPATH/src/code.cloudfoundry.org/cli
-      ./bin/generate-language-resources
-    popd
-
-    mv $GOPATH/src/code.cloudfoundry.org/cli/* cli-with-i18n
+    mv resources/i18n_resources.go i18n-data
