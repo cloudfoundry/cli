@@ -2,7 +2,7 @@
 platform: darwin
 
 inputs:
-- name: cli
+- name: cli-with-i18n
   path: gopath/src/code.cloudfoundry.org/cli
 
 outputs:
