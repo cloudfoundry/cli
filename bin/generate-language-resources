@@ -4,6 +4,6 @@ set -e
 
 go get github.com/jteeuwen/go-bindata/...
 go-bindata -nometadata  -pkg resources -ignore ".go" -o i18n/resources/i18n_resources.go i18n/resources/*.all.json
-pushd cf/resources
+pushd i18n/resources
   go fmt ./...
 popd
