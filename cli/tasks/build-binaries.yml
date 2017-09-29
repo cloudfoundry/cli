@@ -6,8 +6,9 @@ image_resource:
     repository: cfcli/cli-base
 
 inputs:
-- name: cli-with-i18n
+- name: cli
   path: gopath/src/code.cloudfoundry.org/cli
+- name: i18n-data
 
 outputs:
 - name: cross-compiled
@@ -25,6 +26,8 @@ run:
     export PATH=$GOPATH/bin:$PATH
 
     go version
+
+    mv i18n-data/i18n_resources.go $GOPATH/src/code.cloudfoundry.org/cli/i18n/resources
 
     pushd $GOPATH/src/code.cloudfoundry.org/cli
       BUILD_VERSION=$(cat ci/VERSION)
