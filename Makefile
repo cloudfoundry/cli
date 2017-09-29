@@ -8,7 +8,7 @@ CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*")
 
-all : test i18n-binary build
+all : test build
 
 build : out/cf
 
@@ -40,9 +40,6 @@ fly-windows-push : check_target_env
 
 i18n :
 	$(PWD)/bin/i18n-checkup
-
-i18n-binary : i18n
-	$(PWD)/bin/generate-language-resources
 
 integration-cleanup :
 	$(PWD)/bin/cleanup-integration
