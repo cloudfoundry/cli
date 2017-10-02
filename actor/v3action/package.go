@@ -72,7 +72,6 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	}
 
 	if bitsPath == "" {
-		var err error
 		bitsPath, err = os.Getwd()
 		if err != nil {
 			return Package{}, allWarnings, err
