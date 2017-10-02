@@ -26,7 +26,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(nil, fakeCloudControllerClient, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 		})
@@ -113,7 +113,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(nil, fakeCloudControllerClient, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 			envPair = EnvironmentVariablePair{Key: "my-var", Value: "my-val"}
@@ -194,7 +194,7 @@ var _ = Describe("Environment Variable Actions", func() {
 
 		BeforeEach(func() {
 			fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-			actor = NewActor(fakeCloudControllerClient, nil)
+			actor = NewActor(nil, fakeCloudControllerClient, nil)
 			appName = "some-app"
 			spaceGUID = "space-guid"
 			envVariableName = "my-var"

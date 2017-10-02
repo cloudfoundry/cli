@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -191,19 +192,20 @@ func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath 
 			return config, err
 		}
 
-		var resources []v2action.Resource
+		var resources []sharedaction.Resource
 		if info.IsDir() {
 			log.WithField("path_to_resources", config.Path).Info("determine directory resources to zip")
-			resources, err = actor.V2Actor.GatherDirectoryResources(config.Path)
+			resources, err = actor.SharedActor.GatherDirectoryResources(config.Path)
 		} else {
 			config.Archive = true
 			log.WithField("path_to_resources", config.Path).Info("determine archive resources to zip")
-			resources, err = actor.V2Actor.GatherArchiveResources(config.Path)
+			resources, err = actor.SharedActor.GatherArchiveResources(config.Path)
 		}
 		if err != nil {
 			return config, err
 		}
-		config.AllResources = resources
+		config.AllResources = actor.ConvertSharedResourcesToV2Resources(resources)
+
 		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
 	}
 

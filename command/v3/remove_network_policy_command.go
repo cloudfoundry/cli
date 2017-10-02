@@ -37,7 +37,7 @@ type RemoveNetworkPolicyCommand struct {
 func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -48,7 +48,7 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 		return err
 	}
 
-	v3Actor := v3action.NewActor(client, config)
+	v3Actor := v3action.NewActor(nil, client, config)
 	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
 	if err != nil {
 		return err

@@ -9,4 +9,5 @@ type Config interface {
 	HasTargetedOrganization() bool
 	HasTargetedSpace() bool
 	RefreshToken() string
+	Verbose() (bool, []string)
 }

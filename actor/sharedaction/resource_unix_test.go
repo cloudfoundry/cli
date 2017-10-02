@@ -1,14 +1,14 @@
 // +build !windows
 
-package v2action_test
+package sharedaction_test
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	. "code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	. "code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/ykk"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,16 +16,14 @@ import (
 
 var _ = Describe("Resource Actions", func() {
 	var (
-		actor                     *Actor
-		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
-		fakeConfig                *v2actionfakes.FakeConfig
-		srcDir                    string
+		actor      *Actor
+		fakeConfig *sharedactionfakes.FakeConfig
+		srcDir     string
 	)
 
 	BeforeEach(func() {
-		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		fakeConfig = new(v2actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
+		fakeConfig = new(sharedactionfakes.FakeConfig)
+		actor = NewActor(fakeConfig)
 
 		var err error
 		srcDir, err = ioutil.TempDir("", "v2-resource-actions")

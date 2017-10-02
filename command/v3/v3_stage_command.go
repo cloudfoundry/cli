@@ -39,7 +39,7 @@ type V3StageCommand struct {
 func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -50,7 +50,7 @@ func (cmd *V3StageCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.Actor = v3action.NewActor(ccClient, config)
+	cmd.Actor = v3action.NewActor(nil, ccClient, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.APIInfo.Logging(), config, uaaClient, ui)
 
 	return nil

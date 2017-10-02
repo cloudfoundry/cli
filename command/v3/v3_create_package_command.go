@@ -17,7 +17,8 @@ import (
 
 type V3CreatePackageActor interface {
 	CloudControllerAPIVersion() string
-	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
+	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
+	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
 }
 
 type V3CreatePackageCommand struct {
@@ -36,7 +37,8 @@ type V3CreatePackageCommand struct {
 func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	sharedActor := sharedaction.NewActor(config)
+	cmd.SharedActor = sharedActor
 
 	client, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -46,7 +48,7 @@ func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) e
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(client, config)
+	cmd.Actor = v3action.NewActor(sharedActor, client, config)
 
 	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
 
@@ -73,7 +75,15 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "", v3action.DockerImageCredentials{Path: cmd.DockerImage.Path})
+	var (
+		pkg      v3action.Package
+		warnings v3action.Warnings
+	)
+	if isDockerImage {
+		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, v3action.DockerImageCredentials{Path: cmd.DockerImage.Path})
+	} else {
+		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "")
+	}
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

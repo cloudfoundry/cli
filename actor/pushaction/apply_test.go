@@ -43,8 +43,9 @@ func streamsDrainedAndClosed(configStream <-chan ApplicationConfig, eventStream 
 
 var _ = Describe("Apply", func() {
 	var (
-		actor       *Actor
-		fakeV2Actor *pushactionfakes.FakeV2Actor
+		actor           *Actor
+		fakeV2Actor     *pushactionfakes.FakeV2Actor
+		fakeSharedActor *pushactionfakes.FakeSharedActor
 
 		config          ApplicationConfig
 		fakeProgressBar *pushactionfakes.FakeProgressBar
@@ -57,8 +58,8 @@ var _ = Describe("Apply", func() {
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
-
+		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
+		actor = NewActor(fakeV2Actor, fakeSharedActor)
 		config = ApplicationConfig{
 			DesiredApplication: Application{
 				Application: v2action.Application{
@@ -159,7 +160,7 @@ var _ = Describe("Apply", func() {
 								Expect(tmpfile.Close()).ToNot(HaveOccurred())
 
 								archivePath = tmpfile.Name()
-								fakeV2Actor.ZipDirectoryResourcesReturns(archivePath, nil)
+								fakeSharedActor.ZipDirectoryResourcesReturns(archivePath, nil)
 							})
 
 							JustBeforeEach(func() {
@@ -242,7 +243,7 @@ var _ = Describe("Apply", func() {
 
 							BeforeEach(func() {
 								expectedErr = errors.New("dios mio")
-								fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
+								fakeSharedActor.ZipDirectoryResourcesReturns("", expectedErr)
 							})
 
 							It("sends warnings and errors, then stops", func() {
@@ -261,7 +262,7 @@ var _ = Describe("Apply", func() {
 							Eventually(configStream).Should(Receive())
 							Eventually(eventStream).Should(Receive(Equal(Complete)))
 
-							Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(0))
+							Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(0))
 						})
 					})
 				})

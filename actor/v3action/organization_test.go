@@ -20,7 +20,7 @@ var _ = Describe("Organization Actions", func() {
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil)
+		actor = NewActor(nil, fakeCloudControllerClient, nil)
 	})
 
 	Describe("GetOrganizationByName", func() {

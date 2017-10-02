@@ -38,7 +38,7 @@ type V3AppCommand struct {
 func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -49,7 +49,7 @@ func (cmd *V3AppCommand) Setup(config command.Config, ui command.UI) error {
 		return err
 	}
 
-	cmd.Actor = v3action.NewActor(ccClient, config)
+	cmd.Actor = v3action.NewActor(nil, ccClient, config)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {

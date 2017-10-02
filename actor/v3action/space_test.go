@@ -19,7 +19,7 @@ var _ = Describe("Space", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
 		fakeConfig := new(v3actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig)
+		actor = NewActor(nil, fakeCloudControllerClient, fakeConfig)
 	})
 
 	Describe("ResetSpaceIsolationSegment", func() {

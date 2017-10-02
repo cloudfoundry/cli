@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/types"
@@ -20,13 +21,15 @@ import (
 
 var _ = Describe("Application Config", func() {
 	var (
-		actor       *Actor
-		fakeV2Actor *pushactionfakes.FakeV2Actor
+		actor           *Actor
+		fakeV2Actor     *pushactionfakes.FakeV2Actor
+		fakeSharedActor *pushactionfakes.FakeSharedActor
 	)
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
+		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
+		actor = NewActor(fakeV2Actor, fakeSharedActor)
 	})
 
 	Describe("ApplicationConfig", func() {
@@ -151,8 +154,8 @@ var _ = Describe("Application Config", func() {
 				It("returns errors and warnings", func() {
 					Expect(os.IsNotExist(executeErr)).To(BeTrue())
 
-					Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
-					Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(0))
+					Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(0))
+					Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(0))
 				})
 			})
 		})
@@ -616,25 +619,25 @@ var _ = Describe("Application Config", func() {
 		Context("when scanning for files", func() {
 			Context("given a directory", func() {
 				Context("when scanning is successful", func() {
-					var resources []v2action.Resource
+					var resources []sharedaction.Resource
 
 					BeforeEach(func() {
-						resources = []v2action.Resource{
+						resources = []sharedaction.Resource{
 							{Filename: "I am a file!"},
 							{Filename: "I am not a file"},
 						}
-						fakeV2Actor.GatherDirectoryResourcesReturns(resources, nil)
+						fakeSharedActor.GatherDirectoryResourcesReturns(resources, nil)
 					})
 
 					It("sets the full resource list on the config", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
-						Expect(firstConfig.AllResources).To(Equal(resources))
+						Expect(firstConfig.AllResources).To(Equal(actor.ConvertSharedResourcesToV2Resources(resources)))
 						Expect(firstConfig.Path).To(Equal(filesPath))
 						Expect(firstConfig.Archive).To(BeFalse())
 
-						Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(1))
-						Expect(fakeV2Actor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(filesPath))
+						Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(1))
+						Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(filesPath))
 					})
 				})
 
@@ -643,7 +646,7 @@ var _ = Describe("Application Config", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("dios mio")
-						fakeV2Actor.GatherDirectoryResourcesReturns(nil, expectedErr)
+						fakeSharedActor.GatherDirectoryResourcesReturns(nil, expectedErr)
 					})
 
 					It("returns the error and warnings", func() {
@@ -674,25 +677,25 @@ var _ = Describe("Application Config", func() {
 				})
 
 				Context("when scanning is successful", func() {
-					var resources []v2action.Resource
+					var resources []sharedaction.Resource
 
 					BeforeEach(func() {
-						resources = []v2action.Resource{
+						resources = []sharedaction.Resource{
 							{Filename: "I am a file!"},
 							{Filename: "I am not a file"},
 						}
-						fakeV2Actor.GatherArchiveResourcesReturns(resources, nil)
+						fakeSharedActor.GatherArchiveResourcesReturns(resources, nil)
 					})
 
 					It("sets the full resource list on the config", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
-						Expect(firstConfig.AllResources).To(Equal(resources))
+						Expect(firstConfig.AllResources).To(Equal(actor.ConvertSharedResourcesToV2Resources(resources)))
 						Expect(firstConfig.Path).To(Equal(archive))
 						Expect(firstConfig.Archive).To(BeTrue())
 
-						Expect(fakeV2Actor.GatherArchiveResourcesCallCount()).To(Equal(1))
-						Expect(fakeV2Actor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archive))
+						Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(1))
+						Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(archive))
 					})
 				})
 
@@ -701,7 +704,7 @@ var _ = Describe("Application Config", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("dios mio")
-						fakeV2Actor.GatherArchiveResourcesReturns(nil, expectedErr)
+						fakeSharedActor.GatherArchiveResourcesReturns(nil, expectedErr)
 					})
 
 					It("returns the error and warnings", func() {
@@ -721,7 +724,7 @@ var _ = Describe("Application Config", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(firstConfig.DesiredApplication.DockerImage).To(Equal("some-docker-image-path"))
 
-				Expect(fakeV2Actor.GatherDirectoryResourcesCallCount()).To(Equal(0))
+				Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(0))
 			})
 		})
 	})

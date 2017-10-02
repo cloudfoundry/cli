@@ -251,7 +251,7 @@ var _ = Describe("v3-push Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("I am an error")
-						fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
+						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, expectedErr)
 					})
 
 					It("displays the header and error", func() {
@@ -268,7 +268,7 @@ var _ = Describe("v3-push Command", func() {
 
 				Context("when creating the package succeeds", func() {
 					BeforeEach(func() {
-						fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
+						fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a package warning", "I am also a package warning"}, nil)
 					})
 
 					Context("when the -p flag is provided", func() {
@@ -283,44 +283,42 @@ var _ = Describe("v3-push Command", func() {
 							Expect(testUI.Out).To(Say("OK"))
 							Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
 
-							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
-							_, _, appPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+							Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, appPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
 
 							Expect(appPath).To(Equal("some-app-path"))
-							Expect(dockerImageCredentials).To(Equal(v3action.DockerImageCredentials{}))
 						})
 					})
 
 					Context("when the -o flag is provided", func() {
 						BeforeEach(func() {
 							cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
+							fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "some-guid"}, v3action.Warnings{"I am a docker package warning", "I am also a docker package warning"}, nil)
 						})
 
 						It("creates a docker package with the provided image path", func() {
 
 							Expect(testUI.Out).To(Say("Creating docker package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
-							Expect(testUI.Err).To(Say("I am a package warning"))
-							Expect(testUI.Err).To(Say("I am also a package warning"))
+							Expect(testUI.Err).To(Say("I am a docker package warning"))
+							Expect(testUI.Err).To(Say("I am also a docker package warning"))
 							Expect(testUI.Out).To(Say("OK"))
 							Expect(testUI.Out).To(Say("Staging package for app %s in org some-org / space some-space as banana...", app))
 
-							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
-							_, _, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+							Expect(fakeActor.CreateDockerPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, dockerImageCredentials := fakeActor.CreateDockerPackageByApplicationNameAndSpaceArgsForCall(0)
 
-							Expect(bitsPath).To(BeEmpty())
 							Expect(dockerImageCredentials.Path).To(Equal("example.com/docker/docker/docker:docker"))
 						})
 					})
 
 					Context("when neither -p nor -o flags are provided", func() {
-						It("passes empty strings for both dockerImage and bitsPath", func() {
+						It("calls CreateAndUploadBitsPackageByApplicationNameAndSpace with empty string", func() {
 							Expect(testUI.Out).To(Say("Uploading and creating bits package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
 
-							Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
-							_, _, appPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+							Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							_, _, appPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
 
 							Expect(appPath).To(BeEmpty())
-							Expect(dockerImageCredentials).To(Equal(v3action.DockerImageCredentials{}))
 						})
 					})
 
@@ -810,10 +808,9 @@ var _ = Describe("v3-push Command", func() {
 
 				Context("when a username/password are provided", func() {
 					It("updates the app with the provided credentials", func() {
-						appName, spaceGuid, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+						appName, spaceGuid, dockerImageCredentials := fakeActor.CreateDockerPackageByApplicationNameAndSpaceArgsForCall(0)
 						Expect(appName).To(Equal("some-app"))
 						Expect(spaceGuid).To(Equal("some-space-guid"))
-						Expect(bitsPath).To(BeEmpty())
 						Expect(dockerImageCredentials.Path).To(Equal(cmd.DockerImage.Path))
 						Expect(dockerImageCredentials.Username).To(Equal("username"))
 						Expect(dockerImageCredentials.Password).To(Equal("password"))

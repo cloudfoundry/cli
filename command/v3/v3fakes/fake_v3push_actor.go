@@ -18,20 +18,36 @@ type FakeV3PushActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	CreatePackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
-	createPackageByApplicationNameAndSpaceMutex       sync.RWMutex
-	createPackageByApplicationNameAndSpaceArgsForCall []struct {
-		appName                string
-		spaceGUID              string
-		bitsPath               string
-		dockerImageCredentials v3action.DockerImageCredentials
+	CreateAndUploadBitsPackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	createAndUploadBitsPackageByApplicationNameAndSpaceMutex       sync.RWMutex
+	createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall []struct {
+		appName   string
+		spaceGUID string
+		bitsPath  string
 	}
-	createPackageByApplicationNameAndSpaceReturns struct {
+	createAndUploadBitsPackageByApplicationNameAndSpaceReturns struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}
-	createPackageByApplicationNameAndSpaceReturnsOnCall map[int]struct {
+	createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall map[int]struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
+	CreateDockerPackageByApplicationNameAndSpaceStub        func(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
+	createDockerPackageByApplicationNameAndSpaceMutex       sync.RWMutex
+	createDockerPackageByApplicationNameAndSpaceArgsForCall []struct {
+		appName                string
+		spaceGUID              string
+		dockerImageCredentials v3action.DockerImageCredentials
+	}
+	createDockerPackageByApplicationNameAndSpaceReturns struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}
+	createDockerPackageByApplicationNameAndSpaceReturnsOnCall map[int]struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
@@ -233,57 +249,112 @@ func (fake *FakeV3PushActor) CloudControllerAPIVersionReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeV3PushActor) CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error) {
-	fake.createPackageByApplicationNameAndSpaceMutex.Lock()
-	ret, specificReturn := fake.createPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createPackageByApplicationNameAndSpaceArgsForCall)]
-	fake.createPackageByApplicationNameAndSpaceArgsForCall = append(fake.createPackageByApplicationNameAndSpaceArgsForCall, struct {
-		appName                string
-		spaceGUID              string
-		bitsPath               string
-		dockerImageCredentials v3action.DockerImageCredentials
-	}{appName, spaceGUID, bitsPath, dockerImageCredentials})
-	fake.recordInvocation("CreatePackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath, dockerImageCredentials})
-	fake.createPackageByApplicationNameAndSpaceMutex.Unlock()
-	if fake.CreatePackageByApplicationNameAndSpaceStub != nil {
-		return fake.CreatePackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath, dockerImageCredentials)
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error) {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall)]
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall = append(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall, struct {
+		appName   string
+		spaceGUID string
+		bitsPath  string
+	}{appName, spaceGUID, bitsPath})
+	fake.recordInvocation("CreateAndUploadBitsPackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, bitsPath})
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.Unlock()
+	if fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub != nil {
+		return fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub(appName, spaceGUID, bitsPath)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.createPackageByApplicationNameAndSpaceReturns.result1, fake.createPackageByApplicationNameAndSpaceReturns.result2, fake.createPackageByApplicationNameAndSpaceReturns.result3
+	return fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result1, fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result2, fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns.result3
 }
 
-func (fake *FakeV3PushActor) CreatePackageByApplicationNameAndSpaceCallCount() int {
-	fake.createPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createPackageByApplicationNameAndSpaceMutex.RUnlock()
-	return len(fake.createPackageByApplicationNameAndSpaceArgsForCall)
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount() int {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeV3PushActor) CreatePackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string, v3action.DockerImageCredentials) {
-	fake.createPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createPackageByApplicationNameAndSpaceMutex.RUnlock()
-	return fake.createPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath, fake.createPackageByApplicationNameAndSpaceArgsForCall[i].dockerImageCredentials
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, string) {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall[i].bitsPath
 }
 
-func (fake *FakeV3PushActor) CreatePackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreatePackageByApplicationNameAndSpaceStub = nil
-	fake.createPackageByApplicationNameAndSpaceReturns = struct {
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub = nil
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturns = struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeV3PushActor) CreatePackageByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
-	fake.CreatePackageByApplicationNameAndSpaceStub = nil
-	if fake.createPackageByApplicationNameAndSpaceReturnsOnCall == nil {
-		fake.createPackageByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
+func (fake *FakeV3PushActor) CreateAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateAndUploadBitsPackageByApplicationNameAndSpaceStub = nil
+	if fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
 			result1 v3action.Package
 			result2 v3action.Warnings
 			result3 error
 		})
 	}
-	fake.createPackageByApplicationNameAndSpaceReturnsOnCall[i] = struct {
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceReturnsOnCall[i] = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3PushActor) CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error) {
+	fake.createDockerPackageByApplicationNameAndSpaceMutex.Lock()
+	ret, specificReturn := fake.createDockerPackageByApplicationNameAndSpaceReturnsOnCall[len(fake.createDockerPackageByApplicationNameAndSpaceArgsForCall)]
+	fake.createDockerPackageByApplicationNameAndSpaceArgsForCall = append(fake.createDockerPackageByApplicationNameAndSpaceArgsForCall, struct {
+		appName                string
+		spaceGUID              string
+		dockerImageCredentials v3action.DockerImageCredentials
+	}{appName, spaceGUID, dockerImageCredentials})
+	fake.recordInvocation("CreateDockerPackageByApplicationNameAndSpace", []interface{}{appName, spaceGUID, dockerImageCredentials})
+	fake.createDockerPackageByApplicationNameAndSpaceMutex.Unlock()
+	if fake.CreateDockerPackageByApplicationNameAndSpaceStub != nil {
+		return fake.CreateDockerPackageByApplicationNameAndSpaceStub(appName, spaceGUID, dockerImageCredentials)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.createDockerPackageByApplicationNameAndSpaceReturns.result1, fake.createDockerPackageByApplicationNameAndSpaceReturns.result2, fake.createDockerPackageByApplicationNameAndSpaceReturns.result3
+}
+
+func (fake *FakeV3PushActor) CreateDockerPackageByApplicationNameAndSpaceCallCount() int {
+	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createDockerPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return len(fake.createDockerPackageByApplicationNameAndSpaceArgsForCall)
+}
+
+func (fake *FakeV3PushActor) CreateDockerPackageByApplicationNameAndSpaceArgsForCall(i int) (string, string, v3action.DockerImageCredentials) {
+	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createDockerPackageByApplicationNameAndSpaceMutex.RUnlock()
+	return fake.createDockerPackageByApplicationNameAndSpaceArgsForCall[i].appName, fake.createDockerPackageByApplicationNameAndSpaceArgsForCall[i].spaceGUID, fake.createDockerPackageByApplicationNameAndSpaceArgsForCall[i].dockerImageCredentials
+}
+
+func (fake *FakeV3PushActor) CreateDockerPackageByApplicationNameAndSpaceReturns(result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateDockerPackageByApplicationNameAndSpaceStub = nil
+	fake.createDockerPackageByApplicationNameAndSpaceReturns = struct {
+		result1 v3action.Package
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeV3PushActor) CreateDockerPackageByApplicationNameAndSpaceReturnsOnCall(i int, result1 v3action.Package, result2 v3action.Warnings, result3 error) {
+	fake.CreateDockerPackageByApplicationNameAndSpaceStub = nil
+	if fake.createDockerPackageByApplicationNameAndSpaceReturnsOnCall == nil {
+		fake.createDockerPackageByApplicationNameAndSpaceReturnsOnCall = make(map[int]struct {
+			result1 v3action.Package
+			result2 v3action.Warnings
+			result3 error
+		})
+	}
+	fake.createDockerPackageByApplicationNameAndSpaceReturnsOnCall[i] = struct {
 		result1 v3action.Package
 		result2 v3action.Warnings
 		result3 error
@@ -835,8 +906,10 @@ func (fake *FakeV3PushActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.createPackageByApplicationNameAndSpaceMutex.RLock()
-	defer fake.createPackageByApplicationNameAndSpaceMutex.RUnlock()
+	fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createAndUploadBitsPackageByApplicationNameAndSpaceMutex.RUnlock()
+	fake.createDockerPackageByApplicationNameAndSpaceMutex.RLock()
+	defer fake.createDockerPackageByApplicationNameAndSpaceMutex.RUnlock()
 	fake.createApplicationInSpaceMutex.RLock()
 	defer fake.createApplicationInSpaceMutex.RUnlock()
 	fake.getApplicationByNameAndSpaceMutex.RLock()

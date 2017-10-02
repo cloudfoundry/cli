@@ -78,7 +78,7 @@ type V2PushCommand struct {
 func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	sharedActor := sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -86,8 +86,8 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	}
 	v2Actor := v2action.NewActor(ccClient, uaaClient, config)
 	cmd.RestartActor = v2Actor
-	cmd.Actor = pushaction.NewActor(v2Actor)
-
+	cmd.Actor = pushaction.NewActor(v2Actor, sharedActor)
+	cmd.SharedActor = sharedActor
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.DopplerEndpoint(), config, uaaClient, ui)
 
 	cmd.ProgressBar = progressbar.NewProgressBar()

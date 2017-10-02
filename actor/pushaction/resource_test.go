@@ -17,13 +17,15 @@ import (
 
 var _ = Describe("Resources", func() {
 	var (
-		actor       *Actor
-		fakeV2Actor *pushactionfakes.FakeV2Actor
+		actor           *Actor
+		fakeV2Actor     *pushactionfakes.FakeV2Actor
+		fakeSharedActor *pushactionfakes.FakeSharedActor
 	)
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
+		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
+		actor = NewActor(fakeV2Actor, fakeSharedActor)
 	})
 
 	Describe("CreateArchive", func() {
@@ -63,17 +65,19 @@ var _ = Describe("Resources", func() {
 
 				BeforeEach(func() {
 					fakeArchivePath = "some-archive-path"
-					fakeV2Actor.ZipArchiveResourcesReturns(fakeArchivePath, nil)
+					fakeSharedActor.ZipArchiveResourcesReturns(fakeArchivePath, nil)
 				})
 
 				It("returns the path to the zip", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(archivePath).To(Equal(fakeArchivePath))
 
-					Expect(fakeV2Actor.ZipArchiveResourcesCallCount()).To(Equal(1))
-					sourceDir, passedResources := fakeV2Actor.ZipArchiveResourcesArgsForCall(0)
+					Expect(fakeSharedActor.ZipArchiveResourcesCallCount()).To(Equal(1))
+					sourceDir, passedResources := fakeSharedActor.ZipArchiveResourcesArgsForCall(0)
 					Expect(sourceDir).To(Equal("some-path"))
-					Expect(passedResources).To(Equal(resourcesToArchive))
+					sharedResourcesToArchive := actor.ConvertV2ResourcesToSharedResources(resourcesToArchive)
+					Expect(passedResources).To(Equal(sharedResourcesToArchive))
+
 				})
 			})
 
@@ -82,7 +86,7 @@ var _ = Describe("Resources", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("oh no")
-					fakeV2Actor.ZipArchiveResourcesReturns("", expectedErr)
+					fakeSharedActor.ZipArchiveResourcesReturns("", expectedErr)
 				})
 
 				It("sends errors and returns true", func() {
@@ -96,17 +100,18 @@ var _ = Describe("Resources", func() {
 				var fakeArchivePath string
 				BeforeEach(func() {
 					fakeArchivePath = "some-archive-path"
-					fakeV2Actor.ZipDirectoryResourcesReturns(fakeArchivePath, nil)
+					fakeSharedActor.ZipDirectoryResourcesReturns(fakeArchivePath, nil)
 				})
 
 				It("returns the path to the zip", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(archivePath).To(Equal(fakeArchivePath))
 
-					Expect(fakeV2Actor.ZipDirectoryResourcesCallCount()).To(Equal(1))
-					sourceDir, passedResources := fakeV2Actor.ZipDirectoryResourcesArgsForCall(0)
+					Expect(fakeSharedActor.ZipDirectoryResourcesCallCount()).To(Equal(1))
+					sourceDir, passedResources := fakeSharedActor.ZipDirectoryResourcesArgsForCall(0)
 					Expect(sourceDir).To(Equal("some-path"))
-					Expect(passedResources).To(Equal(resourcesToArchive))
+					sharedResourcesToArchive := actor.ConvertV2ResourcesToSharedResources(resourcesToArchive)
+					Expect(passedResources).To(Equal(sharedResourcesToArchive))
 				})
 			})
 
@@ -115,7 +120,7 @@ var _ = Describe("Resources", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("oh no")
-					fakeV2Actor.ZipDirectoryResourcesReturns("", expectedErr)
+					fakeSharedActor.ZipDirectoryResourcesReturns("", expectedErr)
 				})
 
 				It("sends errors and returns true", func() {

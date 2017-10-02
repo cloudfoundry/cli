@@ -101,7 +101,7 @@ var _ = Describe("v3-create-package Command", func() {
 			Context("when the create is successful", func() {
 				BeforeEach(func() {
 					myPackage := v3action.Package{GUID: "1234"}
-					fakeActor.CreatePackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(myPackage, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 				})
 
 				It("displays the header and ok", func() {
@@ -114,13 +114,12 @@ var _ = Describe("v3-create-package Command", func() {
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
 
-					Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+					Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
 
-					appName, spaceGUID, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+					appName, spaceGUID, bitsPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
 					Expect(appName).To(Equal(app))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(bitsPath).To(BeEmpty())
-					Expect(dockerImageCredentials).To(Equal(v3action.DockerImageCredentials{}))
 				})
 			})
 
@@ -129,7 +128,7 @@ var _ = Describe("v3-create-package Command", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am an error")
-					fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
+					fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{}, v3action.Warnings{"I am a warning", "I am also a warning"}, expectedErr)
 				})
 
 				It("displays the header and error", func() {
@@ -146,7 +145,7 @@ var _ = Describe("v3-create-package Command", func() {
 		Context("when the --docker-image flag is set", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
-				fakeActor.CreatePackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
 			})
 
 			It("creates the docker package", func() {
@@ -159,12 +158,11 @@ var _ = Describe("v3-create-package Command", func() {
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 
-				Expect(fakeActor.CreatePackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+				Expect(fakeActor.CreateDockerPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
 
-				appName, spaceGUID, bitsPath, dockerImageCredentials := fakeActor.CreatePackageByApplicationNameAndSpaceArgsForCall(0)
+				appName, spaceGUID, dockerImageCredentials := fakeActor.CreateDockerPackageByApplicationNameAndSpaceArgsForCall(0)
 				Expect(appName).To(Equal(app))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
-				Expect(bitsPath).To(BeEmpty())
 				Expect(dockerImageCredentials.Path).To(Equal("some-docker-image"))
 			})
 		})

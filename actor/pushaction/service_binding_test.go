@@ -19,7 +19,7 @@ var _ = Describe("Binding Services", func() {
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
+		actor = NewActor(fakeV2Actor, nil)
 	})
 
 	Describe("BindServices", func() {

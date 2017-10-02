@@ -3,9 +3,13 @@
 package sharedaction
 
 // Actor handles all shared actions
-type Actor struct{}
+type Actor struct {
+	Config Config
+}
 
 // NewActor returns an Actor with default settings
-func NewActor() *Actor {
-	return &Actor{}
+func NewActor(config Config) *Actor {
+	return &Actor{
+		Config: config,
+	}
 }
