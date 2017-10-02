@@ -540,6 +540,8 @@ var _ = Describe("Package Actions", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(os.Chdir(appDir)).NotTo(HaveOccurred())
+					appDir, err = os.Getwd()
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				AfterEach(func() {
