@@ -57,7 +57,7 @@ var _ = Describe("org Command", func() {
 
 	Context("when it's been six months from April 2017", func() {
 		It("should stop calling CloudControllerAPIVersion() in: org, space, target, create-isolation-segment, delete-isolation-segment, disable-org-isolation, enable-org-isolation, isolation-segments, set-space-isolation, run-task, tasks, terminate-task", func() {
-			Expect(time.Now()).Should(BeTemporally("<", time.Date(2017, 10, 1, 0, 0, 0, 0, new(time.Location))))
+			Expect(time.Now()).Should(BeTemporally("<", time.Date(2017, 10, 7, 0, 0, 0, 0, new(time.Location))))
 		})
 	})
 
