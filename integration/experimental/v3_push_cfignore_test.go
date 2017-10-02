@@ -46,6 +46,34 @@ var _ = Describe("v3-push with .cfignore", func() {
 					err = ioutil.WriteFile(cfIgnoreFilePath, nil, 0666)
 					Expect(err).ToNot(HaveOccurred())
 
+					darcsFile := filepath.Join(appDir, "_darcs")
+					err = ioutil.WriteFile(darcsFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					dsFile := filepath.Join(appDir, ".DS_Store")
+					err = ioutil.WriteFile(dsFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					gitFile := filepath.Join(appDir, ".git")
+					err = ioutil.WriteFile(gitFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					gitIgnoreFile := filepath.Join(appDir, ".gitignore")
+					err = ioutil.WriteFile(gitIgnoreFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					hgFile := filepath.Join(appDir, ".hg")
+					err = ioutil.WriteFile(hgFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					manifestFile := filepath.Join(appDir, "manifest.yml")
+					err = ioutil.WriteFile(manifestFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					svnFile := filepath.Join(appDir, ".svn")
+					err = ioutil.WriteFile(svnFile, nil, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
 
 					Eventually(session).Should(Exit(0))
@@ -162,6 +190,53 @@ var _ = Describe("v3-push with .cfignore", func() {
 					Eventually(session).Should(Exit(0))
 					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
 				})
+			})
+		})
+	})
+
+	Context("when .cfignore file does not exists", func() {
+		It("pushes all the files except for the files ignored by default", func() {
+			helpers.WithHelloWorldApp(func(appDir string) {
+				file1 := filepath.Join(appDir, "file1")
+				err := ioutil.WriteFile(file1, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				file2 := filepath.Join(appDir, "file2")
+				err = ioutil.WriteFile(file2, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				darcsFile := filepath.Join(appDir, "_darcs")
+				err = ioutil.WriteFile(darcsFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				dsFile := filepath.Join(appDir, ".DS_Store")
+				err = ioutil.WriteFile(dsFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				gitFile := filepath.Join(appDir, ".git")
+				err = ioutil.WriteFile(gitFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				gitIgnoreFile := filepath.Join(appDir, ".gitignore")
+				err = ioutil.WriteFile(gitIgnoreFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				hgFile := filepath.Join(appDir, ".hg")
+				err = ioutil.WriteFile(hgFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				manifestFile := filepath.Join(appDir, "manifest.yml")
+				err = ioutil.WriteFile(manifestFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				svnFile := filepath.Join(appDir, ".svn")
+				err = ioutil.WriteFile(svnFile, nil, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-push", appName)
+
+				Eventually(session).Should(Exit(0))
+				helpers.VerifyAppPackageContents(appName, "file1", "file2", "Staticfile", "index.html")
 			})
 		})
 	})
