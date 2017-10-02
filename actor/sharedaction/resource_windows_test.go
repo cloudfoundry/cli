@@ -20,7 +20,7 @@ var _ = Describe("Resource Actions", func() {
 	)
 
 	BeforeEach(func() {
-		fakeConfig = new(sharedaction.FakeConfig)
+		fakeConfig = &sharedactionfakes.FakeConfig{}
 		actor = NewActor(fakeConfig)
 
 		var err error
