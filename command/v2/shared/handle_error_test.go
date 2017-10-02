@@ -102,7 +102,7 @@ var _ = Describe("HandleError", func() {
 		),
 
 		Entry("v2action.EmptyDirectoryError -> EmptyDirectoryError",
-			v2action.EmptyDirectoryError{Path: "some-filename"},
+			sharedaction.EmptyDirectoryError{Path: "some-filename"},
 			translatableerror.EmptyDirectoryError{Path: "some-filename"},
 		),
 

@@ -3,6 +3,9 @@ package pushaction
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/v2action"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,9 +17,9 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 
 	//change to look at unmatched
 	if config.Archive {
-		archivePath, err = actor.V2Actor.ZipArchiveResources(config.Path, config.UnmatchedResources)
+		archivePath, err = actor.SharedActor.ZipArchiveResources(config.Path, actor.ConvertV2ResourcesToSharedResources(config.UnmatchedResources))
 	} else {
-		archivePath, err = actor.V2Actor.ZipDirectoryResources(config.Path, config.UnmatchedResources)
+		archivePath, err = actor.SharedActor.ZipDirectoryResources(config.Path, actor.ConvertV2ResourcesToSharedResources(config.UnmatchedResources))
 	}
 	if err != nil {
 		log.WithField("path", config.Path).Errorln("archiving resources:", err)
@@ -24,6 +27,24 @@ func (actor Actor) CreateArchive(config ApplicationConfig) (string, error) {
 	}
 	log.WithField("archivePath", archivePath).Debug("archive created")
 	return archivePath, nil
+}
+
+func (actor Actor) ConvertSharedResourcesToV2Resources(resources []sharedaction.Resource) []v2action.Resource {
+	newResources := make([]v2action.Resource, 0, len(resources)) // Explicitly done to prevent nils
+
+	for _, resource := range resources {
+		newResources = append(newResources, v2action.Resource(resource))
+	}
+	return newResources
+}
+
+func (actor Actor) ConvertV2ResourcesToSharedResources(resources []v2action.Resource) []sharedaction.Resource {
+	newResources := make([]sharedaction.Resource, 0, len(resources)) // Explicitly done to prevent nils
+
+	for _, resource := range resources {
+		newResources = append(newResources, sharedaction.Resource(resource))
+	}
+	return newResources
 }
 
 func (actor Actor) SetMatchedResources(config ApplicationConfig) (ApplicationConfig, Warnings) {

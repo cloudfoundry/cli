@@ -26,7 +26,8 @@ type V2PushActor interface {
 
 type V3PushActor interface {
 	CloudControllerAPIVersion() string
-	CreatePackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
+	CreateAndUploadBitsPackageByApplicationNameAndSpace(appName string, spaceGUID string, bitsPath string) (v3action.Package, v3action.Warnings, error)
+	CreateDockerPackageByApplicationNameAndSpace(appName string, spaceGUID string, dockerImageCredentials v3action.DockerImageCredentials) (v3action.Package, v3action.Warnings, error)
 	CreateApplicationInSpace(app v3action.Application, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationSummaryByNameAndSpace(appName string, spaceGUID string) (v3action.ApplicationSummary, v3action.Warnings, error)
@@ -65,7 +66,7 @@ type V3PushCommand struct {
 func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor()
+	sharedActor := sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -75,7 +76,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(ccClient, config)
+	cmd.Actor = v3action.NewActor(sharedActor, ccClient, config)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
@@ -83,7 +84,10 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	v2Actor := v2action.NewActor(ccClientV2, uaaClientV2, config)
-	cmd.V2PushActor = pushaction.NewActor(v2Actor)
+
+	cmd.SharedActor = sharedActor
+	cmd.V2PushActor = pushaction.NewActor(v2Actor, sharedActor)
+
 	v2AppActor := v2action.NewActor(ccClientV2, uaaClientV2, config)
 	cmd.NOAAClient = shared.NewNOAAClient(ccClient.APIInfo.Logging(), config, uaaClient, ui)
 
@@ -143,7 +147,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		}
 	}
 
-	pkg, err := cmd.uploadPackage(user.Name)
+	pkg, err := cmd.uploadPackage()
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -335,14 +339,24 @@ func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
 	return nil
 }
 
-func (cmd V3PushCommand) uploadPackage(userName string) (v3action.Package, error) {
+func (cmd V3PushCommand) uploadPackage() (v3action.Package, error) {
 	isDockerImage := (cmd.DockerImage.Path != "")
 	err := cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
 	if err != nil {
 		return v3action.Package{}, err
 	}
 
-	pkg, warnings, err := cmd.Actor.CreatePackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath), v3action.DockerImageCredentials{Path: cmd.DockerImage.Path, Username: cmd.DockerUsername, Password: cmd.Config.DockerPassword()})
+	var (
+		pkg      v3action.Package
+		warnings v3action.Warnings
+	)
+
+	if isDockerImage {
+		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, v3action.DockerImageCredentials{Path: cmd.DockerImage.Path, Username: cmd.DockerUsername, Password: cmd.Config.DockerPassword()})
+	} else {
+		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath))
+	}
+
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return v3action.Package{}, err

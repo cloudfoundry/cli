@@ -21,7 +21,7 @@ var _ = Describe("Applications", func() {
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
+		actor = NewActor(fakeV2Actor, nil)
 	})
 
 	Describe("CreateOrUpdateApp", func() {

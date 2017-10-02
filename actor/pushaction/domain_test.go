@@ -19,7 +19,7 @@ var _ = Describe("Domains", func() {
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
-		actor = NewActor(fakeV2Actor)
+		actor = NewActor(fakeV2Actor, nil)
 	})
 
 	Describe("DefaultDomain", func() {

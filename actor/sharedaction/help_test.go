@@ -2,6 +2,7 @@ package sharedaction_test
 
 import (
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,7 +34,7 @@ var _ = Describe("Help Actions", func() {
 	var actor *Actor
 
 	BeforeEach(func() {
-		actor = NewActor()
+		actor = NewActor(&sharedactionfakes.FakeConfig{})
 	})
 
 	Describe("CommandInfoByName", func() {

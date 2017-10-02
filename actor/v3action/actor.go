@@ -14,13 +14,15 @@ type Warnings []string
 
 // Actor represents a V3 actor.
 type Actor struct {
+	SharedActor           SharedActor
 	CloudControllerClient CloudControllerClient
 	Config                Config
 }
 
 // NewActor returns a new V3 actor.
-func NewActor(client CloudControllerClient, config Config) *Actor {
+func NewActor(sharedActor SharedActor, client CloudControllerClient, config Config) *Actor {
 	return &Actor{
+		SharedActor:           sharedActor,
 		CloudControllerClient: client,
 		Config:                config,
 	}

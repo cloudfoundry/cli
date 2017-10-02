@@ -30,7 +30,7 @@ type SetHealthCheckCommand struct {
 func (cmd *SetHealthCheckCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor()
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {

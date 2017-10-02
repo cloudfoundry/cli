@@ -57,7 +57,7 @@ func HandleError(err error) error {
 		return translatableerror.RouteInDifferentSpaceError(e)
 	case v2action.FileChangedError:
 		return translatableerror.FileChangedError(e)
-	case v2action.EmptyDirectoryError:
+	case sharedaction.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)
 	case v2action.DomainNotFoundError:
 		return translatableerror.DomainNotFoundError(e)

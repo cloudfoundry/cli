@@ -348,6 +348,7 @@ var _ = Describe("v3-push command", func() {
 				Eventually(session.Out).Should(Say("#0\\s+crashed\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
 			})
 		})
+
 		Context("when the -p flag is provided", func() {
 			Context("when the path is a directory", func() {
 				Context("when the directory contains files", func() {

@@ -26,7 +26,7 @@ var _ = Describe("Application Actions", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v3actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, fakeConfig)
+		actor = NewActor(nil, fakeCloudControllerClient, fakeConfig)
 	})
 
 	Describe("DeleteApplicationByNameAndSpace", func() {

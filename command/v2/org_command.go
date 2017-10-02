@@ -46,7 +46,7 @@ type OrgCommand struct {
 func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor()
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -60,7 +60,7 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 			return err
 		}
 	} else {
-		cmd.ActorV3 = v3action.NewActor(ccClientV3, config)
+		cmd.ActorV3 = v3action.NewActor(nil, ccClientV3, config)
 	}
 
 	return nil

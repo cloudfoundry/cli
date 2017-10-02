@@ -36,7 +36,7 @@ func HandleError(err error) error {
 		return translatableerror.ApplicationNotFoundError(e)
 	case v3action.AssignDropletError:
 		return translatableerror.AssignDropletError(e)
-	case v3action.EmptyDirectoryError:
+	case sharedaction.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)
 	case v3action.IsolationSegmentNotFoundError:
 		return translatableerror.IsolationSegmentNotFoundError(e)
