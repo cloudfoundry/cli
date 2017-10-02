@@ -20,10 +20,11 @@ import (
 )
 
 type UpdateService struct {
-	ui          terminal.UI
-	config      coreconfig.Reader
-	serviceRepo api.ServiceRepository
-	planBuilder planbuilder.PlanBuilder
+	ui                 terminal.UI
+	config             coreconfig.Reader
+	serviceRepo        api.ServiceRepository
+	planBuilder        planbuilder.PlanBuilder
+	serviceSummaryRepo api.ServiceSummaryRepository
 }
 
 func init() {
@@ -96,6 +97,7 @@ func (cmd *UpdateService) SetDependency(deps commandregistry.Dependency, pluginC
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	cmd.planBuilder = deps.PlanBuilder
+	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()
 	return cmd
 }
 
@@ -127,6 +129,14 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) error {
 
 	var plan models.ServicePlanFields
 	if planName != "" {
+		// may need to lookup service guid if service plan is private
+		if serviceInstance.ServiceOffering.GUID == "" {
+			serviceInstance.ServiceOffering.GUID, err = cmd.findServiceGuidForInactivePlan(serviceInstanceName)
+			if err != nil {
+				cmd.ui.Failed(err.Error())
+			}
+		}
+
 		plan, err = cmd.findPlan(serviceInstance, planName)
 		if err != nil {
 			return err
@@ -146,6 +156,23 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) error {
 	return nil
 }
 
+// Find the service guid by fetching service instances in current space,
+// matching by service instance name and getting the associated service offering
+func (cmd *UpdateService) findServiceGuidForInactivePlan(serviceInstanceName string) (serviceGuid string, err error) {
+	serviceInstances, apiErr := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
+	if apiErr != nil {
+		return "", apiErr
+	}
+	for _, si := range serviceInstances {
+		if si.Name == serviceInstanceName {
+			serviceGuid = si.ServiceOffering.GUID
+			break
+		}
+	}
+	return serviceGuid, nil
+}
+
+// Find a service plan based on a service instance's service plan's service
 func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (plan models.ServicePlanFields, err error) {
 	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.GUID, cmd.config.OrganizationFields().Name)
 	if err != nil {
