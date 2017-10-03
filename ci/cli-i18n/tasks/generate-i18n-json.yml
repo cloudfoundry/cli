@@ -24,7 +24,7 @@ run:
     git clone cli-i18n updated-cli-i18n
 
     cd cli
-    make i18n
+    make i18n-extract-strings
     mv resources/*.json ../updated-cli-i18n/resources/
 
     cd ../updated-cli-i18n

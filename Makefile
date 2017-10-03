@@ -41,6 +41,9 @@ fly-windows-push : check_target_env
 i18n :
 	$(PWD)/bin/i18n-checkup
 
+i18n-extract-strings :
+	$(PWD)/bin/i18n-extract-strings
+
 integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
@@ -95,6 +98,6 @@ vet :
 	@echo  "Vetting packages for potential issues..."
 	go tool vet -all -shadow=true ./api ./actor ./command ./integration ./types ./util ./version
 
-.PHONY : all build clean i18n format version vet
+.PHONY : all build clean i18n i18n-extract-strings format version vet
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
 .PHONY : fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
