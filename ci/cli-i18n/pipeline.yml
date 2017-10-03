@@ -21,6 +21,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry/cli-i18n
     branch: master
+    trigger: true
 
 - name: cli-ci
   type: git
