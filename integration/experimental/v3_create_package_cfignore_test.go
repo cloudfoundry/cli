@@ -107,6 +107,69 @@ var _ = Describe("v3-create-package with .cfignore", func() {
 					})
 				})
 			})
+
+			Context("when pushing from a different directory", func() {
+				It("does not push those files", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						file1 := filepath.Join(appDir, "file1")
+						err := ioutil.WriteFile(file1, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						file2 := filepath.Join(appDir, "file2")
+						err = ioutil.WriteFile(file2, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-app", appName)).Should(Exit(0))
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v3-create-package", appName, "-p", appDir)
+
+						Eventually(session).Should(Exit(0))
+						helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+					})
+				})
+			})
+
+			Context("when pushing a zip file", func() {
+				var archive string
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						file1 := filepath.Join(appDir, "file1")
+						err := ioutil.WriteFile(file1, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						file2 := filepath.Join(appDir, "file2")
+						err = ioutil.WriteFile(file2, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						cfIgnoreFilePath := filepath.Join(appDir, ".cfignore")
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+						Expect(err).ToNot(HaveOccurred())
+						archive = tmpfile.Name()
+						Expect(tmpfile.Close())
+
+						err = helpers.Zipit(appDir, archive, "")
+						Expect(err).ToNot(HaveOccurred())
+					})
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+				})
+
+				It("does not push those files", func() {
+					Eventually(helpers.CF("v3-create-app", appName)).Should(Exit(0))
+					session := helpers.CF("v3-create-package", appName, "-p", archive)
+
+					Eventually(session).Should(Exit(0))
+					helpers.VerifyAppPackageContents(appName, "Staticfile", "index.html")
+				})
+			})
 		})
 
 		Context("when the CF_TRACE file is in the app source directory", func() {
