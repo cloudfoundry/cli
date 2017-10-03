@@ -86,6 +86,42 @@ var _ = Describe("Resource Actions", func() {
 					}))
 			})
 
+			Context("when the file is a symlink to an archive", func() {
+				var symlinkToArchive string
+
+				BeforeEach(func() {
+					tempFile, err := ioutil.TempFile("", "symlink-to-archive")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+					symlinkToArchive = tempFile.Name()
+					Expect(os.Remove(symlinkToArchive)).To(Succeed())
+
+					Expect(os.Symlink(archive, symlinkToArchive)).To(Succeed())
+				})
+
+				JustBeforeEach(func() {
+					resources, executeErr = actor.GatherArchiveResources(symlinkToArchive)
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(symlinkToArchive)).To(Succeed())
+				})
+
+				It("gathers a list of all files in a source archive", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(resources).To(Equal(
+						[]Resource{
+							{Filename: "/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/level2/", Mode: DefaultFolderPermissions},
+							{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: DefaultArchiveFilePermissions},
+							{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: DefaultArchiveFilePermissions},
+							{Filename: "/tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: DefaultArchiveFilePermissions},
+						}))
+				})
+			})
+
 			Context("when a .cfignore file exists in the archive", func() {
 				BeforeEach(func() {
 					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0655)
@@ -163,6 +199,39 @@ var _ = Describe("Resource Actions", func() {
 						{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
 						{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
 					}))
+			})
+
+			Context("when the provided path is a symlink to the directory", func() {
+				var tmpDir string
+
+				BeforeEach(func() {
+					tmpDir = srcDir
+
+					tmpFile, err := ioutil.TempFile("", "symlink-file-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tmpFile.Close()).To(Succeed())
+
+					srcDir = tmpFile.Name()
+					Expect(os.Remove(srcDir)).To(Succeed())
+					Expect(os.Symlink(tmpDir, srcDir)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(tmpDir)).To(Succeed())
+				})
+
+				It("gathers a list of all directories files in a source directory", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(gatheredResources).To(Equal(
+						[]Resource{
+							{Filename: "level1", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2", Mode: DefaultFolderPermissions},
+							{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4", Size: 9, Mode: 0766},
+							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
+							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
+						}))
+				})
 			})
 
 			Context("when a .cfignore file exists in the sourceDir", func() {

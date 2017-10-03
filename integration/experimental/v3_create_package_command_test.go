@@ -258,7 +258,7 @@ var _ = Describe("v3-create-package command", func() {
 
 						BeforeEach(func() {
 							helpers.WithHelloWorldApp(func(appDir string) {
-								tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+								tmpfile, err := ioutil.TempFile("", "package-archive-integration")
 								Expect(err).ToNot(HaveOccurred())
 								archive = tmpfile.Name()
 								Expect(tmpfile.Close())
@@ -272,7 +272,7 @@ var _ = Describe("v3-create-package command", func() {
 							Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
 						})
 
-						It("pushes the app from the zip file", func() {
+						It("creates and uploads the package from the zip file", func() {
 							session := helpers.CF("v3-create-package", appName, "-p", archive)
 
 							userName, _ := helpers.GetCredentials()
@@ -283,6 +283,80 @@ var _ = Describe("v3-create-package command", func() {
 							Eventually(session).Should(Exit(0))
 						})
 					})
+				})
+
+				Context("when the path is a symlink to a directory", func() {
+					var symlinkPath string
+
+					BeforeEach(func() {
+						tempFile, err := ioutil.TempFile("", "symlink-")
+						Expect(err).ToNot(HaveOccurred())
+						Expect(tempFile.Close()).To(Succeed())
+
+						symlinkPath = tempFile.Name()
+						Expect(os.Remove(symlinkPath)).To(Succeed())
+					})
+
+					AfterEach(func() {
+						Expect(os.Remove(symlinkPath)).To(Succeed())
+					})
+
+					It("creates and uploads the package from the directory", func() {
+						helpers.WithHelloWorldApp(func(appDir string) {
+							Expect(os.Symlink(appDir, symlinkPath)).To(Succeed())
+
+							session := helpers.CF("v3-create-package", appName, "-p", symlinkPath)
+							userName, _ := helpers.GetCredentials()
+
+							Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+			})
+
+			Context("when the path is a symlink to a zip file", func() {
+				var (
+					archive     string
+					symlinkPath string
+				)
+
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						tmpfile, err := ioutil.TempFile("", "package-archive-integration")
+						Expect(err).ToNot(HaveOccurred())
+						archive = tmpfile.Name()
+						Expect(tmpfile.Close())
+
+						err = helpers.Zipit(appDir, archive, "")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					tempFile, err := ioutil.TempFile("", "symlink-to-archive-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+
+					symlinkPath = tempFile.Name()
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+					Expect(os.Symlink(archive, symlinkPath)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(archive)).To(Succeed())
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+				})
+
+				It("creates and uploads the package from the zip file", func() {
+					session := helpers.CF("v3-create-package", appName, "-p", symlinkPath)
+
+					userName, _ := helpers.GetCredentials()
+
+					Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+					Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+					Eventually(session).Should(Say("OK"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 

@@ -441,6 +441,103 @@ var _ = Describe("v3-push command", func() {
 					})
 				})
 			})
+
+			Context("when the path is a symlink to a directory", func() {
+				var symlinkPath string
+
+				BeforeEach(func() {
+					tempFile, err := ioutil.TempFile("", "symlink-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+
+					symlinkPath = tempFile.Name()
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+				})
+
+				It("creates and uploads the package from the directory", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						Expect(os.Symlink(appDir, symlinkPath)).To(Succeed())
+
+						session := helpers.CF("v3-push", appName, "-p", symlinkPath)
+
+						Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
+						Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say(""))
+						Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+						Eventually(session.Out).Should(Say("requested state:\\s+started"))
+						Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+						Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
+						Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+						Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+						Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+						Eventually(session.Out).Should(Say(""))
+						Eventually(session.Out).Should(Say("web:1/1"))
+						Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+						Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			Context("when the path is a symlink to a zip file", func() {
+				var (
+					archive     string
+					symlinkPath string
+				)
+
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						tmpfile, err := ioutil.TempFile("", "package-archive-integration")
+						Expect(err).ToNot(HaveOccurred())
+						archive = tmpfile.Name()
+						Expect(tmpfile.Close())
+
+						err = helpers.Zipit(appDir, archive, "")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					tempFile, err := ioutil.TempFile("", "symlink-to-archive-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+
+					symlinkPath = tempFile.Name()
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+					Expect(os.Symlink(archive, symlinkPath)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(archive)).To(Succeed())
+					Expect(os.Remove(symlinkPath)).To(Succeed())
+				})
+
+				It("creates and uploads the package from the zip file", func() {
+					session := helpers.CF("v3-push", appName, "-p", symlinkPath)
+
+					Eventually(session.Out).Should(Say("Starting app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say("Waiting for app to start\\.\\.\\."))
+					Eventually(session.Out).Should(Say("Showing health and status for app %s in org %s / space %s as %s\\.\\.\\.", appName, orgName, spaceName, userName))
+					Eventually(session.Out).Should(Say(""))
+					Eventually(session.Out).Should(Say("name:\\s+%s", appName))
+					Eventually(session.Out).Should(Say("requested state:\\s+started"))
+					Eventually(session.Out).Should(Say("processes:\\s+web:1/1"))
+					Eventually(session.Out).Should(Say("memory usage:\\s+\\d+M x 1"))
+					Eventually(session.Out).Should(Say("routes:\\s+%s\\.%s", appName, domainName))
+					Eventually(session.Out).Should(Say("stack:\\s+cflinuxfs2"))
+					Eventually(session.Out).Should(Say("buildpacks:\\s+staticfile"))
+					Eventually(session.Out).Should(Say(""))
+					Eventually(session.Out).Should(Say("web:1/1"))
+					Eventually(session.Out).Should(Say(`state\s+since\s+cpu\s+memory\s+disk`))
+					Eventually(session.Out).Should(Say("#0\\s+running\\s+\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M"))
+
+					Eventually(session).Should(Exit(0))
+				})
+			})
 		})
 
 		Context("when the --no-route flag is set", func() {

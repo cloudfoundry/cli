@@ -632,6 +632,74 @@ var _ = Describe("Package Actions", func() {
 					})
 				})
 			})
+
+			Context("when bits path is a symlink to a directory", func() {
+				var tempDir string
+
+				BeforeEach(func() {
+					var err error
+					tempDir, err = ioutil.TempDir("", "example")
+					Expect(err).ToNot(HaveOccurred())
+
+					tempFile, err := ioutil.TempFile("", "example-file-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+
+					bitsPath = tempFile.Name()
+					Expect(os.Remove(bitsPath)).To(Succeed())
+					Expect(os.Symlink(tempDir, bitsPath)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.RemoveAll(tempDir)).To(Succeed())
+					Expect(os.Remove(bitsPath)).To(Succeed())
+				})
+
+				It("calls GatherDirectoryResources and returns without an error", func() {
+					Expect(fakeSharedActor.GatherDirectoryResourcesCallCount()).To(Equal(1))
+					Expect(fakeSharedActor.GatherDirectoryResourcesArgsForCall(0)).To(Equal(bitsPath))
+					Expect(executeErr).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when bits path is symlink to an archive", func() {
+				var archivePath string
+
+				BeforeEach(func() {
+					var err error
+					tempArchiveFile, err := ioutil.TempFile("", "bits-zip-test")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempArchiveFile.Close()).To(Succeed())
+					tempArchiveFilePath := tempArchiveFile.Name()
+
+					archivePathFile, err := ioutil.TempFile("", "example")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(archivePathFile.Close()).To(Succeed())
+					archivePath = archivePathFile.Name()
+
+					zipit(tempArchiveFilePath, archivePath, "")
+					Expect(os.Remove(tempArchiveFilePath)).To(Succeed())
+
+					tempFile, err := ioutil.TempFile("", "example-file-")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tempFile.Close()).To(Succeed())
+
+					bitsPath = tempFile.Name()
+					Expect(os.Remove(bitsPath)).To(Succeed())
+					Expect(os.Symlink(archivePath, bitsPath)).To(Succeed())
+				})
+
+				AfterEach(func() {
+					Expect(os.Remove(archivePath)).To(Succeed())
+					Expect(os.Remove(bitsPath)).To(Succeed())
+				})
+
+				It("calls GatherArchiveResources and returns without an error", func() {
+					Expect(fakeSharedActor.GatherArchiveResourcesCallCount()).To(Equal(1))
+					Expect(fakeSharedActor.GatherArchiveResourcesArgsForCall(0)).To(Equal(bitsPath))
+					Expect(executeErr).ToNot(HaveOccurred())
+				})
+			})
 		})
 	})
 })
