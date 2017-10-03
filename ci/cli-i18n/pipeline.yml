@@ -19,8 +19,9 @@ resources:
 - name: cli-i18n
   type: git
   source:
-    uri: https://github.com/cloudfoundry/cli-i18n
+    uri: git@github.com:cloudfoundry/cli-i18n.git
     branch: master
+    private_key: {{cli-i18n-github-private-key}}
     trigger: true
 
 - name: cli-ci
