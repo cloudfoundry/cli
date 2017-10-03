@@ -1,0 +1,62 @@
+---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
+resources:
+- name: cli
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    ignore_paths:
+    - ci
+    - integration
+
+- name: cli-i18n
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli-i18n
+    branch: master
+
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    paths:
+    - bin
+    - ci
+
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: {{slack-webhook-url}}
+
+groups:
+- name: cli
+  jobs:
+  - build-i18n
+
+jobs:
+- name: build-i18n
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+    - get: cli-ci
+    - get: cli-i18n
+  - task: build-i18n
+    file: cli-ci/ci/cli-i18n/tasks/generate-i18n-json.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "build i18n JSON failed :("
+  - put: cli-i18n
+    params:
+      repository: updated-cli-i18n

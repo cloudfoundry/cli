@@ -1,0 +1,32 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: cfcli/cli-base
+
+inputs:
+ - name: cli
+ - name: cli-i18n
+
+outputs:
+ - name: updated-cli-i18n
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cwd=$PWD
+
+    git clone cli-i18n updated-cli-i18n
+
+    cd cli
+    make i18n
+    mv resources/*.json ../updated-cli-i18n/resources/
+
+    cd ../updated-cli-i18n
+    git add .
+    git commit -m "updated translation files"
