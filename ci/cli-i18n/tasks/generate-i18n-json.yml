@@ -27,6 +27,9 @@ run:
     make i18n-extract-strings
     mv i18n/resources/*.json ../updated-cli-i18n/resources/
 
+    GIT_COMMIT_USERNAME="CI Bot"
+    GIT_COMMIT_EMAIL="cf-cli+i18n@pivotal.io"
+
     cd ../updated-cli-i18n
     git add .
     git commit -m "updated translation files"
