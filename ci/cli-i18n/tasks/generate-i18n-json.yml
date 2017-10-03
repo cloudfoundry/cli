@@ -25,7 +25,7 @@ run:
 
     cd cli
     make i18n-extract-strings
-    mv resources/*.json ../updated-cli-i18n/resources/
+    mv i18n/resources/*.json ../updated-cli-i18n/resources/
 
     cd ../updated-cli-i18n
     git add .
