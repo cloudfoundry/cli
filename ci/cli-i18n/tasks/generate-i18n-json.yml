@@ -22,13 +22,12 @@ run:
     cwd=$PWD
 
     git clone cli-i18n updated-cli-i18n
+    git config user.name "CI Bot"
+    git config user.email "cf-cli+i18n@pivotal.io"
 
     cd cli
     make i18n-extract-strings
     mv i18n/resources/*.json ../updated-cli-i18n/resources/
-
-    GIT_COMMIT_USERNAME="CI Bot"
-    GIT_COMMIT_EMAIL="cf-cli+i18n@pivotal.io"
 
     cd ../updated-cli-i18n
     git add .
