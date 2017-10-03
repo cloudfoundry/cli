@@ -23,6 +23,7 @@ type CommandLineSettings struct {
 	Name               string
 	ProvidedAppPath    string
 	StackName          string
+	Domain             string
 }
 
 func (settings CommandLineSettings) ApplicationPath() string {
@@ -88,12 +89,16 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.StackName = settings.StackName
 	}
 
+	if settings.Domain != "" {
+		app.Domain = settings.Domain
+	}
+
 	return app
 }
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s', Domain: '%s'",
 		settings.Name,
 		settings.Buildpack.IsSet,
 		settings.Buildpack.Value,
@@ -109,6 +114,7 @@ func (settings CommandLineSettings) String() string {
 		settings.Memory,
 		settings.ProvidedAppPath,
 		settings.StackName,
+		settings.Domain,
 	)
 }
 

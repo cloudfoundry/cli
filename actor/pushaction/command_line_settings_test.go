@@ -157,6 +157,16 @@ var _ = Describe("CommandLineSettings", func() {
 			manifest.Application{StackName: "steve"},
 			manifest.Application{StackName: "steve"},
 		),
+		Entry("overrides domain",
+			CommandLineSettings{Domain: "not-steve"},
+			manifest.Application{Domain: "steve"},
+			manifest.Application{Domain: "not-steve"},
+		),
+		Entry("passes through domain",
+			CommandLineSettings{},
+			manifest.Application{Domain: "steve"},
+			manifest.Application{Domain: "steve"},
+		),
 	)
 
 	Describe("OverrideManifestSettings", func() {

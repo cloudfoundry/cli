@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/types"
+	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,7 +39,7 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 }
 
 func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID string, existingRoutes []v2action.Route) ([]v2action.Route, Warnings, error) {
-	calculatedRoutes, unknownRoutes := actor.spitExistingRoutes(existingRoutes, routes)
+	calculatedRoutes, unknownRoutes := actor.splitExistingRoutes(routes, existingRoutes)
 	possibleDomains, err := actor.generatePossibleDomains(unknownRoutes)
 	if err != nil {
 		log.Errorln("domain breakdown:", err)
@@ -172,18 +173,18 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 	return config, createdRoutes, allWarnings, nil
 }
 
-// GetRouteWithDefaultDomain returns a route with the host and the default org
-// domain. This may be a partial route (ie no GUID) if the route does not
-// exist.
-func (actor Actor) GetRouteWithDefaultDomain(host string, orgGUID string, spaceGUID string, knownRoutes []v2action.Route) (v2action.Route, Warnings, error) {
-	defaultDomain, warnings, err := actor.DefaultDomain(orgGUID)
+// GetGeneratedRoute returns a route with the host and the default org domain.
+// This may be a partial route (ie no GUID) if the route does not exist.
+func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID string, spaceGUID string, knownRoutes []v2action.Route) (v2action.Route, Warnings, error) {
+	desiredDomain, warnings, err := actor.calculateDomain(manifestApp, orgGUID)
 	if err != nil {
-		log.Errorln("could not find default domains:", err.Error())
 		return v2action.Route{}, warnings, err
 	}
 
+	host := manifestApp.Name
+
 	defaultRoute := v2action.Route{
-		Domain:    defaultDomain,
+		Domain:    desiredDomain,
 		Host:      strings.ToLower(host),
 		SpaceGUID: spaceGUID,
 	}
@@ -205,6 +206,37 @@ func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2actio
 		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
 	}
 	return warnings, err
+}
+
+func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID string) (v2action.Domain, Warnings, error) {
+	var (
+		desiredDomain v2action.Domain
+		warnings      Warnings
+		err           error
+	)
+
+	if manifestApp.Domain == "" {
+		desiredDomain, warnings, err = actor.DefaultDomain(orgGUID)
+		if err != nil {
+			log.Errorln("could not find default domains:", err.Error())
+			return v2action.Domain{}, warnings, err
+		}
+	} else {
+		desiredDomains, getDomainWarnings, getDomainsErr := actor.V2Actor.GetDomainsByNameAndOrganization([]string{manifestApp.Domain}, orgGUID)
+		warnings = append(warnings, getDomainWarnings...)
+		if getDomainsErr != nil {
+			log.Errorln("could not find provided domains '%s':", manifestApp.Domain, getDomainsErr.Error())
+			return v2action.Domain{}, warnings, getDomainsErr
+		}
+		if len(desiredDomains) == 0 {
+			log.Errorln("could not find provided domains '%s':", manifestApp.Domain)
+			return v2action.Domain{}, warnings, v2action.DomainNotFoundError{Name: manifestApp.Domain}
+		}
+		// CC does not allow one to have shared/owned domains with the same domain name. so it's ok to take the first one
+		desiredDomain = desiredDomains[0]
+	}
+
+	return desiredDomain, warnings, nil
 }
 
 func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.Domain) ([]string, v2action.Domain, error) {
@@ -323,7 +355,7 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 	return v2action.Route{}, false
 }
 
-func (actor Actor) spitExistingRoutes(existingRoutes []v2action.Route, routes []string) ([]v2action.Route, []string) {
+func (actor Actor) splitExistingRoutes(routes []string, existingRoutes []v2action.Route) ([]v2action.Route, []string) {
 	var cachedRoutes []v2action.Route
 	for _, route := range existingRoutes {
 		cachedRoutes = append(cachedRoutes, route)

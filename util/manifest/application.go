@@ -27,6 +27,7 @@ type Application struct {
 	// Memory is the amount of memory in megabytes.
 	Memory    types.NullByteSizeInMb
 	Name      string
+	Domain    string
 	NoRoute   bool
 	Path      string
 	Routes    []string

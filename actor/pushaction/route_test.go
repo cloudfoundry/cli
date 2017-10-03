@@ -8,6 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/util/manifest"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -732,12 +733,12 @@ var _ = Describe("Routes", func() {
 		})
 	})
 
-	Describe("GetRouteWithDefaultDomain", func() {
+	Describe("GetGeneratedRoute", func() {
 		var (
-			host        string
-			orgGUID     string
-			spaceGUID   string
-			knownRoutes []v2action.Route
+			providedManifest manifest.Application
+			orgGUID          string
+			spaceGUID        string
+			knownRoutes      []v2action.Route
 
 			defaultRoute v2action.Route
 			warnings     Warnings
@@ -747,7 +748,9 @@ var _ = Describe("Routes", func() {
 		)
 
 		BeforeEach(func() {
-			host = "Some-App"
+			providedManifest = manifest.Application{
+				Name: "Some-App",
+			}
 			orgGUID = "some-org-guid"
 			spaceGUID = "some-space-guid"
 			knownRoutes = nil
@@ -759,112 +762,200 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			defaultRoute, warnings, executeErr = actor.GetRouteWithDefaultDomain(host, orgGUID, spaceGUID, knownRoutes)
+			defaultRoute, warnings, executeErr = actor.GetGeneratedRoute(providedManifest, orgGUID, spaceGUID, knownRoutes)
 		})
 
-		Context("when retrieving the domains is successful", func() {
+		Context("the domain is provided", func() {
 			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{domain},
-					v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"},
-					nil,
-				)
+				providedManifest.Domain = "some-private-domain"
 			})
 
-			Context("when the route exists", func() {
+			Context("when the provided domain exists", func() {
 				BeforeEach(func() {
-					// Assumes new route
-					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{
-						Domain:    domain,
-						GUID:      "some-route-guid",
-						Host:      strings.ToLower(host),
-						SpaceGUID: spaceGUID,
-					}, v2action.Warnings{"get-route-warnings"}, nil)
+					fakeV2Actor.GetDomainsByNameAndOrganizationReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
 				})
 
-				It("returns the route and warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
-
-					Expect(defaultRoute).To(Equal(v2action.Route{
-						Domain:    domain,
-						GUID:      "some-route-guid",
-						Host:      strings.ToLower(host),
-						SpaceGUID: spaceGUID,
-					}))
-
-					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
-
-					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
-					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(host), SpaceGUID: spaceGUID}))
-				})
-
-				Context("when the route has been found", func() {
+				Context("when the route does not exist", func() {
 					BeforeEach(func() {
-						knownRoutes = []v2action.Route{{
-							Domain:    domain,
-							GUID:      "some-route-guid",
-							Host:      strings.ToLower(host),
-							SpaceGUID: spaceGUID,
-						}}
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
 					})
 
-					It("should return the known route and warnings", func() {
+					It("it uses the provided domain instead of the first shared domain", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning", "get-route-warnings"))
+						Expect(defaultRoute).To(Equal(v2action.Route{
+							Domain:    domain,
+							Host:      strings.ToLower(providedManifest.Name),
+							SpaceGUID: spaceGUID,
+						}))
+
+						Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))
+						domainNamesArg, orgGUIDArg := fakeV2Actor.GetDomainsByNameAndOrganizationArgsForCall(0)
+						Expect(domainNamesArg).To(Equal([]string{"some-private-domain"}))
+						Expect(orgGUIDArg).To(Equal(orgGUID))
+					})
+				})
+
+				Context("when the route exists in the current space", func() {
+					var route v2action.Route
+
+					BeforeEach(func() {
+						route = v2action.Route{
+							Domain:    domain,
+							GUID:      "some-route-guid",
+							Host:      strings.ToLower(providedManifest.Name),
+							SpaceGUID: spaceGUID,
+						}
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(route, v2action.Warnings{"get-route-warnings"}, nil)
+					})
+
+					It("returns the route and warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning", "get-route-warnings"))
+						Expect(defaultRoute).To(Equal(route))
+					})
+				})
+
+				Context("when finding the route errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("some crazy stuff")
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, expectedErr)
+					})
+
+					It("returns the warnings and errors", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning", "get-route-warnings"))
+					})
+				})
+			})
+
+			Context("when the provided domain does not exist", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetDomainsByNameAndOrganizationReturns(
+						[]v2action.Domain{},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
+				})
+
+				It("returns an DomainNotFoundError", func() {
+					Expect(executeErr).To(MatchError(v2action.DomainNotFoundError{Name: "some-private-domain"}))
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+				})
+			})
+		})
+
+		Context("when the domain is not provided", func() {
+			Context("when retrieving the domains is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"},
+						nil,
+					)
+				})
+
+				Context("when the route exists", func() {
+					BeforeEach(func() {
+						// Assumes new route
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{
+							Domain:    domain,
+							GUID:      "some-route-guid",
+							Host:      strings.ToLower(providedManifest.Name),
+							SpaceGUID: spaceGUID,
+						}, v2action.Warnings{"get-route-warnings"}, nil)
+					})
+
+					It("returns the route and warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 
 						Expect(defaultRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							GUID:      "some-route-guid",
-							Host:      strings.ToLower(host),
+							Host:      strings.ToLower(providedManifest.Name),
 							SpaceGUID: spaceGUID,
 						}))
 
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+						Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
+
+						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
+						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(providedManifest.Name), SpaceGUID: spaceGUID}))
+					})
+
+					Context("when the route has been found", func() {
+						BeforeEach(func() {
+							knownRoutes = []v2action.Route{{
+								Domain:    domain,
+								GUID:      "some-route-guid",
+								Host:      strings.ToLower(providedManifest.Name),
+								SpaceGUID: spaceGUID,
+							}}
+						})
+
+						It("should return the known route and warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+
+							Expect(defaultRoute).To(Equal(v2action.Route{
+								Domain:    domain,
+								GUID:      "some-route-guid",
+								Host:      strings.ToLower(providedManifest.Name),
+								SpaceGUID: spaceGUID,
+							}))
+
+							Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+						})
+					})
+				})
+
+				Context("when the route does not exist", func() {
+					BeforeEach(func() {
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+					})
+
+					It("returns a partial route", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+
+						Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(providedManifest.Name), SpaceGUID: spaceGUID}))
+					})
+				})
+
+				Context("when retrieving the routes errors", func() {
+					var expectedErr error
+
+					BeforeEach(func() {
+						expectedErr = errors.New("whoops")
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, expectedErr)
+					})
+
+					It("returns errors and warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
 					})
 				})
 			})
 
-			Context("when the route does not exist", func() {
-				BeforeEach(func() {
-					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
-				})
-
-				It("returns a partial route", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
-
-					Expect(defaultRoute).To(Equal(v2action.Route{Domain: domain, Host: strings.ToLower(host), SpaceGUID: spaceGUID}))
-				})
-			})
-
-			Context("when retrieving the routes errors", func() {
+			Context("when retrieving the domains errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
 					expectedErr = errors.New("whoops")
-					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, expectedErr)
+					fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, expectedErr)
 				})
 
 				It("returns errors and warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 				})
-			})
-		})
-
-		Context("when retrieving the domains errors", func() {
-			var expectedErr error
-
-			BeforeEach(func() {
-				expectedErr = errors.New("whoops")
-				fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, expectedErr)
-			})
-
-			It("returns errors and warnings", func() {
-				Expect(executeErr).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 			})
 		})
 	})

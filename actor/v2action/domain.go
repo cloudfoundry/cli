@@ -74,7 +74,7 @@ func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 }
 
 // GetDomainsByNameAndOrganization returns back a list of domains given a list
-// of domains and the organization GUID. If no domains are given, than this
+// of domains names and the organization GUID. If no domains are given, than this
 // command will not lookup any domains.
 func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID string) ([]Domain, Warnings, error) {
 	if len(domainNames) == 0 {

@@ -21,6 +21,7 @@ func (e NoDomainsFoundError) Error() string {
 // the first one in the list as the default.
 func (actor Actor) DefaultDomain(orgGUID string) (v2action.Domain, Warnings, error) {
 	log.Infoln("getting org domains for org GUID:", orgGUID)
+	// the domains object contains all the shared domains AND all domains private to this org
 	domains, warnings, err := actor.V2Actor.GetOrganizationDomains(orgGUID)
 	if err != nil {
 		log.Errorln("searching for domains in org:", err)

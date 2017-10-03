@@ -74,7 +74,6 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			log.Debug("using empty app as base")
 			config.DesiredApplication = constructedApp
 		}
-
 		config.DesiredApplication = actor.overrideApplicationProperties(config.DesiredApplication, app, noStart)
 
 		var stackWarnings Warnings
@@ -94,7 +93,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		}
 
 		var routeWarnings Warnings
-		config, routeWarnings, err = actor.configureRoutes(app.Routes, orgGUID, spaceGUID, config)
+		config, routeWarnings, err = actor.configureRoutes(app, orgGUID, spaceGUID, config)
 		warnings = append(warnings, routeWarnings...)
 		if err != nil {
 			log.Errorln("determining routes:", err)
@@ -113,22 +112,25 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 	return configs, warnings, nil
 }
 
-func (actor Actor) configureRoutes(routesInManifest []string, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
-	if len(routesInManifest) > 0 {
-		var warnings Warnings
-		var err error
-		config.DesiredRoutes, warnings, err = actor.CalculateRoutes(routesInManifest, orgGUID, spaceGUID, config.CurrentRoutes)
+func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
+	var (
+		warnings Warnings
+		err      error
+	)
+
+	if len(manifestApp.Routes) > 0 {
+		config.DesiredRoutes, warnings, err = actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
 		return config, warnings, err
 	}
 
-	defaultRoute, warnings, err := actor.GetRouteWithDefaultDomain(config.DesiredApplication.Name, orgGUID, spaceGUID, config.CurrentRoutes)
+	desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
 	if err != nil {
 		log.Errorln("getting default route:", err)
 		return config, warnings, err
 	}
 
 	// TODO: when working with all of routes, append to current route
-	config.DesiredRoutes = append(config.CurrentRoutes, defaultRoute)
+	config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
 	return config, warnings, nil
 }
 
