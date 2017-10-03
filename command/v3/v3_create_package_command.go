@@ -22,9 +22,10 @@ type V3CreatePackageActor interface {
 }
 
 type V3CreatePackageCommand struct {
-	RequiredArgs flag.AppName     `positional-args:"yes"`
-	DockerImage  flag.DockerImage `long:"docker-image" short:"o" description:"Docker-image to be used (e.g. user/docker-image-name)"`
-	usage        interface{}      `usage:"CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
+	RequiredArgs flag.AppName                `positional-args:"yes"`
+	DockerImage  flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
+	AppPath      flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	usage        interface{}                 `usage:"CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
 
 	UI          command.UI
 	Config      command.Config
@@ -59,6 +60,12 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
+	if cmd.DockerImage.Path != "" && cmd.AppPath != "" {
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--docker-image", "-o", "-p"},
+		}
+	}
+
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err
@@ -82,7 +89,7 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 	if isDockerImage {
 		pkg, warnings, err = cmd.Actor.CreateDockerPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, v3action.DockerImageCredentials{Path: cmd.DockerImage.Path})
 	} else {
-		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "")
+		pkg, warnings, err = cmd.Actor.CreateAndUploadBitsPackageByApplicationNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, string(cmd.AppPath))
 	}
 
 	cmd.UI.DisplayWarnings(warnings)

@@ -1,6 +1,10 @@
 package experimental
 
 import (
+	"io/ioutil"
+	"os"
+	"regexp"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -31,7 +35,8 @@ var _ = Describe("v3-create-package command", func() {
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf v3-create-package APP_NAME \\[--docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))
-				Eventually(session).Should(Say("--docker-image, -o\\s+Docker-image to be used \\(e.g. user/docker-image-name\\)"))
+				Eventually(session).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
+				Eventually(session).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -42,6 +47,26 @@ var _ = Describe("v3-create-package command", func() {
 			session := helpers.CF("v3-create-package")
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `APP_NAME` was not provided"))
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when the -p flag is not given an arg", func() {
+		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+			session := helpers.CF("v3-create-package", appName, "-p")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: expected argument for flag `-p'"))
+			Eventually(session.Out).Should(Say("NAME:"))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("when the -p flag path does not exist", func() {
+		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
+			session := helpers.CF("v3-create-package", appName, "-p", "path/that/does/not/exist")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: The specified path 'path/that/does/not/exist' does not exist."))
 			Eventually(session.Out).Should(Say("NAME:"))
 			Eventually(session).Should(Exit(1))
 		})
@@ -185,6 +210,90 @@ var _ = Describe("v3-create-package command", func() {
 						Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			Context("when the -p flag is provided", func() {
+				Context("when the path is a directory", func() {
+					Context("when the directory contains files", func() {
+						It("creates and uploads the package from the directory", func() {
+							helpers.WithHelloWorldApp(func(appDir string) {
+								session := helpers.CF("v3-create-package", appName, "-p", appDir)
+								userName, _ := helpers.GetCredentials()
+
+								Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+								Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+								Eventually(session).Should(Say("OK"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
+					})
+
+					Context("when the directory is empty", func() {
+						var emptyDir string
+
+						BeforeEach(func() {
+							var err error
+							emptyDir, err = ioutil.TempDir("", "integration-push-path-empty")
+							Expect(err).ToNot(HaveOccurred())
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(emptyDir)).ToNot(HaveOccurred())
+						})
+
+						It("returns an error", func() {
+							session := helpers.CF("v3-create-package", appName, "-p", emptyDir)
+							// TODO: Modify this after changing code if necessary
+							Eventually(session.Err).Should(Say("No app files found in '%s'", regexp.QuoteMeta(emptyDir)))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				Context("when the path is a zip file", func() {
+					Context("pushing a zip file", func() {
+						var archive string
+
+						BeforeEach(func() {
+							helpers.WithHelloWorldApp(func(appDir string) {
+								tmpfile, err := ioutil.TempFile("", "push-archive-integration")
+								Expect(err).ToNot(HaveOccurred())
+								archive = tmpfile.Name()
+								Expect(tmpfile.Close())
+
+								err = helpers.Zipit(appDir, archive, "")
+								Expect(err).ToNot(HaveOccurred())
+							})
+						})
+
+						AfterEach(func() {
+							Expect(os.RemoveAll(archive)).ToNot(HaveOccurred())
+						})
+
+						It("pushes the app from the zip file", func() {
+							session := helpers.CF("v3-create-package", appName, "-p", archive)
+
+							userName, _ := helpers.GetCredentials()
+
+							Eventually(session).Should(Say("Uploading and creating bits package for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName))
+							Eventually(session).Should(Say("package guid: %s", helpers.GUIDRegex))
+							Eventually(session).Should(Say("OK"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+			})
+
+			Context("when the -o and -p flags are provided together", func() {
+				It("displays an error and exits 1", func() {
+					helpers.WithHelloWorldApp(func(appDir string) {
+						session := helpers.CF("v3-create-package", appName, "-o", PublicDockerImage, "-p", appDir)
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --docker-image, -o, -p"))
+						Eventually(session.Out).Should(Say("NAME:"))
+						Eventually(session).Should(Exit(1))
 					})
 				})
 			})

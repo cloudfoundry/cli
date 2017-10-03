@@ -142,7 +142,7 @@ var _ = Describe("v3-create-package Command", func() {
 			})
 		})
 
-		Context("when the --docker-image flag is set", func() {
+		Context("when the docker image is provided", func() {
 			BeforeEach(func() {
 				cmd.DockerImage.Path = "some-docker-image"
 				fakeActor.CreateDockerPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
@@ -164,6 +164,44 @@ var _ = Describe("v3-create-package Command", func() {
 				Expect(appName).To(Equal(app))
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(dockerImageCredentials.Path).To(Equal("some-docker-image"))
+			})
+		})
+
+		Context("when the path is provided", func() {
+			BeforeEach(func() {
+				cmd.AppPath = "some-app-path"
+				fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceReturns(v3action.Package{GUID: "1234"}, v3action.Warnings{"I am a warning", "I am also a warning"}, nil)
+			})
+
+			It("creates the package using the specified directory", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+
+				Expect(testUI.Out).To(Say("Uploading and creating bits package for app some-app in org some-org / space some-space as banana..."))
+
+				Expect(testUI.Err).To(Say("I am a warning"))
+				Expect(testUI.Err).To(Say("I am also a warning"))
+
+				Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+
+				appName, spaceGUID, appPath := fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceArgsForCall(0)
+				Expect(appName).To(Equal(app))
+				Expect(spaceGUID).To(Equal("some-space-guid"))
+				Expect(appPath).To(Equal("some-app-path"))
+			})
+		})
+
+		Context("when the docker image and path are both provided", func() {
+			BeforeEach(func() {
+				cmd.AppPath = "some-app-path"
+				cmd.DockerImage.Path = "some-docker-image"
+			})
+
+			It("displays an argument combination error", func() {
+				argumentCombinationError := translatableerror.ArgumentCombinationError{
+					Args: []string{"--docker-image", "-o", "-p"},
+				}
+
+				Expect(executeErr).To(MatchError(argumentCombinationError))
 			})
 		})
 	})
