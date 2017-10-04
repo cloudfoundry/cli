@@ -19,7 +19,7 @@ resources:
 - name: cli-i18n
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli-i18n.git
+    uri: git@github.com:cloudfoundry/cli-i18n
     branch: master
     private_key: {{cli-i18n-github-private-key}}
     trigger: true
@@ -59,6 +59,8 @@ jobs:
        params:
          channel: '#cli-firehose'
          text: "build i18n JSON failed :("
-  - put: cli-i18n
-    params:
-      repository: updated-cli-i18n
+    ensure:
+      put: cli-i18n
+        params:
+          repository: updated-cli-i18n
+          rebase: true
