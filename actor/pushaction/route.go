@@ -154,7 +154,7 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 		if route.GUID == "" {
 			log.WithField("route", route).Debug("creating route")
 
-			createdRoute, warnings, err := actor.V2Actor.CreateRoute(route, false)
+			createdRoute, warnings, err := actor.V2Actor.CreateRoute(route, route.RandomTCPPort())
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				log.Errorln("creating route:", err)
@@ -181,7 +181,11 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 		return v2action.Route{}, warnings, err
 	}
 
-	host := manifestApp.Name
+	var host string
+
+	if desiredDomain.IsHTTP() {
+		host = manifestApp.Name
+	}
 
 	defaultRoute := v2action.Route{
 		Domain:    desiredDomain,

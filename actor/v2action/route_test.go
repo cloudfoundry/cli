@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -45,6 +46,58 @@ var _ = Describe("Route Actions", func() {
 			Entry("has domain, port", "", "domain.com", "", types.NullInt{IsSet: true, Value: 3333}, "domain.com:3333"),
 			Entry("has host, domain, path, port", "host", "domain.com", "/path", types.NullInt{IsSet: true, Value: 3333}, "host.domain.com:3333/path"),
 		)
+
+		Describe("RandomRoute", func() {
+			var (
+				route  Route
+				domain Domain
+				port   types.NullInt
+			)
+
+			JustBeforeEach(func() {
+				route = Route{
+					Domain: domain,
+					Port:   port,
+				}
+			})
+
+			Context("when the domain is a tcp domain and there is no port specified", func() {
+				BeforeEach(func() {
+					domain = Domain{
+						RouterGroupType: constant.TCPRouterGroup,
+					}
+					port = types.NullInt{}
+				})
+
+				It("returns true", func() {
+					Expect(route.RandomTCPPort()).To(BeTrue())
+				})
+			})
+
+			Context("when the domain is a tcp domain and the port is specified", func() {
+				BeforeEach(func() {
+					domain = Domain{
+						RouterGroupType: constant.TCPRouterGroup,
+					}
+					port = types.NullInt{IsSet: true}
+				})
+
+				It("returns false", func() {
+					Expect(route.RandomTCPPort()).To(BeFalse())
+				})
+			})
+
+			Context("when the domain is a not tcp domain", func() {
+				BeforeEach(func() {
+					domain = Domain{}
+					port = types.NullInt{}
+				})
+
+				It("returns false", func() {
+					Expect(route.RandomTCPPort()).To(BeFalse())
+				})
+			})
+		})
 	})
 
 	Describe("BindRouteToApplication", func() {
@@ -1159,6 +1212,19 @@ var _ = Describe("Route Actions", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(returnedRoute).To(Equal(existingRoute))
 				Expect(warnings).To(ConsistOf("get route warning", "get domain warning"))
+			})
+		})
+
+		Context("when the route uses a TCP domain", func() {
+			BeforeEach(func() {
+				route.Domain.RouterGroupType = constant.TCPRouterGroup
+			})
+
+			// TODO: Should return only when RandomTCPPort is true, fill in more
+			// tests once TCP routing feature has been added.
+			It("returns RouteNotFoundError", func() {
+				Expect(executeErr).To(MatchError(RouteNotFoundError{DomainGUID: route.Domain.GUID}))
+				Expect(warnings).To(BeEmpty())
 			})
 		})
 

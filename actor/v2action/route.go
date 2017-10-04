@@ -69,12 +69,18 @@ type Route struct {
 	SpaceGUID string
 }
 
+func (r Route) RandomTCPPort() bool {
+	return r.Domain.IsTCP() && !r.Port.IsSet
+}
+
 // String formats the route in a human readable format.
 func (r Route) String() string {
 	routeString := r.Domain.Name
 
 	if r.Port.IsSet {
 		routeString = fmt.Sprintf("%s:%d", routeString, r.Port.Value)
+	} else if r.RandomTCPPort() {
+		routeString = fmt.Sprintf("%s:????", routeString)
 	}
 
 	if r.Host != "" {
@@ -223,7 +229,11 @@ func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
 // exists anywhere in the system. When the route exists in another space,
 // RouteInDifferentSpaceError is returned.
 func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnings, error) {
-	// TODO: Use a more generic search mechanism to support path, port, and no host
+	// TODO: Implement TCP Route lookup. Be sure to handle case of RandomTCPPort.
+	if route.Domain.IsTCP() {
+		return Route{}, nil, RouteNotFoundError{DomainGUID: route.Domain.GUID}
+	}
+
 	existingRoute, warnings, err := actor.GetRouteByHostAndDomain(route.Host, route.Domain.GUID)
 	if routeNotFoundErr, ok := err.(RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
