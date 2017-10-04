@@ -28,8 +28,8 @@ run:
 
     cd ../updated-cli-i18n
 
-    git config user.name "CI Bot"
-    git config user.email "cf-cli+i18n@pivotal.io"
+    git config --global user.name "CI Bot"
+    git config --global user.email "cf-cli+i18n@pivotal.io"
 
     git add .
     git commit -m "updated translation files"
