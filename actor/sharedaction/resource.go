@@ -122,13 +122,13 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 		return nil, err
 	}
 
-	sourceDir, err = filepath.EvalSymlinks(sourceDir)
+	evalDir, err := filepath.EvalSymlinks(sourceDir)
 	if err != nil {
 		log.Errorln("evaluating symlink:", err)
 		return nil, err
 	}
 
-	walkErr := filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(evalDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -138,7 +138,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 			return nil
 		}
 
-		relPath, err := filepath.Rel(sourceDir, path)
+		relPath, err := filepath.Rel(evalDir, path)
 		if err != nil {
 			return err
 		}
