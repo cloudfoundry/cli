@@ -61,6 +61,6 @@ jobs:
          text: "build i18n JSON failed :("
     ensure:
       put: cli-i18n
-        params:
-          repository: updated-cli-i18n
-          rebase: true
+      params:
+        repository: updated-cli-i18n
+        rebase: true
