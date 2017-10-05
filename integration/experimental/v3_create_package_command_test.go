@@ -33,7 +33,7 @@ var _ = Describe("v3-create-package command", func() {
 				Eventually(session).Should(Say("NAME:"))
 				Eventually(session).Should(Say("v3-create-package - Uploads a V3 Package"))
 				Eventually(session).Should(Say("USAGE:"))
-				Eventually(session).Should(Say("cf v3-create-package APP_NAME \\[--docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]\\]"))
+				Eventually(session).Should(Say("cf v3-create-package APP_NAME \\[-p APP_PATH \\| --docker-image \\[REGISTRY_HOST:PORT/\\]IMAGE\\[:TAG\\]\\]"))
 				Eventually(session).Should(Say("OPTIONS:"))
 				Eventually(session).Should(Say("--docker-image, -o\\s+Docker image to use \\(e\\.g\\. user/docker-image-name\\)"))
 				Eventually(session).Should(Say("-p\\s+Path to app directory or to a zip file of the contents of the app directory"))

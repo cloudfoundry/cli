@@ -25,7 +25,7 @@ type V3CreatePackageCommand struct {
 	RequiredArgs flag.AppName                `positional-args:"yes"`
 	DockerImage  flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	AppPath      flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
-	usage        interface{}                 `usage:"CF_NAME v3-create-package APP_NAME [--docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
+	usage        interface{}                 `usage:"CF_NAME v3-create-package APP_NAME [-p APP_PATH | --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG]]"`
 
 	UI          command.UI
 	Config      command.Config
