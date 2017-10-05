@@ -29,3 +29,5 @@ i18n4go -c extract-strings -e strings/excluded.json -s strings/specialStrings.js
 i18n4go -c merge-strings -d ${tmpdir}
 
 i18n4go -c create-translations -f ${tmpdir}/en.all.json -languages "de-de,en-us,es-es,fr-fr,it-it,ja-jp,ko-kr,pt-br,zh-hans,zh-hant"
+
+go run bin/reformat_translated_json.go ./
