@@ -131,6 +131,13 @@ jobs:
       params:
         repository: updated-vars-store
         rebase: true
+  - task: bosh-cleanup
+    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
+    input_mapping:
+      bbl-state: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/beque
+      CLEAN_ALL: true
 
 - name: delete-cf
   serial_groups: [beque]
