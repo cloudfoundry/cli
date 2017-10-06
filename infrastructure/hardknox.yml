@@ -148,7 +148,7 @@ jobs:
     - get: cf-deployment-concourse-tasks
     - get: state
     - get: cli-ci
-  - task: setup-infrastructure
+  - task: smoke-tests
     file: cli-ci/ci/infrastructure/tasks/cf-smoke-tests.yml
     input_mapping:
       bbl-state: state

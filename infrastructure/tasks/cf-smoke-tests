@@ -10,7 +10,7 @@ function main() {
 }
 
 function run_smoke_tests() {
-  bosh -d cf run-errand smoke_tests
+  bosh -d cf run-errand smoke-tests
 }
 
 main
