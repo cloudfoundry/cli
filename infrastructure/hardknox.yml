@@ -4,6 +4,7 @@ groups:
   jobs:
   - setup-infrastructure
   - deploy-cf
+  - smoke-tests
 - name: delete
   jobs:
   - delete-cf
@@ -146,8 +147,9 @@ jobs:
   - aggregate:
     - get: cf-deployment-concourse-tasks
     - get: state
+    - get: cli-ci
   - task: setup-infrastructure
-    file: cli-ci/ci/infrastructure/tasks/smoke-tests.yml
+    file: cli-ci/ci/infrastructure/tasks/cf-smoke-tests.yml
     input_mapping:
       bbl-state: state
       cli-infrastructure-tasks: cli-ci
