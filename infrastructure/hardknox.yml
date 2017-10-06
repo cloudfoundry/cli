@@ -139,6 +139,21 @@ jobs:
       BBL_STATE_DIR: ci/infrastructure/hardknox
       CLEAN_ALL: true
 
+- name: smoke-tests
+  serial_groups: [hardknox]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: setup-infrastructure
+    file: cli-ci/ci/infrastructure/tasks/smoke-tests.yml
+    input_mapping:
+      bbl-state: state
+      cli-infrastructure-tasks: cli-ci
+    params:
+      BBL_STATE_DIR: ci/infrastructure/hardknox
+
 - name: delete-cf
   serial_groups: [hardknox]
   build_logs_to_retain: 100
