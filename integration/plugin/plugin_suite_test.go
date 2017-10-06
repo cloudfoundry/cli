@@ -67,6 +67,7 @@ var _ = BeforeEach(func() {
 })
 
 var _ = AfterEach(func() {
+	GinkgoWriter.Write([]byte("==============================After Each=============================="))
 	helpers.DestroyHomeDir(homeDir)
 })
 

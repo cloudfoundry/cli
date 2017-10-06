@@ -4,17 +4,25 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
 
+const (
+	DebugCommandPrefix = "\nCMD>"
+	DebugOutPrefix     = "OUT: "
+	DebugErrPrefix     = "ERR: "
+)
+
 func CF(args ...string) *Session {
+	WriteCommand(args)
 	session, err := Start(
 		exec.Command("cf", args...),
-		NewPrefixedWriter("OUT: ", GinkgoWriter),
-		NewPrefixedWriter("ERR: ", GinkgoWriter))
+		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
+		NewPrefixedWriter(DebugErrPrefix, GinkgoWriter))
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
@@ -42,25 +50,32 @@ func CustomCF(cfEnv CFEnv, args ...string) *Session {
 		command.Env = env
 	}
 
+	WriteCommand(args)
 	session, err := Start(
 		command,
-		NewPrefixedWriter("OUT: ", GinkgoWriter),
-		NewPrefixedWriter("ERR: ", GinkgoWriter))
+		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
+		NewPrefixedWriter(DebugErrPrefix, GinkgoWriter))
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
 
 func CFWithStdin(stdin io.Reader, args ...string) *Session {
+	WriteCommand(args)
 	command := exec.Command("cf", args...)
 	command.Stdin = stdin
 	session, err := Start(
 		command,
-		NewPrefixedWriter("OUT: ", GinkgoWriter),
-		NewPrefixedWriter("ERR: ", GinkgoWriter))
+		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
+		NewPrefixedWriter(DebugErrPrefix, GinkgoWriter))
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
 
 func CFWithEnv(envVars map[string]string, args ...string) *Session {
 	return CustomCF(CFEnv{EnvVars: envVars}, args...)
+}
+
+func WriteCommand(args []string) {
+	display := append([]string{DebugCommandPrefix, "cf"}, args...)
+	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " ")))
 }
