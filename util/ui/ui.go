@@ -118,6 +118,18 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	}
 }
 
+func (ui *UI) GetIn() io.Reader {
+	return ui.In
+}
+
+func (ui *UI) GetOut() io.Writer {
+	return ui.Out
+}
+
+func (ui *UI) GetErr() io.Writer {
+	return ui.Err
+}
+
 // DisplayBoolPrompt outputs the prompt and waits for user input. It only
 // allows for a boolean response. A default boolean response can be set with
 // defaultResponse.
