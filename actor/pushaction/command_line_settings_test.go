@@ -19,20 +19,6 @@ var _ = Describe("CommandLineSettings", func() {
 		settings = CommandLineSettings{}
 	})
 
-	Describe("ApplicationPath", func() {
-		// more tests under command_line_settings_*OS*_test.go
-
-		Context("when ProvidedAppPath is *not* set", func() {
-			BeforeEach(func() {
-				settings.CurrentDirectory = "current-dir"
-			})
-
-			It("returns the CurrentDirectory", func() {
-				Expect(settings.ApplicationPath()).To(Equal("current-dir"))
-			})
-		})
-	})
-
 	DescribeTable("OverrideManifestSettings",
 		func(settings CommandLineSettings, input manifest.Application, output manifest.Application) {
 			Expect(settings.OverrideManifestSettings(input)).To(Equal(output))

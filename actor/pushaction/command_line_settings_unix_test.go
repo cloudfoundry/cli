@@ -14,21 +14,6 @@ import (
 var _ = Describe("CommandLineSettings with provided path", func() {
 	const currentDirectory = "/some/current-directory"
 
-	Describe("ApplicationPath with provided path", func() {
-		DescribeTable("ApplicationPath", func(providedAppPath string, expectedPath string) {
-			settings := CommandLineSettings{
-				CurrentDirectory: currentDirectory,
-				ProvidedAppPath:  providedAppPath,
-			}
-
-			Expect(settings.ApplicationPath()).To(Equal(expectedPath))
-		},
-
-			Entry("path = provided path; provided path is absolute", "/some/path", "/some/path"),
-			Entry("path = full path to provided path; provided path is relative", "./some-path", "/some/current-directory/some-path"),
-		)
-	})
-
 	Describe("OverrideManifestSettings", func() {
 		DescribeTable("Path", func(providedAppPath string, manifestPath string, expectedPath string) {
 			settings := CommandLineSettings{

@@ -26,13 +26,6 @@ type CommandLineSettings struct {
 	Domain             string
 }
 
-func (settings CommandLineSettings) ApplicationPath() string {
-	if settings.ProvidedAppPath != "" {
-		return settings.absoluteProvidedAppPath()
-	}
-	return settings.CurrentDirectory
-}
-
 func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Application) manifest.Application {
 	if settings.Buildpack.IsSet {
 		app.Buildpack = settings.Buildpack
