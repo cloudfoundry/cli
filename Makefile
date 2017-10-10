@@ -12,7 +12,7 @@ all : test build
 
 build : out/cf
 
-check_target_env :
+check-target-env :
 ifndef CF_API
 	$(error CF_API is undefined)
 endif
@@ -26,16 +26,16 @@ clean :
 format :
 	go fmt ./...
 
-fly-windows-experimental : check_target_env
+fly-windows-experimental : check-target-env
 	CF_CLI_EXPERIMENTAL=true CF_TEST_SUITE=./integration/experimental fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ -x
 
-fly-windows-isolated : check_target_env
+fly-windows-isolated : check-target-env
 	CF_TEST_SUITE=./integration/isolated fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ -x
 
-fly-windows-plugin : check_target_env
+fly-windows-plugin : check-target-env
 	CF_TEST_SUITE=./integration/plugin fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ -x
 
-fly-windows-push : check_target_env
+fly-windows-push : check-target-env
 	CF_TEST_SUITE=./integration/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ -x
 
 i18n :
@@ -100,4 +100,4 @@ vet :
 
 .PHONY : all build clean i18n i18n-extract-strings format version vet
 .PHONY : test units units-full integration integration-tests-full integration-cleanup integration-experimental integration-plugin integration-isolated integration-push
-.PHONY : fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
+.PHONY : check-target-env fly-windows-experimental fly-windows-isolated fly-windows-plugin fly-windows-push
