@@ -2,7 +2,6 @@ package v2_test
 
 import (
 	"errors"
-	"time"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -53,12 +52,6 @@ var _ = Describe("org Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	Context("when it's been six months from April 2017", func() {
-		It("should stop calling CloudControllerAPIVersion() in: org, space, target, create-isolation-segment, delete-isolation-segment, disable-org-isolation, enable-org-isolation, isolation-segments, set-space-isolation, run-task, tasks, terminate-task", func() {
-			Expect(time.Now()).Should(BeTemporally("<", time.Date(2017, 10, 7, 0, 0, 0, 0, new(time.Location))))
-		})
 	})
 
 	Context("when checking the target fails", func() {
