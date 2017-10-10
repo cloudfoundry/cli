@@ -1,8 +1,6 @@
 package translatableerror
 
-type DockerPasswordNotSetError struct {
-	URL string
-}
+type DockerPasswordNotSetError struct{}
 
 func (DockerPasswordNotSetError) Error() string {
 	return "Environment variable CF_DOCKER_PASSWORD not set."

@@ -49,5 +49,34 @@ var _ = Describe("CommandLineSettings with provided path", func() {
 			Entry("path = absolute provided path; provided relative path and manifest path are not empty", "some-provided-path", "some-manifest-path", "/some/current-directory/some-provided-path"),
 			Entry("path = provided path; provided path is absolute", "/some-provided-path", "", "/some-provided-path"),
 		)
+
+		Context("when docker image is provided but path is not", func() {
+			Context("when the image is provided via command line setting", func() {
+				It("does not set path", func() {
+					settings := CommandLineSettings{
+						CurrentDirectory: currentDirectory,
+						DockerImage:      "some-image",
+					}
+
+					app := settings.OverrideManifestSettings(manifest.Application{})
+
+					Expect(app.Path).To(BeEmpty())
+				})
+			})
+
+			Context("when the image is provided via manifest", func() {
+				It("does not set path", func() {
+					settings := CommandLineSettings{
+						CurrentDirectory: currentDirectory,
+					}
+
+					app := settings.OverrideManifestSettings(manifest.Application{
+						DockerImage: "some-image",
+					})
+
+					Expect(app.Path).To(BeEmpty())
+				})
+			})
+		})
 	})
 })

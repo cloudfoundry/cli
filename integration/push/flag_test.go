@@ -31,14 +31,6 @@ var _ = Describe("flag combinations", func() {
 		})
 	})
 
-	Context("when CF_DOCKER_PASSWORD is *not* set", func() {
-		It("errors with usage", func() {
-			session := helpers.CF(PushCommandName, "--docker-username", "some-docker-username", "--docker-image", "some-docker-image", appName)
-			Eventually(session.Err).Should(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-			Eventually(session).Should(Exit(1))
-		})
-	})
-
 	Context("when the -p and -o flags are used together", func() {
 		var path string
 

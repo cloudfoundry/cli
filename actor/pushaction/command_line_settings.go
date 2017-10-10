@@ -81,7 +81,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	if settings.ProvidedAppPath != "" {
 		app.Path = settings.absoluteProvidedAppPath()
 	}
-	if app.Path == "" {
+	if app.Path == "" && app.DockerImage == "" {
 		app.Path = settings.CurrentDirectory
 	}
 

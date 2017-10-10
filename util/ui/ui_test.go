@@ -39,6 +39,52 @@ var _ = Describe("UI", func() {
 		Expect(ui.TimezoneLocation).To(Equal(location))
 	})
 
+	Describe("DisplayPasswordPrompt", func() {
+		var inBuffer *Buffer
+
+		BeforeEach(func() {
+			inBuffer = NewBuffer()
+			ui.In = inBuffer
+			inBuffer.Write([]byte("some-input\n"))
+		})
+
+		It("displays the passed in string", func() {
+			_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				"AppName": "some-app",
+			})
+			Expect(ui.Out).To(Say("App some-app does not exist."))
+		})
+
+		It("returns the user input", func() {
+			userInput, err := ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+				"AppName": "some-app",
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(userInput).To(Equal("some-input"))
+			Expect(ui.Out).ToNot(Say("some-input"))
+		})
+
+		Context("when the locale is not set to English", func() {
+			BeforeEach(func() {
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = NewBuffer()
+			})
+
+			It("translates and displays the prompt", func() {
+				_, _ = ui.DisplayPasswordPrompt("App {{.AppName}} does not exist.", map[string]interface{}{
+					"AppName": "some-app",
+				})
+				Expect(ui.Out).To(Say("L'application some-app n'existe pas.\n"))
+			})
+		})
+	})
+
 	Describe("DisplayBoolPrompt", func() {
 		var inBuffer *Buffer
 
@@ -150,7 +196,7 @@ var _ = Describe("UI", func() {
 			Expect(ui.Out).To(Say("\x1b\\[1msome-header\x1b\\[0m"))
 		})
 
-		Context("when the locale is not set to english", func() {
+		Context("when the locale is not set to English", func() {
 			BeforeEach(func() {
 				fakeConfig.LocaleReturns("fr-FR")
 

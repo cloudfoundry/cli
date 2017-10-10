@@ -229,6 +229,17 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		return pushaction.CommandLineSettings{}, err
 	}
 
+	dockerPassword := cmd.Config.DockerPassword()
+	if dockerPassword != "" {
+		cmd.UI.DisplayText("Using docker repository password from environment variable CF_DOCKER_PASSWORD.")
+	} else if cmd.DockerUsername != "" {
+		cmd.UI.DisplayText("Environment variable CF_DOCKER_PASSWORD not set.")
+		dockerPassword, err = cmd.UI.DisplayPasswordPrompt("Docker password")
+		if err != nil {
+			return pushaction.CommandLineSettings{}, err
+		}
+	}
+
 	config := pushaction.CommandLineSettings{
 		Buildpack:          cmd.Buildpack.FilteredString,
 		Command:            cmd.Command.FilteredString,
@@ -236,7 +247,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		DiskQuota:          cmd.DiskQuota.Value,
 		DockerImage:        cmd.DockerImage.Path,
 		DockerUsername:     cmd.DockerUsername,
-		DockerPassword:     cmd.Config.DockerPassword(),
+		DockerPassword:     dockerPassword,
 		HealthCheckTimeout: cmd.HealthCheckTimeout,
 		HealthCheckType:    cmd.HealthCheckType.Type,
 		Instances:          cmd.Instances.NullInt,
@@ -382,8 +393,6 @@ func (cmd V2PushCommand) validateArgs() error {
 			Arg1: "--docker-image, -o",
 			Arg2: "--docker-username",
 		}
-	case cmd.DockerUsername != "" && cmd.Config.DockerPassword() == "":
-		return translatableerror.DockerPasswordNotSetError{}
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-f", "--no-manifest"},

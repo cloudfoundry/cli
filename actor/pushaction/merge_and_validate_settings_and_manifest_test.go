@@ -1,6 +1,7 @@
 package pushaction_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -38,7 +39,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(manifests).To(Equal([]manifest.Application{{
 				DockerImage: "some-image",
 				Name:        "some-app",
-				Path:        currentDirectory,
 			}}))
 		})
 	})
@@ -206,5 +206,8 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Memory: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{ProvidedAppPath: "some-path"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{StackName: "some-stackname"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
+		Entry("DockerPasswordNotSetError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", DockerUsername: "some-username"}}, actionerror.DockerPasswordNotSetError{}),
+		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Buildpack: types.FilteredString{IsSet: true}}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "buildpack"}}),
+		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Path: "some-path"}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "path"}}),
 	)
 })

@@ -78,6 +78,10 @@ func HandleError(err error) error {
 		return translatableerror.RequiredNameForPushError{}
 	case pushaction.UploadFailedError:
 		return translatableerror.UploadFailedError{Err: HandleError(e.Err)}
+	case actionerror.PropertyCombinationError:
+		return translatableerror.PropertyCombinationError(e)
+	case actionerror.DockerPasswordNotSetError:
+		return translatableerror.DockerPasswordNotSetError{}
 
 	case manifest.ManifestCreationError:
 		return translatableerror.ManifestCreationError(e)

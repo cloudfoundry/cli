@@ -26,6 +26,16 @@ var _ = Describe("HandleError", func() {
 			Expect(actualErr).To(MatchError(expectedErr))
 		},
 
+		Entry("actionerror.PropertyCombinationError -> PropertyCombinationError",
+			actionerror.PropertyCombinationError{Properties: []string{"property-1", "property-2"}},
+			translatableerror.PropertyCombinationError{Properties: []string{"property-1", "property-2"}},
+		),
+
+		Entry("actionerror.DockerPasswordNotSetError -> DockerPasswordNotSetError",
+			actionerror.DockerPasswordNotSetError{},
+			translatableerror.DockerPasswordNotSetError{},
+		),
+
 		Entry("ccerror.RequestError -> APIRequestError",
 			ccerror.RequestError{Err: err},
 			translatableerror.APIRequestError{Err: err}),

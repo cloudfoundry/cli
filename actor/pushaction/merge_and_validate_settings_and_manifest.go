@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -109,6 +110,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			return CommandLineOptionsWithMultipleAppsError{}
 		}
 	}
+
 	return nil
 }
 
@@ -118,10 +120,24 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 			log.WithField("index", i).Error("does not contain an app name")
 			return MissingNameError{}
 		}
-		_, err := os.Stat(app.Path)
-		if os.IsNotExist(err) {
-			log.WithField("path", app.Path).Error("app path does not exist")
-			return NonexistentAppPathError{Path: app.Path}
+
+		if app.DockerImage == "" {
+			_, err := os.Stat(app.Path)
+			if os.IsNotExist(err) {
+				log.WithField("path", app.Path).Error("app path does not exist")
+				return NonexistentAppPathError{Path: app.Path}
+			}
+		} else {
+			if app.DockerUsername != "" && app.DockerPassword == "" {
+				log.WithField("app", app.Name).Error("no docker password found")
+				return actionerror.DockerPasswordNotSetError{}
+			}
+			if app.Buildpack.IsSet {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "buildpack"}}
+			}
+			if app.Path != "" {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "path"}}
+			}
 		}
 	}
 	return nil

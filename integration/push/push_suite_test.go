@@ -45,11 +45,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	homeDir = helpers.SetHomeDir()
 	helpers.SetAPI()
 	helpers.LoginCF()
+
 	organization = helpers.NewOrgName()
 	helpers.CreateOrg(organization)
 	helpers.TargetOrg(organization)
 	helpers.CreateSpace("empty-space")
 	helpers.DestroyHomeDir(homeDir)
+
+	helpers.EnableDockerSupport()
 })
 
 var _ = SynchronizedAfterSuite(func() {

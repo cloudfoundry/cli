@@ -16,6 +16,15 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
+func WithManifest(manifest map[string]interface{}, f func(manifestDir string)) {
+	dir, err := ioutil.TempDir("", "simple-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	WriteManifest(filepath.Join(dir, "manifest.yml"), manifest)
+	f(dir)
+}
+
 // WithHelloWorldApp creates a simple application to use with your CLI command
 // (typically CF Push). When pushing, be aware of specifying '-b
 // staticfile_buildpack" so that your app will correctly start up with the

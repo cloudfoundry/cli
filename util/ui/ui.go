@@ -145,6 +145,20 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	return response, err
 }
 
+// DisplayPasswordPrompt outputs the prompt and waits for user input. Hides
+// user's response from the screen.
+func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[string]interface{}) (string, error) {
+	ui.terminalLock.Lock()
+	defer ui.terminalLock.Unlock()
+
+	var password interact.Password
+	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
+	interactivePrompt.Input = ui.In
+	interactivePrompt.Output = ui.Out
+	err := interactivePrompt.Resolve(interact.Required(&password))
+	return string(password), err
+}
+
 // DisplayError outputs the translated error message to ui.Err if the error
 // satisfies TranslatableError, otherwise it outputs the original error message
 // to ui.Err. It also outputs "FAILED" in bold red to ui.Out.
