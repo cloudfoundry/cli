@@ -159,9 +159,10 @@ var _ = Describe("v2-push Command", func() {
 									Eventually(eventStream).Should(BeSent(pushaction.SettingUpApplication))
 									Eventually(eventStream).Should(BeSent(pushaction.CreatedApplication))
 									Eventually(eventStream).Should(BeSent(pushaction.UpdatedApplication))
-									Eventually(eventStream).Should(BeSent(pushaction.ConfiguringRoutes))
+									Eventually(eventStream).Should(BeSent(pushaction.CreatingAndMappingRoutes))
 									Eventually(eventStream).Should(BeSent(pushaction.CreatedRoutes))
 									Eventually(eventStream).Should(BeSent(pushaction.BoundRoutes))
+									Eventually(eventStream).Should(BeSent(pushaction.UnmappingRoutes))
 									Eventually(eventStream).Should(BeSent(pushaction.ConfiguringServices))
 									Eventually(eventStream).Should(BeSent(pushaction.BoundServices))
 									Eventually(eventStream).Should(BeSent(pushaction.ResourceMatching))
@@ -430,6 +431,7 @@ var _ = Describe("v2-push Command", func() {
 
 								Expect(testUI.Out).To(Say("Creating app with these attributes\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Mapping routes\\.\\.\\."))
+								Expect(testUI.Out).To(Say("Unmapping routes\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Binding services\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
@@ -653,12 +655,13 @@ var _ = Describe("v2-push Command", func() {
 				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
 				cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
 				cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
+				cmd.Domain = "some-domain"
 				cmd.HealthCheckTimeout = 14
 				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
 				cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
 				cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
+				cmd.NoRoute = true
 				cmd.StackName = "some-stack"
-				cmd.Domain = "some-domain"
 			})
 
 			It("sets them on the command line settings", func() {
@@ -666,12 +669,13 @@ var _ = Describe("v2-push Command", func() {
 				Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
 				Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
+				Expect(settings.Domain).To(Equal("some-domain"))
 				Expect(settings.HealthCheckTimeout).To(Equal(14))
 				Expect(settings.HealthCheckType).To(Equal("http"))
 				Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
 				Expect(settings.Memory).To(Equal(uint64(100)))
+				Expect(settings.NoRoute).To(BeTrue())
 				Expect(settings.StackName).To(Equal("some-stack"))
-				Expect(settings.Domain).To(Equal("some-domain"))
 			})
 		})
 

@@ -518,6 +518,26 @@ var _ = Describe("Application Config", func() {
 			})
 		})
 
+		Context("when no-route is set", func() {
+			BeforeEach(func() {
+				manifestApps[0].NoRoute = true
+
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, nil, actionerror.ApplicationNotFoundError{})
+			})
+
+			It("should set NoRoute to true", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(BeEmpty())
+				Expect(firstConfig.NoRoute).To(BeTrue())
+				Expect(firstConfig.DesiredRoutes).To(BeEmpty())
+			})
+
+			It("should skip route generation", func() {
+				Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(0))
+				Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
+			})
+		})
+
 		Context("when routes are defined", func() {
 			BeforeEach(func() {
 				manifestApps[0].Routes = []string{"route-1.private-domain.com", "route-2.private-domain.com"}

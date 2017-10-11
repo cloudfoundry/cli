@@ -16,11 +16,11 @@ const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest   = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                           = "DeleteIsolationSegment"
 	GetAppDropletsRequest                                   = "GetAppDroplets"
-	GetAppProcessesRequest                                  = "GetAppProcesses"
-	GetAppTasksRequest                                      = "GetAppTasks"
 	GetApplicationEnvironmentVariables                      = "GetApplicationEnvironmentVariables"
 	GetApplicationProcessByTypeRequest                      = "GetApplicationProcessByType"
+	GetAppProcessesRequest                                  = "GetAppProcesses"
 	GetAppsRequest                                          = "GetApps"
+	GetAppTasksRequest                                      = "GetAppTasks"
 	GetBuildRequest                                         = "GetBuild"
 	GetDropletRequest                                       = "GetDroplet"
 	GetIsolationSegmentOrganizationsRequest                 = "GetIsolationSegmentRelationshipOrganizations"
@@ -28,22 +28,22 @@ const (
 	GetIsolationSegmentsRequest                             = "GetIsolationSegments"
 	GetOrganizationDefaultIsolationSegmentRequest           = "GetOrganizationDefaultIsolationSegment"
 	GetOrgsRequest                                          = "GetOrgs"
-	GetSpacesRequest                                        = "GetSpaces"
 	GetPackageRequest                                       = "GetPackage"
 	GetPackagesRequest                                      = "GetPackages"
 	GetProcessInstancesRequest                              = "GetProcessInstances"
 	GetSpaceRelationshipIsolationSegmentRequest             = "GetSpaceRelationshipIsolationSegmentRequest"
+	GetSpacesRequest                                        = "GetSpaces"
 	PatchApplicationCurrentDropletRequest                   = "PatchApplicationCurrentDroplet"
-	PatchApplicationUserProvidedEnvironmentVariablesRequest = "PatchApplicationUserProvidedEnvironmentVariablesRequest"
 	PatchApplicationProcessHealthCheckRequest               = "PatchApplicationProcessHealthCheck"
 	PatchApplicationRequest                                 = "PatchApplicationRequest"
+	PatchApplicationUserProvidedEnvironmentVariablesRequest = "PatchApplicationUserProvidedEnvironmentVariablesRequest"
 	PatchOrganizationDefaultIsolationSegmentRequest         = "PatchOrganizationDefaultIsolationSegmentRequest"
 	PatchSpaceRelationshipIsolationSegmentRequest           = "PatchSpaceRelationshipIsolationSegmentRequest"
-	PostAppTasksRequest                                     = "PostAppTasks"
 	PostApplicationProcessScaleRequest                      = "PostApplicationProcessScale"
 	PostApplicationRequest                                  = "PostApplicationRequest"
 	PostApplicationStartRequest                             = "PostApplicationStart"
 	PostApplicationStopRequest                              = "PostApplicationStop"
+	PostAppTasksRequest                                     = "PostAppTasks"
 	PostBuildRequest                                        = "PostBuild"
 	PostIsolationSegmentRelationshipOrganizationsRequest    = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                            = "PostIsolationSegments"
@@ -68,8 +68,8 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetAppsRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
-	{Path: "/", Method: http.MethodGet, Name: GetSpacesRequest, Resource: SpacesResource},
 	{Path: "/", Method: http.MethodGet, Name: GetPackagesRequest, Resource: PackagesResource},
+	{Path: "/", Method: http.MethodGet, Name: GetSpacesRequest, Resource: SpacesResource},
 	{Path: "/", Method: http.MethodPost, Name: PostApplicationRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostBuildRequest, Resource: BuildsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostIsolationSegmentsRequest, Resource: IsolationSegmentsResource},

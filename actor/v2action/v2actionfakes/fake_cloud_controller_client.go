@@ -159,6 +159,20 @@ type FakeCloudControllerClient struct {
 		result1 ccv2.Warnings
 		result2 error
 	}
+	DeleteRouteApplicationStub        func(routeGUID string, appGUID string) (ccv2.Warnings, error)
+	deleteRouteApplicationMutex       sync.RWMutex
+	deleteRouteApplicationArgsForCall []struct {
+		routeGUID string
+		appGUID   string
+	}
+	deleteRouteApplicationReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
+	deleteRouteApplicationReturnsOnCall map[int]struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	DeleteServiceBindingStub        func(serviceBindingGUID string) (ccv2.Warnings, error)
 	deleteServiceBindingMutex       sync.RWMutex
 	deleteServiceBindingArgsForCall []struct {
@@ -1346,6 +1360,58 @@ func (fake *FakeCloudControllerClient) DeleteRouteReturnsOnCall(i int, result1 c
 		})
 	}
 	fake.deleteRouteReturnsOnCall[i] = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteApplication(routeGUID string, appGUID string) (ccv2.Warnings, error) {
+	fake.deleteRouteApplicationMutex.Lock()
+	ret, specificReturn := fake.deleteRouteApplicationReturnsOnCall[len(fake.deleteRouteApplicationArgsForCall)]
+	fake.deleteRouteApplicationArgsForCall = append(fake.deleteRouteApplicationArgsForCall, struct {
+		routeGUID string
+		appGUID   string
+	}{routeGUID, appGUID})
+	fake.recordInvocation("DeleteRouteApplication", []interface{}{routeGUID, appGUID})
+	fake.deleteRouteApplicationMutex.Unlock()
+	if fake.DeleteRouteApplicationStub != nil {
+		return fake.DeleteRouteApplicationStub(routeGUID, appGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.deleteRouteApplicationReturns.result1, fake.deleteRouteApplicationReturns.result2
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteApplicationCallCount() int {
+	fake.deleteRouteApplicationMutex.RLock()
+	defer fake.deleteRouteApplicationMutex.RUnlock()
+	return len(fake.deleteRouteApplicationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteApplicationArgsForCall(i int) (string, string) {
+	fake.deleteRouteApplicationMutex.RLock()
+	defer fake.deleteRouteApplicationMutex.RUnlock()
+	return fake.deleteRouteApplicationArgsForCall[i].routeGUID, fake.deleteRouteApplicationArgsForCall[i].appGUID
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteApplicationReturns(result1 ccv2.Warnings, result2 error) {
+	fake.DeleteRouteApplicationStub = nil
+	fake.deleteRouteApplicationReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeCloudControllerClient) DeleteRouteApplicationReturnsOnCall(i int, result1 ccv2.Warnings, result2 error) {
+	fake.DeleteRouteApplicationStub = nil
+	if fake.deleteRouteApplicationReturnsOnCall == nil {
+		fake.deleteRouteApplicationReturnsOnCall = make(map[int]struct {
+			result1 ccv2.Warnings
+			result2 error
+		})
+	}
+	fake.deleteRouteApplicationReturnsOnCall[i] = struct {
 		result1 ccv2.Warnings
 		result2 error
 	}{result1, result2}
@@ -3768,6 +3834,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteOrganizationMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
+	fake.deleteRouteApplicationMutex.RLock()
+	defer fake.deleteRouteApplicationMutex.RUnlock()
 	fake.deleteServiceBindingMutex.RLock()
 	defer fake.deleteServiceBindingMutex.RUnlock()
 	fake.deleteSpaceMutex.RLock()

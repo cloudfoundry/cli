@@ -102,6 +102,11 @@ func (actor Actor) BindRouteToApplication(routeGUID string, appGUID string) (War
 	return Warnings(warnings), err
 }
 
+func (actor Actor) UnbindRouteFromApplication(routeGUID string, appGUID string) (Warnings, error) {
+	warnings, err := actor.CloudControllerClient.DeleteRouteApplication(routeGUID, appGUID)
+	return Warnings(warnings), err
+}
+
 func (actor Actor) CreateRoute(route Route, generatePort bool) (Route, Warnings, error) {
 	if route.Path != "" && !strings.HasPrefix(route.Path, "/") {
 		route.Path = fmt.Sprintf("/%s", route.Path)

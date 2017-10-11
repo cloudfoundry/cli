@@ -26,6 +26,74 @@ var _ = Describe("Routes", func() {
 		actor = NewActor(fakeV2Actor, nil)
 	})
 
+	Describe("UnbindRoutes", func() {
+		var (
+			config ApplicationConfig
+
+			returnedConfig ApplicationConfig
+			warnings       Warnings
+			executeErr     error
+		)
+
+		BeforeEach(func() {
+			config = ApplicationConfig{
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						GUID: "some-app-guid",
+					}},
+			}
+		})
+
+		JustBeforeEach(func() {
+			returnedConfig, warnings, executeErr = actor.UnbindRoutes(config)
+		})
+
+		Context("when there are routes on the application", func() {
+			BeforeEach(func() {
+				config.CurrentRoutes = []v2action.Route{
+					{GUID: "some-route-guid-1", Host: "some-route-1", Domain: v2action.Domain{Name: "some-domain.com"}},
+					{GUID: "some-route-guid-2", Host: "some-route-2"},
+				}
+			})
+
+			Context("when the unbinding is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.UnbindRouteFromApplicationReturns(v2action.Warnings{"unbind-route-warning"}, nil)
+				})
+
+				It("only creates the routes that do not exist", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("unbind-route-warning", "unbind-route-warning"))
+
+					Expect(returnedConfig.CurrentRoutes).To(BeEmpty())
+
+					Expect(fakeV2Actor.UnbindRouteFromApplicationCallCount()).To(Equal(2))
+
+					routeGUID, appGUID := fakeV2Actor.UnbindRouteFromApplicationArgsForCall(0)
+					Expect(routeGUID).To(Equal("some-route-guid-1"))
+					Expect(appGUID).To(Equal("some-app-guid"))
+
+					routeGUID, appGUID = fakeV2Actor.UnbindRouteFromApplicationArgsForCall(1)
+					Expect(routeGUID).To(Equal("some-route-guid-2"))
+					Expect(appGUID).To(Equal("some-app-guid"))
+				})
+			})
+
+			Context("when the binding errors", func() {
+				var expectedErr error
+				BeforeEach(func() {
+					expectedErr = errors.New("oh my")
+					fakeV2Actor.UnbindRouteFromApplicationReturns(v2action.Warnings{"unbind-route-warning"}, expectedErr)
+				})
+
+				It("sends the warnings and errors and returns true", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("unbind-route-warning"))
+				})
+			})
+		})
+	})
+
 	Describe("BindRoutes", func() {
 		var (
 			config ApplicationConfig

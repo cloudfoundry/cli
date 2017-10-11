@@ -209,5 +209,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("DockerPasswordNotSetError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", DockerUsername: "some-username"}}, actionerror.DockerPasswordNotSetError{}),
 		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Buildpack: types.FilteredString{IsSet: true}}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "buildpack"}}),
 		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Path: "some-path"}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "path"}}),
+		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", Routes: []string{"some-route"}, NoRoute: true, Path: "some-path"}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"no-route", "routes"}}),
 	)
 })

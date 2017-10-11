@@ -38,6 +38,22 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 	return config, boundRoutes, allWarnings, nil
 }
 
+func (actor Actor) UnbindRoutes(config ApplicationConfig) (ApplicationConfig, Warnings, error) {
+	var warnings Warnings
+
+	appGUID := config.DesiredApplication.GUID
+	for _, route := range config.CurrentRoutes {
+		routeWarnings, err := actor.V2Actor.UnbindRouteFromApplication(route.GUID, appGUID)
+		warnings = append(warnings, routeWarnings...)
+		if err != nil {
+			return config, warnings, err
+		}
+	}
+	config.CurrentRoutes = nil
+
+	return config, warnings, nil
+}
+
 func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID string, existingRoutes []v2action.Route) ([]v2action.Route, Warnings, error) {
 	calculatedRoutes, unknownRoutes := actor.splitExistingRoutes(routes, existingRoutes)
 	possibleDomains, err := actor.generatePossibleDomains(unknownRoutes)

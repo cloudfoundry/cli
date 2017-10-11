@@ -18,6 +18,54 @@ var _ = Describe("Route", func() {
 		client = NewTestClient()
 	})
 
+	Describe("DeleteRouteApplication", func() {
+		Context("when the delete is successful", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/routes/some-route-guid/apps/some-app-guid"),
+						RespondWith(http.StatusNoContent, nil, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns the route and warnings", func() {
+				warnings, err := client.DeleteRouteApplication("some-route-guid", "some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+
+		Context("when the cc returns an error", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 10001,
+					"description": "Some Error",
+					"error_code": "CF-SomeError"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodDelete, "/v2/routes/some-route-guid/apps/some-app-guid"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				warnings, err := client.DeleteRouteApplication("some-route-guid", "some-app-guid")
+				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					V2ErrorResponse: ccerror.V2ErrorResponse{
+						Code:        10001,
+						Description: "Some Error",
+						ErrorCode:   "CF-SomeError",
+					},
+				}))
+				Expect(warnings).To(ConsistOf("this is a warning"))
+			})
+		})
+	})
+
 	Describe("BindRouteToApplication", func() {
 		Context("when route binding is successful", func() {
 			BeforeEach(func() {

@@ -157,6 +157,44 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
+	Describe("UnbindRouteFromApplication", func() {
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.DeleteRouteApplicationReturns(
+					ccv2.Warnings{"bind warning"},
+					nil)
+			})
+
+			It("unbinds the route from the application and returns all warnings", func() {
+				warnings, err := actor.UnbindRouteFromApplication("some-route-guid", "some-app-guid")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("bind warning"))
+
+				Expect(fakeCloudControllerClient.DeleteRouteApplicationCallCount()).To(Equal(1))
+				routeGUID, appGUID := fakeCloudControllerClient.DeleteRouteApplicationArgsForCall(0)
+				Expect(routeGUID).To(Equal("some-route-guid"))
+				Expect(appGUID).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("bind route failed")
+				fakeCloudControllerClient.DeleteRouteApplicationReturns(
+					ccv2.Warnings{"bind warning"},
+					expectedErr)
+			})
+
+			It("returns the error", func() {
+				warnings, err := actor.UnbindRouteFromApplication("some-route-guid", "some-app-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("bind warning"))
+			})
+		})
+	})
+
 	Describe("CreateRoute", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {

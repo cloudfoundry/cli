@@ -21,6 +21,7 @@ type CommandLineSettings struct {
 	Instances          types.NullInt
 	Memory             uint64
 	Name               string
+	NoRoute            bool
 	ProvidedAppPath    string
 	StackName          string
 	Domain             string
@@ -69,6 +70,10 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 	if settings.Name != "" {
 		app.Name = settings.Name
+	}
+
+	if settings.NoRoute {
+		app.NoRoute = true
 	}
 
 	if settings.ProvidedAppPath != "" {

@@ -50,10 +50,10 @@ type V2PushCommand struct {
 	DiskQuota flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	Memory    flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	// NoHostname           bool                        `long:"no-hostname" description:"Map the root domain to this app"`
-	NoManifest bool `long:"no-manifest" description:"Ignore manifest file"`
-	// NoRoute              bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
-	NoStart bool                        `long:"no-start" description:"Do not start an app after pushing"`
-	AppPath flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	NoManifest bool                        `long:"no-manifest" description:"Ignore manifest file"`
+	NoRoute    bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
+	NoStart    bool                        `long:"no-start" description:"Do not start an app after pushing"`
+	AppPath    flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
 	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
 	StackName           string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
@@ -253,6 +253,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		Instances:          cmd.Instances.NullInt,
 		Memory:             cmd.Memory.Value,
 		Name:               cmd.OptionalArgs.AppName,
+		NoRoute:            cmd.NoRoute,
 		ProvidedAppPath:    string(cmd.AppPath),
 		StackName:          cmd.StackName,
 		Domain:             cmd.Domain,
@@ -352,8 +353,10 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	log.Infoln("received apply event:", event)
 
 	switch event {
-	case pushaction.ConfiguringRoutes:
+	case pushaction.CreatingAndMappingRoutes:
 		cmd.UI.DisplayText("Mapping routes...")
+	case pushaction.UnmappingRoutes:
+		cmd.UI.DisplayText("Unmapping routes...")
 	case pushaction.ConfiguringServices:
 		cmd.UI.DisplayText("Binding services...")
 	case pushaction.ResourceMatching:

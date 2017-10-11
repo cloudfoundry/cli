@@ -49,7 +49,7 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// BindRouteToApplication binds the given route to the given application.
+// BindRouteToApplication creates a link between the route and application.
 func (client *Client) BindRouteToApplication(routeGUID string, appGUID string) (Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PutBindRouteAppRequest,
@@ -69,6 +69,24 @@ func (client *Client) BindRouteToApplication(routeGUID string, appGUID string) (
 	err = client.connection.Make(request, &response)
 
 	return route, response.Warnings, err
+}
+
+// DeleteRouteApplication removes the link between the route and application.
+func (client *Client) DeleteRouteApplication(routeGUID string, appGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.DeleteRouteAppRequest,
+		URIParams: map[string]string{
+			"app_guid":   appGUID,
+			"route_guid": routeGUID,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var response cloudcontroller.Response
+	err = client.connection.Make(request, &response)
+	return response.Warnings, err
 }
 
 // CreateRoute creates the route with the given properties; SpaceGUID and

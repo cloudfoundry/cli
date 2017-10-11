@@ -17,6 +17,7 @@ type ApplicationConfig struct {
 
 	CurrentRoutes []v2action.Route
 	DesiredRoutes []v2action.Route
+	NoRoute       bool
 
 	CurrentServices map[string]v2action.ServiceInstance
 	DesiredServices map[string]v2action.ServiceInstance
@@ -52,6 +53,7 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 		config := ApplicationConfig{
 			TargetedSpaceGUID: spaceGUID,
 			Path:              absPath,
+			NoRoute:           app.NoRoute,
 		}
 
 		log.Infoln("searching for app", app.Name)
@@ -92,12 +94,14 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			return nil, warnings, err
 		}
 
-		var routeWarnings Warnings
-		config, routeWarnings, err = actor.configureRoutes(app, orgGUID, spaceGUID, config)
-		warnings = append(warnings, routeWarnings...)
-		if err != nil {
-			log.Errorln("determining routes:", err)
-			return nil, warnings, err
+		if !config.NoRoute {
+			var routeWarnings Warnings
+			config, routeWarnings, err = actor.configureRoutes(app, orgGUID, spaceGUID, config)
+			warnings = append(warnings, routeWarnings...)
+			if err != nil {
+				log.Errorln("determining routes:", err)
+				return nil, warnings, err
+			}
 		}
 
 		config, err = actor.configureResources(config, app.DockerImage)

@@ -24,6 +24,7 @@ type V2Actor interface {
 	GetStackByName(stackName string) (v2action.Stack, v2action.Warnings, error)
 	PollJob(job v2action.Job) (v2action.Warnings, error)
 	ResourceMatch(allResources []v2action.Resource) ([]v2action.Resource, []v2action.Resource, v2action.Warnings, error)
+	UnbindRouteFromApplication(routeGUID string, appGUID string) (v2action.Warnings, error)
 	UpdateApplication(application v2action.Application) (v2action.Application, v2action.Warnings, error)
 	UploadApplicationPackage(appGUID string, existingResources []v2action.Resource, newResources io.Reader, newResourcesLength int64) (v2action.Job, v2action.Warnings, error)
 }

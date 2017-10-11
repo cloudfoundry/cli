@@ -16,6 +16,7 @@ type CloudControllerClient interface {
 	CreateUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)
+	DeleteRouteApplication(routeGUID string, appGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
 	DeleteSpace(spaceGUID string) (ccv2.Job, ccv2.Warnings, error)
 	GetApplication(guid string) (ccv2.Application, ccv2.Warnings, error)

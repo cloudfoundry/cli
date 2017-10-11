@@ -110,6 +110,11 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			return CommandLineOptionsWithMultipleAppsError{}
 		}
 	}
+	for _, app := range apps {
+		if app.NoRoute && len(app.Routes) > 0 {
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
+		}
+	}
 
 	return nil
 }

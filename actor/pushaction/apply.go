@@ -45,30 +45,42 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		eventStream <- event
 		log.Debugf("desired application: %#v", config.DesiredApplication)
 
-		eventStream <- ConfiguringRoutes
+		if config.NoRoute {
+			if len(config.CurrentRoutes) > 0 {
+				eventStream <- UnmappingRoutes
+				config, warnings, err = actor.UnbindRoutes(config)
+				warningsStream <- warnings
+				if err != nil {
+					errorStream <- err
+					return
+				}
+			}
+		} else {
+			eventStream <- CreatingAndMappingRoutes
 
-		var createdRoutes bool
-		config, createdRoutes, warnings, err = actor.CreateRoutes(config)
-		warningsStream <- warnings
-		if err != nil {
-			errorStream <- err
-			return
-		}
-		if createdRoutes {
-			log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
-			eventStream <- CreatedRoutes
-		}
+			var createdRoutes bool
+			config, createdRoutes, warnings, err = actor.CreateRoutes(config)
+			warningsStream <- warnings
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			if createdRoutes {
+				log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
+				eventStream <- CreatedRoutes
+			}
 
-		var boundRoutes bool
-		config, boundRoutes, warnings, err = actor.BindRoutes(config)
-		warningsStream <- warnings
-		if err != nil {
-			errorStream <- err
-			return
-		}
-		if boundRoutes {
-			log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
-			eventStream <- BoundRoutes
+			var boundRoutes bool
+			config, boundRoutes, warnings, err = actor.BindRoutes(config)
+			warningsStream <- warnings
+			if err != nil {
+				errorStream <- err
+				return
+			}
+			if boundRoutes {
+				log.Debugf("updated desired routes: %#v", config.DesiredRoutes)
+				eventStream <- BoundRoutes
+			}
 		}
 
 		if len(config.CurrentServices) != len(config.DesiredServices) {

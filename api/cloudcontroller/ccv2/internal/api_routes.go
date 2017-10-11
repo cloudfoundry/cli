@@ -64,6 +64,7 @@ const (
 	PutAppBitsRequest                      = "PutAppBits"
 	PutAppRequest                          = "PutApp"
 	PutBindRouteAppRequest                 = "PutBindRouteApp"
+	DeleteRouteAppRequest                  = "DeleteRouteAppRequest"
 	PutResourceMatch                       = "PutResourceMatch"
 	PutRunningSecurityGroupSpaceRequest    = "PutRunningSecurityGroupSpace"
 	PutStagingSecurityGroupSpaceRequest    = "PutStagingSecurityGroupSpace"
@@ -95,6 +96,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
 	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: GetRouteAppsRequest},
 	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodPut, Name: PutBindRouteAppRequest},
+	{Path: "/v2/routes/:route_guid/apps/:app_guid", Method: http.MethodDelete, Name: DeleteRouteAppRequest},
 	{Path: "/v2/routes/:route_guid/route_mappings", Method: http.MethodGet, Name: GetRouteRouteMappingsRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid", Method: http.MethodGet, Name: GetRouteReservedRequest},
 	{Path: "/v2/routes/reserved/domain/:domain_guid/host/:host", Method: http.MethodGet, Name: GetRouteReservedDeprecatedRequest},
