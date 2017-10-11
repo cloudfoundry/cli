@@ -136,7 +136,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 				boundRoute = helpers.NewRoute(spaceName, domainName, "bound-1", "path-3")
 				boundRoute.Create()
-				helpers.BindRouteToApplication(appName, boundRoute.Domain, boundRoute.Host, boundRoute.Path)
+				helpers.MapRouteToApplication(appName, boundRoute.Domain, boundRoute.Host, boundRoute.Path)
 			})
 
 			It("deletes only the orphaned routes", func() {
@@ -226,7 +226,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 				boundRoute = helpers.NewRoute(spaceName, domainName, "bound-route", "bound-path")
 				boundRoute.Create()
-				helpers.BindRouteToApplication(appName, boundRoute.Domain, boundRoute.Host, boundRoute.Path)
+				helpers.MapRouteToApplication(appName, boundRoute.Domain, boundRoute.Host, boundRoute.Path)
 			})
 
 			It("displays OK without deleting any routes", func() {

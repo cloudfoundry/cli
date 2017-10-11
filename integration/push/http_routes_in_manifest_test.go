@@ -35,7 +35,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 		})
 
 		Context("when the routes are new", func() {
-			It("creates and binds the routes", func() {
+			It("creates and maps the routes", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 						"applications": []map[string]interface{}{
@@ -73,7 +73,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 					route2.Create()
 				})
 
-				It("creates and binds the new route; binds the old route", func() {
+				It("creates and maps the new route; maps the old route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 							"applications": []map[string]interface{}{

@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("push with hostname", func() {
 	Context("when the default domain is a shared domain", func() {
-		DescribeTable("creates and binds the route as neccessary",
+		DescribeTable("creates and maps the route as neccessary",
 			func(existingRoute bool, boundRoute bool, setup func(appName string, dir string) *Session) {
 				appName := helpers.NewAppName()
 
