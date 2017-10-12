@@ -48,7 +48,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 		if config.NoRoute {
 			if len(config.CurrentRoutes) > 0 {
 				eventStream <- UnmappingRoutes
-				config, warnings, err = actor.UnbindRoutes(config)
+				config, warnings, err = actor.UnmapRoutes(config)
 				warningsStream <- warnings
 				if err != nil {
 					errorStream <- err
@@ -71,7 +71,7 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			}
 
 			var boundRoutes bool
-			config, boundRoutes, warnings, err = actor.BindRoutes(config)
+			config, boundRoutes, warnings, err = actor.MapRoutes(config)
 			warningsStream <- warnings
 			if err != nil {
 				errorStream <- err

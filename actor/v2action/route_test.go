@@ -100,22 +100,22 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
-	Describe("BindRouteToApplication", func() {
+	Describe("MapRouteToApplication", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.BindRouteToApplicationReturns(
+				fakeCloudControllerClient.UpdateRouteApplicationReturns(
 					ccv2.Route{},
-					ccv2.Warnings{"bind warning"},
+					ccv2.Warnings{"map warning"},
 					nil)
 			})
 
-			It("binds the route to the application and returns all warnings", func() {
-				warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+			It("maps the route to the application and returns all warnings", func() {
+				warnings, err := actor.MapRouteToApplication("some-route-guid", "some-app-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("bind warning"))
+				Expect(warnings).To(ConsistOf("map warning"))
 
-				Expect(fakeCloudControllerClient.BindRouteToApplicationCallCount()).To(Equal(1))
-				routeGUID, appGUID := fakeCloudControllerClient.BindRouteToApplicationArgsForCall(0)
+				Expect(fakeCloudControllerClient.UpdateRouteApplicationCallCount()).To(Equal(1))
+				routeGUID, appGUID := fakeCloudControllerClient.UpdateRouteApplicationArgsForCall(0)
 				Expect(routeGUID).To(Equal("some-route-guid"))
 				Expect(appGUID).To(Equal("some-app-guid"))
 			})
@@ -124,16 +124,16 @@ var _ = Describe("Route Actions", func() {
 		Context("when an error is encountered", func() {
 			Context("InvalidRelationError", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.BindRouteToApplicationReturns(
+					fakeCloudControllerClient.UpdateRouteApplicationReturns(
 						ccv2.Route{},
-						ccv2.Warnings{"bind warning"},
+						ccv2.Warnings{"map warning"},
 						ccerror.InvalidRelationError{})
 				})
 
 				It("returns the error", func() {
-					warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+					warnings, err := actor.MapRouteToApplication("some-route-guid", "some-app-guid")
 					Expect(err).To(MatchError(RouteInDifferentSpaceError{}))
-					Expect(warnings).To(ConsistOf("bind warning"))
+					Expect(warnings).To(ConsistOf("map warning"))
 				})
 			})
 
@@ -141,34 +141,34 @@ var _ = Describe("Route Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = errors.New("bind route failed")
-					fakeCloudControllerClient.BindRouteToApplicationReturns(
+					expectedErr = errors.New("map route failed")
+					fakeCloudControllerClient.UpdateRouteApplicationReturns(
 						ccv2.Route{},
-						ccv2.Warnings{"bind warning"},
+						ccv2.Warnings{"map warning"},
 						expectedErr)
 				})
 
 				It("returns the error", func() {
-					warnings, err := actor.BindRouteToApplication("some-route-guid", "some-app-guid")
+					warnings, err := actor.MapRouteToApplication("some-route-guid", "some-app-guid")
 					Expect(err).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("bind warning"))
+					Expect(warnings).To(ConsistOf("map warning"))
 				})
 			})
 		})
 	})
 
-	Describe("UnbindRouteFromApplication", func() {
+	Describe("UnmapRouteFromApplication", func() {
 		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.DeleteRouteApplicationReturns(
-					ccv2.Warnings{"bind warning"},
+					ccv2.Warnings{"map warning"},
 					nil)
 			})
 
-			It("unbinds the route from the application and returns all warnings", func() {
-				warnings, err := actor.UnbindRouteFromApplication("some-route-guid", "some-app-guid")
+			It("unmaps the route from the application and returns all warnings", func() {
+				warnings, err := actor.UnmapRouteFromApplication("some-route-guid", "some-app-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(warnings).To(ConsistOf("bind warning"))
+				Expect(warnings).To(ConsistOf("map warning"))
 
 				Expect(fakeCloudControllerClient.DeleteRouteApplicationCallCount()).To(Equal(1))
 				routeGUID, appGUID := fakeCloudControllerClient.DeleteRouteApplicationArgsForCall(0)
@@ -181,16 +181,16 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("bind route failed")
+				expectedErr = errors.New("map route failed")
 				fakeCloudControllerClient.DeleteRouteApplicationReturns(
-					ccv2.Warnings{"bind warning"},
+					ccv2.Warnings{"map warning"},
 					expectedErr)
 			})
 
 			It("returns the error", func() {
-				warnings, err := actor.UnbindRouteFromApplication("some-route-guid", "some-app-guid")
+				warnings, err := actor.UnmapRouteFromApplication("some-route-guid", "some-app-guid")
 				Expect(err).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("bind warning"))
+				Expect(warnings).To(ConsistOf("map warning"))
 			})
 		})
 	})
@@ -308,7 +308,7 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("bind route failed")
+				expectedErr = errors.New("map route failed")
 				fakeCloudControllerClient.CreateRouteReturns(
 					ccv2.Route{},
 					ccv2.Warnings{"create route warning"},
@@ -429,7 +429,7 @@ var _ = Describe("Route Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = errors.New("bind route failed")
+					expectedErr = errors.New("map route failed")
 					fakeCloudControllerClient.CreateRouteReturns(
 						ccv2.Route{},
 						ccv2.Warnings{"create-route-warning"},
@@ -560,7 +560,7 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("bind route failed")
+				expectedErr = errors.New("map route failed")
 				fakeCloudControllerClient.GetSpacesReturns(
 					[]ccv2.Space{},
 					ccv2.Warnings{"get-space-warning"},
@@ -577,7 +577,7 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("bind route failed")
+				expectedErr = errors.New("map route failed")
 				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, expectedErr)
 			})
 

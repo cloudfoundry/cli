@@ -496,7 +496,7 @@ var _ = Describe("v3-push Command", func() {
 									})
 
 									It("does not create any routes", func() {
-										Expect(fakeV2PushActor.CreateAndBindApplicationRoutesCallCount()).To(Equal(0))
+										Expect(fakeV2PushActor.CreateAndMapDefaultApplicationRouteCallCount()).To(Equal(0))
 
 										Expect(fakeActor.StartApplicationCallCount()).To(Equal(1))
 									})
@@ -544,7 +544,7 @@ var _ = Describe("v3-push Command", func() {
 
 								Context("when mapping routes fails", func() {
 									BeforeEach(func() {
-										fakeV2PushActor.CreateAndBindApplicationRoutesReturns(pushaction.Warnings{"route-warning"}, errors.New("some-error"))
+										fakeV2PushActor.CreateAndMapDefaultApplicationRouteReturns(pushaction.Warnings{"route-warning"}, errors.New("some-error"))
 									})
 
 									It("returns the error", func() {
@@ -558,7 +558,7 @@ var _ = Describe("v3-push Command", func() {
 
 								Context("when mapping routes succeeds", func() {
 									BeforeEach(func() {
-										fakeV2PushActor.CreateAndBindApplicationRoutesReturns(pushaction.Warnings{"route-warning"}, nil)
+										fakeV2PushActor.CreateAndMapDefaultApplicationRouteReturns(pushaction.Warnings{"route-warning"}, nil)
 									})
 
 									It("displays the header and OK", func() {
@@ -567,8 +567,8 @@ var _ = Describe("v3-push Command", func() {
 
 										Expect(testUI.Err).To(Say("route-warning"))
 
-										Expect(fakeV2PushActor.CreateAndBindApplicationRoutesCallCount()).To(Equal(1), "Expected CreateAndBindApplicationRoutes to be called")
-										orgArg, spaceArg, appArg := fakeV2PushActor.CreateAndBindApplicationRoutesArgsForCall(0)
+										Expect(fakeV2PushActor.CreateAndMapDefaultApplicationRouteCallCount()).To(Equal(1), "Expected CreateAndMapDefaultApplicationRoute to be called")
+										orgArg, spaceArg, appArg := fakeV2PushActor.CreateAndMapDefaultApplicationRouteArgsForCall(0)
 										Expect(orgArg).To(Equal("some-org-guid"))
 										Expect(spaceArg).To(Equal("some-space-guid"))
 										Expect(appArg).To(Equal(v2action.Application{Name: "some-app", GUID: "some-app-guid"}))

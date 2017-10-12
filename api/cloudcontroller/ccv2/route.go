@@ -49,10 +49,10 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// BindRouteToApplication creates a link between the route and application.
-func (client *Client) BindRouteToApplication(routeGUID string, appGUID string) (Route, Warnings, error) {
+// UpdateRouteApplication creates a link between the route and application.
+func (client *Client) UpdateRouteApplication(routeGUID string, appGUID string) (Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutBindRouteAppRequest,
+		RequestName: internal.PutRouteAppRequest,
 		URIParams: map[string]string{
 			"app_guid":   appGUID,
 			"route_guid": routeGUID,

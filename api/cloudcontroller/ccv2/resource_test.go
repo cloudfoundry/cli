@@ -18,7 +18,7 @@ var _ = Describe("Resource", func() {
 	})
 
 	Describe("ResourceMatch", func() {
-		Context("when route binding is successful", func() {
+		Context("when resource matching is successful", func() {
 			BeforeEach(func() {
 				responseBody := `[
 						{
@@ -66,7 +66,7 @@ var _ = Describe("Resource", func() {
 				)
 			})
 
-			It("returns the route and warnings", func() {
+			It("returns the resources and warnings", func() {
 				resourcesToMatch := []Resource{
 					{
 						Filename: "some-file-1",

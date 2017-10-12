@@ -12,19 +12,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
-	log.Info("binding routes")
+func (actor Actor) MapRoutes(config ApplicationConfig) (ApplicationConfig, bool, Warnings, error) {
+	log.Info("mapping routes")
 
 	var boundRoutes bool
 	var allWarnings Warnings
 
 	for _, route := range config.DesiredRoutes {
 		if !actor.routeInListByGUID(route, config.CurrentRoutes) {
-			log.Debugf("binding route: %#v", route)
-			warnings, err := actor.bindRouteToApp(route, config.DesiredApplication.GUID)
+			log.Debugf("mapping route: %#v", route)
+			warnings, err := actor.mapRouteToApp(route, config.DesiredApplication.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
-				log.Errorln("binding route:", err)
+				log.Errorln("mapping route:", err)
 				return ApplicationConfig{}, false, allWarnings, err
 			}
 			boundRoutes = true
@@ -32,18 +32,18 @@ func (actor Actor) BindRoutes(config ApplicationConfig) (ApplicationConfig, bool
 			log.Debugf("route %s already bound to app", route)
 		}
 	}
-	log.Debug("binding routes complete")
+	log.Debug("mapping routes complete")
 	config.CurrentRoutes = config.DesiredRoutes
 
 	return config, boundRoutes, allWarnings, nil
 }
 
-func (actor Actor) UnbindRoutes(config ApplicationConfig) (ApplicationConfig, Warnings, error) {
+func (actor Actor) UnmapRoutes(config ApplicationConfig) (ApplicationConfig, Warnings, error) {
 	var warnings Warnings
 
 	appGUID := config.DesiredApplication.GUID
 	for _, route := range config.CurrentRoutes {
-		routeWarnings, err := actor.V2Actor.UnbindRouteFromApplication(route.GUID, appGUID)
+		routeWarnings, err := actor.V2Actor.UnmapRouteFromApplication(route.GUID, appGUID)
 		warnings = append(warnings, routeWarnings...)
 		if err != nil {
 			return config, warnings, err
@@ -117,7 +117,7 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 	return calculatedRoutes, allWarnings, nil
 }
 
-func (actor Actor) CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
+func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (Warnings, error) {
 	var warnings Warnings
 	defaultRoute, domainWarnings, err := actor.getDefaultRoute(orgGUID, spaceGUID, app.Name)
 	warnings = append(warnings, domainWarnings...)
@@ -154,8 +154,8 @@ func (actor Actor) CreateAndBindApplicationRoutes(orgGUID string, spaceGUID stri
 		}
 	}
 
-	bindWarnings, err := actor.V2Actor.BindRouteToApplication(spaceRoute.GUID, app.GUID)
-	warnings = append(warnings, bindWarnings...)
+	mapWarnings, err := actor.V2Actor.MapRouteToApplication(spaceRoute.GUID, app.GUID)
+	warnings = append(warnings, mapWarnings...)
 	return warnings, err
 }
 
@@ -220,8 +220,8 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 	return cachedRoute, warnings, nil
 }
 
-func (actor Actor) bindRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
-	warnings, err := actor.V2Actor.BindRouteToApplication(route.GUID, appGUID)
+func (actor Actor) mapRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
+	warnings, err := actor.V2Actor.MapRouteToApplication(route.GUID, appGUID)
 	if _, ok := err.(v2action.RouteInDifferentSpaceError); ok {
 		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
 	}

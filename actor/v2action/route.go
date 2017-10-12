@@ -94,15 +94,15 @@ func (r Route) String() string {
 	return routeString
 }
 
-func (actor Actor) BindRouteToApplication(routeGUID string, appGUID string) (Warnings, error) {
-	_, warnings, err := actor.CloudControllerClient.BindRouteToApplication(routeGUID, appGUID)
+func (actor Actor) MapRouteToApplication(routeGUID string, appGUID string) (Warnings, error) {
+	_, warnings, err := actor.CloudControllerClient.UpdateRouteApplication(routeGUID, appGUID)
 	if _, ok := err.(ccerror.InvalidRelationError); ok {
 		return Warnings(warnings), RouteInDifferentSpaceError{}
 	}
 	return Warnings(warnings), err
 }
 
-func (actor Actor) UnbindRouteFromApplication(routeGUID string, appGUID string) (Warnings, error) {
+func (actor Actor) UnmapRouteFromApplication(routeGUID string, appGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.DeleteRouteApplication(routeGUID, appGUID)
 	return Warnings(warnings), err
 }

@@ -26,7 +26,7 @@ var _ = Describe("Routes", func() {
 		actor = NewActor(fakeV2Actor, nil)
 	})
 
-	Describe("UnbindRoutes", func() {
+	Describe("UnmapRoutes", func() {
 		var (
 			config ApplicationConfig
 
@@ -45,7 +45,7 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			returnedConfig, warnings, executeErr = actor.UnbindRoutes(config)
+			returnedConfig, warnings, executeErr = actor.UnmapRoutes(config)
 		})
 
 		Context("when there are routes on the application", func() {
@@ -56,45 +56,45 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("when the unbinding is successful", func() {
+			Context("when the unmapping is successful", func() {
 				BeforeEach(func() {
-					fakeV2Actor.UnbindRouteFromApplicationReturns(v2action.Warnings{"unbind-route-warning"}, nil)
+					fakeV2Actor.UnmapRouteFromApplicationReturns(v2action.Warnings{"unmap-route-warning"}, nil)
 				})
 
 				It("only creates the routes that do not exist", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("unbind-route-warning", "unbind-route-warning"))
+					Expect(warnings).To(ConsistOf("unmap-route-warning", "unmap-route-warning"))
 
 					Expect(returnedConfig.CurrentRoutes).To(BeEmpty())
 
-					Expect(fakeV2Actor.UnbindRouteFromApplicationCallCount()).To(Equal(2))
+					Expect(fakeV2Actor.UnmapRouteFromApplicationCallCount()).To(Equal(2))
 
-					routeGUID, appGUID := fakeV2Actor.UnbindRouteFromApplicationArgsForCall(0)
+					routeGUID, appGUID := fakeV2Actor.UnmapRouteFromApplicationArgsForCall(0)
 					Expect(routeGUID).To(Equal("some-route-guid-1"))
 					Expect(appGUID).To(Equal("some-app-guid"))
 
-					routeGUID, appGUID = fakeV2Actor.UnbindRouteFromApplicationArgsForCall(1)
+					routeGUID, appGUID = fakeV2Actor.UnmapRouteFromApplicationArgsForCall(1)
 					Expect(routeGUID).To(Equal("some-route-guid-2"))
 					Expect(appGUID).To(Equal("some-app-guid"))
 				})
 			})
 
-			Context("when the binding errors", func() {
+			Context("when the mapping errors", func() {
 				var expectedErr error
 				BeforeEach(func() {
 					expectedErr = errors.New("oh my")
-					fakeV2Actor.UnbindRouteFromApplicationReturns(v2action.Warnings{"unbind-route-warning"}, expectedErr)
+					fakeV2Actor.UnmapRouteFromApplicationReturns(v2action.Warnings{"unmap-route-warning"}, expectedErr)
 				})
 
 				It("sends the warnings and errors and returns true", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
-					Expect(warnings).To(ConsistOf("unbind-route-warning"))
+					Expect(warnings).To(ConsistOf("unmap-route-warning"))
 				})
 			})
 		})
 	})
 
-	Describe("BindRoutes", func() {
+	Describe("MapRoutes", func() {
 		var (
 			config ApplicationConfig
 
@@ -114,7 +114,7 @@ var _ = Describe("Routes", func() {
 		})
 
 		JustBeforeEach(func() {
-			returnedConfig, boundRoutes, warnings, executeErr = actor.BindRoutes(config)
+			returnedConfig, boundRoutes, warnings, executeErr = actor.MapRoutes(config)
 		})
 
 		Context("when routes need to be bound to the application", func() {
@@ -129,39 +129,39 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("when the binding is successful", func() {
+			Context("when the mapping is successful", func() {
 				BeforeEach(func() {
-					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, nil)
+					fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warning"}, nil)
 				})
 
 				It("only creates the routes that do not exist", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("bind-route-warning", "bind-route-warning"))
+					Expect(warnings).To(ConsistOf("map-route-warning", "map-route-warning"))
 					Expect(boundRoutes).To(BeTrue())
 
 					Expect(returnedConfig.CurrentRoutes).To(Equal(config.DesiredRoutes))
 
-					Expect(fakeV2Actor.BindRouteToApplicationCallCount()).To(Equal(2))
+					Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(2))
 
-					routeGUID, appGUID := fakeV2Actor.BindRouteToApplicationArgsForCall(0)
+					routeGUID, appGUID := fakeV2Actor.MapRouteToApplicationArgsForCall(0)
 					Expect(routeGUID).To(Equal("some-route-guid-1"))
 					Expect(appGUID).To(Equal("some-app-guid"))
 
-					routeGUID, appGUID = fakeV2Actor.BindRouteToApplicationArgsForCall(1)
+					routeGUID, appGUID = fakeV2Actor.MapRouteToApplicationArgsForCall(1)
 					Expect(routeGUID).To(Equal("some-route-guid-3"))
 					Expect(appGUID).To(Equal("some-app-guid"))
 				})
 			})
 
-			Context("when the binding errors", func() {
+			Context("when the mapping errors", func() {
 				Context("when the route is bound in another space", func() {
 					BeforeEach(func() {
-						fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, v2action.RouteInDifferentSpaceError{})
+						fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warning"}, v2action.RouteInDifferentSpaceError{})
 					})
 
 					It("sends the RouteInDifferentSpaceError (with a guid set) and warnings and returns true", func() {
 						Expect(executeErr).To(MatchError(v2action.RouteInDifferentSpaceError{Route: "some-route-1.some-domain.com"}))
-						Expect(warnings).To(ConsistOf("bind-route-warning"))
+						Expect(warnings).To(ConsistOf("map-route-warning"))
 					})
 				})
 
@@ -169,12 +169,12 @@ var _ = Describe("Routes", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("oh my")
-						fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warning"}, expectedErr)
+						fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warning"}, expectedErr)
 					})
 
 					It("sends the warnings and errors and returns true", func() {
 						Expect(executeErr).To(MatchError(expectedErr))
-						Expect(warnings).To(ConsistOf("bind-route-warning"))
+						Expect(warnings).To(ConsistOf("map-route-warning"))
 					})
 				})
 			})
@@ -447,14 +447,14 @@ var _ = Describe("Routes", func() {
 		})
 	})
 
-	Describe("CreateAndBindApplicationRoutes", func() {
+	Describe("CreateAndMapDefaultApplicationRoute", func() {
 		var (
 			warnings   Warnings
 			executeErr error
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.CreateAndBindApplicationRoutes("some-org-guid", "some-space-guid",
+			warnings, executeErr = actor.CreateAndMapDefaultApplicationRoute("some-org-guid", "some-space-guid",
 				v2action.Application{Name: "some-app", GUID: "some-app-guid"})
 		})
 
@@ -535,7 +535,7 @@ var _ = Describe("Routes", func() {
 						Expect(appGUID).To(Equal("some-app-guid"))
 
 						Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(0), "Expected CreateRoute to not be called but it was")
-						Expect(fakeV2Actor.BindRouteToApplicationCallCount()).To(Equal(0), "Expected BindRouteToApplication to not be called but it was")
+						Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(0), "Expected MapRouteToApplication to not be called but it was")
 					})
 				})
 
@@ -572,31 +572,31 @@ var _ = Describe("Routes", func() {
 							)
 						})
 
-						Context("when the bind command returns an error", func() {
+						Context("when the map command returns an error", func() {
 							BeforeEach(func() {
-								fakeV2Actor.BindRouteToApplicationReturns(
-									v2action.Warnings{"bind-warning"},
+								fakeV2Actor.MapRouteToApplicationReturns(
+									v2action.Warnings{"map-warning"},
 									errors.New("some-error"),
 								)
 							})
 
 							It("returns the error", func() {
 								Expect(executeErr).To(MatchError("some-error"))
-								Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "bind-warning"))
+								Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "map-warning"))
 							})
 						})
 
-						Context("when the bind command succeeds", func() {
+						Context("when the map command succeeds", func() {
 							BeforeEach(func() {
-								fakeV2Actor.BindRouteToApplicationReturns(
-									v2action.Warnings{"bind-warning"},
+								fakeV2Actor.MapRouteToApplicationReturns(
+									v2action.Warnings{"map-warning"},
 									nil,
 								)
 							})
 
-							It("binds the route to the app and returns any warnings", func() {
+							It("maps the route to the app and returns any warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
-								Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "bind-warning"))
+								Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "map-warning"))
 
 								Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1), "Expected FindRouteBoundToSpaceWithSettings to be called once, but it was not")
 								spaceRoute := fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)
@@ -609,8 +609,8 @@ var _ = Describe("Routes", func() {
 									SpaceGUID: "some-space-guid",
 								}))
 
-								Expect(fakeV2Actor.BindRouteToApplicationCallCount()).To(Equal(1), "Expected BindRouteToApplication to be called once, but it was not")
-								routeGUID, appGUID := fakeV2Actor.BindRouteToApplicationArgsForCall(0)
+								Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(1), "Expected MapRouteToApplication to be called once, but it was not")
+								routeGUID, appGUID := fakeV2Actor.MapRouteToApplicationArgsForCall(0)
 								Expect(routeGUID).To(Equal("some-route-guid"))
 								Expect(appGUID).To(Equal("some-app-guid"))
 							})
@@ -658,31 +658,31 @@ var _ = Describe("Routes", func() {
 								)
 							})
 
-							Context("when the bind command errors", func() {
+							Context("when the map command errors", func() {
 								BeforeEach(func() {
-									fakeV2Actor.BindRouteToApplicationReturns(
-										v2action.Warnings{"bind-warning"},
+									fakeV2Actor.MapRouteToApplicationReturns(
+										v2action.Warnings{"map-warning"},
 										errors.New("some-error"),
 									)
 								})
 
 								It("returns the error", func() {
 									Expect(executeErr).To(MatchError("some-error"))
-									Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "route-create-warning", "bind-warning"))
+									Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning"))
 								})
 							})
-							Context("when the bind command succeeds", func() {
+							Context("when the map command succeeds", func() {
 
 								BeforeEach(func() {
-									fakeV2Actor.BindRouteToApplicationReturns(
-										v2action.Warnings{"bind-warning"},
+									fakeV2Actor.MapRouteToApplicationReturns(
+										v2action.Warnings{"map-warning"},
 										nil,
 									)
 								})
 
-								It("creates the route, binds it to the app, and returns any warnings", func() {
+								It("creates the route, maps it to the app, and returns any warnings", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
-									Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "route-create-warning", "bind-warning"))
+									Expect(warnings).To(ConsistOf("domain-warning", "route-warning", "route-create-warning", "map-warning"))
 
 									Expect(fakeV2Actor.CreateRouteCallCount()).To(Equal(1), "Expected CreateRoute to be called once, but it was not")
 									defaultRoute, shouldGeneratePort := fakeV2Actor.CreateRouteArgsForCall(0)
@@ -707,8 +707,8 @@ var _ = Describe("Routes", func() {
 										SpaceGUID: "some-space-guid",
 									}))
 
-									Expect(fakeV2Actor.BindRouteToApplicationCallCount()).To(Equal(1), "Expected BindRouteToApplication to be called once, but it was not")
-									routeGUID, appGUID := fakeV2Actor.BindRouteToApplicationArgsForCall(0)
+									Expect(fakeV2Actor.MapRouteToApplicationCallCount()).To(Equal(1), "Expected MapRouteToApplication to be called once, but it was not")
+									routeGUID, appGUID := fakeV2Actor.MapRouteToApplicationArgsForCall(0)
 									Expect(routeGUID).To(Equal("some-route-guid"))
 									Expect(appGUID).To(Equal("some-app-guid"))
 								})

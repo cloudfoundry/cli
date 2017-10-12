@@ -8,7 +8,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 type CloudControllerClient interface {
 	AssociateSpaceWithRunningSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
 	AssociateSpaceWithStagingSecurityGroup(securityGroupGUID string, spaceGUID string) (ccv2.Warnings, error)
-	BindRouteToApplication(routeGUID string, appGUID string) (ccv2.Route, ccv2.Warnings, error)
+	UpdateRouteApplication(routeGUID string, appGUID string) (ccv2.Route, ccv2.Warnings, error)
 	CheckRoute(route ccv2.Route) (bool, ccv2.Warnings, error)
 	CreateApplication(app ccv2.Application) (ccv2.Application, ccv2.Warnings, error)
 	CreateRoute(route ccv2.Route, generatePort bool) (ccv2.Route, ccv2.Warnings, error)

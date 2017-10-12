@@ -19,7 +19,7 @@ import (
 //go:generate counterfeiter . V2PushActor
 
 type V2PushActor interface {
-	CreateAndBindApplicationRoutes(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
+	CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID string, app v2action.Application) (pushaction.Warnings, error)
 }
 
 //go:generate counterfeiter . V3PushActor
@@ -170,7 +170,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	}
 
 	if !cmd.NoRoute {
-		err = cmd.createAndBindRoutes(app)
+		err = cmd.createAndMapRoutes(app)
 		if err != nil {
 			return shared.HandleError(err)
 		}
@@ -326,9 +326,9 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 	return app, nil
 }
 
-func (cmd V3PushCommand) createAndBindRoutes(app v3action.Application) error {
+func (cmd V3PushCommand) createAndMapRoutes(app v3action.Application) error {
 	cmd.UI.DisplayText("Mapping routes...")
-	routeWarnings, err := cmd.V2PushActor.CreateAndBindApplicationRoutes(cmd.Config.TargetedOrganization().GUID, cmd.Config.TargetedSpace().GUID, v2action.Application{Name: app.Name, GUID: app.GUID})
+	routeWarnings, err := cmd.V2PushActor.CreateAndMapDefaultApplicationRoute(cmd.Config.TargetedOrganization().GUID, cmd.Config.TargetedSpace().GUID, v2action.Application{Name: app.Name, GUID: app.GUID})
 	cmd.UI.DisplayWarnings(routeWarnings)
 	if err != nil {
 		return err

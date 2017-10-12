@@ -66,8 +66,8 @@ var _ = Describe("Route", func() {
 		})
 	})
 
-	Describe("BindRouteToApplication", func() {
-		Context("when route binding is successful", func() {
+	Describe("UpdateRouteApplication", func() {
+		Context("when route mapping is successful", func() {
 			BeforeEach(func() {
 				response := `
 						{
@@ -91,7 +91,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns the route and warnings", func() {
-				route, warnings, err := client.BindRouteToApplication("some-route-guid", "some-app-guid")
+				route, warnings, err := client.UpdateRouteApplication("some-route-guid", "some-app-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
@@ -122,7 +122,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an error", func() {
-				_, warnings, err := client.BindRouteToApplication("some-route-guid", "some-app-guid")
+				_, warnings, err := client.UpdateRouteApplication("some-route-guid", "some-app-guid")
 				Expect(err).To(MatchError(ccerror.V2UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V2ErrorResponse: ccerror.V2ErrorResponse{

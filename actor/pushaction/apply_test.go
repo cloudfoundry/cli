@@ -112,7 +112,7 @@ var _ = Describe("Apply", func() {
 				Eventually(eventStream).Should(Receive(Equal(CreatedRoutes)))
 			})
 
-			Context("when binding the routes is successful", func() {
+			Context("when mapping the routes is successful", func() {
 				var desiredServices map[string]v2action.ServiceInstance
 
 				BeforeEach(func() {
@@ -120,11 +120,11 @@ var _ = Describe("Apply", func() {
 						"service_1": {Name: "service_1", GUID: "service_guid"},
 					}
 					config.DesiredServices = desiredServices
-					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warnings-1", "bind-route-warnings-2"}, nil)
+					fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warnings-1", "map-route-warnings-2"}, nil)
 				})
 
 				JustBeforeEach(func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warnings-1", "bind-route-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("map-route-warnings-1", "map-route-warnings-2")))
 					Eventually(eventStream).Should(Receive(Equal(BoundRoutes)))
 				})
 
@@ -282,7 +282,7 @@ var _ = Describe("Apply", func() {
 					})
 				})
 
-				Context("when binding routes fails", func() {
+				Context("when mapping routes fails", func() {
 					var expectedErr error
 
 					BeforeEach(func() {
@@ -299,7 +299,7 @@ var _ = Describe("Apply", func() {
 				})
 			})
 
-			Context("when there are no routes to bind", func() {
+			Context("when there are no routes to map", func() {
 				BeforeEach(func() {
 					config.CurrentRoutes = createdRoutes
 				})
@@ -310,16 +310,16 @@ var _ = Describe("Apply", func() {
 				})
 			})
 
-			Context("when binding the routes errors", func() {
+			Context("when mapping the routes errors", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
 					expectedErr = errors.New("dios mio")
-					fakeV2Actor.BindRouteToApplicationReturns(v2action.Warnings{"bind-route-warnings-1", "bind-route-warnings-2"}, expectedErr)
+					fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warnings-1", "map-route-warnings-2"}, expectedErr)
 				})
 
 				It("sends warnings and errors, then stops", func() {
-					Eventually(warningsStream).Should(Receive(ConsistOf("bind-route-warnings-1", "bind-route-warnings-2")))
+					Eventually(warningsStream).Should(Receive(ConsistOf("map-route-warnings-1", "map-route-warnings-2")))
 					Eventually(errorStream).Should(Receive(MatchError(expectedErr)))
 					Consistently(eventStream).ShouldNot(Receive())
 				})
@@ -370,15 +370,15 @@ var _ = Describe("Apply", func() {
 
 				Context("when the unmap is successful", func() {
 					BeforeEach(func() {
-						fakeV2Actor.UnbindRouteFromApplicationReturnsOnCall(0, v2action.Warnings{"unmapping-route-warnings-1"}, nil)
-						fakeV2Actor.UnbindRouteFromApplicationReturnsOnCall(1, v2action.Warnings{"unmapping-route-warnings-2"}, nil)
+						fakeV2Actor.UnmapRouteFromApplicationReturnsOnCall(0, v2action.Warnings{"unmapping-route-warnings-1"}, nil)
+						fakeV2Actor.UnmapRouteFromApplicationReturnsOnCall(1, v2action.Warnings{"unmapping-route-warnings-2"}, nil)
 					})
 
 					It("unmaps the routes and returns all warnings", func() {
 						Eventually(warningsStream).Should(Receive(ConsistOf("unmapping-route-warnings-1", "unmapping-route-warnings-2")))
 						Expect(streamsDrainedAndClosed(configStream, eventStream, warningsStream, errorStream)).To(BeTrue())
 
-						Expect(fakeV2Actor.UnbindRouteFromApplicationCallCount()).To(Equal(2))
+						Expect(fakeV2Actor.UnmapRouteFromApplicationCallCount()).To(Equal(2))
 					})
 				})
 
@@ -387,7 +387,7 @@ var _ = Describe("Apply", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("dios mio")
-						fakeV2Actor.UnbindRouteFromApplicationReturns(v2action.Warnings{"unmapping-route-warnings-1", "unmapping-route-warnings-2"}, expectedErr)
+						fakeV2Actor.UnmapRouteFromApplicationReturns(v2action.Warnings{"unmapping-route-warnings-1", "unmapping-route-warnings-2"}, expectedErr)
 					})
 
 					It("sends warnings and errors, then stops", func() {
@@ -407,7 +407,7 @@ var _ = Describe("Apply", func() {
 					Consistently(eventStream).ShouldNot(Receive(Equal(UnmappingRoutes)))
 					Expect(streamsDrainedAndClosed(configStream, eventStream, warningsStream, errorStream)).To(BeTrue())
 
-					Expect(fakeV2Actor.UnbindRouteFromApplicationCallCount()).To(Equal(0))
+					Expect(fakeV2Actor.UnmapRouteFromApplicationCallCount()).To(Equal(0))
 				})
 			})
 		})
