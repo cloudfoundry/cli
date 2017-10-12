@@ -165,6 +165,7 @@ applications:
 				func(manifestProperty string, numberOfValues int) {
 					tempFile, err := ioutil.TempFile("", "manifest-test-")
 					Expect(err).ToNot(HaveOccurred())
+					defer os.Remove(tempFile.Name())
 					Expect(tempFile.Close()).ToNot(HaveOccurred())
 					pathToManifest := tempFile.Name()
 
