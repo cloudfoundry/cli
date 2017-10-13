@@ -55,7 +55,7 @@ func WithNoResourceMatchedApp(f func(dir string)) {
 
 	tempfile := filepath.Join(dir, "index.html")
 
-	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024*1024))), 0666)
+	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024))), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	f(dir)
