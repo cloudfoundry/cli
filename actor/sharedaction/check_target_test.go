@@ -19,7 +19,7 @@ var _ = Describe("CheckTarget", func() {
 		binaryName = "faceman"
 		fakeConfig = new(sharedactionfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns(binaryName)
-		actor = NewActor(fakeConfig)
+		actor = NewActor(fakeConfig, nil)
 	})
 
 	Context("when the user is not logged in", func() {

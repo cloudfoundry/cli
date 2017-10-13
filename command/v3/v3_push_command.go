@@ -66,7 +66,7 @@ type V3PushCommand struct {
 func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config)
+	sharedActor := sharedaction.NewActor(config, nil)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {

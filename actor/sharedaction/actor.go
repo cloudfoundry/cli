@@ -4,12 +4,14 @@ package sharedaction
 
 // Actor handles all shared actions
 type Actor struct {
-	Config Config
+	Config            Config
+	SecureShellClient SecureShellClient
 }
 
 // NewActor returns an Actor with default settings
-func NewActor(config Config) *Actor {
+func NewActor(config Config, sshClient SecureShellClient) *Actor {
 	return &Actor{
-		Config: config,
+		Config:            config,
+		SecureShellClient: sshClient,
 	}
 }

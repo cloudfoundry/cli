@@ -27,7 +27,7 @@ type SpacesCommand struct {
 func (cmd *SpacesCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor(config)
+	cmd.SharedActor = sharedaction.NewActor(config, nil)
 
 	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {

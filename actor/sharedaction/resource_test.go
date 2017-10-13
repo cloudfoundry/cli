@@ -22,7 +22,7 @@ var _ = Describe("Resource Actions", func() {
 
 	BeforeEach(func() {
 		fakeConfig = new(sharedactionfakes.FakeConfig)
-		actor = NewActor(fakeConfig)
+		actor = NewActor(fakeConfig, nil)
 
 		var err error
 		srcDir, err = ioutil.TempDir("", "resource-actions-test")

@@ -41,7 +41,7 @@ type HelpCommand struct {
 }
 
 func (cmd *HelpCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = sharedaction.NewActor(config)
+	cmd.Actor = sharedaction.NewActor(config, nil)
 	cmd.Config = config
 	cmd.UI = ui
 
