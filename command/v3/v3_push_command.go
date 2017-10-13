@@ -76,7 +76,7 @@ func (cmd *V3PushCommand) Setup(config command.Config, ui command.UI) error {
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(sharedActor, ccClient, config)
+	cmd.Actor = v3action.NewActor(ccClient, config, sharedActor, nil)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {

@@ -44,7 +44,7 @@ func (cmd *V3GetHealthCheckCommand) Setup(config command.Config, ui command.UI) 
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(nil, ccClient, config)
+	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
 	return nil
 }

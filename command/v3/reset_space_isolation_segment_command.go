@@ -53,7 +53,7 @@ func (cmd *ResetSpaceIsolationSegmentCommand) Setup(config command.Config, ui co
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(nil, ccClient, config)
+	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {

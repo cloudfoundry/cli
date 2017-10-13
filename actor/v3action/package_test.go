@@ -28,7 +28,7 @@ var _ = Describe("Package Actions", func() {
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v3actionfakes.FakeConfig)
 		fakeSharedActor = new(v3actionfakes.FakeSharedActor)
-		actor = NewActor(fakeSharedActor, fakeCloudControllerClient, fakeConfig)
+		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, nil)
 	})
 
 	Describe("GetApplicationPackages", func() {

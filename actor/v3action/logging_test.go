@@ -23,7 +23,7 @@ var _ = Describe("Logging Actions", func() {
 	BeforeEach(func() {
 		fakeNOAAClient = new(v3actionfakes.FakeNOAAClient)
 		fakeCloudControllerClient = new(v3actionfakes.FakeCloudControllerClient)
-		actor = NewActor(nil, fakeCloudControllerClient, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, nil, nil)
 	})
 
 	Describe("LogMessage", func() {

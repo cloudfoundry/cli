@@ -48,7 +48,7 @@ func (cmd *AddNetworkPolicyCommand) Setup(config command.Config, ui command.UI) 
 		return err
 	}
 
-	v3Actor := v3action.NewActor(nil, client, config)
+	v3Actor := v3action.NewActor(client, config, nil, nil)
 	networkingClient, err := shared.NewNetworkingClient(client.NetworkPolicyV1(), config, uaa, ui)
 	if err != nil {
 		return err

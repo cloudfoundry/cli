@@ -49,7 +49,7 @@ func (cmd *V3CreatePackageCommand) Setup(config command.Config, ui command.UI) e
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(sharedActor, client, config)
+	cmd.Actor = v3action.NewActor(client, config, sharedActor, nil)
 
 	cmd.PackageDisplayer = shared.NewPackageDisplayer(cmd.UI, cmd.Config)
 

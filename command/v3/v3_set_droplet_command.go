@@ -44,7 +44,7 @@ func (cmd *V3SetDropletCommand) Setup(config command.Config, ui command.UI) erro
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(nil, ccClient, config)
+	cmd.Actor = v3action.NewActor(ccClient, config, nil, nil)
 
 	return nil
 }

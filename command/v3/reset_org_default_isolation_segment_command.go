@@ -53,7 +53,7 @@ func (cmd *ResetOrgDefaultIsolationSegmentCommand) Setup(config command.Config, 
 
 		return err
 	}
-	cmd.Actor = v3action.NewActor(nil, client, config)
+	cmd.Actor = v3action.NewActor(client, config, nil, nil)
 
 	ccClientV2, uaaClientV2, err := sharedV2.NewClients(config, ui, true)
 	if err != nil {
