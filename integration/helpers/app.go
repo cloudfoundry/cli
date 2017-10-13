@@ -44,6 +44,23 @@ func WithHelloWorldApp(f func(dir string)) {
 	f(dir)
 }
 
+// WithNoResourceMatchedApp creates a simple application to use with your CLI
+// command (typically CF Push). When pushing, be aware of specifying '-b
+// staticfile_buildpack" so that your app will correctly start up with the
+// proper buildpack.
+func WithNoResourceMatchedApp(f func(dir string)) {
+	dir, err := ioutil.TempDir("", "simple-app")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(dir)
+
+	tempfile := filepath.Join(dir, "index.html")
+
+	err = ioutil.WriteFile(tempfile, []byte(fmt.Sprintf("hello world %s", strings.Repeat("a", 65*1024*1024))), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
+	f(dir)
+}
+
 func WithMultiBuildpackApp(f func(dir string)) {
 	f("../assets/go_calls_ruby")
 }

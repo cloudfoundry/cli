@@ -142,79 +142,22 @@ func (client *Client) PollJob(job Job) (Warnings, error) {
 
 // UploadApplicationPackage uploads the newResources and a list of existing
 // resources to the cloud controller. A job that combines the requested/newly
-// uploaded bits is returned. If passed an io.Reader, this request will return
-// a PipeSeekError on retry.
+// uploaded bits is returned. The function will act differently given the
+// following Readers:
+//   io.ReadSeeker: Will function properly on retry.
+//   io.Reader: Will return a ccerror.PipeSeekError on retry.
+//   nil: Will not add the "application" section to the request.
+//   newResourcesLength is ignored in this case.
 func (client *Client) UploadApplicationPackage(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
 	if existingResources == nil {
 		return Job{}, nil, ccerror.NilObjectError{Object: "existingResources"}
 	}
+
 	if newResources == nil {
-		return Job{}, nil, ccerror.NilObjectError{Object: "newResources"}
+		return client.uploadExistingResourcesOnly(appGUID, existingResources)
 	}
 
-	contentLength, err := client.overallRequestSize(existingResources, newResourcesLength)
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutAppBitsRequest,
-		URIParams:   Params{"app_guid": appGUID},
-		Query: url.Values{
-			"async": {"true"},
-		},
-		Body: body,
-	})
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	request.Header.Set("Content-Type", contentType)
-	request.ContentLength = contentLength
-
-	var job Job
-	response := cloudcontroller.Response{
-		Result: &job,
-	}
-
-	httpErrors := client.uploadBits(request, &response)
-
-	// The following section makes the following assumptions:
-	// 1) If an error occurs during file reading, an EOF is sent to the request
-	// object. Thus ending the request transfer.
-	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
-	// Thus ending the writing routine.
-	var firstError error
-	var writeClosed, httpClosed bool
-
-	for {
-		select {
-		case writeErr, ok := <-writeErrors:
-			if !ok {
-				writeClosed = true
-				break
-			}
-			if firstError == nil {
-				firstError = writeErr
-			}
-		case httpErr, ok := <-httpErrors:
-			if !ok {
-				httpClosed = true
-				break
-			}
-			if firstError == nil {
-				firstError = httpErr
-			}
-		}
-
-		if writeClosed && httpClosed {
-			break
-		}
-	}
-
-	return job, response.Warnings, firstError
+	return client.uploadNewAndExistingResources(appGUID, existingResources, newResources, newResourcesLength)
 }
 
 func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
@@ -299,4 +242,111 @@ func (client *Client) uploadBits(request *cloudcontroller.Request, response *clo
 	}()
 
 	return httpErrors
+}
+
+func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResources []Resource) (Job, Warnings, error) {
+	jsonResources, err := json.Marshal(existingResources)
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	body := bytes.NewBuffer(nil)
+	form := multipart.NewWriter(body)
+	err = form.WriteField("resources", string(jsonResources))
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	err = form.Close()
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutAppBitsRequest,
+		URIParams:   Params{"app_guid": appGUID},
+		Query: url.Values{
+			"async": {"true"},
+		},
+		Body: bytes.NewReader(body.Bytes()),
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", form.FormDataContentType())
+
+	var job Job
+	response := cloudcontroller.Response{
+		Result: &job,
+	}
+
+	err = client.connection.Make(request, &response)
+	return job, response.Warnings, err
+}
+
+func (client *Client) uploadNewAndExistingResources(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
+	contentLength, err := client.overallRequestSize(existingResources, newResourcesLength)
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutAppBitsRequest,
+		URIParams:   Params{"app_guid": appGUID},
+		Query: url.Values{
+			"async": {"true"},
+		},
+		Body: body,
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", contentType)
+	request.ContentLength = contentLength
+
+	var job Job
+	response := cloudcontroller.Response{
+		Result: &job,
+	}
+
+	httpErrors := client.uploadBits(request, &response)
+
+	// The following section makes the following assumptions:
+	// 1) If an error occurs during file reading, an EOF is sent to the request
+	// object. Thus ending the request transfer.
+	// 2) If an error occurs during request transfer, an EOF is sent to the pipe.
+	// Thus ending the writing routine.
+	var firstError error
+	var writeClosed, httpClosed bool
+
+	for {
+		select {
+		case writeErr, ok := <-writeErrors:
+			if !ok {
+				writeClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = writeErr
+			}
+		case httpErr, ok := <-httpErrors:
+			if !ok {
+				httpClosed = true
+				break // for select
+			}
+			if firstError == nil {
+				firstError = httpErr
+			}
+		}
+
+		if writeClosed && httpClosed {
+			break // for for
+		}
+	}
+
+	return job, response.Warnings, firstError
 }

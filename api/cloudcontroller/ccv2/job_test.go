@@ -382,45 +382,46 @@ var _ = Describe("Job", func() {
 				readerBody []byte
 			)
 
-			BeforeEach(func() {
-				resources = []Resource{
-					{Filename: "foo"},
-					{Filename: "bar"},
-				}
+			Context("when the upload has application bits to upload", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "foo"},
+						{Filename: "bar"},
+					}
 
-				readerBody = []byte("hello world")
-				reader = bytes.NewReader(readerBody)
+					readerBody = []byte("hello world")
+					reader = bytes.NewReader(readerBody)
 
-				verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
-					contentType := req.Header.Get("Content-Type")
-					Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+					verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
+						contentType := req.Header.Get("Content-Type")
+						Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
 
-					defer req.Body.Close()
-					reader := multipart.NewReader(req.Body, contentType[30:])
+						defer req.Body.Close()
+						requestReader := multipart.NewReader(req.Body, contentType[30:])
 
-					// Verify that matched resources are sent properly
-					resourcesPart, err := reader.NextPart()
-					Expect(err).NotTo(HaveOccurred())
+						// Verify that matched resources are sent properly
+						resourcesPart, err := requestReader.NextPart()
+						Expect(err).NotTo(HaveOccurred())
 
-					Expect(resourcesPart.FormName()).To(Equal("resources"))
+						Expect(resourcesPart.FormName()).To(Equal("resources"))
 
-					defer resourcesPart.Close()
-					expectedJSON, err := json.Marshal(resources)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+						defer resourcesPart.Close()
+						expectedJSON, err := json.Marshal(resources)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
 
-					// Verify that the application bits are sent properly
-					resourcesPart, err = reader.NextPart()
-					Expect(err).NotTo(HaveOccurred())
+						// Verify that the application bits are sent properly
+						resourcesPart, err = requestReader.NextPart()
+						Expect(err).NotTo(HaveOccurred())
 
-					Expect(resourcesPart.FormName()).To(Equal("application"))
-					Expect(resourcesPart.FileName()).To(Equal("application.zip"))
+						Expect(resourcesPart.FormName()).To(Equal("application"))
+						Expect(resourcesPart.FileName()).To(Equal("application.zip"))
 
-					defer resourcesPart.Close()
-					Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
-				}
+						defer resourcesPart.Close()
+						Expect(ioutil.ReadAll(resourcesPart)).To(Equal(readerBody))
+					}
 
-				response := `{
+					response := `{
 					"metadata": {
 						"guid": "job-guid",
 						"url": "/v2/jobs/job-guid"
@@ -431,23 +432,85 @@ var _ = Describe("Job", func() {
 					}
 				}`
 
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
-						verifyHeaderAndBody,
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+							verifyHeaderAndBody,
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns the created job and warnings", func() {
+					job, warnings, err := client.UploadApplicationPackage("some-app-guid", resources, reader, int64(len(readerBody)))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+					Expect(job).To(Equal(Job{
+						GUID:   "job-guid",
+						Status: JobStatusQueued,
+					}))
+				})
 			})
 
-			It("returns the created job and warnings", func() {
-				job, warnings, err := client.UploadApplicationPackage("some-app-guid", resources, reader, int64(len(readerBody)))
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf("this is a warning"))
-				Expect(job).To(Equal(Job{
-					GUID:   "job-guid",
-					Status: JobStatusQueued,
-				}))
+			Context("when there are no application bits to upload", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "foo"},
+						{Filename: "bar"},
+					}
+
+					verifyHeaderAndBody := func(_ http.ResponseWriter, req *http.Request) {
+						contentType := req.Header.Get("Content-Type")
+						Expect(contentType).To(MatchRegexp("multipart/form-data; boundary=[\\w\\d]+"))
+
+						defer req.Body.Close()
+						requestReader := multipart.NewReader(req.Body, contentType[30:])
+
+						// Verify that matched resources are sent properly
+						resourcesPart, err := requestReader.NextPart()
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(resourcesPart.FormName()).To(Equal("resources"))
+
+						defer resourcesPart.Close()
+						expectedJSON, err := json.Marshal(resources)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(ioutil.ReadAll(resourcesPart)).To(MatchJSON(expectedJSON))
+
+						// Verify that the application bits are not sent
+						resourcesPart, err = requestReader.NextPart()
+						Expect(err).To(MatchError(io.EOF))
+					}
+
+					response := `{
+					"metadata": {
+						"guid": "job-guid",
+						"url": "/v2/jobs/job-guid"
+					},
+					"entity": {
+						"guid": "job-guid",
+						"status": "queued"
+					}
+				}`
+
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid/bits", "async=true"),
+							verifyHeaderAndBody,
+							RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("does not send the application bits", func() {
+					job, warnings, err := client.UploadApplicationPackage("some-app-guid", resources, nil, 33513531353)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(warnings).To(ConsistOf("this is a warning"))
+					Expect(job).To(Equal(Job{
+						GUID:   "job-guid",
+						Status: JobStatusQueued,
+					}))
+				})
 			})
 		})
 
@@ -478,13 +541,6 @@ var _ = Describe("Job", func() {
 			It("returns a NilObjectError", func() {
 				_, _, err := client.UploadApplicationPackage("some-app-guid", nil, bytes.NewReader(nil), 0)
 				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "existingResources"}))
-			})
-		})
-
-		Context("when passed a nil reader", func() {
-			It("returns a NilObjectError", func() {
-				_, _, err := client.UploadApplicationPackage("some-app-guid", []Resource{}, nil, 0)
-				Expect(err).To(MatchError(ccerror.NilObjectError{Object: "newResources"}))
 			})
 		})
 

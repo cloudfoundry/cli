@@ -103,30 +103,40 @@ func (actor Actor) Apply(config ApplicationConfig, progressBar ProgressBar) (<-c
 			config, warnings = actor.SetMatchedResources(config)
 			warningsStream <- warnings
 
-			archivePath, err := actor.CreateArchive(config)
-			if err != nil {
-				errorStream <- err
-				return
-			}
-			eventStream <- CreatingArchive
-			defer os.Remove(archivePath)
-
-			for count := 0; count < PushRetries; count++ {
-				warnings, err = actor.UploadPackage(config, archivePath, progressBar, eventStream)
+			if len(config.UnmatchedResources) == 0 {
+				eventStream <- UploadingApplication
+				warnings, err = actor.UploadPackage(config)
 				warningsStream <- warnings
-				if _, ok := err.(ccerror.PipeSeekError); !ok {
-					break
-				}
-				eventStream <- RetryUpload
-			}
-
-			if err != nil {
-				if _, ok := err.(ccerror.PipeSeekError); ok {
-					errorStream <- UploadFailedError{}
+				if err != nil {
+					errorStream <- err
 					return
 				}
-				errorStream <- err
-				return
+			} else {
+				archivePath, err := actor.CreateArchive(config)
+				if err != nil {
+					errorStream <- err
+					return
+				}
+				eventStream <- CreatingArchive
+				defer os.Remove(archivePath)
+
+				for count := 0; count < PushRetries; count++ {
+					warnings, err = actor.UploadPackageWithArchive(config, archivePath, progressBar, eventStream)
+					warningsStream <- warnings
+					if _, ok := err.(ccerror.PipeSeekError); !ok {
+						break
+					}
+					eventStream <- RetryUpload
+				}
+
+				if err != nil {
+					if _, ok := err.(ccerror.PipeSeekError); ok {
+						errorStream <- UploadFailedError{}
+						return
+					}
+					errorStream <- err
+					return
+				}
 			}
 		} else {
 			log.WithField("docker_image", config.DesiredApplication.DockerImage).Debug("skipping file upload")

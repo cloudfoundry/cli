@@ -49,7 +49,6 @@ func (actor Actor) ConvertV2ResourcesToSharedResources(resources []v2action.Reso
 
 func (actor Actor) SetMatchedResources(config ApplicationConfig) (ApplicationConfig, Warnings) {
 	matched, unmatched, warnings, err := actor.V2Actor.ResourceMatch(config.AllResources)
-
 	if err != nil {
 		log.Error("uploading all resources instead of resource matching")
 		config.UnmatchedResources = config.AllResources
@@ -62,7 +61,17 @@ func (actor Actor) SetMatchedResources(config ApplicationConfig) (ApplicationCon
 	return config, Warnings(warnings)
 }
 
-func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, progressbar ProgressBar, eventStream chan<- Event) (Warnings, error) {
+func (actor Actor) UploadPackage(config ApplicationConfig) (Warnings, error) {
+	job, warnings, err := actor.V2Actor.UploadApplicationPackage(config.DesiredApplication.GUID, config.MatchedResources, nil, 0)
+	if err != nil {
+		return Warnings(warnings), err
+	}
+
+	pollWarnings, err := actor.V2Actor.PollJob(job)
+	return append(Warnings(warnings), pollWarnings...), err
+}
+
+func (actor Actor) UploadPackageWithArchive(config ApplicationConfig, archivePath string, progressbar ProgressBar, eventStream chan<- Event) (Warnings, error) {
 	log.Info("uploading archive")
 	archive, err := os.Open(archivePath)
 	if err != nil {
@@ -82,7 +91,7 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, p
 		"archiveSize": archiveInfo.Size(),
 	}).Debug("uploading app bits")
 
-	eventStream <- UploadingApplication
+	eventStream <- UploadingApplicationWithArchive
 	reader := progressbar.NewProgressBarWrapper(archive, archiveInfo.Size())
 
 	var allWarnings Warnings
@@ -94,7 +103,7 @@ func (actor Actor) UploadPackage(config ApplicationConfig, archivePath string, p
 		log.WithField("archivePath", archivePath).Errorln("streaming archive:", err)
 		return allWarnings, err
 	}
-	eventStream <- UploadComplete
+	eventStream <- UploadWithArchiveComplete
 	warnings, err = actor.V2Actor.PollJob(job)
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 

@@ -180,6 +180,94 @@ var _ = Describe("Resources", func() {
 
 	Describe("UploadPackage", func() {
 		var (
+			config ApplicationConfig
+
+			warnings   Warnings
+			executeErr error
+
+			resources []v2action.Resource
+		)
+
+		BeforeEach(func() {
+			resources = []v2action.Resource{
+				{Filename: "file-1"},
+				{Filename: "file-2"},
+			}
+
+			config = ApplicationConfig{
+				DesiredApplication: Application{
+					Application: v2action.Application{
+						GUID: "some-app-guid",
+					}},
+				MatchedResources: resources,
+			}
+		})
+
+		JustBeforeEach(func() {
+			warnings, executeErr = actor.UploadPackage(config)
+		})
+
+		Context("when the upload is successful", func() {
+			var uploadJob v2action.Job
+
+			BeforeEach(func() {
+				uploadJob.GUID = "some-job-guid"
+				fakeV2Actor.UploadApplicationPackageReturns(uploadJob, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, nil)
+			})
+
+			Context("when polling is successful", func() {
+				BeforeEach(func() {
+					fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, nil)
+				})
+
+				It("uploads the existing resources", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+
+					Expect(fakeV2Actor.UploadApplicationPackageCallCount()).To(Equal(1))
+					appGUID, existingResources, reader, newResourcesLength := fakeV2Actor.UploadApplicationPackageArgsForCall(0)
+					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(existingResources).To(Equal(resources))
+					Expect(reader).To(BeNil())
+					Expect(newResourcesLength).To(BeNumerically("==", 0))
+
+					Expect(fakeV2Actor.PollJobCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.PollJobArgsForCall(0)).To(Equal(uploadJob))
+				})
+			})
+
+			Context("when the polling fails", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("I can't let you do that starfox")
+					fakeV2Actor.PollJobReturns(v2action.Warnings{"poll-warning-1", "poll-warning-2"}, expectedErr)
+				})
+
+				It("returns the warnings", func() {
+					Expect(executeErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2", "poll-warning-1", "poll-warning-2"))
+				})
+			})
+		})
+
+		Context("when the upload errors", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("I can't let you do that starfox")
+				fakeV2Actor.UploadApplicationPackageReturns(v2action.Job{}, v2action.Warnings{"upload-warning-1", "upload-warning-2"}, expectedErr)
+			})
+
+			It("returns the error and warnings", func() {
+				Expect(executeErr).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("upload-warning-1", "upload-warning-2"))
+			})
+		})
+	})
+
+	Describe("UploadPackageWithArchive", func() {
+		var (
 			config          ApplicationConfig
 			archivePath     string
 			fakeProgressBar *pushactionfakes.FakeProgressBar
@@ -213,7 +301,7 @@ var _ = Describe("Resources", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.UploadPackage(config, archivePath, fakeProgressBar, eventStream)
+			warnings, executeErr = actor.UploadPackageWithArchive(config, archivePath, fakeProgressBar, eventStream)
 		})
 
 		Context("when the archive can be accessed properly", func() {
@@ -247,8 +335,8 @@ var _ = Describe("Resources", func() {
 					go func() {
 						defer GinkgoRecover()
 
-						Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
-						Eventually(eventStream).Should(Receive(Equal(UploadComplete)))
+						Eventually(eventStream).Should(Receive(Equal(UploadingApplicationWithArchive)))
+						Eventually(eventStream).Should(Receive(Equal(UploadWithArchiveComplete)))
 					}()
 				})
 
@@ -310,7 +398,7 @@ var _ = Describe("Resources", func() {
 					go func() {
 						defer GinkgoRecover()
 
-						Eventually(eventStream).Should(Receive(Equal(UploadingApplication)))
+						Eventually(eventStream).Should(Receive(Equal(UploadingApplicationWithArchive)))
 						Consistently(eventStream).ShouldNot(Receive())
 						done <- true
 					}()
