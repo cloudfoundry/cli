@@ -10,7 +10,7 @@ type secureClient struct {
 	client *ssh.Client
 }
 
-func (sc secureClient) NewSession() (*ssh.Session, error) {
+func (sc secureClient) NewSession() (SecureSession, error) {
 	return sc.client.NewSession()
 }
 

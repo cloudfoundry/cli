@@ -107,6 +107,9 @@ var _ = Describe("CLI SSH", func() {
 			fakeTerminalHelper,
 			fakeListenerFactory,
 			keepAliveDuration,
+			testUI.GetIn(),
+			testUI.GetOut(),
+			testUI.GetErr(),
 		)
 	})
 
@@ -153,7 +156,7 @@ var _ = Describe("CLI SSH", func() {
 
 		BeforeEach(func() {
 			interactiveSessionInvoker = func(secureShell *SecureShell) {
-				sessionErr = secureShell.InteractiveSession(commands, terminalRequest, testUI.GetIn(), testUI.GetOut(), testUI.GetErr())
+				sessionErr = secureShell.InteractiveSession(commands, terminalRequest)
 			}
 		})
 
@@ -651,7 +654,7 @@ var _ = Describe("CLI SSH", func() {
 
 					interactiveSessionInvoker = func(secureShell *SecureShell) {
 						go func() {
-							sessionErrorCh <- secureShell.InteractiveSession(commands, terminalRequest, testUI.GetIn(), testUI.GetOut(), testUI.GetErr())
+							sessionErrorCh <- secureShell.InteractiveSession(commands, terminalRequest)
 						}()
 					}
 
