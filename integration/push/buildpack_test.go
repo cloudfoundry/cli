@@ -20,7 +20,6 @@ var _ = Describe("push with different buildpack values", func() {
 	)
 
 	BeforeEach(func() {
-		Skip("unblock when story #150452499 is unblocked")
 		appName = helpers.NewAppName()
 	})
 
@@ -54,7 +53,7 @@ var _ = Describe("push with different buildpack values", func() {
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say(`buildpack:\s+ruby_buildpack`))
+				Eventually(session).Should(Say(`buildpack:\s+ruby`))
 				Eventually(session).Should(Exit(0))
 
 				By("pushing a ruby app with a static buildpack sets buildpack to static")
@@ -80,7 +79,7 @@ var _ = Describe("push with different buildpack values", func() {
 				Eventually(session).Should(Exit(0))
 
 				session = helpers.CF("app", appName)
-				Eventually(session).Should(Say(`buildpack:\s+ruby_buildpack`))
+				Eventually(session).Should(Say(`buildpack:\s+ruby`))
 				Eventually(session).Should(Exit(0))
 
 			})
