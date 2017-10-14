@@ -28,6 +28,9 @@ type UI interface {
 	DisplayTextWithBold(text string, keys ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
+	GetIn() io.Reader
+	GetOut() io.Writer
+	GetErr() io.Writer
 	RequestLoggerFileWriter(filePaths []string) *ui.RequestLoggerFileWriter
 	RequestLoggerTerminalDisplay() *ui.RequestLoggerTerminalDisplay
 	TranslateText(template string, data ...map[string]interface{}) string
