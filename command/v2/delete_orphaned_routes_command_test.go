@@ -64,7 +64,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(checkTargetedOrg).To(BeTrue())
 				Expect(checkTargetedSpace).To(BeTrue())
 			})

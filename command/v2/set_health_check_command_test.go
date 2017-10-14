@@ -69,8 +69,7 @@ var _ = Describe("set-health-check Command", func() {
 
 		It("returns an error", func() {
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
-			Expect(config).To(Equal(fakeConfig))
+			targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(targetedOrganizationRequired).To(Equal(true))
 			Expect(targetedSpaceRequired).To(Equal(true))
 

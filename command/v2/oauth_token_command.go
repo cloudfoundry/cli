@@ -38,7 +38,7 @@ func (cmd *OauthTokenCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd OauthTokenCommand) Execute(_ []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

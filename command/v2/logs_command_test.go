@@ -61,7 +61,7 @@ var _ = Describe("logs command", func() {
 				sharedaction.NotLoggedInError{BinaryName: binaryName})
 		})
 		It("returns an error", func() {
-			_, orgRequired, spaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
+			orgRequired, spaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(orgRequired).To(BeTrue())
 			Expect(spaceRequired).To(BeTrue())
 

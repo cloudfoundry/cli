@@ -35,24 +35,24 @@ func (NoSpaceTargetedError) Error() string {
 
 // CheckTarget confirms that the user is logged in. Optionally it will also
 // check if an organization and space are targeted.
-func (Actor) CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
-	if config.AccessToken() == "" && config.RefreshToken() == "" {
+func (actor Actor) CheckTarget(targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+	if actor.Config.AccessToken() == "" && actor.Config.RefreshToken() == "" {
 		return NotLoggedInError{
-			BinaryName: config.BinaryName(),
+			BinaryName: actor.Config.BinaryName(),
 		}
 	}
 
 	if targetedOrganizationRequired {
-		if !config.HasTargetedOrganization() {
+		if !actor.Config.HasTargetedOrganization() {
 			return NoOrganizationTargetedError{
-				BinaryName: config.BinaryName(),
+				BinaryName: actor.Config.BinaryName(),
 			}
 		}
 
 		if targetedSpaceRequired {
-			if !config.HasTargetedSpace() {
+			if !actor.Config.HasTargetedSpace() {
 				return NoSpaceTargetedError{
-					BinaryName: config.BinaryName(),
+					BinaryName: actor.Config.BinaryName(),
 				}
 			}
 		}

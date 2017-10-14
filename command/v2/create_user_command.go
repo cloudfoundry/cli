@@ -62,7 +62,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		password = ""
 	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

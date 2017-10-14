@@ -66,7 +66,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	err = cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

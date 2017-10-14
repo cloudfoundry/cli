@@ -70,7 +70,7 @@ func (cmd ResetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

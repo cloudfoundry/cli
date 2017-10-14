@@ -50,7 +50,7 @@ func (cmd *TargetCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}

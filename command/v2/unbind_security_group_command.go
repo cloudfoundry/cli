@@ -71,7 +71,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 
 	switch {
 	case cmd.RequiredArgs.OrganizationName == "" && cmd.RequiredArgs.SpaceName == "":
-		err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+		err = cmd.SharedActor.CheckTarget(true, true)
 		if err != nil {
 			return shared.HandleError(err)
 		}
@@ -86,7 +86,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.UnbindSecurityGroupByNameAndSpace(cmd.RequiredArgs.SecurityGroupName, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 
 	case cmd.RequiredArgs.OrganizationName != "" && cmd.RequiredArgs.SpaceName != "":
-		err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+		err = cmd.SharedActor.CheckTarget(false, false)
 		if err != nil {
 			return shared.HandleError(err)
 		}

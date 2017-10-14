@@ -121,8 +121,7 @@ var _ = Describe("get-health-check Command", func() {
 				Expect(testUI.Err).To(Say("warning-1"))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-				config, targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
-				Expect(config).To(Equal(fakeConfig))
+				targetedOrganizationRequired, targetedSpaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)
 				Expect(targetedOrganizationRequired).To(Equal(true))
 				Expect(targetedSpaceRequired).To(Equal(true))
 

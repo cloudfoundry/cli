@@ -57,7 +57,7 @@ var _ = Describe("spaces Command", func() {
 			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			_, checkTargetedOrgArg, checkTargetedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
+			checkTargetedOrgArg, checkTargetedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkTargetedOrgArg).To(BeTrue())
 			Expect(checkTargetedSpaceArg).To(BeFalse())
 		})

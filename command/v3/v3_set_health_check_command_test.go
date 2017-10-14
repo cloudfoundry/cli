@@ -94,7 +94,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkTargetedOrg).To(BeTrue())
 			Expect(checkTargetedSpace).To(BeTrue())
 		})

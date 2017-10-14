@@ -69,7 +69,7 @@ func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SpaceCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+	err := cmd.SharedActor.CheckTarget(true, false)
 
 	if err == nil {
 		if cmd.GUID {

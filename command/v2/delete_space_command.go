@@ -47,10 +47,10 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 	)
 
 	if cmd.Org != "" {
-		err = cmd.SharedActor.CheckTarget(cmd.Config, false, false)
+		err = cmd.SharedActor.CheckTarget(false, false)
 		orgName = cmd.Org
 	} else {
-		err = cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+		err = cmd.SharedActor.CheckTarget(true, false)
 		orgName = cmd.Config.TargetedOrganization().Name
 	}
 

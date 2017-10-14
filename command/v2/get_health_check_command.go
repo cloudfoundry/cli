@@ -38,7 +38,7 @@ func (cmd *GetHealthCheckCommand) Setup(config command.Config, ui command.UI) er
 }
 
 func (cmd GetHealthCheckCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

@@ -44,7 +44,7 @@ func (cmd *CreateAppManifestCommand) Setup(config command.Config, ui command.UI)
 }
 
 func (cmd CreateAppManifestCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

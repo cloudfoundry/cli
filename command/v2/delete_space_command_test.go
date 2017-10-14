@@ -68,7 +68,7 @@ var _ = Describe("delete-space Command", func() {
 				It("returns the NotLoggedInError", func() {
 					Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
-					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 					Expect(checkTargetedOrg).To(BeFalse())
 					Expect(checkTargetedSpace).To(BeFalse())
 				})
@@ -82,7 +82,7 @@ var _ = Describe("delete-space Command", func() {
 				It("returns the NoOrganizationTargetedError", func() {
 					Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{}))
 
-					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 					Expect(checkTargetedOrg).To(BeTrue())
 					Expect(checkTargetedSpace).To(BeFalse())
 				})

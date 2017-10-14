@@ -24,7 +24,7 @@ var _ = Describe("CheckTarget", func() {
 
 	Context("when the user is not logged in", func() {
 		It("returns an error", func() {
-			err := actor.CheckTarget(fakeConfig, false, false)
+			err := actor.CheckTarget(false, false)
 			Expect(err).To(MatchError(NotLoggedInError{
 				BinaryName: binaryName,
 			}))
@@ -41,7 +41,7 @@ var _ = Describe("CheckTarget", func() {
 			func(isOrgTargeted bool, checkForTargeted bool, expectedError error) {
 				fakeConfig.HasTargetedOrganizationReturns(isOrgTargeted)
 
-				err := actor.CheckTarget(fakeConfig, checkForTargeted, false)
+				err := actor.CheckTarget(checkForTargeted, false)
 
 				if expectedError != nil {
 					Expect(err).To(MatchError(expectedError))
@@ -65,7 +65,7 @@ var _ = Describe("CheckTarget", func() {
 				func(isSpaceTargeted bool, checkForTargeted bool, expectedError error) {
 					fakeConfig.HasTargetedSpaceReturns(isSpaceTargeted)
 
-					err := actor.CheckTarget(fakeConfig, true, checkForTargeted)
+					err := actor.CheckTarget(true, checkForTargeted)
 
 					if expectedError != nil {
 						Expect(err).To(MatchError(expectedError))

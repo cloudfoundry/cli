@@ -97,7 +97,7 @@ func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd V2PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

@@ -78,7 +78,7 @@ var _ = Describe("unbind-security-group Command", func() {
 			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkTargetedOrg).To(BeTrue())
 			Expect(checkTargetedSpace).To(BeTrue())
 		})
@@ -195,7 +195,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-					_, checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
+					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
 					Expect(checkTargetedOrg).To(BeFalse())
 					Expect(checkTargetedSpace).To(BeFalse())
 				})

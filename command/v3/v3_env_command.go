@@ -60,7 +60,7 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 		return err
 	}
 
-	err = cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

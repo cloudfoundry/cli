@@ -70,7 +70,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 		cmd.Port.EndPort = 8080
 	}
 
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, true)
+	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
 	}

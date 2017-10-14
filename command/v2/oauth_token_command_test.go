@@ -55,7 +55,7 @@ var _ = Describe("oauth-token command", func() {
 			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
-			_, checkTargettedOrgArg, checkTargettedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
+			checkTargettedOrgArg, checkTargettedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
 			Expect(checkTargettedOrgArg).To(BeFalse())
 			Expect(checkTargettedSpaceArg).To(BeFalse())
 		})

@@ -4,15 +4,13 @@ package commandfakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command"
 )
 
 type FakeSharedActor struct {
-	CheckTargetStub        func(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error
+	CheckTargetStub        func(targetedOrganizationRequired bool, targetedSpaceRequired bool) error
 	checkTargetMutex       sync.RWMutex
 	checkTargetArgsForCall []struct {
-		config                       sharedaction.Config
 		targetedOrganizationRequired bool
 		targetedSpaceRequired        bool
 	}
@@ -26,18 +24,17 @@ type FakeSharedActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeSharedActor) CheckTarget(config sharedaction.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+func (fake *FakeSharedActor) CheckTarget(targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
 	fake.checkTargetMutex.Lock()
 	ret, specificReturn := fake.checkTargetReturnsOnCall[len(fake.checkTargetArgsForCall)]
 	fake.checkTargetArgsForCall = append(fake.checkTargetArgsForCall, struct {
-		config                       sharedaction.Config
 		targetedOrganizationRequired bool
 		targetedSpaceRequired        bool
-	}{config, targetedOrganizationRequired, targetedSpaceRequired})
-	fake.recordInvocation("CheckTarget", []interface{}{config, targetedOrganizationRequired, targetedSpaceRequired})
+	}{targetedOrganizationRequired, targetedSpaceRequired})
+	fake.recordInvocation("CheckTarget", []interface{}{targetedOrganizationRequired, targetedSpaceRequired})
 	fake.checkTargetMutex.Unlock()
 	if fake.CheckTargetStub != nil {
-		return fake.CheckTargetStub(config, targetedOrganizationRequired, targetedSpaceRequired)
+		return fake.CheckTargetStub(targetedOrganizationRequired, targetedSpaceRequired)
 	}
 	if specificReturn {
 		return ret.result1
@@ -51,10 +48,10 @@ func (fake *FakeSharedActor) CheckTargetCallCount() int {
 	return len(fake.checkTargetArgsForCall)
 }
 
-func (fake *FakeSharedActor) CheckTargetArgsForCall(i int) (sharedaction.Config, bool, bool) {
+func (fake *FakeSharedActor) CheckTargetArgsForCall(i int) (bool, bool) {
 	fake.checkTargetMutex.RLock()
 	defer fake.checkTargetMutex.RUnlock()
-	return fake.checkTargetArgsForCall[i].config, fake.checkTargetArgsForCall[i].targetedOrganizationRequired, fake.checkTargetArgsForCall[i].targetedSpaceRequired
+	return fake.checkTargetArgsForCall[i].targetedOrganizationRequired, fake.checkTargetArgsForCall[i].targetedSpaceRequired
 }
 
 func (fake *FakeSharedActor) CheckTargetReturns(result1 error) {

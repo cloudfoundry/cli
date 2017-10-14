@@ -39,7 +39,7 @@ func (cmd *SpacesCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd SpacesCommand) Execute([]string) error {
-	err := cmd.SharedActor.CheckTarget(cmd.Config, true, false)
+	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
 		return shared.HandleError(err)
 	}
