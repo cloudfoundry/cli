@@ -14,11 +14,13 @@ import (
 
 var _ = Describe("push with a simple manifest and no flags", func() {
 	var (
-		appName string
+		appName  string
+		username string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
+		username, _ = helpers.GetCredentials()
 	})
 
 	Context("when the app is new", func() {
@@ -50,6 +52,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						})
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+						Eventually(session).Should(Say("Pushing from manifest to org %s / space %s as %s\\.\\.\\.", organization, space, username))
 						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 						Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))

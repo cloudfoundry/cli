@@ -315,6 +315,13 @@ var _ = Describe("v2-push Command", func() {
 										}))
 										Expect(manifestApps).To(Equal(expectedApps))
 									})
+
+									It("outputs corresponding flavor text", func() {
+										Expect(executeErr).ToNot(HaveOccurred())
+
+										Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+										Expect(testUI.Out).To(Say("Using manifest file %s", pathToManifest))
+									})
 								})
 
 								Context("when reading manifest file errors", func() {
@@ -382,6 +389,54 @@ var _ = Describe("v2-push Command", func() {
 									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
 									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
 								})
+
+								It("outputs corresponding flavor text", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+
+									Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).To(Say("Using manifest file %s", pathToManifest))
+								})
+							})
+						})
+
+						Context("when an app name and manifest are provided", func() {
+							var (
+								tmpDir         string
+								pathToManifest string
+
+								originalDir string
+							)
+
+							BeforeEach(func() {
+								var err error
+								tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
+								Expect(err).ToNot(HaveOccurred())
+
+								// OS X uses weird symlinks that causes problems for some tests
+								tmpDir, err = filepath.EvalSymlinks(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+
+								pathToManifest = filepath.Join(tmpDir, "manifest.yml")
+								err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+								Expect(err).ToNot(HaveOccurred())
+
+								originalDir, err = os.Getwd()
+								Expect(err).ToNot(HaveOccurred())
+
+								err = os.Chdir(tmpDir)
+								Expect(err).ToNot(HaveOccurred())
+							})
+
+							AfterEach(func() {
+								Expect(os.Chdir(originalDir)).ToNot(HaveOccurred())
+								Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
+							})
+
+							It("outputs corresponding flavor text", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("Using manifest file %s", pathToManifest))
 							})
 						})
 
@@ -400,6 +455,7 @@ var _ = Describe("v2-push Command", func() {
 
 						It("outputs flavor text prior to generating app configuration", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("Pushing app %s to org some-org / space some-space as some-user", appName))
 							Expect(testUI.Out).To(Say("Getting app info\\.\\.\\."))
 						})
 

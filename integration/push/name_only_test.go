@@ -13,11 +13,13 @@ import (
 
 var _ = Describe("push with only an app name", func() {
 	var (
-		appName string
+		appName  string
+		username string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
+		username, _ = helpers.GetCredentials()
 	})
 
 	Describe("app existence", func() {
@@ -25,6 +27,7 @@ var _ = Describe("push with only an app name", func() {
 			It("creates the app", func() {
 				helpers.WithHelloWorldApp(func(dir string) {
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+					Eventually(session).Should(Say("Pushing app %s to org %s / space %s as %s\\.\\.\\.", appName, organization, space, username))
 					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
 					Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))

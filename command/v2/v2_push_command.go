@@ -115,7 +115,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	}
 
 	log.Info("checking manifest")
-	rawApps, err := cmd.findAndReadManifest(cliSettings)
+	rawApps, err := cmd.findAndReadManifestWithFlavorText(cliSettings)
 	if _, ok := err.(manifest.UnsupportedFieldsError); ok {
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// The following section is not tested as it calls into the old code.
@@ -263,13 +263,12 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	return config, nil
 }
 
-func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
+func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.CommandLineSettings) ([]manifest.Application, error) {
 	var pathToManifest string
 
 	switch {
 	case cmd.NoManifest:
 		log.Debug("skipping reading of manifest")
-		return nil, nil
 	case cmd.PathToManifest != "":
 		log.Debug("using specified manifest file")
 		pathToManifest = string(cmd.PathToManifest)
@@ -284,11 +283,31 @@ func (cmd V2PushCommand) findAndReadManifest(settings pushaction.CommandLineSett
 			pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yaml")
 			if _, err := os.Stat(pathToManifest); os.IsNotExist(err) {
 				log.WithField("pathToManifest", pathToManifest).Debug("could not find")
-				return nil, nil
+				pathToManifest = ""
 			}
 		}
 	}
 
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return nil, err
+	}
+
+	if pathToManifest == "" {
+		cmd.UI.DisplayTextWithFlavor("Pushing app {{.AppName}} to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+			"AppName":   settings.Name,
+			"OrgName":   cmd.Config.TargetedOrganization().Name,
+			"SpaceName": cmd.Config.TargetedSpace().Name,
+			"Username":  user.Name,
+		})
+		return nil, nil
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Pushing from manifest to org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
+		"OrgName":   cmd.Config.TargetedOrganization().Name,
+		"SpaceName": cmd.Config.TargetedSpace().Name,
+		"Username":  user.Name,
+	})
 	log.WithField("pathToManifest", pathToManifest).Info("reading manifest")
 	cmd.UI.DisplayText("Using manifest file {{.Path}}", map[string]interface{}{
 		"Path": pathToManifest,
