@@ -364,7 +364,7 @@ func (cmd V2PushCommand) processEvent(user configv3.User, appConfig pushaction.A
 	case pushaction.CreatingArchive:
 		cmd.UI.DisplayText("Packaging files to upload...")
 	case pushaction.UploadingApplication:
-		cmd.UI.DisplayText("All files cached, I DON'T KNOW WHAT TO SAY HERE, DIES HELP ME OUT")
+		cmd.UI.DisplayText("All files found in remote cache; nothing to upload.")
 		cmd.UI.DisplayText("Waiting for API to complete processing files...")
 	case pushaction.UploadingApplicationWithArchive:
 		cmd.UI.DisplayText("Uploading files...")

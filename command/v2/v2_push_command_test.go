@@ -435,7 +435,7 @@ var _ = Describe("v2-push Command", func() {
 								Expect(testUI.Out).To(Say("Unmapping routes\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Binding services\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Comparing local files to remote cache\\.\\.\\."))
-								Expect(testUI.Out).To(Say("All files cached, I DON'T KNOW WHAT TO SAY HERE, DIES HELP ME OUT"))
+								Expect(testUI.Out).To(Say("All files found in remote cache; nothing to upload."))
 								Expect(testUI.Out).To(Say("Waiting for API to complete processing files\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Packaging files to upload\\.\\.\\."))
 								Expect(testUI.Out).To(Say("Uploading files\\.\\.\\."))

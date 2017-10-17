@@ -27,7 +27,7 @@ var _ = Describe("resource matching", func() {
 
 				session = helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "-b", "staticfile_buildpack")
 				Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
-				Eventually(session).Should(Say("All files cached"))
+				Eventually(session).Should(Say("All files found in remote cache; nothing to upload."))
 				Eventually(session).Should(Exit(0))
 			})
 
