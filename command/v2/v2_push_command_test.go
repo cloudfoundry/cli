@@ -395,7 +395,7 @@ var _ = Describe("v2-push Command", func() {
 
 									Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
 									Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(pathToManifest)))
-								}
+								})
 							})
 						})
 
