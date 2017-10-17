@@ -62,6 +62,13 @@ var _ = Describe("Info", func() {
 					},
 					"logging": {
 						"href": "wss://doppler.bosh-lite.com:443"
+					},
+					"app_ssh": {
+						"href": "ssh.bosh-lite.com:2222",
+						"meta": {
+							"host_key_fingerprint": "some-fingerprint",
+							"oath_client": "some-client"
+						}
 					}
 				}
 			}`, "SERVER_URL", server.URL(), -1)
@@ -97,6 +104,9 @@ var _ = Describe("Info", func() {
 			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 			Expect(apis.Logging()).To(Equal("wss://doppler.bosh-lite.com:443"))
 			Expect(apis.NetworkPolicyV1()).To(Equal(fmt.Sprintf("%s/networking/v1/external", server.URL())))
+			Expect(apis.AppSSHHostKeyFingerprint()).To(Equal("some-fingerprint"))
+			Expect(apis.AppSSHEndpoint()).To(Equal("ssh.bosh-lite.com:2222"))
+			Expect(apis.OAuthClient()).To(Equal("some-client"))
 		})
 
 		It("returns back the resource links", func() {

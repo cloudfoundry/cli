@@ -10,6 +10,24 @@ import (
 )
 
 type FakeCloudControllerClient struct {
+	AppSSHEndpointStub        func() string
+	appSSHEndpointMutex       sync.RWMutex
+	appSSHEndpointArgsForCall []struct{}
+	appSSHEndpointReturns     struct {
+		result1 string
+	}
+	appSSHEndpointReturnsOnCall map[int]struct {
+		result1 string
+	}
+	AppSSHHostKeyFingerprintStub        func() string
+	appSSHHostKeyFingerprintMutex       sync.RWMutex
+	appSSHHostKeyFingerprintArgsForCall []struct{}
+	appSSHHostKeyFingerprintReturns     struct {
+		result1 string
+	}
+	appSSHHostKeyFingerprintReturnsOnCall map[int]struct {
+		result1 string
+	}
 	AssignSpaceToIsolationSegmentStub        func(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	assignSpaceToIsolationSegmentMutex       sync.RWMutex
 	assignSpaceToIsolationSegmentArgsForCall []struct {
@@ -606,6 +624,86 @@ type FakeCloudControllerClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpoint() string {
+	fake.appSSHEndpointMutex.Lock()
+	ret, specificReturn := fake.appSSHEndpointReturnsOnCall[len(fake.appSSHEndpointArgsForCall)]
+	fake.appSSHEndpointArgsForCall = append(fake.appSSHEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("AppSSHEndpoint", []interface{}{})
+	fake.appSSHEndpointMutex.Unlock()
+	if fake.AppSSHEndpointStub != nil {
+		return fake.AppSSHEndpointStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.appSSHEndpointReturns.result1
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointCallCount() int {
+	fake.appSSHEndpointMutex.RLock()
+	defer fake.appSSHEndpointMutex.RUnlock()
+	return len(fake.appSSHEndpointArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointReturns(result1 string) {
+	fake.AppSSHEndpointStub = nil
+	fake.appSSHEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHEndpointReturnsOnCall(i int, result1 string) {
+	fake.AppSSHEndpointStub = nil
+	if fake.appSSHEndpointReturnsOnCall == nil {
+		fake.appSSHEndpointReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.appSSHEndpointReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprint() string {
+	fake.appSSHHostKeyFingerprintMutex.Lock()
+	ret, specificReturn := fake.appSSHHostKeyFingerprintReturnsOnCall[len(fake.appSSHHostKeyFingerprintArgsForCall)]
+	fake.appSSHHostKeyFingerprintArgsForCall = append(fake.appSSHHostKeyFingerprintArgsForCall, struct{}{})
+	fake.recordInvocation("AppSSHHostKeyFingerprint", []interface{}{})
+	fake.appSSHHostKeyFingerprintMutex.Unlock()
+	if fake.AppSSHHostKeyFingerprintStub != nil {
+		return fake.AppSSHHostKeyFingerprintStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.appSSHHostKeyFingerprintReturns.result1
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintCallCount() int {
+	fake.appSSHHostKeyFingerprintMutex.RLock()
+	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
+	return len(fake.appSSHHostKeyFingerprintArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturns(result1 string) {
+	fake.AppSSHHostKeyFingerprintStub = nil
+	fake.appSSHHostKeyFingerprintReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCloudControllerClient) AppSSHHostKeyFingerprintReturnsOnCall(i int, result1 string) {
+	fake.AppSSHHostKeyFingerprintStub = nil
+	if fake.appSSHHostKeyFingerprintReturnsOnCall == nil {
+		fake.appSSHHostKeyFingerprintReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.appSSHHostKeyFingerprintReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeCloudControllerClient) AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error) {
@@ -2754,6 +2852,10 @@ func (fake *FakeCloudControllerClient) UploadPackageReturnsOnCall(i int, result1
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.appSSHEndpointMutex.RLock()
+	defer fake.appSSHEndpointMutex.RUnlock()
+	fake.appSSHHostKeyFingerprintMutex.RLock()
+	defer fake.appSSHHostKeyFingerprintMutex.RUnlock()
 	fake.assignSpaceToIsolationSegmentMutex.RLock()
 	defer fake.assignSpaceToIsolationSegmentMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()

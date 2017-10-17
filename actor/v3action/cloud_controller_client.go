@@ -10,6 +10,8 @@ import (
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
+	AppSSHEndpoint() string
+	AppSSHHostKeyFingerprint() string
 	AssignSpaceToIsolationSegment(spaceGUID string, isolationSegmentGUID string) (ccv3.Relationship, ccv3.Warnings, error)
 	CloudControllerAPIVersion() string
 	CreateApplication(app ccv3.Application) (ccv3.Application, ccv3.Warnings, error)

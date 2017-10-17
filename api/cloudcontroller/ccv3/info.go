@@ -13,6 +13,9 @@ import (
 type APIInfo struct {
 	// Links is a list of top level Cloud Controller APIs.
 	Links struct {
+		// AppSSH is the link for application ssh info
+		AppSSH APILink `json:"app_ssh"`
+
 		// CCV3 is the link to the Cloud Controller V3 API
 		CCV3 APILink `json:"cloud_controller_v3"`
 
@@ -24,6 +27,18 @@ type APIInfo struct {
 		// UAA is the link to the UAA API
 		UAA APILink `json:"uaa"`
 	} `json:"links"`
+}
+
+func (info APIInfo) AppSSHHostKeyFingerprint() string {
+	return info.Links.AppSSH.Meta.HostKeyFingerprint
+}
+
+func (info APIInfo) AppSSHEndpoint() string {
+	return info.Links.AppSSH.HREF
+}
+
+func (info APIInfo) OAuthClient() string {
+	return info.Links.AppSSH.Meta.OAuthClient
 }
 
 // Logging returns the HREF for Logging.

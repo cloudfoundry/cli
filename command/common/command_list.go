@@ -35,6 +35,7 @@ type commandList struct {
 	V3Start              v3.V3StartCommand              `command:"v3-start" description:"Start an app"`
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 	V3UnsetEnv           v3.V3UnsetEnvCommand           `command:"v3-unset-env" description:"Remove an env variable from an app"`
+	V3SSH                v3.V3SSHCommand                `command:"v3-ssh" description:"SSH to an application container instance"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`
 	AddNetworkPolicy                   v3.AddNetworkPolicyCommand                   `command:"add-network-policy" description:"Create policy to allow direct network traffic from one app to another"`

@@ -45,6 +45,26 @@ type FakeSecureShellClient struct {
 	interactiveSessionReturnsOnCall map[int]struct {
 		result1 error
 	}
+	LocalPortForwardStub        func(localPortForwardSpecs []clissh.LocalPortForward) error
+	localPortForwardMutex       sync.RWMutex
+	localPortForwardArgsForCall []struct {
+		localPortForwardSpecs []clissh.LocalPortForward
+	}
+	localPortForwardReturns struct {
+		result1 error
+	}
+	localPortForwardReturnsOnCall map[int]struct {
+		result1 error
+	}
+	WaitStub        func() error
+	waitMutex       sync.RWMutex
+	waitArgsForCall []struct{}
+	waitReturns     struct {
+		result1 error
+	}
+	waitReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -195,6 +215,99 @@ func (fake *FakeSecureShellClient) InteractiveSessionReturnsOnCall(i int, result
 	}{result1}
 }
 
+func (fake *FakeSecureShellClient) LocalPortForward(localPortForwardSpecs []clissh.LocalPortForward) error {
+	var localPortForwardSpecsCopy []clissh.LocalPortForward
+	if localPortForwardSpecs != nil {
+		localPortForwardSpecsCopy = make([]clissh.LocalPortForward, len(localPortForwardSpecs))
+		copy(localPortForwardSpecsCopy, localPortForwardSpecs)
+	}
+	fake.localPortForwardMutex.Lock()
+	ret, specificReturn := fake.localPortForwardReturnsOnCall[len(fake.localPortForwardArgsForCall)]
+	fake.localPortForwardArgsForCall = append(fake.localPortForwardArgsForCall, struct {
+		localPortForwardSpecs []clissh.LocalPortForward
+	}{localPortForwardSpecsCopy})
+	fake.recordInvocation("LocalPortForward", []interface{}{localPortForwardSpecsCopy})
+	fake.localPortForwardMutex.Unlock()
+	if fake.LocalPortForwardStub != nil {
+		return fake.LocalPortForwardStub(localPortForwardSpecs)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.localPortForwardReturns.result1
+}
+
+func (fake *FakeSecureShellClient) LocalPortForwardCallCount() int {
+	fake.localPortForwardMutex.RLock()
+	defer fake.localPortForwardMutex.RUnlock()
+	return len(fake.localPortForwardArgsForCall)
+}
+
+func (fake *FakeSecureShellClient) LocalPortForwardArgsForCall(i int) []clissh.LocalPortForward {
+	fake.localPortForwardMutex.RLock()
+	defer fake.localPortForwardMutex.RUnlock()
+	return fake.localPortForwardArgsForCall[i].localPortForwardSpecs
+}
+
+func (fake *FakeSecureShellClient) LocalPortForwardReturns(result1 error) {
+	fake.LocalPortForwardStub = nil
+	fake.localPortForwardReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSecureShellClient) LocalPortForwardReturnsOnCall(i int, result1 error) {
+	fake.LocalPortForwardStub = nil
+	if fake.localPortForwardReturnsOnCall == nil {
+		fake.localPortForwardReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.localPortForwardReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSecureShellClient) Wait() error {
+	fake.waitMutex.Lock()
+	ret, specificReturn := fake.waitReturnsOnCall[len(fake.waitArgsForCall)]
+	fake.waitArgsForCall = append(fake.waitArgsForCall, struct{}{})
+	fake.recordInvocation("Wait", []interface{}{})
+	fake.waitMutex.Unlock()
+	if fake.WaitStub != nil {
+		return fake.WaitStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.waitReturns.result1
+}
+
+func (fake *FakeSecureShellClient) WaitCallCount() int {
+	fake.waitMutex.RLock()
+	defer fake.waitMutex.RUnlock()
+	return len(fake.waitArgsForCall)
+}
+
+func (fake *FakeSecureShellClient) WaitReturns(result1 error) {
+	fake.WaitStub = nil
+	fake.waitReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSecureShellClient) WaitReturnsOnCall(i int, result1 error) {
+	fake.WaitStub = nil
+	if fake.waitReturnsOnCall == nil {
+		fake.waitReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.waitReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeSecureShellClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -204,6 +317,10 @@ func (fake *FakeSecureShellClient) Invocations() map[string][][]interface{} {
 	defer fake.closeMutex.RUnlock()
 	fake.interactiveSessionMutex.RLock()
 	defer fake.interactiveSessionMutex.RUnlock()
+	fake.localPortForwardMutex.RLock()
+	defer fake.localPortForwardMutex.RUnlock()
+	fake.waitMutex.RLock()
+	defer fake.waitMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -10,6 +10,12 @@ type APILink struct {
 	Meta struct {
 		// Version of the API
 		Version string `json:"version"`
+
+		// Fingerprint to authenticate api with
+		HostKeyFingerprint string `json:"host_key_fingerprint"`
+
+		// Identifier for UAA queries
+		OAuthClient string `json:"oath_client"`
 	} `json:"meta"`
 }
 
