@@ -15,6 +15,7 @@ type Domain struct {
 	Name            string
 	RouterGroupGUID string
 	RouterGroupType constant.RouterGroupType
+	Type            constant.DomainType
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Domain response.
@@ -59,6 +60,7 @@ func (client *Client) GetSharedDomain(domainGUID string) (Domain, Warnings, erro
 		return Domain{}, response.Warnings, err
 	}
 
+	domain.Type = constant.SharedDomain
 	return domain, response.Warnings, nil
 }
 
@@ -83,6 +85,7 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 		return Domain{}, response.Warnings, err
 	}
 
+	domain.Type = constant.PrivateDomain
 	return domain, response.Warnings, nil
 }
 
@@ -99,6 +102,7 @@ func (client *Client) GetSharedDomains(queries ...Query) ([]Domain, Warnings, er
 	fullDomainsList := []Domain{}
 	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
 		if domain, ok := item.(Domain); ok {
+			domain.Type = constant.SharedDomain
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
 			return ccerror.UnknownObjectInListError{
@@ -126,6 +130,7 @@ func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries ...Q
 	fullDomainsList := []Domain{}
 	warnings, err := client.paginate(request, Domain{}, func(item interface{}) error {
 		if domain, ok := item.(Domain); ok {
+			domain.Type = constant.PrivateDomain
 			fullDomainsList = append(fullDomainsList, domain)
 		} else {
 			return ccerror.UnknownObjectInListError{

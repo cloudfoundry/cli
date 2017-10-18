@@ -15,7 +15,19 @@ type Domain ccv2.Domain
 
 // IsHTTP returns true for any router group type that is not 'tcp'.
 func (domain Domain) IsHTTP() bool {
+	// The default state of a domain is an HTTP domain; so if it is anything
+	// other than TCP, it is HTTP.
 	return !domain.IsTCP()
+}
+
+// IsPrivate returns true when the domain is a private domain.
+func (domain Domain) IsPrivate() bool {
+	return domain.Type == constant.PrivateDomain
+}
+
+// IsShared returns true when the domain is a shared domain.
+func (domain Domain) IsShared() bool {
+	return domain.Type == constant.SharedDomain
 }
 
 // IsTCP returns true only when the router group type equals 'tcp'.

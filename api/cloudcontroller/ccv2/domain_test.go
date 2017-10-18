@@ -48,6 +48,7 @@ var _ = Describe("Domain", func() {
 					GUID:            "shared-domain-guid",
 					RouterGroupGUID: "some-router-group-guid",
 					RouterGroupType: constant.HTTPRouterGroup,
+					Type:            constant.SharedDomain,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -101,7 +102,11 @@ var _ = Describe("Domain", func() {
 			It("returns the private domain and all warnings", func() {
 				domain, warnings, err := client.GetPrivateDomain("private-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(domain).To(Equal(Domain{Name: "private-domain-1.com", GUID: "private-domain-guid"}))
+				Expect(domain).To(Equal(Domain{
+					Name: "private-domain-1.com",
+					GUID: "private-domain-guid",
+					Type: constant.PrivateDomain,
+				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
@@ -211,24 +216,28 @@ var _ = Describe("Domain", func() {
 						Name:            "domain-name-1",
 						RouterGroupGUID: "some-router-group-guid-1",
 						RouterGroupType: constant.HTTPRouterGroup,
+						Type:            constant.SharedDomain,
 					},
 					{
 						GUID:            "domain-guid-2",
 						Name:            "domain-name-2",
 						RouterGroupGUID: "some-router-group-guid-2",
 						RouterGroupType: constant.HTTPRouterGroup,
+						Type:            constant.SharedDomain,
 					},
 					{
 						GUID:            "domain-guid-3",
 						Name:            "domain-name-3",
 						RouterGroupGUID: "some-router-group-guid-3",
 						RouterGroupType: constant.HTTPRouterGroup,
+						Type:            constant.SharedDomain,
 					},
 					{
 						GUID:            "domain-guid-4",
 						Name:            "domain-name-4",
 						RouterGroupGUID: "some-router-group-guid-4",
 						RouterGroupType: constant.HTTPRouterGroup,
+						Type:            constant.SharedDomain,
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
@@ -332,18 +341,22 @@ var _ = Describe("Domain", func() {
 					{
 						Name: "private-domain-name-1",
 						GUID: "private-domain-guid-1",
+						Type: constant.PrivateDomain,
 					},
 					{
 						Name: "private-domain-name-2",
 						GUID: "private-domain-guid-2",
+						Type: constant.PrivateDomain,
 					},
 					{
 						Name: "private-domain-name-3",
 						GUID: "private-domain-guid-3",
+						Type: constant.PrivateDomain,
 					},
 					{
 						Name: "private-domain-name-4",
 						GUID: "private-domain-guid-4",
+						Type: constant.PrivateDomain,
 					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))

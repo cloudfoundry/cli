@@ -26,6 +26,7 @@ var _ = Describe("Domain Actions", func() {
 
 	Describe("Domain", func() {
 		var domain Domain
+
 		Describe("IsHTTP", func() {
 			Context("when the RouterGroupType = 'http'", func() {
 				BeforeEach(func() {
@@ -76,6 +77,50 @@ var _ = Describe("Domain Actions", func() {
 
 				It("returns false", func() {
 					Expect(domain.IsTCP()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("IsShared", func() {
+			Context("when the the type is shared", func() {
+				BeforeEach(func() {
+					domain.Type = constant.SharedDomain
+				})
+
+				It("returns true", func() {
+					Expect(domain.IsShared()).To(BeTrue())
+				})
+			})
+
+			Context("when the RouterGroupType is anything else", func() {
+				BeforeEach(func() {
+					domain.Type = constant.PrivateDomain
+				})
+
+				It("returns false", func() {
+					Expect(domain.IsShared()).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("IsPrivate", func() {
+			Context("when the the type is shared", func() {
+				BeforeEach(func() {
+					domain.Type = constant.PrivateDomain
+				})
+
+				It("returns true", func() {
+					Expect(domain.IsPrivate()).To(BeTrue())
+				})
+			})
+
+			Context("when the RouterGroupType is anything else", func() {
+				BeforeEach(func() {
+					domain.Type = constant.SharedDomain
+				})
+
+				It("returns false", func() {
+					Expect(domain.IsPrivate()).To(BeFalse())
 				})
 			})
 		})
