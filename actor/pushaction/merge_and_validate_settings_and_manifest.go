@@ -144,6 +144,10 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"docker", "path"}}
 			}
 		}
+
+		if app.NoHostname && app.NoRoute {
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-hostname", "no-route"}}
+		}
 	}
 	return nil
 }

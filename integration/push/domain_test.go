@@ -78,7 +78,7 @@ var _ = Describe("push with different domain values", func() {
 			BeforeEach(func() {
 				domainName = helpers.DomainName("tcp-domain")
 				domain = helpers.NewDomain(organization, domainName)
-				domain.CreateWithRouterGroup("default-tcp")
+				domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
 			})
 
 			AfterEach(func() {

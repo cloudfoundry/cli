@@ -8,9 +8,8 @@ import (
 )
 
 type Application struct {
-	Buildpack types.FilteredString
-	Command   types.FilteredString
-	// DiskQuota is the disk size in megabytes.
+	Buildpack      types.FilteredString
+	Command        types.FilteredString
 	DiskQuota      types.NullByteSizeInMb
 	DockerImage    string
 	DockerUsername string
@@ -24,20 +23,20 @@ type Application struct {
 	HealthCheckTimeout int
 	HealthCheckType    string
 	Instances          types.NullInt
-	// Memory is the amount of memory in megabytes.
-	Memory    types.NullByteSizeInMb
-	Name      string
-	Domain    string
-	NoRoute   bool
-	Path      string
-	Routes    []string
-	Services  []string
-	StackName string
+	Memory             types.NullByteSizeInMb
+	Name               string
+	Domain             string
+	NoHostname         bool
+	NoRoute            bool
+	Path               string
+	Routes             []string
+	Services           []string
+	StackName          string
 }
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-route: %t, Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-hostname: %t, No-route: %t, Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -51,6 +50,7 @@ func (app Application) String() string {
 		app.Instances.IsSet,
 		app.Instances.Value,
 		app.Memory,
+		app.NoHostname,
 		app.NoRoute,
 		app.Path,
 		strings.Join(app.Routes, ", "),

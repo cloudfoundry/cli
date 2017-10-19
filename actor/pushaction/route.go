@@ -197,15 +197,14 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 		return v2action.Route{}, warnings, err
 	}
 
-	var host string
-
-	if desiredDomain.IsHTTP() {
-		host = manifestApp.Name
+	desiredHostname, err := actor.calculateHostname(manifestApp, desiredDomain)
+	if err != nil {
+		return v2action.Route{}, warnings, err
 	}
 
 	defaultRoute := v2action.Route{
 		Domain:    desiredDomain,
-		Host:      strings.ToLower(host),
+		Host:      desiredHostname,
 		SpaceGUID: spaceGUID,
 	}
 
@@ -257,6 +256,24 @@ func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID str
 	}
 
 	return desiredDomain, warnings, nil
+}
+
+func (actor Actor) calculateHostname(manifestApp manifest.Application, domain v2action.Domain) (string, error) {
+	sanitizedAppName := strings.ToLower(manifestApp.Name)
+
+	switch {
+	case manifestApp.NoHostname && domain.IsShared():
+		return "", actionerror.PropertyCombinationError{
+			AppName:    manifestApp.Name,
+			Properties: []string{"no-hostname", "shared-domain"},
+		}
+	case manifestApp.NoHostname:
+		return "", nil
+	case domain.IsHTTP():
+		return sanitizedAppName, nil
+	default:
+		return "", nil
+	}
 }
 
 func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.Domain) ([]string, v2action.Domain, error) {

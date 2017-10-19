@@ -428,7 +428,7 @@ var _ = Describe("create-route command", func() {
 
 					BeforeEach(func() {
 						domain = helpers.NewDomain(orgName, domainName)
-						domain.CreateWithRouterGroup("default-tcp")
+						domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
 					})
 
 					AfterEach(func() {

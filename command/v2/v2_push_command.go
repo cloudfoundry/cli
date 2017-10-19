@@ -46,10 +46,10 @@ type V2PushCommand struct {
 	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
 	// Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
-	Instances flag.Instances `short:"i" description:"Number of instances"`
-	DiskQuota flag.Megabytes `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	Memory    flag.Megabytes `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	// NoHostname           bool                        `long:"no-hostname" description:"Map the root domain to this app"`
+	Instances  flag.Instances              `short:"i" description:"Number of instances"`
+	DiskQuota  flag.Megabytes              `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	Memory     flag.Megabytes              `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	NoHostname bool                        `long:"no-hostname" description:"Map the root domain to this app"`
 	NoManifest bool                        `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute    bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
 	NoStart    bool                        `long:"no-start" description:"Do not start an app after pushing"`
@@ -253,6 +253,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		Instances:          cmd.Instances.NullInt,
 		Memory:             cmd.Memory.Value,
 		Name:               cmd.OptionalArgs.AppName,
+		NoHostname:         cmd.NoHostname,
 		NoRoute:            cmd.NoRoute,
 		ProvidedAppPath:    string(cmd.AppPath),
 		StackName:          cmd.StackName,
@@ -421,6 +422,10 @@ func (cmd V2PushCommand) validateArgs() error {
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-f", "--no-manifest"},
+		}
+	case cmd.NoHostname && cmd.NoRoute:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--no-hostname", "--no-route"},
 		}
 	}
 

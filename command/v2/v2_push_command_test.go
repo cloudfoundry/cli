@@ -21,7 +21,9 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/manifest"
 	"code.cloudfoundry.org/cli/util/ui"
+
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -700,160 +702,174 @@ var _ = Describe("v2-push Command", func() {
 	})
 
 	Describe("GetCommandLineSettings", func() {
-		var (
-			settings   pushaction.CommandLineSettings
-			executeErr error
+		Context("valid flag combinations", func() {
+			var (
+				settings   pushaction.CommandLineSettings
+				executeErr error
+			)
+
+			JustBeforeEach(func() {
+				settings, executeErr = cmd.GetCommandLineSettings()
+				Expect(executeErr).ToNot(HaveOccurred())
+			})
+
+			Context("when general app settings are given", func() {
+				BeforeEach(func() {
+					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+					cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
+					cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
+					cmd.HealthCheckTimeout = 14
+					cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
+					cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
+					cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
+					cmd.StackName = "some-stack"
+				})
+
+				It("sets them on the command line settings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
+					Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
+					Expect(settings.DiskQuota).To(Equal(uint64(1024)))
+					Expect(settings.HealthCheckTimeout).To(Equal(14))
+					Expect(settings.HealthCheckType).To(Equal("http"))
+					Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
+					Expect(settings.Memory).To(Equal(uint64(100)))
+					Expect(settings.StackName).To(Equal("some-stack"))
+				})
+			})
+
+			Context("route related flags", func() {
+				Context("when given customed route settings", func() {
+					BeforeEach(func() {
+						cmd.Domain = "some-domain"
+					})
+
+					It("sets NoHostname on the command line settings", func() {
+						Expect(settings.Domain).To(Equal("some-domain"))
+					})
+				})
+
+				Context("when --no-hostname is given", func() {
+					BeforeEach(func() {
+						cmd.NoHostname = true
+					})
+
+					It("sets NoHostname on the command line settings", func() {
+						Expect(settings.NoHostname).To(BeTrue())
+					})
+				})
+
+				Context("when --no-route is given", func() {
+					BeforeEach(func() {
+						cmd.NoRoute = true
+					})
+
+					It("sets NoRoute on the command line settings", func() {
+						Expect(settings.NoRoute).To(BeTrue())
+					})
+				})
+			})
+
+			Context("app bits", func() {
+				Context("when -p flag is given", func() {
+					BeforeEach(func() {
+						cmd.AppPath = "some-directory-path"
+					})
+
+					It("sets ProvidedAppPath", func() {
+						Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
+					})
+				})
+
+				Context("when the -o flag is given", func() {
+					BeforeEach(func() {
+						cmd.DockerImage.Path = "some-docker-image-path"
+					})
+
+					It("creates command line setting from command line arguments", func() {
+						Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+					})
+
+					Context("--docker-username flags is given", func() {
+						BeforeEach(func() {
+							cmd.DockerUsername = "some-docker-username"
+						})
+
+						Context("the docker password environment variable is set", func() {
+							BeforeEach(func() {
+								fakeConfig.DockerPasswordReturns("some-docker-password")
+							})
+
+							It("creates command line setting from command line arguments and config", func() {
+								Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
+
+								Expect(settings.Name).To(Equal(appName))
+								Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+								Expect(settings.DockerUsername).To(Equal("some-docker-username"))
+								Expect(settings.DockerPassword).To(Equal("some-docker-password"))
+							})
+						})
+
+						Context("the docker password environment variable is *not* set", func() {
+							BeforeEach(func() {
+								input.Write([]byte("some-docker-password\n"))
+							})
+
+							It("prompts the user for a password", func() {
+								Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
+								Expect(testUI.Out).To(Say("Docker password"))
+
+								Expect(settings.Name).To(Equal(appName))
+								Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
+								Expect(settings.DockerUsername).To(Equal("some-docker-username"))
+								Expect(settings.DockerPassword).To(Equal("some-docker-password"))
+							})
+						})
+					})
+				})
+			})
+		})
+
+		DescribeTable("validation errors when flags are passed",
+			func(setup func(), expectedErr error) {
+				setup()
+				_, executeErr := cmd.GetCommandLineSettings()
+				Expect(executeErr).To(MatchError(expectedErr))
+			},
+
+			Entry("-o and -p",
+				func() {
+					cmd.DockerImage.Path = "some-docker-image"
+					cmd.AppPath = "some-directory-path"
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
+
+			Entry("-f and --no-manifest",
+				func() {
+					cmd.PathToManifest = "/some/path.yml"
+					cmd.NoManifest = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"-f", "--no-manifest"}}),
+
+			Entry("--docker-username (without DOCKER_PASSWORD env set)",
+				func() {
+					cmd.DockerUsername = "some-docker-username"
+				},
+				translatableerror.RequiredFlagsError{Arg1: "--docker-image, -o", Arg2: "--docker-username"}),
+
+			Entry("-o and -b",
+				func() {
+					cmd.DockerImage.Path = "some-docker-image"
+					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
+
+			Entry("--no-hostname and --no-route",
+				func() {
+					cmd.NoHostname = true
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--no-route"}}),
 		)
-
-		JustBeforeEach(func() {
-			settings, executeErr = cmd.GetCommandLineSettings()
-		})
-
-		Context("when passed app related flags", func() {
-			BeforeEach(func() {
-				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
-				cmd.Command = flag.Command{FilteredString: types.FilteredString{IsSet: true, Value: "echo foo bar baz"}}
-				cmd.DiskQuota = flag.Megabytes{NullUint64: types.NullUint64{Value: 1024, IsSet: true}}
-				cmd.Domain = "some-domain"
-				cmd.HealthCheckTimeout = 14
-				cmd.HealthCheckType = flag.HealthCheckType{Type: "http"}
-				cmd.Instances = flag.Instances{NullInt: types.NullInt{Value: 12, IsSet: true}}
-				cmd.Memory = flag.Megabytes{NullUint64: types.NullUint64{Value: 100, IsSet: true}}
-				cmd.NoRoute = true
-				cmd.StackName = "some-stack"
-			})
-
-			It("sets them on the command line settings", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
-				Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
-				Expect(settings.DiskQuota).To(Equal(uint64(1024)))
-				Expect(settings.Domain).To(Equal("some-domain"))
-				Expect(settings.HealthCheckTimeout).To(Equal(14))
-				Expect(settings.HealthCheckType).To(Equal("http"))
-				Expect(settings.Instances).To(Equal(types.NullInt{Value: 12, IsSet: true}))
-				Expect(settings.Memory).To(Equal(uint64(100)))
-				Expect(settings.NoRoute).To(BeTrue())
-				Expect(settings.StackName).To(Equal("some-stack"))
-			})
-		})
-
-		Context("when the -o and -p flags are both given", func() {
-			BeforeEach(func() {
-				cmd.DockerImage.Path = "some-docker-image"
-				cmd.AppPath = "some-directory-path"
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-					Args: []string{"--docker-image, -o", "-p"},
-				}))
-			})
-		})
-
-		Context("when only -f and --no-manifest flags are passed", func() {
-			BeforeEach(func() {
-				cmd.PathToManifest = "/some/path.yml"
-				cmd.NoManifest = true
-			})
-
-			It("returns an ArgumentCombinationError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-					Args: []string{"-f", "--no-manifest"},
-				}))
-			})
-		})
-
-		Context("when only -o flag is passed", func() {
-			BeforeEach(func() {
-				cmd.DockerImage.Path = "some-docker-image-path"
-			})
-
-			It("creates command line setting from command line arguments", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(settings.Name).To(Equal(appName))
-				Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-			})
-		})
-
-		Context("when only --docker-username flag are passed", func() {
-			BeforeEach(func() {
-				cmd.DockerUsername = "some-docker-username"
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.RequiredFlagsError{
-					Arg1: "--docker-image, -o",
-					Arg2: "--docker-username",
-				}))
-			})
-		})
-
-		Context("when the -o, --docker-username flags are passed", func() {
-			BeforeEach(func() {
-				cmd.DockerImage.Path = "some-docker-image-path"
-				cmd.DockerUsername = "some-docker-username"
-			})
-
-			Context("the docker password environment variable is set", func() {
-				BeforeEach(func() {
-					fakeConfig.DockerPasswordReturns("some-docker-password")
-				})
-
-				It("creates command line setting from command line arguments and config", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(testUI.Out).To(Say("Using docker repository password from environment variable CF_DOCKER_PASSWORD."))
-
-					Expect(settings.Name).To(Equal(appName))
-					Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-					Expect(settings.DockerUsername).To(Equal("some-docker-username"))
-					Expect(settings.DockerPassword).To(Equal("some-docker-password"))
-				})
-			})
-
-			Context("the docker password environment variable is *not* set", func() {
-				BeforeEach(func() {
-					input.Write([]byte("some-docker-password\n"))
-				})
-
-				It("prompts the user for a password", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-
-					Expect(testUI.Out).To(Say("Environment variable CF_DOCKER_PASSWORD not set."))
-					Expect(testUI.Out).To(Say("Docker password"))
-
-					Expect(settings.Name).To(Equal(appName))
-					Expect(settings.DockerImage).To(Equal("some-docker-image-path"))
-					Expect(settings.DockerUsername).To(Equal("some-docker-username"))
-					Expect(settings.DockerPassword).To(Equal("some-docker-password"))
-				})
-			})
-		})
-
-		Context("when only -p flag is passed", func() {
-			BeforeEach(func() {
-				cmd.AppPath = "some-directory-path"
-			})
-
-			It("creates command line setting from command line arguments", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(settings.Name).To(Equal(appName))
-				Expect(settings.ProvidedAppPath).To(Equal("some-directory-path"))
-			})
-		})
-
-		Context("when -o and -b flags are passed", func() {
-			BeforeEach(func() {
-				cmd.DockerImage.Path = "some-docker-image"
-				cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
-			})
-
-			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ArgumentCombinationError{
-					Args: []string{"-b", "--docker-image, -o"},
-				}))
-			})
-		})
 	})
 })

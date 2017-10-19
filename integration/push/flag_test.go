@@ -69,4 +69,16 @@ var _ = Describe("flag combinations", func() {
 			Eventually(session).Should(Exit(1))
 		})
 	})
+
+	Context("when the --no-hostname and --no-route flags are used together", func() {
+		It("tells the user that they cannot be used together, displays usage and fails", func() {
+			session := helpers.CF(PushCommandName, appName, "--no-hostname", "--no-route")
+
+			Eventually(session.Err).Should(Say("Incorrect Usage: The following arguments cannot be used together: --no-hostname, --no-route"))
+			Eventually(session).Should(Say("FAILED"))
+			Eventually(session).Should(Say("USAGE:"))
+
+			Eventually(session).Should(Exit(1))
+		})
+	})
 })

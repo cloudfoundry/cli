@@ -181,6 +181,10 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
+	manifestWithMultipleApps := []manifest.Application{
+		{Name: "some-name-1"},
+		{Name: "some-name-2"},
+	}
 	DescribeTable("validation errors",
 		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
 			_, err := actor.MergeAndValidateSettingsAndManifests(settings, apps)
@@ -189,26 +193,134 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 
 		Entry("MissingNameError", CommandLineSettings{}, nil, MissingNameError{}),
 		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, MissingNameError{}),
-		Entry("NonexistentAppPathError", CommandLineSettings{Name: "some-name", ProvidedAppPath: "does-not-exist"}, nil, NonexistentAppPathError{Path: "does-not-exist"}),
-		Entry("NonexistentAppPathError", CommandLineSettings{}, []manifest.Application{{Name: "some-name", Path: "does-not-exist"}}, NonexistentAppPathError{Path: "does-not-exist"}),
+
+		Entry("NonexistentAppPathError",
+			CommandLineSettings{
+				Name:            "some-name",
+				ProvidedAppPath: "does-not-exist",
+			}, nil,
+			NonexistentAppPathError{Path: "does-not-exist"}),
+		Entry("NonexistentAppPathError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name: "some-name",
+				Path: "does-not-exist",
+			}},
+			NonexistentAppPathError{Path: "does-not-exist"}),
+
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{Buildpack: types.FilteredString{IsSet: true}},
-			[]manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}},
+			CommandLineSettings{
+				Buildpack: types.FilteredString{IsSet: true},
+			},
+			manifestWithMultipleApps,
 			CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{Command: types.FilteredString{IsSet: true}},
-			[]manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{DiskQuota: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{DockerImage: "some-docker-image"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{HealthCheckTimeout: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{HealthCheckType: "http"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Instances: types.NullInt{IsSet: true}}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{Memory: 4}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{ProvidedAppPath: "some-path"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("CommandLineOptionsWithMultipleAppsError", CommandLineSettings{StackName: "some-stackname"}, []manifest.Application{{Name: "some-name-1"}, {Name: "some-name-2"}}, CommandLineOptionsWithMultipleAppsError{}),
-		Entry("DockerPasswordNotSetError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", DockerUsername: "some-username"}}, actionerror.DockerPasswordNotSetError{}),
-		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Buildpack: types.FilteredString{IsSet: true}}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "buildpack"}}),
-		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", DockerImage: "some-image", Path: "some-path"}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"docker", "path"}}),
-		Entry("PropertyCombinationError", CommandLineSettings{}, []manifest.Application{{Name: "some-name-1", Routes: []string{"some-route"}, NoRoute: true, Path: "some-path"}}, actionerror.PropertyCombinationError{AppName: "some-name-1", Properties: []string{"no-route", "routes"}}),
+			CommandLineSettings{
+				Command: types.FilteredString{IsSet: true},
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				DiskQuota: 4,
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				DockerImage: "some-docker-image",
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				HealthCheckTimeout: 4,
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				HealthCheckType: "http",
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				Instances: types.NullInt{IsSet: true},
+			},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{Memory: 4},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{ProvidedAppPath: "some-path"},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{StackName: "some-stackname"},
+			manifestWithMultipleApps,
+			CommandLineOptionsWithMultipleAppsError{}),
+
+		Entry("DockerPasswordNotSetError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:           "some-name-1",
+				DockerImage:    "some-image",
+				DockerUsername: "some-username",
+			}},
+			actionerror.DockerPasswordNotSetError{}),
+
+		// The following are premerge PropertyCombinationErrors
+		Entry("PropertyCombinationError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:    "some-name-1",
+				Routes:  []string{"some-route"},
+				NoRoute: true,
+				Path:    "some-path",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"no-route", "routes"},
+			}),
+
+		// The following are postmerge PropertyCombinationErrors
+		Entry("PropertyCombinationError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-image",
+				Buildpack:   types.FilteredString{IsSet: true},
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"docker", "buildpack"},
+			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-image",
+				Path:        "some-path",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"docker", "path"},
+			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				NoHostname: true,
+				NoRoute:    true,
+			},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-docker-image",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"no-hostname", "no-route"},
+			}),
 	)
 })

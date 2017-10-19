@@ -57,7 +57,7 @@ var _ = Describe("ssh command", func() {
 			appName = helpers.PrefixedRandomName("app")
 			domainName = defaultSharedDomain()
 			tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-			tcpDomain.CreateWithRouterGroup("default-tcp")
+			tcpDomain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
 			helpers.WithHelloWorldApp(func(appDir string) {
 				manifestContents := []byte(fmt.Sprintf(`
 ---
