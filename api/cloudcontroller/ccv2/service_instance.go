@@ -21,10 +21,13 @@ const (
 
 // ServiceInstance represents a Cloud Controller Service Instance.
 type ServiceInstance struct {
-	GUID      string
-	Name      string
-	SpaceGUID string
-	Type      ServiceInstanceType
+	GUID            string
+	Name            string
+	SpaceGUID       string
+	ServicePlanGUID string
+	Type            ServiceInstanceType
+	Tags            []string
+	DashboardURL    string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
@@ -32,9 +35,12 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	var ccServiceInstance struct {
 		Metadata internal.Metadata
 		Entity   struct {
-			Name      string `json:"name"`
-			SpaceGUID string `json:"space_guid"`
-			Type      string `json:"type"`
+			Name            string   `json:"name"`
+			SpaceGUID       string   `json:"space_guid"`
+			ServicePlanGUID string   `json:"service_plan_guid"`
+			Type            string   `json:"type"`
+			Tags            []string `json:"tags"`
+			DashboardURL    string   `json:"dashboard_url"`
 		}
 	}
 	err := json.Unmarshal(data, &ccServiceInstance)
@@ -45,7 +51,10 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.GUID = ccServiceInstance.Metadata.GUID
 	serviceInstance.Name = ccServiceInstance.Entity.Name
 	serviceInstance.SpaceGUID = ccServiceInstance.Entity.SpaceGUID
+	serviceInstance.ServicePlanGUID = ccServiceInstance.Entity.ServicePlanGUID
 	serviceInstance.Type = ServiceInstanceType(ccServiceInstance.Entity.Type)
+	serviceInstance.Tags = ccServiceInstance.Entity.Tags
+	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
 	return nil
 }
 

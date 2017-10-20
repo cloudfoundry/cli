@@ -128,7 +128,13 @@ var _ = Describe("Service Instance", func() {
 				"entity": {
 					"name": "some-service-name",
 					"space_guid": "some-space-guid",
-					"type": "managed_service_instance"
+					"service_plan_guid": "some-service-plan-guid",
+					"type": "managed_service_instance",
+					"tags": [
+						"tag-1",
+						"tag-2"
+					],
+					"dashboard_url": "some-dashboard-url"
 				}
 			}`
 
@@ -146,10 +152,13 @@ var _ = Describe("Service Instance", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(serviceInstance).To(Equal(ServiceInstance{
-					Name:      "some-service-name",
-					GUID:      "some-service-guid",
-					SpaceGUID: "some-space-guid",
-					Type:      ManagedService,
+					GUID:            "some-service-guid",
+					Name:            "some-service-name",
+					SpaceGUID:       "some-space-guid",
+					ServicePlanGUID: "some-service-plan-guid",
+					Type:            ManagedService,
+					Tags:            []string{"tag-1", "tag-2"},
+					DashboardURL:    "some-dashboard-url",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

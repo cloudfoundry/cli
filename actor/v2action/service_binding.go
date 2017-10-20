@@ -107,3 +107,17 @@ func (actor Actor) UnbindServiceBySpace(appName string, serviceInstanceName stri
 
 	return allWarnings, err
 }
+
+func (actor Actor) GetServiceBindingsByServiceInstance(serviceInstanceGUID string) ([]ServiceBinding, Warnings, error) {
+	serviceBindings, warnings, err := actor.CloudControllerClient.GetServiceInstanceServiceBindings(serviceInstanceGUID)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+
+	allServiceBindings := []ServiceBinding{}
+	for _, serviceBinding := range serviceBindings {
+		allServiceBindings = append(allServiceBindings, ServiceBinding(serviceBinding))
+	}
+
+	return allServiceBindings, Warnings(warnings), nil
+}

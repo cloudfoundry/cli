@@ -11,8 +11,8 @@ import (
 
 // ServiceBinding represents a Cloud Controller Service Binding.
 type ServiceBinding struct {
-	AppGUID             string
 	GUID                string
+	AppGUID             string
 	ServiceInstanceGUID string
 }
 
@@ -118,4 +118,29 @@ func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings,
 	var response cloudcontroller.Response
 	err = client.connection.Make(request, &response)
 	return response.Warnings, err
+}
+
+func (client *Client) GetServiceInstanceServiceBindings(serviceInstanceGUID string) ([]ServiceBinding, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetServiceInstanceServiceBindingsRequest,
+		URIParams:   map[string]string{"service_instance_guid": serviceInstanceGUID},
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullBindingsList []ServiceBinding
+	warnings, err := client.paginate(request, ServiceBinding{}, func(item interface{}) error {
+		if binding, ok := item.(ServiceBinding); ok {
+			fullBindingsList = append(fullBindingsList, binding)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   ServiceBinding{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullBindingsList, warnings, err
 }
