@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -243,50 +244,94 @@ var _ = Describe("service Command", func() {
 				})
 
 				Context("when no errors are encountered getting the service instance summary", func() {
-					BeforeEach(func() {
-						fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
-							v2action.ServiceInstanceSummary{
-								ServiceInstance: v2action.ServiceInstance{
-									Name:         "some-service-instance",
-									Tags:         []string{"tag-1", "tag-2", "tag-3"},
-									DashboardURL: "some-dashboard",
+					Context("when the service instance is a managed service instance", func() {
+						BeforeEach(func() {
+							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+								v2action.ServiceInstanceSummary{
+									ServiceInstance: v2action.ServiceInstance{
+										Name:         "some-service-instance",
+										Type:         ccv2.ManagedService,
+										Tags:         []string{"tag-1", "tag-2", "tag-3"},
+										DashboardURL: "some-dashboard",
+									},
+									ServicePlan: v2action.ServicePlan{Name: "some-plan"},
+									Service: v2action.Service{
+										Label:            "some-service",
+										Description:      "some-description",
+										DocumentationURL: "some-docs-url",
+									},
+									BoundApplications: []string{"app-1", "app-2", "app-3"},
 								},
-								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
-								Service: v2action.Service{
-									Label:            "some-service",
-									Description:      "some-description",
-									DocumentationURL: "some-docs-url",
-								},
-								BoundApplications: []string{"app-1", "app-2", "app-3"},
-							},
-							v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
-							nil,
-						)
+								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+								nil,
+							)
+						})
+
+						It("displays the service instance summary", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+							Expect(testUI.Out).To(Say("service:\\s+some-service"))
+							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
+							Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
+							Expect(testUI.Out).To(Say("plan:\\s+some-plan"))
+							Expect(testUI.Out).To(Say("description:\\s+some-description"))
+							Expect(testUI.Out).To(Say("documentation:\\s+some-docs-url"))
+							Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+
+							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+
+							Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+							serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+							Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+							Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+						})
 					})
 
-					It("displays the service instance summary", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+					Context("when the service instance is an user provided service instance", func() {
+						BeforeEach(func() {
+							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+								v2action.ServiceInstanceSummary{
+									ServiceInstance: v2action.ServiceInstance{
+										Name: "some-service-instance",
+										Type: ccv2.UserProvidedService,
+									},
+									BoundApplications: []string{"app-1", "app-2", "app-3"},
+								},
+								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+								nil,
+							)
+						})
 
-						Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
-						Expect(testUI.Out).To(Say(""))
-						Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
-						Expect(testUI.Out).To(Say("service:\\s+some-service"))
-						Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
-						Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
-						Expect(testUI.Out).To(Say("plan:\\s+some-plan"))
-						Expect(testUI.Out).To(Say("description:\\s+some-description"))
-						Expect(testUI.Out).To(Say("documentation:\\s+some-docs-url"))
-						Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+						It("displays the service instance summary", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
-						Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+							Expect(testUI.Out).To(Say("service:\\s+user-provided"))
+							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
+							Expect(testUI.Out).ToNot(Say("tags:"))
+							Expect(testUI.Out).ToNot(Say("plan:"))
+							Expect(testUI.Out).ToNot(Say("description:"))
+							Expect(testUI.Out).ToNot(Say("documentation:"))
+							Expect(testUI.Out).ToNot(Say("dashboard:"))
 
-						Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
-						serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
-						Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
-						Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
 
-						Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+							Expect(fakeActor.GetServiceInstanceSummaryByNameAndSpaceCallCount()).To(Equal(1))
+							serviceInstanceNameArg, spaceGUIDArg := fakeActor.GetServiceInstanceSummaryByNameAndSpaceArgsForCall(0)
+							Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+
+							Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
+						})
 					})
 				})
 			})

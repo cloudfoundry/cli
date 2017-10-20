@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -87,17 +88,29 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		return shared.HandleError(err)
 	}
 
-	table := [][]string{
-		{cmd.UI.TranslateText("name:"), serviceInstanceSummary.Name},
-		{cmd.UI.TranslateText("service:"), serviceInstanceSummary.Service.Label},
-		{cmd.UI.TranslateText("bound apps:"), strings.Join(serviceInstanceSummary.BoundApplications, ", ")},
-		{cmd.UI.TranslateText("tags:"), strings.Join(serviceInstanceSummary.Tags, ", ")},
-		{cmd.UI.TranslateText("plan:"), serviceInstanceSummary.ServicePlan.Name},
-		{cmd.UI.TranslateText("description:"), serviceInstanceSummary.Service.Description},
-		{cmd.UI.TranslateText("documentation:"), serviceInstanceSummary.Service.DocumentationURL},
-		{cmd.UI.TranslateText("dashboard:"), serviceInstanceSummary.DashboardURL},
-	}
-	cmd.UI.DisplayKeyValueTable("", table, 3)
+	var table [][]string
+	serviceInstanceName := serviceInstanceSummary.Name
+	boundApps := strings.Join(serviceInstanceSummary.BoundApplications, ", ")
 
+	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
+		table = [][]string{
+			{cmd.UI.TranslateText("name:"), serviceInstanceName},
+			{cmd.UI.TranslateText("service:"), serviceInstanceSummary.Service.Label},
+			{cmd.UI.TranslateText("bound apps:"), boundApps},
+			{cmd.UI.TranslateText("tags:"), strings.Join(serviceInstanceSummary.Tags, ", ")},
+			{cmd.UI.TranslateText("plan:"), serviceInstanceSummary.ServicePlan.Name},
+			{cmd.UI.TranslateText("description:"), serviceInstanceSummary.Service.Description},
+			{cmd.UI.TranslateText("documentation:"), serviceInstanceSummary.Service.DocumentationURL},
+			{cmd.UI.TranslateText("dashboard:"), serviceInstanceSummary.DashboardURL},
+		}
+	} else {
+		table = [][]string{
+			{cmd.UI.TranslateText("name:"), serviceInstanceName},
+			{cmd.UI.TranslateText("service:"), cmd.UI.TranslateText("user-provided")},
+			{cmd.UI.TranslateText("bound apps:"), boundApps},
+		}
+	}
+
+	cmd.UI.DisplayKeyValueTable("", table, 3)
 	return nil
 }
