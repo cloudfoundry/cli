@@ -5,9 +5,9 @@ import "fmt"
 // ProcessTypeNotFoundError is returned when a requested application is not
 // found.
 type ProcessTypeNotFoundError struct {
-	Name string
+	ProcessType string
 }
 
 func (e ProcessTypeNotFoundError) Error() string {
-	return fmt.Sprintf("Process type '%s' not found.", e.Name)
+	return fmt.Sprintf("Process %s not found", e.ProcessType)
 }

@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 )
@@ -38,6 +39,13 @@ var _ = Describe("v3-ssh Command", func() {
 		appName = "some-app"
 		cmd = v3.V3SSHCommand{
 			RequiredArgs: flag.AppName{AppName: appName},
+
+			ProcessType:         "some-process-type",
+			ProcessIndex:        1,
+			Commands:            []string{"some", "commands"},
+			ForwardSpecs:        []string{"some", "ports"},
+			SkipHostValidation:  true,
+			SkipRemoteExecution: true,
 
 			UI:          testUI,
 			Config:      fakeConfig,
@@ -99,6 +107,7 @@ var _ = Describe("v3-ssh Command", func() {
 		Context("when executing the secure shell succeeds", func() {
 			BeforeEach(func() {
 				fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns(v3action.Warnings{"some-warnings"}, nil)
+				cmd.DisablePseudoTTY = true
 			})
 
 			It("returns nil and displays all warnings", func() {
@@ -109,10 +118,77 @@ var _ = Describe("v3-ssh Command", func() {
 				appNameArg, spaceGUIDArg, processTypeArg, processIndexArg, sshOptionsArg := fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall(0)
 				Expect(appNameArg).To(Equal(appName))
 				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
-				Expect(processTypeArg).To(Equal("web"))
-				Expect(processIndexArg).To(Equal(uint(0)))
-				Expect(sshOptionsArg).To(Equal(v3action.SSHOptions{}))
+				Expect(processTypeArg).To(Equal("some-process-type"))
+				Expect(processIndexArg).To(Equal(uint(1)))
+				Expect(sshOptionsArg).To(Equal(v3action.SSHOptions{
+					Commands:            []string{"some", "commands"},
+					TTYOption:           sharedaction.RequestTTYNo,
+					SkipHostValidation:  true,
+					SkipRemoteExecution: true,
+				}))
 			})
+
+			Context("when the user doesn't provide a process-type and index", func() {
+				BeforeEach(func() {
+					cmd.ProcessType = ""
+					cmd.ProcessIndex = 0
+				})
+
+				It("defaults to 'web' and index 0", func() {
+					Expect(fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexCallCount()).To(Equal(1))
+					_, _, processTypeArg, processIndexArg, _ := fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall(0)
+					Expect(processTypeArg).To(Equal("web"))
+					Expect(processIndexArg).To(Equal(uint(0)))
+				})
+			})
+		})
+
+		Context("when a tty flag is provided", func() {
+			DescribeTable("tty combinations",
+				func(disablePseudoTTY bool, forcePseudoTTY bool, requestPseudoTTY bool, expectedErr error, ttyOption sharedaction.TTYOption) {
+					cmd.DisablePseudoTTY = disablePseudoTTY
+					cmd.ForcePseudoTTY = forcePseudoTTY
+					cmd.RequestPseudoTTY = requestPseudoTTY
+					executeErr = cmd.Execute(nil)
+
+					if expectedErr == nil {
+						Expect(executeErr).To(BeNil())
+						Expect(fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexCallCount()).To(Equal(2))
+						_, _, _, _, sshOptionsArg := fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall(1)
+						Expect(sshOptionsArg.TTYOption).To(Equal(ttyOption))
+					} else {
+						Expect(executeErr).To(MatchError(expectedErr))
+					}
+				},
+				Entry("default", false, false, false, nil, sharedaction.RequestTTYAuto),
+				Entry("disable tty", true, false, false, nil, sharedaction.RequestTTYNo),
+				Entry("force tty", false, true, false, nil, sharedaction.RequestTTYForce),
+				Entry("force tty", false, false, true, nil, sharedaction.RequestTTYYes),
+				Entry("disable and force tty", true, true, false,
+					translatableerror.ArgumentCombinationError{Args: []string{
+						"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
+					}},
+					sharedaction.TTYOption(0),
+				),
+				Entry("disable and requst tty", true, false, true,
+					translatableerror.ArgumentCombinationError{Args: []string{
+						"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
+					}},
+					sharedaction.TTYOption(0),
+				),
+				Entry("force and request tty", false, true, true,
+					translatableerror.ArgumentCombinationError{Args: []string{
+						"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
+					}},
+					sharedaction.TTYOption(0),
+				),
+				Entry("disable, force, and request tty", true, true, true,
+					translatableerror.ArgumentCombinationError{Args: []string{
+						"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
+					}},
+					sharedaction.TTYOption(0),
+				),
+			)
 		})
 	})
 })

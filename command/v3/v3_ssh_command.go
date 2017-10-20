@@ -1,11 +1,15 @@
 package v3
 
 import (
+	"net/http"
+
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/clissh"
 )
@@ -18,18 +22,19 @@ type V3SSHActor interface {
 }
 
 type V3SSHCommand struct {
-	RequiredArgs flag.AppName `positional-args:"yes"`
-	// ProcessType         string       `short:"p" description:"The process name" required:"true"`
-	// ProcessIndex        int          `short:"i" description:"The process index" required:"true"`
-	// Command             string       `short:"c" description:"command" required:"false"`
-	// DisablePseudoTTY    bool         `short:"T" description:"disable pseudo-tty" required:"false"`
-	// ForcePseudoTTY      bool         `short:"F" description:"force pseudo-tty" required:"false"`
-	// RequestPseudoTTY    bool         `short:"t" description:"request pseudo-tty" required:"false"`
-	// Forward             []string     `short:"L" description:"forward" required:"false"`
-	// SkipHostValidation  bool         `short:"k" description:"skip host validation" required:"false"`
-	// SkipRemoteExecution bool         `short:"N" description:"skip remote execution" required:"false"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	ProcessIndex        uint         `long:"app-instance-index" short:"i" description:"App process instance index (Default: 0)"`
+	Commands            []string     `long:"command" short:"c" description:"Command to run"`
+	DisablePseudoTTY    bool         `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
+	ForcePseudoTTY      bool         `long:"force-pseudo-tty" description:"Force pseudo-tty allocation"`
+	ForwardSpecs        []string     `short:"L" description:"Local port forward specification"`
+	ProcessType         string       `long:"process" description:"App process name (Default: web)"`
+	RequestPseudoTTY    bool         `long:"request-pseudo-tty" short:"t" description:"Request pseudo-tty allocation"`
+	SkipHostValidation  bool         `long:"skip-host-validation" short:"k" description:"Skip host key validation. Not recommended!"`
+	SkipRemoteExecution bool         `long:"skip-remote-execution" short:"N" description:"Do not execute a remote command"`
 
-	usage interface{} `usage:"CF_NAME v3-ssh APP_NAME"`
+	usage           interface{} `usage:"cf v3-ssh APP_NAME [--process PROCESS] [-i INDEX] [-c COMMAND]...\n   [-L [BIND_ADDRESS:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT]... [--skip-remote-execution]\n   [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty] [--skip-host-validation]\n"`
+	relatedCommands interface{} `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
 
 	UI          command.UI
 	Config      command.Config
@@ -45,6 +50,10 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
+		if v3Err, ok := err.(ccerror.V3UnexpectedResponseError); ok && v3Err.ResponseCode == http.StatusNotFound {
+			return translatableerror.MinimumAPIVersionNotMetError{MinimumVersion: ccversion.MinVersionV3}
+		}
+
 		return err
 	}
 
@@ -64,11 +73,56 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	warnings, err := cmd.Actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, "web", 0, v3action.SSHOptions{})
+	ttyOption, err := cmd.evaluateTTYOption()
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	if cmd.ProcessType == "" {
+		cmd.ProcessType = "web"
+	}
+
+	warnings, err := cmd.Actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.ProcessType, cmd.ProcessIndex, v3action.SSHOptions{
+		Commands:            cmd.Commands,
+		SkipHostValidation:  cmd.SkipHostValidation,
+		SkipRemoteExecution: cmd.SkipRemoteExecution,
+		TTYOption:           ttyOption,
+	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return shared.HandleError(err)
 	}
 
 	return nil
+}
+
+func (cmd V3SSHCommand) parseForwardSpecs() ([]sharedaction.LocalPortForward, error) {
+	return nil, nil
+}
+
+// tty options are mutually exclusive
+func (cmd V3SSHCommand) evaluateTTYOption() (sharedaction.TTYOption, error) {
+	var count int
+
+	option := sharedaction.RequestTTYAuto
+	if cmd.DisablePseudoTTY {
+		option = sharedaction.RequestTTYNo
+		count++
+	}
+	if cmd.ForcePseudoTTY {
+		option = sharedaction.RequestTTYForce
+		count++
+	}
+	if cmd.RequestPseudoTTY {
+		option = sharedaction.RequestTTYYes
+		count++
+	}
+
+	if count > 1 {
+		return option, translatableerror.ArgumentCombinationError{Args: []string{
+			"--disable-pseudo-tty", "-T", "--force-pseudo-tty", "--request-pseudo-tty", "-t",
+		}}
+	}
+
+	return option, nil
 }

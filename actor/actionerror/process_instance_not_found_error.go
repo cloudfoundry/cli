@@ -1,10 +1,13 @@
 package actionerror
 
-// ProcessInstanceNotFoundError is returned when trying
-// to ssh into an instance that doesn't exist
+import "fmt"
+
+// ProcessInstanceNotFoundError is returned when the proccess type or process instance cannot be found
 type ProcessInstanceNotFoundError struct {
+	ProcessType   string
+	InstanceIndex uint
 }
 
 func (e ProcessInstanceNotFoundError) Error() string {
-	return "The specified application instance does not exist"
+	return fmt.Sprintf("Instance %d of process %s not found", e.InstanceIndex, e.ProcessType)
 }

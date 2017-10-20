@@ -40,7 +40,12 @@ var _ = Describe("SSH Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex("some-app", "some-space-guid", "some-process-type", 0, SSHOptions{})
+			warnings, executeErr = actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex("some-app", "some-space-guid", "some-process-type", 0, SSHOptions{
+				Commands:            []string{"some-command"},
+				TTYOption:           sharedaction.RequestTTYForce,
+				SkipHostValidation:  true,
+				SkipRemoteExecution: true,
+			})
 		})
 
 		Context("when the app ssh endpoint is empty", func() {
@@ -113,7 +118,7 @@ var _ = Describe("SSH Actions", func() {
 						})
 
 						It("returns all warnings and the error", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessTypeNotFoundError{Name: "some-process-type"}))
+							Expect(executeErr).To(MatchError(actionerror.ProcessTypeNotFoundError{ProcessType: "some-process-type"}))
 							Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings"))
 						})
 					})
@@ -134,7 +139,7 @@ var _ = Describe("SSH Actions", func() {
 						})
 
 						It("returns a ProcessIndexNotFoundError", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotFoundError{}))
+							Expect(executeErr).To(MatchError(actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 0}))
 						})
 					})
 
@@ -157,11 +162,14 @@ var _ = Describe("SSH Actions", func() {
 
 								Expect(fakeSharedActor.ExecuteSecureShellCallCount()).To(Equal(1))
 								Expect(fakeSharedActor.ExecuteSecureShellArgsForCall(0)).To(Equal(sharedaction.SSHOptions{
-									Username:           "cf:some-process-guid/0",
-									Passcode:           "some-ssh-passcode",
-									Endpoint:           "some-app-ssh-endpoint",
-									HostKeyFingerprint: "some-app-ssh-fingerprint",
-									TTYOption:          0,
+									Commands:            []string{"some-command"},
+									Username:            "cf:some-process-guid/0",
+									Passcode:            "some-ssh-passcode",
+									Endpoint:            "some-app-ssh-endpoint",
+									HostKeyFingerprint:  "some-app-ssh-fingerprint",
+									TTYOption:           sharedaction.RequestTTYForce,
+									SkipHostValidation:  true,
+									SkipRemoteExecution: true,
 								}))
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))

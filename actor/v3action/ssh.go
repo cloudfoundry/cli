@@ -9,13 +9,13 @@ import (
 
 type SSHOptions struct {
 	Commands            []string
+	TTYOption           sharedaction.TTYOption
+	Forward             []string
 	SkipHostValidation  bool
-	DisablePseudoTTY    bool
-	ForcePseudoTTY      bool
-	RequestPseudoTTY    bool
 	SkipRemoteExecution bool
 }
 
+// TODO: implement port forward
 func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint, sshOptions SSHOptions) (Warnings, error) {
 	endpoint := actor.CloudControllerClient.AppSSHEndpoint()
 	if endpoint == "" {
@@ -42,14 +42,14 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 		if process.Type == processType {
 			processGUID = process.GUID
 			if uint(process.Instances.Value) < processIndex+1 {
-				return warnings, actionerror.ProcessInstanceNotFoundError{}
+				return warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
 			}
 			break
 		}
 	}
 
 	if processGUID == "" {
-		return warnings, actionerror.ProcessTypeNotFoundError{Name: processType}
+		return warnings, actionerror.ProcessTypeNotFoundError{ProcessType: processType}
 	}
 
 	if !summary.Application.Started() {
@@ -57,12 +57,15 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 	}
 
 	err = actor.SharedActor.ExecuteSecureShell(sharedaction.SSHOptions{
-		Username:           fmt.Sprintf("cf:%s/%d", processGUID, processIndex),
-		Passcode:           passcode,
-		Endpoint:           endpoint,
-		HostKeyFingerprint: fingerprint,
+		Username:            fmt.Sprintf("cf:%s/%d", processGUID, processIndex),
+		Commands:            sshOptions.Commands,
+		Passcode:            passcode,
+		Endpoint:            endpoint,
+		HostKeyFingerprint:  fingerprint,
+		SkipHostValidation:  sshOptions.SkipHostValidation,
+		SkipRemoteExecution: sshOptions.SkipRemoteExecution,
+		TTYOption:           sshOptions.TTYOption,
 	})
 
-	// call sharedactor.sshsomething stuff
 	return warnings, err
 }
