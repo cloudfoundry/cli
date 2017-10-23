@@ -7,22 +7,13 @@ import (
 
 	"sort"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 // Task represents a V3 actor Task.
 type Task ccv3.Task
-
-// TaskWorkersUnavailableError is returned when there are no workers to run a
-// given task.
-type TaskWorkersUnavailableError struct {
-	Message string
-}
-
-func (e TaskWorkersUnavailableError) Error() string {
-	return e.Message
-}
 
 // TaskNotFoundError is returned when no tasks matching the filters are found.
 type TaskNotFoundError struct {
@@ -39,7 +30,7 @@ func (actor Actor) RunTask(appGUID string, task Task) (Task, Warnings, error) {
 	createdTask, warnings, err := actor.CloudControllerClient.CreateApplicationTask(appGUID, ccv3.Task(task))
 	if err != nil {
 		if e, ok := err.(ccerror.TaskWorkersUnavailableError); ok {
-			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}
+			return Task{}, Warnings(warnings), actionerror.TaskWorkersUnavailableError{Message: e.Error()}
 		}
 	}
 

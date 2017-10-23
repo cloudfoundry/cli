@@ -3,8 +3,8 @@ package shared
 import (
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
@@ -31,24 +31,24 @@ func HandleError(err error) error {
 		return translatableerror.NoOrganizationTargetedError(e)
 	case sharedaction.NoSpaceTargetedError:
 		return translatableerror.NoSpaceTargetedError(e)
-
-	case v3action.ApplicationNotFoundError:
-		return translatableerror.ApplicationNotFoundError(e)
-	case v3action.AssignDropletError:
-		return translatableerror.AssignDropletError(e)
 	case sharedaction.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)
-	case v3action.IsolationSegmentNotFoundError:
+
+	case actionerror.ApplicationNotFoundError:
+		return translatableerror.ApplicationNotFoundError(e)
+	case actionerror.AssignDropletError:
+		return translatableerror.AssignDropletError(e)
+	case actionerror.IsolationSegmentNotFoundError:
 		return translatableerror.IsolationSegmentNotFoundError(e)
-	case v3action.OrganizationNotFoundError:
+	case actionerror.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError(e)
-	case v3action.ProcessNotFoundError:
-		return translatableerror.ProcessNotFoundError(e)
-	case v3action.ProcessInstanceNotFoundError:
+	case actionerror.ProcessInstanceNotFoundError:
 		return translatableerror.ProcessInstanceNotFoundError(e)
-	case v3action.StagingTimeoutError:
+	case actionerror.ProcessNotFoundError:
+		return translatableerror.ProcessNotFoundError(e)
+	case actionerror.StagingTimeoutError:
 		return translatableerror.StagingTimeoutError(e)
-	case v3action.TaskWorkersUnavailableError:
+	case actionerror.TaskWorkersUnavailableError:
 		return translatableerror.RunTaskError{Message: "Task workers are unavailable."}
 	}
 

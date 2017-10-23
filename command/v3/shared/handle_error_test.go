@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
@@ -53,12 +53,12 @@ var _ = Describe("HandleError", func() {
 			ccerror.APINotFoundError{URL: "some-url"},
 			translatableerror.APINotFoundError{URL: "some-url"}),
 
-		Entry("v3action.ApplicationNotFoundError -> ApplicationNotFoundError",
-			v3action.ApplicationNotFoundError{Name: "some-app"},
+		Entry("actionerror.ApplicationNotFoundError -> ApplicationNotFoundError",
+			actionerror.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
 		Entry("v3action.TaskWorkersUnavailableError -> RunTaskError",
-			v3action.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
+			actionerror.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
 			translatableerror.RunTaskError{Message: "Task workers are unavailable."}),
 
 		Entry("sharedaction.NotLoggedInError -> NotLoggedInError",
@@ -74,23 +74,23 @@ var _ = Describe("HandleError", func() {
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
 		Entry("v3action.AssignDropletError -> AssignDropletError",
-			v3action.AssignDropletError{Message: "some-message"},
+			actionerror.AssignDropletError{Message: "some-message"},
 			translatableerror.AssignDropletError{Message: "some-message"}),
 
 		Entry("v3action.OrganizationNotFoundError -> OrgNotFoundError",
-			v3action.OrganizationNotFoundError{Name: "some-org"},
+			actionerror.OrganizationNotFoundError{Name: "some-org"},
 			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
-		Entry("v3action.ProcessNotFoundError -> ProcessNotFoundError",
-			v3action.ProcessNotFoundError{ProcessType: "some-process-type"},
+		Entry("actionerror.ProcessNotFoundError -> ProcessNotFoundError",
+			actionerror.ProcessNotFoundError{ProcessType: "some-process-type"},
 			translatableerror.ProcessNotFoundError{ProcessType: "some-process-type"}),
 
-		Entry("v3action.ProcessInstanceNotFoundError -> ProcessInstanceNotFoundError",
-			v3action.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42},
+		Entry("actionerror.ProcessInstanceNotFoundError -> ProcessInstanceNotFoundError",
+			actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42},
 			translatableerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42}),
 
 		Entry("v3action.StagingTimeoutError -> StagingTimeoutError",
-			v3action.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
+			actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
 		Entry("v3action.EmptyDirectoryError -> EmptyDirectoryError",

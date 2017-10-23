@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -192,7 +193,7 @@ var _ = Describe("v3-restart Command", func() {
 				Context("when the get app call returns an error", func() {
 					Context("which is an ApplicationNotFoundError", func() {
 						BeforeEach(func() {
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning-1", "get-warning-2"}, v3action.ApplicationNotFoundError{Name: app})
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning-1", "get-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 						})
 
 						It("says that the app wasn't found", func() {
@@ -257,7 +258,7 @@ var _ = Describe("v3-restart Command", func() {
 
 				Context("when the start app call returns an ApplicationNotFoundError (someone else deleted app after we fetched app)", func() {
 					BeforeEach(func() {
-						fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, v3action.ApplicationNotFoundError{Name: app})
+						fakeActor.StartApplicationReturns(v3action.Application{}, v3action.Warnings{"start-warning-1", "start-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 					})
 
 					It("says that the app failed to start", func() {
@@ -301,7 +302,7 @@ var _ = Describe("v3-restart Command", func() {
 
 			Context("when the stop app call returns a ApplicationNotFoundError (someone else deleted app after we fetched summary)", func() {
 				BeforeEach(func() {
-					fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, v3action.ApplicationNotFoundError{Name: app})
+					fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, actionerror.ApplicationNotFoundError{Name: app})
 				})
 
 				It("says that the app failed to start", func() {

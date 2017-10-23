@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -201,7 +202,7 @@ var _ = Describe("v3-delete Command", func() {
 
 		Context("when the app doesn't exist", func() {
 			BeforeEach(func() {
-				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, v3action.ApplicationNotFoundError{Name: "some-app"})
+				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
 
 			It("displays all warnings, that the app wasn't found, and does not error", func() {

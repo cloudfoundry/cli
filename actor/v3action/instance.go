@@ -1,9 +1,9 @@
 package v3action
 
 import (
-	"fmt"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -16,16 +16,6 @@ func (instance *Instance) StartTime() time.Time {
 	uptimeDuration := time.Duration(instance.Uptime) * time.Second
 
 	return time.Now().Add(-uptimeDuration)
-}
-
-// ProcessInstanceNotFoundError is returned when the proccess type or process instance cannot be found
-type ProcessInstanceNotFoundError struct {
-	ProcessType   string
-	InstanceIndex int
-}
-
-func (e ProcessInstanceNotFoundError) Error() string {
-	return fmt.Sprintf("Instance %d for process %s not found", e.InstanceIndex, e.ProcessType)
 }
 
 func (actor Actor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, instanceIndex int) (Warnings, error) {
@@ -42,13 +32,13 @@ func (actor Actor) DeleteInstanceByApplicationNameSpaceProcessTypeAndIndex(appNa
 	if err != nil {
 		switch err.(type) {
 		case ccerror.ProcessNotFoundError:
-			return allWarnings, ProcessNotFoundError{
+			return allWarnings, actionerror.ProcessNotFoundError{
 				ProcessType: processType,
 			}
 		case ccerror.InstanceNotFoundError:
-			return allWarnings, ProcessInstanceNotFoundError{
+			return allWarnings, actionerror.ProcessInstanceNotFoundError{
 				ProcessType:   processType,
-				InstanceIndex: instanceIndex,
+				InstanceIndex: uint(instanceIndex),
 			}
 		default:
 			return allWarnings, err

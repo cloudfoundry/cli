@@ -68,7 +68,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			case actionerror.StagingFailedNoAppDetectedError:
 				return translatableerror.StagingFailedNoAppDetectedError{BinaryName: config.BinaryName(), Message: err.Error()}
 			case actionerror.StagingTimeoutError:
-				return translatableerror.StagingTimeoutError{AppName: err.Name, Timeout: err.Timeout}
+				return translatableerror.StagingTimeoutError{AppName: err.AppName, Timeout: err.Timeout}
 			case actionerror.ApplicationInstanceCrashedError:
 				return translatableerror.UnsuccessfulStartError{AppName: err.Name, BinaryName: config.BinaryName()}
 			case actionerror.ApplicationInstanceFlappingError:

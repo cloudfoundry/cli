@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -91,7 +92,7 @@ func (cmd V3DeleteCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v3action.ApplicationNotFoundError:
+		case actionerror.ApplicationNotFoundError:
 			cmd.UI.DisplayTextWithFlavor("App {{.AppName}} does not exist", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})

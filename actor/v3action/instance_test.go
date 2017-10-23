@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -65,7 +66,7 @@ var _ = Describe("instance actions", func() {
 				})
 
 				It("returns all warnings and the ProcessNotFoundError error", func() {
-					Expect(executeErr).To(Equal(ProcessNotFoundError{ProcessType: "some-process-type"}))
+					Expect(executeErr).To(Equal(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
 					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-warning"))
 				})
 			})
@@ -76,7 +77,7 @@ var _ = Describe("instance actions", func() {
 				})
 
 				It("returns all warnings and the ProcessInstanceNotFoundError error", func() {
-					Expect(executeErr).To(Equal(ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 666}))
+					Expect(executeErr).To(Equal(actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 666}))
 					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-warning"))
 				})
 			})

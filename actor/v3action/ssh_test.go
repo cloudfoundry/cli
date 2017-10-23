@@ -118,7 +118,7 @@ var _ = Describe("SSH Actions", func() {
 						})
 
 						It("returns all warnings and the error", func() {
-							Expect(executeErr).To(MatchError(actionerror.ProcessTypeNotFoundError{ProcessType: "some-process-type"}))
+							Expect(executeErr).To(MatchError(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
 							Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings"))
 						})
 					})

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -95,7 +96,7 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns a TaskWorkersUnavailableError and all warnings", func() {
-					Expect(err).To(MatchError(TaskWorkersUnavailableError{Message: "banana babans"}))
+					Expect(err).To(MatchError(actionerror.TaskWorkersUnavailableError{Message: "banana babans"}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})

@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -88,7 +89,7 @@ func (cmd DeleteIsolationSegmentCommand) Execute(args []string) error {
 
 	warnings, err := cmd.Actor.DeleteIsolationSegmentByName(cmd.RequiredArgs.IsolationSegmentName)
 	cmd.UI.DisplayWarnings(warnings)
-	if _, ok := err.(v3action.IsolationSegmentNotFoundError); ok {
+	if _, ok := err.(actionerror.IsolationSegmentNotFoundError); ok {
 		cmd.UI.DisplayWarning("Isolation segment {{.IsolationSegmentName}} does not exist.", map[string]interface{}{
 			"IsolationSegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		})

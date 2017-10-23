@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -133,7 +134,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 
 			Context("when the isolation segment does not exist", func() {
 				BeforeEach(func() {
-					fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.IsolationSegmentNotFoundError{Name: "segment1"})
+					fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.IsolationSegmentNotFoundError{Name: "segment1"})
 				})
 
 				It("displays all warnings and the isolation segment not found error", func() {
@@ -147,7 +148,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				BeforeEach(func() {
 					fakeActor.EntitleIsolationSegmentToOrganizationByNameReturns(
 						v3action.Warnings{"I am a warning", "I am also a warning"},
-						v3action.OrganizationNotFoundError{Name: "some-org"})
+						actionerror.OrganizationNotFoundError{Name: "some-org"})
 				})
 
 				It("displays all warnings and the org not found error", func() {

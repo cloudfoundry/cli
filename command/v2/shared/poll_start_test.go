@@ -134,7 +134,7 @@ var _ = Describe("Poll Start", func() {
 
 		Entry("StagingTimeoutError",
 			actionerror.StagingTimeoutError{
-				Name:    "some staging timeout name",
+				AppName: "some staging timeout name",
 				Timeout: time.Second,
 			},
 			translatableerror.StagingTimeoutError{

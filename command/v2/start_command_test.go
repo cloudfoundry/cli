@@ -449,7 +449,7 @@ var _ = Describe("Start Command", func() {
 
 					Context("staging timed out", func() {
 						BeforeEach(func() {
-							apiErr = actionerror.StagingTimeoutError{Name: "some-app", Timeout: time.Nanosecond}
+							apiErr = actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}
 						})
 
 						It("stops logging and returns StagingTimeoutError", func() {

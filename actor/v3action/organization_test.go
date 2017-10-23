@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -93,7 +94,7 @@ var _ = Describe("Organization Actions", func() {
 		It("returns an OrganizationNotFoundError and the warnings", func() {
 			_, warnings, err := actor.GetOrganizationByName("some-org-name")
 			Expect(warnings).To(ConsistOf("some-warning"))
-			Expect(err).To(MatchError(OrganizationNotFoundError{Name: "some-org-name"}))
+			Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org-name"}))
 			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 			expectedQuery := url.Values{
 				ccv3.NameFilter: []string{"some-org-name"},

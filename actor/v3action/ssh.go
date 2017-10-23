@@ -49,7 +49,7 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 	}
 
 	if processGUID == "" {
-		return warnings, actionerror.ProcessTypeNotFoundError{ProcessType: processType}
+		return warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
 	}
 
 	if !summary.Application.Started() {

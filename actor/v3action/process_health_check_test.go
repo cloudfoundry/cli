@@ -3,6 +3,7 @@ package v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -66,7 +67,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 			It("returns the error and warnings", func() {
 				_, warnings, err := actor.GetApplicationProcessHealthChecksByNameAndSpace("some-app-name", "some-space-guid")
-				Expect(err).To(Equal(ApplicationNotFoundError{Name: "some-app-name"}))
+				Expect(err).To(Equal(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
 				Expect(warnings).To(Equal(Warnings{"some-warning"}))
 			})
 		})
@@ -190,7 +191,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 			It("returns the error and warnings", func() {
 				_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "http", "some-http-endpoint", "some-process-type")
-				Expect(err).To(Equal(ApplicationNotFoundError{Name: "some-app-name"}))
+				Expect(err).To(Equal(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
 				Expect(warnings).To(Equal(Warnings{"some-warning"}))
 			})
 		})
@@ -243,7 +244,7 @@ var _ = Describe("Process Health Check Actions", func() {
 
 					It("returns a ProcessNotFoundError and all warnings", func() {
 						_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "http", "some-http-endpoint", "some-process-type")
-						Expect(err).To(Equal(ProcessNotFoundError{ProcessType: "some-process-type"}))
+						Expect(err).To(Equal(actionerror.ProcessNotFoundError{ProcessType: "some-process-type"}))
 						Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning"}))
 					})
 				})

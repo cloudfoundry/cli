@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -209,7 +210,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = OrganizationNotFoundError{Name: "some-org"}
+					expectedErr = actionerror.OrganizationNotFoundError{Name: "some-org"}
 					fakeCloudControllerClient.GetOrganizationsReturns(nil, ccv3.Warnings{"get-org-warning"}, expectedErr)
 				})
 
@@ -225,7 +226,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = IsolationSegmentNotFoundError{Name: "some-iso-seg"}
+				expectedErr = actionerror.IsolationSegmentNotFoundError{Name: "some-iso-seg"}
 				fakeCloudControllerClient.GetIsolationSegmentsReturns(nil, ccv3.Warnings{"get-iso-warning"}, expectedErr)
 			})
 
@@ -443,7 +444,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			It("returns an IsolationSegmentNotFoundError", func() {
 				_, warnings, err := actor.GetIsolationSegmentByName("some-iso-seg")
-				Expect(err).To(MatchError(IsolationSegmentNotFoundError{Name: "some-iso-seg"}))
+				Expect(err).To(MatchError(actionerror.IsolationSegmentNotFoundError{Name: "some-iso-seg"}))
 				Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings"))
 			})
 		})
@@ -658,7 +659,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 				It("returns back the error", func() {
 					warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-1", "org-1")
-					Expect(err).To(MatchError(OrganizationNotFoundError{Name: "org-1"}))
+					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "org-1"}))
 					Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1", "get-orgs-warning-1"))
 
 					Expect(fakeCloudControllerClient.RevokeIsolationSegmentFromOrganizationCallCount()).To(Equal(0))
@@ -673,7 +674,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 			It("returns back the error", func() {
 				warnings, err := actor.RevokeIsolationSegmentFromOrganizationByName("iso-2-org-1", "org-1")
-				Expect(err).To(MatchError(IsolationSegmentNotFoundError{Name: "iso-2-org-1"}))
+				Expect(err).To(MatchError(actionerror.IsolationSegmentNotFoundError{Name: "iso-2-org-1"}))
 				Expect(warnings).To(ConsistOf("get-entitled-orgs-warning-1"))
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(0))

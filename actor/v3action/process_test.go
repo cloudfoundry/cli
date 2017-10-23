@@ -3,6 +3,7 @@ package v3action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -89,7 +90,7 @@ var _ = Describe("Process Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				warnings, err := actor.ScaleProcessByApplication("some-app-guid", passedProcess)
-				Expect(err).To(Equal(ProcessNotFoundError{ProcessType: constant.ProcessTypeWeb}))
+				Expect(err).To(Equal(actionerror.ProcessNotFoundError{ProcessType: constant.ProcessTypeWeb}))
 				Expect(warnings).To(ConsistOf("scale-process-warning"))
 			})
 		})

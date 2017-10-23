@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -168,7 +169,7 @@ var _ = Describe("Application Actions", func() {
 				_, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(
-					ApplicationNotFoundError{Name: "some-app-name"}))
+					actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 				expectedQuery := url.Values{
 					"names":       []string{"some-app-name"},

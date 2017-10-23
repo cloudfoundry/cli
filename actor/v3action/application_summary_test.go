@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -247,7 +248,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			It("returns the error and warnings", func() {
 				_, warnings, err := actor.GetApplicationSummaryByNameAndSpace("some-app-name", "some-space-guid")
-				Expect(err).To(Equal(ApplicationNotFoundError{Name: "some-app-name"}))
+				Expect(err).To(Equal(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
 				Expect(warnings).To(Equal(Warnings{"some-warning"}))
 			})
 		})

@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -139,7 +140,7 @@ var _ = Describe("v3-stop Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			expectedErr = v3action.ApplicationNotFoundError{Name: app}
+			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, expectedErr)
 		})
 
@@ -164,7 +165,7 @@ var _ = Describe("v3-stop Command", func() {
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
 			fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{State: "STARTED"}, v3action.Warnings{"get-warning-1", "get-warning-2"}, nil)
-			expectedErr = v3action.ApplicationNotFoundError{Name: app}
+			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.StopApplicationReturns(v3action.Warnings{"stop-warning-1", "stop-warning-2"}, expectedErr)
 		})
 

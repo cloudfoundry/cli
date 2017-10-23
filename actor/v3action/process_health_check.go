@@ -3,6 +3,7 @@ package v3action
 import (
 	"sort"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
@@ -95,7 +96,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName st
 	allWarnings = append(allWarnings, Warnings(warnings)...)
 	if err != nil {
 		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
-			return Application{}, allWarnings, ProcessNotFoundError{ProcessType: processType}
+			return Application{}, allWarnings, actionerror.ProcessNotFoundError{ProcessType: processType}
 		}
 		return Application{}, allWarnings, err
 	}

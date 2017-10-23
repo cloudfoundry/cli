@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -32,16 +33,6 @@ const (
 
 func (app Application) Started() bool {
 	return app.State == "STARTED"
-}
-
-// ApplicationNotFoundError represents the error that occurs when the
-// application is not found.
-type ApplicationNotFoundError struct {
-	Name string
-}
-
-func (e ApplicationNotFoundError) Error() string {
-	return fmt.Sprintf("Application '%s' not found.", e.Name)
 }
 
 // ApplicationAlreadyExistsError represents the error that occurs when the
@@ -86,7 +77,7 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 	}
 
 	if len(apps) == 0 {
-		return Application{}, Warnings(warnings), ApplicationNotFoundError{Name: appName}
+		return Application{}, Warnings(warnings), actionerror.ApplicationNotFoundError{Name: appName}
 	}
 
 	return Application{

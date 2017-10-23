@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -134,7 +135,7 @@ var _ = Describe("Build Actions", func() {
 				var expectedErr error
 
 				BeforeEach(func() {
-					expectedErr = StagingTimeoutError{AppName: "some-app", Timeout: 0}
+					expectedErr = actionerror.StagingTimeoutError{AppName: "some-app", Timeout: 0}
 					fakeConfig.StagingTimeoutReturns(0)
 				})
 

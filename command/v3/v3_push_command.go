@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -133,7 +134,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	var app v3action.Application
 	app, err = cmd.getApplication()
-	if _, ok := err.(v3action.ApplicationNotFoundError); ok {
+	if _, ok := err.(actionerror.ApplicationNotFoundError); ok {
 		app, err = cmd.createApplication(user.Name)
 		if err != nil {
 			return shared.HandleError(err)

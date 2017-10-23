@@ -1,6 +1,7 @@
 package v3_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -146,7 +147,7 @@ var _ = Describe("set-space-isolation-segment Command", func() {
 
 			Context("when the entitlement errors", func() {
 				BeforeEach(func() {
-					fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceReturns(v3action.Warnings{"entitlement-warning", "banana"}, v3action.IsolationSegmentNotFoundError{Name: "segment1"})
+					fakeActor.AssignIsolationSegmentToSpaceByNameAndSpaceReturns(v3action.Warnings{"entitlement-warning", "banana"}, actionerror.IsolationSegmentNotFoundError{Name: "segment1"})
 				})
 
 				It("returns the warnings and error", func() {

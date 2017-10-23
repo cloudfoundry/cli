@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -114,7 +115,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		var expectedErr error
 
 		BeforeEach(func() {
-			expectedErr = v3action.ApplicationNotFoundError{Name: app}
+			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.GetApplicationProcessHealthChecksByNameAndSpaceReturns(nil, v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 

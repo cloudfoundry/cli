@@ -8,10 +8,10 @@ import (
 // StagingTimeoutError is returned when staging timeout is reached waiting for
 // an application to stage.
 type StagingTimeoutError struct {
-	Name    string
+	AppName string
 	Timeout time.Duration
 }
 
 func (e StagingTimeoutError) Error() string {
-	return fmt.Sprintf("Timed out waiting for application '%s' to stage", e.Name)
+	return fmt.Sprintf("Timed out waiting for application '%s' to stage", e.AppName)
 }

@@ -827,7 +827,7 @@ var _ = Describe("Application Actions", func() {
 					It("sends a timeout error and stops polling", func() {
 						Eventually(appState).Should(Receive(Equal(ApplicationStateStaging)))
 						Eventually(warnings).Should(Receive(Equal("state-warning")))
-						Eventually(errs).Should(Receive(MatchError(actionerror.StagingTimeoutError{Name: "some-app", Timeout: 0})))
+						Eventually(errs).Should(Receive(MatchError(actionerror.StagingTimeoutError{AppName: "some-app", Timeout: 0})))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))

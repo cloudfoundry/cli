@@ -4,17 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
-
-type StagingTimeoutError struct {
-	AppName string
-	Timeout time.Duration
-}
-
-func (StagingTimeoutError) Error() string {
-	return "Timed out waiting for package to stage"
-}
 
 func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Droplet, <-chan Warnings, <-chan error) {
 	dropletStream := make(chan Droplet)
@@ -73,7 +65,7 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 			}
 		}
 
-		errorStream <- StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
+		errorStream <- actionerror.StagingTimeoutError{AppName: appName, Timeout: actor.Config.StagingTimeout()}
 	}()
 
 	return dropletStream, warningsStream, errorStream

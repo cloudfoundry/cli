@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -127,7 +128,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 			Context("when the isolation segment lookup is unsuccessful", func() {
 				BeforeEach(func() {
-					fakeActor.GetIsolationSegmentByNameReturns(v3action.IsolationSegment{}, v3action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, v3action.IsolationSegmentNotFoundError{Name: isolationSegment})
+					fakeActor.GetIsolationSegmentByNameReturns(v3action.IsolationSegment{}, v3action.Warnings{"iso-seg-warning-1", "iso-seg-warning-2"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
 				})
 
 				It("returns the warnings and error", func() {
@@ -168,7 +169,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 				Context("when the entitlement errors", func() {
 					BeforeEach(func() {
-						fakeActor.SetOrganizationDefaultIsolationSegmentReturns(v3action.Warnings{"entitlement-warning", "banana"}, v3action.IsolationSegmentNotFoundError{Name: isolationSegment})
+						fakeActor.SetOrganizationDefaultIsolationSegmentReturns(v3action.Warnings{"entitlement-warning", "banana"}, actionerror.IsolationSegmentNotFoundError{Name: isolationSegment})
 					})
 
 					It("returns the warnings and error", func() {

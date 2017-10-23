@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -209,7 +210,7 @@ var _ = Describe("v3-push Command", func() {
 
 		Context("when looking up the application returns an application not found error", func() {
 			BeforeEach(func() {
-				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning"}, v3action.ApplicationNotFoundError{Name: "some-app"})
+				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
 
 			Context("when creating the application returns an error", func() {
@@ -661,7 +662,7 @@ var _ = Describe("v3-push Command", func() {
 										Context("when displaying the application info fails", func() {
 											BeforeEach(func() {
 												var expectedErr error
-												expectedErr = v3action.ApplicationNotFoundError{Name: app}
+												expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 												fakeActor.GetApplicationSummaryByNameAndSpaceReturns(v3action.ApplicationSummary{}, v3action.Warnings{"display-warning-1", "display-warning-2"}, expectedErr)
 											})
 

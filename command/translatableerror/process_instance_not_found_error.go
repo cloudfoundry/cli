@@ -3,7 +3,7 @@ package translatableerror
 // ProcessInstanceNotFoundError is returned when a proccess type or process instance can't be found
 type ProcessInstanceNotFoundError struct {
 	ProcessType   string
-	InstanceIndex int
+	InstanceIndex uint
 }
 
 func (ProcessInstanceNotFoundError) Error() string {

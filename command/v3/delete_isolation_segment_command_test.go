@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -134,7 +135,7 @@ var _ = Describe("delete-isolation-segment Command", func() {
 
 			Context("when the iso segment does not exist", func() {
 				BeforeEach(func() {
-					fakeActor.DeleteIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.IsolationSegmentNotFoundError{})
+					fakeActor.DeleteIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.IsolationSegmentNotFoundError{})
 				})
 
 				It("displays does not exist warning", func() {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -15,16 +16,6 @@ type IsolationSegmentSummary struct {
 
 // IsolationSegment represents a V3 actor IsolationSegment.
 type IsolationSegment ccv3.IsolationSegment
-
-// IsolationSegmentNotFoundError represents the error that occurs when the
-// isolation segment is not found.
-type IsolationSegmentNotFoundError struct {
-	Name string
-}
-
-func (e IsolationSegmentNotFoundError) Error() string {
-	return fmt.Sprintf("Isolation Segment '%s' not found.", e.Name)
-}
 
 // IsolationSegmentAlreadyExistsError gets returned when an isolation segment
 // already exists.
@@ -129,7 +120,7 @@ func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, War
 	}
 
 	if len(isolationSegments) == 0 {
-		return IsolationSegment{}, Warnings(warnings), IsolationSegmentNotFoundError{Name: name}
+		return IsolationSegment{}, Warnings(warnings), actionerror.IsolationSegmentNotFoundError{Name: name}
 	}
 
 	return IsolationSegment(isolationSegments[0]), Warnings(warnings), nil

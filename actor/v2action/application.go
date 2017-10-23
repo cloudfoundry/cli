@@ -379,7 +379,7 @@ func (actor Actor) pollStaging(app Application, config Config, allWarnings chan<
 		}
 		time.Sleep(config.PollingInterval())
 	}
-	return actionerror.StagingTimeoutError{Name: app.Name, Timeout: config.StagingTimeout()}
+	return actionerror.StagingTimeoutError{AppName: app.Name, Timeout: config.StagingTimeout()}
 }
 
 func (actor Actor) pollStartup(app Application, config Config, allWarnings chan<- string) error {

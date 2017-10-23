@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -136,7 +137,7 @@ var _ = Describe("v3-scale Command", func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(
 					v3action.Application{},
 					v3action.Warnings{"get-app-warning"},
-					v3action.ApplicationNotFoundError{Name: appName})
+					actionerror.ApplicationNotFoundError{Name: appName})
 			})
 
 			It("returns an ApplicationNotFoundError and all warnings", func() {

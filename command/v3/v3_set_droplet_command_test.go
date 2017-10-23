@@ -3,6 +3,7 @@ package v3_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -140,7 +141,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 				Name: "some-space",
 			})
 			fakeConfig.CurrentUserReturns(configv3.User{Name: "steve"}, nil)
-			expectedErr = v3action.ApplicationNotFoundError{Name: app}
+			expectedErr = actionerror.ApplicationNotFoundError{Name: app}
 			fakeActor.SetApplicationDropletReturns(v3action.Warnings{"warning-1", "warning-2"}, expectedErr)
 		})
 
