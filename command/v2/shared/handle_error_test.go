@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -136,13 +135,13 @@ var _ = Describe("HandleError", func() {
 			translatableerror.InvalidRefreshTokenError{},
 		),
 
-		Entry("pushaction.AppNotFoundInManifestError -> AppNotFoundInManifestError",
-			pushaction.AppNotFoundInManifestError{Name: "some-app"},
+		Entry("actionerror.AppNotFoundInManifestError -> AppNotFoundInManifestError",
+			actionerror.AppNotFoundInManifestError{Name: "some-app"},
 			translatableerror.AppNotFoundInManifestError{Name: "some-app"},
 		),
 
-		Entry("pushaction.NoDomainsFoundError -> NoDomainsFoundError",
-			pushaction.NoDomainsFoundError{OrganizationGUID: "some-guid"},
+		Entry("actionerror.NoDomainsFoundError -> NoDomainsFoundError",
+			actionerror.NoDomainsFoundError{OrganizationGUID: "some-guid"},
 			translatableerror.NoDomainsFoundError{},
 		),
 
@@ -151,23 +150,23 @@ var _ = Describe("HandleError", func() {
 			translatableerror.PortNotAllowedWithHTTPDomainError{Domain: "some-domain"},
 		),
 
-		Entry("pushaction.MissingNameError -> RequiredNameForPushError",
-			pushaction.MissingNameError{},
+		Entry("actionerror.MissingNameError -> RequiredNameForPushError",
+			actionerror.MissingNameError{},
 			translatableerror.RequiredNameForPushError{},
 		),
 
-		Entry("pushaction.UploadFailedError -> UploadFailedError",
-			pushaction.UploadFailedError{Err: pushaction.NoDomainsFoundError{}},
+		Entry("actionerror.UploadFailedError -> UploadFailedError",
+			actionerror.UploadFailedError{Err: actionerror.NoDomainsFoundError{}},
 			translatableerror.UploadFailedError{Err: translatableerror.NoDomainsFoundError{}},
 		),
 
-		Entry("pushaction.NonexistentAppPathError -> FileNotFoundError",
-			pushaction.NonexistentAppPathError{Path: "some-path"},
+		Entry("actionerror.NonexistentAppPathError -> FileNotFoundError",
+			actionerror.NonexistentAppPathError{Path: "some-path"},
 			translatableerror.FileNotFoundError{Path: "some-path"},
 		),
 
-		Entry("pushaction.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
-			pushaction.CommandLineOptionsWithMultipleAppsError{},
+		Entry("actionerror.CommandLineOptionsWithMultipleAppsError -> CommandLineArgsWithMultipleAppsError",
+			actionerror.CommandLineOptionsWithMultipleAppsError{},
 			translatableerror.CommandLineArgsWithMultipleAppsError{},
 		),
 

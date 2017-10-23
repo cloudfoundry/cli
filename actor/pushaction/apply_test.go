@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -218,7 +219,7 @@ var _ = Describe("Apply", func() {
 											Eventually(warningsStream).Should(Receive(ConsistOf("upload-warnings-1", "upload-warnings-2")))
 											Eventually(eventStream).Should(Receive(Equal(RetryUpload)))
 
-											Eventually(errorStream).Should(Receive(Equal(UploadFailedError{})))
+											Eventually(errorStream).Should(Receive(Equal(actionerror.UploadFailedError{})))
 										})
 									})
 

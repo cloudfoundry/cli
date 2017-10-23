@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -63,7 +64,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 
 			It("returns the RepositoryNameTakenError", func() {
-				Expect(err).To(MatchError(RepositoryNameTakenError{Name: "some-repo"}))
+				Expect(err).To(MatchError(actionerror.RepositoryNameTakenError{Name: "some-repo"}))
 			})
 		})
 
@@ -78,7 +79,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 
 			It("returns a RepositoryAlreadyExistsError", func() {
-				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
+				Expect(err).To(MatchError(actionerror.RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
 
 				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
 				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
@@ -96,7 +97,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 
 			It("returns a RepositoryAlreadyExistsError", func() {
-				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "sOmE-rEpO", URL: "https://some-URL"}))
+				Expect(err).To(MatchError(actionerror.RepositoryAlreadyExistsError{Name: "sOmE-rEpO", URL: "https://some-URL"}))
 
 				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
 				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
@@ -115,7 +116,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 
 			It("returns a RepositoryAlreadyExistsError", func() {
 				err = actor.AddPluginRepository("some-repo", "some-URL/")
-				Expect(err).To(MatchError(RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
+				Expect(err).To(MatchError(actionerror.RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-URL"}))
 
 				Expect(fakePluginClient.GetPluginRepositoryCallCount()).To(Equal(0))
 				Expect(fakeConfig.AddPluginRepositoryCallCount()).To(Equal(0))
@@ -155,7 +156,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 			})
 
 			It("returns an AddPluginRepositoryError", func() {
-				Expect(err).To(MatchError(AddPluginRepositoryError{
+				Expect(err).To(MatchError(actionerror.AddPluginRepositoryError{
 					Name:    "some-repo",
 					URL:     "https://some-URL",
 					Message: "generic-error",
@@ -200,7 +201,7 @@ var _ = Describe("Plugin Repository Actions", func() {
 		Context("when the repository is not registered", func() {
 			It("returns a RepositoryNotRegisteredError", func() {
 				_, err := actor.GetPluginRepository("some-rEPO")
-				Expect(err).To(MatchError(RepositoryNotRegisteredError{Name: "some-rEPO"}))
+				Expect(err).To(MatchError(actionerror.RepositoryNotRegisteredError{Name: "some-rEPO"}))
 			})
 		})
 	})

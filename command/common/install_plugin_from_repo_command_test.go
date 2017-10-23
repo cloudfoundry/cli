@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strconv"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
@@ -88,7 +89,7 @@ var _ = Describe("install-plugin command", func() {
 
 		Context("when the repo is not registered", func() {
 			BeforeEach(func() {
-				fakeActor.GetPluginRepositoryReturns(configv3.PluginRepository{}, pluginaction.RepositoryNotRegisteredError{Name: repoName})
+				fakeActor.GetPluginRepositoryReturns(configv3.PluginRepository{}, actionerror.RepositoryNotRegisteredError{Name: repoName})
 			})
 
 			It("returns a RepositoryNotRegisteredError", func() {
@@ -125,7 +126,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("with a generic error", func() {
 					BeforeEach(func() {
 						expectedErr = errors.New("some-client-error")
-						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.FetchingPluginInfoFromRepositoryError{
+						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            expectedErr,
 						})
@@ -141,7 +142,7 @@ var _ = Describe("install-plugin command", func() {
 
 					BeforeEach(func() {
 						returnedErr = pluginerror.RawHTTPStatusError{Status: "some-status"}
-						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.FetchingPluginInfoFromRepositoryError{
+						fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            returnedErr,
 						})
@@ -155,7 +156,7 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when the plugin can't be found in the repository", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
 				})
 
 				It("returns the PluginNotFoundInRepositoryError", func() {
@@ -176,7 +177,7 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when a compatible binary can't be found in the repository", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.NoCompatibleBinaryError{})
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.NoCompatibleBinaryError{})
 				})
 
 				It("returns the NoCompatibleBinaryError", func() {
@@ -311,7 +312,7 @@ var _ = Describe("install-plugin command", func() {
 
 									Context("when validating the new plugin errors", func() {
 										BeforeEach(func() {
-											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, actionerror.PluginInvalidError{})
 										})
 
 										It("returns the error", func() {
@@ -477,7 +478,7 @@ var _ = Describe("install-plugin command", func() {
 
 									Context("when validating the plugin errors", func() {
 										BeforeEach(func() {
-											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{})
+											fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, actionerror.PluginInvalidError{})
 										})
 
 										It("returns the error", func() {
@@ -751,7 +752,7 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when the plugin is not found", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
 				})
 
 				It("returns the plugin not found error", func() {
@@ -870,7 +871,7 @@ var _ = Describe("install-plugin command", func() {
 					},
 
 					Entry("when the error is a RawHTTPStatusError",
-						pluginaction.FetchingPluginInfoFromRepositoryError{
+						actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            pluginerror.RawHTTPStatusError{Status: "some-status"},
 						},
@@ -878,7 +879,7 @@ var _ = Describe("install-plugin command", func() {
 					),
 
 					Entry("when the error is a SSLValidationHostnameError",
-						pluginaction.FetchingPluginInfoFromRepositoryError{
+						actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            pluginerror.SSLValidationHostnameError{Message: "some-status"},
 						},
@@ -887,7 +888,7 @@ var _ = Describe("install-plugin command", func() {
 					),
 
 					Entry("when the error is an UnverifiedServerError",
-						pluginaction.FetchingPluginInfoFromRepositoryError{
+						actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            pluginerror.UnverifiedServerError{URL: "some-url"},
 						},
@@ -895,7 +896,7 @@ var _ = Describe("install-plugin command", func() {
 					),
 
 					Entry("when the error is generic",
-						pluginaction.FetchingPluginInfoFromRepositoryError{
+						actionerror.FetchingPluginInfoFromRepositoryError{
 							RepositoryName: "some-repo",
 							Err:            errors.New("generic-error"),
 						},
@@ -906,7 +907,7 @@ var _ = Describe("install-plugin command", func() {
 
 			Context("when the plugin can't be found in any repos", func() {
 				BeforeEach(func() {
-					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, pluginaction.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
+					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{}, nil, actionerror.PluginNotFoundInAnyRepositoryError{PluginName: pluginName})
 				})
 
 				It("returns PluginNotFoundOnDiskOrInAnyRepositoryError", func() {

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -51,11 +52,11 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 	err = cmd.Actor.UninstallPlugin(rpcService, plugin.Name)
 	if err != nil {
 		switch e := err.(type) {
-		case pluginaction.PluginBinaryRemoveFailedError:
+		case actionerror.PluginBinaryRemoveFailedError:
 			return translatableerror.PluginBinaryRemoveFailedError{
 				Err: e.Err,
 			}
-		case pluginaction.PluginExecuteError:
+		case actionerror.PluginExecuteError:
 			return translatableerror.PluginBinaryUninstallError{
 				Err: e.Err,
 			}

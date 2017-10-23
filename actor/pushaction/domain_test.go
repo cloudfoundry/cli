@@ -3,6 +3,7 @@ package pushaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/pushaction/pushactionfakes"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -78,7 +79,7 @@ var _ = Describe("Domains", func() {
 			})
 
 			It("returns the first shared domain and warnings", func() {
-				Expect(executeErr).To(MatchError(NoDomainsFoundError{OrganizationGUID: orgGUID}))
+				Expect(executeErr).To(MatchError(actionerror.NoDomainsFoundError{OrganizationGUID: orgGUID}))
 				Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 			})
 		})

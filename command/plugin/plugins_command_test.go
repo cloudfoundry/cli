@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
@@ -191,7 +192,7 @@ var _ = Describe("plugins Command", func() {
 
 				Context("when the actor returns GettingRepositoryError", func() {
 					BeforeEach(func() {
-						fakeActor.GetOutdatedPluginsReturns(nil, pluginaction.GettingPluginRepositoryError{
+						fakeActor.GetOutdatedPluginsReturns(nil, actionerror.GettingPluginRepositoryError{
 							Name:    "repo-1",
 							Message: "404",
 						})

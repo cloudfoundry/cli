@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginfakes"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -95,7 +95,7 @@ var _ = Describe("install-plugin command", func() {
 					var returnedErr error
 
 					BeforeEach(func() {
-						returnedErr = pluginaction.PluginInvalidError{}
+						returnedErr = actionerror.PluginInvalidError{}
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, returnedErr)
 					})
 
@@ -111,7 +111,7 @@ var _ = Describe("install-plugin command", func() {
 
 					BeforeEach(func() {
 						wrappedErr = errors.New("some-error")
-						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, pluginaction.PluginInvalidError{Err: wrappedErr})
+						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, actionerror.PluginInvalidError{Err: wrappedErr})
 					})
 
 					It("returns an error", func() {
@@ -498,7 +498,7 @@ var _ = Describe("install-plugin command", func() {
 					var returnedErr error
 
 					BeforeEach(func() {
-						returnedErr = pluginaction.PluginInvalidError{}
+						returnedErr = actionerror.PluginInvalidError{}
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{}, returnedErr)
 					})
 

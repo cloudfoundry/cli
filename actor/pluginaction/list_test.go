@@ -3,6 +3,7 @@ package pluginaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -39,7 +40,7 @@ var _ = Describe("Plugin actions", func() {
 
 			It("returns a 'GettingPluginRepositoryError", func() {
 				_, err := actor.GetOutdatedPlugins()
-				Expect(err).To(MatchError(GettingPluginRepositoryError{Name: "CF-Community", Message: "generic-error"}))
+				Expect(err).To(MatchError(actionerror.GettingPluginRepositoryError{Name: "CF-Community", Message: "generic-error"}))
 			})
 		})
 

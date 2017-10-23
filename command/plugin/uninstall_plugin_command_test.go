@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
@@ -80,7 +80,7 @@ var _ = Describe("uninstall-plugin command", func() {
 					Err: errors.New("some error"),
 				}
 
-				fakeActor.UninstallPluginReturns(pluginaction.PluginBinaryRemoveFailedError{
+				fakeActor.UninstallPluginReturns(actionerror.PluginBinaryRemoveFailedError{
 					Err: pathError,
 				})
 			})
@@ -101,7 +101,7 @@ var _ = Describe("uninstall-plugin command", func() {
 					Err: errors.New("some error"),
 				}
 
-				fakeActor.UninstallPluginReturns(pluginaction.PluginExecuteError{Err: pathError})
+				fakeActor.UninstallPluginReturns(actionerror.PluginExecuteError{Err: pathError})
 			})
 
 			It("returns a PluginBinaryUninstallError", func() {
@@ -128,7 +128,7 @@ var _ = Describe("uninstall-plugin command", func() {
 	Context("when the plugin is not installed", func() {
 		BeforeEach(func() {
 			fakeActor.UninstallPluginReturns(
-				pluginaction.PluginNotFoundError{
+				actionerror.PluginNotFoundError{
 					PluginName: "some-plugin",
 				},
 			)

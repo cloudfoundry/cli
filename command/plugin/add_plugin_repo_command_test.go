@@ -1,7 +1,7 @@
 package plugin_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
@@ -36,7 +36,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-repo-URL"
-			fakeActor.AddPluginRepositoryReturns(pluginaction.RepositoryNameTakenError{Name: "some-repo"})
+			fakeActor.AddPluginRepositoryReturns(actionerror.RepositoryNameTakenError{Name: "some-repo"})
 		})
 
 		It("returns RepositoryNameTakenError", func() {
@@ -48,7 +48,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-repo-URL"
-			fakeActor.AddPluginRepositoryReturns(pluginaction.RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-repo-URL"})
+			fakeActor.AddPluginRepositoryReturns(actionerror.RepositoryAlreadyExistsError{Name: "some-repo", URL: "https://some-repo-URL"})
 		})
 
 		It("displays a message that the repo is already registered and does not return an error", func() {
@@ -67,7 +67,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		BeforeEach(func() {
 			cmd.RequiredArgs.PluginRepoName = "some-repo"
 			cmd.RequiredArgs.PluginRepoURL = "some-URL"
-			fakeActor.AddPluginRepositoryReturns(pluginaction.AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"})
+			fakeActor.AddPluginRepositoryReturns(actionerror.AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"})
 		})
 
 		It("handles the error", func() {

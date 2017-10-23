@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -206,7 +207,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{Err: expectedErr}))
+				Expect(validateErr).To(MatchError(actionerror.PluginInvalidError{Err: expectedErr}))
 			})
 		})
 
@@ -216,7 +217,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{}))
+				Expect(validateErr).To(MatchError(actionerror.PluginInvalidError{}))
 			})
 		})
 
@@ -226,7 +227,7 @@ var _ = Describe("install actions", func() {
 			})
 
 			It("returns a PluginInvalidError", func() {
-				Expect(validateErr).To(MatchError(PluginInvalidError{}))
+				Expect(validateErr).To(MatchError(actionerror.PluginInvalidError{}))
 			})
 		})
 
@@ -261,7 +262,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command names", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{"version"},
@@ -283,7 +284,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command names", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{"p"},
@@ -305,7 +306,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command aliases", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandAliases: []string{"push"},
@@ -327,7 +328,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command aliases", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandAliases: []string{"v"},
@@ -345,7 +346,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command names", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{"some-command"},
@@ -363,7 +364,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command names", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{"some-command"},
@@ -381,7 +382,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command aliases", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{},
@@ -399,7 +400,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError containing all conflicting command aliases", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandAliases: []string{"sc"},
@@ -447,7 +448,7 @@ var _ = Describe("install actions", func() {
 				})
 
 				It("returns a PluginCommandsConflictError with all conflicting command names and aliases", func() {
-					Expect(validateErr).To(MatchError(PluginCommandsConflictError{
+					Expect(validateErr).To(MatchError(actionerror.PluginCommandsConflictError{
 						PluginName:     "some-plugin",
 						PluginVersion:  "1.1.1",
 						CommandNames:   []string{"p", "some-command", "some-other-command", "version"},

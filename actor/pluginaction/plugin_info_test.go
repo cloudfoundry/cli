@@ -3,6 +3,7 @@ package pluginaction_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/api/plugin"
@@ -31,7 +32,7 @@ var _ = Describe("plugin info actions", func() {
 
 				It("returns a FetchingPluginInfoFromRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", []configv3.PluginRepository{{Name: "some-repository", URL: "some-url"}}, "some-platform")
-					Expect(err).To(MatchError(FetchingPluginInfoFromRepositoryError{
+					Expect(err).To(MatchError(actionerror.FetchingPluginInfoFromRepositoryError{
 						RepositoryName: "some-repository",
 						Err:            errors.New("some-error"),
 					}))
@@ -76,7 +77,7 @@ var _ = Describe("plugin info actions", func() {
 				Context("when the specified plugin does not exist in the repository", func() {
 					It("returns a PluginNotFoundInRepositoryError", func() {
 						_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("plugin-i-dont-exist", []configv3.PluginRepository{{Name: "some-repo", URL: "some-url"}}, "platform-i-dont-exist")
-						Expect(err).To(MatchError(PluginNotFoundInAnyRepositoryError{
+						Expect(err).To(MatchError(actionerror.PluginNotFoundInAnyRepositoryError{
 							PluginName: "plugin-i-dont-exist",
 						}))
 					})
@@ -85,7 +86,7 @@ var _ = Describe("plugin info actions", func() {
 				Context("when the specified plugin for the provided platform does not exist in the repository", func() {
 					It("returns a NoCompatibleBinaryError", func() {
 						_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("linux-plugin", []configv3.PluginRepository{{Name: "some-repo", URL: "some-url"}}, "platform-i-dont-exist")
-						Expect(err).To(MatchError(NoCompatibleBinaryError{}))
+						Expect(err).To(MatchError(actionerror.NoCompatibleBinaryError{}))
 					})
 				})
 
@@ -133,7 +134,7 @@ var _ = Describe("plugin info actions", func() {
 
 				It("returns a FetchingPluginInfoFromRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
-					Expect(err).To(MatchError(FetchingPluginInfoFromRepositoryError{
+					Expect(err).To(MatchError(actionerror.FetchingPluginInfoFromRepositoryError{
 						RepositoryName: "repo2",
 						Err:            errors.New("some-error")}))
 				})
@@ -142,7 +143,7 @@ var _ = Describe("plugin info actions", func() {
 			Context("when the plugin isn't found", func() {
 				It("returns the PluginNotFoundInAnyRepositoryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
-					Expect(err).To(Equal(PluginNotFoundInAnyRepositoryError{PluginName: "some-plugin"}))
+					Expect(err).To(Equal(actionerror.PluginNotFoundInAnyRepositoryError{PluginName: "some-plugin"}))
 				})
 			})
 
@@ -159,7 +160,7 @@ var _ = Describe("plugin info actions", func() {
 
 				It("returns the NoCompatibleBinaryError", func() {
 					_, _, err := actor.GetPluginInfoFromRepositoriesForPlatform("some-plugin", pluginRepositories, "some-platform")
-					Expect(err).To(MatchError(NoCompatibleBinaryError{}))
+					Expect(err).To(MatchError(actionerror.NoCompatibleBinaryError{}))
 				})
 			})
 

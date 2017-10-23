@@ -138,7 +138,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				})
 
 				It("returns just the specified app manifest", func() {
-					Expect(executeErr).To(MatchError(AppNotFoundInManifestError{Name: "app-4"}))
+					Expect(executeErr).To(MatchError(actionerror.AppNotFoundInManifestError{Name: "app-4"}))
 				})
 			})
 		})
@@ -191,77 +191,77 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(err).To(MatchError(expectedErr))
 		},
 
-		Entry("MissingNameError", CommandLineSettings{}, nil, MissingNameError{}),
-		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, MissingNameError{}),
+		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
+		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),
 
 		Entry("NonexistentAppPathError",
 			CommandLineSettings{
 				Name:            "some-name",
 				ProvidedAppPath: "does-not-exist",
 			}, nil,
-			NonexistentAppPathError{Path: "does-not-exist"}),
+			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
 		Entry("NonexistentAppPathError",
 			CommandLineSettings{},
 			[]manifest.Application{{
 				Name: "some-name",
 				Path: "does-not-exist",
 			}},
-			NonexistentAppPathError{Path: "does-not-exist"}),
+			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				Buildpack: types.FilteredString{IsSet: true},
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				Command: types.FilteredString{IsSet: true},
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				DiskQuota: 4,
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				DockerImage: "some-docker-image",
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				HealthCheckTimeout: 4,
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				HealthCheckType: "http",
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				Instances: types.NullInt{IsSet: true},
 			},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{Memory: 4},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{ProvidedAppPath: "some-path"},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{StackName: "some-stackname"},
 			manifestWithMultipleApps,
-			CommandLineOptionsWithMultipleAppsError{}),
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 
 		Entry("DockerPasswordNotSetError",
 			CommandLineSettings{},

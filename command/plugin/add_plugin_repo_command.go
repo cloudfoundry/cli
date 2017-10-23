@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -33,7 +34,7 @@ func (cmd *AddPluginRepoCommand) Setup(config command.Config, ui command.UI) err
 func (cmd AddPluginRepoCommand) Execute(args []string) error {
 	err := cmd.Actor.AddPluginRepository(cmd.RequiredArgs.PluginRepoName, cmd.RequiredArgs.PluginRepoURL)
 	switch e := err.(type) {
-	case pluginaction.RepositoryAlreadyExistsError:
+	case actionerror.RepositoryAlreadyExistsError:
 		cmd.UI.DisplayTextWithFlavor("{{.RepositoryURL}} already registered as {{.RepositoryName}}",
 			map[string]interface{}{
 				"RepositoryName": e.Name,

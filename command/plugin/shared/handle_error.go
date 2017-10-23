@@ -3,7 +3,7 @@ package shared
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/actor/pluginaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
@@ -15,31 +15,26 @@ func HandleError(err error) error {
 	case pluginerror.RawHTTPStatusError:
 		return translatableerror.DownloadPluginHTTPError{Message: e.Status}
 	case pluginerror.SSLValidationHostnameError:
-		return translatableerror.DownloadPluginHTTPError{Message: e.Error()}
+		return translatableerror.DownloadPluginHTTPError(e)
 	case pluginerror.UnverifiedServerError:
 		return translatableerror.DownloadPluginHTTPError{Message: e.Error()}
 
-	case pluginaction.AddPluginRepositoryError:
-		return translatableerror.AddPluginRepositoryError{Name: e.Name, URL: e.URL, Message: e.Message}
-	case pluginaction.GettingPluginRepositoryError:
-		return translatableerror.GettingPluginRepositoryError{Name: e.Name, Message: e.Message}
-	case pluginaction.NoCompatibleBinaryError:
+	case actionerror.AddPluginRepositoryError:
+		return translatableerror.AddPluginRepositoryError(e)
+	case actionerror.GettingPluginRepositoryError:
+		return translatableerror.GettingPluginRepositoryError(e)
+	case actionerror.NoCompatibleBinaryError:
 		return translatableerror.NoCompatibleBinaryError{}
-	case pluginaction.PluginCommandsConflictError:
-		return translatableerror.PluginCommandsConflictError{
-			PluginName:     e.PluginName,
-			PluginVersion:  e.PluginVersion,
-			CommandNames:   e.CommandNames,
-			CommandAliases: e.CommandAliases,
-		}
-	case pluginaction.PluginInvalidError:
-		return translatableerror.PluginInvalidError{Err: e.Err}
-	case pluginaction.PluginNotFoundError:
-		return translatableerror.PluginNotFoundError{PluginName: e.PluginName}
-	case pluginaction.RepositoryNameTakenError:
-		return translatableerror.RepositoryNameTakenError{Name: e.Name}
-	case pluginaction.RepositoryNotRegisteredError:
-		return translatableerror.RepositoryNotRegisteredError{Name: e.Name}
+	case actionerror.PluginCommandsConflictError:
+		return translatableerror.PluginCommandsConflictError(e)
+	case actionerror.PluginInvalidError:
+		return translatableerror.PluginInvalidError(e)
+	case actionerror.PluginNotFoundError:
+		return translatableerror.PluginNotFoundError(e)
+	case actionerror.RepositoryNameTakenError:
+		return translatableerror.RepositoryNameTakenError(e)
+	case actionerror.RepositoryNotRegisteredError:
+		return translatableerror.RepositoryNotRegisteredError(e)
 
 	case PluginInstallationCancelled:
 		return nil

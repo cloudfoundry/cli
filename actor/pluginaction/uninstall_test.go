@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/actor/pluginaction/pluginactionfakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -55,7 +56,7 @@ var _ = Describe("Plugin actor", func() {
 
 			It("returns a PluginNotFoundError", func() {
 				err := actor.UninstallPlugin(fakePluginUninstaller, "some-non-existent-plugin")
-				Expect(err).To(MatchError(PluginNotFoundError{PluginName: "some-non-existent-plugin"}))
+				Expect(err).To(MatchError(actionerror.PluginNotFoundError{PluginName: "some-non-existent-plugin"}))
 			})
 		})
 
@@ -118,7 +119,7 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns a PluginExecuteError, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					Expect(err).To(MatchError(PluginExecuteError{Err: expectedErr}))
+					Expect(err).To(MatchError(actionerror.PluginExecuteError{Err: expectedErr}))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -138,7 +139,7 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns the error, deletes the binary and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					Expect(err).To(MatchError(PluginExecuteError{Err: expectedErr}))
+					Expect(err).To(MatchError(actionerror.PluginExecuteError{Err: expectedErr}))
 
 					_, err = os.Stat(binaryPath)
 					Expect(os.IsNotExist(err)).To(BeTrue())
@@ -193,7 +194,7 @@ var _ = Describe("Plugin actor", func() {
 
 				It("returns the error and removes the plugin config", func() {
 					err := actor.UninstallPlugin(fakePluginUninstaller, "some-plugin")
-					pluginBinaryRemoveErr, ok := err.(PluginBinaryRemoveFailedError)
+					pluginBinaryRemoveErr, ok := err.(actionerror.PluginBinaryRemoveFailedError)
 					Expect(ok).To(BeTrue())
 					_, isPathError := pluginBinaryRemoveErr.Err.(*os.PathError)
 					Expect(isPathError).To(BeTrue())

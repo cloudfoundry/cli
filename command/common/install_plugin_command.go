@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pluginaction"
 	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
@@ -176,14 +177,14 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 		if err != nil {
 			switch pluginErr := err.(type) {
-			case pluginaction.PluginNotFoundInAnyRepositoryError:
+			case actionerror.PluginNotFoundInAnyRepositoryError:
 				return "", 0, translatableerror.PluginNotFoundInRepositoryError{
 					BinaryName:     cmd.Config.BinaryName(),
 					PluginName:     pluginNameOrLocation,
 					RepositoryName: cmd.RegisteredRepository,
 				}
 
-			case pluginaction.FetchingPluginInfoFromRepositoryError:
+			case actionerror.FetchingPluginInfoFromRepositoryError:
 				// The error wrapped inside pluginErr is handled differently in the case of
 				// a specified repo from that of searching through all repos.  pluginErr.Err
 				// is then processed by shared.HandleError by this function's caller.
@@ -213,10 +214,10 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		path, pluginSource, err := cmd.getPluginFromRepositories(pluginNameOrLocation, repos, tempPluginDir)
 		if err != nil {
 			switch pluginErr := err.(type) {
-			case pluginaction.PluginNotFoundInAnyRepositoryError:
+			case actionerror.PluginNotFoundInAnyRepositoryError:
 				return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
 
-			case pluginaction.FetchingPluginInfoFromRepositoryError:
+			case actionerror.FetchingPluginInfoFromRepositoryError:
 				return "", 0, cmd.handleFetchingPluginInfoFromRepositoriesError(pluginErr)
 
 			default:
@@ -229,7 +230,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 // These are specific errors that we output to the user in the context of
 // installing from any repository.
-func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr pluginaction.FetchingPluginInfoFromRepositoryError) error {
+func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchErr actionerror.FetchingPluginInfoFromRepositoryError) error {
 	switch clientErr := fetchErr.Err.(type) {
 	case pluginerror.RawHTTPStatusError:
 		return translatableerror.FetchingPluginInfoFromRepositoriesError{

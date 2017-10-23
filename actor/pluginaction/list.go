@@ -1,8 +1,7 @@
 package pluginaction
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"github.com/blang/semver"
 )
 
@@ -12,17 +11,6 @@ type OutdatedPlugin struct {
 	LatestVersion  string
 }
 
-// GettingPluginRepositoryError is returned when there's an error
-// accessing the plugin repository
-type GettingPluginRepositoryError struct {
-	Name    string
-	Message string
-}
-
-func (e GettingPluginRepositoryError) Error() string {
-	return fmt.Sprintf("Could not get plugin repository '%s'\n%s", e.Name, e.Message)
-}
-
 func (actor Actor) GetOutdatedPlugins() ([]OutdatedPlugin, error) {
 	var outdatedPlugins []OutdatedPlugin
 
@@ -30,7 +18,7 @@ func (actor Actor) GetOutdatedPlugins() ([]OutdatedPlugin, error) {
 	for _, repo := range actor.config.PluginRepositories() {
 		repository, err := actor.client.GetPluginRepository(repo.URL)
 		if err != nil {
-			return nil, GettingPluginRepositoryError{Name: repo.Name, Message: err.Error()}
+			return nil, actionerror.GettingPluginRepositoryError{Name: repo.Name, Message: err.Error()}
 		}
 
 		for _, plugin := range repository.Plugins {

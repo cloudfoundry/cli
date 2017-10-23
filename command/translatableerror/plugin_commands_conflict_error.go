@@ -2,7 +2,7 @@ package translatableerror
 
 import "strings"
 
-// PluginCommandConflictError is returned when a plugin command name conflicts
+// PluginCommandsConflictError is returned when a plugin command name conflicts
 // with a native or existing plugin command name.
 type PluginCommandsConflictError struct {
 	PluginName     string

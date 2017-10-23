@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/plugin"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/generic"
@@ -24,29 +25,6 @@ type PluginMetadata interface {
 type CommandList interface {
 	HasCommand(string) bool
 	HasAlias(string) bool
-}
-
-// PluginInvalidError is returned with a plugin is invalid because it is
-// missing a name or has 0 commands.
-type PluginInvalidError struct {
-	Err error
-}
-
-func (PluginInvalidError) Error() string {
-	return "File is not a valid cf CLI plugin binary."
-}
-
-// PluginCommandConflictError is returned when a plugin command name conflicts
-// with a core or existing plugin command name.
-type PluginCommandsConflictError struct {
-	PluginName     string
-	PluginVersion  string
-	CommandAliases []string
-	CommandNames   []string
-}
-
-func (PluginCommandsConflictError) Error() string {
-	return ""
 }
 
 // CreateExecutableCopy makes a temporary copy of a plugin binary and makes it
@@ -80,8 +58,8 @@ func (actor Actor) CreateExecutableCopy(path string, tempPluginDir string) (stri
 	return executablePath, nil
 }
 
-// DownloadBinaryFromURL fetches a plugin binary from the specified URL, if
-// it exists.
+// DownloadExecutableBinaryFromURL fetches a plugin binary from the specified
+// URL, if it exists.
 func (actor Actor) DownloadExecutableBinaryFromURL(pluginURL string, tempPluginDir string, proxyReader plugin.ProxyReader) (string, error) {
 	tempFile, err := makeTempFile(tempPluginDir)
 	if err != nil {
@@ -106,7 +84,7 @@ func (actor Actor) FileExists(path string) bool {
 func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandList CommandList, path string) (configv3.Plugin, error) {
 	plugin, err := pluginMetadata.GetMetadata(path)
 	if err != nil || plugin.Name == "" || len(plugin.Commands) == 0 {
-		return configv3.Plugin{}, PluginInvalidError{Err: err}
+		return configv3.Plugin{}, actionerror.PluginInvalidError{Err: err}
 	}
 
 	installedPlugins := actor.config.Plugins()
@@ -152,7 +130,7 @@ func (actor Actor) GetAndValidatePlugin(pluginMetadata PluginMetadata, commandLi
 			return strings.ToLower(conflictingAliases[i]) < strings.ToLower(conflictingAliases[j])
 		})
 
-		return configv3.Plugin{}, PluginCommandsConflictError{
+		return configv3.Plugin{}, actionerror.PluginCommandsConflictError{
 			PluginName:     plugin.Name,
 			PluginVersion:  plugin.Version.String(),
 			CommandNames:   conflictingNames,

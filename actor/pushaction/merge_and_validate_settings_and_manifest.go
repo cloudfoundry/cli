@@ -1,41 +1,12 @@
 package pushaction
 
 import (
-	"fmt"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
-
-type MissingNameError struct{}
-
-func (MissingNameError) Error() string {
-	return "name not specified for app"
-}
-
-type NonexistentAppPathError struct {
-	Path string
-}
-
-func (e NonexistentAppPathError) Error() string {
-	return fmt.Sprint("app path not found:", e.Path)
-}
-
-type CommandLineOptionsWithMultipleAppsError struct{}
-
-func (CommandLineOptionsWithMultipleAppsError) Error() string {
-	return "cannot use command line flag with multiple apps"
-}
-
-type AppNotFoundInManifestError struct {
-	Name string
-}
-
-func (e AppNotFoundInManifestError) Error() string {
-	return fmt.Sprintf("specfied app: %s not found in manifest", e.Name)
-}
 
 func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSettings, apps []manifest.Application) ([]manifest.Application, error) {
 	var mergedApps []manifest.Application
@@ -76,7 +47,7 @@ func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.
 		}
 	}
 	if len(returnedApps) == 0 {
-		return nil, AppNotFoundInManifestError{Name: appName}
+		return nil, actionerror.AppNotFoundInManifestError{Name: appName}
 	}
 
 	return returnedApps, nil
@@ -107,7 +78,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			settings.ProvidedAppPath != "",
 			settings.StackName != "":
 			log.Error("cannot use some parameters with multiple apps")
-			return CommandLineOptionsWithMultipleAppsError{}
+			return actionerror.CommandLineOptionsWithMultipleAppsError{}
 		}
 	}
 	for _, app := range apps {
@@ -123,14 +94,14 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 	for i, app := range apps {
 		if app.Name == "" {
 			log.WithField("index", i).Error("does not contain an app name")
-			return MissingNameError{}
+			return actionerror.MissingNameError{}
 		}
 
 		if app.DockerImage == "" {
 			_, err := os.Stat(app.Path)
 			if os.IsNotExist(err) {
 				log.WithField("path", app.Path).Error("app path does not exist")
-				return NonexistentAppPathError{Path: app.Path}
+				return actionerror.NonexistentAppPathError{Path: app.Path}
 			}
 		} else {
 			if app.DockerUsername != "" && app.DockerPassword == "" {

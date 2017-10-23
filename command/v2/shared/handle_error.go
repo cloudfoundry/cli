@@ -2,7 +2,6 @@ package shared
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -66,17 +65,17 @@ func HandleError(err error) error {
 	case actionerror.InvalidHTTPRouteSettings:
 		return translatableerror.PortNotAllowedWithHTTPDomainError(e)
 
-	case pushaction.AppNotFoundInManifestError:
+	case actionerror.AppNotFoundInManifestError:
 		return translatableerror.AppNotFoundInManifestError(e)
-	case pushaction.CommandLineOptionsWithMultipleAppsError:
+	case actionerror.CommandLineOptionsWithMultipleAppsError:
 		return translatableerror.CommandLineArgsWithMultipleAppsError{}
-	case pushaction.NoDomainsFoundError:
+	case actionerror.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
-	case pushaction.NonexistentAppPathError:
+	case actionerror.NonexistentAppPathError:
 		return translatableerror.FileNotFoundError(e)
-	case pushaction.MissingNameError:
+	case actionerror.MissingNameError:
 		return translatableerror.RequiredNameForPushError{}
-	case pushaction.UploadFailedError:
+	case actionerror.UploadFailedError:
 		return translatableerror.UploadFailedError{Err: HandleError(e.Err)}
 	case actionerror.PropertyCombinationError:
 		return translatableerror.PropertyCombinationError(e)
