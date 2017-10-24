@@ -55,6 +55,7 @@ applications:
   routes:
   - route: foo.bar.com
   - route: baz.qux.com
+  - route: blep.blah.com/boop
   services:
   - service_1
   - service_2
@@ -132,7 +133,7 @@ applications:
 							Value: 2048,
 							IsSet: true,
 						},
-						Routes:   []string{"foo.bar.com", "baz.qux.com"},
+						Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
 						Services: []string{"service_1", "service_2"},
 					},
 					Application{
@@ -270,7 +271,7 @@ applications:
 						IsSet: true,
 					},
 					NoRoute:            true,
-					Routes:             []string{"foo.bar.com", "baz.qux.com"},
+					Routes:             []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
 					Services:           []string{"service_1", "service_2"},
 					StackName:          "some-stack",
 					HealthCheckTimeout: 120,
@@ -302,6 +303,7 @@ applications:
   routes:
   - route: foo.bar.com
   - route: baz.qux.com
+  - route: blep.blah.com/boop
   services:
   - service_1
   - service_2

@@ -34,9 +34,13 @@ func (RouteInDifferentSpaceError) Error() string {
 type RouteNotFoundError struct {
 	Host       string
 	DomainGUID string
+	Path       string
 }
 
 func (e RouteNotFoundError) Error() string {
+	if e.Path != "" {
+		return fmt.Sprintf("Route with host %s, domain guid %s, and path %s not found", e.Host, e.DomainGUID, e.Path)
+	}
 	return fmt.Sprintf("Route with host %s and domain guid %s not found", e.Host, e.DomainGUID)
 }
 
@@ -239,7 +243,7 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 		return Route{}, nil, RouteNotFoundError{DomainGUID: route.Domain.GUID}
 	}
 
-	existingRoute, warnings, err := actor.GetRouteByHostAndDomain(route.Host, route.Domain.GUID)
+	existingRoute, warnings, err := actor.GetRouteByHostAndDomainAndPath(route.Host, route.Domain.GUID, route.Path)
 	if routeNotFoundErr, ok := err.(RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
 		// false for anything below that.
@@ -279,8 +283,8 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 
 // GetRouteByHostAndDomain returns the HTTP route with the matching host and
 // the associate domain GUID.
-func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Route, Warnings, error) {
-	ccv2Routes, warnings, err := actor.CloudControllerClient.GetRoutes(
+func (actor Actor) GetRouteByHostAndDomainAndPath(host string, domainGUID string, path string) (Route, Warnings, error) {
+	queries := []ccv2.Query{
 		ccv2.Query{
 			Filter:   ccv2.HostFilter,
 			Operator: ccv2.EqualOperator,
@@ -291,13 +295,23 @@ func (actor Actor) GetRouteByHostAndDomain(host string, domainGUID string) (Rout
 			Operator: ccv2.EqualOperator,
 			Values:   []string{domainGUID},
 		},
-	)
+	}
+
+	if path != "" {
+		queries = append(queries, ccv2.Query{
+			Filter:   ccv2.PathFilter,
+			Operator: ccv2.EqualOperator,
+			Values:   []string{path},
+		})
+	}
+
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetRoutes(queries...)
 	if err != nil {
 		return Route{}, Warnings(warnings), err
 	}
 
 	if len(ccv2Routes) == 0 {
-		return Route{}, Warnings(warnings), RouteNotFoundError{Host: host, DomainGUID: domainGUID}
+		return Route{}, Warnings(warnings), RouteNotFoundError{Host: host, DomainGUID: domainGUID, Path: path}
 	}
 
 	routes, domainWarnings, err := actor.applyDomain(ccv2Routes)
