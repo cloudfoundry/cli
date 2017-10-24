@@ -1059,6 +1059,7 @@ var _ = Describe("Route Actions", func() {
 		BeforeEach(func() {
 			host = "some-host"
 			domainGUID = "some-domain-guid"
+			path = ""
 		})
 
 		JustBeforeEach(func() {
