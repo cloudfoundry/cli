@@ -85,7 +85,7 @@ var _ = Describe("SSH Actions", func() {
 
 			Context("when local port forwarding fails", func() {
 				BeforeEach(func() {
-					fakeSecureShellClient.ConnectReturns(errors.New("some-forwarding-error"))
+					fakeSecureShellClient.LocalPortForwardReturns(errors.New("some-forwarding-error"))
 				})
 
 				It("returns the error", func() {

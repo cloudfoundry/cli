@@ -33,6 +33,9 @@ func (actor Actor) ExecuteSecureShell(sshOptions SSHOptions) error {
 	}
 
 	err = actor.SecureShellClient.LocalPortForward(convertActorToSSHPackageForwardingSpecs(sshOptions.LocalPortForwardSpecs))
+	if err != nil {
+		return err
+	}
 
 	if sshOptions.SkipRemoteExecution {
 		err = actor.SecureShellClient.Wait()
