@@ -189,6 +189,101 @@ var _ = Describe("v3-ssh command", func() {
 				Eventually(session).Should(Exit(0))
 			})
 
+			Context("when the running session is interactive", func() {
+				// This is tested manually (launching an interactive shell in code is hard)
+			})
+
+			Context("when the running session is non-interactive", func() {
+				Context("when providing commands to run on the remote host", func() {
+					Context("when using default tty option (auto)", func() {
+						It("the remote shell is not TTY", func() {
+							session := helpers.CF("v3-ssh", appName, "-c tty")
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when disable-pseudo-tty is specified", func() {
+						It("the remote shell is not TTY", func() {
+							session := helpers.CF("v3-ssh", appName, "--disable-pseudo-tty", "-c tty")
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when force-pseudo-tty is specified", func() {
+						It("the remote shell is TTY", func() {
+							session := helpers.CF("v3-ssh", appName, "--force-pseudo-tty", "-c tty")
+							Eventually(session.Out).ShouldNot(Say("not a tty"))
+							Eventually(session.Out).Should(Say("/dev/*"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when request-pseudo-tty is specified", func() {
+						It("the remote shell is not TTY", func() {
+							session := helpers.CF("v3-ssh", appName, "--request-pseudo-tty", "-c tty")
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				Context("when not providing commands as args", func() {
+					var buffer *Buffer
+
+					BeforeEach(func() {
+						buffer = NewBuffer()
+					})
+
+					Context("when using default tty option (auto)", func() {
+						It("the remote shell is not TTY", func() {
+							buffer.Write([]byte("tty\n"))
+							session := helpers.CFWithStdin(buffer, "v3-ssh", appName)
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when disable-pseudo-tty is specified", func() {
+						It("the remote shell is not TTY", func() {
+							buffer.Write([]byte("tty\n"))
+							session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--disable-pseudo-tty")
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when force-pseudo-tty is specified", func() {
+						It("the remote shell is TTY", func() {
+							buffer.Write([]byte("tty\nexit"))
+							session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--force-pseudo-tty")
+							Eventually(session.Out).ShouldNot(Say("not a tty"))
+							Eventually(session.Out).Should(Say("/dev/*"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when request-pseudo-tty is specified", func() {
+						It("the remote shell is TTY", func() {
+							buffer.Write([]byte("tty\n"))
+							session := helpers.CFWithStdin(buffer, "v3-ssh", appName, "--request-pseudo-tty")
+							Eventually(session.Out).Should(Say("not a tty"))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+			})
+
+			It("ssh's to the process 'web', index '0'", func() {
+				session := helpers.CF("v3-ssh", appName, "-c", "ps aux;", "-c", "env")
+				// To verify we ssh'd into the web process we examine processes
+				// that were launched tha are unique to that process
+				Eventually(session.Out).Should(Say("vcap.*ruby"))
+				Eventually(session.Out).Should(Say("INSTANCE_INDEX=0"))
+				Eventually(session).Should(Exit(0))
+			})
+
 			Context("when commands to run are specified", func() {
 				It("ssh's to the default container and runs the commands", func() {
 					session := helpers.CF("v3-ssh", appName, "-c", "ls;", "-c", "echo $USER")
