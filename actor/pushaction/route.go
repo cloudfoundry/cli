@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"unicode"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -259,7 +260,7 @@ func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID str
 }
 
 func (actor Actor) calculateHostname(manifestApp manifest.Application, domain v2action.Domain) (string, error) {
-	sanitizedAppName := strings.ToLower(manifestApp.Name)
+	sanitizedAppName := actor.sanitizeApplicationName(manifestApp.Name)
 
 	switch {
 	case manifestApp.NoHostname && domain.IsShared():
@@ -390,6 +391,33 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 	}
 
 	return v2action.Route{}, false
+}
+
+func (Actor) sanitizeApplicationName(appName string) string {
+	sanitizedAppName := []rune{}
+	validCount := 0
+
+	for _, runeChar := range strings.TrimSpace(appName) {
+		switch {
+		case 'a' <= runeChar && runeChar <= 'z':
+			sanitizedAppName = append(sanitizedAppName, runeChar)
+			validCount++
+		case 'A' <= runeChar && runeChar <= 'Z':
+			sanitizedAppName = append(sanitizedAppName, unicode.ToLower(runeChar))
+			validCount++
+		case ' ' == runeChar || '-' == runeChar:
+			sanitizedAppName = append(sanitizedAppName, '-')
+		case '0' <= runeChar && runeChar <= '9':
+			sanitizedAppName = append(sanitizedAppName, runeChar)
+			validCount++
+		}
+	}
+
+	if validCount > 0 {
+		return strings.Trim(string(sanitizedAppName), "-")
+	}
+
+	return ""
 }
 
 func (actor Actor) splitExistingRoutes(routes []string, existingRoutes []v2action.Route) ([]v2action.Route, []string) {
