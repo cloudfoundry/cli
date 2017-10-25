@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
@@ -112,5 +113,17 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
+
+	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
+		cmd.UI.DisplayText("last operation")
+		lastOperationTable := [][]string{
+			{cmd.UI.TranslateText("status:"), fmt.Sprintf("%s %s", serviceInstanceSummary.ServiceInstance.LastOperation.Type, serviceInstanceSummary.ServiceInstance.LastOperation.State)},
+			{cmd.UI.TranslateText("message:"), serviceInstanceSummary.ServiceInstance.LastOperation.Description},
+			{cmd.UI.TranslateText("started:"), serviceInstanceSummary.ServiceInstance.LastOperation.CreatedAt},
+			{cmd.UI.TranslateText("updated:"), serviceInstanceSummary.ServiceInstance.LastOperation.UpdatedAt},
+		}
+		cmd.UI.DisplayKeyValueTable("", lastOperationTable, 3)
+	}
+
 	return nil
 }

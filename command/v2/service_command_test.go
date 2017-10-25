@@ -253,6 +253,13 @@ var _ = Describe("service Command", func() {
 										Type:         ccv2.ManagedService,
 										Tags:         []string{"tag-1", "tag-2", "tag-3"},
 										DashboardURL: "some-dashboard",
+										LastOperation: ccv2.LastOperation{
+											Type:        "some-type",
+											State:       "some-state",
+											Description: "some-last-operation-description",
+											UpdatedAt:   "some-updated-at-time",
+											CreatedAt:   "some-created-at-time",
+										},
 									},
 									ServicePlan: v2action.ServicePlan{Name: "some-plan"},
 									Service: v2action.Service{
@@ -280,6 +287,12 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("description:\\s+some-description"))
 							Expect(testUI.Out).To(Say("documentation:\\s+some-docs-url"))
 							Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+							Expect(testUI.Out).To(Say(""))
+							Expect(testUI.Out).To(Say("last operation"))
+							Expect(testUI.Out).To(Say("status:\\s+some-type some-state"))
+							Expect(testUI.Out).To(Say("message:\\s+some-last-operation-description"))
+							Expect(testUI.Out).To(Say("started:\\s+some-created-at-time"))
+							Expect(testUI.Out).To(Say("updated:\\s+some-updated-at-time"))
 
 							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
@@ -321,6 +334,11 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).ToNot(Say("description:"))
 							Expect(testUI.Out).ToNot(Say("documentation:"))
 							Expect(testUI.Out).ToNot(Say("dashboard:"))
+							Expect(testUI.Out).ToNot(Say("last operation"))
+							Expect(testUI.Out).ToNot(Say("status:"))
+							Expect(testUI.Out).ToNot(Say("message:"))
+							Expect(testUI.Out).ToNot(Say("started:"))
+							Expect(testUI.Out).ToNot(Say("updated:"))
 
 							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
 							Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))

@@ -134,7 +134,14 @@ var _ = Describe("Service Instance", func() {
 						"tag-1",
 						"tag-2"
 					],
-					"dashboard_url": "some-dashboard-url"
+					"dashboard_url": "some-dashboard-url",
+					"last_operation": {
+						"type": "create",
+						"state": "succeeded",
+						"description": "service broker-provided description",
+						"updated_at": "updated-at-time",
+						"created_at": "created-at-time"
+					}
 				}
 			}`
 
@@ -159,6 +166,13 @@ var _ = Describe("Service Instance", func() {
 					Type:            ManagedService,
 					Tags:            []string{"tag-1", "tag-2"},
 					DashboardURL:    "some-dashboard-url",
+					LastOperation: LastOperation{
+						Type:        "create",
+						State:       "succeeded",
+						Description: "service broker-provided description",
+						UpdatedAt:   "updated-at-time",
+						CreatedAt:   "created-at-time",
+					},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

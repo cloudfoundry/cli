@@ -28,6 +28,15 @@ type ServiceInstance struct {
 	Type            ServiceInstanceType
 	Tags            []string
 	DashboardURL    string
+	LastOperation   LastOperation
+}
+
+type LastOperation struct {
+	Type        string
+	State       string
+	Description string
+	UpdatedAt   string
+	CreatedAt   string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
@@ -41,6 +50,13 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 			Type            string   `json:"type"`
 			Tags            []string `json:"tags"`
 			DashboardURL    string   `json:"dashboard_url"`
+			LastOperation   struct {
+				Type        string `json:"type"`
+				State       string `json:"state"`
+				Description string `json:"description"`
+				UpdatedAt   string `json:"updated_at"`
+				CreatedAt   string `json:"created_at"`
+			} `json:"last_operation"`
 		}
 	}
 	err := json.Unmarshal(data, &ccServiceInstance)
@@ -55,6 +71,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	serviceInstance.Type = ServiceInstanceType(ccServiceInstance.Entity.Type)
 	serviceInstance.Tags = ccServiceInstance.Entity.Tags
 	serviceInstance.DashboardURL = ccServiceInstance.Entity.DashboardURL
+	serviceInstance.LastOperation = LastOperation(ccServiceInstance.Entity.LastOperation)
 	return nil
 }
 
