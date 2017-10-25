@@ -11,6 +11,8 @@ import (
 
 func HandleError(err error) error {
 	switch e := err.(type) {
+	case actionerror.ApplicationNotStartedError:
+		return translatableerror.ApplicationNotStartedError(e)
 	case ccerror.APINotFoundError:
 		return translatableerror.APINotFoundError(e)
 	case ccerror.RequestError:
@@ -42,10 +44,10 @@ func HandleError(err error) error {
 		return translatableerror.IsolationSegmentNotFoundError(e)
 	case actionerror.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError(e)
-	case actionerror.ProcessInstanceNotFoundError:
-		return translatableerror.ProcessInstanceNotFoundError(e)
 	case actionerror.ProcessNotFoundError:
 		return translatableerror.ProcessNotFoundError(e)
+	case actionerror.ProcessInstanceNotFoundError:
+		return translatableerror.ProcessInstanceNotFoundError(e)
 	case actionerror.StagingTimeoutError:
 		return translatableerror.StagingTimeoutError(e)
 	case actionerror.TaskWorkersUnavailableError:

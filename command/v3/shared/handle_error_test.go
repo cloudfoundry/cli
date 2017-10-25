@@ -24,6 +24,10 @@ var _ = Describe("HandleError", func() {
 			Expect(actualErr).To(MatchError(expectedErr))
 		},
 
+		Entry("actionerror.ApplicationNotStartedError -> ApplicationNotStartedError",
+			actionerror.ApplicationNotStartedError{Name: "some-app"},
+			translatableerror.ApplicationNotStartedError{Name: "some-app"}),
+
 		Entry("ccerror.RequestError -> APIRequestError",
 			ccerror.RequestError{Err: err},
 			translatableerror.APIRequestError{Err: err}),

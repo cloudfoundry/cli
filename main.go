@@ -17,11 +17,13 @@ import (
 	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/ssh"
 )
 
 type UI interface {
 	DisplayError(err error)
 	DisplayWarning(template string, templateValues ...map[string]interface{})
+	DisplayText(template string, templateValues ...map[string]interface{})
 }
 
 type DisplayUsage interface {
@@ -204,6 +206,17 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 func handleError(err error, commandUI UI) error {
 	if err == nil {
 		return nil
+	}
+
+	if exitError, ok := err.(*ssh.ExitError); ok {
+		exitStatus := exitError.ExitStatus()
+		if sig := exitError.Signal(); sig != "" {
+			commandUI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
+				"Signal":   sig,
+				"ExitCode": exitStatus,
+			})
+		}
+		os.Exit(exitStatus)
 	}
 
 	commandUI.DisplayError(err)
