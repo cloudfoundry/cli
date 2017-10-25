@@ -291,6 +291,8 @@ var _ = Describe("Service Instance Summary Actions", func() {
 									Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 									Expect(fakeCloudControllerClient.GetApplicationArgsForCall(0)).To(Equal(returnedServiceBindings[0].AppGUID))
 									Expect(fakeCloudControllerClient.GetApplicationArgsForCall(1)).To(Equal(returnedServiceBindings[1].AppGUID))
+
+									Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsCallCount()).To(Equal(0))
 								})
 							})
 						})
@@ -298,15 +300,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 				})
 			})
 
-			Context("when the service instance is an user provided service instance", func() {
+			Context("when the service instance is a user provided service instance", func() {
 				BeforeEach(func() {
 					returnedServiceInstance = ccv2.ServiceInstance{
-						GUID:            "some-service-instance-guid",
-						Name:            "some-service-instance",
-						Type:            ccv2.UserProvidedService,
-						Tags:            []string{"tag-1", "tag-2"},
-						DashboardURL:    "some-dashboard",
-						ServicePlanGUID: "some-service-plan-guid",
+						GUID: "some-user-provided-service-instance-guid",
+						Name: "some-user-provided-service-instance",
+						Type: ccv2.UserProvidedService,
 					}
 					fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 						[]ccv2.ServiceInstance{returnedServiceInstance},
@@ -328,7 +327,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								AppGUID: "some-app-2-guid",
 							},
 						}
-						fakeCloudControllerClient.GetServiceInstanceServiceBindingsReturns(
+						fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
 							returnedServiceBindings,
 							ccv2.Warnings{"get-service-bindings-warning"},
 							nil)
@@ -373,8 +372,8 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								Values:   []string{"some-service-instance"},
 							}))
 
-							Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
+							Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
 
 							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
 							Expect(fakeCloudControllerClient.GetApplicationArgsForCall(0)).To(Equal(returnedServiceBindings[0].AppGUID))
@@ -382,6 +381,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 							Expect(fakeCloudControllerClient.GetServicePlanCallCount()).To(Equal(0))
 							Expect(fakeCloudControllerClient.GetServiceCallCount()).To(Equal(0))
+							Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(0))
 						})
 					})
 				})

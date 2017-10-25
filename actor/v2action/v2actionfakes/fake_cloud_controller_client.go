@@ -473,6 +473,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetUserProvidedServiceInstanceServiceBindingsStub        func(userProvidedServiceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
+	getUserProvidedServiceInstanceServiceBindingsMutex       sync.RWMutex
+	getUserProvidedServiceInstanceServiceBindingsArgsForCall []struct {
+		userProvidedServiceInstanceGUID string
+	}
+	getUserProvidedServiceInstanceServiceBindingsReturns struct {
+		result1 []ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getUserProvidedServiceInstanceServiceBindingsReturnsOnCall map[int]struct {
+		result1 []ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetServiceInstancesStub        func(queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	getServiceInstancesMutex       sync.RWMutex
 	getServiceInstancesArgsForCall []struct {
@@ -2541,6 +2556,60 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceServiceBindingsReturnsO
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindings(userProvidedServiceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error) {
+	fake.getUserProvidedServiceInstanceServiceBindingsMutex.Lock()
+	ret, specificReturn := fake.getUserProvidedServiceInstanceServiceBindingsReturnsOnCall[len(fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall)]
+	fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall = append(fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall, struct {
+		userProvidedServiceInstanceGUID string
+	}{userProvidedServiceInstanceGUID})
+	fake.recordInvocation("GetUserProvidedServiceInstanceServiceBindings", []interface{}{userProvidedServiceInstanceGUID})
+	fake.getUserProvidedServiceInstanceServiceBindingsMutex.Unlock()
+	if fake.GetUserProvidedServiceInstanceServiceBindingsStub != nil {
+		return fake.GetUserProvidedServiceInstanceServiceBindingsStub(userProvidedServiceInstanceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getUserProvidedServiceInstanceServiceBindingsReturns.result1, fake.getUserProvidedServiceInstanceServiceBindingsReturns.result2, fake.getUserProvidedServiceInstanceServiceBindingsReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindingsCallCount() int {
+	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
+	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
+	return len(fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindingsArgsForCall(i int) string {
+	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
+	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
+	return fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall[i].userProvidedServiceInstanceGUID
+}
+
+func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindingsReturns(result1 []ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
+	fake.GetUserProvidedServiceInstanceServiceBindingsStub = nil
+	fake.getUserProvidedServiceInstanceServiceBindingsReturns = struct {
+		result1 []ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindingsReturnsOnCall(i int, result1 []ccv2.ServiceBinding, result2 ccv2.Warnings, result3 error) {
+	fake.GetUserProvidedServiceInstanceServiceBindingsStub = nil
+	if fake.getUserProvidedServiceInstanceServiceBindingsReturnsOnCall == nil {
+		fake.getUserProvidedServiceInstanceServiceBindingsReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.ServiceBinding
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getUserProvidedServiceInstanceServiceBindingsReturnsOnCall[i] = struct {
+		result1 []ccv2.ServiceBinding
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetServiceInstances(queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error) {
 	fake.getServiceInstancesMutex.Lock()
 	ret, specificReturn := fake.getServiceInstancesReturnsOnCall[len(fake.getServiceInstancesArgsForCall)]
@@ -4083,6 +4152,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceInstanceMutex.RUnlock()
 	fake.getServiceInstanceServiceBindingsMutex.RLock()
 	defer fake.getServiceInstanceServiceBindingsMutex.RUnlock()
+	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
+	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()
 	defer fake.getServiceInstancesMutex.RUnlock()
 	fake.getServicePlanMutex.RLock()

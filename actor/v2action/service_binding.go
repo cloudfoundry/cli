@@ -121,3 +121,16 @@ func (actor Actor) GetServiceBindingsByServiceInstance(serviceInstanceGUID strin
 
 	return allServiceBindings, Warnings(warnings), nil
 }
+
+func (actor Actor) GetServiceBindingsByUserProvidedServiceInstance(userProvidedServiceInstanceGUID string) ([]ServiceBinding, Warnings, error) {
+	serviceBindings, warnings, err := actor.CloudControllerClient.GetUserProvidedServiceInstanceServiceBindings(userProvidedServiceInstanceGUID)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+	allServiceBindings := []ServiceBinding{}
+	for _, serviceBinding := range serviceBindings {
+		allServiceBindings = append(allServiceBindings, ServiceBinding(serviceBinding))
+	}
+
+	return allServiceBindings, Warnings(warnings), nil
+}

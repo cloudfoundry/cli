@@ -357,4 +357,62 @@ var _ = Describe("Service Binding Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetServiceBindingsByUserProvidedServiceInstance", func() {
+		var (
+			serviceBindings         []ServiceBinding
+			serviceBindingsWarnings Warnings
+			serviceBindingsErr      error
+		)
+
+		JustBeforeEach(func() {
+			serviceBindings, serviceBindingsWarnings, serviceBindingsErr = actor.GetServiceBindingsByUserProvidedServiceInstance("some-user-provided-service-instance-guid")
+		})
+
+		Context("when no errors are encountered", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
+					[]ccv2.ServiceBinding{
+						{GUID: "some-service-binding-1-guid"},
+						{GUID: "some-service-binding-2-guid"},
+					},
+					ccv2.Warnings{"get-service-bindings-warning"},
+					nil,
+				)
+			})
+
+			It("returns service bindings and all warnings", func() {
+				Expect(serviceBindingsErr).ToNot(HaveOccurred())
+				Expect(serviceBindings).To(ConsistOf(
+					ServiceBinding{GUID: "some-service-binding-1-guid"},
+					ServiceBinding{GUID: "some-service-binding-2-guid"},
+				))
+				Expect(serviceBindingsWarnings).To(ConsistOf("get-service-bindings-warning"))
+
+				Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsArgsForCall(0)).To(Equal("some-user-provided-service-instance-guid"))
+			})
+		})
+
+		Context("when an error is encountered", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("get service bindings error")
+				fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsReturns(
+					[]ccv2.ServiceBinding{},
+					ccv2.Warnings{"get-service-bindings-warning"},
+					expectedErr,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(serviceBindingsErr).To(MatchError(expectedErr))
+				Expect(serviceBindingsWarnings).To(ConsistOf("get-service-bindings-warning"))
+
+				Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetUserProvidedServiceInstanceServiceBindingsArgsForCall(0)).To(Equal("some-user-provided-service-instance-guid"))
+			})
+		})
+	})
 })

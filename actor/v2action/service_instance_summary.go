@@ -20,6 +20,12 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 	}
 	serviceInstanceSummary.ServiceInstance = serviceInstance
 
+	var (
+		serviceBindings  []ServiceBinding
+		bindingsWarnings Warnings
+		bindingsErr      error
+	)
+
 	if ccv2.ServiceInstance(serviceInstance).Managed() {
 		servicePlan, planWarnings, planErr := actor.GetServicePlan(serviceInstance.ServicePlanGUID)
 		allWarnings = append(allWarnings, planWarnings...)
@@ -34,9 +40,12 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 			return serviceInstanceSummary, allWarnings, serviceErr
 		}
 		serviceInstanceSummary.Service = service
+
+		serviceBindings, bindingsWarnings, bindingsErr = actor.GetServiceBindingsByServiceInstance(serviceInstance.GUID)
+	} else {
+		serviceBindings, bindingsWarnings, bindingsErr = actor.GetServiceBindingsByUserProvidedServiceInstance(serviceInstance.GUID)
 	}
 
-	serviceBindings, bindingsWarnings, bindingsErr := actor.GetServiceBindingsByServiceInstance(serviceInstance.GUID)
 	allWarnings = append(allWarnings, bindingsWarnings...)
 	if bindingsErr != nil {
 		return serviceInstanceSummary, allWarnings, bindingsErr

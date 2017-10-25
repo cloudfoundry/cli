@@ -120,10 +120,37 @@ func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings,
 	return response.Warnings, err
 }
 
+// GetServiceInstanceServiceBindings returns back a list of Service Bindings for the provided service instance GUID.
 func (client *Client) GetServiceInstanceServiceBindings(serviceInstanceGUID string) ([]ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceInstanceServiceBindingsRequest,
 		URIParams:   map[string]string{"service_instance_guid": serviceInstanceGUID},
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fullBindingsList []ServiceBinding
+	warnings, err := client.paginate(request, ServiceBinding{}, func(item interface{}) error {
+		if binding, ok := item.(ServiceBinding); ok {
+			fullBindingsList = append(fullBindingsList, binding)
+		} else {
+			return ccerror.UnknownObjectInListError{
+				Expected:   ServiceBinding{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
+
+	return fullBindingsList, warnings, err
+}
+
+// GetUserProvidedServiceInstanceServiceBindings returns back a list of Service Bindings for the provided user provided service instance GUID.
+func (client *Client) GetUserProvidedServiceInstanceServiceBindings(userProvidedServiceInstanceGUID string) ([]ServiceBinding, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetUserProvidedServiceInstanceServiceBindingsRequest,
+		URIParams:   map[string]string{"user_provided_service_instance_guid": userProvidedServiceInstanceGUID},
 	})
 	if err != nil {
 		return nil, nil, err
