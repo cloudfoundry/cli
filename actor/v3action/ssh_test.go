@@ -23,6 +23,8 @@ var _ = Describe("SSH Actions", func() {
 		fakeUAAClient             *v3actionfakes.FakeUAAClient
 		executeErr                error
 		warnings                  Warnings
+
+		forwardSpecs []sharedaction.LocalPortForward
 	)
 
 	BeforeEach(func() {
@@ -31,6 +33,11 @@ var _ = Describe("SSH Actions", func() {
 		fakeSharedActor = new(v3actionfakes.FakeSharedActor)
 		fakeUAAClient = new(v3actionfakes.FakeUAAClient)
 		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient)
+
+		forwardSpecs = []sharedaction.LocalPortForward{
+			{LocalAddress: "localhost:8888", RemoteAddress: "remote:4444"},
+			{LocalAddress: "localhost:7777", RemoteAddress: "remote:3333"},
+		}
 	})
 
 	Describe("ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex", func() {
@@ -41,10 +48,11 @@ var _ = Describe("SSH Actions", func() {
 
 		JustBeforeEach(func() {
 			warnings, executeErr = actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex("some-app", "some-space-guid", "some-process-type", 0, SSHOptions{
-				Commands:            []string{"some-command"},
-				TTYOption:           sharedaction.RequestTTYForce,
-				SkipHostValidation:  true,
-				SkipRemoteExecution: true,
+				Commands:              []string{"some-command"},
+				LocalPortForwardSpecs: forwardSpecs,
+				TTYOption:             sharedaction.RequestTTYForce,
+				SkipHostValidation:    true,
+				SkipRemoteExecution:   true,
 			})
 		})
 
@@ -162,14 +170,15 @@ var _ = Describe("SSH Actions", func() {
 
 								Expect(fakeSharedActor.ExecuteSecureShellCallCount()).To(Equal(1))
 								Expect(fakeSharedActor.ExecuteSecureShellArgsForCall(0)).To(Equal(sharedaction.SSHOptions{
-									Commands:            []string{"some-command"},
-									Username:            "cf:some-process-guid/0",
-									Passcode:            "some-ssh-passcode",
-									Endpoint:            "some-app-ssh-endpoint",
-									HostKeyFingerprint:  "some-app-ssh-fingerprint",
-									TTYOption:           sharedaction.RequestTTYForce,
-									SkipHostValidation:  true,
-									SkipRemoteExecution: true,
+									Commands:              []string{"some-command"},
+									Endpoint:              "some-app-ssh-endpoint",
+									HostKeyFingerprint:    "some-app-ssh-fingerprint",
+									LocalPortForwardSpecs: forwardSpecs,
+									Passcode:              "some-ssh-passcode",
+									SkipHostValidation:    true,
+									SkipRemoteExecution:   true,
+									TTYOption:             sharedaction.RequestTTYForce,
+									Username:              "cf:some-process-guid/0",
 								}))
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))

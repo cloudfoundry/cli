@@ -8,14 +8,14 @@ import (
 )
 
 type SSHOptions struct {
-	Commands            []string
-	TTYOption           sharedaction.TTYOption
-	Forward             []string
-	SkipHostValidation  bool
-	SkipRemoteExecution bool
+	Commands              []string
+	Forward               []string
+	LocalPortForwardSpecs []sharedaction.LocalPortForward
+	SkipHostValidation    bool
+	SkipRemoteExecution   bool
+	TTYOption             sharedaction.TTYOption
 }
 
-// TODO: implement port forward
 func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint, sshOptions SSHOptions) (Warnings, error) {
 	endpoint := actor.CloudControllerClient.AppSSHEndpoint()
 	if endpoint == "" {
@@ -57,14 +57,15 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 	}
 
 	err = actor.SharedActor.ExecuteSecureShell(sharedaction.SSHOptions{
-		Username:            fmt.Sprintf("cf:%s/%d", processGUID, processIndex),
-		Commands:            sshOptions.Commands,
-		Passcode:            passcode,
-		Endpoint:            endpoint,
-		HostKeyFingerprint:  fingerprint,
-		SkipHostValidation:  sshOptions.SkipHostValidation,
-		SkipRemoteExecution: sshOptions.SkipRemoteExecution,
-		TTYOption:           sshOptions.TTYOption,
+		Commands:              sshOptions.Commands,
+		Endpoint:              endpoint,
+		HostKeyFingerprint:    fingerprint,
+		LocalPortForwardSpecs: sshOptions.LocalPortForwardSpecs,
+		Passcode:              passcode,
+		SkipHostValidation:    sshOptions.SkipHostValidation,
+		SkipRemoteExecution:   sshOptions.SkipRemoteExecution,
+		TTYOption:             sshOptions.TTYOption,
+		Username:              fmt.Sprintf("cf:%s/%d", processGUID, processIndex),
 	})
 
 	return warnings, err

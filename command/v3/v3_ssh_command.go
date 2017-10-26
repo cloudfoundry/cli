@@ -22,16 +22,16 @@ type V3SSHActor interface {
 }
 
 type V3SSHCommand struct {
-	RequiredArgs        flag.AppName `positional-args:"yes"`
-	ProcessIndex        uint         `long:"app-instance-index" short:"i" description:"App process instance index (Default: 0)"`
-	Commands            []string     `long:"command" short:"c" description:"Command to run"`
-	DisablePseudoTTY    bool         `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
-	ForcePseudoTTY      bool         `long:"force-pseudo-tty" description:"Force pseudo-tty allocation"`
-	ForwardSpecs        []string     `short:"L" description:"Local port forward specification"`
-	ProcessType         string       `long:"process" description:"App process name (Default: web)"`
-	RequestPseudoTTY    bool         `long:"request-pseudo-tty" short:"t" description:"Request pseudo-tty allocation"`
-	SkipHostValidation  bool         `long:"skip-host-validation" short:"k" description:"Skip host key validation. Not recommended!"`
-	SkipRemoteExecution bool         `long:"skip-remote-execution" short:"N" description:"Do not execute a remote command"`
+	RequiredArgs          flag.AppName             `positional-args:"yes"`
+	ProcessIndex          uint                     `long:"app-instance-index" short:"i" description:"App process instance index (Default: 0)"`
+	Commands              []string                 `long:"command" short:"c" description:"Command to run"`
+	DisablePseudoTTY      bool                     `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
+	ForcePseudoTTY        bool                     `long:"force-pseudo-tty" description:"Force pseudo-tty allocation"`
+	LocalPortForwardSpecs []flag.SSHPortForwarding `short:"L" description:"Local port forward specification"`
+	ProcessType           string                   `long:"process" description:"App process name (Default: web)"`
+	RequestPseudoTTY      bool                     `long:"request-pseudo-tty" short:"t" description:"Request pseudo-tty allocation"`
+	SkipHostValidation    bool                     `long:"skip-host-validation" short:"k" description:"Skip host key validation. Not recommended!"`
+	SkipRemoteExecution   bool                     `long:"skip-remote-execution" short:"N" description:"Do not execute a remote command"`
 
 	usage           interface{} `usage:"cf v3-ssh APP_NAME [--process PROCESS] [-i INDEX] [-c COMMAND]...\n   [-L [BIND_ADDRESS:]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT]... [--skip-remote-execution]\n   [--disable-pseudo-tty | --force-pseudo-tty | --request-pseudo-tty] [--skip-host-validation]\n"`
 	relatedCommands interface{} `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
@@ -82,11 +82,17 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 		cmd.ProcessType = "web"
 	}
 
+	var forwardSpecs []sharedaction.LocalPortForward
+	for _, spec := range cmd.LocalPortForwardSpecs {
+		forwardSpecs = append(forwardSpecs, sharedaction.LocalPortForward(spec))
+	}
+
 	warnings, err := cmd.Actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.ProcessType, cmd.ProcessIndex, v3action.SSHOptions{
-		Commands:            cmd.Commands,
-		SkipHostValidation:  cmd.SkipHostValidation,
-		SkipRemoteExecution: cmd.SkipRemoteExecution,
-		TTYOption:           ttyOption,
+		Commands:              cmd.Commands,
+		LocalPortForwardSpecs: forwardSpecs,
+		SkipHostValidation:    cmd.SkipHostValidation,
+		SkipRemoteExecution:   cmd.SkipRemoteExecution,
+		TTYOption:             ttyOption,
 	})
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

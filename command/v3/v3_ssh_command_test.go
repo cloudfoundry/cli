@@ -43,7 +43,6 @@ var _ = Describe("v3-ssh Command", func() {
 			ProcessType:         "some-process-type",
 			ProcessIndex:        1,
 			Commands:            []string{"some", "commands"},
-			ForwardSpecs:        []string{"some", "ports"},
 			SkipHostValidation:  true,
 			SkipRemoteExecution: true,
 
@@ -140,6 +139,40 @@ var _ = Describe("v3-ssh Command", func() {
 					Expect(processTypeArg).To(Equal("web"))
 					Expect(processIndexArg).To(Equal(uint(0)))
 				})
+			})
+		})
+
+		Context("when working with local port forwarding", func() {
+			BeforeEach(func() {
+				cmd.LocalPortForwardSpecs = []flag.SSHPortForwarding{
+					{LocalAddress: "localhost:8888", RemoteAddress: "remote:4444"},
+					{LocalAddress: "localhost:7777", RemoteAddress: "remote:3333"},
+				}
+
+				fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns(v3action.Warnings{"some-warnings"}, nil)
+				cmd.DisablePseudoTTY = true
+			})
+
+			It("passes along port forwarding information", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(testUI.Err).To(Say("some-warnings"))
+
+				Expect(fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexCallCount()).To(Equal(1))
+				appNameArg, spaceGUIDArg, processTypeArg, processIndexArg, sshOptionsArg := fakeActor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall(0)
+				Expect(appNameArg).To(Equal(appName))
+				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
+				Expect(processTypeArg).To(Equal("some-process-type"))
+				Expect(processIndexArg).To(Equal(uint(1)))
+				Expect(sshOptionsArg).To(Equal(v3action.SSHOptions{
+					Commands:            []string{"some", "commands"},
+					TTYOption:           sharedaction.RequestTTYNo,
+					SkipHostValidation:  true,
+					SkipRemoteExecution: true,
+					LocalPortForwardSpecs: []sharedaction.LocalPortForward{
+						{LocalAddress: "localhost:8888", RemoteAddress: "remote:4444"},
+						{LocalAddress: "localhost:7777", RemoteAddress: "remote:3333"},
+					},
+				}))
 			})
 		})
 

@@ -2,6 +2,8 @@ package experimental
 
 import (
 	"fmt"
+	"os/exec"
+	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -331,6 +333,32 @@ var _ = Describe("v3-ssh command", func() {
 				It("exits with that status code", func() {
 					session := helpers.CF("v3-ssh", appName, "-c", "asdf")
 					Eventually(session).Should(Exit(127))
+				})
+			})
+
+			Context("when port forwarding is used", func() {
+				var port int
+
+				BeforeEach(func() {
+					port = 55500 + GinkgoParallelNode()
+				})
+
+				It("configures local port to connect to the app port", func() {
+					session := helpers.CF("v3-ssh", appName, "-N", "-L", fmt.Sprintf("%d:localhost:8080", port))
+
+					time.Sleep(5 * time.Second) // Need to wait a few seconds for pipes to connect.
+					curl, err := Start(
+						exec.Command("curl", fmt.Sprintf("localhost:%d/", port)),
+						GinkgoWriter,
+						GinkgoWriter,
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					Eventually(curl).Should(Say("WEBrick"))
+					Eventually(curl).Should(Exit(0))
+
+					session.Terminate()
+					Eventually(session).Should(Exit())
 				})
 			})
 
