@@ -81,8 +81,9 @@ var _ = Describe("create-user command", func() {
 
 			It("fails with insufficient scope error", func() {
 				session := helpers.CF("create-user", newUser, newPassword)
-				Eventually(session.Out).Should(Say("Error creating user %s.", newUser))
-				Eventually(session.Err).Should(Say("Insufficient scope for this resource"))
+				Eventually(session.Out).Should(Say("Creating user %s\\.\\.\\.", newUser))
+				Eventually(session.Out).Should(Say("Error creating user %s\\.", newUser))
+				Eventually(session.Err).Should(Say("You are not authorized to perform the requested action\\."))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})

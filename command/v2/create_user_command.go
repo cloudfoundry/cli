@@ -83,7 +83,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 			cmd.UI.DisplayTextWithFlavor("Error creating user {{.User}}.", map[string]interface{}{
 				"User": cmd.Args.Username,
 			})
-			return err
+			return shared.HandleError(err)
 		}
 	}
 

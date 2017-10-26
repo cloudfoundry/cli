@@ -180,6 +180,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.ManifestCreationError{Err: errors.New("some-error")},
 		),
 
+		Entry("uaa.InsufficientScopeError -> UnauthorizedToPerformActionError",
+			uaa.InsufficientScopeError{},
+			translatableerror.UnauthorizedToPerformActionError{},
+		),
+
 		Entry("default case -> original error",
 			err,
 			err),

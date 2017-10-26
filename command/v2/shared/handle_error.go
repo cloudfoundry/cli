@@ -83,9 +83,10 @@ func HandleError(err error) error {
 		return translatableerror.PropertyCombinationError(e)
 	case actionerror.DockerPasswordNotSetError:
 		return translatableerror.DockerPasswordNotSetError{}
-
 	case manifest.ManifestCreationError:
 		return translatableerror.ManifestCreationError(e)
+	case uaa.InsufficientScopeError:
+		return translatableerror.UnauthorizedToPerformActionError{}
 	}
 
 	return err
