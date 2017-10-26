@@ -264,10 +264,7 @@ func (actor Actor) calculateHostname(manifestApp manifest.Application, domain v2
 
 	switch {
 	case manifestApp.NoHostname && domain.IsShared():
-		return "", actionerror.PropertyCombinationError{
-			AppName:    manifestApp.Name,
-			Properties: []string{"no-hostname", "shared-domain"},
-		}
+		return "", actionerror.NoHostnameAndSharedDomainError{}
 	case manifestApp.NoHostname:
 		return "", nil
 	case domain.IsHTTP():

@@ -145,6 +145,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.NoDomainsFoundError{},
 		),
 
+		Entry("actionerror.NoHostnameAndSharedDomainError -> NoHostnameAndSharedDomainError",
+			actionerror.NoHostnameAndSharedDomainError{},
+			translatableerror.NoHostnameAndSharedDomainError{},
+		),
+
 		Entry("actionerror.InvalidHTTPRouteSettings -> PortNotAllowedWithHTTPDomainError",
 			actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
 			translatableerror.PortNotAllowedWithHTTPDomainError{Domain: "some-domain"},

@@ -977,10 +977,7 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("returns an error and warnings", func() {
-					Expect(executeErr).To(MatchError(actionerror.PropertyCombinationError{
-						AppName:    providedManifest.Name,
-						Properties: []string{"no-hostname", "shared-domain"},
-					}))
+					Expect(executeErr).To(MatchError(actionerror.NoHostnameAndSharedDomainError{}))
 					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 				})
 			})

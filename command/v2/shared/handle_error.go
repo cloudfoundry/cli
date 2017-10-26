@@ -71,6 +71,8 @@ func HandleError(err error) error {
 		return translatableerror.CommandLineArgsWithMultipleAppsError{}
 	case actionerror.NoDomainsFoundError:
 		return translatableerror.NoDomainsFoundError{}
+	case actionerror.NoHostnameAndSharedDomainError:
+		return translatableerror.NoHostnameAndSharedDomainError{}
 	case actionerror.NonexistentAppPathError:
 		return translatableerror.FileNotFoundError(e)
 	case actionerror.MissingNameError:
