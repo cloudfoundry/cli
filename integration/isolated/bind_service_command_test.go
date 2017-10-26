@@ -13,10 +13,6 @@ import (
 )
 
 var _ = Describe("bind-service command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("command is currently experimental")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {

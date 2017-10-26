@@ -50,7 +50,6 @@ var _ = Describe("bind-service Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns("faceman")
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	JustBeforeEach(func() {

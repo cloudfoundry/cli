@@ -2,12 +2,10 @@ package v2
 
 import (
 	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -46,11 +44,6 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd BindServiceCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
 		return shared.HandleError(err)
