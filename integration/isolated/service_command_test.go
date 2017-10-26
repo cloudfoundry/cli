@@ -13,6 +13,7 @@ var _ = Describe("service command", func() {
 
 	BeforeEach(func() {
 		serviceInstanceName = helpers.PrefixedRandomName("SI")
+		helpers.RunIfExperimental("command is currently experimental")
 	})
 
 	Describe("help", func() {
