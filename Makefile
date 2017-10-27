@@ -6,6 +6,10 @@ LC_ALL = "en_US.UTF-8"
 CF_BUILD_VERSION ?= $$(cat ci/VERSION)
 CF_BUILD_SHA ?= $$(git rev-parse --short HEAD)
 CF_BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
+LD_FLAGS = "-w -s \
+	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
+	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
+	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)"
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*")
 
 all : test build
@@ -77,6 +81,18 @@ out/cf : $(GOSRC)
 							-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
 							-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)" \
 		.
+
+out/cf-cli-_winx64.exe : $(GOSRC)
+	go get github.com/akavel/rsrc
+	rsrc -ico ci/installers/windows/cf.ico
+	GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe -ldflags $(LD_FLAGS) .
+	rm rsrc.syso
+
+out/cf-cli-_win32.exe : $(GOSRC)
+	go get github.com/akavel/rsrc
+	rsrc -ico ci/installers/windows/cf.ico
+	GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe -ldflags $(LD_FLAGS) .
+	rm rsrc.syso
 
 test : units
 
