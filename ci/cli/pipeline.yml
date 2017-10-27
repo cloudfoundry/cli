@@ -366,14 +366,65 @@ jobs:
     params:
       release: bosh-lite-lock
 
-- name: integration-experimental
+- name: cats
   serial: true
   plan:
   - aggregate:
     - get: cli
       passed: [build-binaries]
+    - get: cf-acceptance-tests
     - get: cf-cli-binaries
       passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: vars-store
+    - put: bosh-lite-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: config
+      file: cli-ci/ci/cli/tasks/cats-config.yml
+      params:
+        INCLUDE_V3: false
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
+    - task: windows
+      file: cli-ci/ci/cli/tasks/cats-windows.yml
+      params:
+        NODES: 16
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats windows failed :("
+    - task: linux
+      file: cli-ci/ci/cli/tasks/cats-linux.yml
+      params:
+        BACKEND: diego
+        NODES: 16
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-firehose'
+          text: "cats linux failed :("
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lite-lock
+
+- name: integration-experimental
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [cats, integration]
+    - get: cf-cli-binaries
+      passed: [cats]
       trigger: true
     - get: cli-ci
     - get: vars-store
@@ -424,9 +475,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration, integration-experimental]
+      passed: [cats, integration]
     - get: cf-cli-binaries
-      passed: [integration, integration-experimental]
+      passed: [cats, integration]
       trigger: true
     - get: cli-ci
   - task: extract-binaries
@@ -499,57 +550,6 @@ jobs:
       params:
         repos:
         - cli
-
-- name: cats
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [integration, integration-experimental]
-    - get: cf-acceptance-tests
-    - get: cf-cli-binaries
-      passed: [integration, integration-experimental]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lite-lock
-      resource: gcp-bosh-pool
-      params:
-        acquire: true
-  - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: config
-      file: cli-ci/ci/cli/tasks/cats-config.yml
-      params:
-        INCLUDE_V3: false
-        BROKER_START_TIMEOUT: 330
-        CF_PUSH_TIMEOUT: 210
-        DEFAULT_TIMEOUT: 60
-        LONG_CURL_TIMEOUT: 210
-    - task: windows
-      file: cli-ci/ci/cli/tasks/cats-windows.yml
-      params:
-        NODES: 16
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats windows failed :("
-    - task: linux
-      file: cli-ci/ci/cli/tasks/cats-linux.yml
-      params:
-        BACKEND: diego
-        NODES: 16
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-firehose'
-          text: "cats linux failed :("
-  ensure:
-    put: gcp-bosh-pool
-    params:
-      release: bosh-lite-lock
 
 - name: create-cli-base-image
   serial: true

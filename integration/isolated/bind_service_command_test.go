@@ -350,7 +350,7 @@ var _ = Describe("bind-service command", func() {
 					Eventually(session).Should(Say("Bound apps:\\s+%s", appName))
 					Eventually(session).Should(Exit(0))
 
-					session = helpers.CF("env", appName)
+					session = helpers.CF("env", serviceInstance)
 					Eventually(session).Should(Say("waldo"))
 					Eventually(session).Should(Exit(0))
 				})
