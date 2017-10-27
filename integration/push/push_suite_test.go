@@ -70,7 +70,7 @@ var _ = BeforeEach(func() {
 })
 
 var _ = AfterEach(func() {
-	GinkgoWriter.Write([]byte("==============================After Each=============================="))
+	GinkgoWriter.Write([]byte("==============================Global After Each=============================="))
 	helpers.QuickDeleteSpace(space)
 	helpers.DestroyHomeDir(homeDir)
 })
