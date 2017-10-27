@@ -258,22 +258,28 @@ jobs:
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
-           text: "linux unit tests failed :("
+           channel: '#cli-eng'
+           text: |
+             Linux unit tests failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-osx
       file: cli-ci/ci/cli/tasks/units-osx.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
-           text: "osx unit tests failed :("
+           channel: '#cli-eng'
+           text: |
+             OS X unit tests failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: units-windows
       file: cli-ci/ci/cli/tasks/units-windows.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
-           text: "windows unit tests failed :("
+           channel: '#cli-eng'
+           text: |
+             Windows unit tests failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
 
 - name: build-binaries
   serial: true
@@ -289,23 +295,29 @@ jobs:
     on_failure:
        put: slack-alert
        params:
-         channel: '#cli-firehose'
-         text: "build i18n failed :("
+         channel: '#cli-eng'
+         text: |
+           i18n generation failed :(
+           https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - aggregate:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
-           text: "build binaries failed :("
+           channel: '#cli-eng'
+           text: |
+             build binaries failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: build-osx
       file: cli-ci/ci/cli/tasks/build-osx-binary.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
-           text: "build osx binaries failed :("
+           channel: '#cli-eng'
+           text: |
+             build OS X binaries failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -336,8 +348,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-firehose'
-          text: "linux integration failed :("
+          channel: '#cli-eng'
+          text: |
+            Linux integration failed :(
+            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -352,8 +366,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-firehose'
-          text: "windows integration failed :("
+          channel: '#cli-eng'
+          text: |
+            Windows integration failed :(
+            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -366,65 +382,14 @@ jobs:
     params:
       release: bosh-lite-lock
 
-- name: cats
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-      passed: [build-binaries]
-    - get: cf-acceptance-tests
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-      trigger: true
-    - get: cli-ci
-    - get: vars-store
-    - put: bosh-lite-lock
-      resource: gcp-bosh-pool
-      params:
-        acquire: true
-  - do:
-    - task: cleanup-integration
-      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: config
-      file: cli-ci/ci/cli/tasks/cats-config.yml
-      params:
-        INCLUDE_V3: false
-        BROKER_START_TIMEOUT: 330
-        CF_PUSH_TIMEOUT: 210
-        DEFAULT_TIMEOUT: 60
-        LONG_CURL_TIMEOUT: 210
-    - task: windows
-      file: cli-ci/ci/cli/tasks/cats-windows.yml
-      params:
-        NODES: 16
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats windows failed :("
-    - task: linux
-      file: cli-ci/ci/cli/tasks/cats-linux.yml
-      params:
-        BACKEND: diego
-        NODES: 16
-      on_failure:
-        put: slack-alert
-        params:
-          channel: '#cli-firehose'
-          text: "cats linux failed :("
-  ensure:
-    put: gcp-bosh-pool
-    params:
-      release: bosh-lite-lock
-
 - name: integration-experimental
   serial: true
   plan:
   - aggregate:
     - get: cli
-      passed: [cats, integration]
+      passed: [build-binaries]
     - get: cf-cli-binaries
-      passed: [cats]
+      passed: [build-binaries]
       trigger: true
     - get: cli-ci
     - get: vars-store
@@ -442,8 +407,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-firehose'
-          text: "windows integration-experimental failed :("
+          channel: '#cli-eng'
+          text: |
+            Windows integration-experimental failed :(
+            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -456,8 +423,10 @@ jobs:
       on_failure:
         put: slack-alert
         params:
-          channel: '#cli-firehose'
-          text: "linux integration-experimental failed :("
+          channel: '#cli-eng'
+          text: |
+            Linux integration-experimental failed :(
+            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
@@ -475,9 +444,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [cats, integration]
+      passed: [integration, integration-experimental]
     - get: cf-cli-binaries
-      passed: [cats, integration]
+      passed: [integration, integration-experimental]
       trigger: true
     - get: cli-ci
   - task: extract-binaries
@@ -485,7 +454,7 @@ jobs:
     on_failure:
        put: slack-alert
        params:
-         channel: '#cli-firehose'
+         channel: '#cli-eng'
          text: "extracting the binaries in installer creation failed :("
   - aggregate:
     - task: unix
@@ -493,21 +462,21 @@ jobs:
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
+           channel: '#cli-eng'
            text: "create unix installers failed :("
     - task: windows
       file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       on_failure:
          put: slack-alert
          params:
-           channel: '#cli-firehose'
+           channel: '#cli-eng'
            text: "create windows installer failed :("
   - task: package-binaries
     file: cli-ci/ci/cli/tasks/package-binaries.yml
     on_failure:
        put: slack-alert
        params:
-         channel: '#cli-firehose'
+         channel: '#cli-eng'
          text: "extracting the binaries in installer creation failed :("
   - aggregate:
     - put: edge-linux-binary-32
@@ -550,6 +519,62 @@ jobs:
       params:
         repos:
         - cli
+
+- name: cats
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [integration, integration-experimental]
+    - get: cf-acceptance-tests
+    - get: cf-cli-binaries
+      passed: [integration, integration-experimental]
+      trigger: true
+    - get: cli-ci
+    - get: vars-store
+    - put: bosh-lite-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: config
+      file: cli-ci/ci/cli/tasks/cats-config.yml
+      params:
+        INCLUDE_V3: false
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
+    - task: windows
+      file: cli-ci/ci/cli/tasks/cats-windows.yml
+      params:
+        NODES: 16
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-eng'
+           text: |
+             CATs Windows failed :(
+             https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+    - task: linux
+      file: cli-ci/ci/cli/tasks/cats-linux.yml
+      params:
+        BACKEND: diego
+        NODES: 16
+      on_failure:
+        put: slack-alert
+        params:
+          channel: '#cli-eng'
+          text: |
+            CATs Linux failed :(
+            https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lite-lock
+
 
 - name: create-cli-base-image
   serial: true
