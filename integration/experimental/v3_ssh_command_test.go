@@ -357,7 +357,7 @@ var _ = Describe("v3-ssh command", func() {
 					Eventually(curl).Should(Say("WEBrick"))
 					Eventually(curl).Should(Exit(0))
 
-					session.Terminate()
+					session.Kill()
 					Eventually(session).Should(Exit())
 				})
 			})
