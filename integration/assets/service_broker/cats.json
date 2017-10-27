@@ -51,7 +51,8 @@
                       "content": "40 concurrent connections"
                     }
                   ]
-                }
+                },
+                "schemas": "<fake-plan-schema>"
               },
               {
                 "name": "<fake-plan-2>",
