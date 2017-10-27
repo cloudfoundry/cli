@@ -74,7 +74,7 @@ var _ = Describe("pushing with no-hostname", func() {
 				It("returns an invalid route error", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-hostname", "-d", domainName, "--no-start")
-						Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: no-hostname, shared-domain", appName))
+						Eventually(session.Err).Should(Say("The route is invalid: a hostname is required for shared domains."))
 						Eventually(session).Should(Exit(1))
 					})
 				})
