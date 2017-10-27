@@ -346,9 +346,13 @@ var _ = Describe("bind-service command", func() {
 					Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
 					Eventually(session).Should(Exit(0))
 
-					logsSession := helpers.CF("logs", broker.Name, "--recent")
-					Eventually(logsSession).Should(Say("{\"wheres\":\"waldo\"}"))
-					Eventually(logsSession).Should(Exit(0))
+					session = helpers.CF("service", serviceInstance)
+					Eventually(session).Should(Say("Bound apps:\\s+%s", appName))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", serviceInstance)
+					Eventually(session).Should(Say("waldo"))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
