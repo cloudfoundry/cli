@@ -24,7 +24,7 @@ SET CF_PLUGIN_HOME=%CD%
 .\cf remove-plugin-repo CATS-Test-CF-Community
 
 mkdir %CATSPATH%
-xcopy /e /s cf-acceptance-tests %CATSPATH%
+xcopy /q /e /s cf-acceptance-tests %CATSPATH%
 
 cd %CATSPATH%
 
