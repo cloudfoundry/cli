@@ -1,6 +1,7 @@
 package sharedaction_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	. "github.com/onsi/ginkgo"
@@ -25,7 +26,7 @@ var _ = Describe("CheckTarget", func() {
 	Context("when the user is not logged in", func() {
 		It("returns an error", func() {
 			err := actor.CheckTarget(false, false)
-			Expect(err).To(MatchError(NotLoggedInError{
+			Expect(err).To(MatchError(actionerror.NotLoggedInError{
 				BinaryName: binaryName,
 			}))
 		})
@@ -50,7 +51,7 @@ var _ = Describe("CheckTarget", func() {
 				}
 			},
 
-			Entry("it returns an error", false, true, NoOrganizationTargetedError{BinaryName: "faceman"}),
+			Entry("it returns an error", false, true, actionerror.NoOrganizationTargetedError{BinaryName: "faceman"}),
 			Entry("it does not return an error", false, false, nil),
 			Entry("it does not return an error", true, false, nil),
 			Entry("it does not return an error", true, true, nil),
@@ -74,7 +75,7 @@ var _ = Describe("CheckTarget", func() {
 					}
 				},
 
-				Entry("it returns an error", false, true, NoSpaceTargetedError{BinaryName: "faceman"}),
+				Entry("it returns an error", false, true, actionerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 				Entry("it does not return an error", false, false, nil),
 				Entry("it does not return an error", true, false, nil),
 				Entry("it does not return an error", true, true, nil),

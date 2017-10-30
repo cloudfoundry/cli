@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -55,8 +54,8 @@ var _ = Describe("HandleError", func() {
 			actionerror.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
-		Entry("v2action.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
-			v2action.SecurityGroupNotFoundError{Name: "some-security-group"},
+		Entry("actionerror.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
+			actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 			translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}),
 
 		Entry("v2action.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError",
@@ -83,16 +82,16 @@ var _ = Describe("HandleError", func() {
 			v2action.SpaceNotFoundError{Name: "some-space"},
 			translatableerror.SpaceNotFoundError{Name: "some-space"}),
 
-		Entry("sharedaction.NotLoggedInError -> NotLoggedInError",
-			sharedaction.NotLoggedInError{BinaryName: "faceman"},
+		Entry("actionerror.NotLoggedInError -> NotLoggedInError",
+			actionerror.NotLoggedInError{BinaryName: "faceman"},
 			translatableerror.NotLoggedInError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoOrganizationTargetedError -> NoOrganizationTargetedError",
-			sharedaction.NoOrganizationTargetedError{BinaryName: "faceman"},
+		Entry("actionerror.NoOrganizationTargetedError -> NoOrganizationTargetedError",
+			actionerror.NoOrganizationTargetedError{BinaryName: "faceman"},
 			translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoSpaceTargetedError -> NoSpaceTargetedError",
-			sharedaction.NoSpaceTargetedError{BinaryName: "faceman"},
+		Entry("actionerror.NoSpaceTargetedError -> NoSpaceTargetedError",
+			actionerror.NoSpaceTargetedError{BinaryName: "faceman"},
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
 		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
@@ -111,12 +110,12 @@ var _ = Describe("HandleError", func() {
 		),
 
 		Entry("v2action.EmptyDirectoryError -> EmptyDirectoryError",
-			sharedaction.EmptyDirectoryError{Path: "some-filename"},
+			actionerror.EmptyDirectoryError{Path: "some-filename"},
 			translatableerror.EmptyDirectoryError{Path: "some-filename"},
 		),
 
-		Entry("v2action.DomainNotFoundError -> DomainNotFoundError",
-			v2action.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
+		Entry("actionerror.DomainNotFoundError -> DomainNotFoundError",
+			actionerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 			translatableerror.DomainNotFoundError{Name: "some-domain-name", GUID: "some-domain-guid"},
 		),
 

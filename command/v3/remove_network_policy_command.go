@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -79,7 +80,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case cfnetworkingaction.PolicyDoesNotExistError:
+		case actionerror.PolicyDoesNotExistError:
 			cmd.UI.DisplayText("Policy does not exist.")
 		default:
 			return shared.HandleError(err)

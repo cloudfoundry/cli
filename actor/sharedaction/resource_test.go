@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/ykk"
@@ -136,7 +137,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 
 			It("returns an FileChangedError", func() {
-				Expect(executeErr).To(Equal(FileChangedError{Filename: "/tmpFile3"}))
+				Expect(executeErr).To(Equal(actionerror.FileChangedError{Filename: "/tmpFile3"}))
 			})
 		})
 	})
@@ -210,7 +211,7 @@ var _ = Describe("Resource Actions", func() {
 			})
 
 			It("returns an FileChangedError", func() {
-				Expect(executeErr).To(Equal(FileChangedError{Filename: filepath.Join(srcDir, "tmpFile3")}))
+				Expect(executeErr).To(Equal(actionerror.FileChangedError{Filename: filepath.Join(srcDir, "tmpFile3")}))
 			})
 		})
 	})

@@ -1,8 +1,7 @@
 package v2action
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
@@ -35,25 +34,6 @@ func (domain Domain) IsTCP() bool {
 	return domain.RouterGroupType == constant.TCPRouterGroup
 }
 
-// DomainNotFoundError is an error wrapper that represents the case
-// when the domain is not found.
-type DomainNotFoundError struct {
-	Name string
-	GUID string
-}
-
-// Error method to display the error message.
-func (e DomainNotFoundError) Error() string {
-	switch {
-	case e.Name != "":
-		return fmt.Sprintf("Domain %s not found", e.Name)
-	case e.GUID != "":
-		return fmt.Sprintf("Domain with GUID %s not found", e.GUID)
-	default:
-		return "Domain not found"
-	}
-}
-
 // TODO: Move into own file or add function to CCV2/3
 func isResourceNotFoundError(err error) bool {
 	_, isResourceNotFound := err.(ccerror.ResourceNotFoundError)
@@ -70,7 +50,7 @@ func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	switch err.(type) {
 	case nil:
 		return domain, allWarnings, nil
-	case DomainNotFoundError:
+	case actionerror.DomainNotFoundError:
 	default:
 		return Domain{}, allWarnings, err
 	}
@@ -147,7 +127,7 @@ func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) 
 
 	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
 	if isResourceNotFoundError(err) {
-		return Domain{}, Warnings(warnings), DomainNotFoundError{GUID: domainGUID}
+		return Domain{}, Warnings(warnings), actionerror.DomainNotFoundError{GUID: domainGUID}
 	}
 
 	actor.saveDomain(domain)
@@ -167,7 +147,7 @@ func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error)
 
 	domain, warnings, err := actor.CloudControllerClient.GetPrivateDomain(domainGUID)
 	if isResourceNotFoundError(err) {
-		return Domain{}, Warnings(warnings), DomainNotFoundError{GUID: domainGUID}
+		return Domain{}, Warnings(warnings), actionerror.DomainNotFoundError{GUID: domainGUID}
 	}
 
 	actor.saveDomain(domain)

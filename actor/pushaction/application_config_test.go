@@ -648,7 +648,7 @@ var _ = Describe("Application Config", func() {
 					})
 
 					It("returns an DomainNotFoundError", func() {
-						Expect(executeErr).To(MatchError(v2action.DomainNotFoundError{Name: "some-private-domain"}))
+						Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{Name: "some-private-domain"}))
 						Expect(warnings).To(ConsistOf("some-organization-domain-warning", "app-route-warnings"))
 
 						Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))

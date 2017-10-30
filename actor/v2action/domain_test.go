@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -127,10 +128,10 @@ var _ = Describe("Domain Actions", func() {
 	})
 
 	Describe("DomainNotFoundError", func() {
-		var err DomainNotFoundError
+		var err actionerror.DomainNotFoundError
 		Context("when the name is provided", func() {
 			BeforeEach(func() {
-				err = DomainNotFoundError{Name: "some-domain-name"}
+				err = actionerror.DomainNotFoundError{Name: "some-domain-name"}
 			})
 
 			It("returns the correct message", func() {
@@ -140,7 +141,7 @@ var _ = Describe("Domain Actions", func() {
 
 		Context("when the name is not provided but the guid is", func() {
 			BeforeEach(func() {
-				err = DomainNotFoundError{GUID: "some-domain-guid"}
+				err = actionerror.DomainNotFoundError{GUID: "some-domain-guid"}
 			})
 
 			It("returns the correct message", func() {
@@ -150,7 +151,7 @@ var _ = Describe("Domain Actions", func() {
 
 		Context("when neither the name nor the guid is provided", func() {
 			BeforeEach(func() {
-				err = DomainNotFoundError{}
+				err = actionerror.DomainNotFoundError{}
 			})
 
 			It("returns the correct message", func() {
@@ -207,10 +208,10 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		Context("when the domain does not exist", func() {
-			var expectedErr DomainNotFoundError
+			var expectedErr actionerror.DomainNotFoundError
 
 			BeforeEach(func() {
-				expectedErr = DomainNotFoundError{GUID: "private-domain-guid"}
+				expectedErr = actionerror.DomainNotFoundError{GUID: "private-domain-guid"}
 				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccerror.ResourceNotFoundError{})
 				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, ccerror.ResourceNotFoundError{})
 			})
@@ -422,10 +423,10 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		Context("when the API returns a not found error", func() {
-			var expectedErr DomainNotFoundError
+			var expectedErr actionerror.DomainNotFoundError
 
 			BeforeEach(func() {
-				expectedErr = DomainNotFoundError{GUID: "shared-domain-guid"}
+				expectedErr = actionerror.DomainNotFoundError{GUID: "shared-domain-guid"}
 				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, ccerror.ResourceNotFoundError{})
 			})
 
@@ -494,10 +495,10 @@ var _ = Describe("Domain Actions", func() {
 		})
 
 		Context("when the API returns a not found error", func() {
-			var expectedErr DomainNotFoundError
+			var expectedErr actionerror.DomainNotFoundError
 
 			BeforeEach(func() {
-				expectedErr = DomainNotFoundError{GUID: "private-domain-guid"}
+				expectedErr = actionerror.DomainNotFoundError{GUID: "private-domain-guid"}
 				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, ccerror.ResourceNotFoundError{})
 			})
 

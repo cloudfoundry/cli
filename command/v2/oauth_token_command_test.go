@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -48,7 +48,7 @@ var _ = Describe("oauth-token command", func() {
 
 	Context("when checking the target fails", func() {
 		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
+			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
 		It("returns a wrapped error", func() {

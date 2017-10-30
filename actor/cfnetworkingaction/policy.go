@@ -2,13 +2,8 @@ package cfnetworkingaction
 
 import (
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 )
-
-type PolicyDoesNotExistError struct{}
-
-func (e PolicyDoesNotExistError) Error() string {
-	return "Policy does not exist."
-}
 
 type Policy struct {
 	SourceName      string
@@ -166,7 +161,7 @@ func (actor Actor) RemoveNetworkPolicy(spaceGUID, srcAppName, destAppName, proto
 		}
 	}
 
-	return allWarnings, PolicyDoesNotExistError{}
+	return allWarnings, actionerror.PolicyDoesNotExistError{}
 }
 
 func (Actor) transformPolicy(appNameByGuid map[string]string, v1Policy cfnetv1.Policy) Policy {

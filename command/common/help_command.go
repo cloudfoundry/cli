@@ -5,6 +5,7 @@ import (
 	"math"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common/internal"
@@ -219,7 +220,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 func (cmd HelpCommand) displayCommand() error {
 	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
-		if err, ok := err.(sharedaction.ErrorInvalidCommand); ok {
+		if err, ok := err.(actionerror.InvalidCommandError); ok {
 			var found bool
 			if cmdInfo, found = cmd.findPlugin(); !found {
 				return err

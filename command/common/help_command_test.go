@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/common"
@@ -310,7 +311,7 @@ var _ = Describe("help Command", func() {
 				})
 
 				fakeActor.CommandInfoByNameReturns(sharedaction.CommandInfo{},
-					sharedaction.ErrorInvalidCommand{CommandName: "enable-diego"})
+					actionerror.InvalidCommandError{CommandName: "enable-diego"})
 			})
 
 			It("displays the plugin's help", func() {
@@ -353,7 +354,7 @@ var _ = Describe("help Command", func() {
 				})
 
 				fakeActor.CommandInfoByNameReturns(sharedaction.CommandInfo{},
-					sharedaction.ErrorInvalidCommand{CommandName: "enable-diego"})
+					actionerror.InvalidCommandError{CommandName: "enable-diego"})
 			})
 
 			It("displays the plugin's help", func() {

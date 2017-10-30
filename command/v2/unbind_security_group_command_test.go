@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -71,7 +71,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 	Context("when checking target fails", func() {
 		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(sharedaction.NoOrganizationTargetedError{BinaryName: binaryName})
+			fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 		})
 
 		It("returns an error", func() {
@@ -127,7 +127,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindSecurityGroupByNameAndSpaceReturns(
 							v2action.Warnings{"unbind warning"},
-							v2action.SecurityGroupNotFoundError{Name: "some-security-group"},
+							actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 						)
 					})
 
@@ -142,7 +142,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindSecurityGroupByNameAndSpaceReturns(
 							v2action.Warnings{"unbind warning"},
-							v2action.SecurityGroupNotBoundError{
+							actionerror.SecurityGroupNotBoundError{
 								Name:      "some-security-group",
 								Lifecycle: "some-lifecycle",
 							})
@@ -188,7 +188,7 @@ var _ = Describe("unbind-security-group Command", func() {
 
 			Context("when checking target fails", func() {
 				BeforeEach(func() {
-					fakeSharedActor.CheckTargetReturns(sharedaction.NoOrganizationTargetedError{BinaryName: binaryName})
+					fakeSharedActor.CheckTargetReturns(actionerror.NoOrganizationTargetedError{BinaryName: binaryName})
 				})
 
 				It("returns an error", func() {
@@ -227,7 +227,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				BeforeEach(func() {
 					fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameReturns(
 						v2action.Warnings{"unbind warning"},
-						v2action.SecurityGroupNotFoundError{Name: "some-security-group"},
+						actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 					)
 				})
 
@@ -242,7 +242,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				BeforeEach(func() {
 					fakeActor.UnbindSecurityGroupByNameOrganizationNameAndSpaceNameReturns(
 						v2action.Warnings{"unbind warning"},
-						v2action.SecurityGroupNotBoundError{
+						actionerror.SecurityGroupNotBoundError{
 							Name:      "some-security-group",
 							Lifecycle: ccv2.SecurityGroupLifecycle("some-lifecycle"),
 						})

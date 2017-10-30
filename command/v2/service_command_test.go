@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -54,7 +54,7 @@ var _ = Describe("service Command", func() {
 
 	Context("when an error is encountered checking if the environment is setup correctly", func() {
 		BeforeEach(func() {
-			fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
+			fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
 		It("returns an error", func() {

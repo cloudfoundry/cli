@@ -5,6 +5,7 @@ import (
 	"path"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/types"
@@ -132,7 +133,7 @@ func (actor Actor) CreateRouteWithExistenceCheck(orgGUID string, spaceName strin
 		if getDomainErr != nil {
 			return Route{}, warnings, getDomainErr
 		} else if len(domains) == 0 {
-			return Route{}, warnings, DomainNotFoundError{Name: route.Domain.Name}
+			return Route{}, warnings, actionerror.DomainNotFoundError{Name: route.Domain.Name}
 		}
 		route.Domain.GUID = domains[0].GUID
 	}

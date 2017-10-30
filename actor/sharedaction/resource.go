@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/ykk"
 	ignore "github.com/sabhiram/go-gitignore"
 	log "github.com/sirupsen/logrus"
@@ -31,22 +32,6 @@ var DefaultIgnoreLines = []string{
 	"_darcs",
 	"manifest.yaml",
 	"manifest.yml",
-}
-
-type FileChangedError struct {
-	Filename string
-}
-
-func (e FileChangedError) Error() string {
-	return fmt.Sprint("SHA1 mismatch for:", e.Filename)
-}
-
-type EmptyDirectoryError struct {
-	Path string
-}
-
-func (e EmptyDirectoryError) Error() string {
-	return fmt.Sprint(e.Path, "is empty")
 }
 
 type Resource struct {
@@ -175,7 +160,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 	})
 
 	if len(resources) == 0 {
-		return nil, EmptyDirectoryError{Path: sourceDir}
+		return nil, actionerror.EmptyDirectoryError{Path: sourceDir}
 	}
 
 	return resources, walkErr
@@ -331,7 +316,7 @@ func (Actor) addFileToZipFromFileSystem(
 				"expected":   sha1Sum,
 				"currentSum": currentSum,
 			}).Error("setting mode for file")
-			return FileChangedError{Filename: srcPath}
+			return actionerror.FileChangedError{Filename: srcPath}
 		}
 	}
 

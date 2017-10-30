@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -58,7 +58,7 @@ var _ = Describe("logs command", func() {
 	Context("when the checkTarget fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
-				sharedaction.NotLoggedInError{BinaryName: binaryName})
+				actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 		It("returns an error", func() {
 			orgRequired, spaceRequired := fakeSharedActor.CheckTargetArgsForCall(0)

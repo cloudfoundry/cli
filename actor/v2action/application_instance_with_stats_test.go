@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -127,7 +128,7 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 
 				It("returns an ApplicationInstancesNotFoundError", func() {
 					_, _, err := actor.GetApplicationInstancesWithStatsByApplication("some-app-guid")
-					Expect(err).To(MatchError(ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
+					Expect(err).To(MatchError(actionerror.ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
 				})
 			})
 
@@ -143,7 +144,7 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 
 						It("returns an ApplicationInstancesNotFoundError", func() {
 							_, _, err := actor.GetApplicationInstancesWithStatsByApplication("some-app-guid")
-							Expect(err).To(MatchError(ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
+							Expect(err).To(MatchError(actionerror.ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
 						})
 					})
 				})
@@ -159,7 +160,7 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 
 						It("returns an ApplicationInstancesNotFoundError", func() {
 							_, _, err := actor.GetApplicationInstancesWithStatsByApplication("some-app-guid")
-							Expect(err).To(MatchError(ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
+							Expect(err).To(MatchError(actionerror.ApplicationInstancesNotFoundError{ApplicationGUID: "some-app-guid"}))
 						})
 					})
 				})

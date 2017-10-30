@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
@@ -72,16 +73,6 @@ func (instance *ApplicationInstanceWithStats) incomplete() {
 	instance.Details = strings.TrimSpace(fmt.Sprintf("%s (%s)", instance.Details, "Unable to retrieve information"))
 }
 
-// ApplicationInstancesNotFoundError is returned when the application does not
-// have running instances.
-type ApplicationInstancesNotFoundError struct {
-	ApplicationGUID string
-}
-
-func (e ApplicationInstancesNotFoundError) Error() string {
-	return fmt.Sprintf("Application instances '%s' not found.", e.ApplicationGUID)
-}
-
 func (actor Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([]ApplicationInstanceWithStats, Warnings, error) {
 	var allWarnings Warnings
 
@@ -90,7 +81,7 @@ func (actor Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([
 
 	switch err.(type) {
 	case ccerror.ResourceNotFoundError, ccerror.ApplicationStoppedStatsError:
-		return nil, allWarnings, ApplicationInstancesNotFoundError{ApplicationGUID: guid}
+		return nil, allWarnings, actionerror.ApplicationInstancesNotFoundError{ApplicationGUID: guid}
 	case nil:
 		// continue
 	default:

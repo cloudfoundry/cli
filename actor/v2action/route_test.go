@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -546,7 +547,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns all warnings and domain not found err", func() {
-					Expect(createRouteErr).To(Equal(DomainNotFoundError{Name: "some-domain"}))
+					Expect(createRouteErr).To(Equal(actionerror.DomainNotFoundError{Name: "some-domain"}))
 					Expect(createRouteWarnings).To(ConsistOf(
 						"get-space-warning",
 						"get-shared-domains-warning",

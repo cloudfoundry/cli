@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cfnetworking-cli-api/cfnetworking/cfnetv1"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction/cfnetworkingactionfakes"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -431,7 +432,7 @@ var _ = Describe("Policy", func() {
 
 			It("returns an error", func() {
 				Expect(warnings).To(Equal(Warnings([]string{"v3ActorWarningA", "v3ActorWarningB"})))
-				Expect(executeErr).To(MatchError("Policy does not exist."))
+				Expect(executeErr).To(MatchError(actionerror.PolicyDoesNotExistError{}))
 			})
 		})
 

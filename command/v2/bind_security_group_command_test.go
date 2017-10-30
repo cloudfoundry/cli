@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -74,7 +74,7 @@ var _ = Describe("bind-security-group Command", func() {
 
 		Context("when checking target fails", func() {
 			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
+				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
 
 			It("returns an error", func() {
@@ -107,7 +107,7 @@ var _ = Describe("bind-security-group Command", func() {
 				fakeActor.GetSecurityGroupByNameReturns(
 					v2action.SecurityGroup{},
 					v2action.Warnings{"get security group warning"},
-					v2action.SecurityGroupNotFoundError{Name: "some-security-group"})
+					actionerror.SecurityGroupNotFoundError{Name: "some-security-group"})
 			})
 
 			It("returns a SecurityGroupNotFoundError and displays all warnings", func() {

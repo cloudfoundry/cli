@@ -935,7 +935,7 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("returns an DomainNotFoundError", func() {
-					Expect(executeErr).To(MatchError(v2action.DomainNotFoundError{Name: "shared-domain.com"}))
+					Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{Name: "shared-domain.com"}))
 					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 				})
 			})

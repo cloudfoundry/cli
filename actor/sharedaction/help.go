@@ -1,23 +1,13 @@
 package sharedaction
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
-
-// ErrorInvalidCommand represents an error that happens when help is called
-// with an invalid command.
-type ErrorInvalidCommand struct {
-	CommandName string
-}
-
-func (err ErrorInvalidCommand) Error() string {
-	return fmt.Sprintf("'%s' is not a registered command. See 'cf help -a'", err.CommandName)
-}
 
 // CommandInfo contains the help details of a command
 type CommandInfo struct {
@@ -76,7 +66,7 @@ func (Actor) CommandInfoByName(commandList interface{}, commandName string) (Com
 	)
 
 	if !found {
-		return CommandInfo{}, ErrorInvalidCommand{CommandName: commandName}
+		return CommandInfo{}, actionerror.InvalidCommandError{CommandName: commandName}
 	}
 
 	tag := field.Tag

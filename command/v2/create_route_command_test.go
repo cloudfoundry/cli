@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -129,7 +129,7 @@ var _ = Describe("Create Route Command", func() {
 
 		Context("when checking target fails", func() {
 			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(sharedaction.NotLoggedInError{BinaryName: binaryName})
+				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
 			})
 
 			It("returns an error if the check fails", func() {
@@ -292,7 +292,7 @@ var _ = Describe("Create Route Command", func() {
 					fakeActor.CreateRouteWithExistenceCheckReturns(
 						v2action.Route{},
 						v2action.Warnings{"create-route-warning-1", "create-route-warning-2"},
-						v2action.DomainNotFoundError{Name: "some-domain"},
+						actionerror.DomainNotFoundError{Name: "some-domain"},
 					)
 				})
 

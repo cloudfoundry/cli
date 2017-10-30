@@ -1,6 +1,7 @@
 package sharedaction_test
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 
@@ -114,7 +115,7 @@ var _ = Describe("Help Actions", func() {
 				_, err := actor.CommandInfoByName(commandList{}, "does-not-exist")
 
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError(ErrorInvalidCommand{CommandName: "does-not-exist"}))
+				Expect(err).To(MatchError(actionerror.InvalidCommandError{CommandName: "does-not-exist"}))
 			})
 		})
 	})

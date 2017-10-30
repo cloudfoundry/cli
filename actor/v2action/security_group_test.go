@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -1146,7 +1147,7 @@ var _ = Describe("Security Group Actions", func() {
 			})
 
 			It("returns a SecurityGroupNotFound error", func() {
-				Expect(err).To(MatchError(SecurityGroupNotFoundError{Name: "some-security-group"}))
+				Expect(err).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
@@ -1447,7 +1448,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning"}))
-				Expect(err).To(MatchError(SecurityGroupNotFoundError{Name: "some-security-group"}))
+				Expect(err).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
 		})
 
@@ -1667,7 +1668,7 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-5",
 						"warning-6",
 					}))
-					Expect(err).To(MatchError(SecurityGroupNotBoundError{
+					Expect(err).To(MatchError(actionerror.SecurityGroupNotBoundError{
 						Name:      "some-security-group",
 						Lifecycle: lifecycle,
 					}))
@@ -1889,7 +1890,7 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-6",
 					}))
 
-					Expect(err).To(MatchError(SecurityGroupNotBoundError{
+					Expect(err).To(MatchError(actionerror.SecurityGroupNotBoundError{
 						Name:      "some-security-group",
 						Lifecycle: lifecycle,
 					}))
@@ -1980,7 +1981,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning"}))
-				Expect(err).To(MatchError(SecurityGroupNotFoundError{Name: "some-security-group"}))
+				Expect(err).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 			})
 		})
 
@@ -2259,7 +2260,7 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-9",
 						"warning-10",
 					}))
-					Expect(err).To(MatchError(SecurityGroupNotBoundError{
+					Expect(err).To(MatchError(actionerror.SecurityGroupNotBoundError{
 						Name:      "some-security-group",
 						Lifecycle: lifecycle,
 					}))
@@ -2521,7 +2522,7 @@ var _ = Describe("Security Group Actions", func() {
 						"warning-10",
 					}))
 
-					Expect(err).To(MatchError(SecurityGroupNotBoundError{
+					Expect(err).To(MatchError(actionerror.SecurityGroupNotBoundError{
 						Name:      "some-security-group",
 						Lifecycle: lifecycle,
 					}))

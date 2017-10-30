@@ -1,9 +1,9 @@
 package v2action
 
 import (
-	"fmt"
 	"sort"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
@@ -20,37 +20,6 @@ type SecurityGroupWithOrganizationSpaceAndLifecycle struct {
 	Lifecycle     ccv2.SecurityGroupLifecycle
 }
 
-// InvalidLifecycleError is returned when the lifecycle specified is neither
-// running nor staging.
-type InvalidLifecycleError struct {
-	lifecycle ccv2.SecurityGroupLifecycle
-}
-
-func (e InvalidLifecycleError) Error() string {
-	return fmt.Sprintf("Invalid lifecycle: %s", e.lifecycle)
-}
-
-// SecurityGroupNotBoundError is returned when a requested security group is
-// not bound in the requested lifecycle phase to the requested space.
-type SecurityGroupNotBoundError struct {
-	Lifecycle ccv2.SecurityGroupLifecycle
-	Name      string
-}
-
-func (e SecurityGroupNotBoundError) Error() string {
-	return fmt.Sprintf("Security group %s not bound to this space for lifecycle phase %s.", e.Name, e.Lifecycle)
-}
-
-// SecurityGroupNotFoundError is returned when a requested security group is
-// not found.
-type SecurityGroupNotFoundError struct {
-	Name string
-}
-
-func (e SecurityGroupNotFoundError) Error() string {
-	return fmt.Sprintf("Security group '%s' not found.", e.Name)
-}
-
 func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
 	var (
 		warnings ccv2.Warnings
@@ -63,7 +32,7 @@ func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID 
 	case ccv2.SecurityGroupLifecycleStaging:
 		warnings, err = actor.CloudControllerClient.AssociateSpaceWithStagingSecurityGroup(securityGroupGUID, spaceGUID)
 	default:
-		err = InvalidLifecycleError{lifecycle: lifecycle}
+		err = actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
 	}
 
 	return Warnings(warnings), err
@@ -81,7 +50,7 @@ func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGro
 	}
 
 	if len(securityGroups) == 0 {
-		return SecurityGroup{}, Warnings(warnings), SecurityGroupNotFoundError{securityGroupName}
+		return SecurityGroup{}, Warnings(warnings), actionerror.SecurityGroupNotFoundError{Name: securityGroupName}
 	}
 
 	securityGroup := SecurityGroup{
@@ -277,7 +246,7 @@ func (actor Actor) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string) ([]Sec
 
 func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, spaceGUID string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
 	if lifecycle != ccv2.SecurityGroupLifecycleRunning && lifecycle != ccv2.SecurityGroupLifecycleStaging {
-		return nil, InvalidLifecycleError{lifecycle: lifecycle}
+		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
 	}
 
 	var allWarnings Warnings
@@ -296,7 +265,7 @@ func (actor Actor) UnbindSecurityGroupByNameAndSpace(securityGroupName string, s
 
 func (actor Actor) UnbindSecurityGroupByNameOrganizationNameAndSpaceName(securityGroupName string, orgName string, spaceName string, lifecycle ccv2.SecurityGroupLifecycle) (Warnings, error) {
 	if lifecycle != ccv2.SecurityGroupLifecycleRunning && lifecycle != ccv2.SecurityGroupLifecycleStaging {
-		return nil, InvalidLifecycleError{lifecycle: lifecycle}
+		return nil, actionerror.InvalidLifecycleError{Lifecycle: lifecycle}
 	}
 
 	var allWarnings Warnings
@@ -357,7 +326,7 @@ func (Actor) doUnbind(securityGroup SecurityGroup,
 		if otherr != nil {
 			return allWarnings, otherr
 		} else if otherBound {
-			return allWarnings, SecurityGroupNotBoundError{Name: securityGroup.Name, Lifecycle: lifecycle}
+			return allWarnings, actionerror.SecurityGroupNotBoundError{Name: securityGroup.Name, Lifecycle: lifecycle}
 		} else {
 			return allWarnings, nil
 		}

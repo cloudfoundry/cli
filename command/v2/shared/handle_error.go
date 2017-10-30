@@ -2,7 +2,6 @@ package shared
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -31,18 +30,18 @@ func HandleError(err error) error {
 	case uaa.InvalidAuthTokenError:
 		return translatableerror.InvalidRefreshTokenError{}
 
-	case sharedaction.NotLoggedInError:
+	case actionerror.NotLoggedInError:
 		return translatableerror.NotLoggedInError(e)
-	case sharedaction.NoOrganizationTargetedError:
+	case actionerror.NoOrganizationTargetedError:
 		return translatableerror.NoOrganizationTargetedError(e)
-	case sharedaction.NoSpaceTargetedError:
+	case actionerror.NoSpaceTargetedError:
 		return translatableerror.NoSpaceTargetedError(e)
 
 	case actionerror.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
 	case v2action.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError{Name: e.Name}
-	case v2action.SecurityGroupNotFoundError:
+	case actionerror.SecurityGroupNotFoundError:
 		return translatableerror.SecurityGroupNotFoundError(e)
 	case v2action.ServiceInstanceNotFoundError:
 		return translatableerror.ServiceInstanceNotFoundError(e)
@@ -56,9 +55,9 @@ func HandleError(err error) error {
 		return translatableerror.RouteInDifferentSpaceError(e)
 	case v2action.FileChangedError:
 		return translatableerror.FileChangedError(e)
-	case sharedaction.EmptyDirectoryError:
+	case actionerror.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)
-	case v2action.DomainNotFoundError:
+	case actionerror.DomainNotFoundError:
 		return translatableerror.DomainNotFoundError(e)
 	case actionerror.NoMatchingDomainError:
 		return translatableerror.NoMatchingDomainError(e)

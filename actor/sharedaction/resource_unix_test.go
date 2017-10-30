@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction/sharedactionfakes"
 	"code.cloudfoundry.org/ykk"
@@ -319,7 +320,7 @@ var _ = Describe("Resource Actions", func() {
 
 			It("returns an EmptyDirectoryError", func() {
 				_, err := actor.GatherDirectoryResources(emptyDir)
-				Expect(err).To(MatchError(EmptyDirectoryError{Path: emptyDir}))
+				Expect(err).To(MatchError(actionerror.EmptyDirectoryError{Path: emptyDir}))
 			})
 		})
 	})

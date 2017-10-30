@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -109,7 +110,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch e := err.(type) {
-		case v2action.SecurityGroupNotBoundError:
+		case actionerror.SecurityGroupNotBoundError:
 			cmd.UI.DisplayWarning("Security group {{.Name}} not bound to this space for lifecycle phase '{{.Lifecycle}}'.",
 				map[string]interface{}{
 					"Name":      e.Name,

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v3/shared"
@@ -61,27 +60,27 @@ var _ = Describe("HandleError", func() {
 			actionerror.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
-		Entry("v3action.TaskWorkersUnavailableError -> RunTaskError",
+		Entry("actionerror.TaskWorkersUnavailableError -> RunTaskError",
 			actionerror.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
 			translatableerror.RunTaskError{Message: "Task workers are unavailable."}),
 
-		Entry("sharedaction.NotLoggedInError -> NotLoggedInError",
-			sharedaction.NotLoggedInError{BinaryName: "faceman"},
+		Entry("actionerror.NotLoggedInError -> NotLoggedInError",
+			actionerror.NotLoggedInError{BinaryName: "faceman"},
 			translatableerror.NotLoggedInError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoOrganizationTargetedError -> NoOrganizationTargetedError",
-			sharedaction.NoOrganizationTargetedError{BinaryName: "faceman"},
+		Entry("actionerror.NoOrganizationTargetedError -> NoOrganizationTargetedError",
+			actionerror.NoOrganizationTargetedError{BinaryName: "faceman"},
 			translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}),
 
-		Entry("sharedaction.NoSpaceTargetedError -> NoSpaceTargetedError",
-			sharedaction.NoSpaceTargetedError{BinaryName: "faceman"},
+		Entry("actionerror.NoSpaceTargetedError -> NoSpaceTargetedError",
+			actionerror.NoSpaceTargetedError{BinaryName: "faceman"},
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
-		Entry("v3action.AssignDropletError -> AssignDropletError",
+		Entry("actionerror.AssignDropletError -> AssignDropletError",
 			actionerror.AssignDropletError{Message: "some-message"},
 			translatableerror.AssignDropletError{Message: "some-message"}),
 
-		Entry("v3action.OrganizationNotFoundError -> OrgNotFoundError",
+		Entry("actionerror.OrganizationNotFoundError -> OrgNotFoundError",
 			actionerror.OrganizationNotFoundError{Name: "some-org"},
 			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
@@ -93,12 +92,12 @@ var _ = Describe("HandleError", func() {
 			actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42},
 			translatableerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42}),
 
-		Entry("v3action.StagingTimeoutError -> StagingTimeoutError",
+		Entry("actionerror.StagingTimeoutError -> StagingTimeoutError",
 			actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
-		Entry("v3action.EmptyDirectoryError -> EmptyDirectoryError",
-			sharedaction.EmptyDirectoryError{Path: "some-path"},
+		Entry("actionerror.EmptyDirectoryError -> EmptyDirectoryError",
+			actionerror.EmptyDirectoryError{Path: "some-path"},
 			translatableerror.EmptyDirectoryError{Path: "some-path"}),
 
 		Entry("default case -> original error",

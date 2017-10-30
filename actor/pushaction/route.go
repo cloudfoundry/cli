@@ -86,7 +86,7 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 		}
 
 		host, domain, domainErr := actor.calculateRoute(root, nameToFoundDomain)
-		if _, ok := domainErr.(v2action.DomainNotFoundError); ok {
+		if _, ok := domainErr.(actionerror.DomainNotFoundError); ok {
 			log.Error("no matching domains")
 			return nil, allWarnings, actionerror.NoMatchingDomainError{Route: route}
 		} else if domainErr != nil {
@@ -250,7 +250,7 @@ func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID str
 		}
 		if len(desiredDomains) == 0 {
 			log.Errorln("could not find provided domains '%s':", manifestApp.Domain)
-			return v2action.Domain{}, warnings, v2action.DomainNotFoundError{Name: manifestApp.Domain}
+			return v2action.Domain{}, warnings, actionerror.DomainNotFoundError{Name: manifestApp.Domain}
 		}
 		// CC does not allow one to have shared/owned domains with the same domain name. so it's ok to take the first one
 		desiredDomain = desiredDomains[0]
@@ -281,7 +281,7 @@ func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.
 	}
 
 	if host == "" {
-		return nil, v2action.Domain{}, v2action.DomainNotFoundError{Name: route}
+		return nil, v2action.Domain{}, actionerror.DomainNotFoundError{Name: route}
 	}
 
 	hosts, foundDomain, err := actor.calculateRoute(domain, domainCache)

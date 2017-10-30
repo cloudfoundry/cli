@@ -1,6 +1,9 @@
 package v2action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 type ApplicationSummary struct {
 	Application
@@ -46,7 +49,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 			if len(instances) > 0 {
 				applicationSummary.IsolationSegment = instances[0].IsolationSegment
 			}
-		case ApplicationInstancesNotFoundError:
+		case actionerror.ApplicationInstancesNotFoundError:
 			// don't set instances in summary
 		default:
 			return ApplicationSummary{}, allWarnings, err

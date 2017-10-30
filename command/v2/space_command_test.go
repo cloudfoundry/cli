@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actor/sharedaction"
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -58,7 +58,7 @@ var _ = Describe("space Command", func() {
 	Context("when checking the target fails", func() {
 		BeforeEach(func() {
 			fakeSharedActor.CheckTargetReturns(
-				sharedaction.NotLoggedInError{BinaryName: binaryName})
+				actionerror.NotLoggedInError{BinaryName: binaryName})
 		})
 
 		It("returns an error", func() {

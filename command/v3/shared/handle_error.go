@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
@@ -27,13 +26,13 @@ func HandleError(err error) error {
 	case ccerror.UnverifiedServerError:
 		return translatableerror.InvalidSSLCertError{API: e.URL}
 
-	case sharedaction.NotLoggedInError:
+	case actionerror.NotLoggedInError:
 		return translatableerror.NotLoggedInError(e)
-	case sharedaction.NoOrganizationTargetedError:
+	case actionerror.NoOrganizationTargetedError:
 		return translatableerror.NoOrganizationTargetedError(e)
-	case sharedaction.NoSpaceTargetedError:
+	case actionerror.NoSpaceTargetedError:
 		return translatableerror.NoSpaceTargetedError(e)
-	case sharedaction.EmptyDirectoryError:
+	case actionerror.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)
 
 	case actionerror.ApplicationNotFoundError:
