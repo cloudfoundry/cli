@@ -84,6 +84,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("PluginNotFoundOnDiskOrInAnyRepositoryError", PluginNotFoundOnDiskOrInAnyRepositoryError{}),
 		Entry("PortNotAllowedWithHTTPDomainError", PortNotAllowedWithHTTPDomainError{}),
 		Entry("PropertyCombinationError", PropertyCombinationError{Properties: []string{"property-1", "property-2"}}),
+		Entry("ProcessInstanceNotFoundError", ProcessInstanceNotFoundError{ProcessType: "some-process", InstanceIndex: 1}),
+		Entry("ProcessInstanceNotRunningError", ProcessInstanceNotRunningError{ProcessType: "some-process", InstanceIndex: 1}),
 		Entry("RepositoryNameTakenError", RepositoryNameTakenError{}),
 		Entry("RequiredArgumentError", RequiredArgumentError{}),
 		Entry("RequiredFlagsError", RequiredFlagsError{}),

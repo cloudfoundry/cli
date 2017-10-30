@@ -47,6 +47,8 @@ func HandleError(err error) error {
 		return translatableerror.ProcessNotFoundError(e)
 	case actionerror.ProcessInstanceNotFoundError:
 		return translatableerror.ProcessInstanceNotFoundError(e)
+	case actionerror.ProcessInstanceNotRunningError:
+		return translatableerror.ProcessInstanceNotRunningError(e)
 	case actionerror.StagingTimeoutError:
 		return translatableerror.StagingTimeoutError(e)
 	case actionerror.TaskWorkersUnavailableError:

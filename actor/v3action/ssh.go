@@ -32,28 +32,41 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 		return Warnings{}, err
 	}
 
-	summary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
+	appSummary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return warnings, err
 	}
 
-	var processGUID string
-	for _, process := range summary.ProcessSummaries {
-		if process.Type == processType {
-			processGUID = process.GUID
-			if uint(process.Instances.Value) < processIndex+1 {
-				return warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
-			}
+	var processSummary ProcessSummary
+	for _, pS := range appSummary.ProcessSummaries {
+		if pS.Type == processType {
+			processSummary = pS
+			break
+		}
+	}
+	if processSummary.GUID == "" {
+		return warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
+	}
+
+	if !appSummary.Application.Started() {
+		return warnings, actionerror.ApplicationNotStartedError{Name: appName}
+	}
+
+	var processInstance Instance
+	for _, instance := range processSummary.InstanceDetails {
+		if uint(instance.Index) == processIndex {
+			processInstance = instance
 			break
 		}
 	}
 
-	if processGUID == "" {
-		return warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
+	if processInstance == (Instance{}) {
+		return warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
 	}
 
-	if !summary.Application.Started() {
-		return warnings, actionerror.ApplicationNotStartedError{Name: appName}
+	if !processInstance.Running() {
+		return warnings, actionerror.ProcessInstanceNotRunningError{ProcessType: processType,
+			InstanceIndex: processIndex}
 	}
 
 	err = actor.SharedActor.ExecuteSecureShell(sharedaction.SSHOptions{
@@ -65,7 +78,7 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 		SkipHostValidation:    sshOptions.SkipHostValidation,
 		SkipRemoteExecution:   sshOptions.SkipRemoteExecution,
 		TTYOption:             sshOptions.TTYOption,
-		Username:              fmt.Sprintf("cf:%s/%d", processGUID, processIndex),
+		Username:              fmt.Sprintf("cf:%s/%d", processSummary.GUID, processIndex),
 	})
 
 	return warnings, err

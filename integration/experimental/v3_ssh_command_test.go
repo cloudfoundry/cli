@@ -395,10 +395,6 @@ var _ = Describe("v3-ssh command", func() {
 						})
 
 						Context("when the index exists", func() {
-							BeforeEach(func() {
-								Eventually(helpers.CF("v3-scale", appName, "--process", "console", "-i", "2")).Should(Exit(0))
-							})
-
 							It("ssh's to the provided index", func() {
 								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "0", "-c", "ps aux;", "-c", "env")
 								Eventually(session.Out).Should(Say("vcap.*irb"))

@@ -11,6 +11,10 @@ import (
 // Instance represents a V3 actor instance.
 type Instance ccv3.Instance
 
+func (i Instance) Running() bool {
+	return i.State == "RUNNING"
+}
+
 // StartTime returns the time that the instance started.
 func (instance *Instance) StartTime() time.Time {
 	uptimeDuration := time.Duration(instance.Uptime) * time.Second

@@ -92,7 +92,11 @@ var _ = Describe("HandleError", func() {
 			actionerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42},
 			translatableerror.ProcessInstanceNotFoundError{ProcessType: "some-process-type", InstanceIndex: 42}),
 
-		Entry("actionerror.StagingTimeoutError -> StagingTimeoutError",
+		Entry("actionerror.ProcessInstanceNotRunningError -> ProcessInstanceNotRunningError",
+			actionerror.ProcessInstanceNotRunningError{ProcessType: "some-process-type", InstanceIndex: 42},
+			translatableerror.ProcessInstanceNotRunningError{ProcessType: "some-process-type", InstanceIndex: 42}),
+
+		Entry("v3action.StagingTimeoutError -> StagingTimeoutError",
 			actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			translatableerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
