@@ -119,6 +119,10 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 		if app.NoHostname && app.NoRoute {
 			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-hostname", "no-route"}}
 		}
+
+		if app.HealthCheckHTTPEndpoint != "" && app.HealthCheckType != "http" {
+			return actionerror.HTTPHealthCheckInvalidError{}
+		}
 	}
 	return nil
 }

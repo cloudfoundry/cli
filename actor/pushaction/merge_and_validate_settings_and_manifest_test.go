@@ -1,6 +1,8 @@
 package pushaction_test
 
 import (
+	"os"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/types"
@@ -181,13 +183,29 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		})
 	})
 
+	const RealPath = "some-real-path"
+
 	manifestWithMultipleApps := []manifest.Application{
 		{Name: "some-name-1"},
 		{Name: "some-name-2"},
 	}
+
 	DescribeTable("validation errors",
 		func(settings CommandLineSettings, apps []manifest.Application, expectedErr error) {
-			_, err := actor.MergeAndValidateSettingsAndManifests(settings, apps)
+			currentDirectory, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+
+			if settings.ProvidedAppPath == RealPath {
+				settings.ProvidedAppPath = currentDirectory
+			}
+
+			for i, app := range apps {
+				if app.Path == RealPath {
+					apps[i].Path = currentDirectory
+				}
+			}
+
+			_, err = actor.MergeAndValidateSettingsAndManifests(settings, apps)
 			Expect(err).To(MatchError(expectedErr))
 		},
 
@@ -279,7 +297,7 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Name:    "some-name-1",
 				Routes:  []string{"some-route"},
 				NoRoute: true,
-				Path:    "some-path",
+				Path:    RealPath,
 			}},
 			actionerror.PropertyCombinationError{
 				AppName:    "some-name-1",
@@ -322,5 +340,51 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				AppName:    "some-name-1",
 				Properties: []string{"no-hostname", "no-route"},
 			}),
+		Entry("HTTPHealthCheckInvalidError",
+			CommandLineSettings{
+				HealthCheckType: "port",
+			},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				HealthCheckHTTPEndpoint: "/some/endpoint",
+				Path: RealPath,
+			}},
+			actionerror.HTTPHealthCheckInvalidError{}),
+		Entry("HTTPHealthCheckInvalidError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:                    "some-name-1",
+				HealthCheckType:         "port",
+				HealthCheckHTTPEndpoint: "/some/endpoint",
+				Path: RealPath,
+			}},
+			actionerror.HTTPHealthCheckInvalidError{}),
+		Entry("HTTPHealthCheckInvalidError",
+			CommandLineSettings{
+				HealthCheckType: "process",
+			},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				HealthCheckHTTPEndpoint: "/some/endpoint",
+				Path: RealPath,
+			}},
+			actionerror.HTTPHealthCheckInvalidError{}),
+		Entry("HTTPHealthCheckInvalidError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:                    "some-name-1",
+				HealthCheckType:         "process",
+				HealthCheckHTTPEndpoint: "/some/endpoint",
+				Path: RealPath,
+			}},
+			actionerror.HTTPHealthCheckInvalidError{}),
+		Entry("HTTPHealthCheckInvalidError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name: "some-name-1",
+				HealthCheckHTTPEndpoint: "/some/endpoint",
+				Path: RealPath,
+			}},
+			actionerror.HTTPHealthCheckInvalidError{}),
 	)
 })
