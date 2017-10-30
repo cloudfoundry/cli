@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -246,10 +247,10 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 
 	if manifest.HealthCheckType != "" {
-		application.HealthCheckType = ccv2.ApplicationHealthCheckType(manifest.HealthCheckType)
+		application.HealthCheckType = constant.ApplicationHealthCheckType(manifest.HealthCheckType)
 		application.HealthCheckHTTPEndpoint = manifest.HealthCheckHTTPEndpoint
 
-		if application.HealthCheckType == "http" && application.HealthCheckHTTPEndpoint == "" {
+		if application.HealthCheckType == constant.ApplicationHealthCheckHTTP && application.HealthCheckHTTPEndpoint == "" {
 			application.HealthCheckHTTPEndpoint = "/"
 		}
 	}

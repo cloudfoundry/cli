@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
 
@@ -394,7 +395,7 @@ var _ = Describe("Application Config", func() {
 					}))
 					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/some-endpoint"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
-					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
+					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckPort))
 					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 3, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
@@ -416,14 +417,14 @@ var _ = Describe("Application Config", func() {
 
 						It("should overried the health check type and the endpoint should be set", func() {
 							Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/some/endpoint"))
-							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckHTTP))
+							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckHTTP))
 						})
 					})
 
 					Context("when the http health check endpoint is not set", func() {
 						It("should override the health check type and the endpoint should be defaulted to \"/\"", func() {
 							Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/"))
-							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckHTTP))
+							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckHTTP))
 						})
 					})
 				})
@@ -435,7 +436,7 @@ var _ = Describe("Application Config", func() {
 
 					It("should override the health check type and the endpoint should not be set", func() {
 						Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(BeEmpty())
-						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
+						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckPort))
 					})
 				})
 
@@ -446,7 +447,7 @@ var _ = Describe("Application Config", func() {
 
 					It("should override the health check type and the endpoint should not be set", func() {
 						Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(BeEmpty())
-						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckProcess))
+						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(constant.ApplicationHealthCheckProcess))
 					})
 				})
 

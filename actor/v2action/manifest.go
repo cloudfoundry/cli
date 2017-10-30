@@ -1,7 +1,7 @@
 package v2action
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/util/manifest"
 )
 
@@ -49,10 +49,10 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 		manifestApp.NoRoute = true
 	}
 
-	if applicationSummary.HealthCheckType != ccv2.ApplicationHealthCheckPort {
+	if applicationSummary.HealthCheckType != constant.ApplicationHealthCheckPort {
 		manifestApp.HealthCheckType = string(applicationSummary.HealthCheckType)
 
-		if applicationSummary.HealthCheckType == ccv2.ApplicationHealthCheckHTTP &&
+		if applicationSummary.HealthCheckType == constant.ApplicationHealthCheckHTTP &&
 			applicationSummary.HealthCheckHTTPEndpoint != "/" {
 			manifestApp.HealthCheckHTTPEndpoint = applicationSummary.HealthCheckHTTPEndpoint
 		}

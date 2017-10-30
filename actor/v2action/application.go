@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 type ApplicationStateChange string
@@ -16,8 +17,6 @@ const (
 	ApplicationStateStaging  ApplicationStateChange = "staging"
 	ApplicationStateStarting ApplicationStateChange = "starting"
 )
-
-type ApplicationHealthCheckType ccv2.ApplicationHealthCheckType
 
 // Application represents an application.
 type Application ccv2.Application
@@ -196,8 +195,8 @@ func (actor Actor) GetRouteApplications(routeGUID string) ([]Application, Warnin
 
 // SetApplicationHealthCheckTypeByNameAndSpace updates an application's health
 // check type if it is not already the desired type.
-func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType ApplicationHealthCheckType, httpEndpoint string) (Application, Warnings, error) {
-	if httpEndpoint != "/" && healthCheckType != ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) {
+func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType constant.ApplicationHealthCheckType, httpEndpoint string) (Application, Warnings, error) {
+	if httpEndpoint != "/" && healthCheckType != constant.ApplicationHealthCheckHTTP {
 		return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
 	}
 
@@ -210,16 +209,16 @@ func (actor Actor) SetApplicationHealthCheckTypeByNameAndSpace(name string, spac
 		return Application{}, allWarnings, err
 	}
 
-	if app.HealthCheckType != ccv2.ApplicationHealthCheckType(healthCheckType) ||
-		healthCheckType == ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) && app.HealthCheckHTTPEndpoint != httpEndpoint {
+	if app.HealthCheckType != healthCheckType ||
+		healthCheckType == constant.ApplicationHealthCheckHTTP && app.HealthCheckHTTPEndpoint != httpEndpoint {
 		var healthCheckEndpoint string
-		if healthCheckType == ApplicationHealthCheckType(ccv2.ApplicationHealthCheckHTTP) {
+		if healthCheckType == constant.ApplicationHealthCheckHTTP {
 			healthCheckEndpoint = httpEndpoint
 		}
 
 		updatedApp, apiWarnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:                    app.GUID,
-			HealthCheckType:         ccv2.ApplicationHealthCheckType(healthCheckType),
+			HealthCheckType:         healthCheckType,
 			HealthCheckHTTPEndpoint: healthCheckEndpoint,
 		})
 

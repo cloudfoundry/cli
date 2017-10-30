@@ -8,6 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -286,7 +287,7 @@ var _ = Describe("Manifest Actions", func() {
 
 						Context("when the health check type is port", func() {
 							BeforeEach(func() {
-								app.HealthCheckType = ccv2.ApplicationHealthCheckPort
+								app.HealthCheckType = constant.ApplicationHealthCheckPort
 								fakeCloudControllerClient.GetApplicationsReturns(
 									[]ccv2.Application{app},
 									ccv2.Warnings{"some-app-warning"},
@@ -326,7 +327,7 @@ var _ = Describe("Manifest Actions", func() {
 						Context("when the health check type is http", func() {
 							Context("when the health check endpoint path is '/'", func() {
 								BeforeEach(func() {
-									app.HealthCheckType = ccv2.ApplicationHealthCheckHTTP
+									app.HealthCheckType = constant.ApplicationHealthCheckHTTP
 									app.HealthCheckHTTPEndpoint = "/"
 									fakeCloudControllerClient.GetApplicationsReturns(
 										[]ccv2.Application{app},
@@ -367,7 +368,7 @@ var _ = Describe("Manifest Actions", func() {
 
 							Context("when the health check type is process", func() {
 								BeforeEach(func() {
-									app.HealthCheckType = ccv2.ApplicationHealthCheckProcess
+									app.HealthCheckType = constant.ApplicationHealthCheckProcess
 									fakeCloudControllerClient.GetApplicationsReturns(
 										[]ccv2.Application{app},
 										ccv2.Warnings{"some-app-warning"},

@@ -3,6 +3,7 @@ package v2
 import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 
 	"code.cloudfoundry.org/cli/command"
@@ -12,8 +13,9 @@ import (
 )
 
 //go:generate counterfeiter . SetHealthCheckActor
+
 type SetHealthCheckActor interface {
-	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType v2action.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
+	SetApplicationHealthCheckTypeByNameAndSpace(name string, spaceGUID string, healthCheckType constant.ApplicationHealthCheckType, httpEndpoint string) (v2action.Application, v2action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
@@ -82,7 +84,7 @@ func (cmd *SetHealthCheckCommand) Execute(args []string) error {
 	app, warnings, err := cmd.Actor.SetApplicationHealthCheckTypeByNameAndSpace(
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
-		v2action.ApplicationHealthCheckType(cmd.RequiredArgs.HealthCheck.Type),
+		constant.ApplicationHealthCheckType(cmd.RequiredArgs.HealthCheck.Type),
 		cmd.HTTPEndpoint,
 	)
 	cmd.UI.DisplayWarnings(warnings)
