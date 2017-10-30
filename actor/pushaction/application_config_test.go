@@ -307,9 +307,7 @@ var _ = Describe("Application Config", func() {
 					manifestApps[0].DockerImage = "some-docker-image"
 					manifestApps[0].DockerUsername = "some-docker-username"
 					manifestApps[0].DockerPassword = "some-docker-password"
-					manifestApps[0].HealthCheckHTTPEndpoint = "some-buildpack"
 					manifestApps[0].HealthCheckTimeout = 5
-					manifestApps[0].HealthCheckType = "port"
 					manifestApps[0].Instances = types.NullInt{Value: 1, IsSet: true}
 					manifestApps[0].DiskQuota = types.NullByteSizeInMb{Value: 2, IsSet: true}
 					manifestApps[0].Memory = types.NullByteSizeInMb{Value: 3, IsSet: true}
@@ -339,9 +337,7 @@ var _ = Describe("Application Config", func() {
 						"env1": "1",
 						"env3": "3",
 					}))
-					Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("some-buildpack"))
 					Expect(firstConfig.DesiredApplication.HealthCheckTimeout).To(Equal(5))
-					Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
 					Expect(firstConfig.DesiredApplication.Instances).To(Equal(types.NullInt{Value: 1, IsSet: true}))
 					Expect(firstConfig.DesiredApplication.DiskQuota).To(BeNumerically("==", 2))
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
@@ -404,6 +400,61 @@ var _ = Describe("Application Config", func() {
 					Expect(firstConfig.DesiredApplication.Memory).To(BeNumerically("==", 3))
 					Expect(firstConfig.DesiredApplication.StackGUID).To(Equal("some-stack-guid"))
 					Expect(firstConfig.DesiredApplication.Stack).To(Equal(stack))
+				})
+			})
+
+			Context("when setting health check variables", func() {
+				Context("when setting the type to 'http'", func() {
+					BeforeEach(func() {
+						manifestApps[0].HealthCheckType = "http"
+					})
+
+					Context("when the http health check endpoint is set", func() {
+						BeforeEach(func() {
+							manifestApps[0].HealthCheckHTTPEndpoint = "/some/endpoint"
+						})
+
+						It("should overried the health check type and the endpoint should be set", func() {
+							Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/some/endpoint"))
+							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckHTTP))
+						})
+					})
+
+					Context("when the http health check endpoint is not set", func() {
+						It("should override the health check type and the endpoint should be defaulted to \"/\"", func() {
+							Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(Equal("/"))
+							Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckHTTP))
+						})
+					})
+				})
+
+				Context("when setting type to 'port'", func() {
+					BeforeEach(func() {
+						manifestApps[0].HealthCheckType = "port"
+					})
+
+					It("should override the health check type and the endpoint should not be set", func() {
+						Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(BeEmpty())
+						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckPort))
+					})
+				})
+
+				Context("when setting type to 'process'", func() {
+					BeforeEach(func() {
+						manifestApps[0].HealthCheckType = "process"
+					})
+
+					It("should override the health check type and the endpoint should not be set", func() {
+						Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(BeEmpty())
+						Expect(firstConfig.DesiredApplication.HealthCheckType).To(Equal(ccv2.ApplicationHealthCheckProcess))
+					})
+				})
+
+				Context("when type is unset", func() {
+					It("leaves the previously set values", func() {
+						Expect(firstConfig.DesiredApplication.HealthCheckHTTPEndpoint).To(BeEmpty())
+						Expect(firstConfig.DesiredApplication.HealthCheckType).To(BeEmpty())
+					})
 				})
 			})
 

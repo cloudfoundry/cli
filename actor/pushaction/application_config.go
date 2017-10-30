@@ -241,15 +241,19 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 		application.Memory = manifest.Memory.Value
 	}
 
-	if manifest.HealthCheckHTTPEndpoint != "" {
-		application.HealthCheckHTTPEndpoint = manifest.HealthCheckHTTPEndpoint
-	}
 	if manifest.HealthCheckTimeout != 0 {
 		application.HealthCheckTimeout = manifest.HealthCheckTimeout
 	}
+
 	if manifest.HealthCheckType != "" {
 		application.HealthCheckType = ccv2.ApplicationHealthCheckType(manifest.HealthCheckType)
+		application.HealthCheckHTTPEndpoint = manifest.HealthCheckHTTPEndpoint
+
+		if application.HealthCheckType == "http" && application.HealthCheckHTTPEndpoint == "" {
+			application.HealthCheckHTTPEndpoint = "/"
+		}
 	}
+
 	if manifest.Instances.IsSet {
 		application.Instances = manifest.Instances
 	}
