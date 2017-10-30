@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,9 +18,26 @@ const (
 	DefaultDiskLimit   = "1G"
 )
 
+type PlanSchemas struct {
+	ServiceInstance struct {
+		Create struct {
+			Parameters map[string]interface{} `json:"parameters"`
+		} `json:"create"`
+		Update struct {
+			Parameters map[string]interface{} `json:"parameters"`
+		} `json:"update"`
+	} `json:"service_instance"`
+	ServiceBinding struct {
+		Create struct {
+			Parameters map[string]interface{} `json:"parameters"`
+		} `json:"create"`
+	} `json:"service_binding"`
+}
+
 type Plan struct {
-	Name string `json:"name"`
-	ID   string `json:"id"`
+	Name    string      `json:"name"`
+	ID      string      `json:"id"`
+	Schemas PlanSchemas `json:"schemas"`
 }
 
 type ServiceBroker struct {
@@ -105,6 +123,9 @@ func (b ServiceBroker) ToJSON() string {
 	bytes, err := ioutil.ReadFile(NewAssets().ServiceBroker + "/cats.json")
 	Expect(err).To(BeNil())
 
+	planSchema, err := json.Marshal(b.SyncPlans[0].Schemas)
+	Expect(err).To(BeNil())
+
 	replacer := strings.NewReplacer(
 		"<fake-service>", b.Service.Name,
 		"<fake-service-guid>", b.Service.ID,
@@ -119,6 +140,7 @@ func (b ServiceBroker) ToJSON() string {
 		"<fake-async-plan-guid>", b.AsyncPlans[0].ID,
 		"<fake-async-plan-2>", b.AsyncPlans[1].Name,
 		"<fake-async-plan-2-guid>", b.AsyncPlans[1].ID,
+		"\"<fake-plan-schema>\"", string(planSchema),
 	)
 
 	return replacer.Replace(string(bytes))
