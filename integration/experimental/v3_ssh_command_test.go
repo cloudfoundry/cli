@@ -400,9 +400,9 @@ var _ = Describe("v3-ssh command", func() {
 							})
 
 							It("ssh's to the provided index", func() {
-								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "1", "-c", "ps aux;", "-c", "env")
+								session := helpers.CF("v3-ssh", appName, "--process", "console", "-i", "0", "-c", "ps aux;", "-c", "env")
 								Eventually(session.Out).Should(Say("vcap.*irb"))
-								Eventually(session.Out).Should(Say("INSTANCE_INDEX=1"))
+								Eventually(session.Out).Should(Say("INSTANCE_INDEX=0"))
 								Eventually(session).Should(Exit(0))
 							})
 						})
