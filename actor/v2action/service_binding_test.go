@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -213,7 +214,7 @@ var _ = Describe("Service Binding Actions", func() {
 
 			It("returns a ServiceBindingNotFoundError", func() {
 				_, _, err := actor.GetServiceBindingByApplicationAndServiceInstance("some-app-guid", "some-service-instance-guid")
-				Expect(err).To(MatchError(ServiceBindingNotFoundError{
+				Expect(err).To(MatchError(actionerror.ServiceBindingNotFoundError{
 					AppGUID:             "some-app-guid",
 					ServiceInstanceGUID: "some-service-instance-guid",
 				}))

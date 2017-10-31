@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -57,7 +58,7 @@ var _ = Describe("SpaceQuota Actions", func() {
 
 			It("returns an SpaceQuotaNotFoundError", func() {
 				_, _, err := actor.GetSpaceQuota("some-space-quota-guid")
-				Expect(err).To(MatchError(SpaceQuotaNotFoundError{GUID: "some-space-quota-guid"}))
+				Expect(err).To(MatchError(actionerror.SpaceQuotaNotFoundError{GUID: "some-space-quota-guid"}))
 			})
 		})
 

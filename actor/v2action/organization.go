@@ -1,9 +1,7 @@
 package v2action
 
 import (
-	"fmt"
-	"strings"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
@@ -11,36 +9,12 @@ import (
 // Organization represents a CLI Organization.
 type Organization ccv2.Organization
 
-// OrganizationNotFoundError represents the scenario when the organization
-// searched for could not be found.
-type OrganizationNotFoundError struct {
-	GUID string
-	Name string
-}
-
-func (e OrganizationNotFoundError) Error() string {
-	return fmt.Sprintf("Organization '%s' not found.", e.Name)
-}
-
-// MultipleOrganizationsFoundError represents the scenario when the cloud
-// controller returns multiple organizations when filtering by name. This is a
-// far out edge case and should not happen.
-type MultipleOrganizationsFoundError struct {
-	Name  string
-	GUIDs []string
-}
-
-func (e MultipleOrganizationsFoundError) Error() string {
-	guids := strings.Join(e.GUIDs, ", ")
-	return fmt.Sprintf("Organization name '%s' matches multiple GUIDs: %s", e.Name, guids)
-}
-
 // GetOrganization returns an Organization based on the provided guid.
 func (actor Actor) GetOrganization(guid string) (Organization, Warnings, error) {
 	org, warnings, err := actor.CloudControllerClient.GetOrganization(guid)
 
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-		return Organization{}, Warnings(warnings), OrganizationNotFoundError{GUID: guid}
+		return Organization{}, Warnings(warnings), actionerror.OrganizationNotFoundError{GUID: guid}
 	}
 
 	return Organization(org), Warnings(warnings), err
@@ -58,7 +32,7 @@ func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings
 	}
 
 	if len(orgs) == 0 {
-		return Organization{}, Warnings(warnings), OrganizationNotFoundError{Name: orgName}
+		return Organization{}, Warnings(warnings), actionerror.OrganizationNotFoundError{Name: orgName}
 	}
 
 	if len(orgs) > 1 {
@@ -66,7 +40,7 @@ func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings
 		for _, org := range orgs {
 			guids = append(guids, org.GUID)
 		}
-		return Organization{}, Warnings(warnings), MultipleOrganizationsFoundError{Name: orgName, GUIDs: guids}
+		return Organization{}, Warnings(warnings), actionerror.MultipleOrganizationsFoundError{Name: orgName, GUIDs: guids}
 	}
 
 	return Organization(orgs[0]), Warnings(warnings), nil

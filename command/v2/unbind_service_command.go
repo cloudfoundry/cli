@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -62,7 +63,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.UnbindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		if _, ok := err.(v2action.ServiceBindingNotFoundError); ok {
+		if _, ok := err.(actionerror.ServiceBindingNotFoundError); ok {
 			cmd.UI.DisplayWarning("Binding between {{.InstanceName}} and {{.AppName}} did not exist", map[string]interface{}{
 				"AppName":      cmd.RequiredArgs.AppName,
 				"InstanceName": cmd.RequiredArgs.ServiceInstanceName,

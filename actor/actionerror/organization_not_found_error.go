@@ -5,6 +5,7 @@ import "fmt"
 // OrganizationNotFoundError represents the error that occurs when the
 // organization is not found.
 type OrganizationNotFoundError struct {
+	GUID string
 	Name string
 }
 

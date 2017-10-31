@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -70,7 +71,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v2action.OrphanedRoutesNotFoundError:
+		case actionerror.OrphanedRoutesNotFoundError:
 		// Do nothing to parity the existing behavior
 		default:
 			return shared.HandleError(err)

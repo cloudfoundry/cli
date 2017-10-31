@@ -142,7 +142,7 @@ var _ = Describe("spaces Command", func() {
 					fakeActor.GetOrganizationSpacesReturns(
 						nil,
 						v2action.Warnings{"get-spaces-warning"},
-						v2action.OrganizationNotFoundError{Name: "not-found-org"})
+						actionerror.OrganizationNotFoundError{Name: "not-found-org"})
 				})
 
 				It("returns a translatable error", func() {

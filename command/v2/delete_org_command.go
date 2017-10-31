@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
@@ -74,7 +75,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v2action.OrganizationNotFoundError:
+		case actionerror.OrganizationNotFoundError:
 			cmd.UI.DisplayText("Org {{.OrgName}} does not exist.", map[string]interface{}{
 				"OrgName": cmd.RequiredArgs.Organization,
 			})

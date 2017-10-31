@@ -155,7 +155,7 @@ var _ = Describe("v3-create-app Command", func() {
 
 			Context("due to an ApplicationAlreadyExistsError", func() {
 				BeforeEach(func() {
-					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.ApplicationAlreadyExistsError{})
+					fakeActor.CreateApplicationInSpaceReturns(v3action.Application{}, v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.ApplicationAlreadyExistsError{})
 				})
 
 				It("displays the header and ok", func() {

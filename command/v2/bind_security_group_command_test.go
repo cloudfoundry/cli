@@ -138,7 +138,7 @@ var _ = Describe("bind-security-group Command", func() {
 				fakeActor.GetOrganizationByNameReturns(
 					v2action.Organization{},
 					v2action.Warnings{"get organization warning"},
-					v2action.OrganizationNotFoundError{Name: "some-org"})
+					actionerror.OrganizationNotFoundError{Name: "some-org"})
 			})
 
 			It("returns an OrganizationNotFoundError and displays all warnings", func() {
@@ -176,7 +176,7 @@ var _ = Describe("bind-security-group Command", func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{},
 						v2action.Warnings{"get space warning"},
-						v2action.SpaceNotFoundError{Name: "some-space"})
+						actionerror.SpaceNotFoundError{Name: "some-space"})
 				})
 
 				It("returns a SpaceNotFoundError", func() {

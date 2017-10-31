@@ -600,7 +600,7 @@ var _ = Describe("Application Config", func() {
 					// Assumes new routes
 					fakeV2Actor.GetApplicationByNameAndSpaceReturns(v2action.Application{}, nil, actionerror.ApplicationNotFoundError{})
 					fakeV2Actor.GetDomainsByNameAndOrganizationReturns([]v2action.Domain{domain}, v2action.Warnings{"domain-warnings-1", "domains-warnings-2"}, nil)
-					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 				})
 
 				It("adds the new routes to the desired routes", func() {
@@ -668,7 +668,7 @@ var _ = Describe("Application Config", func() {
 							v2action.Warnings{"some-organization-domain-warning"},
 							nil,
 						)
-						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 					})
 
 					It("it uses the provided domain instead of the first shared domain", func() {
@@ -715,7 +715,7 @@ var _ = Describe("Application Config", func() {
 				Context("when retrieving the default route is successful", func() {
 					BeforeEach(func() {
 						// Assumes new route
-						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 					})
 
 					It("adds the default route to desired routes", func() {

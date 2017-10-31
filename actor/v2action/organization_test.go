@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -70,7 +71,7 @@ var _ = Describe("Org Actions", func() {
 			})
 
 			It("returns warnings and OrganizationNotFoundError", func() {
-				Expect(err).To(MatchError(OrganizationNotFoundError{GUID: "some-org-guid"}))
+				Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{GUID: "some-org-guid"}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})
 		})
@@ -141,7 +142,7 @@ var _ = Describe("Org Actions", func() {
 			})
 
 			It("returns OrganizationNotFoundError", func() {
-				Expect(err).To(MatchError(OrganizationNotFoundError{Name: "some-org"}))
+				Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 			})
 		})
 
@@ -248,7 +249,7 @@ var _ = Describe("Org Actions", func() {
 
 			It("returns an error and all warnings", func() {
 				Expect(warnings).To(ConsistOf("get-org-warning"))
-				Expect(deleteOrgErr).To(MatchError(OrganizationNotFoundError{
+				Expect(deleteOrgErr).To(MatchError(actionerror.OrganizationNotFoundError{
 					Name: "some-org",
 				}))
 			})

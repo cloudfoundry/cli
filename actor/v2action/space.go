@@ -1,43 +1,12 @@
 package v2action
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 // Space represents a CLI Space
 type Space ccv2.Space
-
-// SpaceNotFoundError represents the scenario when the space searched for could
-// not be found.
-type SpaceNotFoundError struct {
-	GUID string
-	Name string
-}
-
-func (e SpaceNotFoundError) Error() string {
-	switch {
-	case e.Name != "":
-		return fmt.Sprintf("Space '%s' not found.", e.Name)
-	case e.GUID != "":
-		return fmt.Sprintf("Space with GUID '%s' not found.", e.GUID)
-	default:
-		return fmt.Sprintf("Space '' not found.")
-	}
-}
-
-// MultipleSpacesFoundError represents the scenario when the cloud
-// controller returns multiple spaces when filtering by name. This is a
-// far out edge case and should not happen.
-type MultipleSpacesFoundError struct {
-	Name    string
-	OrgGUID string
-}
-
-func (e MultipleSpacesFoundError) Error() string {
-	return fmt.Sprintf("Multiple spaces found matching organization GUID '%s' and name '%s'", e.OrgGUID, e.Name)
-}
 
 func (actor Actor) DeleteSpaceByNameAndOrganizationName(spaceName string, orgName string) (Warnings, error) {
 	var allWarnings Warnings
@@ -104,11 +73,11 @@ func (actor Actor) GetSpaceByOrganizationAndName(orgGUID string, spaceName strin
 	}
 
 	if len(ccv2Spaces) == 0 {
-		return Space{}, Warnings(warnings), SpaceNotFoundError{Name: spaceName}
+		return Space{}, Warnings(warnings), actionerror.SpaceNotFoundError{Name: spaceName}
 	}
 
 	if len(ccv2Spaces) > 1 {
-		return Space{}, Warnings(warnings), MultipleSpacesFoundError{OrgGUID: orgGUID, Name: spaceName}
+		return Space{}, Warnings(warnings), actionerror.MultipleSpacesFoundError{OrgGUID: orgGUID, Name: spaceName}
 	}
 
 	return Space(ccv2Spaces[0]), Warnings(warnings), nil

@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"fmt"
 	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -16,16 +15,6 @@ type IsolationSegmentSummary struct {
 
 // IsolationSegment represents a V3 actor IsolationSegment.
 type IsolationSegment ccv3.IsolationSegment
-
-// IsolationSegmentAlreadyExistsError gets returned when an isolation segment
-// already exists.
-type IsolationSegmentAlreadyExistsError struct {
-	Name string
-}
-
-func (e IsolationSegmentAlreadyExistsError) Error() string {
-	return fmt.Sprintf("Isolation Segment '%s' already exists.", e.Name)
-}
 
 // GetEffectiveIsolationSegmentBySpace returns the space's effective isolation
 // segment.
@@ -49,7 +38,7 @@ func (actor Actor) GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefa
 		if orgDefaultIsolationSegmentGUID != "" {
 			effectiveGUID = orgDefaultIsolationSegmentGUID
 		} else {
-			return IsolationSegment{}, allWarnings, NoRelationshipError{}
+			return IsolationSegment{}, allWarnings, actionerror.NoRelationshipError{}
 		}
 	}
 
@@ -66,7 +55,7 @@ func (actor Actor) GetEffectiveIsolationSegmentBySpace(spaceGUID string, orgDefa
 func (actor Actor) CreateIsolationSegmentByName(isolationSegment IsolationSegment) (Warnings, error) {
 	_, warnings, err := actor.CloudControllerClient.CreateIsolationSegment(ccv3.IsolationSegment(isolationSegment))
 	if _, ok := err.(ccerror.UnprocessableEntityError); ok {
-		return Warnings(warnings), IsolationSegmentAlreadyExistsError{Name: isolationSegment.Name}
+		return Warnings(warnings), actionerror.IsolationSegmentAlreadyExistsError{Name: isolationSegment.Name}
 	}
 	return Warnings(warnings), err
 }

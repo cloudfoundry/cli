@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -199,7 +200,7 @@ func (cmd SpaceCommand) isolationSegmentRow(spaceSummary v2action.SpaceSummary) 
 	if err == nil {
 		isolationSegmentName = isolationSegment.Name
 	} else {
-		if _, ok := err.(v3action.NoRelationshipError); !ok {
+		if _, ok := err.(actionerror.NoRelationshipError); !ok {
 			return nil, err
 		}
 	}

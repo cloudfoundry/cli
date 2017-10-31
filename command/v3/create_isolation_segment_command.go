@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -74,7 +75,7 @@ func (cmd CreateIsolationSegmentCommand) Execute(args []string) error {
 		Name: cmd.RequiredArgs.IsolationSegmentName,
 	})
 	cmd.UI.DisplayWarnings(warnings)
-	if _, ok := err.(v3action.IsolationSegmentAlreadyExistsError); ok {
+	if _, ok := err.(actionerror.IsolationSegmentAlreadyExistsError); ok {
 		cmd.UI.DisplayWarning("Isolation segment {{.IsolationSegmentName}} already exists.", map[string]interface{}{
 			"IsolationSegmentName": cmd.RequiredArgs.IsolationSegmentName,
 		})

@@ -9,12 +9,6 @@ import (
 
 const StagingLog = "STG"
 
-type NOAATimeoutError struct{}
-
-func (NOAATimeoutError) Error() string {
-	return "Timeout trying to connect to NOAA"
-}
-
 type LogMessage struct {
 	message        string
 	messageType    events.LogMessage_MessageType

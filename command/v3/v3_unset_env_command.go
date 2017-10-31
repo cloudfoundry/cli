@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -85,7 +86,7 @@ func (cmd V3UnsetEnvCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch errVal := err.(type) {
-		case v3action.EnvironmentVariableNotSetError:
+		case actionerror.EnvironmentVariableNotSetError:
 			cmd.UI.DisplayText(errVal.Error())
 		default:
 			return shared.HandleError(err)

@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -57,7 +58,7 @@ var _ = Describe("OrganizationQuota Actions", func() {
 
 			It("returns an OrganizationQuotaNotFoundError", func() {
 				_, _, err := actor.GetOrganizationQuota("some-org-quota-guid")
-				Expect(err).To(MatchError(OrganizationQuotaNotFoundError{GUID: "some-org-quota-guid"}))
+				Expect(err).To(MatchError(actionerror.OrganizationQuotaNotFoundError{GUID: "some-org-quota-guid"}))
 			})
 		})
 

@@ -104,7 +104,7 @@ var _ = Describe("service Command", func() {
 						fakeActor.GetServiceInstanceByNameAndSpaceReturns(
 							v2action.ServiceInstance{},
 							v2action.Warnings{"get-service-instance-warning"},
-							v2action.ServiceInstanceNotFoundError{
+							actionerror.ServiceInstanceNotFoundError{
 								GUID: "non-existant-service-instance-guid",
 								Name: "non-existant-service-instance",
 							})
@@ -192,7 +192,7 @@ var _ = Describe("service Command", func() {
 						fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 							v2action.ServiceInstanceSummary{},
 							v2action.Warnings{"get-service-instance-summary-warning"},
-							v2action.ServiceInstanceNotFoundError{
+							actionerror.ServiceInstanceNotFoundError{
 								GUID: "non-existant-service-instance-guid",
 								Name: "non-existant-service-instance",
 							})

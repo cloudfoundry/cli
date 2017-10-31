@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -240,7 +241,7 @@ var _ = Describe("Environment Variable Actions", func() {
 					)
 				})
 				It("returns an EnvironmentVariableNotSetError", func() {
-					Expect(executeErr).To(MatchError(EnvironmentVariableNotSetError{EnvironmentVariableName: "my-var"}))
+					Expect(executeErr).To(MatchError(actionerror.EnvironmentVariableNotSetError{EnvironmentVariableName: "my-var"}))
 					Expect(warnings).To(ConsistOf("get-application-warning", "some-get-env-var-warnings"))
 				})
 			})

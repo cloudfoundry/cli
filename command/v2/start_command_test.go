@@ -244,7 +244,7 @@ var _ = Describe("Start Command", func() {
 									messages <- v2action.NewLogMessage("log message 1", 1, time.Unix(0, 0), "STG", "1")
 									messages <- v2action.NewLogMessage("log message 2", 1, time.Unix(0, 0), "STG", "1")
 									messages <- v2action.NewLogMessage("log message 3", 1, time.Unix(0, 0), "STG", "1")
-									logErrs <- v2action.NOAATimeoutError{}
+									logErrs <- actionerror.NOAATimeoutError{}
 									close(messages)
 									close(logErrs)
 									close(appState)
@@ -377,7 +377,7 @@ var _ = Describe("Start Command", func() {
 								go func() {
 									warnings <- "warning 1"
 									warnings <- "warning 2"
-									logErrs <- v2action.NOAATimeoutError{}
+									logErrs <- actionerror.NOAATimeoutError{}
 									close(messages)
 									close(logErrs)
 									warnings <- "warning 3"

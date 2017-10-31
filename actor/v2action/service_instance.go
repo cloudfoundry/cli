@@ -1,8 +1,7 @@
 package v2action
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
@@ -10,22 +9,10 @@ import (
 // ServiceInstance represents an instance of a service.
 type ServiceInstance ccv2.ServiceInstance
 
-type ServiceInstanceNotFoundError struct {
-	GUID string
-	Name string
-}
-
-func (e ServiceInstanceNotFoundError) Error() string {
-	if e.Name == "" {
-		return fmt.Sprintf("Service instance (GUID: %s) not found.", e.GUID)
-	}
-	return fmt.Sprintf("Service instance '%s' not found.", e.Name)
-}
-
 func (actor Actor) GetServiceInstance(guid string) (ServiceInstance, Warnings, error) {
 	instance, warnings, err := actor.CloudControllerClient.GetServiceInstance(guid)
 	if _, ok := err.(ccerror.ResourceNotFoundError); ok {
-		return ServiceInstance{}, Warnings(warnings), ServiceInstanceNotFoundError{GUID: guid}
+		return ServiceInstance{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{GUID: guid}
 	}
 	return ServiceInstance(instance), Warnings(warnings), err
 }
@@ -45,7 +32,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 	}
 
 	if len(serviceInstances) == 0 {
-		return ServiceInstance{}, Warnings(warnings), ServiceInstanceNotFoundError{
+		return ServiceInstance{}, Warnings(warnings), actionerror.ServiceInstanceNotFoundError{
 			Name: name,
 		}
 	}

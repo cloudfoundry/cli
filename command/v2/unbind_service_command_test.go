@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -129,7 +128,7 @@ var _ = Describe("unbind-service Command", func() {
 					BeforeEach(func() {
 						fakeActor.UnbindServiceBySpaceReturns(
 							[]string{"foo", "bar"},
-							v2action.ServiceBindingNotFoundError{})
+							actionerror.ServiceBindingNotFoundError{})
 					})
 
 					It("displays warnings and 'OK'", func() {

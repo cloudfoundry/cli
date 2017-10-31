@@ -247,7 +247,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 
 							Context("when the error is an OrphanedRoutesNotFoundError", func() {
 								BeforeEach(func() {
-									expectedErr = v2action.OrphanedRoutesNotFoundError{}
+									expectedErr = actionerror.OrphanedRoutesNotFoundError{}
 									fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
 								})
 

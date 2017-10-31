@@ -140,7 +140,7 @@ func (actor Actor) CreateAndMapDefaultApplicationRoute(orgGUID string, spaceGUID
 	spaceRoute, spaceRouteWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
 	warnings = append(warnings, spaceRouteWarnings...)
 	routeAlreadyExists := true
-	if _, ok := err.(v2action.RouteNotFoundError); ok {
+	if _, ok := err.(actionerror.RouteNotFoundError); ok {
 		routeAlreadyExists = false
 	} else if err != nil {
 		return warnings, err
@@ -212,7 +212,7 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 	cachedRoute, found := actor.routeInListBySettings(defaultRoute, knownRoutes)
 	if !found {
 		route, routeWarnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(defaultRoute)
-		if _, ok := err.(v2action.RouteNotFoundError); ok {
+		if _, ok := err.(actionerror.RouteNotFoundError); ok {
 			return defaultRoute, append(warnings, routeWarnings...), nil
 		}
 		return route, append(warnings, routeWarnings...), err
@@ -222,8 +222,8 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 
 func (actor Actor) mapRouteToApp(route v2action.Route, appGUID string) (v2action.Warnings, error) {
 	warnings, err := actor.V2Actor.MapRouteToApplication(route.GUID, appGUID)
-	if _, ok := err.(v2action.RouteInDifferentSpaceError); ok {
-		return warnings, v2action.RouteInDifferentSpaceError{Route: route.String()}
+	if _, ok := err.(actionerror.RouteInDifferentSpaceError); ok {
+		return warnings, actionerror.RouteInDifferentSpaceError{Route: route.String()}
 	}
 	return warnings, err
 }
@@ -292,7 +292,7 @@ func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.
 
 func (actor Actor) findOrReturnPartialRouteWithSettings(route v2action.Route) (v2action.Route, Warnings, error) {
 	cachedRoute, warnings, err := actor.V2Actor.FindRouteBoundToSpaceWithSettings(route)
-	if _, ok := err.(v2action.RouteNotFoundError); ok {
+	if _, ok := err.(actionerror.RouteNotFoundError); ok {
 		return route, Warnings(warnings), nil
 	}
 	return cachedRoute, Warnings(warnings), err

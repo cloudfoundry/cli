@@ -245,7 +245,7 @@ var _ = Describe("target Command", func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{},
 									v2action.Warnings{},
-									v2action.SpaceNotFoundError{Name: "some-space"})
+									actionerror.SpaceNotFoundError{Name: "some-space"})
 							})
 
 							It("returns a SpaceNotFoundError and clears existing space", func() {
@@ -279,7 +279,7 @@ var _ = Describe("target Command", func() {
 							fakeActor.GetOrganizationByNameReturns(
 								v2action.Organization{},
 								nil,
-								v2action.OrganizationNotFoundError{Name: "some-org"})
+								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})
 
 						It("displays all warnings,returns an org target error, and clears existing targets", func() {
@@ -518,7 +518,7 @@ var _ = Describe("target Command", func() {
 								fakeActor.GetSpaceByOrganizationAndNameReturns(
 									v2action.Space{},
 									nil,
-									v2action.SpaceNotFoundError{Name: "some-space"})
+									actionerror.SpaceNotFoundError{Name: "some-space"})
 							})
 
 							It("returns an error and clears existing targets", func() {
@@ -538,7 +538,7 @@ var _ = Describe("target Command", func() {
 							fakeActor.GetOrganizationByNameReturns(
 								v2action.Organization{},
 								nil,
-								v2action.OrganizationNotFoundError{Name: "some-org"})
+								actionerror.OrganizationNotFoundError{Name: "some-org"})
 						})
 
 						It("returns an error and clears existing targets", func() {

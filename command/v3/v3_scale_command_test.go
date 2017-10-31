@@ -474,7 +474,7 @@ var _ = Describe("v3-scale Command", func() {
 
 						Context("when polling times out", func() {
 							BeforeEach(func() {
-								fakeActor.PollStartReturns(v3action.StartupTimeoutError{})
+								fakeActor.PollStartReturns(actionerror.StartupTimeoutError{})
 							})
 
 							It("returns the StartupTimeoutError", func() {

@@ -1,8 +1,6 @@
 package v2action
 
 import (
-	"fmt"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	log "github.com/sirupsen/logrus"
 )
@@ -23,14 +21,6 @@ var DefaultIgnoreLines = []string{
 	"_darcs",
 	"manifest.yaml",
 	"manifest.yml",
-}
-
-type FileChangedError struct {
-	Filename string
-}
-
-func (e FileChangedError) Error() string {
-	return fmt.Sprint("SHA1 mismatch for:", e.Filename)
 }
 
 type Resource ccv2.Resource

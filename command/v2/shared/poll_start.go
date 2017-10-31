@@ -51,7 +51,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			}
 
 			switch logErr.(type) {
-			case v2action.NOAATimeoutError:
+			case actionerror.NOAATimeoutError:
 				ui.DisplayWarning("timeout connecting to log server, no log will be shown")
 			default:
 				ui.DisplayWarning(logErr.Error())

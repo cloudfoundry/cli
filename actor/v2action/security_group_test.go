@@ -1321,7 +1321,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns an SpaceNotFoundError", func() {
 				_, _, err := actor.GetSpaceRunningSecurityGroupsBySpace("space-guid")
-				Expect(err).To(MatchError(SpaceNotFoundError{GUID: "space-guid"}))
+				Expect(err).To(MatchError(actionerror.SpaceNotFoundError{GUID: "space-guid"}))
 			})
 		})
 
@@ -1392,7 +1392,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns an SpaceNotFoundError", func() {
 				_, _, err := actor.GetSpaceStagingSecurityGroupsBySpace("space-guid")
-				Expect(err).To(MatchError(SpaceNotFoundError{GUID: "space-guid"}))
+				Expect(err).To(MatchError(actionerror.SpaceNotFoundError{GUID: "space-guid"}))
 			})
 		})
 
@@ -2004,7 +2004,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning", "org-warning"}))
-				Expect(err).To(MatchError(OrganizationNotFoundError{Name: "some-org"}))
+				Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 			})
 		})
 
@@ -2034,7 +2034,7 @@ var _ = Describe("Security Group Actions", func() {
 
 			It("returns the error and all warnings", func() {
 				Expect(warnings).To(ConsistOf([]string{"security-group-warning", "org-warning", "space-warning"}))
-				Expect(err).To(MatchError(SpaceNotFoundError{Name: "some-space"}))
+				Expect(err).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
 			})
 		})
 

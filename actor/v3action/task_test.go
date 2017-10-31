@@ -239,7 +239,7 @@ var _ = Describe("Task Actions", func() {
 
 				It("returns a TaskNotFoundError and warnings", func() {
 					_, warnings, err := actor.GetTaskBySequenceIDAndApplication(1, "some-app-guid")
-					Expect(err).To(MatchError(TaskNotFoundError{SequenceID: 1}))
+					Expect(err).To(MatchError(actionerror.TaskNotFoundError{SequenceID: 1}))
 					Expect(warnings).To(ConsistOf("get-task-warning-1"))
 				})
 			})

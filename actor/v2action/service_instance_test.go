@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -64,7 +65,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns errors and warnings", func() {
-				Expect(executeErr).To(MatchError(ServiceInstanceNotFoundError{GUID: serviceInstanceGUID}))
+				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{GUID: serviceInstanceGUID}))
 				Expect(warnings).To(ConsistOf("service-instance-warnings-1"))
 			})
 		})
@@ -130,7 +131,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("returns a ServiceInstanceNotFoundError", func() {
 				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
-				Expect(err).To(MatchError(ServiceInstanceNotFoundError{Name: "some-service-instance"}))
+				Expect(err).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: "some-service-instance"}))
 			})
 		})
 

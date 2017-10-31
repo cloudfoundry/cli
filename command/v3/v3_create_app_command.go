@@ -3,6 +3,7 @@ package v3
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -87,7 +88,7 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v3action.ApplicationAlreadyExistsError:
+		case actionerror.ApplicationAlreadyExistsError:
 			cmd.UI.DisplayWarning("App {{.AppName}} already exists", map[string]interface{}{
 				"AppName": cmd.RequiredArgs.AppName,
 			})

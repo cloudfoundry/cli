@@ -102,7 +102,7 @@ var _ = Describe("org Command", func() {
 					fakeActor.GetOrganizationByNameReturns(
 						v2action.Organization{},
 						v2action.Warnings{"warning-1", "warning-2"},
-						v2action.OrganizationNotFoundError{Name: "some-org"})
+						actionerror.OrganizationNotFoundError{Name: "some-org"})
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {
@@ -268,7 +268,7 @@ var _ = Describe("org Command", func() {
 					fakeActor.GetOrganizationSummaryByNameReturns(
 						v2action.OrganizationSummary{},
 						v2action.Warnings{"warning-1", "warning-2"},
-						v2action.OrganizationNotFoundError{Name: "some-org"})
+						actionerror.OrganizationNotFoundError{Name: "some-org"})
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {

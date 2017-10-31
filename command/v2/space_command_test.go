@@ -108,7 +108,7 @@ var _ = Describe("space Command", func() {
 					fakeActor.GetSpaceByOrganizationAndNameReturns(
 						v2action.Space{},
 						v2action.Warnings{"warning-1", "warning-2"},
-						v2action.SpaceNotFoundError{Name: "some-space"})
+						actionerror.SpaceNotFoundError{Name: "some-space"})
 				})
 
 				It("returns a translatable error and outputs all warnings", func() {
@@ -291,7 +291,7 @@ var _ = Describe("space Command", func() {
 				fakeActor.GetSpaceSummaryByOrganizationAndNameReturns(
 					v2action.SpaceSummary{},
 					v2action.Warnings{"warning-1", "warning-2"},
-					v2action.SpaceNotFoundError{Name: "some-space"})
+					actionerror.SpaceNotFoundError{Name: "some-space"})
 			})
 
 			It("returns a translatable error and outputs all warnings", func() {
@@ -347,7 +347,7 @@ var _ = Describe("space Command", func() {
 				fakeActorV3.GetEffectiveIsolationSegmentBySpaceReturns(
 					v3action.IsolationSegment{},
 					v3action.Warnings{"v3-warning-1", "v3-warning-2"},
-					v3action.NoRelationshipError{})
+					actionerror.NoRelationshipError{})
 			})
 
 			It("does not fill in the isolation segment", func() {

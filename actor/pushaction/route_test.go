@@ -156,11 +156,11 @@ var _ = Describe("Routes", func() {
 			Context("when the mapping errors", func() {
 				Context("when the route is bound in another space", func() {
 					BeforeEach(func() {
-						fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warning"}, v2action.RouteInDifferentSpaceError{})
+						fakeV2Actor.MapRouteToApplicationReturns(v2action.Warnings{"map-route-warning"}, actionerror.RouteInDifferentSpaceError{})
 					})
 
 					It("sends the RouteInDifferentSpaceError (with a guid set) and warnings and returns true", func() {
-						Expect(executeErr).To(MatchError(v2action.RouteInDifferentSpaceError{Route: "some-route-1.some-domain.com"}))
+						Expect(executeErr).To(MatchError(actionerror.RouteInDifferentSpaceError{Route: "some-route-1.some-domain.com"}))
 						Expect(warnings).To(ConsistOf("map-route-warning"))
 					})
 				})
@@ -238,7 +238,7 @@ var _ = Describe("Routes", func() {
 
 				Context("when the route existance check is successful", func() {
 					BeforeEach(func() {
-						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, v2action.RouteNotFoundError{})
+						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, actionerror.RouteNotFoundError{})
 						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturnsOnCall(3, v2action.Route{
 							GUID: "route-guid-4",
 							Host: "d.c",
@@ -391,7 +391,7 @@ var _ = Describe("Routes", func() {
 					{GUID: "domain-guid-1", Name: "a.com"},
 					{GUID: "domain-guid-2", Name: "b.a.com"},
 				}, v2action.Warnings{"domain-warnings-1", "domains-warnings-2"}, nil)
-				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, v2action.RouteNotFoundError{})
+				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, actionerror.RouteNotFoundError{})
 			})
 
 			It("does not lookup known routes", func() {
@@ -622,7 +622,7 @@ var _ = Describe("Routes", func() {
 							fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(
 								v2action.Route{},
 								v2action.Warnings{"route-warning"},
-								v2action.RouteNotFoundError{},
+								actionerror.RouteNotFoundError{},
 							)
 						})
 
@@ -857,7 +857,7 @@ var _ = Describe("Routes", func() {
 					domain.Type = constant.SharedDomain
 
 					// Assumes new route
-					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 				})
 
 				Context("when the provided domain is an HTTP domain", func() {
@@ -946,7 +946,7 @@ var _ = Describe("Routes", func() {
 				providedManifest.NoHostname = true
 
 				// Assumes new route
-				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+				fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 			})
 
 			Context("the domain is a private domain", func() {
@@ -1053,7 +1053,7 @@ var _ = Describe("Routes", func() {
 
 						Context("when the route does not exist", func() {
 							BeforeEach(func() {
-								fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, v2action.RouteNotFoundError{})
+								fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 							})
 
 							It("returns a partial route", func() {

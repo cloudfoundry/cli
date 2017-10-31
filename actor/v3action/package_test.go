@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -519,8 +520,8 @@ var _ = Describe("Package Actions", func() {
 										},
 
 										Entry("READY", ccv3.PackageStateReady, nil),
-										Entry("FAILED", ccv3.PackageStateFailed, PackageProcessingFailedError{}),
-										Entry("EXPIRED", ccv3.PackageStateExpired, PackageProcessingExpiredError{}),
+										Entry("FAILED", ccv3.PackageStateFailed, actionerror.PackageProcessingFailedError{}),
+										Entry("EXPIRED", ccv3.PackageStateExpired, actionerror.PackageProcessingExpiredError{}),
 									)
 								})
 							})

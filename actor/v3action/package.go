@@ -1,11 +1,11 @@
 package v3action
 
 import (
-	"fmt"
 	"net/url"
 	"os"
 	"time"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -15,27 +15,7 @@ const (
 	DefaultArchiveFilePermissions = 0744
 )
 
-type PackageProcessingFailedError struct{}
-
-func (PackageProcessingFailedError) Error() string {
-	return "Package failed to process correctly after upload"
-}
-
-type PackageProcessingExpiredError struct{}
-
-func (PackageProcessingExpiredError) Error() string {
-	return "Package expired after upload"
-}
-
 type Package ccv3.Package
-
-type EmptyDirectoryError struct {
-	Path string
-}
-
-func (e EmptyDirectoryError) Error() string {
-	return fmt.Sprint(e.Path, "is empty")
-}
 
 type DockerImageCredentials struct {
 	Path     string
@@ -136,9 +116,9 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	}
 
 	if pkg.State == ccv3.PackageStateFailed {
-		return Package{}, allWarnings, PackageProcessingFailedError{}
+		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
 	} else if pkg.State == ccv3.PackageStateExpired {
-		return Package{}, allWarnings, PackageProcessingExpiredError{}
+		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
 	}
 
 	return Package(pkg), allWarnings, err

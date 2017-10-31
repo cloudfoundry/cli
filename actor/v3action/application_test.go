@@ -337,7 +337,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the ApplicationAlreadyExistsError and warnings", func() {
-				Expect(err).To(MatchError(ApplicationAlreadyExistsError{Name: "some-app-name"}))
+				Expect(err).To(MatchError(actionerror.ApplicationAlreadyExistsError{Name: "some-app-name"}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})
@@ -494,7 +494,7 @@ var _ = Describe("Application Actions", func() {
 						funcDone <- nil
 
 						Expect(allWarnings).To(ConsistOf("get-app-warning-1", "get-process-warning-1", "get-process-warning-2"))
-						Expect(err).To(MatchError(StartupTimeoutError{}))
+						Expect(err).To(MatchError(actionerror.StartupTimeoutError{}))
 					})
 
 					It("gets polling and timeout values from the config", func() {
@@ -666,7 +666,7 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns the timeout error", func() {
-						Expect(pollStartErr).To(MatchError(StartupTimeoutError{}))
+						Expect(pollStartErr).To(MatchError(actionerror.StartupTimeoutError{}))
 					})
 
 				})
@@ -677,7 +677,7 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					It("returns the timeout error", func() {
-						Expect(pollStartErr).To(MatchError(StartupTimeoutError{}))
+						Expect(pollStartErr).To(MatchError(actionerror.StartupTimeoutError{}))
 					})
 				})
 

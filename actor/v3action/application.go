@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"fmt"
 	"net/url"
 	"time"
 
@@ -33,16 +32,6 @@ const (
 
 func (app Application) Started() bool {
 	return app.State == "STARTED"
-}
-
-// ApplicationAlreadyExistsError represents the error that occurs when the
-// application already exists.
-type ApplicationAlreadyExistsError struct {
-	Name string
-}
-
-func (e ApplicationAlreadyExistsError) Error() string {
-	return fmt.Sprintf("Application '%s' already exists.", e.Name)
 }
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
@@ -135,7 +124,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 
 	if err != nil {
 		if _, ok := err.(ccerror.NameNotUniqueInSpaceError); ok {
-			return Application{}, Warnings(warnings), ApplicationAlreadyExistsError{Name: app.Name}
+			return Application{}, Warnings(warnings), actionerror.ApplicationAlreadyExistsError{Name: app.Name}
 		}
 		return Application{}, Warnings(warnings), err
 	}
@@ -203,7 +192,7 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 		time.Sleep(actor.Config.PollingInterval())
 	}
 
-	return StartupTimeoutError{}
+	return actionerror.StartupTimeoutError{}
 }
 
 // UpdateApplication updates the buildpacks on an application
@@ -230,15 +219,6 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 			Data: AppLifecycleData(updatedApp.Lifecycle.Data),
 		},
 	}, Warnings(warnings), nil
-}
-
-// StartupTimeoutError is returned when startup timeout is reached waiting for
-// an application to start.
-type StartupTimeoutError struct {
-}
-
-func (e StartupTimeoutError) Error() string {
-	return fmt.Sprintf("Timed out waiting for application to start")
 }
 
 func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {

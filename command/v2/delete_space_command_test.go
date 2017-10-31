@@ -115,7 +115,7 @@ var _ = Describe("delete-space Command", func() {
 
 					Context("when the deleting the space errors", func() {
 						BeforeEach(func() {
-							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v2action.Warnings{"warning-1", "warning-2"}, v2action.SpaceNotFoundError{Name: "some-space"})
+							fakeActor.DeleteSpaceByNameAndOrganizationNameReturns(v2action.Warnings{"warning-1", "warning-2"}, actionerror.SpaceNotFoundError{Name: "some-space"})
 						})
 
 						It("returns the translatable error", func() {

@@ -129,7 +129,7 @@ var _ = Describe("v3-unset-env Command", func() {
 
 			Context("when unsetting the environment returns an EnvironmentVariableNotSetError", func() {
 				BeforeEach(func() {
-					fakeActor.UnsetEnvironmentVariableByApplicationNameAndSpaceReturns(v3action.Warnings{"unset-warning-1", "unset-warning-2"}, v3action.EnvironmentVariableNotSetError{EnvironmentVariableName: "some-key"})
+					fakeActor.UnsetEnvironmentVariableByApplicationNameAndSpaceReturns(v3action.Warnings{"unset-warning-1", "unset-warning-2"}, actionerror.EnvironmentVariableNotSetError{EnvironmentVariableName: "some-key"})
 				})
 
 				It("displays okay and the error", func() {

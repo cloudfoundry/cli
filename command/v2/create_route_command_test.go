@@ -316,8 +316,8 @@ var _ = Describe("Create Route Command", func() {
 					fakeActor.CreateRouteWithExistenceCheckReturns(
 						v2action.Route{},
 						v2action.Warnings{"create-route-warning-1", "create-route-warning-2"},
-						v2action.RouteAlreadyExistsError{
-							Route: v2action.Route{Host: "some-host"},
+						actionerror.RouteAlreadyExistsError{
+							Route: v2action.Route{Host: "some-host"}.String(),
 						},
 					)
 				})

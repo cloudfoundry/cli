@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -14,7 +15,7 @@ var _ = Describe("Space", func() {
 	Describe("SpaceNotFoundError#Error", func() {
 		Context("when the name is specified", func() {
 			It("returns an error message with the name of the missing space", func() {
-				err := SpaceNotFoundError{
+				err := actionerror.SpaceNotFoundError{
 					Name: "some-space",
 				}
 				Expect(err.Error()).To(Equal("Space 'some-space' not found."))
@@ -23,7 +24,7 @@ var _ = Describe("Space", func() {
 
 		Context("when the name is not specified, but the GUID is specified", func() {
 			It("returns an error message with the GUID of the missing space", func() {
-				err := SpaceNotFoundError{
+				err := actionerror.SpaceNotFoundError{
 					GUID: "some-space-guid",
 				}
 				Expect(err.Error()).To(Equal("Space with GUID 'some-space-guid' not found."))
@@ -32,7 +33,7 @@ var _ = Describe("Space", func() {
 
 		Context("when neither the name nor the GUID is specified", func() {
 			It("returns a generic error message for the missing space", func() {
-				err := SpaceNotFoundError{}
+				err := actionerror.SpaceNotFoundError{}
 				Expect(err.Error()).To(Equal("Space '' not found."))
 			})
 		})
@@ -72,7 +73,7 @@ var _ = Describe("Space", func() {
 				})
 
 				It("returns an OrganizationNotFoundError", func() {
-					Expect(err).To(MatchError(OrganizationNotFoundError{Name: "some-org"}))
+					Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})
@@ -96,7 +97,7 @@ var _ = Describe("Space", func() {
 					})
 
 					It("returns an SpaceNotFoundError", func() {
-						Expect(err).To(MatchError(SpaceNotFoundError{Name: "some-space"}))
+						Expect(err).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
 						Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4"))
 					})
 				})
@@ -343,7 +344,7 @@ var _ = Describe("Space", func() {
 				It("returns SpaceNotFoundError", func() {
 					_, _, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
-					Expect(err).To(MatchError(SpaceNotFoundError{
+					Expect(err).To(MatchError(actionerror.SpaceNotFoundError{
 						Name: "some-space",
 					}))
 				})
@@ -372,7 +373,7 @@ var _ = Describe("Space", func() {
 				It("returns MultipleSpacesFoundError", func() {
 					_, _, err := actor.GetSpaceByOrganizationAndName("some-org-guid", "some-space")
 
-					Expect(err).To(MatchError(MultipleSpacesFoundError{
+					Expect(err).To(MatchError(actionerror.MultipleSpacesFoundError{
 						OrgGUID: "some-org-guid",
 						Name:    "some-space",
 					}))

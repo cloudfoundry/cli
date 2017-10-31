@@ -1,21 +1,10 @@
 package v3action
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/types"
 )
-
-// EnvironmentVariableNotSetError is returned when trying to unset env variable
-// that was not previously set.
-type EnvironmentVariableNotSetError struct {
-	EnvironmentVariableName string
-}
-
-func (e EnvironmentVariableNotSetError) Error() string {
-	return fmt.Sprintf("Env variable %s was not set.", e.EnvironmentVariableName)
-}
 
 // EnvironmentVariableGroups represents all environment variables for application
 type EnvironmentVariableGroups ccv3.EnvironmentVariableGroups
@@ -69,7 +58,7 @@ func (actor *Actor) UnsetEnvironmentVariableByApplicationNameAndSpace(appName st
 	}
 
 	if _, ok := envGroups.UserProvided[environmentVariableName]; !ok {
-		return warnings, EnvironmentVariableNotSetError{EnvironmentVariableName: environmentVariableName}
+		return warnings, actionerror.EnvironmentVariableNotSetError{EnvironmentVariableName: environmentVariableName}
 	}
 
 	_, patchWarnings, patchErr := actor.CloudControllerClient.PatchApplicationUserProvidedEnvironmentVariables(app.GUID, ccv3.EnvironmentVariables{Variables: map[string]types.FilteredString{environmentVariableName: {Value: "", IsSet: false}}})

@@ -42,15 +42,6 @@ func (phs ProcessHealthChecks) Sort() {
 	})
 }
 
-// HTTPHealthCheckInvalidError is returned when an HTTP endpoint is used with a
-// health check type that is not HTTP.
-type HTTPHealthCheckInvalidError struct {
-}
-
-func (e HTTPHealthCheckInvalidError) Error() string {
-	return "Health check type must be 'http' to set a health check HTTP endpoint"
-}
-
 func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName string, spaceGUID string) ([]ProcessHealthCheck, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
@@ -83,7 +74,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName st
 		if httpEndpoint == "/" {
 			httpEndpoint = ""
 		} else {
-			return Application{}, nil, HTTPHealthCheckInvalidError{}
+			return Application{}, nil, actionerror.HTTPHealthCheckInvalidError{}
 		}
 	}
 

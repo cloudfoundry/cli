@@ -133,7 +133,7 @@ var _ = Describe("Route Actions", func() {
 
 				It("returns the error", func() {
 					warnings, err := actor.MapRouteToApplication("some-route-guid", "some-app-guid")
-					Expect(err).To(MatchError(RouteInDifferentSpaceError{}))
+					Expect(err).To(MatchError(actionerror.RouteInDifferentSpaceError{}))
 					Expect(warnings).To(ConsistOf("map warning"))
 				})
 			})
@@ -466,9 +466,8 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				Expect(createRouteErr).To(MatchError(RouteAlreadyExistsError{
-					Route: CCToActorRoute(foundRoute, Domain{Name: "some-domain", GUID: "some-domain-guid"}),
-				}))
+				routeString := CCToActorRoute(foundRoute, Domain{Name: "some-domain", GUID: "some-domain-guid"}).String()
+				Expect(createRouteErr).To(MatchError(actionerror.RouteAlreadyExistsError{Route: routeString}))
 				Expect(createRouteWarnings).To(ConsistOf("get-space-warning", "get-routes-warning", "get-domain-warning"))
 			})
 		})
@@ -688,7 +687,7 @@ var _ = Describe("Route Actions", func() {
 		})
 
 		Context("when there are no orphaned routes", func() {
-			var expectedErr OrphanedRoutesNotFoundError
+			var expectedErr actionerror.OrphanedRoutesNotFoundError
 
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
@@ -1148,7 +1147,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns a RouteNotFoundError and warnings", func() {
-					Expect(executeErr).To(MatchError(RouteNotFoundError{Host: host, DomainGUID: domainGUID, Path: path}))
+					Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{Host: host, DomainGUID: domainGUID, Path: path}))
 					Expect(warnings).To(ConsistOf("get-routes-warning"))
 				})
 			})
@@ -1321,7 +1320,7 @@ var _ = Describe("Route Actions", func() {
 			// TODO: Should return only when RandomTCPPort is true, fill in more
 			// tests once TCP routing feature has been added.
 			It("returns RouteNotFoundError", func() {
-				Expect(executeErr).To(MatchError(RouteNotFoundError{DomainGUID: route.Domain.GUID}))
+				Expect(executeErr).To(MatchError(actionerror.RouteNotFoundError{DomainGUID: route.Domain.GUID}))
 				Expect(warnings).To(BeEmpty())
 			})
 		})
@@ -1336,7 +1335,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns a RouteInDifferentSpaceError", func() {
-					Expect(executeErr).To(MatchError(RouteInDifferentSpaceError{Route: route.String()}))
+					Expect(executeErr).To(MatchError(actionerror.RouteInDifferentSpaceError{Route: route.String()}))
 					Expect(warnings).To(ConsistOf("get route warning", "get domain warning"))
 				})
 			})
@@ -1348,7 +1347,7 @@ var _ = Describe("Route Actions", func() {
 				})
 
 				It("returns a RouteInDifferentSpaceError", func() {
-					Expect(executeErr).To(MatchError(RouteInDifferentSpaceError{Route: route.String()}))
+					Expect(executeErr).To(MatchError(actionerror.RouteInDifferentSpaceError{Route: route.String()}))
 					Expect(warnings).To(ConsistOf("get route warning", "check route warning"))
 				})
 			})
@@ -1358,7 +1357,7 @@ var _ = Describe("Route Actions", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = RouteNotFoundError{Host: route.Host, DomainGUID: route.Domain.GUID, Path: route.Path}
+				expectedErr = actionerror.RouteNotFoundError{Host: route.Host, DomainGUID: route.Domain.GUID, Path: route.Path}
 				fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get route warning"}, nil)
 				fakeCloudControllerClient.CheckRouteReturns(false, ccv2.Warnings{"check route warning"}, nil)
 			})

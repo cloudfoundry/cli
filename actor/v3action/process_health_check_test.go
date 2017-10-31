@@ -175,7 +175,7 @@ var _ = Describe("Process Health Check Actions", func() {
 		Context("when the user specifies an endpoint for a non-http health check", func() {
 			It("returns an HTTPHealthCheckInvalidError", func() {
 				_, warnings, err := actor.SetApplicationProcessHealthCheckTypeByNameAndSpace("some-app-name", "some-space-guid", "port", "some-http-endpoint", "some-process-type")
-				Expect(err).To(MatchError(HTTPHealthCheckInvalidError{}))
+				Expect(err).To(MatchError(actionerror.HTTPHealthCheckInvalidError{}))
 				Expect(warnings).To(BeNil())
 			})
 		})

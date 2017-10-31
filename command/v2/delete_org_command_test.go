@@ -123,7 +123,7 @@ var _ = Describe("delete-org Command", func() {
 							BeforeEach(func() {
 								fakeActor.DeleteOrganizationReturns(
 									v2action.Warnings{"warning-1", "warning-2"},
-									v2action.OrganizationNotFoundError{
+									actionerror.OrganizationNotFoundError{
 										Name: "some-org",
 									},
 								)

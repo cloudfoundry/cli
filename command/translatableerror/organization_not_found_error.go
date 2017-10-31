@@ -1,6 +1,7 @@
 package translatableerror
 
 type OrganizationNotFoundError struct {
+	GUID string
 	Name string
 }
 

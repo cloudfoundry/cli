@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 
@@ -14,15 +13,6 @@ import (
 
 // Task represents a V3 actor Task.
 type Task ccv3.Task
-
-// TaskNotFoundError is returned when no tasks matching the filters are found.
-type TaskNotFoundError struct {
-	SequenceID int
-}
-
-func (e TaskNotFoundError) Error() string {
-	return fmt.Sprintf("Task sequence ID %d not found.", e.SequenceID)
-}
 
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
@@ -73,7 +63,7 @@ func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID str
 	}
 
 	if len(tasks) == 0 {
-		return Task{}, Warnings(warnings), TaskNotFoundError{SequenceID: sequenceID}
+		return Task{}, Warnings(warnings), actionerror.TaskNotFoundError{SequenceID: sequenceID}
 	}
 
 	return Task(tasks[0]), Warnings(warnings), nil

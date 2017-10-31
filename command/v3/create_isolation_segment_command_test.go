@@ -127,7 +127,7 @@ var _ = Describe("create-isolation-segment Command", func() {
 
 			Context("due to an IsolationSegmentAlreadyExistsError", func() {
 				BeforeEach(func() {
-					fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, v3action.IsolationSegmentAlreadyExistsError{})
+					fakeActor.CreateIsolationSegmentByNameReturns(v3action.Warnings{"I am a warning", "I am also a warning"}, actionerror.IsolationSegmentAlreadyExistsError{})
 				})
 
 				It("displays the header and ok", func() {

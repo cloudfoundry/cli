@@ -2,7 +2,6 @@ package shared
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -39,21 +38,21 @@ func HandleError(err error) error {
 
 	case actionerror.ApplicationNotFoundError:
 		return translatableerror.ApplicationNotFoundError{Name: e.Name}
-	case v2action.OrganizationNotFoundError:
+	case actionerror.OrganizationNotFoundError:
 		return translatableerror.OrganizationNotFoundError{Name: e.Name}
 	case actionerror.SecurityGroupNotFoundError:
 		return translatableerror.SecurityGroupNotFoundError(e)
-	case v2action.ServiceInstanceNotFoundError:
+	case actionerror.ServiceInstanceNotFoundError:
 		return translatableerror.ServiceInstanceNotFoundError(e)
-	case v2action.SpaceNotFoundError:
+	case actionerror.SpaceNotFoundError:
 		return translatableerror.SpaceNotFoundError{Name: e.Name}
-	case v2action.StackNotFoundError:
+	case actionerror.StackNotFoundError:
 		return translatableerror.StackNotFoundError(e)
 	case actionerror.HTTPHealthCheckInvalidError:
 		return translatableerror.HTTPHealthCheckInvalidError{}
-	case v2action.RouteInDifferentSpaceError:
+	case actionerror.RouteInDifferentSpaceError:
 		return translatableerror.RouteInDifferentSpaceError(e)
-	case v2action.FileChangedError:
+	case actionerror.FileChangedError:
 		return translatableerror.FileChangedError(e)
 	case actionerror.EmptyDirectoryError:
 		return translatableerror.EmptyDirectoryError(e)

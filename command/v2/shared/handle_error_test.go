@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -50,7 +49,7 @@ var _ = Describe("HandleError", func() {
 			ccerror.APINotFoundError{URL: "some-url"},
 			translatableerror.APINotFoundError{URL: "some-url"}),
 
-		Entry("v2action.ApplicationNotFoundError -> ApplicationNotFoundError",
+		Entry("actionerror.ApplicationNotFoundError -> ApplicationNotFoundError",
 			actionerror.ApplicationNotFoundError{Name: "some-app"},
 			translatableerror.ApplicationNotFoundError{Name: "some-app"}),
 
@@ -58,12 +57,12 @@ var _ = Describe("HandleError", func() {
 			actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 			translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}),
 
-		Entry("v2action.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError",
-			v2action.ServiceInstanceNotFoundError{Name: "some-service-instance"},
+		Entry("actionerror.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError",
+			actionerror.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			translatableerror.ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
-		Entry("v2action.StackNotFoundError -> StackNotFoundError",
-			v2action.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"},
+		Entry("actionerror.StackNotFoundError -> StackNotFoundError",
+			actionerror.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"},
 			translatableerror.StackNotFoundError{Name: "some-stack-name", GUID: "some-stack-guid"}),
 
 		Entry("ccerror.JobFailedError -> JobFailedError",
@@ -74,12 +73,12 @@ var _ = Describe("HandleError", func() {
 			ccerror.JobTimeoutError{JobGUID: "some-job-guid"},
 			translatableerror.JobTimeoutError{JobGUID: "some-job-guid"}),
 
-		Entry("v2action.OrganizationNotFoundError -> OrgNotFoundError",
-			v2action.OrganizationNotFoundError{Name: "some-org"},
+		Entry("actionerror.OrganizationNotFoundError -> OrgNotFoundError",
+			actionerror.OrganizationNotFoundError{Name: "some-org"},
 			translatableerror.OrganizationNotFoundError{Name: "some-org"}),
 
-		Entry("v2action.SpaceNotFoundError -> SpaceNotFoundError",
-			v2action.SpaceNotFoundError{Name: "some-space"},
+		Entry("actionerror.SpaceNotFoundError -> SpaceNotFoundError",
+			actionerror.SpaceNotFoundError{Name: "some-space"},
 			translatableerror.SpaceNotFoundError{Name: "some-space"}),
 
 		Entry("actionerror.NotLoggedInError -> NotLoggedInError",
@@ -94,22 +93,22 @@ var _ = Describe("HandleError", func() {
 			actionerror.NoSpaceTargetedError{BinaryName: "faceman"},
 			translatableerror.NoSpaceTargetedError{BinaryName: "faceman"}),
 
-		Entry("v2action.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
+		Entry("actionerror.HTTPHealthCheckInvalidError -> HTTPHealthCheckInvalidError",
 			actionerror.HTTPHealthCheckInvalidError{},
 			translatableerror.HTTPHealthCheckInvalidError{},
 		),
 
-		Entry("v2action.RouteInDifferentSpaceError -> RouteInDifferentSpaceError",
-			v2action.RouteInDifferentSpaceError{Route: "some-route"},
+		Entry("actionerror.RouteInDifferentSpaceError -> RouteInDifferentSpaceError",
+			actionerror.RouteInDifferentSpaceError{Route: "some-route"},
 			translatableerror.RouteInDifferentSpaceError{Route: "some-route"},
 		),
 
-		Entry("v2action.FileChangedError -> FileChangedError",
-			v2action.FileChangedError{Filename: "some-filename"},
+		Entry("actionerror.FileChangedError -> FileChangedError",
+			actionerror.FileChangedError{Filename: "some-filename"},
 			translatableerror.FileChangedError{Filename: "some-filename"},
 		),
 
-		Entry("v2action.EmptyDirectoryError -> EmptyDirectoryError",
+		Entry("actionerror.EmptyDirectoryError -> EmptyDirectoryError",
 			actionerror.EmptyDirectoryError{Path: "some-filename"},
 			translatableerror.EmptyDirectoryError{Path: "some-filename"},
 		),

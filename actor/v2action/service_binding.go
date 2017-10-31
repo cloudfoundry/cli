@@ -1,25 +1,13 @@
 package v2action
 
 import (
-	"fmt"
-
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 // ServiceBinding represents the link between a service instance and an
 // application.
 type ServiceBinding ccv2.ServiceBinding
-
-// ServiceBindingNotFoundError is returned when a service binding cannot be
-// found.
-type ServiceBindingNotFoundError struct {
-	AppGUID             string
-	ServiceInstanceGUID string
-}
-
-func (e ServiceBindingNotFoundError) Error() string {
-	return fmt.Sprintf("Service binding for application GUID '%s', and service instance GUID '%s' not found.", e.AppGUID, e.ServiceInstanceGUID)
-}
 
 // BindServiceByApplicationAndServiceInstance binds the service instance to an application.
 func (actor Actor) BindServiceByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (Warnings, error) {
@@ -70,7 +58,7 @@ func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID stri
 	}
 
 	if len(serviceBindings) == 0 {
-		return ServiceBinding{}, Warnings(warnings), ServiceBindingNotFoundError{
+		return ServiceBinding{}, Warnings(warnings), actionerror.ServiceBindingNotFoundError{
 			AppGUID:             appGUID,
 			ServiceInstanceGUID: serviceInstanceGUID,
 		}

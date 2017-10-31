@@ -77,7 +77,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 
 				It("returns an IsolationSegmentAlreadyExistsError and all warnings", func() {
 					warnings, err := actor.CreateIsolationSegmentByName(IsolationSegment{Name: "some-isolation-segment"})
-					Expect(err).To(MatchError(IsolationSegmentAlreadyExistsError{Name: "some-isolation-segment"}))
+					Expect(err).To(MatchError(actionerror.IsolationSegmentAlreadyExistsError{Name: "some-isolation-segment"}))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})
 			})
@@ -361,7 +361,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 				Context("when no org isolation segment is passed in", func() {
 					It("returns NoRelationshipError", func() {
 						_, warnings, err := actor.GetEffectiveIsolationSegmentBySpace("some-space-guid", "")
-						Expect(err).To(MatchError(NoRelationshipError{}))
+						Expect(err).To(MatchError(actionerror.NoRelationshipError{}))
 						Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 					})
 				})

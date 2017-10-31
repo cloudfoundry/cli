@@ -107,7 +107,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 
 		Context("when the org lookup is unsuccessful", func() {
 			BeforeEach(func() {
-				fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{}, v2action.Warnings{"I am a warning", "I am also a warning"}, v2action.OrganizationNotFoundError{Name: org})
+				fakeActorV2.GetOrganizationByNameReturns(v2action.Organization{}, v2action.Warnings{"I am a warning", "I am also a warning"}, actionerror.OrganizationNotFoundError{Name: org})
 			})
 
 			It("returns the warnings and error", func() {

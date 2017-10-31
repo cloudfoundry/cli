@@ -3,6 +3,7 @@ package v2
 import (
 	"os"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
@@ -93,7 +94,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	createdRoute, warnings, err := cmd.Actor.CreateRouteWithExistenceCheck(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.Space, route, cmd.RandomPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		if _, ok := err.(v2action.RouteAlreadyExistsError); ok {
+		if _, ok := err.(actionerror.RouteAlreadyExistsError); ok {
 			cmd.UI.DisplayWarning("Route {{.Route}} already exists.", map[string]interface{}{
 				"Route": route,
 			})

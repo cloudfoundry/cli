@@ -1,4 +1,4 @@
-package v3action
+package actionerror
 
 type NoRelationshipError struct {
 }

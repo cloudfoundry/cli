@@ -3,6 +3,7 @@ package v2action_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -57,7 +58,7 @@ var _ = Describe("Stack Actions", func() {
 
 			It("returns a StackNotFoundError", func() {
 				_, _, err := actor.GetStack("stack-guid")
-				Expect(err).To(MatchError(StackNotFoundError{GUID: "stack-guid"}))
+				Expect(err).To(MatchError(actionerror.StackNotFoundError{GUID: "stack-guid"}))
 			})
 		})
 
@@ -126,7 +127,7 @@ var _ = Describe("Stack Actions", func() {
 
 				It("returns a StackNotFoundError", func() {
 					_, warnings, err := actor.GetStackByName("some-stack")
-					Expect(err).To(MatchError(StackNotFoundError{Name: "some-stack"}))
+					Expect(err).To(MatchError(actionerror.StackNotFoundError{Name: "some-stack"}))
 					Expect(warnings).To(ConsistOf("get-stacks-warning"))
 				})
 			})
@@ -143,7 +144,7 @@ var _ = Describe("Stack Actions", func() {
 
 			It("returns a StackNotFoundError", func() {
 				_, _, err := actor.GetStack("stack-guid")
-				Expect(err).To(MatchError(StackNotFoundError{GUID: "stack-guid"}))
+				Expect(err).To(MatchError(actionerror.StackNotFoundError{GUID: "stack-guid"}))
 			})
 		})
 

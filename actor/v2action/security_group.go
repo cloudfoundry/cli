@@ -358,7 +358,7 @@ func processSecurityGroups(spaceGUID string, ccv2SecurityGroups []ccv2.SecurityG
 	if err != nil {
 		switch err.(type) {
 		case ccerror.ResourceNotFoundError:
-			return []SecurityGroup{}, warnings, SpaceNotFoundError{GUID: spaceGUID}
+			return []SecurityGroup{}, warnings, actionerror.SpaceNotFoundError{GUID: spaceGUID}
 		default:
 			return []SecurityGroup{}, warnings, err
 		}
