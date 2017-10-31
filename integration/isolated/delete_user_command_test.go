@@ -34,7 +34,6 @@ var _ = Describe("delete-user command", func() {
 				var usersDeleted int
 				for _, user := range users {
 					if user.Username == newUser {
-						fmt.Println("deleting : ", newUser)
 						Eventually(helpers.CF("curl", "-X", "DELETE", fmt.Sprintf("/v2/users/%s", user.GUID))).Should(Exit(0))
 						usersDeleted++
 					}
