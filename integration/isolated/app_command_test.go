@@ -178,10 +178,6 @@ applications:
 					})
 				})
 
-				AfterEach(func() {
-					Eventually(helpers.CF("delete", appName, "-f", "-r")).Should(Exit(0))
-				})
-
 				Context("when the app is started and has 2 instances", func() {
 					It("displays the app information with instances table", func() {
 						session := helpers.CF("app", appName)
