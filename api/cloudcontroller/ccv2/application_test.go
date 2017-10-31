@@ -437,7 +437,7 @@ var _ = Describe("Application", func() {
 					"detected_buildpack": null,
 					"health_check_type": "some-health-check-type",
 					"health_check_http_endpoint": "/",
-					"instances": 13,
+					"instances": 7,
 					"memory": 1024,
 					"name": "app-name-1",
 					"package_updated_at": "2015-03-10T23:11:54Z",
@@ -448,7 +448,7 @@ var _ = Describe("Application", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPut, "/v2/apps/some-app-guid"),
-							VerifyBody([]byte(`{"health_check_type":"some-health-check-type"}`)),
+							VerifyBody([]byte(`{"instances":7}`)),
 							RespondWith(http.StatusCreated, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
 					)
@@ -456,8 +456,8 @@ var _ = Describe("Application", func() {
 
 				It("returns the updated object and warnings and sends only updated field", func() {
 					app, warnings, err := client.UpdateApplication(Application{
-						GUID:            "some-app-guid",
-						HealthCheckType: "some-health-check-type",
+						GUID:      "some-app-guid",
+						Instances: types.NullInt{IsSet: true, Value: 7},
 					})
 					Expect(err).NotTo(HaveOccurred())
 
@@ -472,7 +472,7 @@ var _ = Describe("Application", func() {
 						GUID:                    "some-app-guid",
 						HealthCheckType:         "some-health-check-type",
 						HealthCheckHTTPEndpoint: "/",
-						Instances:               types.NullInt{Value: 13, IsSet: true},
+						Instances:               types.NullInt{Value: 7, IsSet: true},
 						Memory:                  1024,
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,

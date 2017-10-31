@@ -123,7 +123,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		DockerCredentials       *DockerCredentials                  `json:"docker_credentials,omitempty"`
 		DockerImage             string                              `json:"docker_image,omitempty"`
 		EnvironmentVariables    map[string]string                   `json:"environment_json,omitempty"`
-		HealthCheckHTTPEndpoint string                              `json:"health_check_http_endpoint,omitempty"`
+		HealthCheckHTTPEndpoint *string                             `json:"health_check_http_endpoint,omitempty"`
 		HealthCheckTimeout      int                                 `json:"health_check_timeout,omitempty"`
 		HealthCheckType         constant.ApplicationHealthCheckType `json:"health_check_type,omitempty"`
 		Instances               *int                                `json:"instances,omitempty"`
@@ -133,17 +133,16 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		StackGUID               string                              `json:"stack_guid,omitempty"`
 		State                   ApplicationState                    `json:"state,omitempty"`
 	}{
-		DiskQuota:               application.DiskQuota,
-		DockerImage:             application.DockerImage,
-		EnvironmentVariables:    application.EnvironmentVariables,
-		HealthCheckHTTPEndpoint: application.HealthCheckHTTPEndpoint,
-		HealthCheckTimeout:      application.HealthCheckTimeout,
-		HealthCheckType:         application.HealthCheckType,
-		Memory:                  application.Memory,
-		Name:                    application.Name,
-		SpaceGUID:               application.SpaceGUID,
-		StackGUID:               application.StackGUID,
-		State:                   application.State,
+		DiskQuota:            application.DiskQuota,
+		DockerImage:          application.DockerImage,
+		EnvironmentVariables: application.EnvironmentVariables,
+		HealthCheckTimeout:   application.HealthCheckTimeout,
+		HealthCheckType:      application.HealthCheckType,
+		Memory:               application.Memory,
+		Name:                 application.Name,
+		SpaceGUID:            application.SpaceGUID,
+		StackGUID:            application.StackGUID,
+		State:                application.State,
 	}
 
 	if application.Buildpack.IsSet {
@@ -163,6 +162,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 
 	if application.Instances.IsSet {
 		ccApp.Instances = &application.Instances.Value
+	}
+
+	if application.HealthCheckType != "" {
+		ccApp.HealthCheckHTTPEndpoint = &application.HealthCheckHTTPEndpoint
 	}
 
 	return json.Marshal(ccApp)
