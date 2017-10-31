@@ -28,13 +28,12 @@ var _ = Describe("no-route property", func() {
 						"applications": []map[string]interface{}{
 							{
 								"name":     appName,
-								"no-start": true,
 								"no-route": true,
 							},
 						},
 					})
 
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 					Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 					Consistently(session).ShouldNot(Say("Mapping routes\\.\\.\\."))
 					Eventually(session).Should(Exit(0))
@@ -61,13 +60,12 @@ var _ = Describe("no-route property", func() {
 						"applications": []map[string]interface{}{
 							{
 								"name":     appName,
-								"no-start": true,
 								"no-route": true,
 							},
 						},
 					})
 
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 					Eventually(session).Should(Say("\\s+name:\\s+%s", appName))
 					Eventually(session).Should(Say("(?i)\\-\\s+%s.%s", appName, defaultSharedDomain()))
 					Eventually(session).Should(Say("Unmapping routes\\.\\.\\."))
@@ -87,7 +85,6 @@ var _ = Describe("no-route property", func() {
 					"applications": []map[string]interface{}{
 						{
 							"name":     appName,
-							"no-start": true,
 							"no-route": true,
 							"routes": []map[string]string{
 								map[string]string{
@@ -98,7 +95,7 @@ var _ = Describe("no-route property", func() {
 					},
 				})
 
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 				Eventually(session.Err).Should(Say("Application %s cannot use the combination of properties: no-route, routes", appName))
 				Eventually(session).Should(Exit(1))
 			})
@@ -153,8 +150,7 @@ var _ = Describe("no-route property", func() {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
 					"applications": []map[string]interface{}{
 						{
-							"name":     appName,
-							"no-start": true,
+							"name": appName,
 							"routes": []map[string]string{
 								map[string]string{
 									"route": "example.com",
@@ -164,7 +160,7 @@ var _ = Describe("no-route property", func() {
 					},
 				})
 
-				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-route")
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-route", "--no-start")
 				Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 				Eventually(session).Should(Exit(0))
 			})
