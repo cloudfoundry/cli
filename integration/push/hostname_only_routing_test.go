@@ -22,7 +22,7 @@ var _ = Describe("push with hostname", func() {
 		appName = helpers.NewAppName()
 	})
 
-	Context("when the default domain is a shared domain", func() {
+	Context("when the default domain is a HTTP domain", func() {
 		Context("when no host is provided / host defaults to app name", func() {
 			BeforeEach(func() {
 				route = fmt.Sprintf("%s.%s", strings.ToLower(appName), defaultSharedDomain())
@@ -152,6 +152,29 @@ var _ = Describe("push with hostname", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+		})
+	})
+
+	Context("when using a tcp domain", func() {
+		var (
+			domain     helpers.Domain
+			domainName string
+		)
+
+		BeforeEach(func() {
+			domainName = helpers.DomainName()
+			domain = helpers.NewDomain(organization, domainName)
+			domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+		})
+
+		AfterEach(func() {
+			domain.DeleteShared()
+		})
+
+		It("returns an error", func() {
+			session := helpers.CF(PushCommandName, appName, "--hostname", "I-dont-care", "-d", domainName, "--no-start")
+			Eventually(session.Err).Should(Say("The route is invalid: a hostname cannot be used with a TCP domain."))
+			Eventually(session).Should(Exit(1))
 		})
 	})
 })
