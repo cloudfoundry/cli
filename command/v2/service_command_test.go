@@ -43,7 +43,6 @@ var _ = Describe("service Command", func() {
 
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
-		fakeConfig.ExperimentalReturns(true)
 
 		cmd.RequiredArgs.ServiceInstance = "some-service-instance"
 	})
