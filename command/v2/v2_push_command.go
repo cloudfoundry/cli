@@ -218,6 +218,9 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	return nil
 }
 
+// GetCommandLineSettings generates a push CommandLineSettings object from the
+// command's command line flags. It also validates those settings, preventing
+// contradictory flags.
 func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSettings, error) {
 	err := cmd.validateArgs()
 	if err != nil {
@@ -420,13 +423,17 @@ func (cmd V2PushCommand) validateArgs() error {
 			Arg1: "--docker-image, -o",
 			Arg2: "--docker-username",
 		}
-	case cmd.PathToManifest != "" && cmd.NoManifest:
+	case cmd.Domain != "" && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{
-			Args: []string{"-f", "--no-manifest"},
+			Args: []string{"-d", "--no-route"},
 		}
 	case cmd.Hostname != "" && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--hostname", "--no-route"},
+		}
+	case cmd.PathToManifest != "" && cmd.NoManifest:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"-f", "--no-manifest"},
 		}
 	case cmd.NoHostname && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{

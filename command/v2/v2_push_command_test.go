@@ -847,13 +847,6 @@ var _ = Describe("v2-push Command", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			},
 
-			Entry("-o and -p",
-				func() {
-					cmd.DockerImage.Path = "some-docker-image"
-					cmd.AppPath = "some-directory-path"
-				},
-				translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
-
 			Entry("-f and --no-manifest",
 				func() {
 					cmd.PathToManifest = "/some/path.yml"
@@ -866,6 +859,13 @@ var _ = Describe("v2-push Command", func() {
 					cmd.DockerUsername = "some-docker-username"
 				},
 				translatableerror.RequiredFlagsError{Arg1: "--docker-image, -o", Arg2: "--docker-username"}),
+
+			Entry("-d and --no-route",
+				func() {
+					cmd.Domain = "some-domain"
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"-d", "--no-route"}}),
 
 			Entry("-o and -b",
 				func() {
@@ -887,6 +887,13 @@ var _ = Describe("v2-push Command", func() {
 					cmd.NoRoute = true
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--no-route"}}),
+
+			Entry("-o and -p",
+				func() {
+					cmd.DockerImage.Path = "some-docker-image"
+					cmd.AppPath = "some-directory-path"
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
 		)
 	})
 })

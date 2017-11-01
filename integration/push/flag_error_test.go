@@ -32,7 +32,7 @@ var _ = Describe("push flag combination errors", func() {
 			Eventually(session.Err).Should(Say(expectedError))
 			Eventually(session).Should(Exit(1))
 		},
-		PEntry("no-route and domain", "The following arguments cannot be used together: --no-hostname, --no-route", "--no-route", "-d", "some-domain"),
+		Entry("no-route and domain", "The following arguments cannot be used together: -d, --no-route", "--no-route", "-d", "some-domain"),
 		Entry("no-route and no-hostname", "The following arguments cannot be used together: --no-hostname, --no-route", "--no-route", "--no-hostname"),
 		Entry("no-route and hostname", "The following arguments cannot be used together: --hostname, --no-route", "--no-route", "--hostname", "some-hostname"),
 
