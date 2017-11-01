@@ -45,15 +45,15 @@ type V2PushCommand struct {
 	DockerUsername  string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	PathToManifest  flag.PathWithExistenceCheck `short:"f" description:"Path to manifest"`
 	HealthCheckType flag.HealthCheckType        `long:"health-check-type" short:"u" description:"Application health check type (Default: 'port', 'none' accepted for 'process', 'http' implies endpoint '/')"`
-	// Hostname             string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
-	Instances  flag.Instances              `short:"i" description:"Number of instances"`
-	DiskQuota  flag.Megabytes              `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	Memory     flag.Megabytes              `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
-	NoHostname bool                        `long:"no-hostname" description:"Map the root domain to this app"`
-	NoManifest bool                        `long:"no-manifest" description:"Ignore manifest file"`
-	NoRoute    bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
-	NoStart    bool                        `long:"no-start" description:"Do not start an app after pushing"`
-	AppPath    flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
+	Hostname        string                      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
+	Instances       flag.Instances              `short:"i" description:"Number of instances"`
+	DiskQuota       flag.Megabytes              `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
+	Memory          flag.Megabytes              `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
+	NoHostname      bool                        `long:"no-hostname" description:"Map the root domain to this app"`
+	NoManifest      bool                        `long:"no-manifest" description:"Ignore manifest file"`
+	NoRoute         bool                        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
+	NoStart         bool                        `long:"no-start" description:"Do not start an app after pushing"`
+	AppPath         flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
 	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
 	StackName           string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
@@ -241,23 +241,24 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	}
 
 	config := pushaction.CommandLineSettings{
-		Buildpack:          cmd.Buildpack.FilteredString,
-		Command:            cmd.Command.FilteredString,
-		CurrentDirectory:   pwd,
-		DiskQuota:          cmd.DiskQuota.Value,
-		DockerImage:        cmd.DockerImage.Path,
-		DockerUsername:     cmd.DockerUsername,
-		DockerPassword:     dockerPassword,
-		HealthCheckTimeout: cmd.HealthCheckTimeout,
-		HealthCheckType:    cmd.HealthCheckType.Type,
-		Instances:          cmd.Instances.NullInt,
-		Memory:             cmd.Memory.Value,
-		Name:               cmd.OptionalArgs.AppName,
-		NoHostname:         cmd.NoHostname,
-		NoRoute:            cmd.NoRoute,
-		ProvidedAppPath:    string(cmd.AppPath),
-		StackName:          cmd.StackName,
-		Domain:             cmd.Domain,
+		Buildpack:            cmd.Buildpack.FilteredString,
+		Command:              cmd.Command.FilteredString,
+		CurrentDirectory:     pwd,
+		DefaultRouteDomain:   cmd.Domain,
+		DefaultRouteHostname: cmd.Hostname,
+		DiskQuota:            cmd.DiskQuota.Value,
+		DockerImage:          cmd.DockerImage.Path,
+		DockerPassword:       dockerPassword,
+		DockerUsername:       cmd.DockerUsername,
+		HealthCheckTimeout:   cmd.HealthCheckTimeout,
+		HealthCheckType:      cmd.HealthCheckType.Type,
+		Instances:            cmd.Instances.NullInt,
+		Memory:               cmd.Memory.Value,
+		Name:                 cmd.OptionalArgs.AppName,
+		NoHostname:           cmd.NoHostname,
+		NoRoute:              cmd.NoRoute,
+		ProvidedAppPath:      string(cmd.AppPath),
+		StackName:            cmd.StackName,
 	}
 
 	log.Debugln("Command Line Settings:", config)
@@ -422,6 +423,10 @@ func (cmd V2PushCommand) validateArgs() error {
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"-f", "--no-manifest"},
+		}
+	case cmd.Hostname != "" && cmd.NoRoute:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--hostname", "--no-route"},
 		}
 	case cmd.NoHostname && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{

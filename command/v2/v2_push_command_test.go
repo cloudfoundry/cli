@@ -745,7 +745,17 @@ var _ = Describe("v2-push Command", func() {
 					})
 
 					It("sets NoHostname on the command line settings", func() {
-						Expect(settings.Domain).To(Equal("some-domain"))
+						Expect(settings.DefaultRouteDomain).To(Equal("some-domain"))
+					})
+				})
+
+				Context("when --hostname is given", func() {
+					BeforeEach(func() {
+						cmd.Hostname = "some-hostname"
+					})
+
+					It("sets NoHostname on the command line settings", func() {
+						Expect(settings.DefaultRouteHostname).To(Equal("some-hostname"))
 					})
 				})
 
@@ -863,6 +873,13 @@ var _ = Describe("v2-push Command", func() {
 					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
+
+			Entry("--hostname and --no-route",
+				func() {
+					cmd.Hostname = "po-tate-toe"
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--no-route"}}),
 
 			Entry("--no-hostname and --no-route",
 				func() {

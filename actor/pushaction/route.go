@@ -260,9 +260,16 @@ func (actor Actor) calculateDomain(manifestApp manifest.Application, orgGUID str
 }
 
 func (actor Actor) calculateHostname(manifestApp manifest.Application, domain v2action.Domain) (string, error) {
-	sanitizedAppName := actor.sanitizeApplicationName(manifestApp.Name)
+	hostname := manifestApp.Hostname
+	if hostname == "" {
+		hostname = manifestApp.Name
+	}
+
+	sanitizedAppName := actor.sanitizeApplicationName(hostname)
 
 	switch {
+	case manifestApp.Hostname != "" && domain.IsTCP():
+		return "", actionerror.HostnameWithTCPDomainError{}
 	case manifestApp.NoHostname && domain.IsShared():
 		return "", actionerror.NoHostnameAndSharedDomainError{}
 	case manifestApp.NoHostname:

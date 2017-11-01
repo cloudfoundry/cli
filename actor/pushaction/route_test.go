@@ -941,6 +941,59 @@ var _ = Describe("Routes", func() {
 			})
 		})
 
+		Context("the hostname is provided", func() {
+			BeforeEach(func() {
+				providedManifest.Hostname = "some HO_ST"
+			})
+
+			Context("when the domain is an HTTP domain", func() {
+				BeforeEach(func() {
+					domain.Type = constant.SharedDomain
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
+
+					// Assumes new route
+					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
+				})
+
+				It("it uses the provided hostname instead of the app name", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning", "get-route-warnings"))
+					Expect(defaultRoute).To(Equal(v2action.Route{
+						Domain:    domain,
+						Host:      "some-host",
+						SpaceGUID: spaceGUID,
+					}))
+
+					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{
+						Domain:    domain,
+						Host:      "some-host",
+						SpaceGUID: spaceGUID,
+					}))
+				})
+			})
+
+			Context("when the provided domain is an TCP domain", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.TCPRouterGroup
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
+				})
+
+				It("returns an error", func() {
+					Expect(executeErr).To(MatchError(actionerror.HostnameWithTCPDomainError{}))
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+				})
+			})
+		})
+
 		Context("when no hostname is requested", func() {
 			BeforeEach(func() {
 				providedManifest.NoHostname = true

@@ -9,23 +9,24 @@ import (
 )
 
 type CommandLineSettings struct {
-	Buildpack          types.FilteredString
-	Command            types.FilteredString
-	CurrentDirectory   string
-	DiskQuota          uint64
-	DockerImage        string
-	DockerPassword     string
-	DockerUsername     string
-	HealthCheckTimeout int
-	HealthCheckType    string
-	Instances          types.NullInt
-	Memory             uint64
-	Name               string
-	NoHostname         bool
-	NoRoute            bool
-	ProvidedAppPath    string
-	StackName          string
-	Domain             string
+	Buildpack            types.FilteredString
+	Command              types.FilteredString
+	CurrentDirectory     string
+	DefaultRouteDomain   string
+	DefaultRouteHostname string
+	DiskQuota            uint64
+	DockerImage          string
+	DockerPassword       string
+	DockerUsername       string
+	HealthCheckTimeout   int
+	HealthCheckType      string
+	Instances            types.NullInt
+	Memory               uint64
+	Name                 string
+	NoHostname           bool
+	NoRoute              bool
+	ProvidedAppPath      string
+	StackName            string
 }
 
 func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Application) manifest.Application {
@@ -35,6 +36,14 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 	if settings.Command.IsSet {
 		app.Command = settings.Command
+	}
+
+	if settings.DefaultRouteDomain != "" {
+		app.Domain = settings.DefaultRouteDomain
+	}
+
+	if settings.DefaultRouteHostname != "" {
+		app.Hostname = settings.DefaultRouteHostname
 	}
 
 	if settings.DiskQuota != 0 {
@@ -92,16 +101,12 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 		app.StackName = settings.StackName
 	}
 
-	if settings.Domain != "" {
-		app.Domain = settings.Domain
-	}
-
 	return app
 }
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%d', Provided App Path: '%s', Stack: '%s', Domain: '%s'",
+		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', Domain: '%s', Hostname: '%s'",
 		settings.Name,
 		settings.Buildpack.IsSet,
 		settings.Buildpack.Value,
@@ -117,7 +122,8 @@ func (settings CommandLineSettings) String() string {
 		settings.Memory,
 		settings.ProvidedAppPath,
 		settings.StackName,
-		settings.Domain,
+		settings.DefaultRouteDomain,
+		settings.DefaultRouteHostname,
 	)
 }
 

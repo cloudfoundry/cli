@@ -12,26 +12,27 @@ type Application struct {
 	Command        types.FilteredString
 	DiskQuota      types.NullByteSizeInMb
 	DockerImage    string
-	DockerUsername string
 	DockerPassword string
+	DockerUsername string
+	Domain         string
 	// EnvironmentVariables can be any valid json type (ie, strings not
 	// guaranteed, although CLI only ships strings).
 	EnvironmentVariables    map[string]string
 	HealthCheckHTTPEndpoint string
+	HealthCheckTimeout      int
 	// HealthCheckType attribute defines the number of seconds that is allocated
 	// for starting an application.
-	HealthCheckTimeout int
-	HealthCheckType    string
-	Instances          types.NullInt
-	Memory             types.NullByteSizeInMb
-	Name               string
-	Domain             string
-	NoHostname         bool
-	NoRoute            bool
-	Path               string
-	Routes             []string
-	Services           []string
-	StackName          string
+	HealthCheckType string
+	Hostname        string
+	Instances       types.NullInt
+	Memory          types.NullByteSizeInMb
+	Name            string
+	NoHostname      bool
+	NoRoute         bool
+	Path            string
+	Routes          []string
+	Services        []string
+	StackName       string
 }
 
 func (app Application) String() string {

@@ -2,72 +2,156 @@ package push
 
 import (
 	"fmt"
-	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("push with hostname", func() {
+	var (
+		appName string
+		route   string
+	)
+
+	BeforeEach(func() {
+		appName = helpers.NewAppName()
+	})
+
 	Context("when the default domain is a shared domain", func() {
-		DescribeTable("creates and maps the route as neccessary",
-			func(existingRoute bool, boundRoute bool, setup func(appName string, dir string) *Session) {
-				appName := helpers.NewAppName()
+		Context("when no host is provided / host defaults to app name", func() {
+			BeforeEach(func() {
+				route = fmt.Sprintf("%s.%s", strings.ToLower(appName), defaultSharedDomain())
+			})
 
-				if existingRoute {
-					session := helpers.CF("create-route", space, defaultSharedDomain(), "-n", appName)
-					Eventually(session).Should(Exit(0))
-				}
-
-				if boundRoute {
+			Context("when the default route does not exist", func() {
+				It("creates and maps the route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
-						// TODO: Add --no-start
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
 						Eventually(session).Should(Exit(0))
 					})
-				}
 
-				helpers.WithHelloWorldApp(func(dir string) {
-					session := setup(appName, dir)
-
-					Eventually(session).Should(Say("routes:"))
-					if existingRoute && boundRoute {
-						Eventually(session).Should(Say("(?i)%s.%s", appName, defaultSharedDomain()))
-					} else {
-						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
-					}
-					Eventually(session).Should(Say("Mapping routes..."))
-
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
 					Eventually(session).Should(Exit(0))
 				})
+			})
 
-				resp, err := http.Get(fmt.Sprintf("http://%s.%s", appName, defaultSharedDomain()))
-				Expect(err).ToNot(HaveOccurred())
-				Expect(resp.StatusCode).To(Equal(http.StatusOK))
-			},
+			Context("the default route exists and is unmapped", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
+				})
 
-			Entry("when the hostname is provided via the appName and route does not exist", false, false, func(appName string, dir string) *Session {
-				// TODO: Add --no-start
-				// TODO: Add --path
-				return helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
-			}),
+				It("maps the route", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Exit(0))
+					})
 
-			Entry("when the hostname is provided via the appName and the unbound route exists", true, false, func(appName string, dir string) *Session {
-				// TODO: Add --no-start
-				// TODO: Add --path
-				return helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
-			}),
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Exit(0))
+				})
+			})
 
-			Entry("when the hostname is provided via the appName and the bound route exists", true, true, func(appName string, dir string) *Session {
-				// TODO: Add --no-start
-				// TODO: Add --path
-				return helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName)
-			}),
-		)
+			Context("when the default route is mapped to the application", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")).Should(Exit(0))
+					})
+				})
+
+				It("does nothing", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\s+%s", route))
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
+
+		Context("when the host is provided", func() {
+			var hostname string
+
+			BeforeEach(func() {
+				hostname = strings.ToLower(helpers.NewAppName())
+				route = fmt.Sprintf("%s.%s", hostname, defaultSharedDomain())
+			})
+
+			Context("when the default route does not exist", func() {
+				It("creates and maps the route", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("the default route exists and is unmapped", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
+				})
+
+				It("maps the route", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\+\\s+%s", route))
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the default route is mapped to the application", func() {
+				BeforeEach(func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")).Should(Exit(0))
+					})
+				})
+
+				It("does nothing", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
+						Eventually(session).Should(Say("routes:"))
+						Eventually(session).Should(Say("(?i)\\s+%s", route))
+						Eventually(session).Should(Exit(0))
+					})
+
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("routes:\\s+%s", route))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+		})
 	})
 })

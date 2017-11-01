@@ -123,6 +123,11 @@ var _ = Describe("HandleError", func() {
 			translatableerror.NoMatchingDomainError{Route: "some-route.com"},
 		),
 
+		Entry("actionerror.HostnameWithTCPDomainError -> HostnameWithTCPDomainError",
+			actionerror.HostnameWithTCPDomainError{},
+			translatableerror.HostnameWithTCPDomainError{},
+		),
+
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
 			uaa.BadCredentialsError{},
 			translatableerror.BadCredentialsError{},

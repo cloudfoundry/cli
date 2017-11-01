@@ -1,6 +1,8 @@
 package push
 
 import (
+	"io/ioutil"
+	"os"
 	"regexp"
 	"testing"
 	"time"
@@ -23,6 +25,7 @@ var (
 	organization       string
 	space              string
 	foundDefaultDomain string
+	realDir            string
 
 	// Per Test Level
 	homeDir string
@@ -53,12 +56,17 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.DestroyHomeDir(homeDir)
 
 	helpers.EnableDockerSupport()
+
+	var err error
+	realDir, err = ioutil.TempDir("", "push-real-dir")
+	Expect(err).ToNot(HaveOccurred())
 })
 
 var _ = SynchronizedAfterSuite(func() {
 	helpers.SetAPI()
 	helpers.LoginCF()
 	helpers.QuickDeleteOrg(organization)
+	Expect(os.RemoveAll(realDir)).ToNot(HaveOccurred())
 }, func() {
 })
 

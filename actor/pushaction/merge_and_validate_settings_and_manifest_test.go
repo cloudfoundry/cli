@@ -340,6 +340,19 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				AppName:    "some-name-1",
 				Properties: []string{"no-hostname", "no-route"},
 			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				DefaultRouteHostname: "potato",
+				NoRoute:              true,
+			},
+			[]manifest.Application{{
+				Name:        "some-name-1",
+				DockerImage: "some-docker-image",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"hostname", "no-route"},
+			}),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{
 				HealthCheckType: "port",
