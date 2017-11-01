@@ -47,6 +47,12 @@ var _ = Describe("v3-create-app command", func() {
 		})
 	})
 
+	It("displays the experimental warning", func() {
+		session := helpers.CF("v3-create-app", appName)
+		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Exit())
+	})
+
 	Context("when app type is not supported", func() {
 		It("tells the user that the app type is incorrect, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-create-app", appName, "--app-type", "unknown-app-type")

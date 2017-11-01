@@ -50,6 +50,9 @@ func (cmd *V3StartCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd V3StartCommand) Execute(args []string) error {
+	cmd.UI.DisplayText(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err

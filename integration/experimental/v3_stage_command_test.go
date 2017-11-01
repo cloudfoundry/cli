@@ -62,6 +62,12 @@ var _ = Describe("v3-stage command", func() {
 		})
 	})
 
+	It("displays the experimental warning", func() {
+		session := helpers.CF("v3-stage", appName, "--package-guid", "some-package-guid")
+		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Exit())
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

@@ -51,6 +51,9 @@ func (cmd *V3RestartAppInstanceCommand) Setup(config command.Config, ui command.
 }
 
 func (cmd V3RestartAppInstanceCommand) Execute(args []string) error {
+	cmd.UI.DisplayText(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
 		return err

@@ -86,6 +86,10 @@ var _ = Describe("v3-scale Command", func() {
 				MinimumVersion: ccversion.MinVersionV3,
 			}))
 		})
+
+		It("displays the experimental warning", func() {
+			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		})
 	})
 
 	Context("when checking target fails", func() {

@@ -58,6 +58,12 @@ var _ = Describe("v3-restart-app-instance command", func() {
 		})
 	})
 
+	It("displays the experimental warning", func() {
+		session := helpers.CF("v3-restart-app-instance", appName, "1")
+		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Exit())
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

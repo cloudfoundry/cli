@@ -66,6 +66,12 @@ var _ = Describe("v3-push command", func() {
 		})
 	})
 
+	It("displays the experimental warning", func() {
+		session := helpers.CF("v3-push", appName)
+		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
+		Eventually(session).Should(Exit())
+	})
+
 	Context("when the -b flag is not given an arg", func() {
 		It("tells the user that the flag requires an arg, prints help text, and exits 1", func() {
 			session := helpers.CF("v3-push", appName, "-b")
