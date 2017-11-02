@@ -39,7 +39,7 @@ var _ = Describe("SSH Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			executeErr = actor.ExecuteSecureShell(sshOptions)
+			executeErr = actor.ExecuteSecureShell(fakeSecureShellClient, sshOptions)
 		})
 
 		AfterEach(func() {

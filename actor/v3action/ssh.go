@@ -4,52 +4,53 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 )
 
-type SSHOptions struct {
-	Commands              []string
-	Forward               []string
-	LocalPortForwardSpecs []sharedaction.LocalPortForward
-	SkipHostValidation    bool
-	SkipRemoteExecution   bool
-	TTYOption             sharedaction.TTYOption
+type SSHAuthentication struct {
+	Endpoint           string
+	HostKeyFingerprint string
+	Passcode           string
+	Username           string
 }
 
-func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint, sshOptions SSHOptions) (Warnings, error) {
+// GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex returns
+// back the SSH authentication information for the SSH session.
+func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(
+	appName string, spaceGUID string, processType string, processIndex uint,
+) (SSHAuthentication, Warnings, error) {
 	endpoint := actor.CloudControllerClient.AppSSHEndpoint()
 	if endpoint == "" {
-		return nil, actionerror.SSHEndpointNotSetError{}
+		return SSHAuthentication{}, nil, actionerror.SSHEndpointNotSetError{}
 	}
 
 	fingerprint := actor.CloudControllerClient.AppSSHHostKeyFingerprint()
 	if fingerprint == "" {
-		return nil, actionerror.SSHHostKeyFingerprintNotSetError{}
+		return SSHAuthentication{}, nil, actionerror.SSHHostKeyFingerprintNotSetError{}
 	}
 
 	passcode, err := actor.UAAClient.GetSSHPasscode(actor.Config.AccessToken(), actor.Config.SSHOAuthClient())
 	if err != nil {
-		return Warnings{}, err
+		return SSHAuthentication{}, Warnings{}, err
 	}
 
 	appSummary, warnings, err := actor.GetApplicationSummaryByNameAndSpace(appName, spaceGUID)
 	if err != nil {
-		return warnings, err
+		return SSHAuthentication{}, warnings, err
 	}
 
 	var processSummary ProcessSummary
-	for _, pS := range appSummary.ProcessSummaries {
-		if pS.Type == processType {
-			processSummary = pS
+	for _, appProcessSummary := range appSummary.ProcessSummaries {
+		if appProcessSummary.Type == processType {
+			processSummary = appProcessSummary
 			break
 		}
 	}
 	if processSummary.GUID == "" {
-		return warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
+		return SSHAuthentication{}, warnings, actionerror.ProcessNotFoundError{ProcessType: processType}
 	}
 
 	if !appSummary.Application.Started() {
-		return warnings, actionerror.ApplicationNotStartedError{Name: appName}
+		return SSHAuthentication{}, warnings, actionerror.ApplicationNotStartedError{Name: appName}
 	}
 
 	var processInstance Instance
@@ -61,25 +62,18 @@ func (actor Actor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(a
 	}
 
 	if processInstance == (Instance{}) {
-		return warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
+		return SSHAuthentication{}, warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
 	}
 
 	if !processInstance.Running() {
-		return warnings, actionerror.ProcessInstanceNotRunningError{ProcessType: processType,
+		return SSHAuthentication{}, warnings, actionerror.ProcessInstanceNotRunningError{ProcessType: processType,
 			InstanceIndex: processIndex}
 	}
 
-	err = actor.SharedActor.ExecuteSecureShell(sharedaction.SSHOptions{
-		Commands:              sshOptions.Commands,
-		Endpoint:              endpoint,
-		HostKeyFingerprint:    fingerprint,
-		LocalPortForwardSpecs: sshOptions.LocalPortForwardSpecs,
-		Passcode:              passcode,
-		SkipHostValidation:    sshOptions.SkipHostValidation,
-		SkipRemoteExecution:   sshOptions.SkipRemoteExecution,
-		TTYOption:             sshOptions.TTYOption,
-		Username:              fmt.Sprintf("cf:%s/%d", processSummary.GUID, processIndex),
-	})
-
-	return warnings, err
+	return SSHAuthentication{
+		Endpoint:           endpoint,
+		HostKeyFingerprint: fingerprint,
+		Passcode:           passcode,
+		Username:           fmt.Sprintf("cf:%s/%d", processSummary.GUID, processIndex),
+	}, warnings, err
 }

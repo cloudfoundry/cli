@@ -5,7 +5,6 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/actor/sharedaction"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -22,8 +21,6 @@ var _ = Describe("SSH Actions", func() {
 		fakeUAAClient             *v3actionfakes.FakeUAAClient
 		executeErr                error
 		warnings                  Warnings
-
-		forwardSpecs []sharedaction.LocalPortForward
 	)
 
 	BeforeEach(func() {
@@ -32,27 +29,18 @@ var _ = Describe("SSH Actions", func() {
 		fakeSharedActor = new(v3actionfakes.FakeSharedActor)
 		fakeUAAClient = new(v3actionfakes.FakeUAAClient)
 		actor = NewActor(fakeCloudControllerClient, fakeConfig, fakeSharedActor, fakeUAAClient)
-
-		forwardSpecs = []sharedaction.LocalPortForward{
-			{LocalAddress: "localhost:8888", RemoteAddress: "remote:4444"},
-			{LocalAddress: "localhost:7777", RemoteAddress: "remote:3333"},
-		}
 	})
 
-	Describe("ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex", func() {
+	Describe("GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex", func() {
+		var sshAuth SSHAuthentication
+
 		BeforeEach(func() {
 			fakeConfig.AccessTokenReturns("some-access-token")
 			fakeConfig.SSHOAuthClientReturns("some-access-oauth-client")
 		})
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex("some-app", "some-space-guid", "some-process-type", 0, SSHOptions{
-				Commands:              []string{"some-command"},
-				LocalPortForwardSpecs: forwardSpecs,
-				TTYOption:             sharedaction.RequestTTYForce,
-				SkipHostValidation:    true,
-				SkipRemoteExecution:   true,
-			})
+			sshAuth, warnings, executeErr = actor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex("some-app", "some-space-guid", "some-process-type", 0)
 		})
 
 		Context("when the app ssh endpoint is empty", func() {
@@ -165,33 +153,16 @@ var _ = Describe("SSH Actions", func() {
 							fakeCloudControllerClient.GetProcessInstancesReturns([]ccv3.Instance{{State: "RUNNING", Index: 0}}, ccv3.Warnings{"some-instance-warnings"}, nil)
 						})
 
-						Context("when starting the secure session fails", func() {
-							BeforeEach(func() {
-								fakeSharedActor.ExecuteSecureShellReturns(errors.New("some-ssh-connection-error"))
-							})
-
-							It("returns all warnings and the error", func() {
-								Expect(executeErr).To(MatchError("some-ssh-connection-error"))
-								Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings", "some-instance-warnings"))
-							})
-						})
-
 						Context("when starting the secure session succeeds", func() {
 							It("returns all warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 								Expect(warnings).To(ConsistOf("some-app-warnings", "some-process-warnings", "some-instance-warnings"))
 
-								Expect(fakeSharedActor.ExecuteSecureShellCallCount()).To(Equal(1))
-								Expect(fakeSharedActor.ExecuteSecureShellArgsForCall(0)).To(Equal(sharedaction.SSHOptions{
-									Commands:              []string{"some-command"},
-									Endpoint:              "some-app-ssh-endpoint",
-									HostKeyFingerprint:    "some-app-ssh-fingerprint",
-									LocalPortForwardSpecs: forwardSpecs,
-									Passcode:              "some-ssh-passcode",
-									SkipHostValidation:    true,
-									SkipRemoteExecution:   true,
-									TTYOption:             sharedaction.RequestTTYForce,
-									Username:              "cf:some-process-guid/0",
+								Expect(sshAuth).To(Equal(SSHAuthentication{
+									Endpoint:           "some-app-ssh-endpoint",
+									HostKeyFingerprint: "some-app-ssh-fingerprint",
+									Passcode:           "some-ssh-passcode",
+									Username:           "cf:some-process-guid/0",
 								}))
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))

@@ -18,22 +18,23 @@ type FakeV3SSHActor struct {
 	cloudControllerAPIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
-	ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexStub        func(appName string, spaceGUID string, processType string, processIndex uint, sshOptions v3action.SSHOptions) (v3action.Warnings, error)
-	executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex       sync.RWMutex
-	executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall []struct {
+	GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub        func(appName string, spaceGUID string, processType string, processIndex uint) (v3action.SSHAuthentication, v3action.Warnings, error)
+	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex       sync.RWMutex
+	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall []struct {
 		appName      string
 		spaceGUID    string
 		processType  string
 		processIndex uint
-		sshOptions   v3action.SSHOptions
 	}
-	executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns struct {
-		result1 v3action.Warnings
-		result2 error
+	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns struct {
+		result1 v3action.SSHAuthentication
+		result2 v3action.Warnings
+		result3 error
 	}
-	executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall map[int]struct {
-		result1 v3action.Warnings
-		result2 error
+	getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall map[int]struct {
+		result1 v3action.SSHAuthentication
+		result2 v3action.Warnings
+		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -79,59 +80,61 @@ func (fake *FakeV3SSHActor) CloudControllerAPIVersionReturnsOnCall(i int, result
 	}{result1}
 }
 
-func (fake *FakeV3SSHActor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint, sshOptions v3action.SSHOptions) (v3action.Warnings, error) {
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.Lock()
-	ret, specificReturn := fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[len(fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall)]
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall = append(fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall, struct {
+func (fake *FakeV3SSHActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint) (v3action.SSHAuthentication, v3action.Warnings, error) {
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.Lock()
+	ret, specificReturn := fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[len(fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall)]
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall = append(fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall, struct {
 		appName      string
 		spaceGUID    string
 		processType  string
 		processIndex uint
-		sshOptions   v3action.SSHOptions
-	}{appName, spaceGUID, processType, processIndex, sshOptions})
-	fake.recordInvocation("ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex", []interface{}{appName, spaceGUID, processType, processIndex, sshOptions})
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.Unlock()
-	if fake.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexStub != nil {
-		return fake.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexStub(appName, spaceGUID, processType, processIndex, sshOptions)
+	}{appName, spaceGUID, processType, processIndex})
+	fake.recordInvocation("GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex", []interface{}{appName, spaceGUID, processType, processIndex})
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.Unlock()
+	if fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub != nil {
+		return fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub(appName, spaceGUID, processType, processIndex)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1, ret.result2, ret.result3
 	}
-	return fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns.result1, fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns.result2
+	return fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns.result1, fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns.result2, fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns.result3
 }
 
-func (fake *FakeV3SSHActor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexCallCount() int {
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
-	defer fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
-	return len(fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall)
+func (fake *FakeV3SSHActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexCallCount() int {
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
+	defer fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
+	return len(fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall)
 }
 
-func (fake *FakeV3SSHActor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall(i int) (string, string, string, uint, v3action.SSHOptions) {
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
-	defer fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
-	return fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].appName, fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].spaceGUID, fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].processType, fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].processIndex, fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].sshOptions
+func (fake *FakeV3SSHActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall(i int) (string, string, string, uint) {
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
+	defer fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
+	return fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].appName, fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].spaceGUID, fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].processType, fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexArgsForCall[i].processIndex
 }
 
-func (fake *FakeV3SSHActor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns(result1 v3action.Warnings, result2 error) {
-	fake.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexStub = nil
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturns = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
+func (fake *FakeV3SSHActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns(result1 v3action.SSHAuthentication, result2 v3action.Warnings, result3 error) {
+	fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub = nil
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturns = struct {
+		result1 v3action.SSHAuthentication
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
-func (fake *FakeV3SSHActor) ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall(i int, result1 v3action.Warnings, result2 error) {
-	fake.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndexStub = nil
-	if fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall == nil {
-		fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall = make(map[int]struct {
-			result1 v3action.Warnings
-			result2 error
+func (fake *FakeV3SSHActor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall(i int, result1 v3action.SSHAuthentication, result2 v3action.Warnings, result3 error) {
+	fake.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexStub = nil
+	if fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall == nil {
+		fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall = make(map[int]struct {
+			result1 v3action.SSHAuthentication
+			result2 v3action.Warnings
+			result3 error
 		})
 	}
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[i] = struct {
-		result1 v3action.Warnings
-		result2 error
-	}{result1, result2}
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexReturnsOnCall[i] = struct {
+		result1 v3action.SSHAuthentication
+		result2 v3action.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeV3SSHActor) Invocations() map[string][][]interface{} {
@@ -139,8 +142,8 @@ func (fake *FakeV3SSHActor) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.cloudControllerAPIVersionMutex.RLock()
 	defer fake.cloudControllerAPIVersionMutex.RUnlock()
-	fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
-	defer fake.executeSecureShellByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
+	fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RLock()
+	defer fake.getSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndexMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

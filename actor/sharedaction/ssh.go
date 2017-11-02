@@ -25,22 +25,22 @@ type SSHOptions struct {
 	LocalPortForwardSpecs []LocalPortForward
 }
 
-func (actor Actor) ExecuteSecureShell(sshOptions SSHOptions) error {
-	err := actor.SecureShellClient.Connect(sshOptions.Username, sshOptions.Passcode, sshOptions.Endpoint, sshOptions.HostKeyFingerprint, false)
-	defer actor.SecureShellClient.Close()
+func (actor Actor) ExecuteSecureShell(sshClient SecureShellClient, sshOptions SSHOptions) error {
+	err := sshClient.Connect(sshOptions.Username, sshOptions.Passcode, sshOptions.Endpoint, sshOptions.HostKeyFingerprint, false)
+	defer sshClient.Close()
 	if err != nil {
 		return err
 	}
 
-	err = actor.SecureShellClient.LocalPortForward(convertActorToSSHPackageForwardingSpecs(sshOptions.LocalPortForwardSpecs))
+	err = sshClient.LocalPortForward(convertActorToSSHPackageForwardingSpecs(sshOptions.LocalPortForwardSpecs))
 	if err != nil {
 		return err
 	}
 
 	if sshOptions.SkipRemoteExecution {
-		err = actor.SecureShellClient.Wait()
+		err = sshClient.Wait()
 	} else {
-		err = actor.SecureShellClient.InteractiveSession(sshOptions.Commands, clissh.TTYRequest(sshOptions.TTYOption))
+		err = sshClient.InteractiveSession(sshOptions.Commands, clissh.TTYRequest(sshOptions.TTYOption))
 	}
 	return err
 }

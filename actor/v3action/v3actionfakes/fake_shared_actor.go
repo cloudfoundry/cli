@@ -63,17 +63,6 @@ type FakeSharedActor struct {
 		result1 string
 		result2 error
 	}
-	ExecuteSecureShellStub        func(sshOptions sharedaction.SSHOptions) error
-	executeSecureShellMutex       sync.RWMutex
-	executeSecureShellArgsForCall []struct {
-		sshOptions sharedaction.SSHOptions
-	}
-	executeSecureShellReturns struct {
-		result1 error
-	}
-	executeSecureShellReturnsOnCall map[int]struct {
-		result1 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -294,54 +283,6 @@ func (fake *FakeSharedActor) ZipDirectoryResourcesReturnsOnCall(i int, result1 s
 	}{result1, result2}
 }
 
-func (fake *FakeSharedActor) ExecuteSecureShell(sshOptions sharedaction.SSHOptions) error {
-	fake.executeSecureShellMutex.Lock()
-	ret, specificReturn := fake.executeSecureShellReturnsOnCall[len(fake.executeSecureShellArgsForCall)]
-	fake.executeSecureShellArgsForCall = append(fake.executeSecureShellArgsForCall, struct {
-		sshOptions sharedaction.SSHOptions
-	}{sshOptions})
-	fake.recordInvocation("ExecuteSecureShell", []interface{}{sshOptions})
-	fake.executeSecureShellMutex.Unlock()
-	if fake.ExecuteSecureShellStub != nil {
-		return fake.ExecuteSecureShellStub(sshOptions)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.executeSecureShellReturns.result1
-}
-
-func (fake *FakeSharedActor) ExecuteSecureShellCallCount() int {
-	fake.executeSecureShellMutex.RLock()
-	defer fake.executeSecureShellMutex.RUnlock()
-	return len(fake.executeSecureShellArgsForCall)
-}
-
-func (fake *FakeSharedActor) ExecuteSecureShellArgsForCall(i int) sharedaction.SSHOptions {
-	fake.executeSecureShellMutex.RLock()
-	defer fake.executeSecureShellMutex.RUnlock()
-	return fake.executeSecureShellArgsForCall[i].sshOptions
-}
-
-func (fake *FakeSharedActor) ExecuteSecureShellReturns(result1 error) {
-	fake.ExecuteSecureShellStub = nil
-	fake.executeSecureShellReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeSharedActor) ExecuteSecureShellReturnsOnCall(i int, result1 error) {
-	fake.ExecuteSecureShellStub = nil
-	if fake.executeSecureShellReturnsOnCall == nil {
-		fake.executeSecureShellReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.executeSecureShellReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -353,8 +294,6 @@ func (fake *FakeSharedActor) Invocations() map[string][][]interface{} {
 	defer fake.zipArchiveResourcesMutex.RUnlock()
 	fake.zipDirectoryResourcesMutex.RLock()
 	defer fake.zipDirectoryResourcesMutex.RUnlock()
-	fake.executeSecureShellMutex.RLock()
-	defer fake.executeSecureShellMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -9,5 +9,4 @@ type SharedActor interface {
 	GatherDirectoryResources(sourceDir string) ([]sharedaction.Resource, error)
 	ZipArchiveResources(sourceArchivePath string, filesToInclude []sharedaction.Resource) (string, error)
 	ZipDirectoryResources(sourceDir string, filesToInclude []sharedaction.Resource) (string, error)
-	ExecuteSecureShell(sshOptions sharedaction.SSHOptions) error
 }

@@ -14,11 +14,17 @@ import (
 	"code.cloudfoundry.org/cli/util/clissh"
 )
 
+//go:generate counterfeiter . SSHActor
+
+type SSHActor interface {
+	ExecuteSecureShell(sshClient sharedaction.SecureShellClient, sshOptions sharedaction.SSHOptions) error
+}
+
 //go:generate counterfeiter . V3SSHActor
 
 type V3SSHActor interface {
 	CloudControllerAPIVersion() string
-	ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint, sshOptions v3action.SSHOptions) (v3action.Warnings, error)
+	GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(appName string, spaceGUID string, processType string, processIndex uint) (v3action.SSHAuthentication, v3action.Warnings, error)
 }
 
 type V3SSHCommand struct {
@@ -40,13 +46,16 @@ type V3SSHCommand struct {
 	Config      command.Config
 	SharedActor command.SharedActor
 	Actor       V3SSHActor
+	SSHActor    SSHActor
+	SSHClient   *clissh.SecureShell
 }
 
 func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config, clissh.NewDefaultSecureShell(ui.GetIn(), ui.GetOut(), ui.GetErr()))
+	sharedActor := sharedaction.NewActor(config, nil)
 	cmd.SharedActor = sharedActor
+	cmd.SSHActor = sharedActor
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {
@@ -58,6 +67,8 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 	}
 
 	cmd.Actor = v3action.NewActor(ccClient, config, sharedActor, uaaClient)
+
+	cmd.SSHClient = clissh.NewDefaultSecureShell(ui.GetIn(), ui.GetOut(), ui.GetErr())
 
 	return nil
 }
@@ -76,7 +87,7 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 		return shared.HandleError(err)
 	}
 
-	ttyOption, err := cmd.evaluateTTYOption()
+	ttyOption, err := cmd.EvaluateTTYOption()
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -90,14 +101,30 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 		forwardSpecs = append(forwardSpecs, sharedaction.LocalPortForward(spec))
 	}
 
-	warnings, err := cmd.Actor.ExecuteSecureShellByApplicationNameSpaceProcessTypeAndIndex(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.ProcessType, cmd.ProcessIndex, v3action.SSHOptions{
-		Commands:              cmd.Commands,
-		LocalPortForwardSpecs: forwardSpecs,
-		SkipHostValidation:    cmd.SkipHostValidation,
-		SkipRemoteExecution:   cmd.SkipRemoteExecution,
-		TTYOption:             ttyOption,
-	})
+	sshAuth, warnings, err := cmd.Actor.GetSecureShellConfigurationByApplicationNameSpaceProcessTypeAndIndex(
+		cmd.RequiredArgs.AppName,
+		cmd.Config.TargetedSpace().GUID,
+		cmd.ProcessType,
+		cmd.ProcessIndex,
+	)
 	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.HandleError(err)
+	}
+
+	err = cmd.SSHActor.ExecuteSecureShell(
+		cmd.SSHClient,
+		sharedaction.SSHOptions{
+			Commands:              cmd.Commands,
+			Endpoint:              sshAuth.Endpoint,
+			HostKeyFingerprint:    sshAuth.HostKeyFingerprint,
+			LocalPortForwardSpecs: forwardSpecs,
+			Passcode:              sshAuth.Passcode,
+			SkipHostValidation:    cmd.SkipHostValidation,
+			SkipRemoteExecution:   cmd.SkipRemoteExecution,
+			TTYOption:             ttyOption,
+			Username:              sshAuth.Username,
+		})
 	if err != nil {
 		return shared.HandleError(err)
 	}
@@ -109,8 +136,9 @@ func (cmd V3SSHCommand) parseForwardSpecs() ([]sharedaction.LocalPortForward, er
 	return nil, nil
 }
 
-// tty options are mutually exclusive
-func (cmd V3SSHCommand) evaluateTTYOption() (sharedaction.TTYOption, error) {
+// EvaluateTTYOption determines which TTY options are mutually exclusive and
+// returns an error accordingly.
+func (cmd V3SSHCommand) EvaluateTTYOption() (sharedaction.TTYOption, error) {
 	var count int
 
 	option := sharedaction.RequestTTYAuto
