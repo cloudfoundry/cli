@@ -49,7 +49,7 @@ type SpaceCommand struct {
 func (cmd *SpaceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor(config, nil)
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {

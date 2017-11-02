@@ -34,7 +34,7 @@ type V3StopCommand struct {
 func (cmd *V3StopCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config, nil)
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, _, err := shared.NewClients(config, ui, true)
 	if err != nil {

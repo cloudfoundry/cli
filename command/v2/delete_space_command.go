@@ -29,7 +29,7 @@ type DeleteSpaceCommand struct {
 func (cmd *DeleteSpaceCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.Config = config
 	cmd.UI = ui
-	cmd.SharedActor = sharedaction.NewActor(config, nil)
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {

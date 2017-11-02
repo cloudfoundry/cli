@@ -37,7 +37,7 @@ type NetworkPoliciesCommand struct {
 func (cmd *NetworkPoliciesCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config, nil)
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	client, uaa, err := shared.NewClients(config, ui, true)
 	if err != nil {

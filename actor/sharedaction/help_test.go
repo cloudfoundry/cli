@@ -35,7 +35,7 @@ var _ = Describe("Help Actions", func() {
 	var actor *Actor
 
 	BeforeEach(func() {
-		actor = NewActor(&sharedactionfakes.FakeConfig{}, nil)
+		actor = NewActor(&sharedactionfakes.FakeConfig{})
 	})
 
 	Describe("CommandInfoByName", func() {

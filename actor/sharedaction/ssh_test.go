@@ -20,7 +20,7 @@ var _ = Describe("SSH Actions", func() {
 	BeforeEach(func() {
 		fakeSecureShellClient = new(sharedactionfakes.FakeSecureShellClient)
 		fakeConfig = new(sharedactionfakes.FakeConfig)
-		actor = NewActor(fakeConfig, fakeSecureShellClient)
+		actor = NewActor(fakeConfig)
 	})
 
 	Describe("ExecuteSecureShell", func() {

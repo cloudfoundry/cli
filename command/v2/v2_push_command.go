@@ -78,7 +78,7 @@ type V2PushCommand struct {
 func (cmd *V2PushCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config, nil)
+	sharedActor := sharedaction.NewActor(config)
 
 	ccClient, uaaClient, err := shared.NewClients(config, ui, true)
 	if err != nil {

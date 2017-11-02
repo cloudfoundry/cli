@@ -36,7 +36,7 @@ type TerminateTaskCommand struct {
 func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	cmd.SharedActor = sharedaction.NewActor(config, nil)
+	cmd.SharedActor = sharedaction.NewActor(config)
 
 	client, _, err := shared.NewClients(config, ui, true)
 	if err != nil {

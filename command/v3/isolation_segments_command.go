@@ -34,7 +34,7 @@ type IsolationSegmentsCommand struct {
 func (cmd *IsolationSegmentsCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config, nil)
+	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 
 	client, _, err := shared.NewClients(config, ui, true)

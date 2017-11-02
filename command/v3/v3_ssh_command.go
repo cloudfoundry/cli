@@ -53,7 +53,7 @@ type V3SSHCommand struct {
 func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
-	sharedActor := sharedaction.NewActor(config, nil)
+	sharedActor := sharedaction.NewActor(config)
 	cmd.SharedActor = sharedActor
 	cmd.SSHActor = sharedActor
 

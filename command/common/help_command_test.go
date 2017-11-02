@@ -377,7 +377,7 @@ var _ = Describe("help Command", func() {
 				CommandName: "",
 			}
 			cmd.AllCommands = false
-			cmd.Actor = sharedaction.NewActor(nil, nil)
+			cmd.Actor = sharedaction.NewActor(nil)
 		})
 
 		It("returns a list of only the common commands", func() {
@@ -479,7 +479,7 @@ var _ = Describe("help Command", func() {
 				}
 				cmd.AllCommands = true
 
-				cmd.Actor = sharedaction.NewActor(nil, nil)
+				cmd.Actor = sharedaction.NewActor(nil)
 				fakeConfig.PluginsReturns([]configv3.Plugin{
 					{
 						Name: "Diego-Enabler",
