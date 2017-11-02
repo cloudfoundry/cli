@@ -1,7 +1,7 @@
 // Package v3action contains the business logic for the commands/v3 package
 package v3action
 
-// This is used for sorting.
+// SortOrder is used for sorting.
 type SortOrder string
 
 const (
