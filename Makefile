@@ -54,6 +54,9 @@ integration-cleanup :
 integration-experimental : build integration-cleanup
 	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/experimental
 
+integration-global : build integration-cleanup
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
+
 integration-isolated : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated
 
