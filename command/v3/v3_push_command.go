@@ -120,7 +120,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -137,49 +137,49 @@ func (cmd V3PushCommand) Execute(args []string) error {
 	if _, ok := err.(actionerror.ApplicationNotFoundError); ok {
 		app, err = cmd.createApplication(user.Name)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	} else if err != nil {
-		return shared.HandleError(err)
+		return err
 	} else {
 		app, err = cmd.updateApplication(user.Name, app.GUID)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 
 	pkg, err := cmd.uploadPackage()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	dropletGUID, err := cmd.stagePackage(pkg, user.Name)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if app.Started() {
 		err = cmd.stopApplication(app.GUID, user.Name)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 
 	err = cmd.setApplicationDroplet(dropletGUID, user.Name)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if !cmd.NoRoute {
 		err = cmd.createAndMapRoutes(app)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 
 	err = cmd.startApplication(app.GUID, user.Name)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayText("Waiting for app to start...")
@@ -208,7 +208,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 			}
 		}
 
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{

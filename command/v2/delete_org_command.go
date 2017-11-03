@@ -44,7 +44,7 @@ func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd *DeleteOrgCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -80,7 +80,7 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 				"OrgName": cmd.RequiredArgs.Organization,
 			})
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

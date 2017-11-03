@@ -56,7 +56,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
@@ -74,7 +74,7 @@ func (cmd DisableOrgIsolationCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

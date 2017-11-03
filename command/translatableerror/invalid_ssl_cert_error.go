@@ -1,7 +1,7 @@
 package translatableerror
 
 type InvalidSSLCertError struct {
-	API string
+	URL string
 }
 
 func (InvalidSSLCertError) Error() string {
@@ -10,6 +10,6 @@ func (InvalidSSLCertError) Error() string {
 
 func (e InvalidSSLCertError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"API": e.API,
+		"API": e.URL,
 	})
 }

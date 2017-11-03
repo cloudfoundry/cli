@@ -69,7 +69,7 @@ func (cmd *OrgCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd OrgCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if cmd.GUID {
@@ -83,7 +83,7 @@ func (cmd OrgCommand) displayOrgGUID() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayText(org.GUID)
@@ -94,7 +94,7 @@ func (cmd OrgCommand) displayOrgGUID() error {
 func (cmd OrgCommand) displayOrgSummary() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor(
@@ -108,7 +108,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 	orgSummary, warnings, err := cmd.Actor.GetOrganizationSummaryByName(cmd.RequiredArgs.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	table := [][]string{
@@ -124,7 +124,7 @@ func (cmd OrgCommand) displayOrgSummary() error {
 			isolationSegments, v3Warnings, err := cmd.ActorV3.GetIsolationSegmentsByOrganization(orgSummary.GUID)
 			cmd.UI.DisplayWarnings(v3Warnings)
 			if err != nil {
-				return shared.HandleError(err)
+				return err
 			}
 
 			isolationSegmentNames := []string{}

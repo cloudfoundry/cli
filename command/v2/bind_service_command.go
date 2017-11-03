@@ -46,7 +46,7 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 func (cmd BindServiceCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -73,7 +73,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 			cmd.UI.DisplayOK()
 			return nil
 		}
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

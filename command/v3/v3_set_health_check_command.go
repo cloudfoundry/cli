@@ -61,12 +61,12 @@ func (cmd V3SetHealthCheckCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Updating health check type for app {{.AppName}} process {{.ProcessType}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
@@ -88,7 +88,7 @@ func (cmd V3SetHealthCheckCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

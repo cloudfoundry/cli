@@ -61,7 +61,7 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -93,7 +93,7 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 				"AppName": cmd.RequiredArgs.AppName,
 			})
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

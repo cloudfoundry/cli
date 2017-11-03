@@ -75,7 +75,7 @@ func (cmd PluginsCommand) displayOutdatedPlugins() error {
 
 	outdatedPlugins, err := cmd.Actor.GetOutdatedPlugins()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	table := [][]string{{"plugin", "version", "latest version"}}

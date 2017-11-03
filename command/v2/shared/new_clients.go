@@ -52,7 +52,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv2.Clie
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
-		return nil, nil, HandleError(err)
+		return nil, nil, err
 	}
 
 	if ccClient.AuthorizationEndpoint() == "" {

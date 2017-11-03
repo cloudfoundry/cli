@@ -67,7 +67,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -78,13 +78,13 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 	securityGroup, warnings, err := cmd.Actor.GetSecurityGroupByName(cmd.RequiredArgs.SecurityGroupName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.RequiredArgs.OrganizationName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	spacesToBind := []v2action.Space{}
@@ -93,7 +93,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		space, warnings, err = cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.RequiredArgs.SpaceName)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 		spacesToBind = append(spacesToBind, space)
 	} else {
@@ -101,7 +101,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		spaces, warnings, err = cmd.Actor.GetOrganizationSpaces(org.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 		spacesToBind = append(spacesToBind, spaces...)
 	}
@@ -117,7 +117,7 @@ func (cmd BindSecurityGroupCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.BindSecurityGroupToSpace(securityGroup.GUID, space.GUID, ccv2.SecurityGroupLifecycle(cmd.Lifecycle))
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 
 		cmd.UI.DisplayOK()

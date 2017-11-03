@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -54,7 +53,7 @@ var _ = Describe("orgs Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrgArg, checkTargetedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -137,7 +136,7 @@ var _ = Describe("orgs Command", func() {
 				})
 
 				It("returns a translatable error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "not-found-org"}))
+					Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "not-found-org"}))
 
 					Expect(testUI.Out).To(Say("Getting orgs as some-user\\.\\.\\."))
 					Expect(testUI.Out).To(Say(""))

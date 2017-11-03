@@ -90,7 +90,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -101,7 +101,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if !cmd.Instances.IsSet && !cmd.DiskLimit.IsSet && !cmd.MemoryLimit.IsSet {
@@ -110,7 +110,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 
 	scalled, err := cmd.scaleProcess(app.GUID, user.Name)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 	if !scalled {
 		return nil
@@ -139,7 +139,7 @@ func (cmd V3ScaleCommand) Execute(args []string) error {
 				BinaryName: cmd.Config.BinaryName(),
 			}
 		} else {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

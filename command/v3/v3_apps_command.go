@@ -69,12 +69,12 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
@@ -87,7 +87,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 	summaries, warnings, err := cmd.Actor.GetApplicationsWithProcessesBySpace(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if len(summaries) == 0 {
@@ -110,7 +110,7 @@ func (cmd V3AppsCommand) Execute(args []string) error {
 			routes, warnings, err := cmd.V2AppRouteActor.GetApplicationRoutes(summary.GUID)
 			cmd.UI.DisplayWarnings(warnings)
 			if err != nil {
-				return shared.HandleError(err)
+				return err
 			}
 			routesList = routes.Summary()
 		}

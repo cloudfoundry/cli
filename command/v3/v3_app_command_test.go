@@ -107,7 +107,7 @@ var _ = Describe("v3-app Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -138,7 +138,7 @@ var _ = Describe("v3-app Command", func() {
 		})
 
 		It("returns the error and prints warnings", func() {
-			Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
 			Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
@@ -184,7 +184,7 @@ var _ = Describe("v3-app Command", func() {
 				})
 
 				It("returns a translatable error and all warnings", func() {
-					Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: "some-app"}))
+					Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: "some-app"}))
 
 					Expect(testUI.Err).To(Say("warning-1"))
 					Expect(testUI.Err).To(Say("warning-2"))
@@ -318,7 +318,7 @@ var _ = Describe("v3-app Command", func() {
 			})
 
 			It("returns the error and prints warnings", func() {
-				Expect(executeErr).To(Equal(translatableerror.APIRequestError{}))
+				Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
 				Expect(testUI.Out).To(Say("Showing health and status for app some-app in org some-org / space some-space as steve\\.\\.\\."))
 

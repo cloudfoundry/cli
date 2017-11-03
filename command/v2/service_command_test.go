@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -57,7 +56,7 @@ var _ = Describe("service Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrgArg, checkTargetedSpaceArg := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -110,7 +109,7 @@ var _ = Describe("service Command", func() {
 					})
 
 					It("returns ServiceInstanceNotFoundError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.ServiceInstanceNotFoundError{
+						Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{
 							GUID: "non-existant-service-instance-guid",
 							Name: "non-existant-service-instance",
 						}))
@@ -198,7 +197,7 @@ var _ = Describe("service Command", func() {
 					})
 
 					It("returns ServiceInstanceNotFoundError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.ServiceInstanceNotFoundError{
+						Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{
 							GUID: "non-existant-service-instance-guid",
 							Name: "non-existant-service-instance",
 						}))

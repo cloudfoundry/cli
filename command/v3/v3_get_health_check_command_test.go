@@ -90,7 +90,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 
@@ -123,7 +123,7 @@ var _ = Describe("v3-get-health-check Command", func() {
 		})
 
 		It("returns the error and prints warnings", func() {
-			Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
 			Expect(testUI.Out).To(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 			Expect(testUI.Out).To(Say("Getting process health check types for app some-app in org some-org / space some-space as steve\\.\\.\\."))

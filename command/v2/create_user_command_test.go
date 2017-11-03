@@ -58,7 +58,7 @@ var _ = Describe("create-user Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)

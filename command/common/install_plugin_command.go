@@ -77,36 +77,36 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 func (cmd InstallPluginCommand) Execute([]string) error {
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
 	defer os.RemoveAll(tempPluginDir)
 
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	tempPluginPath, pluginSource, err := cmd.getPluginBinaryAndSource(tempPluginDir)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
 	executablePath, err := cmd.Actor.CreateExecutableCopy(tempPluginPath, tempPluginDir)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, executablePath)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
@@ -120,7 +120,7 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 
 		err = cmd.uninstallPlugin(plugin, rpcService)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 
@@ -256,10 +256,10 @@ func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchE
 }
 
 func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (string, PluginSource, error) {
-	err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	exitInstall, err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
-	if err != nil {
+	if err != nil || exitInstall {
 		return "", 0, err
 	}
 
@@ -267,12 +267,10 @@ func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (s
 }
 
 func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPluginDir string) (string, PluginSource, error) {
-	var err error
-
-	err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	exitInstall, err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
-	if err != nil {
+	if err != nil || exitInstall {
 		return "", 0, err
 	}
 
@@ -311,23 +309,24 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 	})
 
 	installedPlugin, exist := cmd.Config.GetPlugin(pluginName)
+	var exitInstall bool
 	if exist {
 		cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} is already installed.", map[string]interface{}{
 			"PluginName":    installedPlugin.Name,
 			"PluginVersion": installedPlugin.Version.String(),
 		})
 
-		err = cmd.installPluginPrompt("Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?", map[string]interface{}{
+		exitInstall, err = cmd.installPluginPrompt("Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?", map[string]interface{}{
 			"Path":          pluginName,
 			"PluginVersion": pluginInfo.Version,
 		})
 	} else {
-		err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+		exitInstall, err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 			"Path": pluginName,
 		})
 	}
 
-	if err != nil {
+	if err != nil || exitInstall {
 		return "", 0, err
 	}
 
@@ -347,12 +346,12 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 	return tempPath, PluginFromRepository, err
 }
 
-func (cmd InstallPluginCommand) installPluginPrompt(template string, templateValues ...map[string]interface{}) error {
+func (cmd InstallPluginCommand) installPluginPrompt(template string, templateValues ...map[string]interface{}) (bool, error) {
 	cmd.UI.DisplayHeader("Attention: Plugins are binaries written by potentially untrusted authors.")
 	cmd.UI.DisplayHeader("Install and use plugins at your own risk.")
 
 	if cmd.Force {
-		return nil
+		return false, nil
 	}
 
 	var (
@@ -363,13 +362,13 @@ func (cmd InstallPluginCommand) installPluginPrompt(template string, templateVal
 	really, promptErr = cmd.UI.DisplayBoolPrompt(false, template, templateValues...)
 
 	if promptErr != nil {
-		return promptErr
+		return false, promptErr
 	}
 
 	if !really {
 		cmd.UI.DisplayText("Plugin installation cancelled.")
-		return shared.PluginInstallationCancelled{}
+		return true, nil
 	}
 
-	return nil
+	return false, nil
 }

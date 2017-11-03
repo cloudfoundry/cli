@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -87,7 +86,7 @@ var _ = Describe("auth Command", func() {
 		})
 
 		It("returns a BadCredentialsError", func() {
-			Expect(err).To(MatchError(translatableerror.BadCredentialsError{}))
+			Expect(err).To(MatchError(uaa.BadCredentialsError{Message: "some message"}))
 		})
 	})
 

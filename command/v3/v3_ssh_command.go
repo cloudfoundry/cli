@@ -79,17 +79,17 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 
 	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionV3)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	ttyOption, err := cmd.EvaluateTTYOption()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if cmd.ProcessType == "" {
@@ -109,7 +109,7 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	err = cmd.SSHActor.ExecuteSecureShell(
@@ -126,7 +126,7 @@ func (cmd V3SSHCommand) Execute(args []string) error {
 			Username:              sshAuth.Username,
 		})
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	return nil

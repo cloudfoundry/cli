@@ -80,7 +80,7 @@ func (cmd SpaceCommand) Execute(args []string) error {
 		}
 	}
 
-	return shared.HandleError(err)
+	return err
 }
 
 func (cmd SpaceCommand) displaySpaceGUID() error {

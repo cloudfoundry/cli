@@ -41,12 +41,12 @@ func (cmd *SpacesCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd SpacesCommand) Execute([]string) error {
 	err := cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting spaces in org {{.OrgName}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -58,7 +58,7 @@ func (cmd SpacesCommand) Execute([]string) error {
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(cmd.Config.TargetedOrganization().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if len(spaces) == 0 {

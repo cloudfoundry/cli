@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -61,7 +60,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
+				Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: "faceman"}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -238,7 +237,7 @@ var _ = Describe("deleted-orphaned-routes Command", func() {
 								})
 
 								It("returns translatableerror.DomainNotFoundError", func() {
-									Expect(executeErr).To(MatchError(translatableerror.DomainNotFoundError{
+									Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{
 										Name: "some-domain",
 										GUID: "some-domain-guid",
 									}))

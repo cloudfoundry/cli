@@ -79,7 +79,7 @@ var _ = Describe("v3-restart Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -200,7 +200,7 @@ var _ = Describe("v3-restart Command", func() {
 						})
 
 						It("says that the app wasn't found", func() {
-							Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+							Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 							Expect(testUI.Out).ToNot(Say("Stopping"))
 							Expect(testUI.Out).ToNot(Say("Starting"))
 
@@ -265,7 +265,7 @@ var _ = Describe("v3-restart Command", func() {
 					})
 
 					It("says that the app failed to start", func() {
-						Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+						Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 						Expect(testUI.Out).To(Say("Starting app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 						Expect(testUI.Err).To(Say("get-warning-1"))
@@ -309,7 +309,7 @@ var _ = Describe("v3-restart Command", func() {
 				})
 
 				It("says that the app failed to start", func() {
-					Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+					Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 					Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as steve\\.\\.\\."))
 
 					Expect(testUI.Err).To(Say("get-warning-1"))

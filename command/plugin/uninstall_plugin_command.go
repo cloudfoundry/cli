@@ -61,7 +61,7 @@ func (cmd UninstallPluginCommand) Execute(args []string) error {
 				Err: e.Err,
 			}
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

@@ -84,7 +84,7 @@ var _ = Describe("Restage Command", func() {
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -135,7 +135,7 @@ var _ = Describe("Restage Command", func() {
 			})
 
 			It("returns back an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: "some-app"}))
+				Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: "some-app"}))
 
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))

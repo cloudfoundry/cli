@@ -121,7 +121,7 @@ var _ = Describe("Logs Command", func() {
 				It("fails with an app not found message", func() {
 					session := helpers.CF("logs", "dora")
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say("Application 'dora' not found."))
+					Eventually(session.Err).Should(Say("App dora not found"))
 					Eventually(session).Should(Exit(1))
 				})
 			})

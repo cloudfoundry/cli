@@ -93,7 +93,7 @@ var _ = Describe("install-plugin command", func() {
 			})
 
 			It("returns a RepositoryNotRegisteredError", func() {
-				Expect(executeErr).To(MatchError(translatableerror.RepositoryNotRegisteredError{Name: repoName}))
+				Expect(executeErr).To(MatchError(actionerror.RepositoryNotRegisteredError{Name: repoName}))
 
 				Expect(fakeActor.GetPluginRepositoryCallCount()).To(Equal(1))
 				repositoryNameArg := fakeActor.GetPluginRepositoryArgsForCall(0)
@@ -118,7 +118,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns a JSONSyntaxError", func() {
-					Expect(executeErr).To(MatchError(translatableerror.JSONSyntaxError{Err: jsonErr}))
+					Expect(executeErr).To(MatchError(jsonErr))
 				})
 			})
 
@@ -149,7 +149,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns the wrapped client(request/http status) error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: returnedErr.Status}))
+						Expect(executeErr).To(MatchError(returnedErr))
 					})
 				})
 			})
@@ -181,7 +181,7 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				It("returns the NoCompatibleBinaryError", func() {
-					Expect(executeErr).To(MatchError(translatableerror.NoCompatibleBinaryError{}))
+					Expect(executeErr).To(MatchError(actionerror.NoCompatibleBinaryError{}))
 				})
 			})
 
@@ -316,7 +316,7 @@ var _ = Describe("install-plugin command", func() {
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
+											Expect(executeErr).To(MatchError(actionerror.PluginInvalidError{}))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 
 											Expect(fakeActor.GetAndValidatePluginCallCount()).To(Equal(1))
@@ -482,7 +482,7 @@ var _ = Describe("install-plugin command", func() {
 										})
 
 										It("returns the error", func() {
-											Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
+											Expect(executeErr).To(MatchError(actionerror.PluginInvalidError{}))
 											Expect(testUI.Out).ToNot(Say("Installing plugin"))
 										})
 									})

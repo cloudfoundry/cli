@@ -53,7 +53,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 
 	err = cmd.Actor.Authenticate(cmd.Config, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

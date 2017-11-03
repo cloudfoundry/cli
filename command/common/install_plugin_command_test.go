@@ -100,7 +100,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
+						Expect(executeErr).To(MatchError(returnedErr))
 
 						Expect(testUI.Out).ToNot(Say("Installing plugin"))
 					})
@@ -115,7 +115,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{Err: wrappedErr}))
+						Expect(executeErr).To(MatchError(actionerror.PluginInvalidError{Err: wrappedErr}))
 
 						Expect(testUI.Out).ToNot(Say("Installing plugin"))
 					})
@@ -454,7 +454,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: "some-status"}))
+						Expect(executeErr).To(MatchError(pluginerror.RawHTTPStatusError{Status: "some-status"}))
 					})
 				})
 
@@ -464,7 +464,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns a DownloadPluginHTTPError", func() {
-						Expect(executeErr).To(MatchError(translatableerror.DownloadPluginHTTPError{Message: "x509: certificate signed by unknown authority"}))
+						Expect(executeErr).To(MatchError(pluginerror.UnverifiedServerError{}))
 					})
 				})
 			})
@@ -503,7 +503,7 @@ var _ = Describe("install-plugin command", func() {
 					})
 
 					It("returns an error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.PluginInvalidError{}))
+						Expect(executeErr).To(MatchError(returnedErr))
 
 						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(0))
 					})

@@ -78,7 +78,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -104,7 +104,7 @@ var _ = Describe("reset-space-isolation-segment Command", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: space}))
+				Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: space}))
 				Expect(testUI.Err).To(Say("warning-1"))
 				Expect(testUI.Err).To(Say("warning-2"))
 			})

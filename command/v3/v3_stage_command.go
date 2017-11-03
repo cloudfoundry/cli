@@ -67,7 +67,7 @@ func (cmd V3StageCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -85,7 +85,7 @@ func (cmd V3StageCommand) Execute(args []string) error {
 	logStream, logErrStream, logWarnings, logErr := cmd.Actor.GetStreamingLogsForApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID, cmd.NOAAClient)
 	cmd.UI.DisplayWarnings(logWarnings)
 	if logErr != nil {
-		return shared.HandleError(logErr)
+		return logErr
 	}
 
 	dropletStream, warningsStream, errStream := cmd.Actor.StagePackage(cmd.PackageGUID, cmd.RequiredArgs.AppName)

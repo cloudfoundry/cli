@@ -73,13 +73,13 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	isDockerImage := (cmd.DockerImage.Path != "")
 	err = cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	var (
@@ -94,7 +94,7 @@ func (cmd V3CreatePackageCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayText("package guid: {{.PackageGuid}}", map[string]interface{}{

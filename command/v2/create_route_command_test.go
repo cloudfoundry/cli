@@ -129,7 +129,7 @@ var _ = Describe("Create Route Command", func() {
 
 		Context("when checking target fails", func() {
 			BeforeEach(func() {
-				fakeSharedActor.CheckTargetReturns(actionerror.NotLoggedInError{BinaryName: binaryName})
+				fakeSharedActor.CheckTargetReturns(translatableerror.NotLoggedInError{BinaryName: binaryName})
 			})
 
 			It("returns an error if the check fails", func() {
@@ -298,7 +298,7 @@ var _ = Describe("Create Route Command", func() {
 
 				It("prints warnings and returns an error", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr).To(MatchError(translatableerror.DomainNotFoundError{Name: "some-domain"}))
+					Expect(executeErr).To(MatchError(actionerror.DomainNotFoundError{Name: "some-domain"}))
 
 					Expect(testUI.Out).To(Say("Creating route some-domain for org some-org / space some-space as some-user\\.\\.\\."))
 					Expect(testUI.Err).To(Say("create-route-warning-1"))

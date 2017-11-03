@@ -73,7 +73,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -139,7 +139,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				It("displays all warnings and the isolation segment not found error", func() {
 					Expect(testUI.Err).To(Say("I am a warning"))
 					Expect(testUI.Err).To(Say("I am also a warning"))
-					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: "segment1"}))
+					Expect(executeErr).To(MatchError(actionerror.IsolationSegmentNotFoundError{Name: "segment1"}))
 				})
 			})
 
@@ -151,7 +151,7 @@ var _ = Describe("enable-org-isolation Command", func() {
 				})
 
 				It("displays all warnings and the org not found error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
+					Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 				})
 			})
 

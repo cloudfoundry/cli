@@ -61,12 +61,12 @@ func (cmd V3DeleteCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	currentUser, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if !cmd.Force {
@@ -75,7 +75,7 @@ func (cmd V3DeleteCommand) Execute(args []string) error {
 		})
 
 		if promptErr != nil {
-			return shared.HandleError(promptErr)
+			return promptErr
 		}
 
 		if !response {
@@ -100,7 +100,7 @@ func (cmd V3DeleteCommand) Execute(args []string) error {
 				"AppName": cmd.RequiredArgs.AppName,
 			})
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

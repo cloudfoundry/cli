@@ -43,7 +43,7 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 func (cmd UnbindServiceCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	space := cmd.Config.TargetedSpace()
@@ -69,7 +69,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 				"InstanceName": cmd.RequiredArgs.ServiceInstanceName,
 			})
 		} else {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

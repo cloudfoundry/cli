@@ -82,7 +82,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -149,7 +149,7 @@ var _ = Describe("v3-set-droplet Command", func() {
 		})
 
 		It("displays that the droplet was assigned", func() {
-			Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: app}))
+			Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: app}))
 
 			Expect(testUI.Out).To(Say("Setting app some-app to droplet some-droplet-guid in org some-org / space some-space as steve..."))
 

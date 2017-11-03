@@ -198,7 +198,7 @@ var _ = Describe("plugins Command", func() {
 						})
 					})
 					It("displays the repository and the error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.GettingPluginRepositoryError{
+						Expect(executeErr).To(MatchError(actionerror.GettingPluginRepositoryError{
 							Name:    "repo-1",
 							Message: "404",
 						}))

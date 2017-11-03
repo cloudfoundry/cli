@@ -61,9 +61,8 @@ var _ = Describe("New Clients", func() {
 
 			It("returns a command api request error", func() {
 				_, _, err := NewClients(fakeConfig, testUI, true)
-				Expect(err).To(MatchError(ContainSubstring("Request error:")))
+				Expect(err).To(MatchError(ContainSubstring("dial")))
 			})
-
 		})
 
 		Context("when the error is a cloud controller api not found error", func() {
@@ -78,7 +77,7 @@ var _ = Describe("New Clients", func() {
 
 			It("returns a command api not found error", func() {
 				_, _, err := NewClients(fakeConfig, testUI, true)
-				Expect(err).To(MatchError(translatableerror.APINotFoundError{URL: server.URL()}))
+				Expect(err).To(MatchError(ccerror.APINotFoundError{URL: server.URL()}))
 			})
 		})
 
@@ -127,7 +126,7 @@ var _ = Describe("New Clients", func() {
 
 		It("passes the value to the target", func() {
 			_, _, err := NewClients(fakeConfig, testUI, true)
-			Expect(err.Error()).To(MatchRegexp("TIP: If you are behind a firewall"))
+			Expect(err.Error()).To(MatchRegexp("timeout"))
 		})
 	})
 

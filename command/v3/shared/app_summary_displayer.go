@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	sharedV2 "code.cloudfoundry.org/cli/command/v2/shared"
 	"github.com/cloudfoundry/bytefmt"
 )
 
@@ -36,7 +35,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
 	display.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return HandleError(err)
+		return err
 	}
 	summary.ProcessSummaries.Sort()
 
@@ -46,7 +45,7 @@ func (display AppSummaryDisplayer) DisplayAppInfo() error {
 		routes, routeWarnings, err = display.V2AppRouteActor.GetApplicationRoutes(summary.Application.GUID)
 		display.UI.DisplayWarnings(routeWarnings)
 		if err != nil {
-			return sharedV2.HandleError(err)
+			return err
 		}
 	}
 
@@ -103,7 +102,7 @@ func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 	summary, warnings, err := display.Actor.GetApplicationSummaryByNameAndSpace(display.AppName, display.Config.TargetedSpace().GUID)
 	display.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return HandleError(err)
+		return err
 	}
 	summary.ProcessSummaries.Sort()
 

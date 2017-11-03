@@ -62,7 +62,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	space := cmd.Config.TargetedSpace()
@@ -75,7 +75,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	application, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -102,7 +102,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	task, warnings, err := cmd.Actor.RunTask(application.GUID, inputTask)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

@@ -88,7 +88,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -119,7 +119,7 @@ var _ = Describe("v3-packages Command", func() {
 		})
 
 		It("returns the error and prints warnings", func() {
-			Expect(executeErr).To(Equal(translatableerror.APIRequestError{}))
+			Expect(executeErr).To(Equal(ccerror.RequestError{}))
 
 			Expect(testUI.Out).To(Say("Listing packages of app some-app in org some-org / space some-space as steve\\.\\.\\."))
 

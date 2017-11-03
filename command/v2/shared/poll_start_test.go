@@ -175,7 +175,7 @@ var _ = Describe("Poll Start", func() {
 
 		Entry("any other error",
 			actionerror.HTTPHealthCheckInvalidError{},
-			translatableerror.HTTPHealthCheckInvalidError{},
+			actionerror.HTTPHealthCheckInvalidError{},
 		),
 	)
 })

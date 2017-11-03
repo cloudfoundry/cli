@@ -74,7 +74,7 @@ var _ = Describe("set-health-check Command", func() {
 			Expect(targetedOrganizationRequired).To(Equal(true))
 			Expect(targetedSpaceRequired).To(Equal(true))
 
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 		})
 	})
 

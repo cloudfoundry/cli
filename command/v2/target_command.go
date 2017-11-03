@@ -52,13 +52,13 @@ func (cmd *TargetCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
 		cmd.clearTargets()
-		return shared.HandleError(err)
+		return err
 	}
 
 	switch {
@@ -121,13 +121,13 @@ func (cmd *TargetCommand) setOrgAndSpace() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(org.GUID, cmd.Space)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
@@ -141,7 +141,7 @@ func (cmd *TargetCommand) setOrg() error {
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
@@ -156,7 +156,7 @@ func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(orgGUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if len(spaces) == 1 {
@@ -176,7 +176,7 @@ func (cmd *TargetCommand) setSpace() error {
 	space, warnings, err := cmd.Actor.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.Space)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)

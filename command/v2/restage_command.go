@@ -50,12 +50,12 @@ func (cmd *RestageCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd RestageCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -69,7 +69,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestageApplication(app, cmd.NOAAClient, cmd.Config)
@@ -82,7 +82,7 @@ func (cmd RestageCommand) Execute(args []string) error {
 	appSummary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	shared.DisplayAppSummary(cmd.UI, appSummary, true)

@@ -62,12 +62,12 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	appName := cmd.RequiredArgs.AppName
@@ -85,7 +85,7 @@ func (cmd V3EnvCommand) Execute(args []string) error {
 	)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if len(envGroups.SystemProvided) > 0 || len(envGroups.ApplicationProvided) > 0 {

@@ -46,12 +46,12 @@ func (cmd *SecurityGroupsCommand) Setup(config command.Config, ui command.UI) er
 func (cmd SecurityGroupsCommand) Execute(args []string) error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	includeStaging := true

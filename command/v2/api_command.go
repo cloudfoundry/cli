@@ -94,7 +94,7 @@ func (cmd *ApiCommand) setAPI() error {
 		DialTimeout:       cmd.Config.DialTimeout(),
 	})
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if strings.HasPrefix(apiURL, "http:") {

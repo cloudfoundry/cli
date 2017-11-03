@@ -40,7 +40,7 @@ func PollStage(dropletStream <-chan v3action.Droplet, warningsStream <-chan v3ac
 				closedErrStream = true
 				break
 			}
-			return v3action.Droplet{}, HandleError(err)
+			return v3action.Droplet{}, err
 		}
 		if closedBuildStream && closedWarningsStream && closedErrStream {
 			return droplet, nil

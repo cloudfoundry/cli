@@ -75,7 +75,7 @@ var _ = Describe("unbind-security-group Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
+			Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -134,7 +134,7 @@ var _ = Describe("unbind-security-group Command", func() {
 					It("returns a translated security group not found error", func() {
 						Expect(testUI.Err).To(Say("unbind warning"))
 
-						Expect(executeErr).To(MatchError(translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
+						Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 					})
 				})
 
@@ -192,7 +192,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				})
 
 				It("returns an error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
+					Expect(executeErr).To(MatchError(actionerror.NoOrganizationTargetedError{BinaryName: "faceman"}))
 
 					Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 					checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -234,7 +234,7 @@ var _ = Describe("unbind-security-group Command", func() {
 				It("returns a translated security group not found error", func() {
 					Expect(testUI.Err).To(Say("unbind warning"))
 
-					Expect(executeErr).To(MatchError(translatableerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
+					Expect(executeErr).To(MatchError(actionerror.SecurityGroupNotFoundError{Name: "some-security-group"}))
 				})
 			})
 

@@ -136,7 +136,7 @@ var _ = Describe("uninstall-plugin command", func() {
 
 		It("returns a PluginNotFoundError", func() {
 			Expect(testUI.Out).To(Say("Uninstalling plugin some-plugin..."))
-			Expect(executeErr).To(MatchError(translatableerror.PluginNotFoundError{
+			Expect(executeErr).To(MatchError(actionerror.PluginNotFoundError{
 				PluginName: "some-plugin",
 			}))
 		})

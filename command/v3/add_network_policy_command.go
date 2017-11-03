@@ -72,7 +72,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -89,7 +89,7 @@ func (cmd AddNetworkPolicyCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.AddNetworkPolicy(cmd.Config.TargetedSpace().GUID, cmd.RequiredArgs.SourceApp, cmd.DestinationApp, cmd.Protocol.Protocol, cmd.Port.StartPort, cmd.Port.EndPort)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 	cmd.UI.DisplayOK()
 

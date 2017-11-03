@@ -72,7 +72,7 @@ func (cmd ResetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -88,13 +88,13 @@ func (cmd ResetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 	organization, v2Warnings, err := cmd.ActorV2.GetOrganizationByName(cmd.RequiredArgs.OrgName)
 	cmd.UI.DisplayWarnings(v2Warnings)
 	if err != nil {
-		return sharedV2.HandleError(err)
+		return err
 	}
 
 	warnings, err := cmd.Actor.ResetOrganizationDefaultIsolationSegment(organization.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

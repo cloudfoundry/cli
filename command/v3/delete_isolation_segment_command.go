@@ -59,7 +59,7 @@ func (cmd DeleteIsolationSegmentCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if !cmd.Force {

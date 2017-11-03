@@ -76,7 +76,7 @@ func PollStart(ui command.UI, config command.Config, messages <-chan *v2action.L
 			case actionerror.StartupTimeoutError:
 				return translatableerror.StartupTimeoutError{AppName: err.Name, BinaryName: config.BinaryName()}
 			default:
-				return HandleError(apiErr)
+				return apiErr
 			}
 		}
 

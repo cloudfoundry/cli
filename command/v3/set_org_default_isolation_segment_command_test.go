@@ -78,7 +78,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -111,7 +111,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 			})
 
 			It("returns the warnings and error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: org}))
+				Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: org}))
 				Expect(testUI.Err).To(Say("I am a warning"))
 				Expect(testUI.Err).To(Say("I am also a warning"))
 			})
@@ -131,7 +131,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 				})
 
 				It("returns the warnings and error", func() {
-					Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: isolationSegment}))
+					Expect(executeErr).To(MatchError(actionerror.IsolationSegmentNotFoundError{Name: isolationSegment}))
 					Expect(testUI.Err).To(Say("org-warning-1"))
 					Expect(testUI.Err).To(Say("org-warning-2"))
 					Expect(testUI.Err).To(Say("iso-seg-warning-1"))
@@ -179,7 +179,7 @@ var _ = Describe("set-org-default-isolation-segment Command", func() {
 						Expect(testUI.Err).To(Say("iso-seg-warning-2"))
 						Expect(testUI.Err).To(Say("entitlement-warning"))
 						Expect(testUI.Err).To(Say("banana"))
-						Expect(executeErr).To(MatchError(translatableerror.IsolationSegmentNotFoundError{Name: isolationSegment}))
+						Expect(executeErr).To(MatchError(actionerror.IsolationSegmentNotFoundError{Name: isolationSegment}))
 					})
 				})
 			})

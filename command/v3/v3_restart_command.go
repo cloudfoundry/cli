@@ -62,18 +62,18 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if app.Started() {
@@ -87,7 +87,7 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.StopApplication(app.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 
 		cmd.UI.DisplayOK()
@@ -104,7 +104,7 @@ func (cmd V3RestartCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

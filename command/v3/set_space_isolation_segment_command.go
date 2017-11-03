@@ -72,7 +72,7 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -90,13 +90,13 @@ func (cmd SetSpaceIsolationSegmentCommand) Execute(args []string) error {
 	space, v2Warnings, err := cmd.ActorV2.GetSpaceByOrganizationAndName(cmd.Config.TargetedOrganization().GUID, cmd.RequiredArgs.SpaceName)
 	cmd.UI.DisplayWarnings(v2Warnings)
 	if err != nil {
-		return sharedV2.HandleError(err)
+		return err
 	}
 
 	warnings, err := cmd.Actor.AssignIsolationSegmentToSpaceByNameAndSpace(cmd.RequiredArgs.IsolationSegmentName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

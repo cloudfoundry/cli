@@ -65,7 +65,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	var warnings v2action.Warnings
@@ -74,7 +74,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	case cmd.RequiredArgs.OrganizationName == "" && cmd.RequiredArgs.SpaceName == "":
 		err = cmd.SharedActor.CheckTarget(true, true)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 
 		space := cmd.Config.TargetedSpace()
@@ -89,7 +89,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 	case cmd.RequiredArgs.OrganizationName != "" && cmd.RequiredArgs.SpaceName != "":
 		err = cmd.SharedActor.CheckTarget(false, false)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 
 		cmd.UI.DisplayTextWithFlavor("Unbinding security group {{.SecurityGroupName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
@@ -119,7 +119,7 @@ func (cmd UnbindSecurityGroupCommand) Execute(args []string) error {
 			cmd.UI.DisplayOK()
 			return nil
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

@@ -64,7 +64,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
@@ -83,7 +83,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 			cmd.UI.DisplayTextWithFlavor("Error creating user {{.User}}.", map[string]interface{}{
 				"User": cmd.Args.Username,
 			})
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

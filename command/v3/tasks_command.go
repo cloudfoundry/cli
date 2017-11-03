@@ -69,7 +69,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	space := cmd.Config.TargetedSpace()
@@ -82,7 +82,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 	application, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -95,7 +95,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3action.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

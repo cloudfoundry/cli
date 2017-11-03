@@ -49,7 +49,7 @@ func (cmd *LogsCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd LogsCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()

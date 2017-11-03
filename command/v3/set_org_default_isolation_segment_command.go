@@ -73,7 +73,7 @@ func (cmd SetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -90,19 +90,19 @@ func (cmd SetOrgDefaultIsolationSegmentCommand) Execute(args []string) error {
 	org, v2Warnings, err := cmd.ActorV2.GetOrganizationByName(cmd.RequiredArgs.OrganizationName)
 	cmd.UI.DisplayWarnings(v2Warnings)
 	if err != nil {
-		return sharedV2.HandleError(err)
+		return err
 	}
 
 	isoSeg, v3Warnings, err := cmd.Actor.GetIsolationSegmentByName(cmd.RequiredArgs.IsolationSegmentName)
 	cmd.UI.DisplayWarnings(v3Warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	v3Warnings, err = cmd.Actor.SetOrganizationDefaultIsolationSegment(org.GUID, isoSeg.GUID)
 	cmd.UI.DisplayWarnings(v3Warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

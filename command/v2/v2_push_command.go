@@ -99,19 +99,19 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	log.Info("collating flags")
 	cliSettings, err := cmd.GetCommandLineSettings()
 	if err != nil {
 		log.Errorln("reading flags:", err)
-		return shared.HandleError(err)
+		return err
 	}
 
 	log.Info("checking manifest")
@@ -134,14 +134,14 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		return nil
 	} else if err != nil {
 		log.Errorln("reading manifest:", err)
-		return shared.HandleError(err)
+		return err
 	}
 
 	log.Info("merging manifest and command flags")
 	manifestApplications, err := cmd.Actor.MergeAndValidateSettingsAndManifests(cliSettings, rawApps)
 	if err != nil {
 		log.Errorln("merging manifest:", err)
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayText("Getting app info...")
@@ -156,7 +156,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		log.Errorln("converting manifest:", err)
-		return shared.HandleError(err)
+		return err
 	}
 
 	for _, appConfig := range appConfigs {
@@ -170,7 +170,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		err := cmd.UI.DisplayChangesForPush(changes)
 		if err != nil {
 			log.Errorln("display changes:", err)
-			return shared.HandleError(err)
+			return err
 		}
 		cmd.UI.DisplayNewline()
 	}
@@ -190,7 +190,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		updatedConfig, err := cmd.processApplyStreams(user, appConfig, configStream, eventStream, warningsStream, errorStream)
 		if err != nil {
 			log.Errorln("process apply stream:", err)
-			return shared.HandleError(err)
+			return err
 		}
 
 		if !cmd.NoStart {
@@ -205,7 +205,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 		appSummary, warnings, err := cmd.RestartActor.GetApplicationSummaryByNameAndSpace(appConfig.DesiredApplication.Name, cmd.Config.TargetedSpace().GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 
 		shared.DisplayAppSummary(cmd.UI, appSummary, true)

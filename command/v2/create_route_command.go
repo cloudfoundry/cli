@@ -59,22 +59,22 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 	err := cmd.validateArguments()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	err = cmd.minimumFlagVersions()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	err = cmd.SharedActor.CheckTarget(true, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	route := v2action.Route{
@@ -102,7 +102,7 @@ func (cmd CreateRouteCommand) Execute(args []string) error {
 			return nil
 		}
 
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Route {{.Route}} has been created.", map[string]interface{}{

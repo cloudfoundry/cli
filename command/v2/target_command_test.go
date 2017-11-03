@@ -112,7 +112,7 @@ var _ = Describe("target Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+				Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -249,7 +249,7 @@ var _ = Describe("target Command", func() {
 							})
 
 							It("returns a SpaceNotFoundError and clears existing space", func() {
-								Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
+								Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(0))
@@ -283,7 +283,7 @@ var _ = Describe("target Command", func() {
 						})
 
 						It("displays all warnings,returns an org target error, and clears existing targets", func() {
-							Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
+							Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
@@ -522,7 +522,7 @@ var _ = Describe("target Command", func() {
 							})
 
 							It("returns an error and clears existing targets", func() {
-								Expect(executeErr).To(MatchError(translatableerror.SpaceNotFoundError{Name: "some-space"}))
+								Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: "some-space"}))
 
 								Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 								Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))
@@ -542,7 +542,7 @@ var _ = Describe("target Command", func() {
 						})
 
 						It("returns an error and clears existing targets", func() {
-							Expect(executeErr).To(MatchError(translatableerror.OrganizationNotFoundError{Name: "some-org"}))
+							Expect(executeErr).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org"}))
 
 							Expect(fakeConfig.SetOrganizationInformationCallCount()).To(Equal(0))
 							Expect(fakeConfig.SetSpaceInformationCallCount()).To(Equal(0))

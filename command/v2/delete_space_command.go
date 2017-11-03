@@ -55,12 +55,12 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 	}
 
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if !cmd.Force {
@@ -87,7 +87,7 @@ func (cmd DeleteSpaceCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.DeleteSpaceByNameAndOrganizationName(cmd.RequiredArgs.Space, orgName)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayOK()

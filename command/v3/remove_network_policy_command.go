@@ -62,7 +62,7 @@ func (cmd *RemoveNetworkPolicyCommand) Setup(config command.Config, ui command.U
 func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -83,7 +83,7 @@ func (cmd RemoveNetworkPolicyCommand) Execute(args []string) error {
 		case actionerror.PolicyDoesNotExistError:
 			cmd.UI.DisplayText("Policy does not exist.")
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 	cmd.UI.DisplayOK()

@@ -40,7 +40,7 @@ func (cmd *OrgsCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd OrgsCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -56,7 +56,7 @@ func (cmd OrgsCommand) Execute(args []string) error {
 	orgs, warnings, err := cmd.Actor.GetOrganizations()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if len(orgs) == 0 {

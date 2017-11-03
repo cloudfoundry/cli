@@ -47,7 +47,7 @@ func (cmd AddPluginRepoCommand) Execute(args []string) error {
 				"RepositoryURL":  cmd.RequiredArgs.PluginRepoURL,
 			})
 	default:
-		return shared.HandleError(err)
+		return err
 	}
 
 	return nil

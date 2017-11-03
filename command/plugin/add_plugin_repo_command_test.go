@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/plugin"
 	"code.cloudfoundry.org/cli/command/plugin/pluginfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util/ui"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -40,7 +39,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 
 		It("returns RepositoryNameTakenError", func() {
-			Expect(executeErr).To(MatchError(translatableerror.RepositoryNameTakenError{Name: "some-repo"}))
+			Expect(executeErr).To(MatchError(actionerror.RepositoryNameTakenError{Name: "some-repo"}))
 		})
 	})
 
@@ -71,7 +70,7 @@ var _ = Describe("add-plugin-repo command", func() {
 		})
 
 		It("handles the error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"}))
+			Expect(executeErr).To(MatchError(actionerror.AddPluginRepositoryError{Name: "some-repo", URL: "some-URL", Message: "404"}))
 		})
 	})
 

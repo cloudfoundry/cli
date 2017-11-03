@@ -5,7 +5,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/cfnetworkingaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v3"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -64,7 +63,7 @@ var _ = Describe("remove-network-policy Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -137,7 +136,7 @@ var _ = Describe("remove-network-policy Command", func() {
 			})
 
 			It("does not display OK when an error occurs", func() {
-				Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{Name: srcApp}))
+				Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{Name: srcApp}))
 
 				Expect(testUI.Out).To(Say(`Removing network policy for app %s in org some-org / space some-space as some-user\.\.\.`, srcApp))
 				Expect(testUI.Err).To(Say("some-warning-1"))

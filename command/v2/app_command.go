@@ -44,7 +44,7 @@ func (cmd *AppCommand) Setup(config command.Config, ui command.UI) error {
 func (cmd AppCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	if cmd.GUID {
@@ -58,7 +58,7 @@ func (cmd AppCommand) displayAppGUID() error {
 	app, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayText(app.GUID)
@@ -68,7 +68,7 @@ func (cmd AppCommand) displayAppGUID() error {
 func (cmd AppCommand) displayAppSummary() error {
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	cmd.UI.DisplayTextWithFlavor(
@@ -84,7 +84,7 @@ func (cmd AppCommand) displayAppSummary() error {
 	appSummary, warnings, err := cmd.Actor.GetApplicationSummaryByNameAndSpace(cmd.RequiredArgs.AppName, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	shared.DisplayAppSummary(cmd.UI, appSummary, false)

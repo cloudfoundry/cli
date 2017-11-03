@@ -61,12 +61,12 @@ func (cmd V3UnsetEnvCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	appName := cmd.RequiredArgs.AppName
@@ -89,7 +89,7 @@ func (cmd V3UnsetEnvCommand) Execute(args []string) error {
 		case actionerror.EnvironmentVariableNotSetError:
 			cmd.UI.DisplayText(errVal.Error())
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

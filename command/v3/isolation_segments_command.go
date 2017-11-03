@@ -58,7 +58,7 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 
 	err = cmd.SharedActor.CheckTarget(false, false)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -73,7 +73,7 @@ func (cmd IsolationSegmentsCommand) Execute(args []string) error {
 	summaries, warnings, err := cmd.Actor.GetIsolationSegmentSummaries()
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()

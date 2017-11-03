@@ -72,7 +72,7 @@ var _ = Describe("tasks Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -250,7 +250,7 @@ id   name   state   start time   command
 						})
 
 						It("returns a translatable error", func() {
-							Expect(executeErr).To(MatchError(translatableerror.APIRequestError{Err: expectedErr}))
+							Expect(executeErr).To(MatchError(ccerror.RequestError{Err: expectedErr}))
 						})
 					})
 
@@ -270,7 +270,7 @@ id   name   state   start time   command
 						})
 
 						It("returns a translatable error", func() {
-							Expect(executeErr).To(MatchError(translatableerror.InvalidSSLCertError{API: "some-url"}))
+							Expect(executeErr).To(MatchError(returnedErr))
 						})
 					})
 				})

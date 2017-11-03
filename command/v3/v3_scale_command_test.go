@@ -98,7 +98,7 @@ var _ = Describe("v3-scale Command", func() {
 		})
 
 		It("returns an error", func() {
-			Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+			Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 			Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 			checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -144,7 +144,7 @@ var _ = Describe("v3-scale Command", func() {
 			})
 
 			It("returns an ApplicationNotFoundError and all warnings", func() {
-				Expect(executeErr).To(Equal(translatableerror.ApplicationNotFoundError{Name: appName}))
+				Expect(executeErr).To(Equal(actionerror.ApplicationNotFoundError{Name: appName}))
 
 				Expect(testUI.Out).ToNot(Say("Showing"))
 				Expect(testUI.Out).ToNot(Say("Scaling"))

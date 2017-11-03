@@ -43,7 +43,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.
 func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	err := cmd.SharedActor.CheckTarget(true, true)
 	if err != nil {
-		return shared.HandleError(err)
+		return err
 	}
 
 	user, err := cmd.Config.CurrentUser()
@@ -74,7 +74,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		case actionerror.OrphanedRoutesNotFoundError:
 		// Do nothing to parity the existing behavior
 		default:
-			return shared.HandleError(err)
+			return err
 		}
 	}
 
@@ -86,7 +86,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.DeleteRoute(route.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return shared.HandleError(err)
+			return err
 		}
 	}
 

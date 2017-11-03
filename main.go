@@ -230,7 +230,7 @@ func handleError(err error, commandUI UI) error {
 		return err
 	}
 
-	commandUI.DisplayError(err)
+	commandUI.DisplayError(translatableerror.ConvertToTranslatableError(err))
 
 	if _, ok := err.(DisplayUsage); ok {
 		return ParseErr

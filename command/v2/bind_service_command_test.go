@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -66,7 +65,7 @@ var _ = Describe("bind-service Command", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(executeErr).To(MatchError(translatableerror.NotLoggedInError{BinaryName: binaryName}))
+				Expect(executeErr).To(MatchError(actionerror.NotLoggedInError{BinaryName: binaryName}))
 
 				Expect(fakeSharedActor.CheckTargetCallCount()).To(Equal(1))
 				checkTargetedOrg, checkTargetedSpace := fakeSharedActor.CheckTargetArgsForCall(0)
@@ -142,7 +141,7 @@ var _ = Describe("bind-service Command", func() {
 					})
 
 					It("should return the error", func() {
-						Expect(executeErr).To(MatchError(translatableerror.ApplicationNotFoundError{
+						Expect(executeErr).To(MatchError(actionerror.ApplicationNotFoundError{
 							Name: "some-app",
 						}))
 					})
