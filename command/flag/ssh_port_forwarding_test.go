@@ -53,6 +53,10 @@ var _ = Describe("SpaceRole", func() {
 			Entry("1 colon", "IAMABANANA:909009009"),
 			Entry("too many colons", "I:AM:A:BANANA:909009009"),
 			Entry("empty values in between colons", "I:AM:A:"),
+			Entry("[implicit localhost] incorrect port numbers for first value", "I:AM:8888"),
+			Entry("[implicit localhost] incorrect port numbers for third value", "8888:AM:potato"),
+			Entry("[explicit localhost] incorrect port numbers for second value", "localhost:foo:AM:8888"),
+			Entry("[explicit localhost] incorrect port numbers for fourth value", "localhost:8080:AM:bar"),
 		)
 	})
 })

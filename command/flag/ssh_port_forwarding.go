@@ -2,6 +2,7 @@ package flag
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	flags "github.com/jessevdk/go-flags"
@@ -25,11 +26,12 @@ func (s *SSHPortForwarding) UnmarshalFlag(val string) error {
 		}
 	}
 
-	switch len(splitHosts) {
-	case 3:
+	re := regexp.MustCompile("^\\d+$")
+	switch {
+	case len(splitHosts) == 3 && re.MatchString(splitHosts[0]) && re.MatchString(splitHosts[2]):
 		s.LocalAddress = fmt.Sprintf("%s:%s", DefaultLocalAddress, splitHosts[0])
 		s.RemoteAddress = fmt.Sprintf("%s:%s", splitHosts[1], splitHosts[2])
-	case 4:
+	case len(splitHosts) == 4 && re.MatchString(splitHosts[1]) && re.MatchString(splitHosts[3]):
 		s.LocalAddress = fmt.Sprintf("%s:%s", splitHosts[0], splitHosts[1])
 		s.RemoteAddress = fmt.Sprintf("%s:%s", splitHosts[2], splitHosts[3])
 	default:
