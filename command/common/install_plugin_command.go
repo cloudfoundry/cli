@@ -16,6 +16,7 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	"code.cloudfoundry.org/cli/util"
 	"code.cloudfoundry.org/cli/util/configv3"
+	log "github.com/sirupsen/logrus"
 )
 
 //go:generate counterfeiter . InstallPluginActor
@@ -41,6 +42,13 @@ type InvalidChecksumError struct {
 
 func (InvalidChecksumError) Error() string {
 	return "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author."
+}
+
+type cancelInstall struct {
+}
+
+func (cancelInstall) Error() string {
+	return "Nobody should see this error. If you do, report it!"
 }
 
 type PluginSource int
@@ -75,12 +83,14 @@ func (cmd *InstallPluginCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd InstallPluginCommand) Execute([]string) error {
+	log.WithField("PluginHome", cmd.Config.PluginHome()).Info("making plugin dir")
 	err := os.MkdirAll(cmd.Config.PluginHome(), 0700)
 	if err != nil {
 		return err
 	}
 
 	tempPluginDir, err := ioutil.TempDir(cmd.Config.PluginHome(), "temp")
+	log.WithField("tempPluginDir", tempPluginDir).Debug("making tempPluginDir dir")
 	defer os.RemoveAll(tempPluginDir)
 
 	if err != nil {
@@ -88,9 +98,13 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 	}
 
 	tempPluginPath, pluginSource, err := cmd.getPluginBinaryAndSource(tempPluginDir)
-	if err != nil {
+	if _, ok := err.(cancelInstall); ok {
+		cmd.UI.DisplayText("Plugin installation cancelled.")
+		return nil
+	} else if err != nil {
 		return err
 	}
+	log.WithFields(log.Fields{"tempPluginPath": tempPluginPath, "pluginSource": pluginSource}).Debug("getPluginBinaryAndSource")
 
 	// copy twice when downloading from a URL to keep Windows specific code
 	// isolated to CreateExecutableCopy
@@ -98,16 +112,19 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+	log.WithField("executablePath", executablePath).Debug("created executable copy")
 
 	rpcService, err := shared.NewRPCService(cmd.Config, cmd.UI)
 	if err != nil {
 		return err
 	}
+	log.Info("started RPC server")
 
 	plugin, err := cmd.Actor.GetAndValidatePlugin(rpcService, Commands, executablePath)
 	if err != nil {
 		return err
 	}
+	log.Info("validated plugin")
 
 	if cmd.Actor.IsPluginInstalled(plugin.Name) {
 		if !cmd.Force && pluginSource != PluginFromRepository {
@@ -118,12 +135,14 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 			}
 		}
 
+		log.Info("uninstall plugin")
 		err = cmd.uninstallPlugin(plugin, rpcService)
 		if err != nil {
 			return err
 		}
 	}
 
+	log.Info("install plugin")
 	return cmd.installPlugin(plugin, executablePath)
 }
 
@@ -169,6 +188,7 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 
 	switch {
 	case cmd.RegisteredRepository != "":
+		log.WithField("RegisteredRepository", cmd.RegisteredRepository).Info("installing from specified repository")
 		pluginRepository, err := cmd.Actor.GetPluginRepository(cmd.RegisteredRepository)
 		if err != nil {
 			return "", 0, err
@@ -197,15 +217,19 @@ func (cmd InstallPluginCommand) getPluginBinaryAndSource(tempPluginDir string) (
 		return path, pluginSource, nil
 
 	case cmd.Actor.FileExists(pluginNameOrLocation):
+		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Info("installing from specified file")
 		return cmd.getPluginFromLocalFile(pluginNameOrLocation)
 
 	case util.IsHTTPScheme(pluginNameOrLocation):
+		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Info("installing from specified URL")
 		return cmd.getPluginFromURL(pluginNameOrLocation, tempPluginDir)
 
 	case util.IsUnsupportedURLScheme(pluginNameOrLocation):
+		log.WithField("pluginNameOrLocation", pluginNameOrLocation).Error("Unsupported URL")
 		return "", 0, translatableerror.UnsupportedURLSchemeError{UnsupportedURL: pluginNameOrLocation}
 
 	default:
+		log.Info("installing from first repository with plugin")
 		repos := cmd.Config.PluginRepositories()
 		if len(repos) == 0 {
 			return "", 0, translatableerror.PluginNotFoundOnDiskOrInAnyRepositoryError{PluginName: pluginNameOrLocation, BinaryName: cmd.Config.BinaryName()}
@@ -256,10 +280,10 @@ func (InstallPluginCommand) handleFetchingPluginInfoFromRepositoriesError(fetchE
 }
 
 func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (string, PluginSource, error) {
-	exitInstall, err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
-	if err != nil || exitInstall {
+	if err != nil {
 		return "", 0, err
 	}
 
@@ -267,10 +291,10 @@ func (cmd InstallPluginCommand) getPluginFromLocalFile(pluginLocation string) (s
 }
 
 func (cmd InstallPluginCommand) getPluginFromURL(pluginLocation string, tempPluginDir string) (string, PluginSource, error) {
-	exitInstall, err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+	err := cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 		"Path": pluginLocation,
 	})
-	if err != nil || exitInstall {
+	if err != nil {
 		return "", 0, err
 	}
 
@@ -297,7 +321,6 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 
 	currentPlatform := cmd.Actor.GetPlatformString(runtime.GOOS, runtime.GOARCH)
 	pluginInfo, repoList, err := cmd.Actor.GetPluginInfoFromRepositoriesForPlatform(pluginName, repos, currentPlatform)
-
 	if err != nil {
 		return "", 0, err
 	}
@@ -309,24 +332,23 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 	})
 
 	installedPlugin, exist := cmd.Config.GetPlugin(pluginName)
-	var exitInstall bool
 	if exist {
 		cmd.UI.DisplayText("Plugin {{.PluginName}} {{.PluginVersion}} is already installed.", map[string]interface{}{
 			"PluginName":    installedPlugin.Name,
 			"PluginVersion": installedPlugin.Version.String(),
 		})
 
-		exitInstall, err = cmd.installPluginPrompt("Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?", map[string]interface{}{
+		err = cmd.installPluginPrompt("Do you want to uninstall the existing plugin and install {{.Path}} {{.PluginVersion}}?", map[string]interface{}{
 			"Path":          pluginName,
 			"PluginVersion": pluginInfo.Version,
 		})
 	} else {
-		exitInstall, err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
+		err = cmd.installPluginPrompt(installConfirmationPrompt, map[string]interface{}{
 			"Path": pluginName,
 		})
 	}
 
-	if err != nil || exitInstall {
+	if err != nil {
 		return "", 0, err
 	}
 
@@ -346,12 +368,12 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 	return tempPath, PluginFromRepository, err
 }
 
-func (cmd InstallPluginCommand) installPluginPrompt(template string, templateValues ...map[string]interface{}) (bool, error) {
+func (cmd InstallPluginCommand) installPluginPrompt(template string, templateValues ...map[string]interface{}) error {
 	cmd.UI.DisplayHeader("Attention: Plugins are binaries written by potentially untrusted authors.")
 	cmd.UI.DisplayHeader("Install and use plugins at your own risk.")
 
 	if cmd.Force {
-		return false, nil
+		return nil
 	}
 
 	var (
@@ -362,13 +384,13 @@ func (cmd InstallPluginCommand) installPluginPrompt(template string, templateVal
 	really, promptErr = cmd.UI.DisplayBoolPrompt(false, template, templateValues...)
 
 	if promptErr != nil {
-		return false, promptErr
+		return promptErr
 	}
 
 	if !really {
-		cmd.UI.DisplayText("Plugin installation cancelled.")
-		return true, nil
+		log.Debug("plugin confirmation - 'no' inputed")
+		return cancelInstall{}
 	}
 
-	return false, nil
+	return nil
 }

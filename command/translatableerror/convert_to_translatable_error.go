@@ -2,6 +2,7 @@ package translatableerror
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -9,9 +10,12 @@ import (
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/util/manifest"
+	log "github.com/sirupsen/logrus"
 )
 
 func ConvertToTranslatableError(err error) error {
+	log.WithField("err", fmt.Sprintf("%#v", err)).Debugf("convert to translatable error")
+
 	switch e := err.(type) {
 	// Action Errors
 	case actionerror.AddPluginRepositoryError:
