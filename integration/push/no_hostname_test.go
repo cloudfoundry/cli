@@ -59,7 +59,7 @@ var _ = Describe("pushing with no-hostname", func() {
 				})
 			})
 
-			Context("when using a tcp domain", func() {
+			Context("when using a TCP domain", func() {
 				var domain helpers.Domain
 
 				BeforeEach(func() {
@@ -71,12 +71,18 @@ var _ = Describe("pushing with no-hostname", func() {
 					domain.DeleteShared()
 				})
 
-				It("returns an invalid route error", func() {
+				It("creates a TCP route", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-hostname", "-d", domainName, "--no-start")
-						Eventually(session.Err).Should(Say("The route is invalid: a hostname is required for shared domains."))
-						Eventually(session).Should(Exit(1))
+						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+						Eventually(session).Should(Say("\\+\\s+%s:", domainName))
+						Eventually(session).Should(Exit(0))
 					})
+
+					session := helpers.CF("app", appName)
+					Eventually(session).Should(Say("name:\\s+%s", appName))
+					Eventually(session).Should(Say("(?m)routes:\\s+%s:\\d+", domainName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})

@@ -1024,14 +1024,33 @@ var _ = Describe("Routes", func() {
 			})
 
 			Context("the domain is a shared domain", func() {
-				BeforeEach(func() {
-					domain.Type = constant.SharedDomain
-					fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{domain}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, nil)
+				Context("when the domain is a TCP Domain", func() {
+					BeforeEach(func() {
+						domain.Type = constant.SharedDomain
+						domain.RouterGroupType = constant.TCPRouterGroup
+						fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{domain}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, nil)
+					})
+
+					It("returns a TCP route", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+						Expect(defaultRoute).To(Equal(v2action.Route{
+							Domain:    domain,
+							SpaceGUID: spaceGUID,
+						}))
+					})
 				})
 
-				It("returns an error and warnings", func() {
-					Expect(executeErr).To(MatchError(actionerror.NoHostnameAndSharedDomainError{}))
-					Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+				Context("when the domain is an HTTP Domain", func() {
+					BeforeEach(func() {
+						domain.Type = constant.SharedDomain
+						fakeV2Actor.GetOrganizationDomainsReturns([]v2action.Domain{domain}, v2action.Warnings{"private-domain-warnings", "shared-domain-warnings"}, nil)
+					})
+
+					It("returns an error and warnings", func() {
+						Expect(executeErr).To(MatchError(actionerror.NoHostnameAndSharedDomainError{}))
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
+					})
 				})
 			})
 		})

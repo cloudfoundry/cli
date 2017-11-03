@@ -271,17 +271,17 @@ func (actor Actor) calculateHostname(manifestApp manifest.Application, domain v2
 		hostname = manifestApp.Name
 	}
 
-	sanitizedAppName := actor.sanitizeApplicationName(hostname)
+	sanitizedHostname := actor.sanitize(hostname)
 
 	switch {
 	case manifestApp.Hostname != "" && domain.IsTCP():
 		return "", actionerror.HostnameWithTCPDomainError{}
-	case manifestApp.NoHostname && domain.IsShared():
+	case manifestApp.NoHostname && domain.IsShared() && domain.IsHTTP():
 		return "", actionerror.NoHostnameAndSharedDomainError{}
 	case manifestApp.NoHostname:
 		return "", nil
 	case domain.IsHTTP():
-		return sanitizedAppName, nil
+		return sanitizedHostname, nil
 	default:
 		return "", nil
 	}
@@ -412,28 +412,28 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 	return v2action.Route{}, false
 }
 
-func (Actor) sanitizeApplicationName(appName string) string {
-	sanitizedAppName := []rune{}
+func (Actor) sanitize(name string) string {
+	sanitizedName := []rune{}
 	validCount := 0
 
-	for _, runeChar := range strings.TrimSpace(appName) {
+	for _, runeChar := range strings.TrimSpace(name) {
 		switch {
 		case 'a' <= runeChar && runeChar <= 'z':
-			sanitizedAppName = append(sanitizedAppName, runeChar)
+			sanitizedName = append(sanitizedName, runeChar)
 			validCount++
 		case 'A' <= runeChar && runeChar <= 'Z':
-			sanitizedAppName = append(sanitizedAppName, unicode.ToLower(runeChar))
+			sanitizedName = append(sanitizedName, unicode.ToLower(runeChar))
 			validCount++
 		case ' ' == runeChar || '-' == runeChar:
-			sanitizedAppName = append(sanitizedAppName, '-')
+			sanitizedName = append(sanitizedName, '-')
 		case '0' <= runeChar && runeChar <= '9':
-			sanitizedAppName = append(sanitizedAppName, runeChar)
+			sanitizedName = append(sanitizedName, runeChar)
 			validCount++
 		}
 	}
 
 	if validCount > 0 {
-		return strings.Trim(string(sanitizedAppName), "-")
+		return strings.Trim(string(sanitizedName), "-")
 	}
 
 	return ""
