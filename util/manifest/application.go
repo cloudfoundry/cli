@@ -31,13 +31,14 @@ type Application struct {
 	NoRoute         bool
 	Path            string
 	Routes          []string
+	RoutePath       string
 	Services        []string
 	StackName       string
 }
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-hostname: %t, No-route: %t, Path: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-hostname: %t, No-route: %t, Path: '%s', RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -48,12 +49,14 @@ func (app Application) String() string {
 		app.HealthCheckHTTPEndpoint,
 		app.HealthCheckTimeout,
 		app.HealthCheckType,
+		app.Hostname,
 		app.Instances.IsSet,
 		app.Instances.Value,
 		app.Memory,
 		app.NoHostname,
 		app.NoRoute,
 		app.Path,
+		app.RoutePath,
 		strings.Join(app.Routes, ", "),
 		strings.Join(app.Services, ", "),
 		app.StackName,

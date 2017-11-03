@@ -754,7 +754,7 @@ var _ = Describe("v2-push Command", func() {
 						cmd.Hostname = "some-hostname"
 					})
 
-					It("sets NoHostname on the command line settings", func() {
+					It("sets DefaultRouteHostname on the command line settings", func() {
 						Expect(settings.DefaultRouteHostname).To(Equal("some-hostname"))
 					})
 				})
@@ -766,6 +766,17 @@ var _ = Describe("v2-push Command", func() {
 
 					It("sets NoHostname on the command line settings", func() {
 						Expect(settings.NoHostname).To(BeTrue())
+					})
+				})
+
+				Context("when --routepath is given", func() {
+					BeforeEach(func() {
+						cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
+					})
+
+					It("sets --route-path on the command line settings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(settings.RoutePath).To(Equal("/some-path"))
 					})
 				})
 
@@ -866,6 +877,13 @@ var _ = Describe("v2-push Command", func() {
 					cmd.NoRoute = true
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"-d", "--no-route"}}),
+
+			Entry("--route-path and --no-route",
+				func() {
+					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),
 
 			Entry("-o and -b",
 				func() {

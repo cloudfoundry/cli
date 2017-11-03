@@ -276,6 +276,12 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			CommandLineSettings{ProvidedAppPath: "some-path"},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{RoutePath: "some-route-path"},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{StackName: "some-stackname"},
 			manifestWithMultipleApps,
@@ -330,9 +336,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("PropertyCombinationError",
 			CommandLineSettings{
 				NoHostname: true,
-				NoRoute:    true,
 			},
 			[]manifest.Application{{
+				NoRoute:     true,
 				Name:        "some-name-1",
 				DockerImage: "some-docker-image",
 			}},
@@ -343,15 +349,28 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("PropertyCombinationError",
 			CommandLineSettings{
 				DefaultRouteHostname: "potato",
-				NoRoute:              true,
 			},
 			[]manifest.Application{{
+				NoRoute:     true,
 				Name:        "some-name-1",
 				DockerImage: "some-docker-image",
 			}},
 			actionerror.PropertyCombinationError{
 				AppName:    "some-name-1",
 				Properties: []string{"hostname", "no-route"},
+			}),
+		Entry("PropertyCombinationError",
+			CommandLineSettings{
+				RoutePath: "some-path",
+			},
+			[]manifest.Application{{
+				NoRoute:     true,
+				Name:        "some-name-1",
+				DockerImage: "some-docker-image",
+			}},
+			actionerror.PropertyCombinationError{
+				AppName:    "some-name-1",
+				Properties: []string{"route-path", "no-route"},
 			}),
 		Entry("HTTPHealthCheckInvalidError",
 			CommandLineSettings{

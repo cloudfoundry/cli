@@ -128,6 +128,7 @@ func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID str
 		return config, warnings, err
 	}
 
+	// if routes aren't provided in the manifest
 	desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
 	if err != nil {
 		log.Errorln("getting default route:", err)

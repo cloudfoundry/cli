@@ -203,10 +203,16 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 		return v2action.Route{}, warnings, err
 	}
 
+	desiredPath, err := actor.calculatePath(manifestApp, desiredDomain)
+	if err != nil {
+		return v2action.Route{}, warnings, err
+	}
+
 	defaultRoute := v2action.Route{
 		Domain:    desiredDomain,
 		Host:      desiredHostname,
 		SpaceGUID: spaceGUID,
+		Path:      desiredPath,
 	}
 
 	cachedRoute, found := actor.routeInListBySettings(defaultRoute, knownRoutes)
@@ -295,6 +301,14 @@ func (actor Actor) calculateRoute(route string, domainCache map[string]v2action.
 	hosts = append([]string{host}, hosts...)
 
 	return hosts, foundDomain, err
+}
+
+func (actor Actor) calculatePath(manifestApp manifest.Application, domain v2action.Domain) (string, error) {
+	if manifestApp.RoutePath != "" && domain.IsTCP() {
+		return "", actionerror.RoutePathWithTCPDomainError{}
+	} else {
+		return manifestApp.RoutePath, nil
+	}
 }
 
 func (actor Actor) findOrReturnPartialRouteWithSettings(route v2action.Route) (v2action.Route, Warnings, error) {
@@ -386,6 +400,7 @@ func (Actor) routeInListByName(route string, routes []v2action.Route) (v2action.
 
 	return v2action.Route{}, false
 }
+
 func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route) (v2action.Route, bool) {
 	for _, r := range routes {
 		if r.Host == route.Host && r.Path == route.Path && r.Port == route.Port &&

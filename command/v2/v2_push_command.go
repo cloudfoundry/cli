@@ -55,12 +55,12 @@ type V2PushCommand struct {
 	NoStart         bool                        `long:"no-start" description:"Do not start an app after pushing"`
 	AppPath         flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	// RandomRoute          bool                        `long:"random-route" description:"Create a random route for this app"`
-	// RoutePath            string                      `long:"route-path" description:"Path for the route"`
-	StackName           string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
-	HealthCheckTimeout  int         `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
-	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
-	dockerPassword      interface{} `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
+	RoutePath           flag.RoutePath `long:"route-path" description:"Path for the route"`
+	StackName           string         `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	HealthCheckTimeout  int            `short:"t" description:"Time (in seconds) allowed to elapse between starting up an app and the first healthy response from the app"`
+	envCFStagingTimeout interface{}    `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}    `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	dockerPassword      interface{}    `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 
 	usage           interface{} `usage:"cf v2-push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-p PATH] [-s STACK] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME]\n   [-c COMMAND] [-f MANIFEST_PATH | --no-manifest] [--no-start]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-t HEALTH_TIMEOUT] [-u (process | port | http)]\n   [--no-route | --random-route | --hostname HOST | --no-hostname] [-d DOMAIN] [--route-path ROUTE_PATH]\n\n   cf v2-push -f MANIFEST_WITH_MULTIPLE_APPS_PATH [APP_NAME] [--no-start]"`
 	relatedCommands interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
@@ -261,6 +261,7 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 		NoHostname:           cmd.NoHostname,
 		NoRoute:              cmd.NoRoute,
 		ProvidedAppPath:      string(cmd.AppPath),
+		RoutePath:            cmd.RoutePath.Path,
 		StackName:            cmd.StackName,
 	}
 
@@ -430,6 +431,10 @@ func (cmd V2PushCommand) validateArgs() error {
 	case cmd.Hostname != "" && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{
 			Args: []string{"--hostname", "--no-route"},
+		}
+	case cmd.RoutePath.Path != "" && cmd.NoRoute:
+		return translatableerror.ArgumentCombinationError{
+			Args: []string{"--route-path", "--no-route"},
 		}
 	case cmd.PathToManifest != "" && cmd.NoManifest:
 		return translatableerror.ArgumentCombinationError{

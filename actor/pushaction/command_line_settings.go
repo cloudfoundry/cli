@@ -26,6 +26,7 @@ type CommandLineSettings struct {
 	NoHostname           bool
 	NoRoute              bool
 	ProvidedAppPath      string
+	RoutePath            string
 	StackName            string
 }
 
@@ -96,6 +97,9 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	if app.Path == "" && app.DockerImage == "" {
 		app.Path = settings.CurrentDirectory
 	}
+	if settings.RoutePath != "" {
+		app.RoutePath = settings.RoutePath
+	}
 
 	if settings.StackName != "" {
 		app.StackName = settings.StackName
@@ -106,7 +110,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 
 func (settings CommandLineSettings) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', Domain: '%s', Hostname: '%s'",
+		"App Name: '%s', Buildpack: (%t, '%s'), Command: (%t, '%s'), CurrentDirectory: '%s', Disk Quota: '%d', Docker Image: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Instances: (%t, '%d'), Memory: '%d', Provided App Path: '%s', Stack: '%s', RoutePath: '%s', Domain: '%s', Hostname: '%s'",
 		settings.Name,
 		settings.Buildpack.IsSet,
 		settings.Buildpack.Value,
@@ -122,6 +126,7 @@ func (settings CommandLineSettings) String() string {
 		settings.Memory,
 		settings.ProvidedAppPath,
 		settings.StackName,
+		settings.RoutePath,
 		settings.DefaultRouteDomain,
 		settings.DefaultRouteHostname,
 	)

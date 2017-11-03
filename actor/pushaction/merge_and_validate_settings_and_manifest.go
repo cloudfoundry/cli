@@ -76,6 +76,7 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			settings.Instances.IsSet,
 			settings.Memory != 0,
 			settings.ProvidedAppPath != "",
+			settings.RoutePath != "",
 			settings.StackName != "":
 			log.Error("cannot use some parameters with multiple apps")
 			return actionerror.CommandLineOptionsWithMultipleAppsError{}
@@ -122,6 +123,9 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 			}
 			if app.NoHostname {
 				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-hostname", "no-route"}}
+			}
+			if app.RoutePath != "" {
+				return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"route-path", "no-route"}}
 			}
 		}
 

@@ -116,7 +116,7 @@ var _ = Describe("push with hostname", func() {
 					Eventually(helpers.CF("create-route", space, defaultSharedDomain(), "-n", strings.ToLower(appName))).Should(Exit(0))
 				})
 
-				It("maps the route", func() {
+				It("creates and maps the route with the provided hostname", func() {
 					helpers.WithHelloWorldApp(func(dir string) {
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--hostname", hostname, "--no-start")
 						Eventually(session).Should(Say("routes:"))

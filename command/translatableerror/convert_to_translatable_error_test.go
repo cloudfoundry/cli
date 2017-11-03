@@ -183,6 +183,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.RouteInDifferentSpaceError{Route: "some-route"},
 			RouteInDifferentSpaceError{Route: "some-route"}),
 
+		Entry("actionerror.RoutePathWithTCPDomainError -> RoutePathWithTCPDomainError",
+			actionerror.RoutePathWithTCPDomainError{},
+			RoutePathWithTCPDomainError{}),
+
 		Entry("actionerror.SecurityGroupNotFoundError -> SecurityGroupNotFoundError",
 			actionerror.SecurityGroupNotFoundError{Name: "some-security-group"},
 			SecurityGroupNotFoundError{Name: "some-security-group"}),

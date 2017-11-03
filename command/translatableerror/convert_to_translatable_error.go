@@ -88,6 +88,8 @@ func ConvertToTranslatableError(err error) error {
 		return RepositoryNotRegisteredError(e)
 	case actionerror.RouteInDifferentSpaceError:
 		return RouteInDifferentSpaceError(e)
+	case actionerror.RoutePathWithTCPDomainError:
+		return RoutePathWithTCPDomainError(e)
 	case actionerror.SecurityGroupNotFoundError:
 		return SecurityGroupNotFoundError(e)
 	case actionerror.ServiceInstanceNotFoundError:

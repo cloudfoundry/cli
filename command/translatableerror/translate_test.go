@@ -93,6 +93,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("RequiredFlagsError", RequiredFlagsError{}),
 		Entry("RequiredNameForPushError", RequiredNameForPushError{}),
 		Entry("RouteInDifferentSpaceError", RouteInDifferentSpaceError{}),
+		Entry("RoutePathWithTCPDomainError", RoutePathWithTCPDomainError{}),
 		Entry("RunTaskError", RunTaskError{}),
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
