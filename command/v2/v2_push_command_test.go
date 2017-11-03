@@ -899,6 +899,13 @@ var _ = Describe("v2-push Command", func() {
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--no-route"}}),
 
+			Entry("--hostname and --no-hostname",
+				func() {
+					cmd.Hostname = "po-tate-toe"
+					cmd.NoHostname = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "--no-hostname"}}),
+
 			Entry("--no-hostname and --no-route",
 				func() {
 					cmd.NoHostname = true
