@@ -56,6 +56,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("HealthCheckTypeUnsupportedError", HealthCheckTypeUnsupportedError{SupportedTypes: []string{"some-type", "another-type"}}),
 		Entry("HostnameWithTCPDomainError", HostnameWithTCPDomainError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
+		Entry("InvalidChecksumError", InvalidChecksumError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
 		Entry("IsolationSegmentNotFoundError", IsolationSegmentNotFoundError{}),
 		Entry("JobFailedError", JobFailedError{}),

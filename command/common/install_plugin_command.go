@@ -37,13 +37,6 @@ type InstallPluginActor interface {
 
 const installConfirmationPrompt = "Do you want to install the plugin {{.Path}}?"
 
-type InvalidChecksumError struct {
-}
-
-func (InvalidChecksumError) Error() string {
-	return "Downloaded plugin binary's checksum does not match repo metadata.\nPlease try again or contact the plugin author."
-}
-
 type cancelInstall struct {
 }
 
@@ -362,7 +355,7 @@ func (cmd InstallPluginCommand) getPluginFromRepositories(pluginName string, rep
 	}
 
 	if !cmd.Actor.ValidateFileChecksum(tempPath, pluginInfo.Checksum) {
-		return "", 0, InvalidChecksumError{}
+		return "", 0, translatableerror.InvalidChecksumError{}
 	}
 
 	return tempPath, PluginFromRepository, err

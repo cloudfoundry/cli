@@ -267,7 +267,7 @@ var _ = Describe("install-plugin command", func() {
 								})
 
 								It("returns the checksum error", func() {
-									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
+									Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
 									Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
@@ -444,7 +444,7 @@ var _ = Describe("install-plugin command", func() {
 								})
 
 								It("returns the checksum error", func() {
-									Expect(executeErr).To(MatchError(InvalidChecksumError{}))
+									Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
 									Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
 									Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
@@ -837,7 +837,7 @@ var _ = Describe("install-plugin command", func() {
 						})
 
 						It("returns the checksum error", func() {
-							Expect(executeErr).To(MatchError(InvalidChecksumError{}))
+							Expect(executeErr).To(MatchError(translatableerror.InvalidChecksumError{}))
 
 							Expect(testUI.Out).To(Say("Searching %s for plugin %s\\.\\.\\.", repoName, pluginName))
 							Expect(testUI.Out).To(Say("Plugin %s %s found in: %s", pluginName, downloadedVersionString, repoName))
