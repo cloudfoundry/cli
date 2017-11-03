@@ -10,7 +10,7 @@ LD_FLAGS = "-w -s \
 	-X code.cloudfoundry.org/cli/version.binaryVersion=$(CF_BUILD_VERSION) \
 	-X code.cloudfoundry.org/cli/version.binarySHA=$(CF_BUILD_SHA) \
 	-X code.cloudfoundry.org/cli/version.binaryBuildDate=$(CF_BUILD_DATE)"
-GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*")
+GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 
 all : test build
 
