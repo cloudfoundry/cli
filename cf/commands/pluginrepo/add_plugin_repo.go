@@ -17,7 +17,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
+	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 )

@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/models"
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
+	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 )
 
 type FakePluginRepo struct {

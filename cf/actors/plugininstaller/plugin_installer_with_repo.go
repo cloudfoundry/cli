@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/util"
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
+	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 )
 
 type pluginInstallerWithRepo struct {

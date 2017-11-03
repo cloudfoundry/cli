@@ -12,7 +12,7 @@ import (
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
+	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "github.com/onsi/ginkgo"

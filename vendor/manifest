@@ -94,20 +94,20 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry-incubator/cli-plugin-repo/web",
-			"repository": "https://github.com/cloudfoundry-incubator/cli-plugin-repo",
-			"vcs": "git",
-			"revision": "c617dd749bce96b5357933bfde859cb9a01c6012",
-			"branch": "master",
-			"path": "/web",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/cloudfoundry/bytefmt",
 			"repository": "https://github.com/cloudfoundry/bytefmt",
 			"vcs": "git",
 			"revision": "f4415fafc5619dd75599a54a7c91fb3948ad58bd",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/cloudfoundry/cli-plugin-repo/web",
+			"repository": "https://github.com/cloudfoundry/cli-plugin-repo",
+			"vcs": "git",
+			"revision": "0fa3509478c3a91d8174da991d3a7cff84b0456e",
+			"branch": "master",
+			"path": "/web",
 			"notests": true
 		},
 		{

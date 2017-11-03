@@ -25,7 +25,7 @@ import (
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 	"code.cloudfoundry.org/cli/util/utilfakes"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
+	clipr "github.com/cloudfoundry/cli-plugin-repo/web"
 
 	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
