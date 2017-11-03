@@ -33,7 +33,7 @@ var _ = Describe("v3-ssh command", func() {
 			Eventually(session.Out).Should(Say(`NAME:`))
 			Eventually(session.Out).Should(Say(`ssh - SSH to an application container instance`))
 			Eventually(session.Out).Should(Say(`USAGE:`))
-			Eventually(session.Out).Should(Say(`cf v3-ssh APP_NAME \[--process PROCESS\] \[-i INDEX\] \[-c COMMAND\]\.\.\.`))
+			Eventually(session.Out).Should(Say(`cf v3-ssh APP_NAME \[--process PROCESS\] \[-i INDEX\] \[-c COMMAND\]\n`))
 			Eventually(session.Out).Should(Say(`\[-L \[BIND_ADDRESS:\]LOCAL_PORT:REMOTE_HOST:REMOTE_PORT\]\.\.\. \[--skip-remote-execution\]`))
 			Eventually(session.Out).Should(Say(`\[--disable-pseudo-tty \| --force-pseudo-tty \| --request-pseudo-tty\] \[--skip-host-validation\]`))
 			Eventually(session.Out).Should(Say(`OPTIONS:`))
