@@ -42,7 +42,7 @@ resources:
 - name: cf-acceptance-tests
   type: git
   source:
-    uri: https://github.com/nickwei84/cf-acceptance-tests #switch back to cloudfoundry when PR #251 is merged
+    uri: https://github.com/cloudfoundry/cf-acceptance-tests
     branch: master
 
 - name: cf-cli-binaries
