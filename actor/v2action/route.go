@@ -193,16 +193,17 @@ func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
 }
 
 // FindRouteBoundToSpaceWithSettings finds the route with the given host,
-// domain and space.  If it is unable to find the route, it will check if it
+// domain and space. If it is unable to find the route, it will check if it
 // exists anywhere in the system. When the route exists in another space,
-// RouteInDifferentSpaceError is returned.
+// RouteInDifferentSpaceError is returned. Use this when you know the space
+// GUID.
 func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnings, error) {
 	// TODO: Implement TCP Route lookup. Be sure to handle case of RandomTCPPort.
 	if route.Domain.IsTCP() {
 		return Route{}, nil, actionerror.RouteNotFoundError{DomainGUID: route.Domain.GUID}
 	}
 
-	existingRoute, warnings, err := actor.GetRouteByHostAndDomainAndPath(route.Host, route.Domain.GUID, route.Path)
+	existingRoute, warnings, err := actor.GetRouteByComponents(route)
 	if routeNotFoundErr, ok := err.(actionerror.RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
 		// false for anything below that.
@@ -240,27 +241,27 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 	return existingRoute, Warnings(warnings), err
 }
 
-// GetRouteByHostAndDomain returns the HTTP route with the matching host and
-// the associate domain GUID.
-func (actor Actor) GetRouteByHostAndDomainAndPath(host string, domainGUID string, path string) (Route, Warnings, error) {
+// GetRouteByComponents returns the route with the matching host, domain, path,
+// and port. Use this when you don't know the space GUID.
+func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 	queries := []ccv2.Query{
 		ccv2.Query{
 			Filter:   ccv2.HostFilter,
 			Operator: ccv2.EqualOperator,
-			Values:   []string{host},
+			Values:   []string{route.Host},
 		},
 		ccv2.Query{
 			Filter:   ccv2.DomainGUIDFilter,
 			Operator: ccv2.EqualOperator,
-			Values:   []string{domainGUID},
+			Values:   []string{route.Domain.GUID},
 		},
 	}
 
-	if path != "" {
+	if route.Path != "" {
 		queries = append(queries, ccv2.Query{
 			Filter:   ccv2.PathFilter,
 			Operator: ccv2.EqualOperator,
-			Values:   []string{path},
+			Values:   []string{route.Path},
 		})
 	}
 
@@ -270,15 +271,14 @@ func (actor Actor) GetRouteByHostAndDomainAndPath(host string, domainGUID string
 	}
 
 	if len(ccv2Routes) == 0 {
-		return Route{}, Warnings(warnings), actionerror.RouteNotFoundError{Host: host, DomainGUID: domainGUID, Path: path}
+		return Route{}, Warnings(warnings), actionerror.RouteNotFoundError{
+			Host:       route.Host,
+			DomainGUID: route.Domain.GUID,
+			Path:       route.Path,
+		}
 	}
 
-	routes, domainWarnings, err := actor.applyDomain(ccv2Routes)
-	if err != nil {
-		return Route{}, append(Warnings(warnings), domainWarnings...), err
-	}
-
-	return routes[0], append(Warnings(warnings), domainWarnings...), err
+	return CCToActorRoute(ccv2Routes[0], route.Domain), Warnings(warnings), err
 }
 
 func ActorToCCRoute(route Route) ccv2.Route {
