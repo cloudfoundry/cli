@@ -129,12 +129,9 @@ func (client *Client) rootResponse() (APIInfo, Warnings, error) {
 	}
 
 	err = client.connection.Make(request, &response)
-	if err != nil {
-		if _, ok := err.(ccerror.NotFoundError); ok {
-			return APIInfo{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
-		}
-		return APIInfo{}, response.Warnings, err
+	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
+		return APIInfo{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 
-	return rootResponse, response.Warnings, nil
+	return rootResponse, response.Warnings, err
 }

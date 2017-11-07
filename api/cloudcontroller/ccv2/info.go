@@ -1,6 +1,8 @@
 package ccv2
 
 import (
+	"net/http"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -73,7 +75,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 	}
 
 	err = client.connection.Make(request, &response)
-	if _, ok := err.(ccerror.NotFoundError); ok {
+	if unknownSourceErr, ok := err.(ccerror.UnknownHTTPSourceError); ok && unknownSourceErr.StatusCode == http.StatusNotFound {
 		return APIInformation{}, nil, ccerror.APINotFoundError{URL: client.cloudControllerURL}
 	}
 	return info, response.Warnings, err

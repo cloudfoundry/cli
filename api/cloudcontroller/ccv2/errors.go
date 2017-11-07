@@ -37,14 +37,12 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 
 func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
-	// return the raw error.
+	// either we're not talking to a CC, or the CC returned invalid json.
 	var errorResponse ccerror.V2ErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
 	if err != nil {
-		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
-			return ccerror.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
-		}
-		return rawHTTPStatusErr
+		// ccv2/info.go converts this error to an APINotFoundError.
+		return ccerror.UnknownHTTPSourceError{StatusCode: rawHTTPStatusErr.StatusCode, RawResponse: rawHTTPStatusErr.RawResponse}
 	}
 
 	switch rawHTTPStatusErr.StatusCode {

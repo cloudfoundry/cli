@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Error Wrapper", func() {
 	var (
-		response           string
+		serverResponse     string
 		serverResponseCode int
 
 		client *Client
@@ -21,7 +21,7 @@ var _ = Describe("Error Wrapper", func() {
 
 	Describe("Make", func() {
 		BeforeEach(func() {
-			response = `{
+			serverResponse = `{
 					"code": 777,
 					"description": "SomeCC Error Message",
 					"error_code": "CF-SomeError"
@@ -34,7 +34,7 @@ var _ = Describe("Error Wrapper", func() {
 			server.AppendHandlers(
 				CombineHandlers(
 					VerifyRequest(http.MethodGet, "/v2/apps"),
-					RespondWith(serverResponseCode, response, http.Header{
+					RespondWith(serverResponseCode, serverResponse, http.Header{
 						"X-Vcap-Request-Id": {
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
 							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
@@ -45,22 +45,15 @@ var _ = Describe("Error Wrapper", func() {
 			)
 		})
 
-		Context("when the error is not from the cloud controller", func() {
+		Context("when we can't unmarshal the response successfully", func() {
 			BeforeEach(func() {
-				serverResponseCode = http.StatusTeapot
-				response = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
+				serverResponse = "I am not unmarshallable"
+				serverResponseCode = http.StatusNotFound
 			})
 
-			It("returns a RawHTTPStatusError", func() {
+			It("returns an unknown http source error", func() {
 				_, _, err := client.GetApplications()
-				Expect(err).To(MatchError(ccerror.RawHTTPStatusError{
-					StatusCode:  http.StatusTeapot,
-					RawResponse: []byte(response),
-					RequestIDs: []string{
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
-						"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
-					},
-				}))
+				Expect(err).To(MatchError(ccerror.UnknownHTTPSourceError{StatusCode: serverResponseCode, RawResponse: []byte(serverResponse)}))
 			})
 		})
 
@@ -72,7 +65,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("generic 400", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 							"description": "bad request",
 							"error_code": "CF-BadRequest"
 						}`
@@ -88,7 +81,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("when a not staged error is encountered", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 								"description": "App has not finished staging",
 								"error_code": "CF-NotStaged"
 							}`
@@ -104,7 +97,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("when an instances error is encountered", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 								"description": "instances went bananas",
 								"error_code": "CF-InstancesError"
 							}`
@@ -120,7 +113,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("when creating a relation that is invalid", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 							"code": 1002,
 							"description": "The requested app relation is invalid: the app and route must belong to the same space",
 							"error_code": "CF-InvalidRelation"
@@ -137,7 +130,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("getting stats for a stopped app", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 							"code": 200003,
 							"description": "Could not fetch stats for stopped app: some-app",
 							"error_code": "CF-AppStoppedStatsError"
@@ -167,7 +160,7 @@ var _ = Describe("Error Wrapper", func() {
 
 				Context("invalid token", func() {
 					BeforeEach(func() {
-						response = `{
+						serverResponse = `{
 						"code": 1000,
 						"description": "Invalid Auth Token",
 						"error_code": "CF-InvalidAuthToken"
@@ -201,17 +194,6 @@ var _ = Describe("Error Wrapper", func() {
 					It("returns a ResourceNotFoundError", func() {
 						_, _, err := client.GetApplications()
 						Expect(err).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
-					})
-				})
-
-				Context("when the error is not from the cloud controller API", func() {
-					BeforeEach(func() {
-						response = "an error not from the CC API"
-					})
-
-					It("returns a NotFoundError", func() {
-						_, _, err := client.GetApplications()
-						Expect(err).To(MatchError(ccerror.NotFoundError{Message: response}))
 					})
 				})
 			})

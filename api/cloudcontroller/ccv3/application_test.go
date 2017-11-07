@@ -544,7 +544,7 @@ var _ = Describe("Application", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodDelete, "/v3/apps/some-app-guid"),
-						RespondWith(http.StatusBadRequest, ``,
+						RespondWith(http.StatusBadRequest, `{}`,
 							http.Header{
 								"X-Cf-Warnings": {"some-warning"},
 							},
@@ -555,7 +555,7 @@ var _ = Describe("Application", func() {
 
 			It("returns all warnings", func() {
 				_, warnings, err := client.DeleteApplication("some-app-guid")
-				Expect(err).To(MatchError(ccerror.RawHTTPStatusError{StatusCode: 400, RawResponse: []byte{}}))
+				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{ResponseCode: 400}))
 				Expect(warnings).To(ConsistOf("some-warning"))
 			})
 		})

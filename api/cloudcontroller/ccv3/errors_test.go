@@ -56,32 +56,14 @@ var _ = Describe("Error Wrapper", func() {
 			_, _, makeError = client.GetApplications(nil)
 		})
 
-		Context("when the error is not from the cloud controller", func() {
-			Context("and the raw status is 404", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusNotFound
-					serverResponse = "some not found message"
-				})
-				It("returns a NotFoundError", func() {
-					Expect(makeError).To(MatchError(ccerror.NotFoundError{Message: serverResponse}))
-				})
+		Context("when we can't unmarshal the response successfully", func() {
+			BeforeEach(func() {
+				serverResponse = "I am not unmarshallable"
+				serverResponseCode = http.StatusNotFound
 			})
 
-			Context("and the raw status is another error", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusTeapot
-					serverResponse = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
-				})
-				It("returns a RawHTTPStatusError", func() {
-					Expect(makeError).To(MatchError(ccerror.RawHTTPStatusError{
-						StatusCode:  http.StatusTeapot,
-						RawResponse: []byte(serverResponse),
-						RequestIDs: []string{
-							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
-							"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
-						},
-					}))
-				})
+			It("returns an unknown http source error", func() {
+				Expect(makeError).To(MatchError(ccerror.UnknownHTTPSourceError{StatusCode: serverResponseCode, RawResponse: []byte(serverResponse)}))
 			})
 		})
 

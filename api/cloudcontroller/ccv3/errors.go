@@ -40,13 +40,9 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// return the raw error.
 	var errorResponse ccerror.V3ErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
-
 	// error parsing json
 	if err != nil {
-		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
-			return ccerror.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
-		}
-		return rawHTTPStatusErr
+		return ccerror.UnknownHTTPSourceError{StatusCode: rawHTTPStatusErr.StatusCode, RawResponse: rawHTTPStatusErr.RawResponse}
 	}
 
 	errors := errorResponse.Errors
