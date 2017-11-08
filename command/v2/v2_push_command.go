@@ -430,7 +430,7 @@ func (cmd V2PushCommand) validateArgs() error {
 		}
 	case cmd.Hostname != "" && cmd.NoRoute:
 		return translatableerror.ArgumentCombinationError{
-			Args: []string{"--hostname", "--no-route"},
+			Args: []string{"--hostname", "-n", "--no-route"},
 		}
 	case cmd.Hostname != "" && cmd.NoHostname:
 		return translatableerror.ArgumentCombinationError{
