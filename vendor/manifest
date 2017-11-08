@@ -11,14 +11,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "code.cloudfoundry.org/clock",
-			"repository": "https://github.com/cloudfoundry/clock",
-			"vcs": "git",
-			"revision": "2269160ae1757f96bbb8c6475e6fa36c805e73e0",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "code.cloudfoundry.org/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
@@ -516,26 +508,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "gopkg.in/airbrake/gobrake.v2",
-			"repository": "https://gopkg.in/airbrake/gobrake.v2",
-			"vcs": "git",
-			"revision": "668876711219e8b0206e2994bf0a59d889c775aa",
-			"branch": "master",
-			"notests": true
-		},
-		{
 			"importpath": "gopkg.in/cheggaaa/pb.v1",
 			"repository": "https://gopkg.in/cheggaaa/pb.v1",
 			"vcs": "git",
 			"revision": "b6229822fa186496fcbf34111237e7a9693c6971",
-			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
-			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
-			"vcs": "git",
-			"revision": "bfee1239d796830ca346767650cce5ba90d58c57",
 			"branch": "master",
 			"notests": true
 		},
