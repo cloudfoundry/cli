@@ -7,6 +7,7 @@ type RouteNotFoundError struct {
 	Host       string
 	DomainGUID string
 	Path       string
+	Port       int
 }
 
 func (e RouteNotFoundError) Error() string {

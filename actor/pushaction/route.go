@@ -94,18 +94,20 @@ func (actor Actor) CalculateRoutes(routes []string, orgGUID string, spaceGUID st
 			return nil, allWarnings, domainErr
 		}
 
-		// TODO: redo once TCP routing has been completed
-		if port.IsSet && domain.IsHTTP() {
-			return nil, allWarnings, actionerror.InvalidHTTPRouteSettings{Domain: domain.Name}
-		}
-
-		calculatedRoute, routeWarnings, routeErr := actor.findOrReturnPartialRouteWithSettings(v2action.Route{
+		potentialRoute := v2action.Route{
 			Host:      strings.Join(host, "."),
 			Domain:    domain,
 			Path:      path,
 			Port:      port,
 			SpaceGUID: spaceGUID,
-		})
+		}
+
+		validationErr := potentialRoute.Validate()
+		if validationErr != nil {
+			return nil, allWarnings, validationErr
+		}
+
+		calculatedRoute, routeWarnings, routeErr := actor.findOrReturnPartialRouteWithSettings(potentialRoute)
 		allWarnings = append(allWarnings, routeWarnings...)
 		if routeErr != nil {
 			log.Errorln("route lookup:", routeErr)
@@ -213,6 +215,12 @@ func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID s
 		Host:      desiredHostname,
 		SpaceGUID: spaceGUID,
 		Path:      desiredPath,
+	}
+
+	// when the default desired domain is a TCP domain, always return a
+	// new/random route
+	if desiredDomain.IsTCP() {
+		return defaultRoute, warnings, nil
 	}
 
 	cachedRoute, found := actor.routeInListBySettings(defaultRoute, knownRoutes)
@@ -362,8 +370,8 @@ func (actor Actor) getDefaultRoute(orgGUID string, spaceGUID string, appName str
 	}, domainWarnings, nil
 }
 
-func (Actor) parseURL(route string) (string, types.NullInt, string, error) {
-	if !(strings.HasPrefix(route, "http://") || strings.HasPrefix(route, "https://")) {
+func (actor Actor) parseURL(route string) (string, types.NullInt, string, error) {
+	if !(actor.startWithProtocol.MatchString(route)) {
 		route = fmt.Sprintf("http://%s", route)
 	}
 	parsedURL, err := url.Parse(route)
@@ -391,9 +399,10 @@ func (Actor) routeInListByGUID(route v2action.Route, routes []v2action.Route) bo
 	return false
 }
 
-func (Actor) routeInListByName(route string, routes []v2action.Route) (v2action.Route, bool) {
+func (actor Actor) routeInListByName(route string, routes []v2action.Route) (v2action.Route, bool) {
+	strippedRoute := actor.startWithProtocol.ReplaceAllString(route, "")
 	for _, r := range routes {
-		if r.String() == route {
+		if r.String() == strippedRoute {
 			return r, true
 		}
 	}

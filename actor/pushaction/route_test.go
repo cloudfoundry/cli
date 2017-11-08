@@ -236,6 +236,17 @@ var _ = Describe("Routes", func() {
 					}, v2action.Warnings{"domain-warnings-1", "domains-warnings-2"}, nil)
 				})
 
+				Context("when the route is invalid", func() {
+					BeforeEach(func() {
+						routes = []string{"a.com", "b.a.com", "c.b.a.com:1234"}
+					})
+
+					It("returns back warnings and error", func() {
+						Expect(executeErr).To(MatchError(actionerror.InvalidHTTPRouteSettings{Domain: "b.a.com"}))
+						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
+					})
+				})
+
 				Context("when the route existance check is successful", func() {
 					BeforeEach(func() {
 						fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"find-route-warning"}, actionerror.RouteNotFoundError{})
@@ -344,17 +355,6 @@ var _ = Describe("Routes", func() {
 
 					It("returns back warnings and error", func() {
 						Expect(executeErr).To(MatchError(actionerror.NoMatchingDomainError{Route: "a.com"}))
-						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
-					})
-				})
-
-				Context("when TCP properties are being set on a HTTP domain", func() {
-					BeforeEach(func() {
-						routes = []string{"a.com", "b.a.com", "c.b.a.com:1234"}
-					})
-
-					It("returns back warnings and error", func() {
-						Expect(executeErr).To(MatchError(actionerror.InvalidHTTPRouteSettings{Domain: "b.a.com"}))
 						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2"))
 					})
 				})
@@ -905,7 +905,7 @@ var _ = Describe("Routes", func() {
 
 					It("it uses the provided domain instead of the first shared domain and has no host", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("some-organization-domain-warning", "get-route-warnings"))
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 						Expect(defaultRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							SpaceGUID: spaceGUID,
@@ -916,11 +916,7 @@ var _ = Describe("Routes", func() {
 						Expect(domainNamesArg).To(Equal([]string{"shared-domain.com"}))
 						Expect(orgGUIDArg).To(Equal(orgGUID))
 
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(1))
-						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsArgsForCall(0)).To(Equal(v2action.Route{
-							Domain:    domain,
-							SpaceGUID: spaceGUID,
-						}))
+						Expect(fakeV2Actor.FindRouteBoundToSpaceWithSettingsCallCount()).To(Equal(0))
 					})
 				})
 			})
@@ -1033,7 +1029,7 @@ var _ = Describe("Routes", func() {
 
 					It("returns a TCP route", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
-						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings", "get-route-warnings"))
+						Expect(warnings).To(ConsistOf("private-domain-warnings", "shared-domain-warnings"))
 						Expect(defaultRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							SpaceGUID: spaceGUID,

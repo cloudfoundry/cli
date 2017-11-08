@@ -32,6 +32,8 @@ const (
 	HostFilter QueryFilter = "host"
 	// PathFilter is the name of the 'path' filter.
 	PathFilter QueryFilter = "path"
+	// PortFilter is the name of the 'port' filter.
+	PortFilter QueryFilter = "port"
 )
 
 const (

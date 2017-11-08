@@ -89,6 +89,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
 			PortNotAllowedWithHTTPDomainError{Domain: "some-domain"}),
 
+		Entry("actionerror.InvalidTCPRouteSettings -> HostAndPathNotAllowedWithTCPDomainError",
+			actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
+			HostAndPathNotAllowedWithTCPDomainError{Domain: "some-domain"}),
+
 		Entry("actionerror.MissingNameError -> RequiredNameForPushError",
 			actionerror.MissingNameError{},
 			RequiredNameForPushError{}),

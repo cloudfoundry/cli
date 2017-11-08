@@ -14,6 +14,7 @@ import (
 
 type Routes []Route
 
+// Summary converts routes into a comma separated string.
 func (rs Routes) Summary() string {
 	formattedRoutes := []string{}
 	for _, route := range rs {
@@ -34,6 +35,21 @@ type Route struct {
 
 func (r Route) RandomTCPPort() bool {
 	return r.Domain.IsTCP() && !r.Port.IsSet
+}
+
+// Validate will return an error if there are invalid HTTP or TCP settings for
+// it's given domain.
+func (r Route) Validate() error {
+	if r.Domain.IsHTTP() {
+		if r.Port.IsSet {
+			return actionerror.InvalidHTTPRouteSettings{Domain: r.Domain.Name}
+		}
+	} else { // Is TCP Domain
+		if r.Host != "" || r.Path != "" {
+			return actionerror.InvalidTCPRouteSettings{Domain: r.Domain.Name}
+		}
+	}
+	return nil
 }
 
 // String formats the route in a human readable format.
@@ -198,11 +214,6 @@ func (actor Actor) CheckRoute(route Route) (bool, Warnings, error) {
 // RouteInDifferentSpaceError is returned. Use this when you know the space
 // GUID.
 func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnings, error) {
-	// TODO: Implement TCP Route lookup. Be sure to handle case of RandomTCPPort.
-	if route.Domain.IsTCP() {
-		return Route{}, nil, actionerror.RouteNotFoundError{DomainGUID: route.Domain.GUID}
-	}
-
 	existingRoute, warnings, err := actor.GetRouteByComponents(route)
 	if routeNotFoundErr, ok := err.(actionerror.RouteNotFoundError); ok {
 		// This check only works for API versions 2.55 or higher. It will return
@@ -246,15 +257,18 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 	queries := []ccv2.Query{
 		ccv2.Query{
-			Filter:   ccv2.HostFilter,
-			Operator: ccv2.EqualOperator,
-			Values:   []string{route.Host},
-		},
-		ccv2.Query{
 			Filter:   ccv2.DomainGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Domain.GUID},
 		},
+	}
+
+	if route.Host != "" {
+		queries = append(queries, ccv2.Query{
+			Filter:   ccv2.HostFilter,
+			Operator: ccv2.EqualOperator,
+			Values:   []string{route.Host},
+		})
 	}
 
 	if route.Path != "" {
@@ -262,6 +276,14 @@ func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 			Filter:   ccv2.PathFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Path},
+		})
+	}
+
+	if route.Port.IsSet {
+		queries = append(queries, ccv2.Query{
+			Filter:   ccv2.PortFilter,
+			Operator: ccv2.EqualOperator,
+			Values:   []string{fmt.Sprint(route.Port.Value)},
 		})
 	}
 
@@ -275,6 +297,7 @@ func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 			Host:       route.Host,
 			DomainGUID: route.Domain.GUID,
 			Path:       route.Path,
+			Port:       route.Port.Value,
 		}
 	}
 

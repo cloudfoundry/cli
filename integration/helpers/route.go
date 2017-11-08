@@ -9,8 +9,6 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-const DefaultTCPRouterGroup = "default-tcp"
-
 type Route struct {
 	Domain string
 	Host   string

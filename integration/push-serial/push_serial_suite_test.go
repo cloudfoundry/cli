@@ -1,16 +1,17 @@
-package push
+package push_serial_test
 
 import (
 	"io/ioutil"
 	"os"
 	"regexp"
-	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
+
+	"testing"
 )
 
 const (
@@ -31,14 +32,12 @@ var (
 	homeDir string
 )
 
-func TestPush(t *testing.T) {
+func TestPushSerial(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Parallel Push Integration Suite")
+	RunSpecs(t, "Serial Push Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	return nil
-}, func(_ []byte) {
 	// Ginkgo Globals
 	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 	SetDefaultConsistentlyDuration(CFEventuallyTimeout)
@@ -60,14 +59,18 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	var err error
 	realDir, err = ioutil.TempDir("", "push-real-dir")
 	Expect(err).ToNot(HaveOccurred())
+	return nil
+}, func(_ []byte) {
+	if GinkgoParallelNode() != 1 {
+		Fail("Test suite cannot run in parallel")
+	}
 })
 
-var _ = SynchronizedAfterSuite(func() {
+var _ = SynchronizedAfterSuite(func() {}, func() {
 	helpers.SetAPI()
 	helpers.LoginCF()
 	helpers.QuickDeleteOrg(organization)
 	Expect(os.RemoveAll(realDir)).ToNot(HaveOccurred())
-}, func() {
 })
 
 var _ = BeforeEach(func() {

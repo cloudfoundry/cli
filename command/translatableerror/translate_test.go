@@ -55,6 +55,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("GettingPluginRepositoryError", GettingPluginRepositoryError{}),
 		Entry("HealthCheckTypeUnsupportedError", HealthCheckTypeUnsupportedError{SupportedTypes: []string{"some-type", "another-type"}}),
 		Entry("HostnameWithTCPDomainError", HostnameWithTCPDomainError{}),
+		Entry("HostAndPathNotAllowedWithTCPDomainError", HostAndPathNotAllowedWithTCPDomainError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 		Entry("InvalidChecksumError", InvalidChecksumError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
