@@ -35,7 +35,7 @@ var _ = Describe("push flag combination errors", func() {
 		Entry("no-route and domain", "The following arguments cannot be used together: -d, --no-route", "--no-route", "-d", "some-domain"),
 		Entry("no-route and no-hostname", "The following arguments cannot be used together: --no-hostname, --no-route", "--no-route", "--no-hostname"),
 		Entry("no-route and hostname", "The following arguments cannot be used together: --hostname, -n, --no-route", "--no-route", "--hostname", "some-hostname"),
-		Entry("hostname and no-hostname", "The following arguments cannot be used together: --hostname, --no-hostname", "--hostname", "some-hostname", "--no-hostname"),
+		Entry("hostname and no-hostname", "The following arguments cannot be used together: --hostname, -n, --no-hostname", "--hostname", "some-hostname", "--no-hostname"),
 
 		Entry("docker-username without image", "Incorrect Usage: '--docker-image, -o' and '--docker-username' must be used together.", "--docker-username", "some-user"),
 		Entry("docker-image and buildpack", "Incorrect Usage: The following arguments cannot be used together: -b, --docker-image, -o", "-o", "some-image", "-b", "some-buidpack"),
