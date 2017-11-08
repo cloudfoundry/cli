@@ -42,10 +42,6 @@ var _ = Describe("SSH Actions", func() {
 			executeErr = actor.ExecuteSecureShell(fakeSecureShellClient, sshOptions)
 		})
 
-		AfterEach(func() {
-			Expect(fakeSecureShellClient.CloseCallCount()).To(Equal(1))
-		})
-
 		It("calls connect with the provided authorization info", func() {
 			Expect(fakeSecureShellClient.ConnectCallCount()).To(Equal(1))
 			usernameArg, passcodeArg, endpointArg, fingerprintArg, _ := fakeSecureShellClient.ConnectArgsForCall(0)
@@ -60,6 +56,10 @@ var _ = Describe("SSH Actions", func() {
 				fakeSecureShellClient.ConnectReturns(errors.New("some-connect-error"))
 			})
 
+			It("does not call Close", func() {
+				Expect(fakeSecureShellClient.CloseCallCount()).To(Equal(0))
+			})
+
 			It("returns the error", func() {
 				Expect(executeErr).To(MatchError("some-connect-error"))
 			})
@@ -71,6 +71,10 @@ var _ = Describe("SSH Actions", func() {
 					{LocalAddress: "local-address-1", RemoteAddress: "remote-address-1"},
 					{LocalAddress: "local-address-2", RemoteAddress: "remote-address-2"},
 				}
+			})
+
+			AfterEach(func() {
+				Expect(fakeSecureShellClient.CloseCallCount()).To(Equal(1))
 			})
 
 			It("forwards the local ports", func() {

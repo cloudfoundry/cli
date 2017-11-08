@@ -27,10 +27,10 @@ type SSHOptions struct {
 
 func (actor Actor) ExecuteSecureShell(sshClient SecureShellClient, sshOptions SSHOptions) error {
 	err := sshClient.Connect(sshOptions.Username, sshOptions.Passcode, sshOptions.Endpoint, sshOptions.HostKeyFingerprint, false)
-	defer sshClient.Close()
 	if err != nil {
 		return err
 	}
+	defer sshClient.Close()
 
 	err = sshClient.LocalPortForward(convertActorToSSHPackageForwardingSpecs(sshOptions.LocalPortForwardSpecs))
 	if err != nil {
