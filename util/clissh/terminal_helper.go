@@ -1,6 +1,8 @@
 package clissh
 
 import (
+	"io"
+
 	"github.com/docker/docker/pkg/term"
 )
 
@@ -24,4 +26,8 @@ func (terminalHelper) SetRawTerminal(fd uintptr) (*term.State, error) {
 
 func (terminalHelper) RestoreTerminal(fd uintptr, state *term.State) error {
 	return term.RestoreTerminal(fd, state)
+}
+
+func (terminalHelper) StdStreams() (io.ReadCloser, io.Writer, io.Writer) {
+	return term.StdStreams()
 }

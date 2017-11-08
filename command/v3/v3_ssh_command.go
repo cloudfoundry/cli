@@ -68,7 +68,7 @@ func (cmd *V3SSHCommand) Setup(config command.Config, ui command.UI) error {
 
 	cmd.Actor = v3action.NewActor(ccClient, config, sharedActor, uaaClient)
 
-	cmd.SSHClient = clissh.NewDefaultSecureShell(ui.GetIn(), ui.GetOut(), ui.GetErr())
+	cmd.SSHClient = clissh.NewDefaultSecureShell()
 
 	return nil
 }

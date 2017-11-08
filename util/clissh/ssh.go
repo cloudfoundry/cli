@@ -67,6 +67,7 @@ type TerminalHelper interface {
 	SetRawTerminal(fd uintptr) (*term.State, error)
 	RestoreTerminal(fd uintptr, state *term.State) error
 	GetWinsize(fd uintptr) (*term.Winsize, error)
+	StdStreams() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)
 }
 
 //go:generate counterfeiter . ListenerFactory
@@ -97,13 +98,9 @@ type SecureShell struct {
 
 	localListeners    []net.Listener
 	keepAliveInterval time.Duration
-
-	stdIn  io.Reader
-	stdOut io.Writer
-	stdErr io.Writer
 }
 
-func NewDefaultSecureShell(stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) *SecureShell {
+func NewDefaultSecureShell() *SecureShell {
 	defaultSecureDialer := DefaultSecureDialer()
 	defaultTerminalHelper := DefaultTerminalHelper()
 	defaultListenerFactory := DefaultListenerFactory()
@@ -113,9 +110,6 @@ func NewDefaultSecureShell(stdIn io.Reader, stdOut io.Writer, stdErr io.Writer) 
 		listenerFactory:   defaultListenerFactory,
 		keepAliveInterval: DefaultKeepAliveInterval,
 		localListeners:    []net.Listener{},
-		stdIn:             stdIn,
-		stdOut:            stdOut,
-		stdErr:            stdErr,
 	}
 }
 
@@ -124,9 +118,6 @@ func NewSecureShell(
 	terminalHelper TerminalHelper,
 	listenerFactory ListenerFactory,
 	keepAliveInterval time.Duration,
-	stdIn io.Reader,
-	stdOut io.Writer,
-	stdErr io.Writer,
 ) *SecureShell {
 	return &SecureShell{
 		secureDialer:      secureDialer,
@@ -134,9 +125,6 @@ func NewSecureShell(
 		listenerFactory:   listenerFactory,
 		keepAliveInterval: keepAliveInterval,
 		localListeners:    []net.Listener{},
-		stdIn:             stdIn,
-		stdOut:            stdOut,
-		stdErr:            stdErr,
 	}
 }
 
@@ -232,6 +220,8 @@ func (c *SecureShell) InteractiveSession(commands []string, terminalRequest TTYR
 	}
 	defer session.Close()
 
+	stdin, stdout, stderr := c.terminalHelper.StdStreams()
+
 	inPipe, err := session.StdinPipe()
 	if err != nil {
 		return err
@@ -247,8 +237,8 @@ func (c *SecureShell) InteractiveSession(commands []string, terminalRequest TTYR
 		return err
 	}
 
-	stdinFd, stdinIsTerminal := c.terminalHelper.GetFdInfo(c.stdIn)
-	stdoutFd, stdoutIsTerminal := c.terminalHelper.GetFdInfo(c.stdOut)
+	stdinFd, stdinIsTerminal := c.terminalHelper.GetFdInfo(stdin)
+	stdoutFd, stdoutIsTerminal := c.terminalHelper.GetFdInfo(stdout)
 
 	if c.shouldAllocateTerminal(commands, terminalRequest, stdinIsTerminal) {
 		modes := ssh.TerminalModes{
@@ -287,9 +277,9 @@ func (c *SecureShell) InteractiveSession(commands []string, terminalRequest TTYR
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 
-	go copyAndClose(nil, inPipe, c.stdIn)
-	go copyAndDone(wg, c.stdOut, outPipe)
-	go copyAndDone(wg, c.stdErr, errPipe)
+	go copyAndClose(nil, inPipe, stdin)
+	go copyAndDone(wg, stdout, outPipe)
+	go copyAndDone(wg, stderr, errPipe)
 
 	if stdoutIsTerminal {
 		resized := make(chan os.Signal, 16)

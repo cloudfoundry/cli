@@ -2,6 +2,7 @@
 package clisshfakes
 
 import (
+	"io"
 	"sync"
 
 	"code.cloudfoundry.org/cli/util/clissh"
@@ -59,6 +60,19 @@ type FakeTerminalHelper struct {
 	getWinsizeReturnsOnCall map[int]struct {
 		result1 *term.Winsize
 		result2 error
+	}
+	StdStreamsStub        func() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)
+	stdStreamsMutex       sync.RWMutex
+	stdStreamsArgsForCall []struct{}
+	stdStreamsReturns     struct {
+		result1 io.ReadCloser
+		result2 io.Writer
+		result3 io.Writer
+	}
+	stdStreamsReturnsOnCall map[int]struct {
+		result1 io.ReadCloser
+		result2 io.Writer
+		result3 io.Writer
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -266,6 +280,52 @@ func (fake *FakeTerminalHelper) GetWinsizeReturnsOnCall(i int, result1 *term.Win
 	}{result1, result2}
 }
 
+func (fake *FakeTerminalHelper) StdStreams() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer) {
+	fake.stdStreamsMutex.Lock()
+	ret, specificReturn := fake.stdStreamsReturnsOnCall[len(fake.stdStreamsArgsForCall)]
+	fake.stdStreamsArgsForCall = append(fake.stdStreamsArgsForCall, struct{}{})
+	fake.recordInvocation("StdStreams", []interface{}{})
+	fake.stdStreamsMutex.Unlock()
+	if fake.StdStreamsStub != nil {
+		return fake.StdStreamsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.stdStreamsReturns.result1, fake.stdStreamsReturns.result2, fake.stdStreamsReturns.result3
+}
+
+func (fake *FakeTerminalHelper) StdStreamsCallCount() int {
+	fake.stdStreamsMutex.RLock()
+	defer fake.stdStreamsMutex.RUnlock()
+	return len(fake.stdStreamsArgsForCall)
+}
+
+func (fake *FakeTerminalHelper) StdStreamsReturns(result1 io.ReadCloser, result2 io.Writer, result3 io.Writer) {
+	fake.StdStreamsStub = nil
+	fake.stdStreamsReturns = struct {
+		result1 io.ReadCloser
+		result2 io.Writer
+		result3 io.Writer
+	}{result1, result2, result3}
+}
+
+func (fake *FakeTerminalHelper) StdStreamsReturnsOnCall(i int, result1 io.ReadCloser, result2 io.Writer, result3 io.Writer) {
+	fake.StdStreamsStub = nil
+	if fake.stdStreamsReturnsOnCall == nil {
+		fake.stdStreamsReturnsOnCall = make(map[int]struct {
+			result1 io.ReadCloser
+			result2 io.Writer
+			result3 io.Writer
+		})
+	}
+	fake.stdStreamsReturnsOnCall[i] = struct {
+		result1 io.ReadCloser
+		result2 io.Writer
+		result3 io.Writer
+	}{result1, result2, result3}
+}
+
 func (fake *FakeTerminalHelper) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -277,6 +337,8 @@ func (fake *FakeTerminalHelper) Invocations() map[string][][]interface{} {
 	defer fake.restoreTerminalMutex.RUnlock()
 	fake.getWinsizeMutex.RLock()
 	defer fake.getWinsizeMutex.RUnlock()
+	fake.stdStreamsMutex.RLock()
+	defer fake.stdStreamsMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
