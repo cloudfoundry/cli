@@ -99,6 +99,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
+		Entry("SSHUnableToAuthenticateError", SSHUnableToAuthenticateError{}),
 		Entry("SSLCertError", SSLCertError{}),
 		Entry("StackNotFoundError with name", SpaceNotFoundError{Name: "steve"}),
 		Entry("StackNotFoundError without name", SpaceNotFoundError{}),

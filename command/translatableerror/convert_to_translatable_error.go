@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/manifest"
 	log "github.com/sirupsen/logrus"
 )
@@ -151,6 +152,9 @@ func ConvertToTranslatableError(err error) error {
 	case manifest.ManifestCreationError:
 		return ManifestCreationError(e)
 
+	// SSH Errors
+	case ssherror.UnableToAuthenticateError:
+		return SSHUnableToAuthenticateError{}
 	}
 
 	return err

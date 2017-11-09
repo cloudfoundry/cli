@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/util/clissh/sigwinch"
+	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"github.com/docker/docker/pkg/term"
 	"golang.org/x/crypto/ssh"
 )
@@ -137,6 +138,9 @@ func (c *SecureShell) Connect(username string, passcode string, appSSHEndpoint s
 
 	secureClient, err := c.secureDialer.Dial("tcp", appSSHEndpoint, clientConfig)
 	if err != nil {
+		if strings.Contains(err.Error(), "ssh: unable to authenticate") {
+			return ssherror.UnableToAuthenticateError{Err: err}
+		}
 		return err
 	}
 

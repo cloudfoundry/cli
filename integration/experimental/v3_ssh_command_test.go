@@ -411,6 +411,34 @@ var _ = Describe("v3-ssh command", func() {
 					})
 				})
 			})
+
+			Context("when a user isn't authorized", func() {
+				var (
+					newUser string
+					newPass string
+				)
+
+				BeforeEach(func() {
+					newUser = helpers.NewUsername()
+					newPass = helpers.NewPassword()
+
+					Eventually(helpers.CF("create-user", newUser, newPass)).Should(Exit(0))
+					Eventually(helpers.CF("set-space-role", newUser, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
+					Eventually(helpers.CF("auth", newUser, newPass)).Should(Exit(0))
+					helpers.TargetOrgAndSpace(orgName, spaceName)
+				})
+
+				AfterEach(func() {
+					helpers.LoginCF()
+				})
+
+				It("returns an error", func() {
+					session := helpers.CF("v3-ssh", appName)
+
+					Eventually(session.Err).Should(Say("Error opening SSH connection: You are not authorized to perform the requested action."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
 		})
 	})
 })

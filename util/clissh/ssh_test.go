@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/util/clissh/clisshfakes"
+	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/diego-ssh/server"
 	fake_server "code.cloudfoundry.org/diego-ssh/server/fakes"
 	"code.cloudfoundry.org/diego-ssh/test_helpers"
@@ -129,15 +130,30 @@ var _ = Describe("CLI SSH", func() {
 		})
 
 		Context("when dialing fails", func() {
-			var dialError = errors.New("woops")
+			var dialError error
 
-			BeforeEach(func() {
-				fakeSecureDialer.DialReturns(nil, dialError)
+			Context("when the error is a generic Dial error", func() {
+				BeforeEach(func() {
+					dialError = errors.New("woops")
+					fakeSecureDialer.DialReturns(nil, dialError)
+				})
+
+				It("returns the dial error", func() {
+					Expect(connectErr).To(Equal(dialError))
+					Expect(fakeSecureDialer.DialCallCount()).To(Equal(1))
+				})
 			})
 
-			It("returns the dial error", func() {
-				Expect(connectErr).To(Equal(dialError))
-				Expect(fakeSecureDialer.DialCallCount()).To(Equal(1))
+			Context("when the dialing error is a golang 'unable to authenticate' error", func() {
+				BeforeEach(func() {
+					dialError = fmt.Errorf("ssh: unable to authenticate, attempted methods %v, no supported methods remain", []string{"none", "password"})
+					fakeSecureDialer.DialReturns(nil, dialError)
+				})
+
+				It("returns an UnableToAuthenticateError", func() {
+					Expect(connectErr).To(MatchError(ssherror.UnableToAuthenticateError{Err: dialError}))
+					Expect(fakeSecureDialer.DialCallCount()).To(Equal(1))
+				})
 			})
 		})
 	})

@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/plugin/pluginerror"
 	"code.cloudfoundry.org/cli/api/uaa"
 	. "code.cloudfoundry.org/cli/command/translatableerror"
+	"code.cloudfoundry.org/cli/util/clissh/ssherror"
 	"code.cloudfoundry.org/cli/util/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -292,6 +293,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("uaa.InvalidAuthTokenError -> InvalidRefreshTokenError",
 			uaa.InvalidAuthTokenError{},
 			InvalidRefreshTokenError{}),
+
+		Entry("ssherror.UnableToAuthenticateError -> UnableToAuthenticateError",
+			ssherror.UnableToAuthenticateError{},
+			SSHUnableToAuthenticateError{}),
 
 		Entry("default case -> original error",
 			err,
