@@ -3,8 +3,8 @@ package pushaction
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"strings"
-	"unicode"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
@@ -422,30 +422,18 @@ func (Actor) routeInListBySettings(route v2action.Route, routes []v2action.Route
 }
 
 func (Actor) sanitize(name string) string {
-	sanitizedName := []rune{}
-	validCount := 0
+	name = strings.ToLower(name)
 
-	for _, runeChar := range strings.TrimSpace(name) {
-		switch {
-		case 'a' <= runeChar && runeChar <= 'z':
-			sanitizedName = append(sanitizedName, runeChar)
-			validCount++
-		case 'A' <= runeChar && runeChar <= 'Z':
-			sanitizedName = append(sanitizedName, unicode.ToLower(runeChar))
-			validCount++
-		case ' ' == runeChar || '-' == runeChar:
-			sanitizedName = append(sanitizedName, '-')
-		case '0' <= runeChar && runeChar <= '9':
-			sanitizedName = append(sanitizedName, runeChar)
-			validCount++
-		}
-	}
+	re := regexp.MustCompile("\\s+")
+	name = re.ReplaceAllString(name, "-")
 
-	if validCount > 0 {
-		return strings.Trim(string(sanitizedName), "-")
-	}
+	re = regexp.MustCompile("[^[:alnum:]\\-]")
+	name = re.ReplaceAllString(name, "")
 
-	return ""
+	re = regexp.MustCompile("-+")
+	name = re.ReplaceAllString(name, "-")
+
+	return strings.Trim(name, "-")
 }
 
 func (actor Actor) splitExistingRoutes(routes []string, existingRoutes []v2action.Route) ([]v2action.Route, []string) {
