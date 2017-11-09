@@ -49,6 +49,13 @@ func GetSpaceGUID(spaceName string) string {
 }
 
 func QuickDeleteOrg(orgName string) {
+	// If orgName is empty, the BeforeSuite has failed and attempting to delete
+	// will produce a meaningless error.
+	if orgName == "" {
+		fmt.Println("Empty org name. Skipping deletion.")
+		return
+	}
+
 	guid := GetOrgGUID(orgName)
 	url := fmt.Sprintf("/v2/organizations/%s?recursive=true&async=true", guid)
 	session := CF("curl", "-X", "DELETE", url)
