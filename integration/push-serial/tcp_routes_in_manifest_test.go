@@ -164,7 +164,7 @@ var _ = Describe("TCP routes in manifest", func() {
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 					Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-					Eventually(session.Err).Should(Say("Host and path not allowed in TCP domain %s", route1.Domain))
+					Eventually(session.Err).Should(Say("Host and path not allowed in route with TCP domain %s", route1.Domain))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -185,7 +185,7 @@ var _ = Describe("TCP routes in manifest", func() {
 					})
 
 					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-					Eventually(session.Err).Should(Say("Host and path not allowed in TCP domain %s", route1.Domain))
+					Eventually(session.Err).Should(Say("Host and path not allowed in route with TCP domain %s", route1.Domain))
 					Eventually(session).Should(Exit(1))
 				})
 			})

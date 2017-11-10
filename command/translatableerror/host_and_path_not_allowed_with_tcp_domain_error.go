@@ -5,7 +5,7 @@ type HostAndPathNotAllowedWithTCPDomainError struct {
 }
 
 func (HostAndPathNotAllowedWithTCPDomainError) Error() string {
-	return "Host and path not allowed in TCP domain {{.Domain}}"
+	return "Host and path not allowed in route with TCP domain {{.Domain}}"
 }
 
 func (e HostAndPathNotAllowedWithTCPDomainError) Translate(translate func(string, ...interface{}) string) string {
