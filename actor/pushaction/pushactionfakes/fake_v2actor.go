@@ -10,17 +10,17 @@ import (
 )
 
 type FakeV2Actor struct {
-	MapRouteToApplicationStub         func(routeGUID string, appGUID string) (v2action.Warnings, error)
-	updateRouteApplicationMutex       sync.RWMutex
-	updateRouteApplicationArgsForCall []struct {
+	MapRouteToApplicationStub        func(routeGUID string, appGUID string) (v2action.Warnings, error)
+	mapRouteToApplicationMutex       sync.RWMutex
+	mapRouteToApplicationArgsForCall []struct {
 		routeGUID string
 		appGUID   string
 	}
-	updateRouteApplicationReturns struct {
+	mapRouteToApplicationReturns struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	updateRouteApplicationReturnsOnCall map[int]struct {
+	mapRouteToApplicationReturnsOnCall map[int]struct {
 		result1 v2action.Warnings
 		result2 error
 	}
@@ -237,17 +237,17 @@ type FakeV2Actor struct {
 		result3 v2action.Warnings
 		result4 error
 	}
-	UnmapRouteFromApplicationStub         func(routeGUID string, appGUID string) (v2action.Warnings, error)
-	unbindRouteFromApplicationMutex       sync.RWMutex
-	unbindRouteFromApplicationArgsForCall []struct {
+	UnmapRouteFromApplicationStub        func(routeGUID string, appGUID string) (v2action.Warnings, error)
+	unmapRouteFromApplicationMutex       sync.RWMutex
+	unmapRouteFromApplicationArgsForCall []struct {
 		routeGUID string
 		appGUID   string
 	}
-	unbindRouteFromApplicationReturns struct {
+	unmapRouteFromApplicationReturns struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	unbindRouteFromApplicationReturnsOnCall map[int]struct {
+	unmapRouteFromApplicationReturnsOnCall map[int]struct {
 		result1 v2action.Warnings
 		result2 error
 	}
@@ -289,38 +289,38 @@ type FakeV2Actor struct {
 }
 
 func (fake *FakeV2Actor) MapRouteToApplication(routeGUID string, appGUID string) (v2action.Warnings, error) {
-	fake.updateRouteApplicationMutex.Lock()
-	ret, specificReturn := fake.updateRouteApplicationReturnsOnCall[len(fake.updateRouteApplicationArgsForCall)]
-	fake.updateRouteApplicationArgsForCall = append(fake.updateRouteApplicationArgsForCall, struct {
+	fake.mapRouteToApplicationMutex.Lock()
+	ret, specificReturn := fake.mapRouteToApplicationReturnsOnCall[len(fake.mapRouteToApplicationArgsForCall)]
+	fake.mapRouteToApplicationArgsForCall = append(fake.mapRouteToApplicationArgsForCall, struct {
 		routeGUID string
 		appGUID   string
 	}{routeGUID, appGUID})
 	fake.recordInvocation("MapRouteToApplication", []interface{}{routeGUID, appGUID})
-	fake.updateRouteApplicationMutex.Unlock()
+	fake.mapRouteToApplicationMutex.Unlock()
 	if fake.MapRouteToApplicationStub != nil {
 		return fake.MapRouteToApplicationStub(routeGUID, appGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.updateRouteApplicationReturns.result1, fake.updateRouteApplicationReturns.result2
+	return fake.mapRouteToApplicationReturns.result1, fake.mapRouteToApplicationReturns.result2
 }
 
 func (fake *FakeV2Actor) MapRouteToApplicationCallCount() int {
-	fake.updateRouteApplicationMutex.RLock()
-	defer fake.updateRouteApplicationMutex.RUnlock()
-	return len(fake.updateRouteApplicationArgsForCall)
+	fake.mapRouteToApplicationMutex.RLock()
+	defer fake.mapRouteToApplicationMutex.RUnlock()
+	return len(fake.mapRouteToApplicationArgsForCall)
 }
 
 func (fake *FakeV2Actor) MapRouteToApplicationArgsForCall(i int) (string, string) {
-	fake.updateRouteApplicationMutex.RLock()
-	defer fake.updateRouteApplicationMutex.RUnlock()
-	return fake.updateRouteApplicationArgsForCall[i].routeGUID, fake.updateRouteApplicationArgsForCall[i].appGUID
+	fake.mapRouteToApplicationMutex.RLock()
+	defer fake.mapRouteToApplicationMutex.RUnlock()
+	return fake.mapRouteToApplicationArgsForCall[i].routeGUID, fake.mapRouteToApplicationArgsForCall[i].appGUID
 }
 
 func (fake *FakeV2Actor) MapRouteToApplicationReturns(result1 v2action.Warnings, result2 error) {
 	fake.MapRouteToApplicationStub = nil
-	fake.updateRouteApplicationReturns = struct {
+	fake.mapRouteToApplicationReturns = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
@@ -328,13 +328,13 @@ func (fake *FakeV2Actor) MapRouteToApplicationReturns(result1 v2action.Warnings,
 
 func (fake *FakeV2Actor) MapRouteToApplicationReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
 	fake.MapRouteToApplicationStub = nil
-	if fake.updateRouteApplicationReturnsOnCall == nil {
-		fake.updateRouteApplicationReturnsOnCall = make(map[int]struct {
+	if fake.mapRouteToApplicationReturnsOnCall == nil {
+		fake.mapRouteToApplicationReturnsOnCall = make(map[int]struct {
 			result1 v2action.Warnings
 			result2 error
 		})
 	}
-	fake.updateRouteApplicationReturnsOnCall[i] = struct {
+	fake.mapRouteToApplicationReturnsOnCall[i] = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
@@ -1109,38 +1109,38 @@ func (fake *FakeV2Actor) ResourceMatchReturnsOnCall(i int, result1 []v2action.Re
 }
 
 func (fake *FakeV2Actor) UnmapRouteFromApplication(routeGUID string, appGUID string) (v2action.Warnings, error) {
-	fake.unbindRouteFromApplicationMutex.Lock()
-	ret, specificReturn := fake.unbindRouteFromApplicationReturnsOnCall[len(fake.unbindRouteFromApplicationArgsForCall)]
-	fake.unbindRouteFromApplicationArgsForCall = append(fake.unbindRouteFromApplicationArgsForCall, struct {
+	fake.unmapRouteFromApplicationMutex.Lock()
+	ret, specificReturn := fake.unmapRouteFromApplicationReturnsOnCall[len(fake.unmapRouteFromApplicationArgsForCall)]
+	fake.unmapRouteFromApplicationArgsForCall = append(fake.unmapRouteFromApplicationArgsForCall, struct {
 		routeGUID string
 		appGUID   string
 	}{routeGUID, appGUID})
 	fake.recordInvocation("UnmapRouteFromApplication", []interface{}{routeGUID, appGUID})
-	fake.unbindRouteFromApplicationMutex.Unlock()
+	fake.unmapRouteFromApplicationMutex.Unlock()
 	if fake.UnmapRouteFromApplicationStub != nil {
 		return fake.UnmapRouteFromApplicationStub(routeGUID, appGUID)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.unbindRouteFromApplicationReturns.result1, fake.unbindRouteFromApplicationReturns.result2
+	return fake.unmapRouteFromApplicationReturns.result1, fake.unmapRouteFromApplicationReturns.result2
 }
 
 func (fake *FakeV2Actor) UnmapRouteFromApplicationCallCount() int {
-	fake.unbindRouteFromApplicationMutex.RLock()
-	defer fake.unbindRouteFromApplicationMutex.RUnlock()
-	return len(fake.unbindRouteFromApplicationArgsForCall)
+	fake.unmapRouteFromApplicationMutex.RLock()
+	defer fake.unmapRouteFromApplicationMutex.RUnlock()
+	return len(fake.unmapRouteFromApplicationArgsForCall)
 }
 
 func (fake *FakeV2Actor) UnmapRouteFromApplicationArgsForCall(i int) (string, string) {
-	fake.unbindRouteFromApplicationMutex.RLock()
-	defer fake.unbindRouteFromApplicationMutex.RUnlock()
-	return fake.unbindRouteFromApplicationArgsForCall[i].routeGUID, fake.unbindRouteFromApplicationArgsForCall[i].appGUID
+	fake.unmapRouteFromApplicationMutex.RLock()
+	defer fake.unmapRouteFromApplicationMutex.RUnlock()
+	return fake.unmapRouteFromApplicationArgsForCall[i].routeGUID, fake.unmapRouteFromApplicationArgsForCall[i].appGUID
 }
 
 func (fake *FakeV2Actor) UnmapRouteFromApplicationReturns(result1 v2action.Warnings, result2 error) {
 	fake.UnmapRouteFromApplicationStub = nil
-	fake.unbindRouteFromApplicationReturns = struct {
+	fake.unmapRouteFromApplicationReturns = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
@@ -1148,13 +1148,13 @@ func (fake *FakeV2Actor) UnmapRouteFromApplicationReturns(result1 v2action.Warni
 
 func (fake *FakeV2Actor) UnmapRouteFromApplicationReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
 	fake.UnmapRouteFromApplicationStub = nil
-	if fake.unbindRouteFromApplicationReturnsOnCall == nil {
-		fake.unbindRouteFromApplicationReturnsOnCall = make(map[int]struct {
+	if fake.unmapRouteFromApplicationReturnsOnCall == nil {
+		fake.unmapRouteFromApplicationReturnsOnCall = make(map[int]struct {
 			result1 v2action.Warnings
 			result2 error
 		})
 	}
-	fake.unbindRouteFromApplicationReturnsOnCall[i] = struct {
+	fake.unmapRouteFromApplicationReturnsOnCall[i] = struct {
 		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
@@ -1279,8 +1279,8 @@ func (fake *FakeV2Actor) UploadApplicationPackageReturnsOnCall(i int, result1 v2
 func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.updateRouteApplicationMutex.RLock()
-	defer fake.updateRouteApplicationMutex.RUnlock()
+	fake.mapRouteToApplicationMutex.RLock()
+	defer fake.mapRouteToApplicationMutex.RUnlock()
 	fake.bindServiceByApplicationAndServiceInstanceMutex.RLock()
 	defer fake.bindServiceByApplicationAndServiceInstanceMutex.RUnlock()
 	fake.createApplicationMutex.RLock()
@@ -1309,8 +1309,8 @@ func (fake *FakeV2Actor) Invocations() map[string][][]interface{} {
 	defer fake.pollJobMutex.RUnlock()
 	fake.resourceMatchMutex.RLock()
 	defer fake.resourceMatchMutex.RUnlock()
-	fake.unbindRouteFromApplicationMutex.RLock()
-	defer fake.unbindRouteFromApplicationMutex.RUnlock()
+	fake.unmapRouteFromApplicationMutex.RLock()
+	defer fake.unmapRouteFromApplicationMutex.RUnlock()
 	fake.updateApplicationMutex.RLock()
 	defer fake.updateApplicationMutex.RUnlock()
 	fake.uploadApplicationPackageMutex.RLock()

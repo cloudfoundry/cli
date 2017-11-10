@@ -2,15 +2,21 @@
 // push.
 package pushaction
 
-import "regexp"
+import (
+	"regexp"
+
+	"code.cloudfoundry.org/cli/util/randomword"
+)
 
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string
 
 // Actor handles all business logic for Cloud Controller v2 operations.
 type Actor struct {
-	V2Actor           V2Actor
-	SharedActor       SharedActor
+	SharedActor   SharedActor
+	V2Actor       V2Actor
+	WordGenerator RandomWordGenerator
+
 	startWithProtocol *regexp.Regexp
 }
 
@@ -19,8 +25,10 @@ const ProtocolRegexp = "^https?://|^tcp://"
 // NewActor returns a new actor.
 func NewActor(v2Actor V2Actor, sharedActor SharedActor) *Actor {
 	return &Actor{
-		V2Actor:           v2Actor,
-		SharedActor:       sharedActor,
+		SharedActor:   sharedActor,
+		V2Actor:       v2Actor,
+		WordGenerator: new(randomword.Generator),
+
 		startWithProtocol: regexp.MustCompilePOSIX(ProtocolRegexp),
 	}
 }

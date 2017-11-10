@@ -26,6 +26,7 @@ type CommandLineSettings struct {
 	NoHostname           bool
 	NoRoute              bool
 	ProvidedAppPath      string
+	RandomRoute          bool
 	RoutePath            string
 	StackName            string
 }
@@ -97,6 +98,11 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	if app.Path == "" && app.DockerImage == "" {
 		app.Path = settings.CurrentDirectory
 	}
+
+	if settings.RandomRoute {
+		app.RandomRoute = true
+	}
+
 	if settings.RoutePath != "" {
 		app.RoutePath = settings.RoutePath
 	}

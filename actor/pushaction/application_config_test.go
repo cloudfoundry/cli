@@ -22,15 +22,19 @@ import (
 
 var _ = Describe("Application Config", func() {
 	var (
-		actor           *Actor
-		fakeV2Actor     *pushactionfakes.FakeV2Actor
-		fakeSharedActor *pushactionfakes.FakeSharedActor
+		actor                   *Actor
+		fakeV2Actor             *pushactionfakes.FakeV2Actor
+		fakeSharedActor         *pushactionfakes.FakeSharedActor
+		fakeRandomWordGenerator *pushactionfakes.FakeRandomWordGenerator
 	)
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
 		fakeSharedActor = new(pushactionfakes.FakeSharedActor)
 		actor = NewActor(fakeV2Actor, fakeSharedActor)
+
+		fakeRandomWordGenerator = new(pushactionfakes.FakeRandomWordGenerator)
+		actor.WordGenerator = fakeRandomWordGenerator
 	})
 
 	Describe("ApplicationConfig", func() {
@@ -108,6 +112,7 @@ var _ = Describe("Application Config", func() {
 				Name: "private-domain.com",
 				GUID: "some-private-domain-guid",
 			}
+
 			// Prevents NoDomainsFoundError
 			fakeV2Actor.GetOrganizationDomainsReturns(
 				[]v2action.Domain{domain},
@@ -567,6 +572,49 @@ var _ = Describe("Application Config", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-service-warning-1", "some-service-warning-2"))
 				})
+			})
+		})
+
+		Context("when random-route is set", func() {
+			var existingRoute v2action.Route
+
+			BeforeEach(func() {
+				manifestApps[0].RandomRoute = true
+
+				app := v2action.Application{
+					Name:      appName,
+					GUID:      "some-app-guid",
+					SpaceGUID: spaceGUID,
+				}
+
+				existingRoute = v2action.Route{
+					Domain: v2action.Domain{
+						Name: "some-domain.com",
+						GUID: "some-domain-guid",
+					},
+					Host:      app.Name,
+					GUID:      "route-guid",
+					SpaceGUID: spaceGUID,
+				}
+
+				fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
+				fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{existingRoute}, v2action.Warnings{"app-route-warnings"}, nil)
+
+				fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+				fakeRandomWordGenerator.RandomNounReturns("apple")
+			})
+
+			It("appends a random route to the current route for desired routes", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
+				Expect(firstConfig.DesiredRoutes).To(ConsistOf(
+					existingRoute,
+					v2action.Route{
+						Domain:    domain,
+						SpaceGUID: spaceGUID,
+						Host:      "some-app-striped-apple",
+					},
+				))
 			})
 		})
 

@@ -30,6 +30,7 @@ type Application struct {
 	NoHostname      bool
 	NoRoute         bool
 	Path            string
+	RandomRoute     bool
 	Routes          []string
 	RoutePath       string
 	Services        []string
@@ -38,7 +39,7 @@ type Application struct {
 
 func (app Application) String() string {
 	return fmt.Sprintf(
-		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-hostname: %t, No-route: %t, Path: '%s', RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
+		"App Name: '%s', Buildpack IsSet: %t, Buildpack: '%s', Command IsSet: %t, Command: '%s', Disk Quota: '%s', Docker Image: '%s', Health Check HTTP Endpoint: '%s', Health Check Timeout: '%d', Health Check Type: '%s', Hostname: '%s', Instances IsSet: %t, Instances: '%d', Memory: '%s', No-Hostname: %t, No-Route: %t, Path: '%s', RandomRoute: %t, RoutePath: '%s', Routes: [%s], Services: [%s], Stack Name: '%s'",
 		app.Name,
 		app.Buildpack.IsSet,
 		app.Buildpack.Value,
@@ -56,6 +57,7 @@ func (app Application) String() string {
 		app.NoHostname,
 		app.NoRoute,
 		app.Path,
+		app.RandomRoute,
 		app.RoutePath,
 		strings.Join(app.Routes, ", "),
 		strings.Join(app.Services, ", "),

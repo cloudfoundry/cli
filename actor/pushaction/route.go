@@ -192,6 +192,25 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 	return config, createdRoutes, allWarnings, nil
 }
 
+func (actor Actor) GenerateRandomRoute(appName string, spaceGUID string, orgGUID string) (v2action.Route, Warnings, error) {
+	domain, warnings, err := actor.DefaultDomain(orgGUID)
+	if err != nil {
+		return v2action.Route{}, Warnings(warnings), err
+	}
+
+	var hostname string
+	if domain.IsHTTP() {
+		hostname = fmt.Sprintf("%s-%s-%s", actor.sanitize(appName), actor.WordGenerator.RandomAdjective(), actor.WordGenerator.RandomNoun())
+		hostname = strings.Trim(hostname, "-")
+	}
+
+	return v2action.Route{
+		Host:      hostname,
+		Domain:    domain,
+		SpaceGUID: spaceGUID,
+	}, Warnings(warnings), err
+}
+
 // GetGeneratedRoute returns a route with the host and the default org domain.
 // This may be a partial route (ie no GUID) if the route does not exist.
 func (actor Actor) GetGeneratedRoute(manifestApp manifest.Application, orgGUID string, spaceGUID string, knownRoutes []v2action.Route) (v2action.Route, Warnings, error) {

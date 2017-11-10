@@ -118,13 +118,16 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 }
 
 func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
-	var (
-		warnings Warnings
-		err      error
-	)
+	if manifestApp.RandomRoute {
+		// append random route to current route (becomes desired route)
+		randomRoute, warnings, err := actor.GenerateRandomRoute(manifestApp.Name, spaceGUID, orgGUID)
+		config.DesiredRoutes = append(config.CurrentRoutes, randomRoute)
+		return config, warnings, err
+	}
 
 	if len(manifestApp.Routes) > 0 {
-		config.DesiredRoutes, warnings, err = actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
+		routes, warnings, err := actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
+		config.DesiredRoutes = routes
 		return config, warnings, err
 	}
 
@@ -135,7 +138,6 @@ func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID str
 		return config, warnings, err
 	}
 
-	// TODO: when working with all of routes, append to current route
 	config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
 	return config, warnings, nil
 }

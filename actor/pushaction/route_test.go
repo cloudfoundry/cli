@@ -17,13 +17,17 @@ import (
 
 var _ = Describe("Routes", func() {
 	var (
-		actor       *Actor
-		fakeV2Actor *pushactionfakes.FakeV2Actor
+		actor                   *Actor
+		fakeV2Actor             *pushactionfakes.FakeV2Actor
+		fakeRandomWordGenerator *pushactionfakes.FakeRandomWordGenerator
 	)
 
 	BeforeEach(func() {
 		fakeV2Actor = new(pushactionfakes.FakeV2Actor)
 		actor = NewActor(fakeV2Actor, nil)
+
+		fakeRandomWordGenerator = new(pushactionfakes.FakeRandomWordGenerator)
+		actor.WordGenerator = fakeRandomWordGenerator
 	})
 
 	Describe("UnmapRoutes", func() {
@@ -811,6 +815,108 @@ var _ = Describe("Routes", func() {
 
 			It("returns false", func() {
 				Expect(createdRoutes).To(BeFalse())
+			})
+		})
+	})
+
+	Describe("GenerateRandomRoute", func() {
+		var (
+			appName   string
+			spaceGUID string
+			orgGUID   string
+
+			randomRoute v2action.Route
+			warnings    Warnings
+			executeErr  error
+
+			domain v2action.Domain
+		)
+
+		BeforeEach(func() {
+			appName = "some a$pp nAme"
+			spaceGUID = "some-space-guid"
+			orgGUID = "some-org-guid"
+		})
+
+		JustBeforeEach(func() {
+			randomRoute, warnings, executeErr = actor.GenerateRandomRoute(appName, spaceGUID, orgGUID)
+		})
+
+		Context("when the domain is a tcp domain", func() {
+			BeforeEach(func() {
+				domain.RouterGroupType = constant.TCPRouterGroup
+				fakeV2Actor.GetOrganizationDomainsReturns(
+					[]v2action.Domain{domain},
+					v2action.Warnings{"some-organization-domain-warning"},
+					nil,
+				)
+			})
+
+			It("generates a route with a randomly generated server side port number", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(randomRoute).To(Equal(v2action.Route{
+					Domain:    domain,
+					SpaceGUID: spaceGUID,
+				}))
+				Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+
+				Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
+				Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
+			})
+		})
+
+		Context("when the domain is an http domain", func() {
+			BeforeEach(func() {
+				domain.RouterGroupType = constant.HTTPRouterGroup
+				fakeV2Actor.GetOrganizationDomainsReturns(
+					[]v2action.Domain{domain},
+					v2action.Warnings{"some-organization-domain-warning"},
+					nil,
+				)
+				fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+				fakeRandomWordGenerator.RandomNounReturns("apple")
+			})
+
+			Context("when the app name is partially sanitized", func() {
+				It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(randomRoute).To(Equal(v2action.Route{
+						Domain:    domain,
+						SpaceGUID: spaceGUID,
+						Host:      "some-app-name-striped-apple",
+					}))
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+				})
+			})
+
+			Context("when the app name is fully sanitized", func() {
+				BeforeEach(func() {
+					appName = "@@@"
+				})
+
+				It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(randomRoute).To(Equal(v2action.Route{
+						Domain:    domain,
+						SpaceGUID: spaceGUID,
+						Host:      "striped-apple",
+					}))
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+				})
+			})
+		})
+
+		Context("when the default domain lookup fails", func() {
+			BeforeEach(func() {
+				fakeV2Actor.GetOrganizationDomainsReturns(
+					[]v2action.Domain{domain},
+					v2action.Warnings{"some-organization-domain-warning"},
+					errors.New("some-error"),
+				)
+			})
+			It("returns an error and a warning", func() {
+				Expect(executeErr).To(MatchError("some-error"))
+				Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 			})
 		})
 	})

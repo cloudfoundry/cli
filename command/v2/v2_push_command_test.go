@@ -769,7 +769,18 @@ var _ = Describe("v2-push Command", func() {
 					})
 				})
 
-				Context("when --routepath is given", func() {
+				Context("when --random-route is given", func() {
+					BeforeEach(func() {
+						cmd.RandomRoute = true
+					})
+
+					It("sets --random-route on the command line settings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(settings.RandomRoute).To(BeTrue())
+					})
+				})
+
+				Context("when --route-path is given", func() {
 					BeforeEach(func() {
 						cmd.RoutePath = flag.RoutePath{Path: "/some-path"}
 					})
@@ -858,12 +869,19 @@ var _ = Describe("v2-push Command", func() {
 				Expect(executeErr).To(MatchError(expectedErr))
 			},
 
-			Entry("-f and --no-manifest",
+			Entry("-o and -p",
 				func() {
-					cmd.PathToManifest = "/some/path.yml"
-					cmd.NoManifest = true
+					cmd.DockerImage.Path = "some-docker-image"
+					cmd.AppPath = "some-directory-path"
 				},
-				translatableerror.ArgumentCombinationError{Args: []string{"-f", "--no-manifest"}}),
+				translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
+
+			Entry("-b and --docker-image",
+				func() {
+					cmd.DockerImage.Path = "some-docker-image"
+					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
 
 			Entry("--docker-username (without DOCKER_PASSWORD env set)",
 				func() {
@@ -878,19 +896,12 @@ var _ = Describe("v2-push Command", func() {
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"-d", "--no-route"}}),
 
-			Entry("--route-path and --no-route",
+			Entry("--hostname and --no-hostname",
 				func() {
-					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
-					cmd.NoRoute = true
+					cmd.Hostname = "po-tate-toe"
+					cmd.NoHostname = true
 				},
-				translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),
-
-			Entry("-o and -b",
-				func() {
-					cmd.DockerImage.Path = "some-docker-image"
-					cmd.Buildpack = flag.Buildpack{FilteredString: types.FilteredString{Value: "some-buildpack", IsSet: true}}
-				},
-				translatableerror.ArgumentCombinationError{Args: []string{"-b", "--docker-image, -o"}}),
+				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--no-hostname"}}),
 
 			Entry("--hostname and --no-route",
 				func() {
@@ -899,13 +910,6 @@ var _ = Describe("v2-push Command", func() {
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--no-route"}}),
 
-			Entry("--hostname and --no-hostname",
-				func() {
-					cmd.Hostname = "po-tate-toe"
-					cmd.NoHostname = true
-				},
-				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--no-hostname"}}),
-
 			Entry("--no-hostname and --no-route",
 				func() {
 					cmd.NoHostname = true
@@ -913,12 +917,47 @@ var _ = Describe("v2-push Command", func() {
 				},
 				translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--no-route"}}),
 
-			Entry("-o and -p",
+			Entry("-f and --no-manifest",
 				func() {
-					cmd.DockerImage.Path = "some-docker-image"
-					cmd.AppPath = "some-directory-path"
+					cmd.PathToManifest = "/some/path.yml"
+					cmd.NoManifest = true
 				},
-				translatableerror.ArgumentCombinationError{Args: []string{"--docker-image, -o", "-p"}}),
+				translatableerror.ArgumentCombinationError{Args: []string{"-f", "--no-manifest"}}),
+
+			Entry("--random-route and --hostname",
+				func() {
+					cmd.Hostname = "po-tate-toe"
+					cmd.RandomRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--hostname", "-n", "--random-route"}}),
+
+			Entry("--random-route and --no-hostname",
+				func() {
+					cmd.RandomRoute = true
+					cmd.NoHostname = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--no-hostname", "--random-route"}}),
+
+			Entry("--random-route and --no-route",
+				func() {
+					cmd.RandomRoute = true
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--no-route", "--random-route"}}),
+
+			Entry("--random-route and --route-path",
+				func() {
+					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+					cmd.RandomRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--random-route", "--route-path"}}),
+
+			Entry("--route-path and --no-route",
+				func() {
+					cmd.RoutePath = flag.RoutePath{Path: "/bananas"}
+					cmd.NoRoute = true
+				},
+				translatableerror.ArgumentCombinationError{Args: []string{"--route-path", "--no-route"}}),
 		)
 	})
 })
