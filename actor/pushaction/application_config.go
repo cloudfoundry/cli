@@ -119,6 +119,9 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 
 func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
 	if manifestApp.RandomRoute {
+		if len(config.CurrentRoutes) > 0 {
+			return config, Warnings{"App already has a route."}, nil
+		}
 		// append random route to current route (becomes desired route)
 		randomRoute, warnings, err := actor.GenerateRandomRoute(manifestApp.Name, spaceGUID, orgGUID)
 		config.DesiredRoutes = append(config.CurrentRoutes, randomRoute)

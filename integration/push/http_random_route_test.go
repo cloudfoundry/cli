@@ -16,19 +16,28 @@ var _ = Describe("HTTP random route", func() {
 
 	BeforeEach(func() {
 		appName = "short-app-name" // used on purpose to fit route length requirement
-	})
-
-	It("generates a random route for the app", func() {
 		helpers.WithHelloWorldApp(func(dir string) {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-start")
 			Eventually(session).Should(Say("routes:"))
 			Eventually(session).Should(Say("(?i)\\+\\s+%s-[\\w\\d]+-[\\w\\d]+.%s", appName, defaultSharedDomain()))
 			Eventually(session).Should(Exit(0))
 		})
+	})
 
+	It("generates a random route for the app", func() {
 		session := helpers.CF("app", appName)
 		Eventually(session).Should(Say("name:\\s+%s", appName))
 		Eventually(session).Should(Say("(?i)routes:\\s+%s-[\\w\\d]+-[\\w\\d]+.%s", appName, defaultSharedDomain()))
 		Eventually(session).Should(Exit(0))
+	})
+
+	Context("when the app has an existing route", func() {
+		It("does not generate a random route for the app, but displays a warning instead", func() {
+			helpers.WithHelloWorldApp(func(dir string) {
+				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-start")
+				Eventually(session.Err).Should(Say("App already has a route\\."))
+				Eventually(session).Should(Exit(0))
+			})
+		})
 	})
 })
