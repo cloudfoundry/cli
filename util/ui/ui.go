@@ -59,6 +59,10 @@ type UI struct {
 	In io.Reader
 	// Out is the output buffer
 	Out io.Writer
+	// OutForInteration is the output buffer when working with go-interact. When
+	// working with Windows, color.Output does not work with TTY detection. So
+	// real STDOUT is required or go-interact will not properly work.
+	OutForInteration io.Writer
 	// Err is the error buffer
 	Err io.Writer
 
@@ -87,6 +91,7 @@ func NewUI(config Config) (*UI, error) {
 	return &UI{
 		In:               os.Stdin,
 		Out:              color.Output,
+		OutForInteration: os.Stdout,
 		Err:              os.Stderr,
 		colorEnabled:     config.ColorEnabled(),
 		translate:        translateFunc,
@@ -109,6 +114,7 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	return &UI{
 		In:               in,
 		Out:              out,
+		OutForInteration: out,
 		Err:              err,
 		colorEnabled:     configv3.ColorDisabled,
 		translate:        translationFunc,
@@ -140,7 +146,7 @@ func (ui *UI) DisplayBoolPrompt(defaultResponse bool, template string, templateV
 	response := defaultResponse
 	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
 	interactivePrompt.Input = ui.In
-	interactivePrompt.Output = ui.Out
+	interactivePrompt.Output = ui.OutForInteration
 	err := interactivePrompt.Resolve(&response)
 	return response, err
 }
@@ -154,7 +160,7 @@ func (ui *UI) DisplayPasswordPrompt(template string, templateValues ...map[strin
 	var password interact.Password
 	interactivePrompt := interact.NewInteraction(ui.TranslateText(template, templateValues...))
 	interactivePrompt.Input = ui.In
-	interactivePrompt.Output = ui.Out
+	interactivePrompt.Output = ui.OutForInteration
 	err := interactivePrompt.Resolve(interact.Required(&password))
 	return string(password), err
 }
