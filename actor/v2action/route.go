@@ -52,6 +52,14 @@ func (r Route) Validate() error {
 	return nil
 }
 
+func (r Route) ValidateWithRandomPort(randomPort bool) error {
+	if r.Domain.IsHTTP() && randomPort {
+		return actionerror.InvalidHTTPRouteSettings{Domain: r.Domain.Name}
+	}
+
+	return r.Validate()
+}
+
 // String formats the route in a human readable format.
 func (r Route) String() string {
 	routeString := r.Domain.Name
@@ -110,6 +118,11 @@ func (actor Actor) CreateRouteWithExistenceCheck(orgGUID string, spaceName strin
 			return Route{}, warnings, actionerror.DomainNotFoundError{Name: route.Domain.Name}
 		}
 		route.Domain.GUID = domains[0].GUID
+	}
+
+	validateErr := route.ValidateWithRandomPort(generatePort)
+	if validateErr != nil {
+		return Route{}, Warnings(warnings), validateErr
 	}
 
 	foundRoute, spaceRouteWarnings, findErr := actor.FindRouteBoundToSpaceWithSettings(route)

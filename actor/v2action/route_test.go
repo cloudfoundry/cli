@@ -166,6 +166,87 @@ var _ = Describe("Route Actions", func() {
 				actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
 			),
 		)
+
+		DescribeTable("ValidateWithRandomPort",
+			func(route Route, randomPort bool, expectedErr error) {
+				err := route.ValidateWithRandomPort(randomPort)
+				if expectedErr == nil {
+					Expect(err).To(BeNil())
+				} else {
+					Expect(err).To(Equal(expectedErr))
+				}
+			},
+
+			Entry("valid - host and path on HTTP domain",
+				Route{
+					Host: "some-host",
+					Path: "some-path",
+					Domain: Domain{
+						Name: "some-domain",
+					},
+				},
+				false,
+				nil,
+			),
+
+			Entry("valid - port on TCP domain",
+				Route{
+					Port: types.NullInt{IsSet: true},
+					Domain: Domain{
+						Name:            "some-domain",
+						RouterGroupType: constant.TCPRouterGroup,
+					},
+				},
+				false,
+				nil,
+			),
+
+			Entry("error - port on HTTP domain",
+				Route{
+					Port: types.NullInt{IsSet: true},
+					Domain: Domain{
+						Name: "some-domain",
+					},
+				},
+				false,
+				actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
+			),
+
+			Entry("error - randomport on HTTP domain",
+				Route{
+					Port: types.NullInt{IsSet: false},
+					Domain: Domain{
+						Name: "some-domain",
+					},
+				},
+				true,
+				actionerror.InvalidHTTPRouteSettings{Domain: "some-domain"},
+			),
+
+			Entry("error - hostname on TCP domain",
+				Route{
+					Host: "some-host",
+					Domain: Domain{
+						Name:            "some-domain",
+						RouterGroupType: constant.TCPRouterGroup,
+					},
+				},
+				false,
+				actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
+			),
+
+			Entry("error - path on TCP domain",
+				Route{
+					Path: "some-path",
+					Domain: Domain{
+						Name:            "some-domain",
+						RouterGroupType: constant.TCPRouterGroup,
+					},
+				},
+				false,
+				actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
+			),
+		)
 	})
 
 	Describe("MapRouteToApplication", func() {
@@ -394,6 +475,7 @@ var _ = Describe("Route Actions", func() {
 	Describe("CreateRouteWithExistenceCheck", func() {
 		var (
 			route               Route
+			generatePort        bool
 			createdRoute        Route
 			createRouteWarnings Warnings
 			createRouteErr      error
@@ -417,13 +499,14 @@ var _ = Describe("Route Actions", func() {
 					GUID:       "some-route-guid",
 					Host:       "some-host",
 					Path:       "some-path",
-					Port:       types.NullInt{IsSet: true, Value: 3333},
 					DomainGUID: "some-domain-guid",
 					SpaceGUID:  "some-space-guid",
 				},
 				ccv2.Warnings{"create-route-warning"},
 				nil)
+
 			fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{}, ccv2.Warnings{"get-routes-warning"}, nil)
+
 			route = Route{
 				Domain: Domain{
 					Name: "some-domain",
@@ -431,8 +514,8 @@ var _ = Describe("Route Actions", func() {
 				},
 				Host: "some-host",
 				Path: "some-path",
-				Port: types.NullInt{IsSet: true, Value: 3333},
 			}
+			generatePort = false
 		})
 
 		JustBeforeEach(func() {
@@ -440,7 +523,7 @@ var _ = Describe("Route Actions", func() {
 				"some-org-guid",
 				"some-space",
 				route,
-				true)
+				generatePort)
 		})
 
 		Context("when route does not exist", func() {
@@ -464,7 +547,6 @@ var _ = Describe("Route Actions", func() {
 					GUID:      "some-route-guid",
 					Host:      "some-host",
 					Path:      "some-path",
-					Port:      types.NullInt{IsSet: true, Value: 3333},
 					SpaceGUID: "some-space-guid",
 				}))
 
@@ -482,15 +564,14 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 				Expect(fakeCloudControllerClient.CreateRouteCallCount()).To(Equal(1))
-				passedRoute, generatePort := fakeCloudControllerClient.CreateRouteArgsForCall(0)
+				passedRoute, passedGeneratePort := fakeCloudControllerClient.CreateRouteArgsForCall(0)
 				Expect(passedRoute).To(Equal(ccv2.Route{
 					DomainGUID: "some-domain-guid",
 					Host:       "some-host",
 					Path:       "/some-path",
-					Port:       types.NullInt{IsSet: true, Value: 3333},
 					SpaceGUID:  "some-space-guid",
 				}))
-				Expect(generatePort).To(BeTrue())
+				Expect(passedGeneratePort).To(BeFalse())
 			})
 
 			Context("when creating route errors", func() {
@@ -547,7 +628,6 @@ var _ = Describe("Route Actions", func() {
 					},
 					Host: "some-host",
 					Path: "some-path",
-					Port: types.NullInt{IsSet: true, Value: 3333},
 				}
 			})
 
@@ -582,7 +662,6 @@ var _ = Describe("Route Actions", func() {
 						GUID:      "some-route-guid",
 						Host:      "some-host",
 						Path:      "some-path",
-						Port:      types.NullInt{IsSet: true, Value: 3333},
 						SpaceGUID: "some-space-guid",
 					}))
 					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
@@ -620,6 +699,17 @@ var _ = Describe("Route Actions", func() {
 						"get-private-domains-warning",
 					))
 				})
+			})
+		})
+
+		Context("when the requested route is invalid", func() {
+			BeforeEach(func() {
+				generatePort = true
+			})
+
+			It("returns a validation error", func() {
+				Expect(createRouteErr).To(MatchError(actionerror.InvalidHTTPRouteSettings{Domain: route.Domain.Name}))
+				Expect(createRouteWarnings).To(ConsistOf("get-space-warning"))
 			})
 		})
 
