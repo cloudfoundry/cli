@@ -368,7 +368,7 @@
 			"importpath": "github.com/vito/go-interact",
 			"repository": "https://github.com/vito/go-interact",
 			"vcs": "git",
-			"revision": "c5a3f51ad50e34ec101050f69383caa75082f233",
+			"revision": "fa338ed9e9ecbb0e9c2e6c7a0160d9fc9b0efbd9",
 			"branch": "master",
 			"notests": true
 		},
