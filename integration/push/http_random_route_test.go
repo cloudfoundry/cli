@@ -32,10 +32,10 @@ var _ = Describe("HTTP random route", func() {
 	})
 
 	Context("when the app has an existing route", func() {
-		It("does not generate a random route for the app, but displays a warning instead", func() {
+		It("does not generate a random route for the app", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--random-route", "--no-start")
-				Eventually(session.Err).Should(Say("App already has a route\\."))
+				Eventually(session).ShouldNot(Say("\\+\\s+%s-adj", appName))
 				Eventually(session).Should(Exit(0))
 			})
 		})

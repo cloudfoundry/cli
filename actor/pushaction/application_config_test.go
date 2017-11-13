@@ -261,14 +261,41 @@ var _ = Describe("Application Config", func() {
 					})
 
 					It("does not generate a random route", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(warnings).To(ConsistOf(
 							"some-app-warning-1",
 							"some-app-warning-2",
 							"app-route-warnings",
-							"App already has a route.",
 						))
+						Expect(firstConfig.DesiredRoutes).To(ConsistOf(route))
 
 						Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(0))
+					})
+				})
+			})
+
+			Context("when there is not an existing route and no errors are encountered", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetApplicationRoutesReturns(nil, v2action.Warnings{"app-route-warnings"}, nil)
+				})
+
+				Context("when the --random-route flag is provided", func() {
+					BeforeEach(func() {
+						manifestApps[0].RandomRoute = true
+						fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+						fakeRandomWordGenerator.RandomNounReturns("apple")
+					})
+
+					It("appends a random route to the current route for desired routes", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
+						Expect(firstConfig.DesiredRoutes).To(ConsistOf(
+							v2action.Route{
+								Domain:    domain,
+								SpaceGUID: spaceGUID,
+								Host:      "some-app-striped-apple",
+							},
+						))
 					})
 				})
 			})
@@ -303,6 +330,26 @@ var _ = Describe("Application Config", func() {
 						SpaceGUID: spaceGUID,
 					}}))
 				Expect(firstConfig.TargetedSpaceGUID).To(Equal(spaceGUID))
+			})
+
+			Context("when the --random-route flag is provided", func() {
+				BeforeEach(func() {
+					manifestApps[0].RandomRoute = true
+					fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+					fakeRandomWordGenerator.RandomNounReturns("apple")
+				})
+
+				It("appends a random route to the current route for desired routes", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "private-domain-warnings", "shared-domain-warnings"))
+					Expect(firstConfig.DesiredRoutes).To(ConsistOf(
+						v2action.Route{
+							Domain:    domain,
+							SpaceGUID: spaceGUID,
+							Host:      "some-app-striped-apple",
+						},
+					))
+				})
 			})
 		})
 
@@ -588,52 +635,6 @@ var _ = Describe("Application Config", func() {
 				It("returns the error and warnings", func() {
 					Expect(executeErr).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-service-warning-1", "some-service-warning-2"))
-				})
-			})
-		})
-
-		// TODO: refactor this by putting it into the two contexts that it belongs in
-		Context("when the app exists and does not have any existing routes; or the app does not exist", func() {
-			Context("when the --random-route flag is provided", func() {
-				var existingRoute v2action.Route
-
-				BeforeEach(func() {
-					manifestApps[0].RandomRoute = true
-
-					app := v2action.Application{
-						Name:      appName,
-						GUID:      "some-app-guid",
-						SpaceGUID: spaceGUID,
-					}
-
-					existingRoute = v2action.Route{
-						Domain: v2action.Domain{
-							Name: "some-domain.com",
-							GUID: "some-domain-guid",
-						},
-						Host:      app.Name,
-						GUID:      "route-guid",
-						SpaceGUID: spaceGUID,
-					}
-
-					fakeV2Actor.GetApplicationByNameAndSpaceReturns(app, v2action.Warnings{"some-app-warning-1", "some-app-warning-2"}, nil)
-					fakeV2Actor.GetApplicationRoutesReturns([]v2action.Route{existingRoute}, v2action.Warnings{"app-route-warnings"}, nil)
-
-					fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
-					fakeRandomWordGenerator.RandomNounReturns("apple")
-				})
-
-				It("appends a random route to the current route for desired routes", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "app-route-warnings", "private-domain-warnings", "shared-domain-warnings"))
-					Expect(firstConfig.DesiredRoutes).To(ConsistOf(
-						existingRoute,
-						v2action.Route{
-							Domain:    domain,
-							SpaceGUID: spaceGUID,
-							Host:      "some-app-striped-apple",
-						},
-					))
 				})
 			})
 		})
