@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("create-route command", func() {
+var _ = PDescribe("create-route command", func() {
 	Context("Help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-route", "--help")
