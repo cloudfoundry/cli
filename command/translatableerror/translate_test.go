@@ -36,6 +36,7 @@ var _ = Describe("Translatable Errors", func() {
 			err.Translate(translateFunc)
 		},
 
+		Entry("TriggerLegacyPushError", TriggerLegacyPushError{}),
 		Entry("AddPluginRepositoryError", AddPluginRepositoryError{}),
 		Entry("APINotFoundError", APINotFoundError{}),
 		Entry("APIRequestError", APIRequestError{}),

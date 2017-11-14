@@ -67,6 +67,11 @@ applications:
 - name: "app-4"
   buildpack: null
   command: null
+- name: "app-5"
+  domain: "some-domain"
+  domains:
+  - domain_1
+  - domain_2
 `
 				tempFile, err := ioutil.TempFile("", "manifest-test-")
 				Expect(err).ToNot(HaveOccurred())
@@ -87,80 +92,87 @@ applications:
 
 			It("reads the manifest file", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(apps).To(ConsistOf(
-					Application{
-						Name: "app-1",
-						Buildpack: types.FilteredString{
-							IsSet: true,
-							Value: "some-buildpack",
-						},
-						Command: types.FilteredString{
-							IsSet: true,
-							Value: "some-command",
-						},
-						HealthCheckHTTPEndpoint: "\\some-endpoint",
-						HealthCheckType:         "http",
-						Instances: types.NullInt{
-							Value: 10,
-							IsSet: true,
-						},
-						DiskQuota: types.NullByteSizeInMb{
-							Value: 100,
-							IsSet: true,
-						},
-						DockerImage:    "some-docker-image",
-						DockerUsername: "some-docker-username",
-						Memory: types.NullByteSizeInMb{
-							Value: 200,
-							IsSet: true,
-						},
-						RandomRoute:        true,
-						StackName:          "some-stack",
-						HealthCheckTimeout: 120,
+				Expect(apps).To(HaveLen(5))
+
+				Expect(apps[0]).To(Equal(Application{
+					Name: "app-1",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "some-buildpack",
 					},
-					Application{
-						Name: "app-2",
-						Buildpack: types.FilteredString{
-							IsSet: true,
-							Value: "",
-						},
-						DiskQuota: types.NullByteSizeInMb{
-							Value: 1024,
-							IsSet: true,
-						},
-						Instances: types.NullInt{
-							IsSet: true,
-							Value: 0,
-						},
-						Memory: types.NullByteSizeInMb{
-							Value: 2048,
-							IsSet: true,
-						},
-						Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
-						Services: []string{"service_1", "service_2"},
+					Command: types.FilteredString{
+						IsSet: true,
+						Value: "some-command",
 					},
-					Application{
-						Name: "app-3",
-						EnvironmentVariables: map[string]string{
-							"env_1": "foo",
-							"env_2": "182837403930483038",
-							"env_3": "true",
-							"env_4": "1.00001",
-						},
-						NoRoute: true,
+					HealthCheckHTTPEndpoint: "\\some-endpoint",
+					HealthCheckType:         "http",
+					Instances: types.NullInt{
+						Value: 10,
+						IsSet: true,
 					},
-					Application{
-						Name: "app-4",
-						Buildpack: types.FilteredString{
-							IsSet: true,
-							Value: "",
-						},
-						Command: types.FilteredString{
-							IsSet: true,
-							Value: "",
-						},
+					DiskQuota: types.NullByteSizeInMb{
+						Value: 100,
+						IsSet: true,
 					},
-				))
+					DockerImage:    "some-docker-image",
+					DockerUsername: "some-docker-username",
+					Memory: types.NullByteSizeInMb{
+						Value: 200,
+						IsSet: true,
+					},
+					RandomRoute:        true,
+					StackName:          "some-stack",
+					HealthCheckTimeout: 120,
+				}))
+
+				Expect(apps[1]).To(Equal(Application{
+					Name: "app-2",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "",
+					},
+					DiskQuota: types.NullByteSizeInMb{
+						Value: 1024,
+						IsSet: true,
+					},
+					Instances: types.NullInt{
+						IsSet: true,
+						Value: 0,
+					},
+					Memory: types.NullByteSizeInMb{
+						Value: 2048,
+						IsSet: true,
+					},
+					Routes:   []string{"foo.bar.com", "baz.qux.com", "blep.blah.com/boop"},
+					Services: []string{"service_1", "service_2"},
+				}))
+
+				Expect(apps[2]).To(Equal(Application{
+					Name: "app-3",
+					EnvironmentVariables: map[string]string{
+						"env_1": "foo",
+						"env_2": "182837403930483038",
+						"env_3": "true",
+						"env_4": "1.00001",
+					},
+					NoRoute: true,
+				}))
+
+				Expect(apps[3]).To(Equal(Application{
+					Name: "app-4",
+					Buildpack: types.FilteredString{
+						IsSet: true,
+						Value: "",
+					},
+					Command: types.FilteredString{
+						IsSet: true,
+						Value: "",
+					},
+				}))
+
+				Expect(apps[4].Name).To(Equal("app-5"))
+				Expect(apps[4].DeprecatedDomain).ToNot(BeNil())
+				Expect(apps[4].DeprecatedDomains).ToNot(BeNil())
 			})
 		})
 

@@ -105,6 +105,8 @@ func ConvertToTranslatableError(err error) error {
 		return StagingTimeoutError(e)
 	case actionerror.TaskWorkersUnavailableError:
 		return RunTaskError{Message: "Task workers are unavailable."}
+	case actionerror.TriggerLegacyPushError:
+		return TriggerLegacyPushError(e)
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
 

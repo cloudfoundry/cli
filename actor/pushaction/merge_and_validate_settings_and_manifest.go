@@ -86,6 +86,10 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 		if app.NoRoute && len(app.Routes) > 0 {
 			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
 		}
+
+		if app.DeprecatedDomain != nil || app.DeprecatedDomains != nil {
+			return actionerror.TriggerLegacyPushError{DomainRelated: true}
+		}
 	}
 
 	return nil

@@ -30,6 +30,11 @@ type DisplayUsage interface {
 	DisplayUsage()
 }
 
+type TriggerLegacyMain interface {
+	LegacyMain()
+	error
+}
+
 var ErrFailed = errors.New("command failed")
 var ParseErr = errors.New("incorrect type for arg")
 
@@ -214,25 +219,44 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	return fmt.Errorf("command does not conform to ExtendedCommander")
 }
 
-func handleError(err error, commandUI UI) error {
-	if err == nil {
+func handleError(passedErr error, commandUI UI) error {
+	if passedErr == nil {
 		return nil
 	}
 
-	if exitError, ok := err.(*ssh.ExitError); ok {
-		exitStatus := exitError.ExitStatus()
-		if sig := exitError.Signal(); sig != "" {
+	translatedErr := translatableerror.ConvertToTranslatableError(passedErr)
+
+	switch typedErr := translatedErr.(type) {
+	case TriggerLegacyMain:
+		if typedErr.Error() != "" {
+			commandUI.DisplayWarning("")
+			commandUI.DisplayWarning(typedErr.Error())
+		}
+
+		// TODO: Replace this section with os.Args when v2-push has been replaced
+		var args []string
+		for _, arg := range os.Args {
+			if arg == "v2-push" {
+				args = append(args, "push")
+			} else {
+				args = append(args, arg)
+			}
+		}
+		cmd.Main(os.Getenv("CF_TRACE"), args)
+	case *ssh.ExitError:
+		exitStatus := typedErr.ExitStatus()
+		if sig := typedErr.Signal(); sig != "" {
 			commandUI.DisplayText("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
 				"Signal":   sig,
 				"ExitCode": exitStatus,
 			})
 		}
-		return err
+		return passedErr
 	}
 
-	commandUI.DisplayError(translatableerror.ConvertToTranslatableError(err))
+	commandUI.DisplayError(translatedErr)
 
-	if _, ok := err.(DisplayUsage); ok {
+	if _, ok := translatedErr.(DisplayUsage); ok {
 		return ParseErr
 	}
 

@@ -212,6 +212,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
 			RunTaskError{Message: "Task workers are unavailable."}),
 
+		Entry("actionerror.TriggerLegacyPushError -> TriggerLegacyPushError",
+			actionerror.TriggerLegacyPushError{DomainRelated: true},
+			TriggerLegacyPushError{DomainRelated: true}),
+
 		Entry("actionerror.UploadFailedError -> UploadFailedError",
 			actionerror.UploadFailedError{Err: actionerror.NoDomainsFoundError{}},
 			UploadFailedError{Err: NoDomainsFoundError{}}),

@@ -209,23 +209,6 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(err).To(MatchError(expectedErr))
 		},
 
-		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
-		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),
-
-		Entry("NonexistentAppPathError",
-			CommandLineSettings{
-				Name:            "some-name",
-				ProvidedAppPath: "does-not-exist",
-			}, nil,
-			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
-		Entry("NonexistentAppPathError",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name: "some-name",
-				Path: "does-not-exist",
-			}},
-			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
-
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
 				Buildpack: types.FilteredString{IsSet: true},
@@ -295,6 +278,34 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				DockerUsername: "some-username",
 			}},
 			actionerror.DockerPasswordNotSetError{}),
+
+		Entry("NonexistentAppPathError",
+			CommandLineSettings{
+				Name:            "some-name",
+				ProvidedAppPath: "does-not-exist",
+			}, nil,
+			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
+
+		Entry("NonexistentAppPathError",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name: "some-name",
+				Path: "does-not-exist",
+			}},
+			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
+
+		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
+		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),
+
+		Entry("TriggerLegacyPushError",
+			CommandLineSettings{},
+			[]manifest.Application{{DeprecatedDomain: true}},
+			actionerror.TriggerLegacyPushError{DomainRelated: true}),
+
+		Entry("TriggerLegacyPushError",
+			CommandLineSettings{},
+			[]manifest.Application{{DeprecatedDomains: true}},
+			actionerror.TriggerLegacyPushError{DomainRelated: true}),
 
 		// The following are premerge PropertyCombinationErrors
 		Entry("PropertyCombinationError",
