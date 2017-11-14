@@ -28,9 +28,6 @@ var _ = Describe("Manifest", func() {
 				executeErr     error
 			)
 
-			JustBeforeEach(func() {
-				apps, executeErr = ReadAndMergeManifests(pathToManifest)
-			})
 			BeforeEach(func() {
 				manifest = `---
 applications:
@@ -45,6 +42,7 @@ applications:
     image: "some-docker-image"
     username: "some-docker-username"
   memory: 200M
+  random-route: true
   stack: "some-stack"
   timeout: 120
 - name: "app-2"
@@ -77,6 +75,10 @@ applications:
 
 				err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
 				Expect(err).ToNot(HaveOccurred())
+			})
+
+			JustBeforeEach(func() {
+				apps, executeErr = ReadAndMergeManifests(pathToManifest)
 			})
 
 			AfterEach(func() {
@@ -112,6 +114,7 @@ applications:
 							Value: 200,
 							IsSet: true,
 						},
+						RandomRoute:        true,
 						StackName:          "some-stack",
 						HealthCheckTimeout: 120,
 					},

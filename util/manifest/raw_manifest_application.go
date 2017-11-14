@@ -13,6 +13,7 @@ type rawManifestApplication struct {
 	Memory                  string             `yaml:"memory,omitempty"`
 	NoRoute                 bool               `yaml:"no-route,omitempty"`
 	Path                    string             `yaml:"path,omitempty"`
+	RandomRoute             bool               `yaml:"random-route,omitempty"`
 	Routes                  []rawManifestRoute `yaml:"routes,omitempty"`
 	Services                []string           `yaml:"services,omitempty"`
 	StackName               string             `yaml:"stack,omitempty"`

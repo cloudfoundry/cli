@@ -29,7 +29,6 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 // ReadAndMergeManifests reads the manifest at provided path and returns a
 // fully merged set of applications.
 func ReadAndMergeManifests(pathToManifest string) ([]Application, error) {
-	// Read all manifest files
 	raw, err := ioutil.ReadFile(pathToManifest)
 	if err != nil {
 		return nil, err
@@ -41,13 +40,13 @@ func ReadAndMergeManifests(pathToManifest string) ([]Application, error) {
 		return nil, err
 	}
 
+	// turns the relative path into an absolute path
 	for i, app := range manifest.Applications {
 		if app.Path != "" && !filepath.IsAbs(app.Path) {
 			manifest.Applications[i].Path = filepath.Join(filepath.Dir(pathToManifest), app.Path)
 		}
 	}
 
-	// Merge all manifest files
 	return manifest.Applications, err
 }
 

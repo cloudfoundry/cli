@@ -109,6 +109,7 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	app.Name = m.Name
 	app.NoRoute = m.NoRoute
 	app.Path = m.Path
+	app.RandomRoute = m.RandomRoute
 	app.Services = m.Services
 	app.StackName = m.StackName
 	app.HealthCheckTimeout = m.Timeout
