@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = PDescribe("create-route command", func() {
+var _ = Describe("create-route command", func() {
 	Context("Help", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("create-route", "--help")
@@ -375,7 +375,14 @@ var _ = PDescribe("create-route command", func() {
 							port := "90230"
 							session := helpers.CF("create-route", spaceName, domainName, "--port", port)
 							Eventually(session.Out).Should(Say(`Creating route %s:%s for org %s / space %s as %s\.\.\.`, domainName, port, orgName, spaceName, userName))
-							Eventually(session.Err).Should(Say(`The route is invalid: host is required for shared-domains`))
+							Eventually(session.Err).Should(Say(`Port not allowed in HTTP domain %s`, domainName))
+							Eventually(session).Should(Exit(1))
+						})
+
+						It("fails with an error message and exits 1", func() {
+							session := helpers.CF("create-route", spaceName, domainName, "--random-port")
+							Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+							Eventually(session.Err).Should(Say(`Port not allowed in HTTP domain %s`, domainName))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -441,7 +448,7 @@ var _ = PDescribe("create-route command", func() {
 							path := helpers.PrefixedRandomName("path-")
 							session := helpers.CF("create-route", spaceName, domainName, "--hostname", hostName, "--path", path)
 							Eventually(session.Out).Should(Say(`Creating route %s.%s/%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
-							Eventually(session.Err).Should(Say(`For TCP routes you must specify a port or request a random one\.`))
+							Eventually(session.Err).Should(Say(`Host and path not allowed in route with TCP domain %s`, domainName))
 							Eventually(session).Should(Exit(1))
 						})
 					})

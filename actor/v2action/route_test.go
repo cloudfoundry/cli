@@ -620,60 +620,114 @@ var _ = Describe("Route Actions", func() {
 			})
 		})
 
-		Context("when route domain does not have GUID", func() {
+		Context("when looking up the domain GUID", func() {
 			BeforeEach(func() {
 				route = Route{
 					Domain: Domain{
 						Name: "some-domain",
 					},
-					Host: "some-host",
-					Path: "some-path",
 				}
 			})
 
 			Context("when the domain exists", func() {
-				BeforeEach(func() {
-					fakeCloudControllerClient.GetSharedDomainsReturns(
-						[]ccv2.Domain{},
-						ccv2.Warnings{"get-shared-domains-warning"},
-						nil,
-					)
-					fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(
-						[]ccv2.Domain{{Name: "some-domain", GUID: "some-requested-domain-guid"}},
-						ccv2.Warnings{"get-private-domains-warning"},
-						nil,
-					)
+				Context("when the domain is an HTTP domain", func() {
+					BeforeEach(func() {
+						route.Host = "some-host"
+						route.Path = "some-path"
+
+						fakeCloudControllerClient.GetSharedDomainsReturns(
+							[]ccv2.Domain{},
+							ccv2.Warnings{"get-shared-domains-warning"},
+							nil,
+						)
+						fakeCloudControllerClient.GetOrganizationPrivateDomainsReturns(
+							[]ccv2.Domain{{Name: "some-domain", GUID: "some-requested-domain-guid"}},
+							ccv2.Warnings{"get-private-domains-warning"},
+							nil,
+						)
+					})
+
+					It("gets domain and finds route with fully instantiated domain", func() {
+						Expect(createRouteErr).ToNot(HaveOccurred())
+						Expect(createRouteWarnings).To(ConsistOf(
+							"get-space-warning",
+							"get-shared-domains-warning",
+							"get-private-domains-warning",
+							"get-routes-warning",
+							"create-route-warning",
+						))
+						Expect(createdRoute).To(Equal(Route{
+							Domain: Domain{
+								Name: "some-domain",
+								GUID: "some-requested-domain-guid",
+							},
+							GUID:      "some-route-guid",
+							Host:      "some-host",
+							Path:      "some-path",
+							SpaceGUID: "some-space-guid",
+						}))
+						Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+						orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(queries).To(HaveLen(1))
+						Expect(queries[0]).To(Equal(ccv2.Query{
+							Filter:   ccv2.NameFilter,
+							Operator: ccv2.InOperator,
+							Values:   []string{"some-domain"},
+						}))
+					})
 				})
 
-				It("gets domain and finds route with fully instantiated domain", func() {
-					Expect(createRouteErr).ToNot(HaveOccurred())
-					Expect(createRouteWarnings).To(ConsistOf(
-						"get-space-warning",
-						"get-shared-domains-warning",
-						"get-private-domains-warning",
-						"get-routes-warning",
-						"create-route-warning",
-					))
-					Expect(createdRoute).To(Equal(Route{
-						Domain: Domain{
-							Name: "some-domain",
-							GUID: "some-requested-domain-guid",
-						},
-						GUID:      "some-route-guid",
-						Host:      "some-host",
-						Path:      "some-path",
-						SpaceGUID: "some-space-guid",
-					}))
-					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
-					orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
-					Expect(orgGUID).To(Equal("some-org-guid"))
-					Expect(queries).To(HaveLen(1))
-					Expect(queries[0]).To(Equal(ccv2.Query{
-						Filter:   ccv2.NameFilter,
-						Operator: ccv2.InOperator,
-						Values:   []string{"some-domain"},
-					}))
+				Context("when the domain is a TCP domain", func() {
+					BeforeEach(func() {
+						fakeCloudControllerClient.GetSharedDomainsReturns(
+							[]ccv2.Domain{{
+								Name:            "some-tcp-domain",
+								GUID:            "some-requested-domain-guid",
+								RouterGroupType: constant.TCPRouterGroup,
+							}},
+							ccv2.Warnings{"get-shared-domains-warning"},
+							nil,
+						)
+						fakeCloudControllerClient.CreateRouteReturns(
+							ccv2.Route{
+								GUID:       "some-route-guid",
+								DomainGUID: "some-domain-guid",
+								SpaceGUID:  "some-space-guid",
+							},
+							ccv2.Warnings{"create-route-warning"},
+							nil)
+					})
+
+					It("gets domain and finds route with fully instantiated domain", func() {
+						Expect(createRouteErr).ToNot(HaveOccurred())
+						Expect(createRouteWarnings).To(ConsistOf(
+							"get-space-warning",
+							"get-shared-domains-warning",
+							"get-routes-warning",
+							"create-route-warning",
+						))
+						Expect(createdRoute).To(Equal(Route{
+							Domain: Domain{
+								Name:            "some-domain",
+								GUID:            "some-requested-domain-guid",
+								RouterGroupType: constant.TCPRouterGroup,
+							},
+							GUID:      "some-route-guid",
+							SpaceGUID: "some-space-guid",
+						}))
+						Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+						orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+						Expect(orgGUID).To(Equal("some-org-guid"))
+						Expect(queries).To(HaveLen(1))
+						Expect(queries[0]).To(Equal(ccv2.Query{
+							Filter:   ccv2.NameFilter,
+							Operator: ccv2.InOperator,
+							Values:   []string{"some-domain"},
+						}))
+					})
 				})
 			})
 

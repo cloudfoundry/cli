@@ -118,6 +118,7 @@ func (actor Actor) CreateRouteWithExistenceCheck(orgGUID string, spaceName strin
 			return Route{}, warnings, actionerror.DomainNotFoundError{Name: route.Domain.Name}
 		}
 		route.Domain.GUID = domains[0].GUID
+		route.Domain.RouterGroupType = domains[0].RouterGroupType
 	}
 
 	validateErr := route.ValidateWithRandomPort(generatePort)
