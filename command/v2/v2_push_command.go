@@ -7,7 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	oldcmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -116,23 +115,7 @@ func (cmd V2PushCommand) Execute(args []string) error {
 
 	log.Info("checking manifest")
 	rawApps, err := cmd.findAndReadManifestWithFlavorText(cliSettings)
-	if _, ok := err.(manifest.UnsupportedFieldsError); ok {
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// The following section is not tested as it calls into the old code.
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		cmd.UI.DisplayWarning("*** Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push ***")
-		var args []string
-		for _, arg := range os.Args {
-			if arg == "v2-push" {
-				args = append(args, "push")
-			} else {
-				args = append(args, arg)
-			}
-		}
-
-		oldcmd.Main(os.Getenv("CF_TRACE"), args)
-		return nil
-	} else if err != nil {
+	if err != nil {
 		log.Errorln("reading manifest:", err)
 		return err
 	}

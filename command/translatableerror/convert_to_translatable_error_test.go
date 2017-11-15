@@ -272,6 +272,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			manifest.ManifestCreationError{Err: errors.New("some-error")},
 			ManifestCreationError{Err: errors.New("some-error")}),
 
+		Entry("manifest.UnsupportedFieldsError -> TriggerLegacyPushError",
+			manifest.UnsupportedFieldsError{},
+			TriggerLegacyPushError{InheritanceGlobalRelated: true}),
+
+		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",
 			pluginerror.RawHTTPStatusError{Status: "some status"},
 			DownloadPluginHTTPError{Message: "some status"},
@@ -285,6 +290,11 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			DownloadPluginHTTPError{Message: "x509: certificate signed by unknown authority"},
 		),
 
+		// SSH Error
+		Entry("ssherror.UnableToAuthenticateError -> UnableToAuthenticateError",
+			ssherror.UnableToAuthenticateError{},
+			SSHUnableToAuthenticateError{}),
+
 		// UAA Errors
 		Entry("uaa.BadCredentialsError -> BadCredentialsError",
 			uaa.BadCredentialsError{},
@@ -297,10 +307,6 @@ var _ = Describe("ConvertToTranslatableError", func() {
 		Entry("uaa.InvalidAuthTokenError -> InvalidRefreshTokenError",
 			uaa.InvalidAuthTokenError{},
 			InvalidRefreshTokenError{}),
-
-		Entry("ssherror.UnableToAuthenticateError -> UnableToAuthenticateError",
-			ssherror.UnableToAuthenticateError{},
-			SSHUnableToAuthenticateError{}),
 
 		Entry("default case -> original error",
 			err,

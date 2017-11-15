@@ -106,7 +106,7 @@ func ConvertToTranslatableError(err error) error {
 	case actionerror.TaskWorkersUnavailableError:
 		return RunTaskError{Message: "Task workers are unavailable."}
 	case actionerror.TriggerLegacyPushError:
-		return TriggerLegacyPushError(e)
+		return TriggerLegacyPushError{DomainRelated: e.DomainRelated}
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
 
@@ -134,6 +134,12 @@ func ConvertToTranslatableError(err error) error {
 	case *json.SyntaxError:
 		return JSONSyntaxError{Err: e}
 
+	// Manifest Errors
+	case manifest.ManifestCreationError:
+		return ManifestCreationError(e)
+	case manifest.UnsupportedFieldsError:
+		return TriggerLegacyPushError{InheritanceGlobalRelated: true}
+
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:
 		return DownloadPluginHTTPError{Message: e.Status}
@@ -142,6 +148,10 @@ func ConvertToTranslatableError(err error) error {
 	case pluginerror.UnverifiedServerError:
 		return DownloadPluginHTTPError{Message: e.Error()}
 
+	// SSH Errors
+	case ssherror.UnableToAuthenticateError:
+		return SSHUnableToAuthenticateError{}
+
 	// UAA Errors
 	case uaa.BadCredentialsError:
 		return BadCredentialsError{}
@@ -149,14 +159,6 @@ func ConvertToTranslatableError(err error) error {
 		return UnauthorizedToPerformActionError{}
 	case uaa.InvalidAuthTokenError:
 		return InvalidRefreshTokenError{}
-
-	// Manifest Errors
-	case manifest.ManifestCreationError:
-		return ManifestCreationError(e)
-
-	// SSH Errors
-	case ssherror.UnableToAuthenticateError:
-		return SSHUnableToAuthenticateError{}
 	}
 
 	return err
