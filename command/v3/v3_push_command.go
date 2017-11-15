@@ -47,10 +47,11 @@ type V3PushCommand struct {
 	DockerImage    flag.DockerImage            `long:"docker-image" short:"o" description:"Docker image to use (e.g. user/docker-image-name)"`
 	DockerUsername string                      `long:"docker-username" description:"Repository username; used with password from environment variable CF_DOCKER_PASSWORD"`
 	NoRoute        bool                        `long:"no-route" description:"Do not map a route to this app"`
+	NoStart        bool                        `long:"no-start" description:"Do not stage and start the app after pushing"`
 	AppPath        flag.PathWithExistenceCheck `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"`
 	dockerPassword interface{}                 `environmentName:"CF_DOCKER_PASSWORD" environmentDescription:"Password used for private docker repository"`
 
-	usage               interface{} `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route]"`
+	usage               interface{} `usage:"cf v3-push APP_NAME [-b BUILDPACK]... [-p APP_PATH] [--no-route] [--no-start]\n   cf v3-push APP_NAME --docker-image [REGISTRY_HOST:PORT/]IMAGE[:TAG] [--docker-username USERNAME] [--no-route] [--no-start]"`
 	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
 	envCFStartupTimeout interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 
@@ -148,12 +149,7 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		}
 	}
 
-	pkg, err := cmd.uploadPackage()
-	if err != nil {
-		return err
-	}
-
-	dropletGUID, err := cmd.stagePackage(pkg, user.Name)
+	pkg, err := cmd.createPackage()
 	if err != nil {
 		return err
 	}
@@ -163,6 +159,15 @@ func (cmd V3PushCommand) Execute(args []string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	if cmd.NoStart {
+		return nil
+	}
+
+	dropletGUID, err := cmd.stagePackage(pkg, user.Name)
+	if err != nil {
+		return err
 	}
 
 	err = cmd.setApplicationDroplet(dropletGUID, user.Name)
@@ -340,7 +345,7 @@ func (cmd V3PushCommand) createAndMapRoutes(app v3action.Application) error {
 	return nil
 }
 
-func (cmd V3PushCommand) uploadPackage() (v3action.Package, error) {
+func (cmd V3PushCommand) createPackage() (v3action.Package, error) {
 	isDockerImage := (cmd.DockerImage.Path != "")
 	err := cmd.PackageDisplayer.DisplaySetupMessage(cmd.RequiredArgs.AppName, isDockerImage)
 	if err != nil {

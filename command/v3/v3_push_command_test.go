@@ -211,7 +211,11 @@ var _ = Describe("v3-push Command", func() {
 			})
 		})
 
-		Context("when looking up the application returns an application not found error", func() {
+		Context("when the application doesn't exist", func() {
+			It("doesn't stop the application", func() {
+				Expect(fakeActor.StopApplicationCallCount()).To(Equal(0))
+			})
+
 			BeforeEach(func() {
 				fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{}, v3action.Warnings{"get-warning"}, actionerror.ApplicationNotFoundError{Name: "some-app"})
 			})
@@ -341,6 +345,20 @@ var _ = Describe("v3-push Command", func() {
 							Expect(testUI.Err).To(Say("some-logging-warning"))
 							Expect(testUI.Err).To(Say("some-other-logging-warning"))
 
+						})
+					})
+
+					Context("when --no-start is provided", func() {
+						BeforeEach(func() {
+							cmd.NoStart = true
+						})
+
+						It("does not stage the package and returns", func() {
+							Expect(testUI.Out).To(Say("Uploading and creating bits package for app %s in org %s / space %s as %s", app, orgName, spaceName, userName))
+							Expect(fakeActor.CreateAndUploadBitsPackageByApplicationNameAndSpaceCallCount()).To(Equal(1))
+							Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(0))
+
+							Expect(executeErr).ToNot(HaveOccurred())
 						})
 					})
 
@@ -803,6 +821,19 @@ var _ = Describe("v3-push Command", func() {
 				Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1))
 			})
 
+			Context("when updating the application fails", func() {
+				BeforeEach(func() {
+					fakeActor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"update-warning-1"}, errors.New("some-error"))
+				})
+
+				It("returns the error and displays warnings", func() {
+					Expect(executeErr).To(MatchError("some-error"))
+
+					Expect(testUI.Err).To(Say("get-warning"))
+					Expect(testUI.Err).To(Say("update-warning"))
+				})
+			})
+
 			Context("when a docker image is provided", func() {
 				BeforeEach(func() {
 					cmd.DockerImage.Path = "example.com/docker/docker/docker:docker"
@@ -831,18 +862,6 @@ var _ = Describe("v3-push Command", func() {
 							Data: v3action.AppLifecycleData{},
 						},
 					}))
-				})
-			})
-			Context("when updating the application fails", func() {
-				BeforeEach(func() {
-					fakeActor.UpdateApplicationReturns(v3action.Application{}, v3action.Warnings{"update-warning-1"}, errors.New("some-error"))
-				})
-
-				It("returns the error and displays warnings", func() {
-					Expect(executeErr).To(MatchError("some-error"))
-
-					Expect(testUI.Err).To(Say("get-warning"))
-					Expect(testUI.Err).To(Say("update-warning"))
 				})
 			})
 
@@ -959,6 +978,21 @@ var _ = Describe("v3-push Command", func() {
 						Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
 
 						Expect(fakeActor.StartApplicationCallCount()).To(Equal(1), "Expected StartApplication to be called")
+					})
+
+					Context("when no-start is provided", func() {
+						BeforeEach(func() {
+							cmd.NoStart = true
+						})
+
+						It("stops the application and returns", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(testUI.Out).To(Say("Stopping app some-app in org some-org / space some-space as banana..."))
+
+							Expect(fakeActor.StopApplicationCallCount()).To(Equal(1))
+
+							Expect(fakeActor.StartApplicationCallCount()).To(Equal(0))
+						})
 					})
 				})
 			})
