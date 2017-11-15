@@ -6,6 +6,9 @@ type rawManifestApplication struct {
 	Command                 string             `yaml:"command,omitempty"`
 	DeprecatedDomain        interface{}        `yaml:"domain,omitempty"`
 	DeprecatedDomains       interface{}        `yaml:"domains,omitempty"`
+	DeprecatedHost          interface{}        `yaml:"host,omitempty"`
+	DeprecatedHosts         interface{}        `yaml:"hosts,omitempty"`
+	DeprecatedNoHostname    interface{}        `yaml:"no-hostname,omitempty"`
 	DiskQuota               string             `yaml:"disk_quota,omitempty"`
 	Docker                  rawDockerInfo      `yaml:"docker,omitempty"`
 	EnvironmentVariables    map[string]string  `yaml:"env,omitempty"`

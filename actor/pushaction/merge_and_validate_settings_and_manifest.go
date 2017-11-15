@@ -90,6 +90,9 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 		if app.DeprecatedDomain != nil || app.DeprecatedDomains != nil {
 			return actionerror.TriggerLegacyPushError{DomainRelated: true}
 		}
+		if app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil {
+			return actionerror.TriggerLegacyPushError{HostnameRelated: true}
+		}
 	}
 
 	return nil

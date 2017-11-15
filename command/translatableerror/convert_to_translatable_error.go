@@ -106,7 +106,7 @@ func ConvertToTranslatableError(err error) error {
 	case actionerror.TaskWorkersUnavailableError:
 		return RunTaskError{Message: "Task workers are unavailable."}
 	case actionerror.TriggerLegacyPushError:
-		return TriggerLegacyPushError{DomainRelated: e.DomainRelated}
+		return TriggerLegacyPushError{DomainRelated: e.DomainRelated, HostnameRelated: e.HostnameRelated}
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
 

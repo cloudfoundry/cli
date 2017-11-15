@@ -213,8 +213,8 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			RunTaskError{Message: "Task workers are unavailable."}),
 
 		Entry("actionerror.TriggerLegacyPushError -> TriggerLegacyPushError",
-			actionerror.TriggerLegacyPushError{DomainRelated: true},
-			TriggerLegacyPushError{DomainRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true},
+			TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true}),
 
 		Entry("actionerror.UploadFailedError -> UploadFailedError",
 			actionerror.UploadFailedError{Err: actionerror.NoDomainsFoundError{}},

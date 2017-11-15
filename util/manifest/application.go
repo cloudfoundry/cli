@@ -36,8 +36,11 @@ type Application struct {
 	Services        []string
 	StackName       string
 
-	DeprecatedDomain  interface{}
-	DeprecatedDomains interface{}
+	DeprecatedDomain     interface{}
+	DeprecatedDomains    interface{}
+	DeprecatedHost       interface{}
+	DeprecatedHosts      interface{}
+	DeprecatedNoHostname interface{}
 }
 
 func (app Application) String() string {
@@ -106,6 +109,9 @@ func (app *Application) UnmarshalYAML(unmarshaller func(interface{}) error) erro
 	}
 	app.DeprecatedDomain = m.DeprecatedDomain
 	app.DeprecatedDomains = m.DeprecatedDomains
+	app.DeprecatedHost = m.DeprecatedHost
+	app.DeprecatedHosts = m.DeprecatedHosts
+	app.DeprecatedNoHostname = m.DeprecatedNoHostname
 	app.DockerImage = m.Docker.Image
 	app.DockerUsername = m.Docker.Username
 	app.HealthCheckHTTPEndpoint = m.HealthCheckHTTPEndpoint

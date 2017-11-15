@@ -307,6 +307,21 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			[]manifest.Application{{DeprecatedDomains: true}},
 			actionerror.TriggerLegacyPushError{DomainRelated: true}),
 
+		Entry("TriggerLegacyPushError",
+			CommandLineSettings{},
+			[]manifest.Application{{DeprecatedHost: true}},
+			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+
+		Entry("TriggerLegacyPushError",
+			CommandLineSettings{},
+			[]manifest.Application{{DeprecatedHosts: true}},
+			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+
+		Entry("TriggerLegacyPushError",
+			CommandLineSettings{},
+			[]manifest.Application{{DeprecatedNoHostname: true}},
+			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+
 		// The following are premerge PropertyCombinationErrors
 		Entry("PropertyCombinationError",
 			CommandLineSettings{},
