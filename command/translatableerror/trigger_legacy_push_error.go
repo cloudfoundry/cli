@@ -18,9 +18,9 @@ func (TriggerLegacyPushError) LegacyMain() {}
 func (e TriggerLegacyPushError) Error() string {
 	switch {
 	case e.DomainRelated:
-		return `App manifest declares routes using domain or domains attributes.
+		return `App manifest declares routes using 'domain' or 'domains' attributes.
 These attributes are not processed by 'v2-push' and may be deprecated in the future.
-You can prevent this message by declaring routes in a "routes" section.
+You can prevent this message by declaring routes in a 'routes' section.
 See http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#routes.
 Continuing processing using 'push' command...
 `

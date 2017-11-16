@@ -224,7 +224,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using domain or domains attributes."))
+				Eventually(session.Err).Should(Say("App manifest declares routes using 'domain' or 'domains' attributes."))
 				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push' and may be deprecated in the future."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", host, privateDomain))
 				Eventually(session).Should(Say("OK"))
