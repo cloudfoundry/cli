@@ -726,6 +726,28 @@ var _ = Describe("Application Config", func() {
 					fakeV2Actor.FindRouteBoundToSpaceWithSettingsReturns(v2action.Route{}, v2action.Warnings{"get-route-warnings"}, actionerror.RouteNotFoundError{})
 				})
 
+				Context("when the --random-route flag is provided", func() {
+					BeforeEach(func() {
+						manifestApps[0].RandomRoute = true
+					})
+
+					It("adds the new routes to the desired routes, and does not generate a random route", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "get-route-warnings", "get-route-warnings"))
+						Expect(firstConfig.DesiredRoutes).To(ConsistOf(v2action.Route{
+							Domain:    domain,
+							Host:      "route-1",
+							SpaceGUID: spaceGUID,
+						}, v2action.Route{
+							Domain:    domain,
+							Host:      "route-2",
+							SpaceGUID: spaceGUID,
+						}))
+
+						Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(0))
+					})
+				})
+
 				It("adds the new routes to the desired routes", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("domain-warnings-1", "domains-warnings-2", "get-route-warnings", "get-route-warnings"))

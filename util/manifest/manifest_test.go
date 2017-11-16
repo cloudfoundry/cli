@@ -78,6 +78,11 @@ applications:
   - hostname_1
   - hostname_2
   no-hostname: true
+- name: "app-7"
+  routes:
+  - route: hello.com
+  - route: bleep.blah.com
+  random-route: true
 `
 				tempFile, err := ioutil.TempFile("", "manifest-test-")
 				Expect(err).ToNot(HaveOccurred())
@@ -98,7 +103,7 @@ applications:
 
 			It("reads the manifest file", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(apps).To(HaveLen(6))
+				Expect(apps).To(HaveLen(7))
 
 				Expect(apps[0]).To(Equal(Application{
 					Name: "app-1",
@@ -184,6 +189,12 @@ applications:
 				Expect(apps[5].DeprecatedHost).ToNot(BeNil())
 				Expect(apps[5].DeprecatedHosts).ToNot(BeNil())
 				Expect(apps[5].DeprecatedNoHostname).ToNot(BeNil())
+
+				Expect(apps[6]).To(Equal(Application{
+					Name:        "app-7",
+					Routes:      []string{"hello.com", "bleep.blah.com"},
+					RandomRoute: true,
+				}))
 			})
 		})
 

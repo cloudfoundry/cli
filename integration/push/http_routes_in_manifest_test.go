@@ -68,6 +68,40 @@ var _ = Describe("HTTP routes in manifest", func() {
 					Eventually(session).Should(Say("routes:\\s+(%s, %s)|(%s, %s)", route1, route2, route2, route1))
 					Eventually(session).Should(Exit(0))
 				})
+
+				Context("when --random-route is also specified", func() {
+					It("creates and maps the routes", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":         app,
+										"random-route": true,
+										"routes": []map[string]string{
+											{"route": route1.String()},
+											{"route": route2.String()},
+										},
+									},
+								},
+							})
+
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName)
+							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+
+							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", app))
+							Eventually(session).Should(Say("\\s+routes:"))
+							Eventually(session).Should(Say("(?i)\\+\\s+%s", route1))
+							Eventually(session).Should(Say("(?i)\\+\\s+%s", route2))
+							Eventually(session).Should(Exit(0))
+						})
+
+						session := helpers.CF("app", app)
+						Eventually(session).Should(Say("name:\\s+%s", app))
+						Eventually(session).Should(Say("routes:\\s+(%s, %s)|(%s, %s)", route1, route2, route2, route1))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 
 			Context("when one of the routes exists", func() {
