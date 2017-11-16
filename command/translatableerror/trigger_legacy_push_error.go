@@ -1,10 +1,16 @@
 package translatableerror
 
+import (
+	"fmt"
+	"strings"
+)
+
 type TriggerLegacyPushError struct {
-	DomainRelated            bool
-	HostnameRelated          bool
-	InheritanceGlobalRelated bool
-	RandomRouteRelated       bool
+	DomainRelated      bool
+	HostnameRelated    bool
+	GlobalRelated      []string
+	InheritanceRelated bool
+	RandomRouteRelated bool
 }
 
 func (TriggerLegacyPushError) LegacyMain() {}
@@ -23,8 +29,16 @@ Continuing processing using 'push' command...
 These attributes are not processed by 'v2-push'.
 Continuing processing using 'push' command...
 `
-	case e.InheritanceGlobalRelated:
-		return "*** Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push ***"
+	case len(e.GlobalRelated) > 0:
+		return fmt.Sprintf(`App manifest has attributes promoted to the top level. Found: %s.
+Promoted attributes are not processed by 'v2-push' and may be deprecated in the future.
+Continuing processing using 'push' command...`, strings.Join(e.GlobalRelated, ", "))
+
+	case e.InheritanceRelated:
+		return `App manifest uses inheritance, which is not supported by 'v2-push'.
+Continuing processing using 'push' command...
+`
+
 	default:
 		return ""
 	}

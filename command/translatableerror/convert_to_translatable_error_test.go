@@ -272,9 +272,13 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			manifest.ManifestCreationError{Err: errors.New("some-error")},
 			ManifestCreationError{Err: errors.New("some-error")}),
 
-		Entry("manifest.UnsupportedFieldsError -> TriggerLegacyPushError",
-			manifest.UnsupportedFieldsError{},
-			TriggerLegacyPushError{InheritanceGlobalRelated: true}),
+		Entry("manifest.InheritanceFieldError -> TriggerLegacyPushError",
+			manifest.InheritanceFieldError{},
+			TriggerLegacyPushError{InheritanceRelated: true}),
+
+		Entry("manifest.GlobalFieldError -> TriggerLegacyPushError",
+			manifest.GlobalFieldsError{Fields: []string{"some-field"}},
+			TriggerLegacyPushError{GlobalRelated: []string{"some-field"}}),
 
 		// Plugin Errors
 		Entry("pluginerror.RawHTTPStatusError -> DownloadPluginHTTPError",

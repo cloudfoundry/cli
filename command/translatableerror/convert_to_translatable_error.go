@@ -137,8 +137,10 @@ func ConvertToTranslatableError(err error) error {
 	// Manifest Errors
 	case manifest.ManifestCreationError:
 		return ManifestCreationError(e)
-	case manifest.UnsupportedFieldsError:
-		return TriggerLegacyPushError{InheritanceGlobalRelated: true}
+	case manifest.InheritanceFieldError:
+		return TriggerLegacyPushError{InheritanceRelated: true}
+	case manifest.GlobalFieldsError:
+		return TriggerLegacyPushError{GlobalRelated: e.Fields}
 
 	// Plugin Execution Errors
 	case pluginerror.RawHTTPStatusError:

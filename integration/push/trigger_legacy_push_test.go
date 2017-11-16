@@ -42,7 +42,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("\\*\\*\\* Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push \\*\\*\\*"))
+				Eventually(session.Err).Should(Say("App manifest has attributes promoted to the top level\\. Found: host\\."))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, defaultDomain))
 			})
 		})
@@ -65,7 +65,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("\\*\\*\\* Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push \\*\\*\\*"))
+				Eventually(session.Err).Should(Say("App manifest uses inheritance, which is not supported by 'v2-push'"))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -202,7 +202,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("\\*\\*\\* Global attributes/inheritance in app manifest are not supported in v2-push, delegating to old push \\*\\*\\*"))
+				Eventually(session.Err).Should(Say("App manifest uses inheritance, which is not supported by 'v2-push'"))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, privateDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))

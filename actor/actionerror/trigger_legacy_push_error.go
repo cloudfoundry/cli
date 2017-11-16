@@ -5,6 +5,8 @@ import "fmt"
 type TriggerLegacyPushError struct {
 	DomainRelated      bool
 	HostnameRelated    bool
+	GlobalRelated      []string
+	InheritanceRelated bool
 	RandomRouteRelated bool
 }
 

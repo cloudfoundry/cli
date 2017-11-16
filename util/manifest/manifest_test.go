@@ -188,52 +188,86 @@ applications:
 		})
 
 		Context("when provided deprecated fields", func() {
-			DescribeTable("raises a UnsupportedFieldsError",
-				func(manifestProperty string, numberOfValues int) {
-					tempFile, err := ioutil.TempFile("", "manifest-test-")
-					Expect(err).ToNot(HaveOccurred())
-					defer os.Remove(tempFile.Name())
-					Expect(tempFile.Close()).ToNot(HaveOccurred())
-					pathToManifest := tempFile.Name()
 
-					var manifest string
-					if numberOfValues == 1 {
-						manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
-					} else {
-						values := []string{"A", "B"}
-						manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
-					}
-					err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
-					Expect(err).ToNot(HaveOccurred())
+			Context("when global fields are provided", func() {
+				DescribeTable("raises a GlobalFieldsError",
+					func(manifestProperty string, numberOfValues int) {
+						tempFile, err := ioutil.TempFile("", "manifest-test-")
+						Expect(err).ToNot(HaveOccurred())
+						defer os.Remove(tempFile.Name())
+						Expect(tempFile.Close()).ToNot(HaveOccurred())
+						pathToManifest := tempFile.Name()
 
-					_, err = ReadAndMergeManifests(pathToManifest)
-					Expect(err).To(MatchError(UnsupportedFieldsError{}))
-				},
+						if numberOfValues == 1 {
+							manifest = fmt.Sprintf("---\n%s: value", manifestProperty)
+						} else {
+							values := []string{"A", "B"}
+							manifest = fmt.Sprintf("---\n%s: [%s]", manifestProperty, strings.Join(values, ","))
+						}
+						err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-				Entry("global buildpack", "buildpack", 1),
-				Entry("global command", "command", 1),
-				Entry("global disk quota", "disk_quota", 1),
-				Entry("global docker", "docker", 1),
-				Entry("global domain", "domain", 1),
-				Entry("global domains", "domains", 2),
-				Entry("global environment variables", "env", 2),
-				Entry("global health check HTTP endpoint", "health-check-http-endpoint", 1),
-				Entry("global health check timeout", "timeout", 1),
-				Entry("global health check type", "health-check-type", 1),
-				Entry("global host", "host", 1),
-				Entry("global hosts", "hosts", 2),
-				Entry("global instances", "instances", 1),
-				Entry("global memory", "memory", 1),
-				Entry("global name", "name", 1),
-				Entry("global no hostname", "no-hostname", 1),
-				Entry("global no route", "no-route", 1),
-				Entry("global path", "path", 1),
-				Entry("global random-route", "random-route", 1),
-				Entry("global routes", "routes", 2),
-				Entry("global services", "services", 2),
-				Entry("global stack", "stack", 1),
-				Entry("inheritance", "inherit", 1),
+						_, err = ReadAndMergeManifests(pathToManifest)
+						Expect(err).To(MatchError(GlobalFieldsError{Fields: []string{manifestProperty}}))
+					},
+
+					Entry("global buildpack", "buildpack", 1),
+					Entry("global command", "command", 1),
+					Entry("global disk quota", "disk_quota", 1),
+					Entry("global docker", "docker", 1),
+					Entry("global domain", "domain", 1),
+					Entry("global domains", "domains", 2),
+					Entry("global environment variables", "env", 2),
+					Entry("global health check HTTP endpoint", "health-check-http-endpoint", 1),
+					Entry("global health check timeout", "timeout", 1),
+					Entry("global health check type", "health-check-type", 1),
+					Entry("global host", "host", 1),
+					Entry("global hosts", "hosts", 2),
+					Entry("global instances", "instances", 1),
+					Entry("global memory", "memory", 1),
+					Entry("global name", "name", 1),
+					Entry("global no hostname", "no-hostname", 1),
+					Entry("global no route", "no-route", 1),
+					Entry("global path", "path", 1),
+					Entry("global random-route", "random-route", 1),
+					Entry("global routes", "routes", 2),
+					Entry("global services", "services", 2),
+					Entry("global stack", "stack", 1),
+				)
+			})
+
+		})
+
+		Context("when inheritance is provided", func() {
+			var (
+				pathToManifest string
+
+				apps       []Application
+				executeErr error
 			)
+
+			BeforeEach(func() {
+				manifest = `---
+inherit: "./some-inheritance-file"
+applications:
+- name: "app-1"
+`
+				tempFile, err := ioutil.TempFile("", "manifest-test-")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(tempFile.Close()).ToNot(HaveOccurred())
+				pathToManifest = tempFile.Name()
+
+				err = ioutil.WriteFile(pathToManifest, []byte(manifest), 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			JustBeforeEach(func() {
+				apps, executeErr = ReadAndMergeManifests(pathToManifest)
+			})
+
+			It("raises an InheritanceFieldError", func() {
+				Expect(executeErr).To(MatchError(InheritanceFieldError{}))
+			})
 		})
 	})
 
