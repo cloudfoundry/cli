@@ -152,9 +152,9 @@ var HelpCategoryList = []HelpCategory{
 	},
 }
 
-var V3HelpCategoryList = []HelpCategory{
+var ExperimentalHelpCategoryList = []HelpCategory{
 	{
-		CategoryName: "V3 APPS (experimental):",
+		CategoryName: "APPS (experimental):",
 		CommandList: [][]string{
 			{"v3-apps", "v3-app", "v3-create-app"},
 			{"v3-push", "v3-scale", "v3-delete"},
@@ -163,6 +163,7 @@ var V3HelpCategoryList = []HelpCategory{
 			{"v3-set-env", "v3-unset-env"},
 			{"v3-get-health-check", "v3-set-health-check"},
 			{"v3-packages", "v3-create-package"},
+			{"v2-push"},
 		},
 	},
 }

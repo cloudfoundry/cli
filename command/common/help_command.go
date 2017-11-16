@@ -143,7 +143,7 @@ func (cmd HelpCommand) displayHelpFooter(cmdInfo map[string]sharedaction.Command
 
 	cmd.UI.DisplayNewline()
 
-	cmd.displayCommandGroups(internal.V3HelpCategoryList, cmdInfo, 34)
+	cmd.displayCommandGroups(internal.ExperimentalHelpCategoryList, cmdInfo, 34)
 }
 
 func (cmd HelpCommand) displayCommonCommands() {

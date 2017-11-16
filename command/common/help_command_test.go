@@ -608,7 +608,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   --help, -h                         Show help"))
 				Expect(testUI.Out).To(Say("   -v                                 Print API request diagnostics to stdout"))
 
-				Expect(testUI.Out).To(Say("V3 APPS \\(experimental\\):"))
+				Expect(testUI.Out).To(Say("APPS \\(experimental\\):"))
 				Expect(testUI.Out).To(Say("   v3-apps\\s+List all apps in the target space"))
 				Expect(testUI.Out).To(Say("   v3-app\\s+Display health and status for an app"))
 				Expect(testUI.Out).To(Say("   v3-create-app\\s+Create a V3 App"))
@@ -628,6 +628,7 @@ var _ = Describe("help Command", func() {
 				Expect(testUI.Out).To(Say("   v3-set-health-check\\s+Change type of health check performed on an app's process"))
 				Expect(testUI.Out).To(Say("   v3-packages\\s+List packages of an app"))
 				Expect(testUI.Out).To(Say("   v3-create-package\\s+Uploads a V3 Package"))
+				Expect(testUI.Out).To(Say("   v2-push\\s+Push a new app or sync changes to an existing app"))
 			})
 
 			Context("when there are multiple installed plugins", func() {
