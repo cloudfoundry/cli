@@ -350,11 +350,11 @@ func base64Sha256Fingerprint(key ssh.PublicKey) string {
 }
 
 func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) ssh.HostKeyCallback {
-	if opts.SkipHostValidation {
-		return nil
-	}
-
 	return func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+
+		if opts.SkipHostValidation {
+			return nil
+		}
 		var fingerprint string
 
 		switch len(expectedFingerprint) {

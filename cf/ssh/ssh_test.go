@@ -328,7 +328,7 @@ var _ = Describe("SSH", func() {
 				Expect(fakeSecureDialer.DialCallCount()).To(Equal(1))
 
 				_, _, config := fakeSecureDialer.DialArgsForCall(0)
-				Expect(config.HostKeyCallback).To(BeNil())
+				Expect(config.HostKeyCallback("some-addr", nil, nil)).To(BeNil())
 			})
 		})
 
