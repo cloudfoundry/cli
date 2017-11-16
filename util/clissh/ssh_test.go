@@ -302,11 +302,11 @@ var _ = Describe("CLI SSH", func() {
 				skipHostValidation = true
 			})
 
-			It("removes the HostKeyCallback from the client config", func() {
+			It("the HostKeyCallback on the Config to always return nil", func() {
 				Expect(fakeSecureDialer.DialCallCount()).To(Equal(1))
 
 				_, _, config := fakeSecureDialer.DialArgsForCall(0)
-				Expect(config.HostKeyCallback).To(BeNil())
+				Expect(config.HostKeyCallback("some-hostname", nil, nil)).To(BeNil())
 			})
 		})
 

@@ -35,6 +35,7 @@ var _ = Describe("SSH Actions", func() {
 				Passcode:           "some-passcode",
 				Endpoint:           "some-endpoint",
 				HostKeyFingerprint: "some-fingerprint",
+				SkipHostValidation: true,
 			}
 		})
 
@@ -44,11 +45,12 @@ var _ = Describe("SSH Actions", func() {
 
 		It("calls connect with the provided authorization info", func() {
 			Expect(fakeSecureShellClient.ConnectCallCount()).To(Equal(1))
-			usernameArg, passcodeArg, endpointArg, fingerprintArg, _ := fakeSecureShellClient.ConnectArgsForCall(0)
+			usernameArg, passcodeArg, endpointArg, fingerprintArg, skipHostValidationArg := fakeSecureShellClient.ConnectArgsForCall(0)
 			Expect(usernameArg).To(Equal("some-user"))
 			Expect(passcodeArg).To(Equal("some-passcode"))
 			Expect(endpointArg).To(Equal("some-endpoint"))
 			Expect(fingerprintArg).To(Equal("some-fingerprint"))
+			Expect(skipHostValidationArg).To(BeTrue())
 		})
 
 		Context("when connecting fails", func() {

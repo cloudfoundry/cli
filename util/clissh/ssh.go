@@ -130,10 +130,12 @@ func NewSecureShell(
 }
 
 func (c *SecureShell) Connect(username string, passcode string, appSSHEndpoint string, appSSHHostKeyFingerprint string, skipHostValidation bool) error {
+	hostKeyCallbackFunction := fingerprintCallback(skipHostValidation, appSSHHostKeyFingerprint)
+
 	clientConfig := &ssh.ClientConfig{
 		User:            username,
 		Auth:            []ssh.AuthMethod{ssh.Password(passcode)},
-		HostKeyCallback: fingerprintCallback(skipHostValidation, appSSHHostKeyFingerprint),
+		HostKeyCallback: hostKeyCallbackFunction,
 	}
 
 	secureClient, err := c.secureDialer.Dial("tcp", appSSHEndpoint, clientConfig)
@@ -341,11 +343,11 @@ func base64Sha256Fingerprint(key ssh.PublicKey) string {
 }
 
 func fingerprintCallback(skipHostValidation bool, expectedFingerprint string) ssh.HostKeyCallback {
-	if skipHostValidation {
-		return nil
-	}
-
 	return func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+		if skipHostValidation {
+			return nil
+		}
+
 		var fingerprint string
 
 		switch len(expectedFingerprint) {
