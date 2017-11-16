@@ -821,7 +821,6 @@ var _ = Describe("Routes", func() {
 
 	Describe("GenerateRandomRoute", func() {
 		var (
-			appName   string
 			spaceGUID string
 			orgGUID   string
 
@@ -829,94 +828,130 @@ var _ = Describe("Routes", func() {
 			warnings    Warnings
 			executeErr  error
 
-			domain v2action.Domain
+			domain      v2action.Domain
+			manifestApp manifest.Application
 		)
 
 		BeforeEach(func() {
-			appName = "some a$pp nAme"
+			manifestApp = manifest.Application{
+				Name: "some a$pp nAme",
+			}
 			spaceGUID = "some-space-guid"
 			orgGUID = "some-org-guid"
+			domain = v2action.Domain{}
 		})
 
 		JustBeforeEach(func() {
-			randomRoute, warnings, executeErr = actor.GenerateRandomRoute(appName, spaceGUID, orgGUID)
+			randomRoute, warnings, executeErr = actor.GenerateRandomRoute(manifestApp, spaceGUID, orgGUID)
 		})
 
-		Context("when the domain is a tcp domain", func() {
+		Context("when a domain is specified", func() {
 			BeforeEach(func() {
-				domain.RouterGroupType = constant.TCPRouterGroup
-				fakeV2Actor.GetOrganizationDomainsReturns(
+				manifestApp.Domain = "some-domain"
+				domain.Name = "some-domain"
+				fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+				fakeRandomWordGenerator.RandomNounReturns("apple")
+
+				fakeV2Actor.GetDomainsByNameAndOrganizationReturns(
 					[]v2action.Domain{domain},
 					v2action.Warnings{"some-organization-domain-warning"},
 					nil,
 				)
 			})
 
-			It("generates a route with a randomly generated server side port number", func() {
+			It("uses the specified domain to generate a route", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(randomRoute).To(Equal(v2action.Route{
 					Domain:    domain,
+					Host:      "some-app-name-striped-apple",
 					SpaceGUID: spaceGUID,
 				}))
 				Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 
-				Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
-				Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
+				Expect(fakeV2Actor.GetDomainsByNameAndOrganizationCallCount()).To(Equal(1))
+				domainsArg, orgGUIDArg := fakeV2Actor.GetDomainsByNameAndOrganizationArgsForCall(0)
+				Expect(domainsArg).To(ConsistOf("some-domain"))
+				Expect(orgGUIDArg).To(Equal("some-org-guid"))
 			})
 		})
 
-		Context("when the domain is an http domain", func() {
-			BeforeEach(func() {
-				domain.RouterGroupType = constant.HTTPRouterGroup
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{domain},
-					v2action.Warnings{"some-organization-domain-warning"},
-					nil,
-				)
-				fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
-				fakeRandomWordGenerator.RandomNounReturns("apple")
-			})
-
-			Context("when the app name is partially sanitized", func() {
-				It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
-					Expect(randomRoute).To(Equal(v2action.Route{
-						Domain:    domain,
-						SpaceGUID: spaceGUID,
-						Host:      "some-app-name-striped-apple",
-					}))
-					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
-				})
-			})
-
-			Context("when the app name is fully sanitized", func() {
+		Context("when no domain is specified", func() {
+			Context("when the default domain is a tcp domain", func() {
 				BeforeEach(func() {
-					appName = "@@@"
+					domain.RouterGroupType = constant.TCPRouterGroup
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
 				})
 
-				It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
+				It("generates a route with a randomly generated server side port number", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 					Expect(randomRoute).To(Equal(v2action.Route{
 						Domain:    domain,
 						SpaceGUID: spaceGUID,
-						Host:      "striped-apple",
 					}))
 					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+
+					Expect(fakeV2Actor.GetOrganizationDomainsCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.GetOrganizationDomainsArgsForCall(0)).To(Equal(orgGUID))
 				})
 			})
-		})
 
-		Context("when the default domain lookup fails", func() {
-			BeforeEach(func() {
-				fakeV2Actor.GetOrganizationDomainsReturns(
-					[]v2action.Domain{domain},
-					v2action.Warnings{"some-organization-domain-warning"},
-					errors.New("some-error"),
-				)
+			Context("when the default domain is an http domain", func() {
+				BeforeEach(func() {
+					domain.RouterGroupType = constant.HTTPRouterGroup
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						nil,
+					)
+					fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+					fakeRandomWordGenerator.RandomNounReturns("apple")
+				})
+
+				Context("when the app name is partially sanitized", func() {
+					It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(randomRoute).To(Equal(v2action.Route{
+							Domain:    domain,
+							SpaceGUID: spaceGUID,
+							Host:      "some-app-name-striped-apple",
+						}))
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+					})
+				})
+
+				Context("when the app name is fully sanitized", func() {
+					BeforeEach(func() {
+						manifestApp.Name = "@@@"
+					})
+
+					It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(randomRoute).To(Equal(v2action.Route{
+							Domain:    domain,
+							SpaceGUID: spaceGUID,
+							Host:      "striped-apple",
+						}))
+						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+					})
+				})
 			})
-			It("returns an error and a warning", func() {
-				Expect(executeErr).To(MatchError("some-error"))
-				Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+
+			Context("when the default domain lookup fails", func() {
+				BeforeEach(func() {
+					fakeV2Actor.GetOrganizationDomainsReturns(
+						[]v2action.Domain{domain},
+						v2action.Warnings{"some-organization-domain-warning"},
+						errors.New("some-error"),
+					)
+				})
+				It("returns an error and a warning", func() {
+					Expect(executeErr).To(MatchError("some-error"))
+					Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
+				})
 			})
 		})
 	})

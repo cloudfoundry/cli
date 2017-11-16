@@ -350,6 +350,60 @@ var _ = Describe("Application Config", func() {
 						},
 					))
 				})
+
+				Context("when the -d flag is provided", func() {
+					Context("when the domain is an http domain", func() {
+						var httpDomain v2action.Domain
+
+						BeforeEach(func() {
+							httpDomain = v2action.Domain{
+								Name: "some-http-domain.com",
+							}
+
+							manifestApps[0].Domain = "some-http-domain.com"
+							fakeV2Actor.GetDomainsByNameAndOrganizationReturns([]v2action.Domain{httpDomain}, v2action.Warnings{"domain-warnings-1", "domain-warnings-2"}, nil)
+							fakeRandomWordGenerator.RandomAdjectiveReturns("striped")
+							fakeRandomWordGenerator.RandomNounReturns("apple")
+						})
+
+						It("appends a random HTTP route to the desired routes", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "domain-warnings-1", "domain-warnings-2"))
+							Expect(firstConfig.DesiredRoutes).To(ConsistOf(
+								v2action.Route{
+									Host:      "some-app-striped-apple",
+									Domain:    httpDomain,
+									SpaceGUID: spaceGUID,
+								},
+							))
+						})
+					})
+
+					Context("when the domain is a tcp domain", func() {
+						var tcpDomain v2action.Domain
+						BeforeEach(func() {
+							tcpDomain = v2action.Domain{
+								Name:            "some-tcp-domain.com",
+								RouterGroupType: constant.TCPRouterGroup,
+							}
+
+							manifestApps[0].Domain = "some-tcp-domain.com"
+							fakeV2Actor.GetDomainsByNameAndOrganizationReturns([]v2action.Domain{tcpDomain}, v2action.Warnings{"domain-warnings-1", "domain-warnings-2"}, nil)
+						})
+
+						It("appends a random TCP route to the desired routes", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(warnings).To(ConsistOf("some-app-warning-1", "some-app-warning-2", "domain-warnings-1", "domain-warnings-2"))
+							Expect(firstConfig.DesiredRoutes).To(ConsistOf(
+								v2action.Route{
+									Domain:    tcpDomain,
+									SpaceGUID: spaceGUID,
+									Port:      types.NullInt{IsSet: false},
+								},
+							))
+						})
+					})
+				})
 			})
 		})
 

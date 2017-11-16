@@ -192,15 +192,18 @@ func (actor Actor) CreateRoutes(config ApplicationConfig) (ApplicationConfig, bo
 	return config, createdRoutes, allWarnings, nil
 }
 
-func (actor Actor) GenerateRandomRoute(appName string, spaceGUID string, orgGUID string) (v2action.Route, Warnings, error) {
-	domain, warnings, err := actor.DefaultDomain(orgGUID)
+// GenerateRandomRoute generates a random route with a specified or default domain
+// If the domain is HTTP, a random hostname is generated
+// If the domain is TCP, an empty port is used (to signify a random port should be generated)
+func (actor Actor) GenerateRandomRoute(manifestApp manifest.Application, spaceGUID string, orgGUID string) (v2action.Route, Warnings, error) {
+	domain, warnings, err := actor.calculateDomain(manifestApp, orgGUID)
 	if err != nil {
-		return v2action.Route{}, Warnings(warnings), err
+		return v2action.Route{}, warnings, err
 	}
 
 	var hostname string
 	if domain.IsHTTP() {
-		hostname = fmt.Sprintf("%s-%s-%s", actor.sanitize(appName), actor.WordGenerator.RandomAdjective(), actor.WordGenerator.RandomNoun())
+		hostname = fmt.Sprintf("%s-%s-%s", actor.sanitize(manifestApp.Name), actor.WordGenerator.RandomAdjective(), actor.WordGenerator.RandomNoun())
 		hostname = strings.Trim(hostname, "-")
 	}
 
@@ -208,7 +211,7 @@ func (actor Actor) GenerateRandomRoute(appName string, spaceGUID string, orgGUID
 		Host:      hostname,
 		Domain:    domain,
 		SpaceGUID: spaceGUID,
-	}, Warnings(warnings), err
+	}, warnings, err
 }
 
 // GetGeneratedRoute returns a route with the host and the default org domain.

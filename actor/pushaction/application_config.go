@@ -105,10 +105,12 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 			}
 		}
 
-		config, err = actor.configureResources(config, app.DockerImage)
-		if err != nil {
-			log.Errorln("configuring resources", err)
-			return nil, warnings, err
+		if app.DockerImage == "" {
+			config, err = actor.configureResources(config)
+			if err != nil {
+				log.Errorln("configuring resources", err)
+				return nil, warnings, err
+			}
 		}
 
 		configs = append(configs, config)
@@ -118,32 +120,28 @@ func (actor Actor) ConvertToApplicationConfigs(orgGUID string, spaceGUID string,
 }
 
 func (actor Actor) configureRoutes(manifestApp manifest.Application, orgGUID string, spaceGUID string, config ApplicationConfig) (ApplicationConfig, Warnings, error) {
-	if manifestApp.RandomRoute {
-		if len(config.CurrentRoutes) > 0 {
-			config.DesiredRoutes = config.CurrentRoutes
-			return config, nil, nil
-		}
-		// append random route to current route (becomes desired route)
-		randomRoute, warnings, err := actor.GenerateRandomRoute(manifestApp.Name, spaceGUID, orgGUID)
-		config.DesiredRoutes = append(config.CurrentRoutes, randomRoute)
-		return config, warnings, err
-	}
-
-	if len(manifestApp.Routes) > 0 {
+	switch {
+	case len(manifestApp.Routes) > 0: // Routes in manifest mutually exclusive with all other route related fields
 		routes, warnings, err := actor.CalculateRoutes(manifestApp.Routes, orgGUID, spaceGUID, config.CurrentRoutes)
 		config.DesiredRoutes = routes
 		return config, warnings, err
-	}
-
-	// if routes aren't provided in the manifest
-	desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
-	if err != nil {
-		log.Errorln("getting default route:", err)
+	case manifestApp.RandomRoute && len(config.CurrentRoutes) > 0:
+		config.DesiredRoutes = config.CurrentRoutes
+		return config, nil, nil
+	case manifestApp.RandomRoute:
+		// append random route to current route (becomes desired route)
+		randomRoute, warnings, err := actor.GenerateRandomRoute(manifestApp, spaceGUID, orgGUID)
+		config.DesiredRoutes = append(config.CurrentRoutes, randomRoute)
 		return config, warnings, err
+	default:
+		desiredRoute, warnings, err := actor.GetGeneratedRoute(manifestApp, orgGUID, spaceGUID, config.CurrentRoutes)
+		if err != nil {
+			log.Errorln("getting default route:", err)
+			return config, warnings, err
+		}
+		config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
+		return config, warnings, nil
 	}
-
-	config.DesiredRoutes = append(config.CurrentRoutes, desiredRoute)
-	return config, warnings, nil
 }
 
 func (actor Actor) getDesiredServices(currentServices map[string]v2action.ServiceInstance, requestedServices []string, spaceGUID string) (map[string]v2action.ServiceInstance, Warnings, error) {
@@ -199,29 +197,27 @@ func (actor Actor) configureExistingApp(config ApplicationConfig, app manifest.A
 	return config, warnings, nil
 }
 
-func (actor Actor) configureResources(config ApplicationConfig, dockerImagePath string) (ApplicationConfig, error) {
-	if dockerImagePath == "" {
-		info, err := os.Stat(config.Path)
-		if err != nil {
-			return config, err
-		}
-
-		var resources []sharedaction.Resource
-		if info.IsDir() {
-			log.WithField("path_to_resources", config.Path).Info("determine directory resources to zip")
-			resources, err = actor.SharedActor.GatherDirectoryResources(config.Path)
-		} else {
-			config.Archive = true
-			log.WithField("path_to_resources", config.Path).Info("determine archive resources to zip")
-			resources, err = actor.SharedActor.GatherArchiveResources(config.Path)
-		}
-		if err != nil {
-			return config, err
-		}
-		config.AllResources = actor.ConvertSharedResourcesToV2Resources(resources)
-
-		log.WithField("number_of_files", len(resources)).Debug("completed file scan")
+func (actor Actor) configureResources(config ApplicationConfig) (ApplicationConfig, error) {
+	info, err := os.Stat(config.Path)
+	if err != nil {
+		return config, err
 	}
+
+	var resources []sharedaction.Resource
+	if info.IsDir() {
+		log.WithField("path_to_resources", config.Path).Info("determine directory resources to zip")
+		resources, err = actor.SharedActor.GatherDirectoryResources(config.Path)
+	} else {
+		config.Archive = true
+		log.WithField("path_to_resources", config.Path).Info("determine archive resources to zip")
+		resources, err = actor.SharedActor.GatherArchiveResources(config.Path)
+	}
+	if err != nil {
+		return config, err
+	}
+	config.AllResources = actor.ConvertSharedResourcesToV2Resources(resources)
+
+	log.WithField("number_of_files", len(resources)).Debug("completed file scan")
 
 	return config, nil
 }
