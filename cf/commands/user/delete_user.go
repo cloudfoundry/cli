@@ -77,7 +77,7 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 	case nil:
 		if len(users) > 1 {
 			return fmt.Errorf(T(
-				"Error deleting user {{.Username}} \nMultiple users with that username found. Please use 'cf curl' to delete the user by guid instead.",
+				"Error deleting user {{.Username}} \nThe user exists in multiple origins.",
 				map[string]interface{}{
 					"Username": username,
 				}))

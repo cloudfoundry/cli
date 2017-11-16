@@ -112,6 +112,27 @@ var _ = Describe("delete-user command", func() {
 		})
 	})
 
+	Context("when multiple users exist", func() {
+		BeforeEach(func() {
+			userRepo.FindAllByUsernameReturns([]models.UserFields{
+				{
+					Username: "user-name1",
+					GUID:     "user-guid1"},
+				{
+					Username: "user-name2",
+					GUID:     "user-guid2"},
+			}, nil)
+		})
+
+		It("returns a muliple users found error", func() {
+			runCommand("user-name")
+
+			Expect(ui.Outputs()).To(ContainSubstrings(
+				[]string{"Error deleting user"},
+				[]string{"The user exists in multiple origins."},
+			))
+		})
+	})
 	Context("when the given user does not exist", func() {
 		BeforeEach(func() {
 			userRepo.FindAllByUsernameReturns(nil, errors.NewModelNotFoundError("User", ""))

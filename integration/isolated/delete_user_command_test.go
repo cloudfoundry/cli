@@ -46,7 +46,7 @@ var _ = Describe("delete-user command", func() {
 				session := helpers.CF("delete-user", "-f", newUser)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Out).Should(Say("Error deleting user %s", newUser))
-				Eventually(session.Out).Should(Say("Multiple users with that username found. Please use 'cf curl' to delete the user by guid instead."))
+				Eventually(session.Out).Should(Say("The user exists in multiple origins."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
