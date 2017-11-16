@@ -74,6 +74,10 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 	if apiErr != nil {
 		return user, apiErr
 	}
+	if len(users) > 1 {
+		return user, errors.New("The user exists in multiple origins.")
+	}
+
 	user = users[0]
 
 	return user, nil

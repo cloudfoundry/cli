@@ -53,6 +53,28 @@ var _ = Describe("UserRepository", func() {
 		}
 	})
 
+	Describe("FindByUsername", func() {
+		Context("when a username has multiple origins", func() {
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/Users"),
+						ghttp.RespondWith(http.StatusOK, `{
+							"resources": [
+								{ "id": "user-1-guid", "userName": "some-user" },
+								{ "id": "user-2-guid", "userName": "some-user" }
+							]}`),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				_, err := client.FindByUsername("some-user")
+				Expect(err).To(MatchError("The user exists in multiple origins."))
+			})
+		})
+	})
+
 	Describe("ListUsersInOrgForRole", func() {
 		Context("when there are no users in the given org with the given role", func() {
 			BeforeEach(func() {
