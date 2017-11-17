@@ -224,6 +224,16 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond},
 			StagingTimeoutError{AppName: "some-app", Timeout: time.Nanosecond}),
 
+		Entry("actionerror.CommandLineOptionsAndManifestConflictError -> CommandLineOptionsAndManifestConflictError",
+			actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "some-attribute",
+				CommandLineOptions: []string{"option-1", "option-2"},
+			},
+			CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "some-attribute",
+				CommandLineOptions: []string{"option-1", "option-2"},
+			}),
+
 		// CC Errors
 		Entry("ccerror.APINotFoundError -> APINotFoundError",
 			ccerror.APINotFoundError{URL: "some-url"},

@@ -82,16 +82,26 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 			return actionerror.CommandLineOptionsWithMultipleAppsError{}
 		}
 	}
-	for _, app := range apps {
-		if app.NoRoute && len(app.Routes) > 0 {
-			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
-		}
 
-		if app.DeprecatedDomain != nil || app.DeprecatedDomains != nil {
+	for _, app := range apps {
+		switch {
+		case app.NoRoute && len(app.Routes) > 0:
+			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
+		case app.DeprecatedDomain != nil || app.DeprecatedDomains != nil:
 			return actionerror.TriggerLegacyPushError{DomainRelated: true}
-		}
-		if app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil {
+		case app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil:
 			return actionerror.TriggerLegacyPushError{HostnameRelated: true}
+		case len(app.Routes) > 0:
+			commandLineOptionsAndManifestConflictErr := actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "route",
+				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
+			}
+			if settings.DefaultRouteDomain != "" ||
+				settings.DefaultRouteHostname != "" ||
+				settings.NoHostname != false ||
+				settings.RoutePath != "" {
+				return commandLineOptionsAndManifestConflictErr
+			}
 		}
 	}
 

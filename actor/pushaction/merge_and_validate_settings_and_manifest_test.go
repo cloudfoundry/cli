@@ -335,6 +335,55 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				AppName:    "some-name-1",
 				Properties: []string{"no-route", "routes"},
 			}),
+		// These represent manifest/commandline conflict errors
+		Entry("CommmandLineOptionsAndManifestConflictError",
+			CommandLineSettings{
+				DefaultRouteDomain: "some-domain",
+			},
+			[]manifest.Application{{
+				Routes: []string{"some-route-1", "some-route-2"},
+			}},
+			actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "route",
+				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
+			},
+		),
+		Entry("CommmandLineOptionsAndManifestConflictError",
+			CommandLineSettings{
+				DefaultRouteHostname: "some-hostname",
+			},
+			[]manifest.Application{{
+				Routes: []string{"some-route-1", "some-route-2"},
+			}},
+			actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "route",
+				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
+			},
+		),
+		Entry("CommmandLineOptionsAndManifestConflictError",
+			CommandLineSettings{
+				NoHostname: true,
+			},
+			[]manifest.Application{{
+				Routes: []string{"some-route-1", "some-route-2"},
+			}},
+			actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "route",
+				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
+			},
+		),
+		Entry("CommmandLineOptionsAndManifestConflictError",
+			CommandLineSettings{
+				RoutePath: "some-route",
+			},
+			[]manifest.Application{{
+				Routes: []string{"some-route-1", "some-route-2"},
+			}},
+			actionerror.CommandLineOptionsAndManifestConflictError{
+				ManifestAttribute:  "route",
+				CommandLineOptions: []string{"-d", "--hostname", "-n", "--no-hostname", "--route-path"},
+			},
+		),
 
 		// The following are postmerge PropertyCombinationErrors
 		Entry("PropertyCombinationError",

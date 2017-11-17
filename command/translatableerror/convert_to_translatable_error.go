@@ -109,6 +109,11 @@ func ConvertToTranslatableError(err error) error {
 		return TriggerLegacyPushError{DomainRelated: e.DomainRelated, HostnameRelated: e.HostnameRelated}
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
+	case actionerror.CommandLineOptionsAndManifestConflictError:
+		return CommandLineOptionsAndManifestConflictError{
+			ManifestAttribute:  e.ManifestAttribute,
+			CommandLineOptions: e.CommandLineOptions,
+		}
 
 	// Generic CC Errors
 	case ccerror.APINotFoundError:

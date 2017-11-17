@@ -191,6 +191,89 @@ var _ = Describe("push with a simple manifest and flags", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+
+			Context("when the manifest contains 'routes'", func() {
+				var manifestContents map[string]interface{}
+
+				BeforeEach(func() {
+					manifestContents = map[string]interface{}{
+						"applications": []map[string]interface{}{
+							{
+								"name": appName,
+								"routes": []map[string]string{
+									{"route": "some-route-1"},
+									{"route": "some-route-2"},
+								},
+							},
+						},
+					}
+				})
+
+				Context("when the -d flag is provided", func() {
+					It("returns an error message and exits 1", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-d", "some-domain.com")
+
+							Eventually(session).ShouldNot(Say("Getting app info"))
+							Eventually(session.Err).Should(Say("The following arguments cannot be used with an app manifest that declares routes using the 'route' attribute: -d, --hostname, -n, --no-hostname, --route-path"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				Context("when the --hostname flag is provided", func() {
+					It("returns an error message and exits 1", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--hostname", "some-host")
+
+							Eventually(session).ShouldNot(Say("Getting app info"))
+							Eventually(session.Err).Should(Say("The following arguments cannot be used with an app manifest that declares routes using the 'route' attribute: -d, --hostname, -n, --no-hostname, --route-path"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				Context("when the -n flag is provided", func() {
+					It("returns an error message and exits 1", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-n", "some-host")
+
+							Eventually(session).ShouldNot(Say("Getting app info"))
+							Eventually(session.Err).Should(Say("The following arguments cannot be used with an app manifest that declares routes using the 'route' attribute: -d, --hostname, -n, --no-hostname, --route-path"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				Context("when the --no-hostname flag is provided", func() {
+					It("returns an error message and exits 1", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-hostname")
+
+							Eventually(session).ShouldNot(Say("Getting app info"))
+							Eventually(session.Err).Should(Say("The following arguments cannot be used with an app manifest that declares routes using the 'route' attribute: -d, --hostname, -n, --no-hostname, --route-path"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+
+				Context("when the --route-path flag is provided", func() {
+					It("returns an error message and exits 1", func() {
+						helpers.WithHelloWorldApp(func(dir string) {
+							helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), manifestContents)
+							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--route-path", "some-path")
+
+							Eventually(session).ShouldNot(Say("Getting app info"))
+							Eventually(session.Err).Should(Say("The following arguments cannot be used with an app manifest that declares routes using the 'route' attribute: -d, --hostname, -n, --no-hostname, --route-path"))
+							Eventually(session).Should(Exit(1))
+						})
+					})
+				})
+			})
 		})
 
 		Context("when pushing multiple apps from the manifest", func() {
