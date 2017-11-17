@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	netdialer "net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 )
 
 //go:generate counterfeiter . TokenRefresher
@@ -49,6 +51,11 @@ func NewUAARepository(gateway net.Gateway, config coreconfig.ReadWriter, dumper 
 }
 
 func (uaa UAARepository) Authorize(token string) (string, error) {
+	dialContext := dialcontext.FromEnvironment((&netdialer.Dialer{
+		KeepAlive: 30 * time.Second,
+		Timeout:   30 * time.Second,
+	}).DialContext)
+
 	httpClient := &http.Client{
 		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 			uaa.DumpRequest(req)
@@ -62,6 +69,7 @@ func (uaa UAARepository) Authorize(token string) (string, error) {
 			},
 			Proxy:               http.ProxyFromEnvironment,
 			TLSHandshakeTimeout: 10 * time.Second,
+			DialContext:         dialContext,
 		},
 	}
 

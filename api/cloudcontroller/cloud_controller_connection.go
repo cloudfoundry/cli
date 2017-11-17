@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/cf/net/dialcontext"
 )
 
 // CloudControllerConnection represents a connection to the Cloud Controller
@@ -31,15 +32,17 @@ type Config struct {
 // NewConnection returns a new CloudControllerConnection with provided
 // configuration.
 func NewConnection(config Config) *CloudControllerConnection {
+	dialContext := dialcontext.FromEnvironment((&net.Dialer{
+		KeepAlive: 30 * time.Second,
+		Timeout:   config.DialTimeout,
+	}).DialContext)
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: config.SkipSSLValidation,
 		},
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			KeepAlive: 30 * time.Second,
-			Timeout:   config.DialTimeout,
-		}).DialContext,
+		Proxy:       http.ProxyFromEnvironment,
+		DialContext: dialContext,
 	}
 
 	return &CloudControllerConnection{
