@@ -115,7 +115,9 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
-		cmd.UI.DisplayText("last operation")
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("Showing status of last operation from service {{.ServiceInstanceName}}...", map[string]interface{}{"ServiceInstanceName": serviceInstanceName})
+		cmd.UI.DisplayNewline()
 		lastOperationTable := [][]string{
 			{cmd.UI.TranslateText("status:"), fmt.Sprintf("%s %s", serviceInstanceSummary.ServiceInstance.LastOperation.Type, serviceInstanceSummary.ServiceInstance.LastOperation.State)},
 			{cmd.UI.TranslateText("message:"), serviceInstanceSummary.ServiceInstance.LastOperation.Description},
