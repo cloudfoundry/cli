@@ -77,17 +77,17 @@ sudo yum install cf-cli
 
 | | Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
 | :---------------: | :---------------: |:---------------:| :------------:|
-| Installers | [pkg](https://cli.run.pivotal.io/stable?release=macosx64&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64&source=github) | [rpm](https://cli.run.pivotal.io/stable?release=redhat64&source=github) / [deb](https://cli.run.pivotal.io/stable?release=debian64&source=github) |
-| Binaries | [tgz](https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github) | [zip](https://cli.run.pivotal.io/stable?release=windows64-exe&source=github) | [tgz](https://cli.run.pivotal.io/stable?release=linux64-binary&source=github) |
+| Installers | [pkg](https://packages.cloudfoundry.org/stable?release=macosx64&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64&source=github) | [rpm](https://packages.cloudfoundry.org/stable?release=redhat64&source=github) / [deb](https://packages.cloudfoundry.org/stable?release=debian64&source=github) |
+| Binaries | [tgz](https://packages.cloudfoundry.org/stable?release=macosx64-binary&source=github) | [zip](https://packages.cloudfoundry.org/stable?release=windows64-exe&source=github) | [tgz](https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github) |
 
 Release notes, and 32 bit releases can be found [here](https://github.com/cloudfoundry/cli/releases).
 
 **Download examples** with curl for Mac OS X and Linux binaries
 ```sh
 # ...download & extract Mac OS X binary
-curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
+curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&source=github" | tar -zx
 # ...or Linux 64-bit binary
-curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
 # ...move it to /usr/local/bin or a location you know is in your $PATH
 mv cf /usr/local/bin
 # ...copy tab completion file on Ubuntu (takes affect after re-opening your shell)
@@ -98,7 +98,7 @@ cf --version
 
 #### Edge binaries
 Edge binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are 'pushed' and passed through the CI.
-Follow these download links for [Mac OS X 64 bit](https://cli.run.pivotal.io/edge?arch=macosx64&source=github), [Windows 64 bit](https://cli.run.pivotal.io/edge?arch=windows64&source=github) and [Linux 64 bit](https://cli.run.pivotal.io/edge?arch=linux64&source=github).
+Follow these download links for [Mac OS X 64 bit](https://packages.cloudfoundry.org/edge?arch=macosx64&source=github), [Windows 64 bit](https://packages.cloudfoundry.org/edge?arch=windows64&source=github) and [Linux 64 bit](https://packages.cloudfoundry.org/edge?arch=linux64&source=github).
 
 ## Known Issues
 
