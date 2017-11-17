@@ -227,26 +227,26 @@ func (cmd V2PushCommand) GetCommandLineSettings() (pushaction.CommandLineSetting
 	}
 
 	config := pushaction.CommandLineSettings{
-		Buildpack:            cmd.Buildpack.FilteredString,
-		Command:              cmd.Command.FilteredString,
+		Buildpack:            cmd.Buildpack.FilteredString, // -b
+		Command:              cmd.Command.FilteredString,   // -c
 		CurrentDirectory:     pwd,
-		DefaultRouteDomain:   cmd.Domain,
-		DefaultRouteHostname: cmd.Hostname,
-		DiskQuota:            cmd.DiskQuota.Value,
-		DockerImage:          cmd.DockerImage.Path,
-		DockerPassword:       dockerPassword,
-		DockerUsername:       cmd.DockerUsername,
-		HealthCheckTimeout:   cmd.HealthCheckTimeout,
-		HealthCheckType:      cmd.HealthCheckType.Type,
-		Instances:            cmd.Instances.NullInt,
-		Memory:               cmd.Memory.Value,
-		Name:                 cmd.OptionalArgs.AppName,
-		NoHostname:           cmd.NoHostname,
-		NoRoute:              cmd.NoRoute,
-		ProvidedAppPath:      string(cmd.AppPath),
-		RandomRoute:          cmd.RandomRoute,
-		RoutePath:            cmd.RoutePath.Path,
-		StackName:            cmd.StackName,
+		DefaultRouteDomain:   cmd.Domain,               // -d
+		DefaultRouteHostname: cmd.Hostname,             // -n/--hostname
+		DiskQuota:            cmd.DiskQuota.Value,      // -k
+		DockerImage:          cmd.DockerImage.Path,     // -o
+		DockerPassword:       dockerPassword,           // ENV - CF_DOCKER_PASSWORD
+		DockerUsername:       cmd.DockerUsername,       // --docker-username
+		HealthCheckTimeout:   cmd.HealthCheckTimeout,   // -t
+		HealthCheckType:      cmd.HealthCheckType.Type, // -u/--health-check-type
+		Instances:            cmd.Instances.NullInt,    // -i
+		Memory:               cmd.Memory.Value,         // -m
+		Name:                 cmd.OptionalArgs.AppName, // arg
+		NoHostname:           cmd.NoHostname,           // --no-hostname
+		NoRoute:              cmd.NoRoute,              // --no-route
+		ProvidedAppPath:      string(cmd.AppPath),      // -p
+		RandomRoute:          cmd.RandomRoute,          // --random-route
+		RoutePath:            cmd.RoutePath.Path,       // --route-path
+		StackName:            cmd.StackName,            // -s
 	}
 
 	log.Debugln("Command Line Settings:", config)

@@ -229,7 +229,19 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
+				DefaultRouteDomain: "some-domain",
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
 				DockerImage: "some-docker-image",
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				DockerUsername: "some-docker-username",
 			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
@@ -247,26 +259,64 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
 			CommandLineSettings{
+				DefaultRouteHostname: "some-hostname",
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
 				Instances: types.NullInt{IsSet: true},
 			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{Memory: 4},
+			CommandLineSettings{
+				Memory: 4,
+			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{ProvidedAppPath: "some-path"},
+			CommandLineSettings{
+				ProvidedAppPath: "some-path",
+			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{RoutePath: "some-route-path"},
+			CommandLineSettings{
+				NoHostname: true,
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				NoRoute: true,
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				ProvidedAppPath: "some-app-path",
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				RandomRoute: true,
+			},
+			manifestWithMultipleApps,
+			actionerror.CommandLineOptionsWithMultipleAppsError{}),
+		Entry("CommandLineOptionsWithMultipleAppsError",
+			CommandLineSettings{
+				RoutePath: "some-route-path",
+			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
-			CommandLineSettings{StackName: "some-stackname"},
+			CommandLineSettings{
+				StackName: "some-stackname",
+			},
 			manifestWithMultipleApps,
 			actionerror.CommandLineOptionsWithMultipleAppsError{}),
 

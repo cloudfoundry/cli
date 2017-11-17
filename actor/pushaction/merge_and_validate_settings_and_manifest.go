@@ -69,13 +69,19 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 		case
 			settings.Buildpack.IsSet,
 			settings.Command.IsSet,
+			settings.DefaultRouteDomain != "",
+			settings.DefaultRouteHostname != "",
 			settings.DiskQuota != 0,
 			settings.DockerImage != "",
+			settings.DockerUsername != "",
 			settings.HealthCheckTimeout != 0,
 			settings.HealthCheckType != "",
 			settings.Instances.IsSet,
 			settings.Memory != 0,
+			settings.NoHostname,
+			settings.NoRoute,
 			settings.ProvidedAppPath != "",
+			settings.RandomRoute,
 			settings.RoutePath != "",
 			settings.StackName != "":
 			log.Error("cannot use some parameters with multiple apps")
