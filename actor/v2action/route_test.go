@@ -690,43 +690,95 @@ var _ = Describe("Route Actions", func() {
 							ccv2.Warnings{"get-shared-domains-warning"},
 							nil,
 						)
-						fakeCloudControllerClient.CreateRouteReturns(
-							ccv2.Route{
-								GUID:       "some-route-guid",
-								DomainGUID: "some-domain-guid",
-								SpaceGUID:  "some-space-guid",
-							},
-							ccv2.Warnings{"create-route-warning"},
-							nil)
 					})
 
-					It("gets domain and finds route with fully instantiated domain", func() {
-						Expect(createRouteErr).ToNot(HaveOccurred())
-						Expect(createRouteWarnings).To(ConsistOf(
-							"get-space-warning",
-							"get-shared-domains-warning",
-							"get-routes-warning",
-							"create-route-warning",
-						))
-						Expect(createdRoute).To(Equal(Route{
-							Domain: Domain{
-								Name:            "some-domain",
-								GUID:            "some-requested-domain-guid",
-								RouterGroupType: constant.TCPRouterGroup,
-							},
-							GUID:      "some-route-guid",
-							SpaceGUID: "some-space-guid",
-						}))
-						Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
-						orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
-						Expect(orgGUID).To(Equal("some-org-guid"))
-						Expect(queries).To(HaveLen(1))
-						Expect(queries[0]).To(Equal(ccv2.Query{
-							Filter:   ccv2.NameFilter,
-							Operator: ccv2.InOperator,
-							Values:   []string{"some-domain"},
-						}))
+					Context("when specifying a port", func() {
+						BeforeEach(func() {
+							fakeCloudControllerClient.CreateRouteReturns(
+								ccv2.Route{
+									GUID:       "some-route-guid",
+									DomainGUID: "some-domain-guid",
+									SpaceGUID:  "some-space-guid",
+								},
+								ccv2.Warnings{"create-route-warning"},
+								nil)
+						})
+						It("gets domain and finds route with fully instantiated domain", func() {
+							Expect(createRouteErr).ToNot(HaveOccurred())
+							Expect(createRouteWarnings).To(ConsistOf(
+								"get-space-warning",
+								"get-shared-domains-warning",
+								"get-routes-warning",
+								"create-route-warning",
+							))
+							Expect(createdRoute).To(Equal(Route{
+								Domain: Domain{
+									Name:            "some-domain",
+									GUID:            "some-requested-domain-guid",
+									RouterGroupType: constant.TCPRouterGroup,
+								},
+								GUID:      "some-route-guid",
+								SpaceGUID: "some-space-guid",
+							}))
+							Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+							orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(queries).To(HaveLen(1))
+							Expect(queries[0]).To(Equal(ccv2.Query{
+								Filter:   ccv2.NameFilter,
+								Operator: ccv2.InOperator,
+								Values:   []string{"some-domain"},
+							}))
+
+							Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+						})
+					})
+
+					Context("when generating a random port", func() {
+						BeforeEach(func() {
+							generatePort = true
+							fakeCloudControllerClient.CreateRouteReturns(
+								ccv2.Route{
+									GUID:       "some-route-guid",
+									DomainGUID: "some-domain-guid",
+									Port:       types.NullInt{IsSet: true, Value: 1234},
+									SpaceGUID:  "some-space-guid",
+								},
+								ccv2.Warnings{"create-route-warning"},
+								nil)
+						})
+
+						It("creates a route with a generated port, and doesn't check for existence", func() {
+							Expect(createRouteErr).ToNot(HaveOccurred())
+							Expect(createRouteWarnings).To(ConsistOf(
+								"get-space-warning",
+								"get-shared-domains-warning",
+								"create-route-warning",
+							))
+							Expect(createdRoute).To(Equal(Route{
+								Domain: Domain{
+									Name:            "some-domain",
+									GUID:            "some-requested-domain-guid",
+									RouterGroupType: constant.TCPRouterGroup,
+								},
+								GUID:      "some-route-guid",
+								Port:      types.NullInt{IsSet: true, Value: 1234},
+								SpaceGUID: "some-space-guid",
+							}))
+							Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
+							Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
+							orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
+							Expect(orgGUID).To(Equal("some-org-guid"))
+							Expect(queries).To(HaveLen(1))
+							Expect(queries[0]).To(Equal(ccv2.Query{
+								Filter:   ccv2.NameFilter,
+								Operator: ccv2.InOperator,
+								Values:   []string{"some-domain"},
+							}))
+
+							Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(0))
+						})
 					})
 				})
 			})

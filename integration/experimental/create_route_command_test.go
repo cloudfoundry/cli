@@ -469,6 +469,21 @@ var _ = Describe("create-route command", func() {
 							Eventually(session.Out).Should(Say(`Route %s:\d+ has been created\.`, domainName))
 							Eventually(session).Should(Exit(0))
 						})
+
+						Context("when there are other routes in the domain we want to create the route with", func() {
+							BeforeEach(func() {
+								session := helpers.CF("create-route", spaceName, domainName, "--random-port")
+								Eventually(session.Out).Should(Say(`Route %s:\d+ has been created\.`, domainName))
+								Eventually(session).Should(Exit(0))
+							})
+
+							It("should determine that the random route does not already exist, and create it", func() {
+								session := helpers.CF("create-route", spaceName, domainName, "--random-port")
+								Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+								Eventually(session.Out).Should(Say(`Route %s:\d+ has been created\.`, domainName))
+								Eventually(session).Should(Exit(0))
+							})
+						})
 					})
 				})
 			})

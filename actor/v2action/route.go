@@ -126,17 +126,19 @@ func (actor Actor) CreateRouteWithExistenceCheck(orgGUID string, spaceName strin
 		return Route{}, Warnings(warnings), validateErr
 	}
 
-	foundRoute, spaceRouteWarnings, findErr := actor.FindRouteBoundToSpaceWithSettings(route)
-	warnings = append(warnings, spaceRouteWarnings...)
-	routeAlreadyExists := true
-	if _, ok := findErr.(actionerror.RouteNotFoundError); ok {
-		routeAlreadyExists = false
-	} else if findErr != nil {
-		return Route{}, Warnings(warnings), findErr
-	}
+	if !generatePort {
+		foundRoute, spaceRouteWarnings, findErr := actor.FindRouteBoundToSpaceWithSettings(route)
+		warnings = append(warnings, spaceRouteWarnings...)
+		routeAlreadyExists := true
+		if _, ok := findErr.(actionerror.RouteNotFoundError); ok {
+			routeAlreadyExists = false
+		} else if findErr != nil {
+			return Route{}, Warnings(warnings), findErr
+		}
 
-	if routeAlreadyExists {
-		return Route{}, Warnings(warnings), actionerror.RouteAlreadyExistsError{Route: foundRoute.String()}
+		if routeAlreadyExists {
+			return Route{}, Warnings(warnings), actionerror.RouteAlreadyExistsError{Route: foundRoute.String()}
+		}
 	}
 
 	createdRoute, createRouteWarnings, createErr := actor.CreateRoute(route, generatePort)
