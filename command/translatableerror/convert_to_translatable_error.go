@@ -47,6 +47,8 @@ func ConvertToTranslatableError(err error) error {
 		return HTTPHealthCheckInvalidError{}
 	case actionerror.InvalidHTTPRouteSettings:
 		return PortNotAllowedWithHTTPDomainError(e)
+	case actionerror.InvalidRouteError:
+		return InvalidRouteError(e)
 	case actionerror.InvalidTCPRouteSettings:
 		return HostAndPathNotAllowedWithTCPDomainError(e)
 	case actionerror.IsolationSegmentNotFoundError:

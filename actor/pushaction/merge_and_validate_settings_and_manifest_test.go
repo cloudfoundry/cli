@@ -59,7 +59,10 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}
 
 			apps = []manifest.Application{
-				{Name: "app-1"},
+				{
+					Name:   "app-1",
+					Routes: []string{"google.com"},
+				},
 			}
 		})
 
@@ -72,8 +75,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 
 			Expect(mergedApps).To(ConsistOf(
 				manifest.Application{
-					Name: "steve",
-					Path: currentDirectory,
+					Name:   "steve",
+					Path:   currentDirectory,
+					Routes: []string{"google.com"},
 				},
 			))
 		})
@@ -328,6 +332,24 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				DockerUsername: "some-username",
 			}},
 			actionerror.DockerPasswordNotSetError{}),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"I R ROUTE"},
+			}},
+			actionerror.InvalidRouteError{Route: "I R ROUTE"}),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"potato"},
+			}},
+			actionerror.InvalidRouteError{Route: "potato"}),
 
 		Entry("NonexistentAppPathError",
 			CommandLineSettings{

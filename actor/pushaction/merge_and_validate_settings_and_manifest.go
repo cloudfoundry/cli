@@ -1,6 +1,7 @@
 package pushaction
 
 import (
+	"net/url"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -114,11 +115,18 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 	return nil
 }
 
-func (Actor) validateMergedSettings(apps []manifest.Application) error {
+func (actor Actor) validateMergedSettings(apps []manifest.Application) error {
 	for i, app := range apps {
 		if app.Name == "" {
 			log.WithField("index", i).Error("does not contain an app name")
 			return actionerror.MissingNameError{}
+		}
+
+		for _, route := range app.Routes {
+			err := actor.validateRoute(route)
+			if err != nil {
+				return err
+			}
 		}
 
 		if app.DockerImage == "" {
@@ -156,5 +164,14 @@ func (Actor) validateMergedSettings(apps []manifest.Application) error {
 			return actionerror.HTTPHealthCheckInvalidError{}
 		}
 	}
+	return nil
+}
+
+func (actor Actor) validateRoute(route string) error {
+	_, err := url.Parse(route)
+	if err != nil || !actor.urlValidator.MatchString(route) {
+		return actionerror.InvalidRouteError{Route: route}
+	}
+
 	return nil
 }

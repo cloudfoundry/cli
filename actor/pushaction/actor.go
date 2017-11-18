@@ -18,9 +18,11 @@ type Actor struct {
 	WordGenerator RandomWordGenerator
 
 	startWithProtocol *regexp.Regexp
+	urlValidator      *regexp.Regexp
 }
 
 const ProtocolRegexp = "^https?://|^tcp://"
+const URLRegexp = "^(?:https?://|tcp://)?(?:[\\w-]+\\.)+\\w+(?:\\:\\d+)?(?:/[\\w-]+)*(?:\\.\\w+)?$"
 
 // NewActor returns a new actor.
 func NewActor(v2Actor V2Actor, sharedActor SharedActor) *Actor {
@@ -29,6 +31,7 @@ func NewActor(v2Actor V2Actor, sharedActor SharedActor) *Actor {
 		V2Actor:       v2Actor,
 		WordGenerator: new(randomword.Generator),
 
-		startWithProtocol: regexp.MustCompilePOSIX(ProtocolRegexp),
+		startWithProtocol: regexp.MustCompile(ProtocolRegexp),
+		urlValidator:      regexp.MustCompile(URLRegexp),
 	}
 }

@@ -36,7 +36,6 @@ var _ = Describe("Translatable Errors", func() {
 			err.Translate(translateFunc)
 		},
 
-		Entry("TriggerLegacyPushError", TriggerLegacyPushError{}),
 		Entry("AddPluginRepositoryError", AddPluginRepositoryError{}),
 		Entry("APINotFoundError", APINotFoundError{}),
 		Entry("APIRequestError", APIRequestError{}),
@@ -56,10 +55,11 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("FileNotFoundError", FileNotFoundError{}),
 		Entry("GettingPluginRepositoryError", GettingPluginRepositoryError{}),
 		Entry("HealthCheckTypeUnsupportedError", HealthCheckTypeUnsupportedError{SupportedTypes: []string{"some-type", "another-type"}}),
-		Entry("HostnameWithTCPDomainError", HostnameWithTCPDomainError{}),
 		Entry("HostAndPathNotAllowedWithTCPDomainError", HostAndPathNotAllowedWithTCPDomainError{}),
+		Entry("HostnameWithTCPDomainError", HostnameWithTCPDomainError{}),
 		Entry("HTTPHealthCheckInvalidError", HTTPHealthCheckInvalidError{}),
 		Entry("InvalidChecksumError", InvalidChecksumError{}),
+		Entry("InvalidRouteError", InvalidRouteError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
 		Entry("IsolationSegmentNotFoundError", IsolationSegmentNotFoundError{}),
 		Entry("JobFailedError", JobFailedError{}),
@@ -110,6 +110,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("StagingTimeoutError", StagingTimeoutError{}),
 		Entry("StartupTimeoutError", StartupTimeoutError{}),
 		Entry("ThreeRequiredArgumentsError", ThreeRequiredArgumentsError{}),
+		Entry("TriggerLegacyPushError", TriggerLegacyPushError{}),
 		Entry("UnsuccessfulStartError", UnsuccessfulStartError{}),
 		Entry("UnsupportedURLSchemeError", UnsupportedURLSchemeError{}),
 		Entry("UploadFailedError", UploadFailedError{Err: JobFailedError{}}),
