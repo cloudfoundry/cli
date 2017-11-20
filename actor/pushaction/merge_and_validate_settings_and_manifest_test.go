@@ -210,7 +210,11 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}
 
 			_, err = actor.MergeAndValidateSettingsAndManifests(settings, apps)
-			Expect(err).To(MatchError(expectedErr))
+			if expectedErr == nil {
+				Expect(err).ToNot(HaveOccurred())
+			} else {
+				Expect(err).To(MatchError(expectedErr))
+			}
 		},
 
 		Entry("CommandLineOptionsWithMultipleAppsError",
@@ -332,6 +336,24 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				DockerUsername: "some-username",
 			}},
 			actionerror.DockerPasswordNotSetError{}),
+
+		Entry("ValidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"www.hardknox.cli.fun:1234/foo_1+2.html"},
+			}},
+			nil),
+
+		Entry("InvalidRoute",
+			CommandLineSettings{},
+			[]manifest.Application{{
+				Name:   "some-name-1",
+				Path:   RealPath,
+				Routes: []string{"http:/www.hardknox.com"},
+			}},
+			actionerror.InvalidRouteError{Route: "http:/www.hardknox.com"}),
 
 		Entry("InvalidRoute",
 			CommandLineSettings{},
