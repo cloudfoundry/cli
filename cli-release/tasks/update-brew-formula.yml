@@ -38,8 +38,8 @@ run:
 
     class CfCli < Formula
       homepage 'https://code.cloudfoundry.org/cli'
-      head 'https://cli.run.pivotal.io/edge?arch=macosx64&source=homebrew'
-      url 'https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
+      head 'https://packages.cloudfoundry.org/edge?arch=macosx64&source=homebrew'
+      url 'https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
       version '${VERSION}'
       sha256 '${CLI_SHA256}'
 
