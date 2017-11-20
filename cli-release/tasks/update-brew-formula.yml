@@ -25,11 +25,18 @@ run:
 
     VERSION=$(cat cli/ci/VERSION)
 
-    mkdir cf-cli-osx-tarball
-    curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > cf-cli-osx-tarball/cf-cli_${VERSION}_osx.tgz
+    mkdir cf-cli-osx-tarball cf-cli-linux-tarball
+    curl -L "https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > cf-cli-osx-tarball/cf-cli_${VERSION}_osx.tgz
+    curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${VERSION}&source=github-rel" > cf-cli-linux-tarball/cf-cli_${VERSION}_linux64.tgz
+
+
 
     pushd cf-cli-osx-tarball
-      CLI_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
+      CLI_OSX_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
+    popd
+
+    pushd cf-cli-linux-tarball
+      CLI_LINUX_64_SHA256=$(shasum -a 256 cf-cli_*_linux64.tgz | cut -d ' ' -f 1)
     popd
 
     pushd homebrew-tap
@@ -38,10 +45,17 @@ run:
 
     class CfCli < Formula
       homepage 'https://code.cloudfoundry.org/cli'
-      head 'https://packages.cloudfoundry.org/edge?arch=macosx64&source=homebrew'
-      url 'https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
       version '${VERSION}'
-      sha256 '${CLI_SHA256}'
+
+      if OS.mac?
+        head 'https://packages.cloudfoundry.org/edge?arch=macosx64&source=homebrew'
+        url 'https://packages.cloudfoundry.org/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
+        sha256 '${CLI_OSX_SHA256}'
+      elsif OS.linux?
+        head 'https://packages.cloudfoundry.org/edge?arch=linux64&source=homebrew'
+        url 'https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${VERSION}&source=homebrew'
+        sha256 '${CLI_LINUX_64_SHA256}'
+      end
 
       depends_on :arch => :x86_64
 
