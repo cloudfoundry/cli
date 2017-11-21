@@ -48,7 +48,7 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 
 ### Installing using a package manager
 
-**Mac OS X** (using [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap)):
+**Mac OS X** and **Linux** using [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
 
 ```sh
 brew install cloudfoundry/tap/cf-cli
