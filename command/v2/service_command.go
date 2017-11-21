@@ -51,19 +51,6 @@ func (cmd ServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	user, err := cmd.Config.CurrentUser()
-	if err != nil {
-		return err
-	}
-
-	cmd.UI.DisplayTextWithFlavor("Showing info of service {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.UserName}}...", map[string]interface{}{
-		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
-		"OrgName":             cmd.Config.TargetedOrganization().Name,
-		"SpaceName":           cmd.Config.TargetedSpace().Name,
-		"UserName":            user.Name,
-	})
-	cmd.UI.DisplayNewline()
-
 	if cmd.GUID {
 		return cmd.displayServiceInstanceGUID()
 	}
@@ -83,6 +70,19 @@ func (cmd ServiceCommand) displayServiceInstanceGUID() error {
 }
 
 func (cmd ServiceCommand) displayServiceInstanceSummary() error {
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	cmd.UI.DisplayTextWithFlavor("Showing info of service {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.UserName}}...", map[string]interface{}{
+		"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+		"OrgName":             cmd.Config.TargetedOrganization().Name,
+		"SpaceName":           cmd.Config.TargetedSpace().Name,
+		"UserName":            user.Name,
+	})
+	cmd.UI.DisplayNewline()
+
 	serviceInstanceSummary, warnings, err := cmd.Actor.GetServiceInstanceSummaryByNameAndSpace(cmd.RequiredArgs.ServiceInstance, cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

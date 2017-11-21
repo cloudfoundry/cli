@@ -132,8 +132,7 @@ var _ = Describe("service command", func() {
 				Context("when the --guid flag is provided", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
-						Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say(""))
+						Consistently(session.Out).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
 						Eventually(session.Out).Should(Say(helpers.UserProvidedServiceInstanceGUID(serviceInstanceName)))
 						Eventually(session).Should(Exit(0))
 					})
@@ -216,8 +215,7 @@ var _ = Describe("service command", func() {
 				Context("when the --guid flag is provided", func() {
 					It("displays the service instance GUID", func() {
 						session := helpers.CF("service", serviceInstanceName, "--guid")
-						Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
-						Eventually(session.Out).Should(Say(""))
+						Consistently(session.Out).ShouldNot(Say("Showing info of service %s in org %s / space %s as %s", serviceInstanceName, orgName, spaceName, userName))
 						Eventually(session.Out).Should(Say(helpers.ManagedServiceInstanceGUID(serviceInstanceName)))
 						Eventually(session).Should(Exit(0))
 					})

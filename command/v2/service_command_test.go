@@ -114,8 +114,6 @@ var _ = Describe("service Command", func() {
 							Name: "non-existant-service-instance",
 						}))
 
-						Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
-
 						Expect(testUI.Err).To(Say("get-service-instance-warning"))
 
 						Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(1))
@@ -141,8 +139,6 @@ var _ = Describe("service Command", func() {
 
 					It("returns the error", func() {
 						Expect(executeErr).To(MatchError(expectedErr))
-
-						Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
 
 						Expect(testUI.Err).To(Say("get-service-instance-warning"))
 
@@ -170,7 +166,6 @@ var _ = Describe("service Command", func() {
 					It("displays the service instance guid", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
 						Expect(testUI.Out).To(Say("some-service-instance-guid"))
 						Expect(testUI.Err).To(Say("get-service-instance-warning"))
 
