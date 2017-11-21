@@ -44,6 +44,9 @@ func (r Route) Validate() error {
 		if r.Port.IsSet {
 			return actionerror.InvalidHTTPRouteSettings{Domain: r.Domain.Name}
 		}
+		if r.Domain.IsShared() && r.Host == "" {
+			return actionerror.NoHostnameAndSharedDomainError{}
+		}
 	} else { // Is TCP Domain
 		if r.Host != "" || r.Path != "" {
 			return actionerror.InvalidTCPRouteSettings{Domain: r.Domain.Name}
@@ -52,11 +55,15 @@ func (r Route) Validate() error {
 	return nil
 }
 
+// TODO: rename to ValidateWithPortOptions
 func (r Route) ValidateWithRandomPort(randomPort bool) error {
 	if r.Domain.IsHTTP() && randomPort {
 		return actionerror.InvalidHTTPRouteSettings{Domain: r.Domain.Name}
 	}
 
+	if r.Domain.IsTCP() && !r.Port.IsSet && !randomPort {
+		return actionerror.TCPRouteOptionsNotProvidedError{}
+	}
 	return r.Validate()
 }
 
@@ -270,29 +277,32 @@ func (actor Actor) FindRouteBoundToSpaceWithSettings(route Route) (Route, Warnin
 
 // GetRouteByComponents returns the route with the matching host, domain, path,
 // and port. Use this when you don't know the space GUID.
+// TCP routes require a port to be uniquely identified
+// HTTP routes using shared domains require a hostname or path to be uniquely identified
 func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
+	// TODO: validation should probably be done separately (?)
+	if route.Domain.IsTCP() && !route.Port.IsSet {
+		return Route{}, nil, actionerror.PortNotProvidedForQueryError{}
+	}
+
+	if route.Domain.IsShared() && route.Domain.IsHTTP() && route.Host == "" {
+		return Route{}, nil, actionerror.NoHostnameAndSharedDomainError{}
+	}
+
 	queries := []ccv2.Query{
-		ccv2.Query{
+		{
 			Filter:   ccv2.DomainGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Domain.GUID},
-		},
-	}
-
-	if route.Host != "" {
-		queries = append(queries, ccv2.Query{
+		}, {
 			Filter:   ccv2.HostFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Host},
-		})
-	}
-
-	if route.Path != "" {
-		queries = append(queries, ccv2.Query{
+		}, {
 			Filter:   ccv2.PathFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Path},
-		})
+		},
 	}
 
 	if route.Port.IsSet {

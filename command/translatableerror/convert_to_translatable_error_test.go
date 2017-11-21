@@ -216,6 +216,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.TaskWorkersUnavailableError{Message: "fooo: Banana Pants"},
 			RunTaskError{Message: "Task workers are unavailable."}),
 
+		Entry("actionerror.TCPRouteOptionsNotProvidedError-> TCPRouteOptionsNotProvidedError",
+			actionerror.TCPRouteOptionsNotProvidedError{},
+			TCPRouteOptionsNotProvidedError{}),
+
 		Entry("actionerror.TriggerLegacyPushError -> TriggerLegacyPushError",
 			actionerror.TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true},
 			TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true}),

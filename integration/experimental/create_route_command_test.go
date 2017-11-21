@@ -362,6 +362,23 @@ var _ = Describe("create-route command", func() {
 					})
 
 					Context("when no flags are used", func() {
+						Context("when the domain already has some routes", func() {
+							var hostName string
+
+							BeforeEach(func() {
+								hostName = helpers.PrefixedRandomName("my-host")
+								Eventually(helpers.CF("create-route", spaceName, domainName, "--hostname", hostName)).Should(Exit(0))
+							})
+
+							It("fails with error message informing users to provide a port or random-port", func() {
+								session := helpers.CF("create-route", spaceName, domainName)
+								Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+								Eventually(session.Out).Should(Say(`FAILED`))
+								Eventually(session.Err).Should(Say(`The route is invalid: host is required for shared-domains`))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+
 						It("fails with an error message and exits 1", func() {
 							session := helpers.CF("create-route", spaceName, domainName)
 							Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
@@ -448,7 +465,7 @@ var _ = Describe("create-route command", func() {
 							path := helpers.PrefixedRandomName("path-")
 							session := helpers.CF("create-route", spaceName, domainName, "--hostname", hostName, "--path", path)
 							Eventually(session.Out).Should(Say(`Creating route %s.%s/%s for org %s / space %s as %s\.\.\.`, hostName, domainName, path, orgName, spaceName, userName))
-							Eventually(session.Err).Should(Say(`Host and path not allowed in route with TCP domain %s`, domainName))
+							Eventually(session.Err).Should(Say(`The route is invalid: For TCP routes you must specify a port or request a random one.`))
 							Eventually(session).Should(Exit(1))
 						})
 					})
@@ -482,6 +499,30 @@ var _ = Describe("create-route command", func() {
 								Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
 								Eventually(session.Out).Should(Say(`Route %s:\d+ has been created\.`, domainName))
 								Eventually(session).Should(Exit(0))
+							})
+						})
+					})
+
+					Context("when no options are provided", func() {
+						It("fails with error message informing users to provide a port or random-port", func() {
+							session := helpers.CF("create-route", spaceName, domainName)
+							Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+							Eventually(session.Out).Should(Say(`FAILED`))
+							Eventually(session.Err).Should(Say(`The route is invalid: For TCP routes you must specify a port or request a random one.`))
+							Eventually(session).Should(Exit(1))
+						})
+
+						Context("when the domain already has some routes", func() {
+							BeforeEach(func() {
+								Eventually(helpers.CF("create-route", spaceName, domainName, "--random-port")).Should(Exit(0))
+							})
+
+							It("fails with error message informing users to provide a port or random-port", func() {
+								session := helpers.CF("create-route", spaceName, domainName)
+								Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
+								Eventually(session.Out).Should(Say(`FAILED`))
+								Eventually(session.Err).Should(Say(`The route is invalid: For TCP routes you must specify a port or request a random one.`))
+								Eventually(session).Should(Exit(1))
 							})
 						})
 					})

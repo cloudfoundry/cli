@@ -134,6 +134,17 @@ var _ = Describe("Route Actions", func() {
 				nil,
 			),
 
+			Entry("error - no host on shared HTTP domain",
+				Route{
+					Path: "some-path",
+					Domain: Domain{
+						Name: "some-domain",
+						Type: constant.SharedDomain,
+					},
+				},
+				actionerror.NoHostnameAndSharedDomainError{},
+			),
+
 			Entry("error - port on HTTP domain",
 				Route{
 					Port: types.NullInt{IsSet: true},
@@ -231,7 +242,7 @@ var _ = Describe("Route Actions", func() {
 						RouterGroupType: constant.TCPRouterGroup,
 					},
 				},
-				false,
+				true,
 				actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
 			),
 
@@ -243,7 +254,7 @@ var _ = Describe("Route Actions", func() {
 						RouterGroupType: constant.TCPRouterGroup,
 					},
 				},
-				false,
+				true,
 				actionerror.InvalidTCPRouteSettings{Domain: "some-domain"},
 			),
 		)
@@ -694,15 +705,18 @@ var _ = Describe("Route Actions", func() {
 
 					Context("when specifying a port", func() {
 						BeforeEach(func() {
+							route.Port = types.NullInt{IsSet: true, Value: 1234}
 							fakeCloudControllerClient.CreateRouteReturns(
 								ccv2.Route{
 									GUID:       "some-route-guid",
 									DomainGUID: "some-domain-guid",
+									Port:       types.NullInt{IsSet: true, Value: 1234},
 									SpaceGUID:  "some-space-guid",
 								},
 								ccv2.Warnings{"create-route-warning"},
 								nil)
 						})
+
 						It("gets domain and finds route with fully instantiated domain", func() {
 							Expect(createRouteErr).ToNot(HaveOccurred())
 							Expect(createRouteWarnings).To(ConsistOf(
@@ -718,6 +732,7 @@ var _ = Describe("Route Actions", func() {
 									RouterGroupType: constant.TCPRouterGroup,
 								},
 								GUID:      "some-route-guid",
+								Port:      types.NullInt{IsSet: true, Value: 1234},
 								SpaceGUID: "some-space-guid",
 							}))
 							Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
@@ -778,6 +793,17 @@ var _ = Describe("Route Actions", func() {
 							}))
 
 							Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when no port options are provided", func() {
+						BeforeEach(func() {
+							generatePort = false
+							route.Port.IsSet = false
+						})
+
+						It("returns a TCPRouteOptionsNotProvidedError", func() {
+							Expect(createRouteErr).To(MatchError(actionerror.TCPRouteOptionsNotProvidedError{}))
 						})
 					})
 				})
@@ -1333,7 +1359,84 @@ var _ = Describe("Route Actions", func() {
 			route, warnings, executeErr = actor.GetRouteByComponents(inputRoute)
 		})
 
+		Context("validation", func() {
+			Context("when the route's domain is a TCP domain", func() {
+				BeforeEach(func() {
+					inputRoute.Domain.RouterGroupType = constant.TCPRouterGroup
+				})
+
+				Context("when a port isn't provided for the query", func() {
+					BeforeEach(func() {
+						inputRoute.Port.IsSet = false
+					})
+
+					It("returns a PortNotProvidedForQueryError", func() {
+						Expect(executeErr).To(MatchError(actionerror.PortNotProvidedForQueryError{}))
+					})
+				})
+			})
+
+			Context("when the route's domain is an HTTP shared domain", func() {
+				BeforeEach(func() {
+					inputRoute.Domain.RouterGroupType = constant.HTTPRouterGroup
+					inputRoute.Domain.Type = constant.SharedDomain
+				})
+
+				Context("when a host is not provided", func() {
+					BeforeEach(func() {
+						inputRoute.Host = ""
+					})
+
+					It("returns a NoHostnameAndSharedDomainError", func() {
+						Expect(executeErr).To(MatchError(actionerror.NoHostnameAndSharedDomainError{}))
+					})
+				})
+			})
+		})
+
 		Context("when finding the route is successful and returns one route", func() {
+			Context("when hostname and path aren't provided", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetRoutesReturns([]ccv2.Route{
+						{
+							GUID:       "route-guid-1",
+							SpaceGUID:  "some-space-guid",
+							DomainGUID: domain.GUID,
+						},
+					}, ccv2.Warnings{"get-routes-warning"}, nil)
+				})
+
+				It("explicitly queries for empty hostname and path", func() {
+					Expect(warnings).To(ConsistOf("get-routes-warning"))
+					Expect(executeErr).NotTo(HaveOccurred())
+					Expect(route).To(Equal(Route{
+						Domain:    domain,
+						GUID:      "route-guid-1",
+						Host:      inputRoute.Host,
+						SpaceGUID: "some-space-guid",
+					}))
+
+					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+						{
+							Filter:   ccv2.DomainGUIDFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{domain.GUID},
+						},
+						{
+							Filter:   ccv2.HostFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{""},
+						},
+						{
+							Filter:   ccv2.PathFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{""},
+						},
+					}))
+				})
+			})
+
 			Context("when the hostname is provided", func() {
 				BeforeEach(func() {
 					inputRoute.Host = "some-host"
@@ -1370,6 +1473,11 @@ var _ = Describe("Route Actions", func() {
 							Operator: ccv2.EqualOperator,
 							Values:   []string{inputRoute.Host},
 						},
+						{
+							Filter:   ccv2.PathFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{""},
+						},
 					}))
 				})
 			})
@@ -1404,6 +1512,11 @@ var _ = Describe("Route Actions", func() {
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{domain.GUID},
+						},
+						{
+							Filter:   ccv2.HostFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{inputRoute.Host},
 						},
 						{
 							Filter:   ccv2.PathFilter,
@@ -1444,6 +1557,16 @@ var _ = Describe("Route Actions", func() {
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{domain.GUID},
+						},
+						{
+							Filter:   ccv2.HostFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{inputRoute.Host},
+						},
+						{
+							Filter:   ccv2.PathFilter,
+							Operator: ccv2.EqualOperator,
+							Values:   []string{inputRoute.Path},
 						},
 						{
 							Filter:   ccv2.PortFilter,
