@@ -28,8 +28,8 @@ import (
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_net"
 	"code.cloudfoundry.org/diego-ssh/test_helpers/fake_ssh"
 	"code.cloudfoundry.org/lager/lagertest"
-	"github.com/docker/docker/pkg/term"
 	"github.com/kr/pty"
+	"github.com/moby/moby/pkg/term"
 	"golang.org/x/crypto/ssh"
 
 	. "github.com/onsi/ginkgo"

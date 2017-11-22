@@ -1,0 +1,44 @@
+@font-face {
+  font-family: 'Proxima Nova';
+  font-weight: 400;
+  font-style: normal;
+  src: url("fonts/proxima-nova-regular.eot");
+  src: url("fonts/proxima-nova-regular.eot?#iefix") format("embedded-opentype"), url("fonts/proxima-nova-regular.woff2") format("woff2"), url("fonts/proxima-nova-regular.woff") format("woff"), url("fonts/proxima-nova-regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: 'Proxima Nova Light';
+  font-weight: 300;
+  font-style: normal;
+  src: url("fonts/proxima-nova-light.eot");
+  src: url("fonts/proxima-nova-light.eot?#iefix") format("embedded-opentype"), url("fonts/proxima-nova-light.woff2") format("woff2"), url("fonts/proxima-nova-light.woff") format("woff"), url("fonts/proxima-nova-light.ttf") format("truetype");
+}
+@font-face {
+  font-family: 'Proxima Nova Bold';
+  font-weight: 700;
+  font-style: normal;
+  src: url("fonts/proxima-nova-bold.eot");
+  src: url("fonts/proxima-nova-bold.eot?#iefix") format("embedded-opentype"), url("fonts/proxima-nova-bold.woff2") format("woff2"), url("fonts/proxima-nova-bold.woff") format("woff"), url("fonts/proxima-nova-bold.ttf") format("truetype");
+}
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: "Proxima Nova", sans-serif;
+}
+
+h3.name {
+  font-family: "Proxima Nova Bold", sans-serif;
+}
+
+ul.list-of-links li {
+  font-family: "Proxima Nova", sans-serif;
+  border: 0 !important;
+  font-size: 14px;
+  line-height: 150%;
+}
+
+.table .tr, .table .td {
+  border: none !important;
+  padding: 2px 8px;
+}

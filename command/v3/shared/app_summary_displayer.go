@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	"github.com/cloudfoundry/bytefmt"
 )
 
 type AppSummaryDisplayer struct {

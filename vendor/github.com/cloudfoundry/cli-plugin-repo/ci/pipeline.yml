@@ -1,0 +1,47 @@
+---
+resources:
+- name: cli-plugin-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli-plugin-repo
+    branch: master
+
+- name: cli-plugin-repo-pws
+  type: cf
+  source:
+    api: https://api.run.pivotal.io
+    username: {{cli-pws-username}}
+    password: {{cli-pws-password}}
+    organization: {{cli-pws-oss-org}}
+    space: {{cli-pws-oss-space}}
+    skip_cert_check: false
+
+- name: cf-cli-tracker
+  type: tracker
+  source:
+    token: {{cf-cli-public-tracker-token}}
+    project_id: {{cf-cli-public-tracker-project-id}}
+    tracker_url: https://www.pivotaltracker.com
+
+jobs:
+- name: test
+  plan:
+  - get: cli-plugin-repo
+    trigger: true
+  - task: test
+    file: cli-plugin-repo/ci/tasks/test.yml
+
+- name: deploy
+  plan:
+  - get: cli-plugin-repo
+    passed: [test]
+    trigger: true
+  - put: cli-plugin-repo-pws
+    params:
+      manifest: cli-plugin-repo/manifest.yml
+      path: cli-plugin-repo
+      current_app_name: plugins
+  - put: cf-cli-tracker
+    params:
+      repos:
+      - cli-plugin-repo

@@ -3,7 +3,7 @@ package terminal
 import (
 	"io"
 
-	"github.com/docker/docker/pkg/term"
+	"github.com/moby/moby/pkg/term"
 )
 
 //go:generate counterfeiter . TerminalHelper

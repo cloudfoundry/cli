@@ -1,0 +1,67 @@
+#!/usr/bin/expect -f
+
+set timeout 1
+
+spawn go run main.go
+
+expect -ex {Well? [yN]} {} timeout { exit 1 }
+send "\r"
+expect "\r\nfalse\r\n" {} timeout { exit 1 }
+
+expect -ex {Well? [Yn]: } {} timeout { exit 1 }
+send "\r"
+expect "\r\ntrue\r\n" {} timeout { exit 1 }
+
+expect -ex {Well? [yn]: } {} timeout { exit 1 }
+send "y\r"
+expect "\r\ntrue\r\n" {} timeout { exit 1 }
+
+expect -ex {Message (hello): } {} timeout { exit 1 }
+send "\r"
+expect "\r\nhello\r\n" {} timeout { exit 1 }
+
+expect -ex {Message (): } {} timeout { exit 1 }
+send "\r"
+expect "\r\n\r\n" {} timeout { exit 1 }
+
+expect -ex {Message: } {} timeout { exit 1 }
+send "sup\r"
+expect "\r\nsup\r\n" {} timeout { exit 1 }
+
+expect -ex {1: One} {} timeout { exit 1 }
+expect -ex {2: Two} {} timeout { exit 1 }
+expect -ex {3: Three} {} timeout { exit 1 }
+expect -ex {Choose a number: } {} timeout { exit 1 }
+send "2\r"
+expect "\r\ndos\r\n" {} timeout { exit 1 }
+
+expect -ex {1: One} {} timeout { exit 1 }
+expect -ex {2: Two} {} timeout { exit 1 }
+expect -ex {3: Three} {} timeout { exit 1 }
+expect -ex {Choose a number (2): } {} timeout { exit 1 }
+send "\r"
+expect "\r\ndos\r\n" {} timeout { exit 1 }
+
+expect -ex {1: One} {} timeout { exit 1 }
+expect -ex {2: Two} {} timeout { exit 1 }
+expect -ex {3: Three} {} timeout { exit 1 }
+expect -ex {4: none} {} timeout { exit 1 }
+expect -ex {Choose a number (4): } {} timeout { exit 1 }
+send "\r"
+expect "\r\n<nil>\r\n" {} timeout { exit 1 }
+
+expect -ex {Username:} {} timeout { exit 1 }
+send "\r"
+expect "\r\nUsername: " {} timeout { exit 1 }
+send "bilbo\r"
+expect "\r\nbilbo\r\n" {} timeout { exit 1 }
+
+expect -ex {Password:} {} timeout { exit 1 }
+send "\r"
+expect "\r\nPassword: " {} timeout { exit 1 }
+send "baggins\r"
+expect "\r\nbaggins\r\n" {} timeout { exit 1 }
+
+expect -ex {Interrupt:} {} timeout { exit 1 }
+send \003
+expect "keyboard interrupt" {} timeout { exit 1 }

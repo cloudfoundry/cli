@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/ssh/terminal"
-	"github.com/docker/docker/pkg/term"
+	"github.com/moby/moby/pkg/term"
 )
 
 type FakeTerminalHelper struct {

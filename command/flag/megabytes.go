@@ -5,7 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/types"
 
-	"github.com/cloudfoundry/bytefmt"
+	"code.cloudfoundry.org/bytefmt"
 	flags "github.com/jessevdk/go-flags"
 )
 

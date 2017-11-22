@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+echo -e "\nGenerating Binary..."
+
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+
+go build -o $ROOT_DIR/out/clipr ./

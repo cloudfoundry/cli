@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/util/clissh"
-	"github.com/docker/docker/pkg/term"
+	"github.com/moby/moby/pkg/term"
 )
 
 type FakeTerminalHelper struct {

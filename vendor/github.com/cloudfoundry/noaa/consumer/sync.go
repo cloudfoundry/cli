@@ -72,12 +72,7 @@ func (c *Consumer) readTC(appGuid string, authToken string, endpoint string) ([]
 		return nil, err
 	}
 
-	scheme := "https"
-	if trafficControllerUrl.Scheme == "ws" {
-		scheme = "http"
-	}
-
-	recentPath := fmt.Sprintf("%s://%s/apps/%s/%s", scheme, trafficControllerUrl.Host, appGuid, endpoint)
+	recentPath := c.recentPathBuilder(trafficControllerUrl, appGuid, endpoint)
 
 	resp, err := c.requestTC(recentPath, authToken)
 	if err != nil {
@@ -102,7 +97,9 @@ func (c *Consumer) readTC(appGuid string, authToken string, endpoint string) ([]
 		}
 
 		envelope := new(events.Envelope)
-		proto.Unmarshal(buffer.Bytes(), envelope)
+		if err := proto.Unmarshal(buffer.Bytes(), envelope); err != nil {
+			continue
+		}
 
 		envelopes = append(envelopes, envelope)
 	}

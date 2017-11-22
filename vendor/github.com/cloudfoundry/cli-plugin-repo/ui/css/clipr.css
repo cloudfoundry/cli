@@ -1,0 +1,66 @@
+body {
+  background: url('../images/bg-plain-x.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+a {
+  color: #f13131;
+}
+
+#cfLogo {
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+  z-index: -1;
+  width: 250px;
+}
+
+#titleDiv {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 250px;
+  font-weight: bold;
+  text-align: left;
+}
+
+#bodyBox {
+  width: 1100px;
+  margin: auto;
+  position: relative;
+}
+
+#adBox {
+  width: 300px;
+  height: 500px; 
+  position: fixed;
+  left: 50%;
+  margin-left: 350px;
+  top: 200px;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width:100%;
+  background: #333;
+  z-index: 10;
+}
+
+#githubFork {
+  position: fixed;
+  top:0;
+  right:0;
+  z-index: 20;
+}
+
+.letterpress {
+	color: #336699;
+	text-shadow: 0 1px 0 #fff;
+}
+
+.letterpress-white {
+	color:#eee;
+	text-shadow: 0 -1px 0 #555;
+}

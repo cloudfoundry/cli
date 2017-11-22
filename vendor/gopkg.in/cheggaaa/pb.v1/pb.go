@@ -13,7 +13,7 @@ import (
 )
 
 // Current version
-const Version = "1.0.13"
+const Version = "1.0.18"
 
 const (
 	// Default refresh rate - 200ms
@@ -47,7 +47,6 @@ func New64(total int64) *ProgressBar {
 		Units:         U_NO,
 		ManualUpdate:  false,
 		finish:        make(chan struct{}),
-		currentValue:  -1,
 	}
 	return pb.Format(FORMAT)
 }
@@ -66,7 +65,8 @@ func StartNew(total int) *ProgressBar {
 type Callback func(out string)
 
 type ProgressBar struct {
-	current int64 // current must be first member of struct (https://code.google.com/p/go/issues/detail?id=5278)
+	current  int64 // current must be first member of struct (https://code.google.com/p/go/issues/detail?id=5278)
+	previous int64
 
 	Total                            int64
 	RefreshRate                      time.Duration
@@ -90,9 +90,10 @@ type ProgressBar struct {
 	finish     chan struct{}
 	isFinish   bool
 
-	startTime    time.Time
-	startValue   int64
-	currentValue int64
+	startTime  time.Time
+	startValue int64
+
+	changeTime time.Time
 
 	prefix, postfix string
 
@@ -298,8 +299,12 @@ func (pb *ProgressBar) write(current int64) {
 	}
 
 	// time left
-	fromStart := time.Now().Sub(pb.startTime)
+	pb.mu.Lock()
 	currentFromStart := current - pb.startValue
+	fromStart := time.Now().Sub(pb.startTime)
+	lastChangeTime := pb.changeTime
+	fromChange := lastChangeTime.Sub(pb.startTime)
+	pb.mu.Unlock()
 	select {
 	case <-pb.finish:
 		if pb.ShowFinalTime {
@@ -309,17 +314,20 @@ func (pb *ProgressBar) write(current int64) {
 		}
 	default:
 		if pb.ShowTimeLeft && currentFromStart > 0 {
-			perEntry := fromStart / time.Duration(currentFromStart)
+			perEntry := fromChange / time.Duration(currentFromStart)
 			var left time.Duration
 			if pb.Total > 0 {
 				left = time.Duration(pb.Total-currentFromStart) * perEntry
+				left -= time.Since(lastChangeTime)
 				left = (left / time.Second) * time.Second
 			} else {
 				left = time.Duration(currentFromStart) * perEntry
 				left = (left / time.Second) * time.Second
 			}
-			timeLeft := Format(int64(left)).To(U_DURATION).String()
-			timeLeftBox = fmt.Sprintf(" %s", timeLeft)
+			if left > 0 {
+				timeLeft := Format(int64(left)).To(U_DURATION).String()
+				timeLeftBox = fmt.Sprintf(" %s", timeLeft)
+			}
 		}
 	}
 
@@ -340,24 +348,32 @@ func (pb *ProgressBar) write(current int64) {
 		size := width - barWidth
 		if size > 0 {
 			if pb.Total > 0 {
-				curCount := int(math.Ceil((float64(current) / float64(pb.Total)) * float64(size)))
-				emptCount := size - curCount
+				curSize := int(math.Ceil((float64(current) / float64(pb.Total)) * float64(size)))
+				emptySize := size - curSize
 				barBox = pb.BarStart
-				if emptCount < 0 {
-					emptCount = 0
+				if emptySize < 0 {
+					emptySize = 0
 				}
-				if curCount > size {
-					curCount = size
+				if curSize > size {
+					curSize = size
 				}
-				if emptCount <= 0 {
-					barBox += strings.Repeat(pb.Current, curCount)
-				} else if curCount > 0 {
-					barBox += strings.Repeat(pb.Current, curCount-1) + pb.CurrentN
+
+				cursorLen := escapeAwareRuneCountInString(pb.Current)
+				if emptySize <= 0 {
+					barBox += strings.Repeat(pb.Current, curSize/cursorLen)
+				} else if curSize > 0 {
+					cursorEndLen := escapeAwareRuneCountInString(pb.CurrentN)
+					cursorRepetitions := (curSize - cursorEndLen) / cursorLen
+					barBox += strings.Repeat(pb.Current, cursorRepetitions)
+					barBox += pb.CurrentN
 				}
-				barBox += strings.Repeat(pb.Empty, emptCount) + pb.BarEnd
+
+				emptyLen := escapeAwareRuneCountInString(pb.Empty)
+				barBox += strings.Repeat(pb.Empty, emptySize/emptyLen)
+				barBox += pb.BarEnd
 			} else {
-				barBox = pb.BarStart
 				pos := size - int(current)%int(size)
+				barBox = pb.BarStart
 				if pos-1 > 0 {
 					barBox += strings.Repeat(pb.Empty, pos-1)
 				}
@@ -415,10 +431,14 @@ func (pb *ProgressBar) GetWidth() int {
 // Write the current state of the progressbar
 func (pb *ProgressBar) Update() {
 	c := atomic.LoadInt64(&pb.current)
-	if pb.AlwaysUpdate || c != pb.currentValue {
-		pb.write(c)
-		pb.currentValue = c
+	p := atomic.LoadInt64(&pb.previous)
+	if p != c {
+		pb.mu.Lock()
+		pb.changeTime = time.Now()
+		pb.mu.Unlock()
+		atomic.StoreInt64(&pb.previous, c)
 	}
+	pb.write(c)
 	if pb.AutoStat {
 		if c == 0 {
 			pb.startTime = time.Now()

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e -x
+
+# because go get does not install test deps
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega
+
+FIRST_GOPATH_DIR=$(echo $GOPATH | cut -d: -f1)
+$FIRST_GOPATH_DIR/bin/ginkgo -r

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command"
-	"github.com/cloudfoundry/bytefmt"
 )
 
 // DisplayAppSummary displays the application summary to the UI, and optionally

@@ -2,12 +2,13 @@ package io
 
 import (
 	"bytes"
-	"github.com/fatih/color"
-	"github.com/mattn/go-colorable"
 	"io"
 	"os"
 	"runtime"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/mattn/go-colorable"
 )
 
 func SimulateStdin(input string, block func(r io.Reader)) {

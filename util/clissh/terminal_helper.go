@@ -3,7 +3,7 @@ package clissh
 import (
 	"io"
 
-	"github.com/docker/docker/pkg/term"
+	"github.com/moby/moby/pkg/term"
 )
 
 type terminalHelper struct{}
