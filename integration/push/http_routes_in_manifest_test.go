@@ -176,7 +176,7 @@ var _ = Describe("HTTP routes in manifest", func() {
 
 			Context("when the route contains a port", func() {
 				BeforeEach(func() {
-					route1 = helpers.NewTCPRoute(space, domain.Name, 1234)
+					route1.Port = 1234
 				})
 
 				It("returns an error", func() {

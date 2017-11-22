@@ -21,8 +21,8 @@ var _ = Describe("TCP routes in manifest", func() {
 	BeforeEach(func() {
 		app = helpers.NewAppName()
 		domain = helpers.NewDomain(organization, helpers.DomainName())
-		route1 = helpers.NewTCPRoute(space, domain.Name, helpers.RandomPort())
-		route2 = helpers.NewTCPRoute(space, domain.Name, helpers.RandomPort())
+		route1 = helpers.NewTCPRoute(space, domain.Name)
+		route2 = helpers.NewTCPRoute(space, domain.Name)
 	})
 
 	Context("when the domain exists", func() {

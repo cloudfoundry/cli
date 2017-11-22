@@ -9,6 +9,8 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
+const TestPort = 1024
+
 type Route struct {
 	Domain string
 	Host   string
@@ -26,11 +28,11 @@ func NewRoute(space string, domain string, hostname string, path string) Route {
 	}
 }
 
-func NewTCPRoute(space string, domain string, port int) Route {
+func NewTCPRoute(space string, domain string) Route {
 	return Route{
 		Space:  space,
 		Domain: domain,
-		Port:   port,
+		Port:   TestPort,
 	}
 }
 
