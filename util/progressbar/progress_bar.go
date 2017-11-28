@@ -37,4 +37,5 @@ func (p *ProgressBar) Ready() {
 func (p *ProgressBar) Complete() {
 	// Adding sleep to ensure UI has finished drawing
 	time.Sleep(time.Second)
+	p.bar.Finish()
 }
