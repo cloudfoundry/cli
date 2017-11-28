@@ -3,13 +3,35 @@ package helpers
 import (
 	"fmt"
 	"path"
+	"regexp"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 )
 
-const TestPort = 1024
+// MinTestPort should be defined by the CF router group for integration tests.
+const MinTestPort = 1024
+
+// MaxTestPort should be defined by the CF router group for integration tests.
+const MaxTestPort = 1034
+
+func FindOrCreateTCPRouterGroup(node int) string {
+	routerGroupName := fmt.Sprintf("INTEGRATION-TCP-NODE-%d", node)
+
+	session := CF("curl", fmt.Sprintf("/routing/v1/router_groups?name=%s", routerGroupName))
+	Eventually(session).Should(Exit(0))
+	doesNotExist := regexp.MustCompile("ResourceNotFoundError")
+	if doesNotExist.Match(session.Out.Contents()) {
+		jsonBody := fmt.Sprintf(`{"name": "%s", "type": "tcp", "reservable_ports": "%d-%d"}`, routerGroupName, MinTestPort, MaxTestPort)
+		session := CF("curl", "-d", jsonBody, "-X", "POST", "/routing/v1/router_groups")
+		Eventually(session).Should(Say(`"name":\s*"%s"`, routerGroupName))
+		Eventually(session).Should(Say(`"type":\s*"tcp"`))
+		Eventually(session).Should(Exit(0))
+	}
+
+	return routerGroupName
+}
 
 type Route struct {
 	Domain string
@@ -28,11 +50,11 @@ func NewRoute(space string, domain string, hostname string, path string) Route {
 	}
 }
 
-func NewTCPRoute(space string, domain string) Route {
+func NewTCPRoute(space string, domain string, port int) Route {
 	return Route{
 		Space:  space,
 		Domain: domain,
-		Port:   TestPort,
+		Port:   port,
 	}
 }
 

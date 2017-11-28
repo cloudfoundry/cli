@@ -1,7 +1,5 @@
 package helpers
 
-const DefaultTCPRouterGroup = "default-tcp" // Allows for ports 1024-1123
-
 var previouslyUsedPort int
 
 func RandomPort() int {

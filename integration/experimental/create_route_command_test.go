@@ -181,7 +181,7 @@ var _ = Describe("create-route command", func() {
 		Context("for TCP routes", func() {
 			Context("when specifying --port", func() {
 				It("reports an error with a minimum-version message", func() {
-					session := helpers.CF("create-route", "some-space", "example.com", "--port", "1110")
+					session := helpers.CF("create-route", "some-space", "example.com", "--port", "1025")
 					Eventually(session.Out).Should(Say(`FAILED`))
 					Eventually(session.Err).Should(Say(`Option '--port' requires CF API version 2\.53\.0 or higher\. Your target is 2\.34\.0\.`))
 					Eventually(session).Should(Exit(1))
@@ -452,7 +452,7 @@ var _ = Describe("create-route command", func() {
 
 					BeforeEach(func() {
 						domain = helpers.NewDomain(orgName, domainName)
-						domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+						domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					})
 
 					AfterEach(func() {
@@ -472,7 +472,7 @@ var _ = Describe("create-route command", func() {
 
 					Context("when a port is provided", func() {
 						It("creates the route", func() {
-							port := "1110"
+							port := "1025"
 							session := helpers.CF("create-route", spaceName, domainName, "--port", port)
 							Eventually(session.Out).Should(Say(`Creating route %s:%s for org %s / space %s as %s\.\.\.`, domainName, port, orgName, spaceName, userName))
 							Eventually(session).Should(Exit(0))

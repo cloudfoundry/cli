@@ -1,4 +1,4 @@
-package push_serial_test
+package push
 
 import (
 	"path/filepath"
@@ -21,13 +21,13 @@ var _ = Describe("TCP routes in manifest", func() {
 	BeforeEach(func() {
 		app = helpers.NewAppName()
 		domain = helpers.NewDomain(organization, helpers.DomainName())
-		route1 = helpers.NewTCPRoute(space, domain.Name)
-		route2 = helpers.NewTCPRoute(space, domain.Name)
+		route1 = helpers.NewTCPRoute(space, domain.Name, 1024)
+		route2 = helpers.NewTCPRoute(space, domain.Name, 1025)
 	})
 
 	Context("when the domain exists", func() {
 		BeforeEach(func() {
-			domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+			domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 		})
 
 		AfterEach(func() {

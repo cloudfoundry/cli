@@ -164,7 +164,7 @@ var _ = Describe("push with hostname", func() {
 		BeforeEach(func() {
 			domainName = helpers.DomainName()
 			domain = helpers.NewDomain(organization, domainName)
-			domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+			domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 		})
 
 		AfterEach(func() {

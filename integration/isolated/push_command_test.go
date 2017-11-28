@@ -134,7 +134,7 @@ applications:
 				sharedDomain = helpers.NewDomain(orgName, helpers.DomainName("shared"))
 				sharedDomain.CreateShared()
 				tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-				tcpDomain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+				tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 
 				var err error
 				appDir, err = ioutil.TempDir("", "simple-app")

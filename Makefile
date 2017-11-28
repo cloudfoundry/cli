@@ -65,7 +65,6 @@ integration-plugin : build integration-cleanup
 
 integration-push : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/push
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/push-serial
 
 integration-tests : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push

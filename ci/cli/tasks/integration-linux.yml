@@ -56,4 +56,4 @@ run:
     fi
 
     ginkgo -r -nodes=16 -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/isolated integration/plugin integration/push
-    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global integration/push-serial
+    ginkgo -r -flakeAttempts=2 -slowSpecThreshold=60 -randomizeAllSpecs integration/global

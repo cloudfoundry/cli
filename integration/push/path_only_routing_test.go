@@ -99,7 +99,7 @@ var _ = Describe("push with route path", func() {
 			BeforeEach(func() {
 				domainName = helpers.DomainName()
 				domain = helpers.NewDomain(organization, domainName)
-				domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+				domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 			})
 
 			AfterEach(func() {

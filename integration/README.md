@@ -29,3 +29,5 @@ ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated integra
 
 ### The test suite does not cleanup after itself!
 In order to focus on clean test code and performance of each test, we have decided to not cleanup after each test. However, in order to facilitate [clean up scripts](https://github.com/cloudfoundry/cli/blob/master/bin/cleanup-integration), we are trying to keep consistent naming across organizations, spaces, etc.
+
+In addition, several router groups are created using a `INTEGRATION-TCP-NODE-[NUMBER]` format. These cannot be deleted without manual changes to the database.

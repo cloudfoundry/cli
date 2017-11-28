@@ -78,7 +78,7 @@ var _ = Describe("push with different domain values", func() {
 			BeforeEach(func() {
 				domainName = helpers.DomainName("tcp-domain")
 				domain = helpers.NewDomain(organization, domainName)
-				domain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+				domain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 			})
 
 			AfterEach(func() {

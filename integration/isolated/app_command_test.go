@@ -156,7 +156,7 @@ var _ = Describe("app command", func() {
 					appName = helpers.PrefixedRandomName("app")
 					domainName = defaultSharedDomain()
 					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-					tcpDomain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					helpers.WithHelloWorldApp(func(appDir string) {
 						manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -280,7 +280,7 @@ applications:
 					appName = helpers.PrefixedRandomName("app")
 					domainName = defaultSharedDomain()
 					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-					tcpDomain.CreateWithRouterGroup(helpers.DefaultTCPRouterGroup)
+					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
 				})
 
