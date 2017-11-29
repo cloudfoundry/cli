@@ -57,7 +57,7 @@ var _ = Describe("Logging Actions", func() {
 		BeforeEach(func() {
 			expectedAppGUID = "some-app-guid"
 
-			eventStream = make(chan *events.LogMessage)
+			eventStream = make(chan *events.LogMessage, 100)
 			errStream = make(chan error)
 		})
 
@@ -126,6 +126,43 @@ var _ = Describe("Logging Actions", func() {
 				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
 				Expect(message.SourceType()).To(Equal("some-source-type"))
 				Expect(message.SourceInstance()).To(Equal("some-source-instance"))
+			})
+
+			It("sorts the logs by timestamp", func() {
+				outMessage := events.LogMessage_OUT
+				sourceType := "some-source-type"
+				sourceInstance := "some-source-instance"
+
+				ts3 := int64(0)
+				eventStream <- &events.LogMessage{
+					Message:        []byte("message-3"),
+					MessageType:    &outMessage,
+					Timestamp:      &ts3,
+					SourceType:     &sourceType,
+					SourceInstance: &sourceInstance,
+				}
+
+				errMessage := events.LogMessage_ERR
+				ts4 := int64(15)
+				eventStream <- &events.LogMessage{
+					Message:        []byte("message-4"),
+					MessageType:    &errMessage,
+					Timestamp:      &ts4,
+					SourceType:     &sourceType,
+					SourceInstance: &sourceInstance,
+				}
+
+				message := <-messages
+				Expect(message.Timestamp()).To(Equal(time.Unix(0, 0)))
+
+				message = <-messages
+				Expect(message.Timestamp()).To(Equal(time.Unix(0, 10)))
+
+				message = <-messages
+				Expect(message.Timestamp()).To(Equal(time.Unix(0, 15)))
+
+				message = <-messages
+				Expect(message.Timestamp()).To(Equal(time.Unix(0, 20)))
 			})
 		})
 

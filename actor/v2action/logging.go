@@ -1,6 +1,7 @@
 package v2action
 
 import (
+	"sort"
 	"time"
 
 	"github.com/cloudfoundry/noaa"
@@ -9,6 +10,8 @@ import (
 )
 
 const StagingLog = "STG"
+
+var flushInterval = 300 * time.Millisecond
 
 type LogMessage struct {
 	message        string
@@ -55,6 +58,18 @@ func NewLogMessage(message string, messageType int, timestamp time.Time, sourceT
 	}
 }
 
+type LogMessages []*LogMessage
+
+func (lm LogMessages) Len() int { return len(lm) }
+
+func (lm LogMessages) Less(i, j int) bool {
+	return lm[i].timestamp.Before(lm[j].timestamp)
+}
+
+func (lm LogMessages) Swap(i, j int) {
+	lm[i], lm[j] = lm[j], lm[i]
+}
+
 func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error) {
 	// Do not pass in token because client should have a TokenRefresher set
 	eventStream, errStream := client.TailingLogs(appGUID, "")
@@ -66,6 +81,11 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) 
 		defer close(messages)
 		defer close(errs)
 
+		ticker := time.NewTicker(flushInterval)
+		defer ticker.Stop()
+
+		var logs LogMessages
+
 	dance:
 		for {
 			select {
@@ -74,13 +94,13 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) 
 					break dance
 				}
 
-				messages <- &LogMessage{
+				logs = append(logs, &LogMessage{
 					message:        string(event.GetMessage()),
 					messageType:    event.GetMessageType(),
 					timestamp:      time.Unix(0, event.GetTimestamp()),
 					sourceInstance: event.GetSourceInstance(),
 					sourceType:     event.GetSourceType(),
-				}
+				})
 			case err, ok := <-errStream:
 				if !ok {
 					break dance
@@ -93,6 +113,13 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) 
 				if err != nil {
 					errs <- err
 				}
+			case <-ticker.C:
+				sort.Stable(logs)
+				for _, l := range logs {
+					messages <- l
+				}
+
+				logs = logs[0:0]
 			}
 		}
 	}()
