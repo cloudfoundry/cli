@@ -31,6 +31,7 @@ const (
 	GetPackageRequest                                       = "GetPackage"
 	GetPackagesRequest                                      = "GetPackages"
 	GetProcessInstancesRequest                              = "GetProcessInstances"
+	GetServiceInstancesRequest                              = "GetServiceInstances"
 	GetSpaceRelationshipIsolationSegmentRequest             = "GetSpaceRelationshipIsolationSegmentRequest"
 	GetSpacesRequest                                        = "GetSpaces"
 	PatchApplicationCurrentDropletRequest                   = "PatchApplicationCurrentDroplet"
@@ -48,6 +49,7 @@ const (
 	PostIsolationSegmentRelationshipOrganizationsRequest    = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                            = "PostIsolationSegments"
 	PostPackageRequest                                      = "PostPackageRequest"
+	PostServiceInstanceRelationshipSharedSpacesRequest      = "PostServiceInstanceRelationshipSharedSpaces"
 	PutTaskCancelRequest                                    = "PutTaskCancelRequest"
 )
 
@@ -59,6 +61,7 @@ const (
 	OrgsResource              = "organizations"
 	PackagesResource          = "packages"
 	ProcessesResource         = "processes"
+	ServiceInstancesResource  = "service_instances"
 	SpacesResource            = "spaces"
 	TasksResource             = "tasks"
 )
@@ -69,6 +72,7 @@ var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetPackagesRequest, Resource: PackagesResource},
+	{Path: "/", Method: http.MethodGet, Name: GetServiceInstancesRequest, Resource: ServiceInstancesResource},
 	{Path: "/", Method: http.MethodGet, Name: GetSpacesRequest, Resource: SpacesResource},
 	{Path: "/", Method: http.MethodPost, Name: PostApplicationRequest, Resource: AppsResource},
 	{Path: "/", Method: http.MethodPost, Name: PostBuildRequest, Resource: BuildsResource},
@@ -100,6 +104,7 @@ var APIRoutes = []Route{
 	{Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:process_guid", Method: http.MethodPatch, Name: PatchApplicationProcessHealthCheckRequest, Resource: ProcessesResource},
 	{Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessInstancesRequest, Resource: ProcessesResource},
+	{Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipSharedSpacesRequest, Resource: ServiceInstancesResource},
 	{Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest, Resource: SpacesResource},
 	{Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest, Resource: SpacesResource},
 	{Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},

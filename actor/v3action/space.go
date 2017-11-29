@@ -1,5 +1,14 @@
 package v3action
 
+import (
+	"net/url"
+
+	"code.cloudfoundry.org/cli/actor/actionerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+)
+
+type Space ccv3.Space
+
 // ResetSpaceIsolationSegment disassociates a space from an isolation segment.
 //
 // If the space's organization has a default isolation segment, return its
@@ -30,4 +39,21 @@ func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) 
 	}
 
 	return isoSegName, allWarnings, nil
+}
+
+func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (Space, Warnings, error) {
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(url.Values{
+		ccv3.NameFilter:             []string{spaceName},
+		ccv3.OrganizationGUIDFilter: []string{orgGUID},
+	})
+
+	if err != nil {
+		return Space{}, Warnings(warnings), err
+	}
+
+	if len(spaces) == 0 {
+		return Space{}, Warnings(warnings), actionerror.SpaceNotFoundError{Name: spaceName}
+	}
+
+	return Space(spaces[0]), Warnings(warnings), nil
 }

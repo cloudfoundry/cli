@@ -2,7 +2,9 @@ package v3action_test
 
 import (
 	"errors"
+	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -144,5 +146,79 @@ var _ = Describe("Space", func() {
 				Expect(err).To(MatchError(expectedErr))
 			})
 		})
+	})
+
+	Describe("GetSpaceByNameAndOrganization", func() {
+		var (
+			spaceName string
+			orgGUID   string
+
+			space      Space
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			spaceName = "some-space"
+			orgGUID = "some-org-guid"
+		})
+
+		JustBeforeEach(func() {
+			space, warnings, executeErr = actor.GetSpaceByNameAndOrganization(spaceName, orgGUID)
+		})
+
+		Context("when the GetSpace call is successful", func() {
+			Context("when the cloud controller returns back one space", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						[]ccv3.Space{{GUID: "some-space-guid", Name: spaceName}},
+						ccv3.Warnings{"some-space-warning"}, nil)
+				})
+
+				It("returns back the first space and warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(space).To(Equal(Space{
+						GUID: "some-space-guid",
+						Name: spaceName,
+					}))
+					Expect(warnings).To(ConsistOf("some-space-warning"))
+
+					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
+					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(url.Values{
+						ccv3.NameFilter:             []string{spaceName},
+						ccv3.OrganizationGUIDFilter: []string{orgGUID},
+					}))
+				})
+			})
+
+			Context("when the cloud controller returns back no spaces", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetSpacesReturns(
+						nil, ccv3.Warnings{"some-space-warning"}, nil)
+				})
+
+				It("returns back the first space and warnings", func() {
+					Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: spaceName}))
+
+					Expect(warnings).To(ConsistOf("some-space-warning"))
+				})
+			})
+		})
+
+		Context("when the GetSpace call is unsuccessful", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpacesReturns(
+					nil,
+					ccv3.Warnings{"some-space-warning"},
+					errors.New("cannot get space"))
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError("cannot get space"))
+				Expect(warnings).To(ConsistOf("some-space-warning"))
+			})
+		})
+
 	})
 })
