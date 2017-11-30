@@ -285,29 +285,7 @@ func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResour
 	return job, response.Warnings, err
 }
 
-func (client *Client) uploadNewAndExistingResources(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
-	contentLength, err := client.overallRequestSize(existingResources, newResourcesLength)
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
-
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PutAppBitsRequest,
-		URIParams:   Params{"app_guid": appGUID},
-		Query: url.Values{
-			"async": {"true"},
-		},
-		Body: body,
-	})
-	if err != nil {
-		return Job{}, nil, err
-	}
-
-	request.Header.Set("Content-Type", contentType)
-	request.ContentLength = contentLength
-
+func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, writeErrors <-chan error) (Job, Warnings, error) {
 	var job Job
 	response := cloudcontroller.Response{
 		Result: &job,
@@ -349,4 +327,30 @@ func (client *Client) uploadNewAndExistingResources(appGUID string, existingReso
 	}
 
 	return job, response.Warnings, firstError
+}
+
+func (client *Client) uploadNewAndExistingResources(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
+	contentLength, err := client.overallRequestSize(existingResources, newResourcesLength)
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForAppBits(existingResources, newResources, newResourcesLength)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutAppBitsRequest,
+		URIParams:   Params{"app_guid": appGUID},
+		Query: url.Values{
+			"async": {"true"},
+		},
+		Body: body,
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", contentType)
+	request.ContentLength = contentLength
+
+	return client.uploadAsynchronously(request, writeErrors)
 }
