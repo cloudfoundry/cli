@@ -154,7 +154,7 @@ var _ = Describe("Resource Actions", func() {
 				)
 
 				allResources = []Resource{} // empties to prevent test pollution
-				for i := 0; i < MaxResourceMatchChunkSize+2; i += 1 {
+				for i := 0; i < MaxResourceMatchChunkSize+2; i++ {
 					allResources = append(allResources, Resource{Filename: "file", Mode: 0744, Size: 11, SHA1: "some-sha"})
 				}
 			})
@@ -183,7 +183,7 @@ var _ = Describe("Resource Actions", func() {
 				)
 
 				allResources = []Resource{} // empties to prevent test pollution
-				for i := 0; i < MaxResourceMatchChunkSize+2; i += 1 {
+				for i := 0; i < MaxResourceMatchChunkSize+2; i++ {
 					allResources = append(allResources, Resource{Filename: "file", Mode: 0744, Size: 11, SHA1: "some-sha"})
 				}
 			})

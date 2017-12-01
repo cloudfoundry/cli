@@ -39,10 +39,10 @@ func (actor Actor) ResourceMatch(allResources []Resource) ([]Resource, []Resourc
 			resourcesToSend[currentList],
 			ccv2.Resource(resource),
 		)
-		sendCount += 1
+		sendCount++
 
 		if len(resourcesToSend[currentList]) == MaxResourceMatchChunkSize {
-			currentList += 1
+			currentList++
 			resourcesToSend = append(resourcesToSend, []ccv2.Resource{})
 		}
 	}

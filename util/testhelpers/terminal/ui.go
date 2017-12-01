@@ -175,5 +175,5 @@ func (ui *FakeUI) Table(headers []string) *term.UITable {
 }
 
 func (ui *FakeUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
-	ui.NotifyUpdateIfNeededCallCount += 1
+	ui.NotifyUpdateIfNeededCallCount++
 }

@@ -160,7 +160,7 @@ func (cmd SpaceCommand) displaySpaceSummary(displaySecurityGroupRules bool) erro
 			var currentGroupIndexString string
 
 			if securityGroupRule.Name != currentGroupName {
-				currentGroupIndex += 1
+				currentGroupIndex++
 				currentGroupIndexString = fmt.Sprintf("#%d", currentGroupIndex)
 				currentGroupName = securityGroupRule.Name
 			}

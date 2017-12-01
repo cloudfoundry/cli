@@ -95,7 +95,7 @@ func (cmd SecurityGroupsCommand) Execute(args []string) error {
 		var currentGroupIndexString string
 
 		if secGroupOrgSpace.SecurityGroup.Name != currentGroupName {
-			currentGroupIndex += 1
+			currentGroupIndex++
 			currentGroupIndexString = fmt.Sprintf("#%d", currentGroupIndex)
 			currentGroupName = secGroupOrgSpace.SecurityGroup.Name
 		}

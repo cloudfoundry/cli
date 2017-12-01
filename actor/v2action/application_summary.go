@@ -18,7 +18,7 @@ func (app ApplicationSummary) StartingOrRunningInstanceCount() int {
 	for _, instance := range app.RunningInstances {
 		if instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceStarting) ||
 			instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceRunning) {
-			count += 1
+			count++
 		}
 	}
 	return count

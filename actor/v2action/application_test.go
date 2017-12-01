@@ -699,7 +699,7 @@ var _ = Describe("Application Actions", func() {
 			appCount := 0
 			fakeCloudControllerClient.GetApplicationStub = func(appGUID string) (ccv2.Application, ccv2.Warnings, error) {
 				if appCount == 0 {
-					appCount += 1
+					appCount++
 					return ccv2.Application{
 						GUID:         "some-app-guid",
 						Instances:    types.NullInt{Value: 2, IsSet: true},
@@ -719,7 +719,7 @@ var _ = Describe("Application Actions", func() {
 			instanceCount := 0
 			fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 				if instanceCount == 0 {
-					instanceCount += 1
+					instanceCount++
 					return map[int]ccv2.ApplicationInstance{
 						0: {State: ccv2.ApplicationInstanceStarting},
 						1: {State: ccv2.ApplicationInstanceStarting},

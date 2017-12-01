@@ -124,7 +124,7 @@ var _ = Describe("UAA Authentication", func() {
 					Expect(string(body)).To(Equal(expectedBody))
 
 					if makeCount == 0 {
-						makeCount += 1
+						makeCount++
 						return uaa.InvalidAuthTokenError{}
 					} else {
 						return nil
