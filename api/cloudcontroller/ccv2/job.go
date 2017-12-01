@@ -160,6 +160,29 @@ func (client *Client) UploadApplicationPackage(appGUID string, existingResources
 	return client.uploadNewAndExistingResources(appGUID, existingResources, newResources, newResourcesLength)
 }
 
+func (client *Client) UploadDroplet(appGUID string, droplet io.Reader, dropletLength int64) (Job, Warnings, error) {
+	contentLength, err := client.calculateDropletRequestSize(dropletLength)
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	contentType, body, writeErrors := client.createMultipartBodyAndHeaderForDroplet(droplet)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PutDropletRequest,
+		URIParams:   Params{"app_guid": appGUID},
+		Body:        body,
+	})
+	if err != nil {
+		return Job{}, nil, err
+	}
+
+	request.Header.Set("Content-Type", contentType)
+	request.ContentLength = contentLength
+
+	return client.uploadAsynchronously(request, writeErrors)
+}
+
 func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resource, newResources io.Reader, newResourcesLength int64) (string, io.ReadSeeker, <-chan error) {
 	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
 	form := multipart.NewWriter(writerInput)
@@ -205,7 +228,38 @@ func (*Client) createMultipartBodyAndHeaderForAppBits(existingResources []Resour
 	return form.FormDataContentType(), writerOutput, writeErrors
 }
 
-func (*Client) overallRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
+func (*Client) createMultipartBodyAndHeaderForDroplet(droplet io.Reader) (string, io.ReadSeeker, <-chan error) {
+	writerOutput, writerInput := cloudcontroller.NewPipeBomb()
+	form := multipart.NewWriter(writerInput)
+
+	writeErrors := make(chan error)
+
+	go func() {
+		defer close(writeErrors)
+		defer writerInput.Close()
+
+		writer, err := form.CreateFormFile("droplet", "droplet.tgz")
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		_, err = io.Copy(writer, droplet)
+		if err != nil {
+			writeErrors <- err
+			return
+		}
+
+		err = form.Close()
+		if err != nil {
+			writeErrors <- err
+		}
+	}()
+
+	return form.FormDataContentType(), writerOutput, writeErrors
+}
+
+func (*Client) calculateAppBitsRequestSize(existingResources []Resource, newResourcesLength int64) (int64, error) {
 	body := &bytes.Buffer{}
 	form := multipart.NewWriter(body)
 
@@ -229,19 +283,21 @@ func (*Client) overallRequestSize(existingResources []Resource, newResourcesLeng
 	return int64(body.Len()) + newResourcesLength, nil
 }
 
-func (client *Client) uploadBits(request *cloudcontroller.Request, response *cloudcontroller.Response) <-chan error {
-	httpErrors := make(chan error)
+func (*Client) calculateDropletRequestSize(dropletSize int64) (int64, error) {
+	body := &bytes.Buffer{}
+	form := multipart.NewWriter(body)
 
-	go func() {
-		defer close(httpErrors)
+	_, err := form.CreateFormFile("droplet", "droplet.tgz")
+	if err != nil {
+		return 0, err
+	}
 
-		err := client.connection.Make(request, response)
-		if err != nil {
-			httpErrors <- err
-		}
-	}()
+	err = form.Close()
+	if err != nil {
+		return 0, err
+	}
 
-	return httpErrors
+	return int64(body.Len()) + dropletSize, nil
 }
 
 func (client *Client) uploadExistingResourcesOnly(appGUID string, existingResources []Resource) (Job, Warnings, error) {
@@ -291,7 +347,16 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 		Result: &job,
 	}
 
-	httpErrors := client.uploadBits(request, &response)
+	httpErrors := make(chan error)
+
+	go func() {
+		defer close(httpErrors)
+
+		err := client.connection.Make(request, &response)
+		if err != nil {
+			httpErrors <- err
+		}
+	}()
 
 	// The following section makes the following assumptions:
 	// 1) If an error occurs during file reading, an EOF is sent to the request
@@ -330,7 +395,7 @@ func (client *Client) uploadAsynchronously(request *cloudcontroller.Request, wri
 }
 
 func (client *Client) uploadNewAndExistingResources(appGUID string, existingResources []Resource, newResources Reader, newResourcesLength int64) (Job, Warnings, error) {
-	contentLength, err := client.overallRequestSize(existingResources, newResourcesLength)
+	contentLength, err := client.calculateAppBitsRequestSize(existingResources, newResourcesLength)
 	if err != nil {
 		return Job{}, nil, err
 	}

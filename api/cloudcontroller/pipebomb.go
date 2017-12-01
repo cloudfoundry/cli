@@ -7,7 +7,8 @@ import (
 )
 
 // Pipebomb is a wrapper around an io.Pipe's io.ReadCloser that turns it into a
-// ReadSeeker that errors on Seek calls.
+// ReadSeeker that errors on Seek calls. This is designed to prevent the caller
+// from rereading the body multiple times.
 type Pipebomb struct {
 	io.ReadCloser
 }

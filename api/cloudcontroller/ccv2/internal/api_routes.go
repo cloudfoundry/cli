@@ -69,6 +69,7 @@ const (
 	PostUserRequest                                      = "PostUser"
 	PutAppBitsRequest                                    = "PutAppBits"
 	PutAppRequest                                        = "PutApp"
+	PutDropletRequest                                    = "PutDroplet"
 	PutResourceMatch                                     = "PutResourceMatch"
 	PutRouteAppRequest                                   = "PutRouteApp"
 	PutRunningSecurityGroupSpaceRequest                  = "PutRunningSecurityGroupSpace"
@@ -83,6 +84,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid", Method: http.MethodGet, Name: GetAppRequest},
 	{Path: "/v2/apps/:app_guid", Method: http.MethodPut, Name: PutAppRequest},
 	{Path: "/v2/apps/:app_guid/bits", Method: http.MethodPut, Name: PutAppBitsRequest},
+	{Path: "/v2/apps/:app_guid/droplet/upload", Method: http.MethodPut, Name: PutDropletRequest},
 	{Path: "/v2/apps/:app_guid/instances", Method: http.MethodGet, Name: GetAppInstancesRequest},
 	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
