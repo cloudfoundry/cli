@@ -13,18 +13,18 @@ import (
 
 var _ = Describe("v3-share-service command", func() {
 	var (
-		sourceOrgName   string
-		sourceSpaceName string
-		targetOrgName   string
-		targetSpaceName string
-		serviceInstance string
+		sourceOrgName     string
+		sourceSpaceName   string
+		sharedToOrgName   string
+		sharedToSpaceName string
+		serviceInstance   string
 	)
 
 	BeforeEach(func() {
 		sourceOrgName = helpers.NewOrgName()
 		sourceSpaceName = helpers.NewSpaceName()
-		targetOrgName = helpers.NewOrgName()
-		targetSpaceName = helpers.NewSpaceName()
+		sharedToOrgName = helpers.NewOrgName()
+		sharedToSpaceName = helpers.NewSpaceName()
 		serviceInstance = helpers.PrefixedRandomName("svc-inst")
 
 		helpers.LoginCF()
@@ -52,7 +52,7 @@ var _ = Describe("v3-share-service command", func() {
 
 	Context("when the service instance name is not provided", func() {
 		It("tells the user that the service instance name is required, prints help text, and exits 1", func() {
-			session := helpers.CF("v3-share-service", "-s", targetSpaceName)
+			session := helpers.CF("v3-share-service", "-s", sharedToSpaceName)
 
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `SERVICE_INSTANCE` was not provided"))
 			Eventually(session.Out).Should(Say("NAME:"))
@@ -71,7 +71,7 @@ var _ = Describe("v3-share-service command", func() {
 	})
 
 	It("displays the experimental warning", func() {
-		session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+		session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 		Eventually(session.Out).Should(Say("This command is in EXPERIMENTAL stage and may change without notice"))
 		Eventually(session).Should(Exit())
 	})
@@ -83,7 +83,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
 				Eventually(session).Should(Exit(1))
@@ -102,7 +102,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.34\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
@@ -121,7 +121,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with error message that the minimum version is not met", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.34\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
@@ -134,7 +134,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
@@ -148,7 +148,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with no org targeted error message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
 				Eventually(session).Should(Exit(1))
@@ -163,7 +163,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with no space targeted error message", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space\\."))
 				Eventually(session).Should(Exit(1))
@@ -182,7 +182,7 @@ var _ = Describe("v3-share-service command", func() {
 			service = helpers.PrefixedRandomName("SERVICE")
 			servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
 
-			helpers.CreateOrgAndSpace(targetOrgName, targetSpaceName)
+			helpers.CreateOrgAndSpace(sharedToOrgName, sharedToSpaceName)
 			setupCF(sourceOrgName, sourceSpaceName)
 
 			domain = defaultSharedDomain()
@@ -190,7 +190,7 @@ var _ = Describe("v3-share-service command", func() {
 
 		AfterEach(func() {
 			helpers.QuickDeleteOrg(sourceOrgName)
-			helpers.QuickDeleteOrg(targetOrgName)
+			helpers.QuickDeleteOrg(sharedToOrgName)
 		})
 
 		Context("when there is a managed service instance in my current targeted space", func() {
@@ -212,25 +212,25 @@ var _ = Describe("v3-share-service command", func() {
 
 			Context("when I want to shared my service instance to a space in another org", func() {
 				It("shares the service instance from my targeted space with the share-to org/space", func() {
-					session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName, "-o", targetOrgName)
+					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when I want to share my service instance into another space in my targeted org", func() {
 				BeforeEach(func() {
-					helpers.CreateSpace(targetSpaceName)
+					helpers.CreateSpace(sharedToSpaceName)
 				})
 
 				It("shares the service instance from my targeted space with the share-to space", func() {
-					session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when the org I want to share into does not exist", func() {
 				It("fails with an org not found error", func() {
-					session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName, "-o", "missing-org")
+					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", "missing-org")
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Organization 'missing-org' not found"))
 					Eventually(session).Should(Exit(1))
@@ -255,18 +255,18 @@ var _ = Describe("v3-share-service command", func() {
 				})
 			})
 
-			Context("when a service instance with the same name exists in the target space", func() {
+			Context("when a service instance with the same name exists in the shared-to space", func() {
 				BeforeEach(func() {
-					helpers.CreateSpace(targetSpaceName)
-					helpers.TargetOrgAndSpace(sourceOrgName, targetSpaceName)
+					helpers.CreateSpace(sharedToSpaceName)
+					helpers.TargetOrgAndSpace(sourceOrgName, sharedToSpaceName)
 					Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					helpers.TargetOrgAndSpace(sourceOrgName, sourceSpaceName)
 				})
 
 				It("fails with a name clash error", func() {
-					session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 					Eventually(session).Should(Say("FAILED"))
-					Eventually(session.Err).Should(Say(fmt.Sprintf("A service instance called %s already exists in %s", serviceInstance, targetSpaceName)))
+					Eventually(session.Err).Should(Say(fmt.Sprintf("A service instance called %s already exists in %s", serviceInstance, sharedToSpaceName)))
 					Eventually(session).Should(Exit(1))
 				})
 			})
@@ -274,7 +274,7 @@ var _ = Describe("v3-share-service command", func() {
 
 		Context("when the service instance does not exist", func() {
 			It("fails with a service instance not found error", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Specified instance not found or not a managed service instance. Sharing is not supported for user provided services."))
 				Eventually(session).Should(Exit(1))
@@ -287,7 +287,7 @@ var _ = Describe("v3-share-service command", func() {
 			})
 
 			It("fails with only managed services can be shared", func() {
-				session := helpers.CF("v3-share-service", serviceInstance, "-s", targetSpaceName)
+				session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("Specified instance not found or not a managed service instance. Sharing is not supported for user provided services."))
 				Eventually(session).Should(Exit(1))

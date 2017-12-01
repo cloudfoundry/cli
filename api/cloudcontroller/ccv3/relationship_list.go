@@ -72,7 +72,7 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 }
 
 // ShareServiceInstanceToSpaces will create a sharing relationship between
-// the service instance and the target space for each space provided.
+// the service instance and the shared-to space for each space provided.
 func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (RelationshipList, Warnings, error) {
 	body, err := json.Marshal(RelationshipList{GUIDs: spaceGUIDs})
 	if err != nil {

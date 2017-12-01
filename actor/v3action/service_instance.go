@@ -9,13 +9,13 @@ import (
 
 type ServiceInstance ccv3.ServiceInstance
 
-func (actor Actor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, targetOrgName string, targetSpaceName string) (Warnings, error) {
-	organization, allWarnings, err := actor.GetOrganizationByName(targetOrgName)
+func (actor Actor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (Warnings, error) {
+	organization, allWarnings, err := actor.GetOrganizationByName(sharedToOrgName)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	warnings, err := actor.ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName, sourceSpaceGUID, organization.GUID, targetSpaceName)
+	warnings, err := actor.ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName, sourceSpaceGUID, organization.GUID, sharedToSpaceName)
 	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {

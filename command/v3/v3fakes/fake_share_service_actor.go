@@ -9,13 +9,13 @@ import (
 )
 
 type FakeShareServiceActor struct {
-	ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, targetOrgGUID string, targetSpaceName string) (v3action.Warnings, error)
+	ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string, sharedToSpaceName string) (v3action.Warnings, error)
 	shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex       sync.RWMutex
 	shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall []struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
-		targetOrgGUID       string
-		targetSpaceName     string
+		sharedToOrgGUID     string
+		sharedToSpaceName   string
 	}
 	shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns struct {
 		result1 v3action.Warnings
@@ -25,13 +25,13 @@ type FakeShareServiceActor struct {
 		result1 v3action.Warnings
 		result2 error
 	}
-	ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, targetOrgName string, targetSpaceName string) (v3action.Warnings, error)
+	ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub        func(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (v3action.Warnings, error)
 	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex       sync.RWMutex
 	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall []struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
-		targetOrgName       string
-		targetSpaceName     string
+		sharedToOrgName     string
+		sharedToSpaceName   string
 	}
 	shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns struct {
 		result1 v3action.Warnings
@@ -54,19 +54,19 @@ type FakeShareServiceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, targetOrgGUID string, targetSpaceName string) (v3action.Warnings, error) {
+func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string, sharedToSpaceName string) (v3action.Warnings, error) {
 	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.Lock()
 	ret, specificReturn := fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameReturnsOnCall[len(fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall)]
 	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall = append(fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall, struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
-		targetOrgGUID       string
-		targetSpaceName     string
-	}{serviceInstanceName, sourceSpaceGUID, targetOrgGUID, targetSpaceName})
-	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, targetOrgGUID, targetSpaceName})
+		sharedToOrgGUID     string
+		sharedToSpaceName   string
+	}{serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName})
+	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName})
 	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.Unlock()
 	if fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub != nil {
-		return fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, targetOrgGUID, targetSpaceName)
+		return fake.ShareServiceInstanceInSpaceByOrganizationAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, sharedToOrgGUID, sharedToSpaceName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -83,7 +83,7 @@ func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndS
 func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall(i int) (string, string, string, string) {
 	fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RLock()
 	defer fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameMutex.RUnlock()
-	return fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].targetOrgGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].targetSpaceName
+	return fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sharedToOrgGUID, fake.shareServiceInstanceInSpaceByOrganizationAndSpaceNameArgsForCall[i].sharedToSpaceName
 }
 
 func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndSpaceNameReturns(result1 v3action.Warnings, result2 error) {
@@ -108,19 +108,19 @@ func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationAndS
 	}{result1, result2}
 }
 
-func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, targetOrgName string, targetSpaceName string) (v3action.Warnings, error) {
+func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (v3action.Warnings, error) {
 	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.Lock()
 	ret, specificReturn := fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturnsOnCall[len(fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall)]
 	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall = append(fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall, struct {
 		serviceInstanceName string
 		sourceSpaceGUID     string
-		targetOrgName       string
-		targetSpaceName     string
-	}{serviceInstanceName, sourceSpaceGUID, targetOrgName, targetSpaceName})
-	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, targetOrgName, targetSpaceName})
+		sharedToOrgName     string
+		sharedToSpaceName   string
+	}{serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName})
+	fake.recordInvocation("ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName", []interface{}{serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName})
 	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.Unlock()
 	if fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub != nil {
-		return fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, targetOrgName, targetSpaceName)
+		return fake.ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameStub(serviceInstanceName, sourceSpaceGUID, sharedToOrgName, sharedToSpaceName)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -137,7 +137,7 @@ func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationName
 func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall(i int) (string, string, string, string) {
 	fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RLock()
 	defer fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameMutex.RUnlock()
-	return fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].targetOrgName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].targetSpaceName
+	return fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].serviceInstanceName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sourceSpaceGUID, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sharedToOrgName, fake.shareServiceInstanceInSpaceByOrganizationNameAndSpaceNameArgsForCall[i].sharedToSpaceName
 }
 
 func (fake *FakeShareServiceActor) ShareServiceInstanceInSpaceByOrganizationNameAndSpaceNameReturns(result1 v3action.Warnings, result2 error) {

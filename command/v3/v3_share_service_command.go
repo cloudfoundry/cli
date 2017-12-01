@@ -16,8 +16,8 @@ import (
 //go:generate counterfeiter . ShareServiceActor
 
 type ShareServiceActor interface {
-	ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, targetOrgGUID string, targetSpaceName string) (v3action.Warnings, error)
-	ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, targetOrgName string, targetSpaceName string) (v3action.Warnings, error)
+	ShareServiceInstanceInSpaceByOrganizationAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgGUID string, sharedToSpaceName string) (v3action.Warnings, error)
+	ShareServiceInstanceInSpaceByOrganizationNameAndSpaceName(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (v3action.Warnings, error)
 	CloudControllerAPIVersion() string
 }
 
