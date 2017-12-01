@@ -261,6 +261,19 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetConfigFeatureFlagsStub        func() ([]ccv2.FeatureFlag, ccv2.Warnings, error)
+	getConfigFeatureFlagsMutex       sync.RWMutex
+	getConfigFeatureFlagsArgsForCall []struct{}
+	getConfigFeatureFlagsReturns     struct {
+		result1 []ccv2.FeatureFlag
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getConfigFeatureFlagsReturnsOnCall map[int]struct {
+		result1 []ccv2.FeatureFlag
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetJobStub        func(jobGUID string) (ccv2.Job, ccv2.Warnings, error)
 	getJobMutex       sync.RWMutex
 	getJobArgsForCall []struct {
@@ -1793,6 +1806,52 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturnsOnCall(i int, resul
 	}
 	fake.getApplicationsReturnsOnCall[i] = struct {
 		result1 []ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetConfigFeatureFlags() ([]ccv2.FeatureFlag, ccv2.Warnings, error) {
+	fake.getConfigFeatureFlagsMutex.Lock()
+	ret, specificReturn := fake.getConfigFeatureFlagsReturnsOnCall[len(fake.getConfigFeatureFlagsArgsForCall)]
+	fake.getConfigFeatureFlagsArgsForCall = append(fake.getConfigFeatureFlagsArgsForCall, struct{}{})
+	fake.recordInvocation("GetConfigFeatureFlags", []interface{}{})
+	fake.getConfigFeatureFlagsMutex.Unlock()
+	if fake.GetConfigFeatureFlagsStub != nil {
+		return fake.GetConfigFeatureFlagsStub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getConfigFeatureFlagsReturns.result1, fake.getConfigFeatureFlagsReturns.result2, fake.getConfigFeatureFlagsReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetConfigFeatureFlagsCallCount() int {
+	fake.getConfigFeatureFlagsMutex.RLock()
+	defer fake.getConfigFeatureFlagsMutex.RUnlock()
+	return len(fake.getConfigFeatureFlagsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetConfigFeatureFlagsReturns(result1 []ccv2.FeatureFlag, result2 ccv2.Warnings, result3 error) {
+	fake.GetConfigFeatureFlagsStub = nil
+	fake.getConfigFeatureFlagsReturns = struct {
+		result1 []ccv2.FeatureFlag
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetConfigFeatureFlagsReturnsOnCall(i int, result1 []ccv2.FeatureFlag, result2 ccv2.Warnings, result3 error) {
+	fake.GetConfigFeatureFlagsStub = nil
+	if fake.getConfigFeatureFlagsReturnsOnCall == nil {
+		fake.getConfigFeatureFlagsReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.FeatureFlag
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getConfigFeatureFlagsReturnsOnCall[i] = struct {
+		result1 []ccv2.FeatureFlag
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -4124,6 +4183,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationRoutesMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()
 	defer fake.getApplicationsMutex.RUnlock()
+	fake.getConfigFeatureFlagsMutex.RLock()
+	defer fake.getConfigFeatureFlagsMutex.RUnlock()
 	fake.getJobMutex.RLock()
 	defer fake.getJobMutex.RUnlock()
 	fake.getOrganizationMutex.RLock()

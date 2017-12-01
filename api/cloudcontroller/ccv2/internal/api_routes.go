@@ -28,6 +28,7 @@ const (
 	GetAppRoutesRequest                                  = "GetAppRoutes"
 	GetAppStatsRequest                                   = "GetAppStats"
 	GetAppsRequest                                       = "GetApps"
+	GetConfigFeatureFlagsRequest                         = "GetConfigFeatureFlags"
 	GetInfoRequest                                       = "GetInfo"
 	GetJobRequest                                        = "GetJob"
 	GetOrganizationPrivateDomainsRequest                 = "GetOrganizationPrivateDomains"
@@ -86,6 +87,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/apps/:app_guid/restage", Method: http.MethodPost, Name: PostAppRestageRequest},
 	{Path: "/v2/apps/:app_guid/routes", Method: http.MethodGet, Name: GetAppRoutesRequest},
 	{Path: "/v2/apps/:app_guid/stats", Method: http.MethodGet, Name: GetAppStatsRequest},
+	{Path: "/v2/config/feature_flags", Method: http.MethodGet, Name: GetConfigFeatureFlagsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: GetInfoRequest},
 	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: GetJobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: GetOrganizationsRequest},

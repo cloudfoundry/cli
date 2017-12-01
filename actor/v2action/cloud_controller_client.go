@@ -23,6 +23,7 @@ type CloudControllerClient interface {
 	GetApplicationInstancesByApplication(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error)
 	GetApplicationRoutes(appGUID string, queries ...ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	GetApplications(queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetConfigFeatureFlags() ([]ccv2.FeatureFlag, ccv2.Warnings, error)
 	GetJob(jobGUID string) (ccv2.Job, ccv2.Warnings, error)
 	GetOrganization(guid string) (ccv2.Organization, ccv2.Warnings, error)
 	GetOrganizationPrivateDomains(orgGUID string, queries ...ccv2.Query) ([]ccv2.Domain, ccv2.Warnings, error)
