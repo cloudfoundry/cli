@@ -36,6 +36,7 @@ type commandList struct {
 	V3Stop               v3.V3StopCommand               `command:"v3-stop" description:"Stop an app"`
 	V3UnsetEnv           v3.V3UnsetEnvCommand           `command:"v3-unset-env" description:"Remove an env variable from an app"`
 	V3ShareService       v3.V3ShareServiceCommand       `command:"v3-share-service" description:"Share a service instance with another space"`
+	V3UnshareService     v3.V3UnshareServiceCommand     `command:"v3-unshare-service" description:"Unshare a shared service instance from a space"`
 	V3SSH                v3.V3SSHCommand                `command:"v3-ssh" description:"SSH to an application container instance"`
 
 	AddPluginRepo                      plugin.AddPluginRepoCommand                  `command:"add-plugin-repo" description:"Add a new plugin repository"`

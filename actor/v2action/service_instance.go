@@ -80,3 +80,26 @@ func (actor Actor) GetServiceInstancesBySpace(spaceGUID string) ([]ServiceInstan
 
 	return serviceInstances, Warnings(warnings), nil
 }
+
+func (actor Actor) GetSharedToSpaceGUID(serviceInstanceName string, sourceSpaceGUID string, sharedToOrgName string, sharedToSpaceName string) (string, Warnings, error) {
+	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
+
+	if err != nil {
+		return "", allWarnings, err
+	}
+
+	sharedTos, apiWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedTos(serviceInstance.GUID)
+	allWarnings = append(allWarnings, apiWarnings...)
+
+	if err != nil {
+		return "", allWarnings, err
+	}
+
+	for _, sharedTo := range sharedTos {
+		if sharedTo.SpaceName == sharedToSpaceName && sharedTo.OrgName == sharedToOrgName {
+			return sharedTo.SpaceGUID, allWarnings, nil
+		}
+	}
+
+	return "", allWarnings, actionerror.ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: serviceInstanceName}
+}

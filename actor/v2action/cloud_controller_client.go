@@ -37,6 +37,7 @@ type CloudControllerClient interface {
 	GetServiceBindings(queries ...ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	GetServiceInstance(serviceInstanceGUID string) (ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetServiceInstanceServiceBindings(serviceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
+	GetServiceInstanceSharedTos(serviceInstanceGUID string) ([]ccv2.ServiceInstanceSharedTo, ccv2.Warnings, error)
 	GetUserProvidedServiceInstanceServiceBindings(userProvidedServiceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	GetServiceInstances(queries ...ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
 	GetServicePlan(servicePlanGUID string) (ccv2.ServicePlan, ccv2.Warnings, error)
