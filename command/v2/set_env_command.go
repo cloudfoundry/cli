@@ -6,9 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/command/translatableerror"
 )
 
-// WorkAroundPrefix is the flag in hole emoji
-const WorkAroundPrefix = "\U000026f3"
-
 type SetEnvCommand struct {
 	RequiredArgs    flag.SetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}             `usage:"CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`

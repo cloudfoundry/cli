@@ -8,6 +8,9 @@ import (
 	flags "github.com/jessevdk/go-flags"
 )
 
+// WorkAroundPrefix is the flag in hole emoji
+const WorkAroundPrefix = "\U000026f3"
+
 type EnvironmentVariable string
 
 func (EnvironmentVariable) Complete(prefix string) []flags.Completion {
@@ -22,4 +25,9 @@ func (EnvironmentVariable) Complete(prefix string) []flags.Completion {
 	}
 
 	return completions(envVars, prefix, true)
+}
+
+func (e *EnvironmentVariable) UnmarshalFlag(val string) error {
+	*e = EnvironmentVariable(strings.TrimLeft(val, WorkAroundPrefix))
+	return nil
 }

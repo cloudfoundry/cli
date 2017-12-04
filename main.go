@@ -10,8 +10,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
-	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -80,11 +80,11 @@ func handleFlagErrorAndCommandHelp(flagErr *flags.Error, parser *flags.Parser, e
 			},
 		)
 
-		if found && flagErr.Type == flags.ErrUnknownFlag && parser.Active.Name == "set-env" {
+		if found && flagErr.Type == flags.ErrUnknownFlag && (parser.Active.Name == "set-env" || parser.Active.Name == "v3-set-env") {
 			newArgs := []string{}
 			for _, arg := range originalArgs {
 				if arg[0] == '-' {
-					newArgs = append(newArgs, fmt.Sprintf("%s%s", v2.WorkAroundPrefix, arg))
+					newArgs = append(newArgs, fmt.Sprintf("%s%s", flag.WorkAroundPrefix, arg))
 				} else {
 					newArgs = append(newArgs, arg)
 				}

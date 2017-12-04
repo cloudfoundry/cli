@@ -219,6 +219,26 @@ var _ = Describe("v3-set-env command", func() {
 					Eventually(session.Out).Should(Say(`"%s": "%s"`, envVarName, envVarValue))
 					Eventually(session).Should(Exit(0))
 				})
+
+				// This is to prevent the '-' being read in as another flag
+				Context("when the environment variable value starts with a '-' character", func() {
+					BeforeEach(func() {
+						envVarValue = "-" + envVarValue
+					})
+
+					It("sets the environment variable value pair", func() {
+						session := helpers.CF("v3-set-env", appName, envVarName, envVarValue)
+
+						Eventually(session.Out).Should(Say("Setting env variable %s for app %s in org %s / space %s as %s\\.\\.\\.", envVarName, appName, orgName, spaceName, userName))
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Use 'cf v3-stage %s' to ensure your env variable changes take effect\\.", appName))
+						Eventually(session).Should(Exit(0))
+
+						session = helpers.CF("curl", fmt.Sprintf("v3/apps/%s/environment_variables", helpers.AppGUID(appName)))
+						Eventually(session.Out).Should(Say(`"%s": "%s"`, envVarName, envVarValue))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 
 			Context("when the environment variable has been previously set", func() {
@@ -240,6 +260,7 @@ var _ = Describe("v3-set-env command", func() {
 					Eventually(session).Should(Exit(0))
 				})
 			})
+
 		})
 	})
 })

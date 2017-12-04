@@ -100,4 +100,34 @@ var _ = Describe("EnvironmentVariable", func() {
 			})
 		})
 	})
+
+	Describe("UnmarshalFlag", func() {
+		var rawFlagValue string
+
+		BeforeEach(func() {
+			envVar = ""
+			rawFlagValue = "SOME_FLAG"
+		})
+
+		JustBeforeEach(func() {
+			_ = envVar.UnmarshalFlag(rawFlagValue)
+		})
+
+		Context("when the env variable value prefix starts with the WorkAroundPrefix", func() {
+			BeforeEach(func() {
+				rawFlagValue = WorkAroundPrefix + "SOME_FLAG"
+			})
+
+			It("removes the WorkAroundPrefix", func() {
+				Expect(string(envVar)).ToNot(ContainSubstring(WorkAroundPrefix))
+				Expect(string(envVar)).To(Equal("SOME_FLAG"))
+			})
+		})
+
+		Context("when the env variable value does not start with the WorkAroundPrefix", func() {
+			It("unmarshals the value with no error", func() {
+				Expect(string(envVar)).To(Equal("SOME_FLAG"))
+			})
+		})
+	})
 })
