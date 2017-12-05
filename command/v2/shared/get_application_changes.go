@@ -64,16 +64,16 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 			})
 	}
 
-	if appConfig.CurrentApplication.DiskQuota != 0 || appConfig.DesiredApplication.DiskQuota != 0 {
+	if appConfig.CurrentApplication.DiskQuota.IsSet || appConfig.DesiredApplication.DiskQuota.IsSet {
 		var currentDiskQuota string
-		if appConfig.CurrentApplication.DiskQuota != 0 {
-			currentDiskQuota = MegabytesToString(appConfig.CurrentApplication.DiskQuota)
+		if appConfig.CurrentApplication.DiskQuota.IsSet {
+			currentDiskQuota = appConfig.CurrentApplication.DiskQuota.String()
 		}
 		changes = append(changes,
 			ui.Change{
 				Header:       "disk quota:",
 				CurrentValue: currentDiskQuota,
-				NewValue:     MegabytesToString(appConfig.DesiredApplication.DiskQuota),
+				NewValue:     appConfig.DesiredApplication.DiskQuota.String(),
 			})
 	}
 
@@ -113,16 +113,16 @@ func GetApplicationChanges(appConfig pushaction.ApplicationConfig) []ui.Change {
 			})
 	}
 
-	if appConfig.CurrentApplication.Memory != 0 || appConfig.DesiredApplication.Memory != 0 {
+	if appConfig.CurrentApplication.Memory.IsSet || appConfig.DesiredApplication.Memory.IsSet {
 		var currentMemory string
-		if appConfig.CurrentApplication.Memory != 0 {
-			currentMemory = MegabytesToString(appConfig.CurrentApplication.Memory)
+		if appConfig.CurrentApplication.Memory.IsSet {
+			currentMemory = appConfig.CurrentApplication.Memory.String()
 		}
 		changes = append(changes,
 			ui.Change{
 				Header:       "memory:",
 				CurrentValue: currentMemory,
-				NewValue:     MegabytesToString(appConfig.DesiredApplication.Memory),
+				NewValue:     appConfig.DesiredApplication.Memory.String(),
 			})
 	}
 

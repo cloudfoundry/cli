@@ -242,8 +242,8 @@ var _ = Describe("GetApplicationChanges", func() {
 
 		DescribeTable("non-empty values",
 			func(existingDiskQuota int, newDiskQuota int, currentValue string, newValue string) {
-				appConfig.CurrentApplication.DiskQuota = uint64(existingDiskQuota)
-				appConfig.DesiredApplication.DiskQuota = uint64(newDiskQuota)
+				appConfig.CurrentApplication.DiskQuota = types.NullByteSizeInMb{IsSet: existingDiskQuota != 0, Value: uint64(existingDiskQuota)}
+				appConfig.DesiredApplication.DiskQuota = types.NullByteSizeInMb{IsSet: true, Value: uint64(newDiskQuota)}
 
 				changes = GetApplicationChanges(appConfig)
 
@@ -381,8 +381,8 @@ var _ = Describe("GetApplicationChanges", func() {
 
 		DescribeTable("non-empty values",
 			func(existingMemory int, newMemory int, currentValue string, newValue string) {
-				appConfig.CurrentApplication.Memory = uint64(existingMemory)
-				appConfig.DesiredApplication.Memory = uint64(newMemory)
+				appConfig.CurrentApplication.Memory = types.NullByteSizeInMb{IsSet: existingMemory != 0, Value: uint64(existingMemory)}
+				appConfig.DesiredApplication.Memory = types.NullByteSizeInMb{IsSet: true, Value: uint64(newMemory)}
 
 				changes = GetApplicationChanges(appConfig)
 

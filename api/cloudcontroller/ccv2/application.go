@@ -46,7 +46,7 @@ type Application struct {
 	DetectedStartCommand types.FilteredString
 
 	// DiskQuota is the disk given to each instance, in megabytes.
-	DiskQuota uint64
+	DiskQuota types.NullByteSizeInMb
 
 	// DockerCredentials is the authentication information for the provided
 	// DockerImage.
@@ -75,7 +75,7 @@ type Application struct {
 	Instances types.NullInt
 
 	// Memory is the memory given to each instance, in megabytes.
-	Memory uint64
+	Memory types.NullByteSizeInMb
 
 	// Name is the name given to the application.
 	Name string
@@ -119,7 +119,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 	ccApp := struct {
 		Buildpack               *string                             `json:"buildpack,omitempty"`
 		Command                 *string                             `json:"command,omitempty"`
-		DiskQuota               uint64                              `json:"disk_quota,omitempty"`
+		DiskQuota               *uint64                             `json:"disk_quota,omitempty"`
 		DockerCredentials       *DockerCredentials                  `json:"docker_credentials,omitempty"`
 		DockerImage             string                              `json:"docker_image,omitempty"`
 		EnvironmentVariables    map[string]string                   `json:"environment_json,omitempty"`
@@ -127,18 +127,16 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		HealthCheckTimeout      int                                 `json:"health_check_timeout,omitempty"`
 		HealthCheckType         constant.ApplicationHealthCheckType `json:"health_check_type,omitempty"`
 		Instances               *int                                `json:"instances,omitempty"`
-		Memory                  uint64                              `json:"memory,omitempty"`
+		Memory                  *uint64                             `json:"memory,omitempty"`
 		Name                    string                              `json:"name,omitempty"`
 		SpaceGUID               string                              `json:"space_guid,omitempty"`
 		StackGUID               string                              `json:"stack_guid,omitempty"`
 		State                   ApplicationState                    `json:"state,omitempty"`
 	}{
-		DiskQuota:            application.DiskQuota,
 		DockerImage:          application.DockerImage,
 		EnvironmentVariables: application.EnvironmentVariables,
 		HealthCheckTimeout:   application.HealthCheckTimeout,
 		HealthCheckType:      application.HealthCheckType,
-		Memory:               application.Memory,
 		Name:                 application.Name,
 		SpaceGUID:            application.SpaceGUID,
 		StackGUID:            application.StackGUID,
@@ -151,6 +149,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 
 	if application.Command.IsSet {
 		ccApp.Command = &application.Command.Value
+	}
+
+	if application.DiskQuota.IsSet {
+		ccApp.DiskQuota = &application.DiskQuota.Value
 	}
 
 	if application.DockerCredentials.Username != "" || application.DockerCredentials.Password != "" {
@@ -168,6 +170,10 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		ccApp.HealthCheckHTTPEndpoint = &application.HealthCheckHTTPEndpoint
 	}
 
+	if application.Memory.IsSet {
+		ccApp.Memory = &application.Memory.Value
+	}
+
 	return json.Marshal(ccApp)
 }
 
@@ -180,7 +186,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			Command              string            `json:"command"`
 			DetectedBuildpack    string            `json:"detected_buildpack"`
 			DetectedStartCommand string            `json:"detected_start_command"`
-			DiskQuota            uint64            `json:"disk_quota"`
+			DiskQuota            *uint64           `json:"disk_quota"`
 			DockerImage          string            `json:"docker_image"`
 			DockerCredentials    DockerCredentials `json:"docker_credentials"`
 			// EnvironmentVariables' values can be any type, so we must accept
@@ -190,7 +196,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			HealthCheckTimeout       int                    `json:"health_check_timeout"`
 			HealthCheckType          string                 `json:"health_check_type"`
 			Instances                json.Number            `json:"instances"`
-			Memory                   uint64                 `json:"memory"`
+			Memory                   *uint64                `json:"memory"`
 			Name                     string                 `json:"name"`
 			PackageState             string                 `json:"package_state"`
 			PackageUpdatedAt         *time.Time             `json:"package_updated_at"`
@@ -208,26 +214,24 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	application.DiskQuota = ccApp.Entity.DiskQuota
-	application.DockerImage = ccApp.Entity.DockerImage
+	application.Buildpack.ParseValue(ccApp.Entity.Buildpack)
+	application.Command.ParseValue(ccApp.Entity.Command)
+	application.DetectedBuildpack.ParseValue(ccApp.Entity.DetectedBuildpack)
+	application.DetectedStartCommand.ParseValue(ccApp.Entity.DetectedStartCommand)
+	application.DiskQuota.ParseUint64Value(ccApp.Entity.DiskQuota)
 	application.DockerCredentials = ccApp.Entity.DockerCredentials
+	application.DockerImage = ccApp.Entity.DockerImage
 	application.GUID = ccApp.Metadata.GUID
 	application.HealthCheckHTTPEndpoint = ccApp.Entity.HealthCheckHTTPEndpoint
 	application.HealthCheckTimeout = ccApp.Entity.HealthCheckTimeout
 	application.HealthCheckType = constant.ApplicationHealthCheckType(ccApp.Entity.HealthCheckType)
-	application.Memory = ccApp.Entity.Memory
+	application.Memory.ParseUint64Value(ccApp.Entity.Memory)
 	application.Name = ccApp.Entity.Name
 	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)
 	application.StackGUID = ccApp.Entity.StackGUID
 	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
 	application.State = ApplicationState(ccApp.Entity.State)
-
-	application.Buildpack.ParseValue(ccApp.Entity.Buildpack)
-	application.DetectedBuildpack.ParseValue(ccApp.Entity.DetectedBuildpack)
-
-	application.Command.ParseValue(ccApp.Entity.Command)
-	application.DetectedStartCommand.ParseValue(ccApp.Entity.DetectedStartCommand)
 
 	if len(ccApp.Entity.EnvironmentVariables) > 0 {
 		envVariableValues := map[string]string{}

@@ -33,18 +33,18 @@ func (actor Actor) CreateApplicationManifestByNameAndSpace(appName string, space
 	manifestApp := manifest.Application{
 		Buildpack:            applicationSummary.Buildpack,
 		Command:              applicationSummary.Command,
+		DiskQuota:            applicationSummary.DiskQuota,
 		DockerImage:          applicationSummary.DockerImage,
 		DockerUsername:       applicationSummary.DockerCredentials.Username,
 		EnvironmentVariables: applicationSummary.EnvironmentVariables,
 		HealthCheckTimeout:   applicationSummary.HealthCheckTimeout,
 		Instances:            applicationSummary.Instances,
+		Memory:               applicationSummary.Memory,
 		Name:                 applicationSummary.Name,
 		Routes:               routes,
 		Services:             services,
 		StackName:            applicationSummary.Stack.Name,
 	}
-	manifestApp.DiskQuota.ParseUint64Value(&applicationSummary.DiskQuota)
-	manifestApp.Memory.ParseUint64Value(&applicationSummary.Memory)
 	if len(routes) < 1 {
 		manifestApp.NoRoute = true
 	}

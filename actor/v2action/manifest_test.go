@@ -62,6 +62,7 @@ var _ = Describe("Manifest Actions", func() {
 						IsSet: true,
 						Value: "some-detected-buildpack",
 					},
+					DiskQuota:   types.NullByteSizeInMb{IsSet: true, Value: 1024},
 					DockerImage: "some-docker-image",
 					DockerCredentials: ccv2.DockerCredentials{
 						Username: "some-docker-username",
@@ -88,8 +89,7 @@ var _ = Describe("Manifest Actions", func() {
 						Value: 10,
 						IsSet: true,
 					},
-					DiskQuota: 1024,
-					Memory:    200,
+					Memory:    types.NullByteSizeInMb{IsSet: true, Value: 200},
 					StackGUID: "some-stack-guid",
 				}
 

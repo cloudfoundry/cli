@@ -18,7 +18,7 @@ func DisplayAppSummary(ui command.UI, appSummary v2action.ApplicationSummary, di
 	usage := ui.TranslateText(
 		"{{.MemorySize}} x {{.NumInstances}} instances",
 		map[string]interface{}{
-			"MemorySize":   bytefmt.ByteSize(uint64(appSummary.Memory) * bytefmt.MEGABYTE),
+			"MemorySize":   appSummary.Memory,
 			"NumInstances": appSummary.Instances.Value,
 		})
 

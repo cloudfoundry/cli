@@ -238,11 +238,11 @@ func (Actor) overrideApplicationProperties(application Application, manifest man
 	}
 
 	if manifest.DiskQuota.IsSet {
-		application.DiskQuota = manifest.DiskQuota.Value
+		application.DiskQuota = manifest.DiskQuota
 	}
 
 	if manifest.Memory.IsSet {
-		application.Memory = manifest.Memory.Value
+		application.Memory = manifest.Memory
 	}
 
 	if manifest.HealthCheckTimeout != 0 {

@@ -42,18 +42,18 @@ func (b *NullByteSizeInMb) ParseStringValue(value string) error {
 }
 
 // ParseUint64Value is used to parse a user provided *uint64 argument.
-func (n *NullByteSizeInMb) ParseUint64Value(val *uint64) {
+func (b *NullByteSizeInMb) ParseUint64Value(val *uint64) {
 	if val == nil {
-		n.IsSet = false
-		n.Value = 0
+		b.IsSet = false
+		b.Value = 0
 		return
 	}
 
-	n.Value = *val
-	n.IsSet = true
+	b.Value = *val
+	b.IsSet = true
 }
 
-func (n *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
+func (b *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
 	var value json.Number
 	err := json.Unmarshal(rawJSON, &value)
 	if err != nil {
@@ -61,8 +61,8 @@ func (n *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
 	}
 
 	if value.String() == "" {
-		n.Value = 0
-		n.IsSet = false
+		b.Value = 0
+		b.IsSet = false
 		return nil
 	}
 
@@ -71,8 +71,8 @@ func (n *NullByteSizeInMb) UnmarshalJSON(rawJSON []byte) error {
 		return err
 	}
 
-	n.Value = valueInt
-	n.IsSet = true
+	b.Value = valueInt
+	b.IsSet = true
 
 	return nil
 }
