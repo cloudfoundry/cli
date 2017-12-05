@@ -33,7 +33,7 @@ var (
 
 func TestPush(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Parallel Push Integration Suite")
+	RunSpecs(t, "Push Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
