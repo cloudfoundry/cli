@@ -20,6 +20,8 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+required = ["github.com/gorilla/websocket"]
+
 [[constraint]]
   branch = "master"
   name = "code.cloudfoundry.org/bytefmt"
