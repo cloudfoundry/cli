@@ -262,6 +262,16 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	case cmd.PathToManifest != "":
 		log.Debug("using specified manifest file")
 		pathToManifest = string(cmd.PathToManifest)
+
+		//TEMP adding logic here. Seems to work. To be reviewed...
+		fileInfo, err := os.Stat(pathToManifest)
+		if err != nil {
+			return nil, err
+		}
+
+		if fileInfo.IsDir() {
+			pathToManifest = filepath.Join(pathToManifest, "manifest.yml")
+		}
 	default:
 		log.Debug("searching for manifest file")
 		pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yml")

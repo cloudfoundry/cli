@@ -288,7 +288,7 @@ var _ = Describe("v2-push Command", func() {
 								Expect(os.RemoveAll(tmpDir)).ToNot(HaveOccurred())
 							})
 
-							Context("via a manfiest.yml in the current directory", func() {
+							Context("via a manifest.yml in the current directory", func() {
 								var expectedApps []manifest.Application
 
 								BeforeEach(func() {
@@ -296,7 +296,7 @@ var _ = Describe("v2-push Command", func() {
 									Expect(err).ToNot(HaveOccurred())
 
 									pathToManifest = filepath.Join(tmpDir, "manifest.yml")
-									err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+									err = ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
 									Expect(err).ToNot(HaveOccurred())
 
 									expectedApps = []manifest.Application{{Name: "some-app"}, {Name: "some-other-app"}}
@@ -358,13 +358,13 @@ var _ = Describe("v2-push Command", func() {
 								})
 							})
 
-							Context("via a manfiest.yaml in the current directory", func() {
+							Context("via a manifest.yaml in the current directory", func() {
 								BeforeEach(func() {
 									err := os.Chdir(tmpDir)
 									Expect(err).ToNot(HaveOccurred())
 
 									pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
-									err = ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+									err = ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
 									Expect(err).ToNot(HaveOccurred())
 								})
 
@@ -379,7 +379,7 @@ var _ = Describe("v2-push Command", func() {
 							Context("via the -f flag", func() {
 								BeforeEach(func() {
 									pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
-									err := ioutil.WriteFile(pathToManifest, []byte("some manfiest file"), 0666)
+									err := ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
 									Expect(err).ToNot(HaveOccurred())
 
 									cmd.PathToManifest = flag.PathWithExistenceCheck(pathToManifest)
