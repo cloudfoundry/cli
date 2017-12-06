@@ -388,6 +388,40 @@ var _ = Describe("Service Instance Actions", func() {
 								"get-service-instance-shared-tos-warning"}))
 						})
 					})
+
+					Context("and is shared with a space with the same name but different capitalization as the specified space", func() {
+						BeforeEach(func() {
+							sharedToSpaceName = "ShArEd-To-SpAcE-nAmE"
+						})
+
+						It("returns the space guid and all warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(spaceGUID).To(Equal("shared-to-space-guid"))
+							Expect(warnings).To(Equal(Warnings{
+								"get-space-service-instances-warning",
+								"get-service-instance-shared-tos-warning"}))
+						})
+					})
+				})
+
+				Context("and is shared with an org with the same name but different capitalization as the specified org", func() {
+					BeforeEach(func() {
+						sharedToOrgName = "Shared-To-Org-Name"
+					})
+
+					Context("and is shared with the specified space", func() {
+						BeforeEach(func() {
+							sharedToSpaceName = "shared-to-space-name"
+						})
+
+						It("returns the space guid and all warnings", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+							Expect(spaceGUID).To(Equal("shared-to-space-guid"))
+							Expect(warnings).To(Equal(Warnings{
+								"get-space-service-instances-warning",
+								"get-service-instance-shared-tos-warning"}))
+						})
+					})
 				})
 			})
 

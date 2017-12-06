@@ -1,6 +1,8 @@
 package v2action
 
 import (
+	"strings"
+
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
@@ -96,7 +98,7 @@ func (actor Actor) GetSharedToSpaceGUID(serviceInstanceName string, sourceSpaceG
 	}
 
 	for _, sharedTo := range sharedTos {
-		if sharedTo.SpaceName == sharedToSpaceName && sharedTo.OrgName == sharedToOrgName {
+		if strings.EqualFold(sharedTo.SpaceName, sharedToSpaceName) && strings.EqualFold(sharedTo.OrgName, sharedToOrgName) {
 			return sharedTo.SpaceGUID, allWarnings, nil
 		}
 	}
