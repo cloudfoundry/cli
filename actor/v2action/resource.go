@@ -31,6 +31,7 @@ func (actor Actor) ResourceMatch(allResources []Resource) ([]Resource, []Resourc
 	resourcesToSend := [][]ccv2.Resource{{}}
 	var currentList, sendCount int
 	for _, resource := range allResources {
+		// If directory skip. TODO: skip symlinks
 		if resource.Size == 0 {
 			continue
 		}

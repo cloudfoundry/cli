@@ -69,9 +69,14 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 		}
 
 		resource := Resource{Filename: filename}
-		if archivedFile.FileInfo().IsDir() {
+		info := archivedFile.FileInfo()
+
+		switch {
+		case info.IsDir():
 			resource.Mode = DefaultFolderPermissions
-		} else {
+		case info.Mode()&os.ModeSymlink == os.ModeSymlink:
+			resource.Mode = info.Mode()
+		default:
 			fileReader, err := archivedFile.Open()
 			if err != nil {
 				return nil, err
@@ -89,6 +94,7 @@ func (actor Actor) GatherArchiveResources(archivePath string) ([]Resource, error
 			resource.SHA1 = fmt.Sprintf("%x", hash.Sum(nil))
 			resource.Size = archivedFile.FileInfo().Size()
 		}
+
 		resources = append(resources, resource)
 	}
 	return resources, nil
@@ -113,17 +119,17 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 		return nil, err
 	}
 
-	walkErr := filepath.Walk(evalDir, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(evalDir, func(fullPath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
 		// if file ignored contine to the next file
-		if gitIgnore.MatchesPath(path) {
+		if gitIgnore.MatchesPath(fullPath) {
 			return nil
 		}
 
-		relPath, err := filepath.Rel(evalDir, path)
+		relPath, err := filepath.Rel(evalDir, fullPath)
 		if err != nil {
 			return err
 		}
@@ -136,10 +142,19 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 			Filename: filepath.ToSlash(relPath),
 		}
 
-		if info.IsDir() {
+		switch {
+		case info.IsDir():
+			// If the file is a directory
 			resource.Mode = DefaultFolderPermissions
-		} else {
-			file, err := os.Open(path)
+		case info.Mode()&os.ModeSymlink == os.ModeSymlink:
+			// If the file is a Symlink we just set the mode of the file
+			// We won't be using any sha information since we don't do
+			// any resource matching on symlinks.
+			resource.Mode = fixMode(info.Mode())
+		default:
+			// If the file is regular we want to open
+			// and calculate the sha of the file
+			file, err := os.Open(fullPath)
 			if err != nil {
 				return err
 			}
@@ -155,6 +170,7 @@ func (actor Actor) GatherDirectoryResources(sourceDir string) ([]Resource, error
 			resource.SHA1 = fmt.Sprintf("%x", sum.Sum(nil))
 			resource.Size = info.Size()
 		}
+
 		resources = append(resources, resource)
 		return nil
 	})
@@ -199,20 +215,23 @@ func (actor Actor) ZipArchiveResources(sourceArchivePath string, filesToInclude 
 		}
 
 		log.WithField("archiveFileName", archiveFile.Name).Debug("zipping file")
+		// archiveFile.Open opens the symlink file, not the file it points too
 		reader, openErr := archiveFile.Open()
 		if openErr != nil {
 			log.WithField("archiveFile", archiveFile.Name).Errorln("opening path in dir:", openErr)
 			return "", openErr
 		}
+		defer reader.Close()
 
 		err = actor.addFileToZipFromFileSystem(
 			resource.Filename, reader, archiveFile.FileInfo(),
-			resource.Filename, resource.SHA1, resource.Mode, writer,
+			resource, writer,
 		)
 		if err != nil {
 			log.WithField("archiveFileName", archiveFile.Name).Errorln("zipping file:", err)
 			return "", err
 		}
+		reader.Close()
 	}
 
 	log.WithFields(log.Fields{
@@ -240,25 +259,36 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 		fullPath := filepath.Join(sourceDir, resource.Filename)
 		log.WithField("fullPath", fullPath).Debug("zipping file")
 
-		srcFile, err := os.Open(fullPath)
-		if err != nil {
-			log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
-			return "", err
-		}
-
-		fileInfo, err := srcFile.Stat()
+		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			log.WithField("fullPath", fullPath).Errorln("stat error in dir:", err)
 			return "", err
 		}
 
-		err = actor.addFileToZipFromFileSystem(
-			fullPath, srcFile, fileInfo,
-			resource.Filename, resource.SHA1, resource.Mode, writer,
-		)
-		if err != nil {
-			log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
-			return "", err
+		if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
+			// we need to user os.Readlink to read a symlink file from a directory
+			err = actor.addLinkToZipFromFileSystem(fullPath, fileInfo, resource, writer)
+			if err != nil {
+				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
+				return "", err
+			}
+		} else {
+			srcFile, err := os.Open(fullPath)
+			defer srcFile.Close()
+			if err != nil {
+				log.WithField("fullPath", fullPath).Errorln("opening path in dir:", err)
+				return "", err
+			}
+
+			err = actor.addFileToZipFromFileSystem(
+				fullPath, srcFile, fileInfo,
+				resource, writer,
+			)
+			srcFile.Close()
+			if err != nil {
+				log.WithField("fullPath", fullPath).Errorln("zipping file:", err)
+				return "", err
+			}
 		}
 	}
 
@@ -269,31 +299,23 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 	return zipFile.Name(), nil
 }
 
-func (Actor) addFileToZipFromFileSystem(
-	srcPath string, srcFile io.ReadCloser, fileInfo os.FileInfo,
-	destPath string, sha1Sum string, mode os.FileMode, zipFile *zip.Writer,
+func (Actor) addLinkToZipFromFileSystem(srcPath string,
+	fileInfo os.FileInfo, resource Resource,
+	zipFile *zip.Writer,
 ) error {
-	defer srcFile.Close()
-
 	header, err := zip.FileInfoHeader(fileInfo)
 	if err != nil {
 		log.WithField("srcPath", srcPath).Errorln("getting file info in dir:", err)
 		return err
 	}
 
-	// An extra '/' indicates that this file is a directory
-	if fileInfo.IsDir() && !strings.HasSuffix(destPath, "/") {
-		destPath += "/"
-	}
-
-	header.Name = destPath
+	header.Name = resource.Filename
 	header.Method = zip.Deflate
 
-	header.SetMode(mode)
 	log.WithFields(log.Fields{
 		"srcPath":  srcPath,
-		"destPath": destPath,
-		"mode":     mode,
+		"destPath": header.Name,
+		"mode":     header.Mode,
 	}).Debug("setting mode for file")
 
 	destFileWriter, err := zipFile.CreateHeader(header)
@@ -302,22 +324,68 @@ func (Actor) addFileToZipFromFileSystem(
 		return err
 	}
 
-	if !fileInfo.IsDir() {
-		sum := sha1.New()
+	pathInSymlink, err := os.Readlink(srcPath)
+	if err != nil {
+		return err
+	}
+	log.WithField("path", pathInSymlink).Debug("resolving symlink")
+	symLinkContents := strings.NewReader(pathInSymlink)
+	if _, err := io.Copy(destFileWriter, symLinkContents); err != nil {
+		log.WithField("srcPath", srcPath).Errorln("copying data in dir:", err)
+		return err
+	}
 
+	return nil
+}
+
+func (Actor) addFileToZipFromFileSystem(srcPath string,
+	srcFile io.Reader, fileInfo os.FileInfo, resource Resource,
+	zipFile *zip.Writer,
+) error {
+	header, err := zip.FileInfoHeader(fileInfo)
+	if err != nil {
+		log.WithField("srcPath", srcPath).Errorln("getting file info in dir:", err)
+		return err
+	}
+
+	header.Name = resource.Filename
+
+	// An extra '/' indicates that this file is a directory
+	if fileInfo.IsDir() && !strings.HasSuffix(resource.Filename, "/") {
+		header.Name += "/"
+	}
+	header.Method = zip.Deflate
+
+	log.WithFields(log.Fields{
+		"srcPath":  srcPath,
+		"destPath": header.Name,
+		"mode":     header.Mode,
+	}).Debug("setting mode for file")
+
+	destFileWriter, err := zipFile.CreateHeader(header)
+	if err != nil {
+		log.Errorln("creating header:", err)
+		return err
+	}
+
+	if fileInfo.Mode().IsRegular() {
+		sum := sha1.New()
 		multi := io.MultiWriter(sum, destFileWriter)
+
 		if _, err := io.Copy(multi, srcFile); err != nil {
 			log.WithField("srcPath", srcPath).Errorln("copying data in dir:", err)
 			return err
 		}
 
-		if currentSum := fmt.Sprintf("%x", sum.Sum(nil)); sha1Sum != currentSum {
+		if currentSum := fmt.Sprintf("%x", sum.Sum(nil)); resource.SHA1 != currentSum {
 			log.WithFields(log.Fields{
-				"expected":   sha1Sum,
+				"expected":   resource.SHA1,
 				"currentSum": currentSum,
 			}).Error("setting mode for file")
 			return actionerror.FileChangedError{Filename: srcPath}
 		}
+	} else if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
+		io.Copy(destFileWriter, srcFile)
 	}
 
 	return nil

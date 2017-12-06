@@ -69,14 +69,26 @@ func zipit(source, target, prefix string) error {
 			return nil
 		}
 
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
+		if info.Mode().IsRegular() {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
 
-		_, err = io.Copy(writer, file)
-		return err
+			_, err = io.Copy(writer, file)
+			return err
+		} else if info.Mode()&os.ModeSymlink != 0 {
+			pathInSymlink, err := os.Readlink(path)
+			if err != nil {
+				return err
+			}
+			symLinkContents := strings.NewReader(pathInSymlink)
+			if _, err := io.Copy(writer, symLinkContents); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 
 	return err

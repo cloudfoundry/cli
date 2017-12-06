@@ -42,6 +42,9 @@ fly-windows-plugin : check-target-env
 fly-windows-push : check-target-env
 	CF_TEST_SUITE=./integration/push fly -t ci execute -c ci/cli/tasks/integration-windows-oneoff.yml -i cli=./ -x
 
+fly-windows-units :
+	fly -t ci execute -c ci/cli/tasks/units-windows.yml -i cli=./ -x -i cli-ci=./
+
 i18n :
 	$(PWD)/bin/i18n-checkup
 

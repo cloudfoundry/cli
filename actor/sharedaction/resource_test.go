@@ -41,6 +41,12 @@ var _ = Describe("Resource Actions", func() {
 
 		err = ioutil.WriteFile(filepath.Join(srcDir, "tmpFile3"), []byte("Bananarama"), 0600)
 		Expect(err).ToNot(HaveOccurred())
+
+		relativePath, err := filepath.Rel(srcDir, subDir)
+		Expect(err).ToNot(HaveOccurred())
+
+		err = os.Symlink(filepath.Join(relativePath, "tmpFile1"), filepath.Join(srcDir, "symlink1"))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -83,44 +89,84 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		Context("when the files have not been changed since scanning them", func() {
-			BeforeEach(func() {
-				resources = []Resource{
-					{Filename: "/"},
-					{Filename: "/level1/"},
-					{Filename: "/level1/level2/"},
-					{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
-					{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
-					// Explicitly skipping /tmpFile3
-				}
+			Context("when there are no symlinks", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "/"},
+						{Filename: "/level1/"},
+						{Filename: "/level1/level2/"},
+						{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+						{Filename: "/tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
+						// Explicitly skipping /tmpFile3
+					}
+				})
+
+				It("zips the file and returns a populated resources list", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(resultZip).ToNot(BeEmpty())
+					zipFile, err := os.Open(resultZip)
+					Expect(err).ToNot(HaveOccurred())
+					defer zipFile.Close()
+
+					zipInfo, err := zipFile.Stat()
+					Expect(err).ToNot(HaveOccurred())
+
+					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(reader.File).To(HaveLen(5))
+					Expect(reader.File[0].Name).To(Equal("/"))
+					Expect(reader.File[1].Name).To(Equal("/level1/"))
+					Expect(reader.File[2].Name).To(Equal("/level1/level2/"))
+					Expect(reader.File[3].Name).To(Equal("/level1/level2/tmpFile1"))
+					Expect(reader.File[4].Name).To(Equal("/tmpFile2"))
+
+					expectFileContentsToEqual(reader.File[3], "why hello")
+					expectFileContentsToEqual(reader.File[4], "Hello, Binky")
+
+					for _, file := range reader.File {
+						Expect(file.Method).To(Equal(zip.Deflate))
+					}
+				})
 			})
 
-			It("zips the file and returns a populated resources list", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
+			Context("when there are relative symlink files", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "/"},
+						{Filename: "/level1/"},
+						{Filename: "/level1/level2/"},
+						{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+						{Filename: "/symlink1", Mode: os.ModeSymlink | 0777},
+					}
+				})
 
-				Expect(resultZip).ToNot(BeEmpty())
-				zipFile, err := os.Open(resultZip)
-				Expect(err).ToNot(HaveOccurred())
-				defer zipFile.Close()
+				It("zips the file and returns a populated resources list", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
 
-				zipInfo, err := zipFile.Stat()
-				Expect(err).ToNot(HaveOccurred())
+					Expect(resultZip).ToNot(BeEmpty())
+					zipFile, err := os.Open(resultZip)
+					Expect(err).ToNot(HaveOccurred())
+					defer zipFile.Close()
 
-				reader, err := ykk.NewReader(zipFile, zipInfo.Size())
-				Expect(err).ToNot(HaveOccurred())
+					zipInfo, err := zipFile.Stat()
+					Expect(err).ToNot(HaveOccurred())
 
-				Expect(reader.File).To(HaveLen(5))
-				Expect(reader.File[0].Name).To(Equal("/"))
-				Expect(reader.File[1].Name).To(Equal("/level1/"))
-				Expect(reader.File[2].Name).To(Equal("/level1/level2/"))
-				Expect(reader.File[3].Name).To(Equal("/level1/level2/tmpFile1"))
-				Expect(reader.File[4].Name).To(Equal("/tmpFile2"))
+					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+					Expect(err).ToNot(HaveOccurred())
 
-				expectFileContentsToEqual(reader.File[3], "why hello")
-				expectFileContentsToEqual(reader.File[4], "Hello, Binky")
+					Expect(reader.File).To(HaveLen(5))
+					Expect(reader.File[0].Name).To(Equal("/"))
+					Expect(reader.File[1].Name).To(Equal("/level1/"))
+					Expect(reader.File[2].Name).To(Equal("/level1/level2/"))
+					Expect(reader.File[3].Name).To(Equal("/level1/level2/tmpFile1"))
+					Expect(reader.File[4].Name).To(Equal("/symlink1"))
 
-				for _, file := range reader.File {
-					Expect(file.Method).To(Equal(zip.Deflate))
-				}
+					expectFileContentsToEqual(reader.File[3], "why hello")
+					Expect(reader.File[4].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
+					expectFileContentsToEqual(reader.File[4], filepath.FromSlash("level1/level2/tmpFile1"))
+				})
 			})
 		})
 
@@ -158,44 +204,82 @@ var _ = Describe("Resource Actions", func() {
 		})
 
 		Context("when the files have not been changed since scanning them", func() {
-			BeforeEach(func() {
-				resources = []Resource{
-					{Filename: "level1"},
-					{Filename: "level1/level2"},
-					{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
-					{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
-					{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879"},
-				}
+			Context("when there are no symlinks", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "level1"},
+						{Filename: "level1/level2"},
+						{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+						{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95"},
+						{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879"},
+					}
+				})
+
+				It("zips the file and returns a populated resources list", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(resultZip).ToNot(BeEmpty())
+					zipFile, err := os.Open(resultZip)
+					Expect(err).ToNot(HaveOccurred())
+					defer zipFile.Close()
+
+					zipInfo, err := zipFile.Stat()
+					Expect(err).ToNot(HaveOccurred())
+
+					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(reader.File).To(HaveLen(5))
+					Expect(reader.File[0].Name).To(Equal("level1/"))
+					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
+					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
+					Expect(reader.File[3].Name).To(Equal("tmpFile2"))
+					Expect(reader.File[4].Name).To(Equal("tmpFile3"))
+
+					expectFileContentsToEqual(reader.File[2], "why hello")
+					expectFileContentsToEqual(reader.File[3], "Hello, Binky")
+					expectFileContentsToEqual(reader.File[4], "Bananarama")
+
+					for _, file := range reader.File {
+						Expect(file.Method).To(Equal(zip.Deflate))
+					}
+				})
 			})
 
-			It("zips the file and returns a populated resources list", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
+			Context("when there are relative symlink files", func() {
+				BeforeEach(func() {
+					resources = []Resource{
+						{Filename: "level1"},
+						{Filename: "level1/level2"},
+						{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
+						{Filename: "symlink1", Mode: os.ModeSymlink},
+					}
+				})
 
-				Expect(resultZip).ToNot(BeEmpty())
-				zipFile, err := os.Open(resultZip)
-				Expect(err).ToNot(HaveOccurred())
-				defer zipFile.Close()
+				It("zips the file and returns a populated resources list", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
 
-				zipInfo, err := zipFile.Stat()
-				Expect(err).ToNot(HaveOccurred())
+					Expect(resultZip).ToNot(BeEmpty())
+					zipFile, err := os.Open(resultZip)
+					Expect(err).ToNot(HaveOccurred())
+					defer zipFile.Close()
 
-				reader, err := ykk.NewReader(zipFile, zipInfo.Size())
-				Expect(err).ToNot(HaveOccurred())
+					zipInfo, err := zipFile.Stat()
+					Expect(err).ToNot(HaveOccurred())
 
-				Expect(reader.File).To(HaveLen(5))
-				Expect(reader.File[0].Name).To(Equal("level1/"))
-				Expect(reader.File[1].Name).To(Equal("level1/level2/"))
-				Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
-				Expect(reader.File[3].Name).To(Equal("tmpFile2"))
-				Expect(reader.File[4].Name).To(Equal("tmpFile3"))
+					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
+					Expect(err).ToNot(HaveOccurred())
 
-				expectFileContentsToEqual(reader.File[2], "why hello")
-				expectFileContentsToEqual(reader.File[3], "Hello, Binky")
-				expectFileContentsToEqual(reader.File[4], "Bananarama")
+					Expect(reader.File).To(HaveLen(4))
+					Expect(reader.File[0].Name).To(Equal("level1/"))
+					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
+					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
+					Expect(reader.File[3].Name).To(Equal("symlink1"))
 
-				for _, file := range reader.File {
-					Expect(file.Method).To(Equal(zip.Deflate))
-				}
+					expectFileContentsToEqual(reader.File[2], "why hello")
+					Expect(reader.File[3].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
+					expectFileContentsToEqual(reader.File[3], filepath.FromSlash("level1/level2/tmpFile1"))
+				})
 			})
 		})
 
