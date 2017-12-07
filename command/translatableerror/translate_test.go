@@ -100,6 +100,7 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("RunTaskError", RunTaskError{}),
 		Entry("SecurityGroupNotFoundError", SecurityGroupNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
+		Entry("SharedServiceInstanceNotFoundError", SharedServiceInstanceNotFoundError{}),
 		Entry("SpaceNotFoundError", SpaceNotFoundError{}),
 		Entry("SSHUnableToAuthenticateError", SSHUnableToAuthenticateError{}),
 		Entry("SSLCertError", SSLCertError{}),

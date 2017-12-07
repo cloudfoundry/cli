@@ -198,7 +198,7 @@ var _ = Describe("Space", func() {
 						nil, ccv3.Warnings{"some-space-warning"}, nil)
 				})
 
-				It("returns back the first space and warnings", func() {
+				It("returns a SpaceNotFoundError and warnings", func() {
 					Expect(executeErr).To(MatchError(actionerror.SpaceNotFoundError{Name: spaceName}))
 
 					Expect(warnings).To(ConsistOf("some-space-warning"))

@@ -204,6 +204,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			actionerror.ServiceInstanceNotFoundError{Name: "some-service-instance"},
 			ServiceInstanceNotFoundError{Name: "some-service-instance"}),
 
+		Entry("actionerror.SharedServiceInstanceNotFoundError -> SharedServiceInstanceNotFoundError",
+			actionerror.SharedServiceInstanceNotFoundError{},
+			SharedServiceInstanceNotFoundError{}),
+
 		Entry("actionerror.SpaceNotFoundError -> SpaceNotFoundError",
 			actionerror.SpaceNotFoundError{Name: "some-space"},
 			SpaceNotFoundError{Name: "some-space"}),

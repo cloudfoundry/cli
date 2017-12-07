@@ -29,7 +29,7 @@ func (actor Actor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(service
 	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
 
 	if _, ok := err.(actionerror.ServiceInstanceNotFoundError); ok == true {
-		return allWarnings, actionerror.SharedServiceInstanceNotFound{}
+		return allWarnings, actionerror.SharedServiceInstanceNotFoundError{}
 	}
 
 	if err != nil {

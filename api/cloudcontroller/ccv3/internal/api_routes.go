@@ -49,7 +49,7 @@ const (
 	PostIsolationSegmentRelationshipOrganizationsRequest    = "PostIsolationSegmentRelationshipOrganizations"
 	PostIsolationSegmentsRequest                            = "PostIsolationSegments"
 	PostPackageRequest                                      = "PostPackageRequest"
-	PostServiceInstanceRelationshipSharedSpacesRequest      = "PostServiceInstanceRelationshipSharedSpaces"
+	PostServiceInstanceRelationshipsSharedSpacesRequest     = "PostServiceInstanceRelationshipsSharedSpaces"
 	PutTaskCancelRequest                                    = "PutTaskCancelRequest"
 )
 
@@ -104,7 +104,7 @@ var APIRoutes = []Route{
 	{Path: "/:package_guid", Method: http.MethodGet, Name: GetPackageRequest, Resource: PackagesResource},
 	{Path: "/:process_guid", Method: http.MethodPatch, Name: PatchApplicationProcessHealthCheckRequest, Resource: ProcessesResource},
 	{Path: "/:process_guid/stats", Method: http.MethodGet, Name: GetProcessInstancesRequest, Resource: ProcessesResource},
-	{Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipSharedSpacesRequest, Resource: ServiceInstancesResource},
+	{Path: "/:service_instance_guid/relationships/shared_spaces", Method: http.MethodPost, Name: PostServiceInstanceRelationshipsSharedSpacesRequest, Resource: ServiceInstancesResource},
 	{Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodGet, Name: GetSpaceRelationshipIsolationSegmentRequest, Resource: SpacesResource},
 	{Path: "/:space_guid/relationships/isolation_segment", Method: http.MethodPatch, Name: PatchSpaceRelationshipIsolationSegmentRequest, Resource: SpacesResource},
 	{Path: "/:task_guid/cancel", Method: http.MethodPut, Name: PutTaskCancelRequest, Resource: TasksResource},

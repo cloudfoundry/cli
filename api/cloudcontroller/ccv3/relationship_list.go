@@ -80,7 +80,7 @@ func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, s
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.PostServiceInstanceRelationshipSharedSpacesRequest,
+		RequestName: internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
 		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
 		Body:        bytes.NewReader(body),
 	})

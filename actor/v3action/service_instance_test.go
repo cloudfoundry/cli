@@ -137,7 +137,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns error", func() {
-				Expect(executionError).To(Equal(actionerror.SharedServiceInstanceNotFound{}))
+				Expect(executionError).To(Equal(actionerror.SharedServiceInstanceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("some-service-instance-warning"))
 			})
 		})

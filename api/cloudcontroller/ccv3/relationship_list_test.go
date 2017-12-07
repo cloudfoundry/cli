@@ -112,7 +112,7 @@ var _ = Describe("RelationshipList", func() {
 			relationshipList, warnings, executeErr = client.ShareServiceInstanceToSpaces(serviceInstanceGUID, spaceGUIDs)
 		})
 
-		Context("when the delete is successful", func() {
+		Context("when no errors are encountered", func() {
 			BeforeEach(func() {
 				response := `{
 					"data": [
