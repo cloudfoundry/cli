@@ -265,6 +265,7 @@ func (actor Actor) ZipDirectoryResources(sourceDir string, filesToInclude []Reso
 			return "", err
 		}
 
+		log.WithField("file-mode", fileInfo.Mode().String()).Debug("resource file info")
 		if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
 			// we need to user os.Readlink to read a symlink file from a directory
 			err = actor.addLinkToZipFromFileSystem(fullPath, fileInfo, resource, writer)
@@ -315,7 +316,7 @@ func (Actor) addLinkToZipFromFileSystem(srcPath string,
 	log.WithFields(log.Fields{
 		"srcPath":  srcPath,
 		"destPath": header.Name,
-		"mode":     header.Mode,
+		"mode":     header.Mode().String(),
 	}).Debug("setting mode for file")
 
 	destFileWriter, err := zipFile.CreateHeader(header)
@@ -355,11 +356,12 @@ func (Actor) addFileToZipFromFileSystem(srcPath string,
 		header.Name += "/"
 	}
 	header.Method = zip.Deflate
+	header.SetMode(resource.Mode)
 
 	log.WithFields(log.Fields{
 		"srcPath":  srcPath,
 		"destPath": header.Name,
-		"mode":     header.Mode,
+		"mode":     header.Mode().String(),
 	}).Debug("setting mode for file")
 
 	destFileWriter, err := zipFile.CreateHeader(header)

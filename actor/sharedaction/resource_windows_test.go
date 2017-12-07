@@ -368,9 +368,9 @@ var _ = Describe("Resource Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(reader.File).To(HaveLen(5))
-				Expect(reader.File[2].Mode()).To(Equal(os.FileMode(0766)))
-				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0766)))
-				Expect(reader.File[4].Mode()).To(Equal(os.FileMode(0766)))
+				Expect(reader.File[2].Mode()).To(Equal(os.FileMode(0766)), reader.File[2].Name)
+				Expect(reader.File[3].Mode()).To(Equal(os.FileMode(0766)), reader.File[3].Name)
+				Expect(reader.File[4].Mode()).To(Equal(os.FileMode(0766)), reader.File[4].Name)
 			})
 		})
 	})
