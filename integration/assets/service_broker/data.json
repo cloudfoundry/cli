@@ -38,7 +38,8 @@
                 "blurb": "fake broker that is fake",
                 "longDescription": "A long time ago, in a galaxy far far away..."
               },
-              "displayName": "The Fake Broker"
+              "displayName": "The Fake Broker",
+              "shareable": true
             },
             "dashboard_client": {
               "id": "sso-test",

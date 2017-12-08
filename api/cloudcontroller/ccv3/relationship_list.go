@@ -70,3 +70,30 @@ func (client *Client) EntitleIsolationSegmentToOrganizations(isolationSegmentGUI
 	err = client.connection.Make(request, &response)
 	return relationships, response.Warnings, err
 }
+
+// ShareServiceInstanceToSpaces will create a sharing relationship between
+// the service instance and the shared-to space for each space provided.
+func (client *Client) ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (RelationshipList, Warnings, error) {
+	body, err := json.Marshal(RelationshipList{GUIDs: spaceGUIDs})
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.PostServiceInstanceRelationshipsSharedSpacesRequest,
+		URIParams:   internal.Params{"service_instance_guid": serviceInstanceGUID},
+		Body:        bytes.NewReader(body),
+	})
+
+	if err != nil {
+		return RelationshipList{}, nil, err
+	}
+
+	var relationships RelationshipList
+	response := cloudcontroller.Response{
+		Result: &relationships,
+	}
+
+	err = client.connection.Make(request, &response)
+	return relationships, response.Warnings, err
+}

@@ -99,6 +99,8 @@ func ConvertToTranslatableError(err error) error {
 		return SecurityGroupNotFoundError(e)
 	case actionerror.ServiceInstanceNotFoundError:
 		return ServiceInstanceNotFoundError(e)
+	case actionerror.SharedServiceInstanceNotFoundError:
+		return SharedServiceInstanceNotFoundError(e)
 	case actionerror.SpaceNotFoundError:
 		return SpaceNotFoundError{Name: e.Name}
 	case actionerror.StackNotFoundError:
