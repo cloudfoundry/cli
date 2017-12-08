@@ -210,7 +210,7 @@ var _ = Describe("v3-share-service command", func() {
 				broker.Destroy()
 			})
 
-			Context("when I want to shared my service instance to a space in another org", func() {
+			Context("when I want to share my service instance to a space in another org", func() {
 				It("shares the service instance from my targeted space with the share-to org/space", func() {
 					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
 					Eventually(session).Should(Exit(0))
@@ -242,6 +242,29 @@ var _ = Describe("v3-share-service command", func() {
 					session := helpers.CF("v3-share-service", serviceInstance, "-s", "missing-space")
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Space 'missing-space' not found"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when I am a SpaceAuditor in the space I want to share into", func() {
+				BeforeEach(func() {
+					user := helpers.NewUsername()
+					password := helpers.NewPassword()
+					Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
+					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
+					Eventually(helpers.CF("set-space-role", user, sharedToOrgName, sharedToSpaceName, "SpaceAuditor")).Should(Exit(0))
+					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					Eventually(helpers.CF("target", "-o", sourceOrgName, "-s", sourceSpaceName)).Should(Exit(0))
+				})
+
+				AfterEach(func() {
+					setupCF(sourceOrgName, sourceSpaceName)
+				})
+
+				It("fails with an unauthorized error", func() {
+					session := helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
 					Eventually(session).Should(Exit(1))
 				})
 			})
