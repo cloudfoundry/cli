@@ -184,7 +184,7 @@ var _ = Describe("push with symlinked resources", func() {
 			})
 		})
 
-		Context("when the directory contains a symlink to a file outside the directory", func() {
+		PContext("when the directory contains a symlink to a file outside the directory", func() {
 			var targetPath string
 
 			BeforeEach(func() {
@@ -199,17 +199,15 @@ var _ = Describe("push with symlinked resources", func() {
 				Expect(os.Remove(targetPath))
 			})
 
-			Context("when pushing a symlinked file", func() {
-				It("should push the symlinked file", func() {
-					helpers.WithHelloWorldApp(func(dir string) {
-						err := os.Symlink(targetPath, filepath.Join(dir, "symlinkFile"))
-						Expect(err).ToNot(HaveOccurred())
+			It("it should fail with an upload invalid error", func() {
+				helpers.WithHelloWorldApp(func(dir string) {
+					err := os.Symlink(targetPath, filepath.Join(dir, "symlinkFile"))
+					Expect(err).ToNot(HaveOccurred())
 
-						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
+					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, appName, "--no-start")
 
-						Eventually(session.Err).Should(Say("The app upload is invalid: Symlink\\(s\\) point outside of root folder"))
-						Eventually(session).Should(Exit(1))
-					})
+					Eventually(session.Err).Should(Say("The app upload is invalid: Symlink\\(s\\) point outside of root folder"))
+					Eventually(session).Should(Exit(1))
 				})
 			})
 		})
