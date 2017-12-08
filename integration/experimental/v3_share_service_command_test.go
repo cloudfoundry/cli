@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("v3-share-service command", func() {
+var _ = PDescribe("v3-share-service command", func() {
 	var (
 		sourceOrgName     string
 		sourceSpaceName   string
