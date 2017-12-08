@@ -14,9 +14,9 @@ var _ = Describe("Process Actions", func() {
 		BeforeEach(func() {
 			summary = ProcessSummary{
 				InstanceDetails: []Instance{
-					Instance{State: "RUNNING"},
-					Instance{State: "RUNNING"},
-					Instance{State: "STOPPED"},
+					Instance{State: constant.ProcessInstanceRunning},
+					Instance{State: constant.ProcessInstanceRunning},
+					Instance{State: constant.ProcessInstanceDown},
 				},
 			}
 		})
@@ -44,8 +44,8 @@ var _ = Describe("Process Actions", func() {
 						Type: "worker",
 					},
 					InstanceDetails: []Instance{
-						{State: "RUNNING"},
-						{State: "STOPPED"},
+						{State: constant.ProcessInstanceRunning},
+						{State: constant.ProcessInstanceDown},
 					},
 				},
 				{
@@ -53,7 +53,7 @@ var _ = Describe("Process Actions", func() {
 						Type: "console",
 					},
 					InstanceDetails: []Instance{
-						{State: "RUNNING"},
+						{State: constant.ProcessInstanceRunning},
 					},
 				},
 				{
@@ -61,9 +61,9 @@ var _ = Describe("Process Actions", func() {
 						Type: constant.ProcessTypeWeb,
 					},
 					InstanceDetails: []Instance{
-						{State: "RUNNING"},
-						{State: "RUNNING"},
-						{State: "STOPPED"},
+						{State: constant.ProcessInstanceRunning},
+						{State: constant.ProcessInstanceRunning},
+						{State: constant.ProcessInstanceDown},
 					},
 				},
 			}

@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ApplicationWithProcessSummary struct {
@@ -38,7 +39,7 @@ func (actor Actor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]Appl
 				GUID:  app.GUID,
 				State: app.State,
 				Lifecycle: AppLifecycle{
-					Type: AppLifecycleType(app.Lifecycle.Type),
+					Type: constant.AppLifecycleType(app.Lifecycle.Type),
 					Data: AppLifecycleData(app.Lifecycle.Data),
 				},
 			},

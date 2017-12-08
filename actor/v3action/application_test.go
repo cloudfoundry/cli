@@ -12,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -252,7 +253,7 @@ var _ = Describe("Application Actions", func() {
 			application, warnings, err = actor.CreateApplicationInSpace(Application{
 				Name: "some-app-name",
 				Lifecycle: AppLifecycle{
-					Type: "buildpack",
+					Type: constant.BuildpackAppLifecycleType,
 					Data: AppLifecycleData{
 						Buildpacks: []string{"buildpack-1", "buildpack-2"},
 					},
@@ -267,7 +268,7 @@ var _ = Describe("Application Actions", func() {
 						Name: "some-app-name",
 						GUID: "some-app-guid",
 						Lifecycle: ccv3.AppLifecycle{
-							Type: ccv3.BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: ccv3.AppLifecycleData{
 								Buildpacks: []string{"buildpack-1", "buildpack-2"},
 							},
@@ -284,7 +285,7 @@ var _ = Describe("Application Actions", func() {
 					Name: "some-app-name",
 					GUID: "some-app-guid",
 					Lifecycle: AppLifecycle{
-						Type: "buildpack",
+						Type: constant.BuildpackAppLifecycleType,
 						Data: AppLifecycleData{
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
@@ -299,7 +300,7 @@ var _ = Describe("Application Actions", func() {
 						ccv3.SpaceRelationship: ccv3.Relationship{GUID: "some-space-guid"},
 					},
 					Lifecycle: ccv3.AppLifecycle{
-						Type: ccv3.BuildpackAppLifecycleType,
+						Type: constant.BuildpackAppLifecycleType,
 						Data: ccv3.AppLifecycleData{
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
@@ -354,7 +355,7 @@ var _ = Describe("Application Actions", func() {
 			application, warnings, err = actor.UpdateApplication(Application{
 				GUID: "some-app-guid",
 				Lifecycle: AppLifecycle{
-					Type: "buildpack",
+					Type: constant.BuildpackAppLifecycleType,
 					Data: AppLifecycleData{
 						Buildpacks: []string{"buildpack-1", "buildpack-2"},
 					},
@@ -368,7 +369,7 @@ var _ = Describe("Application Actions", func() {
 					ccv3.Application{
 						GUID: "some-app-guid",
 						Lifecycle: ccv3.AppLifecycle{
-							Type: ccv3.BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: ccv3.AppLifecycleData{
 								Buildpacks: []string{"buildpack-1", "buildpack-2"},
 							},
@@ -384,7 +385,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(application).To(Equal(Application{
 					GUID: "some-app-guid",
 					Lifecycle: AppLifecycle{
-						Type: "buildpack",
+						Type: constant.BuildpackAppLifecycleType,
 						Data: AppLifecycleData{
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
@@ -396,7 +397,7 @@ var _ = Describe("Application Actions", func() {
 				expectedApp := ccv3.Application{
 					GUID: "some-app-guid",
 					Lifecycle: ccv3.AppLifecycle{
-						Type: ccv3.BuildpackAppLifecycleType,
+						Type: constant.BuildpackAppLifecycleType,
 						Data: ccv3.AppLifecycleData{
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
@@ -483,7 +484,7 @@ var _ = Describe("Application Actions", func() {
 						fakeConfig.StartupTimeoutReturns(time.Millisecond)
 						fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
 						fakeCloudControllerClient.GetProcessInstancesReturns(
-							[]ccv3.Instance{{State: "STARTING"}},
+							[]ccv3.Instance{{State: constant.ProcessInstanceStarting}},
 							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
 							nil,
 						)
@@ -575,8 +576,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when all instances become running by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: "STARTING"}, {State: "STARTING"}}
-							eventualInstanceStates = []ccv3.Instance{{State: "RUNNING"}, {State: "RUNNING"}}
+							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}}
 						})
 
 						It("should not return an error", func() {
@@ -594,8 +595,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when at least one instance has become running by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: "STARTING"}, {State: "STARTING"}, {State: "STARTING"}}
-							eventualInstanceStates = []ccv3.Instance{{State: "STARTING"}, {State: "STARTING"}, {State: "RUNNING"}}
+							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceRunning}}
 						})
 
 						It("should not return an error", func() {
@@ -614,8 +615,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when all of the instances have crashed by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: "STARTING"}, {State: "STARTING"}, {State: "STARTING"}}
-							eventualInstanceStates = []ccv3.Instance{{State: "CRASHED"}, {State: "CRASHED"}, {State: "CRASHED"}}
+							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
 						})
 
 						It("should not return an error", func() {
@@ -650,9 +651,9 @@ var _ = Describe("Application Actions", func() {
 					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.Instance, ccv3.Warnings, error) {
 						defer func() { processInstanceCallCount++ }()
 						if strings.HasPrefix(processGuid, "good") {
-							return []ccv3.Instance{ccv3.Instance{State: "RUNNING"}}, nil, nil
+							return []ccv3.Instance{ccv3.Instance{State: constant.ProcessInstanceRunning}}, nil, nil
 						} else {
-							return []ccv3.Instance{ccv3.Instance{State: "STARTING"}}, nil, nil
+							return []ccv3.Instance{ccv3.Instance{State: constant.ProcessInstanceStarting}}, nil, nil
 						}
 					}
 

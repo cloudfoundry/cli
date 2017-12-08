@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -45,7 +46,7 @@ var _ = Describe("Application", func() {
 			BeforeEach(func() {
 				app = Application{
 					Lifecycle: AppLifecycle{
-						Type: DockerAppLifecycleType,
+						Type: constant.DockerAppLifecycleType,
 					},
 				}
 			})
@@ -60,7 +61,7 @@ var _ = Describe("Application", func() {
 				BeforeEach(func() {
 					app = Application{
 						Lifecycle: AppLifecycle{
-							Type: BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 						},
 					}
 				})
@@ -74,7 +75,7 @@ var _ = Describe("Application", func() {
 				BeforeEach(func() {
 					app = Application{
 						Lifecycle: AppLifecycle{
-							Type: BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: AppLifecycleData{
 								Buildpacks: []string{"default"},
 							},
@@ -91,7 +92,7 @@ var _ = Describe("Application", func() {
 				BeforeEach(func() {
 					app = Application{
 						Lifecycle: AppLifecycle{
-							Type: BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: AppLifecycleData{
 								Buildpacks: []string{"null"},
 							},
@@ -108,7 +109,7 @@ var _ = Describe("Application", func() {
 				BeforeEach(func() {
 					app = Application{
 						Lifecycle: AppLifecycle{
-							Type: BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: AppLifecycleData{
 								Buildpacks: []string{"some-buildpack"},
 							},
@@ -187,7 +188,7 @@ var _ = Describe("Application", func() {
 						Name: "app-name-1",
 						GUID: "app-guid-1",
 						Lifecycle: AppLifecycle{
-							Type: BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 							Data: AppLifecycleData{
 								Buildpacks: []string{"some-buildpack"},
 							},
@@ -286,7 +287,7 @@ var _ = Describe("Application", func() {
 					GUID: "some-app-guid",
 					Name: "some-app-name",
 					Lifecycle: AppLifecycle{
-						Type: BuildpackAppLifecycleType,
+						Type: constant.BuildpackAppLifecycleType,
 						Data: AppLifecycleData{
 							Buildpacks: []string{"some-buildpack"},
 						},
@@ -441,7 +442,7 @@ var _ = Describe("Application", func() {
 				app, warnings, err := client.CreateApplication(Application{
 					Name: "some-app-name",
 					Lifecycle: AppLifecycle{
-						Type: BuildpackAppLifecycleType,
+						Type: constant.BuildpackAppLifecycleType,
 						Data: AppLifecycleData{
 							Buildpacks: []string{"some-buildpack"},
 						},
@@ -458,7 +459,7 @@ var _ = Describe("Application", func() {
 					Name: "some-app-name",
 					GUID: "some-app-guid",
 					Lifecycle: AppLifecycle{
-						Type: BuildpackAppLifecycleType,
+						Type: constant.BuildpackAppLifecycleType,
 						Data: AppLifecycleData{
 							Buildpacks: []string{"some-buildpack"},
 						},

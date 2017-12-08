@@ -220,8 +220,8 @@ var _ = Describe("v3-app Command", func() {
 					Application: v3action.Application{
 						GUID:      "some-guid",
 						Name:      "some-app",
-						State:     "STARTED",
-						Lifecycle: v3action.AppLifecycle{Type: v3action.DockerAppLifecycleType},
+						State:     constant.ApplicationStarted,
+						Lifecycle: v3action.AppLifecycle{Type: constant.DockerAppLifecycleType},
 					},
 					CurrentDroplet: v3action.Droplet{
 						Image: "docker/some-image",
@@ -262,7 +262,7 @@ var _ = Describe("v3-app Command", func() {
 					Application: v3action.Application{
 						GUID:  "some-guid",
 						Name:  "some-app",
-						State: "STARTED",
+						State: constant.ApplicationStarted,
 					},
 				},
 				v3action.Warnings{"warning-1", "warning-2"},
@@ -302,7 +302,7 @@ var _ = Describe("v3-app Command", func() {
 				summary := v3action.ApplicationSummary{
 					Application: v3action.Application{
 						Name:  "some-app",
-						State: "STARTED",
+						State: constant.ApplicationStarted,
 					},
 					ProcessSummaries: []v3action.ProcessSummary{
 						{Process: v3action.Process{Type: constant.ProcessTypeWeb}},
@@ -342,7 +342,7 @@ var _ = Describe("v3-app Command", func() {
 					summary := v3action.ApplicationSummary{
 						Application: v3action.Application{
 							Name:  "some-app",
-							State: "STARTED",
+							State: constant.ApplicationStarted,
 						},
 						CurrentDroplet: v3action.Droplet{
 							Stack: "cflinuxfs2",
@@ -399,7 +399,7 @@ var _ = Describe("v3-app Command", func() {
 					summary := v3action.ApplicationSummary{
 						Application: v3action.Application{
 							Name:  "some-app",
-							State: "STARTED",
+							State: constant.ApplicationStarted,
 						},
 						CurrentDroplet: v3action.Droplet{
 							Stack: "cflinuxfs2",
@@ -420,21 +420,21 @@ var _ = Describe("v3-app Command", func() {
 									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
 								},
-								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
+								InstanceDetails: []v3action.Instance{{State: constant.ProcessInstanceDown}},
 							},
 							{
 								Process: v3action.Process{
 									Type:       "worker",
 									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 								},
-								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
+								InstanceDetails: []v3action.Instance{{State: constant.ProcessInstanceDown}},
 							},
 							{
 								Process: v3action.Process{
 									Type:       constant.ProcessTypeWeb,
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								},
-								InstanceDetails: []v3action.Instance{{State: "DOWN"}},
+								InstanceDetails: []v3action.Instance{{State: constant.ProcessInstanceDown}},
 							},
 						},
 					}
@@ -461,7 +461,7 @@ var _ = Describe("v3-app Command", func() {
 					summary := v3action.ApplicationSummary{
 						Application: v3action.Application{
 							Name:  "some-app",
-							State: "STARTED",
+							State: constant.ApplicationStarted,
 						},
 						CurrentDroplet: v3action.Droplet{
 							Stack: "cflinuxfs2",
@@ -492,7 +492,7 @@ var _ = Describe("v3-app Command", func() {
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,
-										State:       "DOWN",
+										State:       constant.ProcessInstanceDown,
 										MemoryUsage: 4000000,
 										DiskUsage:   4000000,
 										MemoryQuota: 67108864,
@@ -509,7 +509,7 @@ var _ = Describe("v3-app Command", func() {
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index:       0,
-										State:       "RUNNING",
+										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 1000000,
 										DiskUsage:   1000000,
 										MemoryQuota: 33554432,
@@ -518,7 +518,7 @@ var _ = Describe("v3-app Command", func() {
 									},
 									v3action.Instance{
 										Index:       1,
-										State:       "RUNNING",
+										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 2000000,
 										DiskUsage:   2000000,
 										MemoryQuota: 33554432,
@@ -527,7 +527,7 @@ var _ = Describe("v3-app Command", func() {
 									},
 									v3action.Instance{
 										Index:       2,
-										State:       "RUNNING",
+										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 3000000,
 										DiskUsage:   3000000,
 										MemoryQuota: 33554432,

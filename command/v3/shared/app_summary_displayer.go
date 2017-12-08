@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/command"
 )
 
@@ -113,7 +114,7 @@ func (display AppSummaryDisplayer) DisplayAppProcessInfo() error {
 func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationSummary, routes v2action.Routes) {
 	keyValueTable := [][]string{
 		{display.UI.TranslateText("name:"), summary.Application.Name},
-		{display.UI.TranslateText("requested state:"), strings.ToLower(summary.State)},
+		{display.UI.TranslateText("requested state:"), strings.ToLower(string(summary.State))},
 		{display.UI.TranslateText("processes:"), summary.ProcessSummaries.String()},
 		{display.UI.TranslateText("memory usage:"), display.usageSummary(summary.ProcessSummaries)},
 		{display.UI.TranslateText("routes:"), routes.Summary()},
@@ -122,7 +123,7 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 
 	var lifecycleInfo []string
 
-	if summary.Lifecycle.Type == v3action.DockerAppLifecycleType {
+	if summary.Lifecycle.Type == constant.DockerAppLifecycleType {
 		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
 	} else {
 		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}
@@ -193,7 +194,7 @@ func (AppSummaryDisplayer) appInstanceDate(input time.Time) string {
 
 func (AppSummaryDisplayer) processHasAnInstance(processSummary *v3action.ProcessSummary) bool {
 	for instanceIdx := range processSummary.InstanceDetails {
-		if processSummary.InstanceDetails[instanceIdx].State != "DOWN" {
+		if processSummary.InstanceDetails[instanceIdx].State != constant.ProcessInstanceDown {
 			return true
 		}
 	}
@@ -207,7 +208,7 @@ func (AppSummaryDisplayer) processInstancesAreAllCrashed(processSummary *v3actio
 	}
 
 	for instanceIdx := range processSummary.InstanceDetails {
-		if processSummary.InstanceDetails[instanceIdx].State != "CRASHED" {
+		if processSummary.InstanceDetails[instanceIdx].State != constant.ProcessInstanceCrashed {
 			return false
 		}
 	}

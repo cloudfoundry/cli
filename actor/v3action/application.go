@@ -7,31 +7,26 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // Application represents a V3 actor application.
 type Application struct {
 	Name      string
 	GUID      string
-	State     string
+	State     constant.ApplicationState
 	Lifecycle AppLifecycle
 }
 
 type AppLifecycle struct {
-	Type AppLifecycleType
+	Type constant.AppLifecycleType
 	Data AppLifecycleData
 }
 
-type AppLifecycleType ccv3.AppLifecycleType
 type AppLifecycleData ccv3.AppLifecycleData
 
-const (
-	BuildpackAppLifecycleType AppLifecycleType = AppLifecycleType(ccv3.BuildpackAppLifecycleType)
-	DockerAppLifecycleType    AppLifecycleType = AppLifecycleType(ccv3.DockerAppLifecycleType)
-)
-
 func (app Application) Started() bool {
-	return app.State == "STARTED"
+	return app.State == constant.ApplicationStarted
 }
 
 func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string) (Warnings, error) {
@@ -74,7 +69,7 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 		GUID:  apps[0].GUID,
 		State: apps[0].State,
 		Lifecycle: AppLifecycle{
-			Type: AppLifecycleType(apps[0].Lifecycle.Type),
+			Type: constant.AppLifecycleType(apps[0].Lifecycle.Type),
 			Data: AppLifecycleData(apps[0].Lifecycle.Data),
 		},
 	}, Warnings(warnings), nil
@@ -97,7 +92,7 @@ func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warn
 			GUID:  ccv3App.GUID,
 			State: ccv3App.State,
 			Lifecycle: AppLifecycle{
-				Type: AppLifecycleType(ccv3App.Lifecycle.Type),
+				Type: constant.AppLifecycleType(ccv3App.Lifecycle.Type),
 				Data: AppLifecycleData(ccv3App.Lifecycle.Data),
 			},
 		}
@@ -115,7 +110,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 				ccv3.SpaceRelationship: ccv3.Relationship{GUID: spaceGUID},
 			},
 			Lifecycle: ccv3.AppLifecycle{
-				Type: ccv3.AppLifecycleType(app.Lifecycle.Type),
+				Type: constant.AppLifecycleType(app.Lifecycle.Type),
 				Data: ccv3.AppLifecycleData{
 					Buildpacks: app.Lifecycle.Data.Buildpacks,
 				},
@@ -134,7 +129,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		GUID:  createdApp.GUID,
 		State: createdApp.State,
 		Lifecycle: AppLifecycle{
-			Type: AppLifecycleType(createdApp.Lifecycle.Type),
+			Type: constant.AppLifecycleType(createdApp.Lifecycle.Type),
 			Data: AppLifecycleData(createdApp.Lifecycle.Data),
 		},
 	}, Warnings(warnings), nil
@@ -159,7 +154,7 @@ func (actor Actor) StartApplication(appGUID string) (Application, Warnings, erro
 		GUID:  updatedApp.GUID,
 		State: updatedApp.State,
 		Lifecycle: AppLifecycle{
-			Type: AppLifecycleType(updatedApp.Lifecycle.Type),
+			Type: constant.AppLifecycleType(updatedApp.Lifecycle.Type),
 			Data: AppLifecycleData(updatedApp.Lifecycle.Data),
 		},
 	}, Warnings(warnings), nil
@@ -200,7 +195,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 	ccApp := ccv3.Application{
 		GUID: app.GUID,
 		Lifecycle: ccv3.AppLifecycle{
-			Type: ccv3.AppLifecycleType(app.Lifecycle.Type),
+			Type: constant.AppLifecycleType(app.Lifecycle.Type),
 			Data: ccv3.AppLifecycleData(app.Lifecycle.Data),
 		},
 	}
@@ -215,7 +210,7 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 		GUID:  updatedApp.GUID,
 		State: updatedApp.State,
 		Lifecycle: AppLifecycle{
-			Type: AppLifecycleType(updatedApp.Lifecycle.Type),
+			Type: constant.AppLifecycleType(updatedApp.Lifecycle.Type),
 			Data: AppLifecycleData(updatedApp.Lifecycle.Data),
 		},
 	}, Warnings(warnings), nil
@@ -232,13 +227,13 @@ func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Wa
 	}
 
 	for _, instance := range instances {
-		if instance.State == "RUNNING" {
+		if instance.State == constant.ProcessInstanceRunning {
 			return true, nil
 		}
 	}
 
 	for _, instance := range instances {
-		if instance.State != "CRASHED" {
+		if instance.State != constant.ProcessInstanceCrashed {
 			return false, nil
 		}
 	}

@@ -34,7 +34,7 @@ var _ = Describe("Application Summary Actions", func() {
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -56,7 +56,7 @@ var _ = Describe("Application Summary Actions", func() {
 				fakeCloudControllerClient.GetProcessInstancesReturns(
 					[]ccv3.Instance{
 						{
-							State:       "RUNNING",
+							State:       constant.ProcessInstanceRunning,
 							CPU:         0.01,
 							MemoryUsage: 1000000,
 							DiskUsage:   2000000,
@@ -96,7 +96,7 @@ var _ = Describe("Application Summary Actions", func() {
 						Application: Application{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 						CurrentDroplet: Droplet{
 							Stack: "some-stack",
@@ -116,7 +116,7 @@ var _ = Describe("Application Summary Actions", func() {
 								},
 								InstanceDetails: []Instance{
 									{
-										State:       "RUNNING",
+										State:       constant.ProcessInstanceRunning,
 										CPU:         0.01,
 										MemoryUsage: 1000000,
 										DiskUsage:   2000000,
@@ -188,7 +188,7 @@ var _ = Describe("Application Summary Actions", func() {
 						Application: Application{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
@@ -199,7 +199,7 @@ var _ = Describe("Application Summary Actions", func() {
 								},
 								InstanceDetails: []Instance{
 									{
-										State:       "RUNNING",
+										State:       constant.ProcessInstanceRunning,
 										CPU:         0.01,
 										MemoryUsage: 1000000,
 										DiskUsage:   2000000,
@@ -262,7 +262,7 @@ var _ = Describe("Application Summary Actions", func() {
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -293,7 +293,7 @@ var _ = Describe("Application Summary Actions", func() {
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 					},
 					ccv3.Warnings{"some-warning"},

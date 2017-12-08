@@ -7,28 +7,22 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-)
-
-type AppLifecycleType string
-
-const (
-	BuildpackAppLifecycleType AppLifecycleType = "buildpack"
-	DockerAppLifecycleType    AppLifecycleType = "docker"
 )
 
 // Application represents a Cloud Controller V3 Application.
 type Application struct {
-	Name          string        `json:"name,omitempty"`
-	Relationships Relationships `json:"relationships,omitempty"`
-	GUID          string        `json:"guid,omitempty"`
-	State         string        `json:"state,omitempty"`
-	Lifecycle     AppLifecycle  `json:"lifecycle,omitempty"`
+	Name          string                    `json:"name,omitempty"`
+	Relationships Relationships             `json:"relationships,omitempty"`
+	GUID          string                    `json:"guid,omitempty"`
+	State         constant.ApplicationState `json:"state,omitempty"`
+	Lifecycle     AppLifecycle              `json:"lifecycle,omitempty"`
 }
 
 type AppLifecycle struct {
-	Type AppLifecycleType `json:"type,omitempty"`
-	Data AppLifecycleData `json:"data,omitempty"`
+	Type constant.AppLifecycleType `json:"type,omitempty"`
+	Data AppLifecycleData          `json:"data,omitempty"`
 }
 
 type AppLifecycleData struct {
@@ -46,7 +40,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	ccApp.Relationships = a.Relationships
 
 	switch a.Lifecycle.Type {
-	case BuildpackAppLifecycleType:
+	case constant.BuildpackAppLifecycleType:
 		if len(a.Lifecycle.Data.Buildpacks) > 0 {
 			switch a.Lifecycle.Data.Buildpacks[0] {
 			case "default", "null":
@@ -65,7 +59,7 @@ func (a Application) MarshalJSON() ([]byte, error) {
 				}
 			}
 		}
-	case DockerAppLifecycleType:
+	case constant.DockerAppLifecycleType:
 		ccApp.Lifecycle = map[string]interface{}{
 			"type": a.Lifecycle.Type,
 			"data": map[string]interface{}{},
@@ -108,7 +102,7 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 	return fullAppsList, warnings, err
 }
 
-// CreateApplication creates an application with the given settings
+// CreateApplication creates an application with the given settings.
 func (client *Client) CreateApplication(app Application) (Application, Warnings, error) {
 	bodyBytes, err := json.Marshal(app)
 	if err != nil {
@@ -132,6 +126,7 @@ func (client *Client) CreateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+// DeleteApplication deletes the app with the given app GUID.
 func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteApplicationRequest,
@@ -147,7 +142,7 @@ func (client *Client) DeleteApplication(appGUID string) (string, Warnings, error
 	return response.ResourceLocationURL, response.Warnings, err
 }
 
-// UpdateApplication updates an application with the given settings
+// UpdateApplication updates an application with the given settings.
 func (client *Client) UpdateApplication(app Application) (Application, Warnings, error) {
 	bodyBytes, err := json.Marshal(app)
 	if err != nil {
@@ -172,6 +167,7 @@ func (client *Client) UpdateApplication(app Application) (Application, Warnings,
 	return responseApp, response.Warnings, err
 }
 
+// SetApplicationDroplet sets the specified droplet on the given application.
 func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) (Relationship, Warnings, error) {
 	relationship := Relationship{GUID: dropletGUID}
 	bodyBytes, err := json.Marshal(relationship)
@@ -197,6 +193,7 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 	return responseRelationship, response.Warnings, err
 }
 
+// StopApplication stops the given application.
 func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationStopRequest,
@@ -212,6 +209,7 @@ func (client *Client) StopApplication(appGUID string) (Warnings, error) {
 	return response.Warnings, err
 }
 
+// StartApplication starts the given application.
 func (client *Client) StartApplication(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationStartRequest,

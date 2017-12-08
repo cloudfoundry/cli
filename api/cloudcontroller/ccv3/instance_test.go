@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -115,7 +116,7 @@ var _ = Describe("Instance", func() {
 
 				Expect(processes).To(ConsistOf(
 					Instance{
-						State:       "RUNNING",
+						State:       constant.ProcessInstanceRunning,
 						CPU:         0.01,
 						MemoryUsage: 1000000,
 						DiskUsage:   2000000,
@@ -125,7 +126,7 @@ var _ = Describe("Instance", func() {
 						Uptime:      123,
 					},
 					Instance{
-						State:       "RUNNING",
+						State:       constant.ProcessInstanceRunning,
 						CPU:         0.02,
 						MemoryUsage: 8000000,
 						DiskUsage:   16000000,

@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -254,11 +255,11 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 
 	if cmd.DockerImage.Path != "" {
 		appToCreate.Lifecycle = v3action.AppLifecycle{
-			Type: v3action.DockerAppLifecycleType,
+			Type: constant.DockerAppLifecycleType,
 		}
 	} else {
 		appToCreate.Lifecycle = v3action.AppLifecycle{
-			Type: v3action.BuildpackAppLifecycleType,
+			Type: constant.BuildpackAppLifecycleType,
 			Data: v3action.AppLifecycleData{
 				Buildpacks: cmd.Buildpacks,
 			},
@@ -310,11 +311,11 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 
 	if cmd.DockerImage.Path != "" {
 		appToUpdate.Lifecycle = v3action.AppLifecycle{
-			Type: v3action.DockerAppLifecycleType,
+			Type: constant.DockerAppLifecycleType,
 		}
 	} else {
 		appToUpdate.Lifecycle = v3action.AppLifecycle{
-			Type: v3action.BuildpackAppLifecycleType,
+			Type: constant.BuildpackAppLifecycleType,
 			Data: v3action.AppLifecycleData{
 				Buildpacks: cmd.Buildpacks,
 			},

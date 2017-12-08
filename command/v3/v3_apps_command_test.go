@@ -141,7 +141,7 @@ var _ = Describe("v3-apps Command", func() {
 					Application: v3action.Application{
 						GUID:  "app-guid",
 						Name:  "some-app",
-						State: "STARTED",
+						State: constant.ApplicationStarted,
 					},
 					ProcessSummaries: []v3action.ProcessSummary{{Process: v3action.Process{Type: "process-type"}}},
 				},
@@ -201,7 +201,7 @@ var _ = Describe("v3-apps Command", func() {
 						Application: v3action.Application{
 							GUID:  "app-guid-1",
 							Name:  "some-app-1",
-							State: "STARTED",
+							State: constant.ApplicationStarted,
 						},
 						ProcessSummaries: []v3action.ProcessSummary{
 							{
@@ -217,7 +217,7 @@ var _ = Describe("v3-apps Command", func() {
 								InstanceDetails: []v3action.Instance{
 									{
 										Index: 0,
-										State: "DOWN",
+										State: constant.ProcessInstanceDown,
 									},
 								},
 							},
@@ -228,11 +228,11 @@ var _ = Describe("v3-apps Command", func() {
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index: 0,
-										State: "RUNNING",
+										State: constant.ProcessInstanceRunning,
 									},
 									v3action.Instance{
 										Index: 1,
-										State: "RUNNING",
+										State: constant.ProcessInstanceRunning,
 									},
 								},
 							},
@@ -242,7 +242,7 @@ var _ = Describe("v3-apps Command", func() {
 						Application: v3action.Application{
 							GUID:  "app-guid-2",
 							Name:  "some-app-2",
-							State: "STOPPED",
+							State: constant.ApplicationStopped,
 						},
 						ProcessSummaries: []v3action.ProcessSummary{
 							{
@@ -252,11 +252,11 @@ var _ = Describe("v3-apps Command", func() {
 								InstanceDetails: []v3action.Instance{
 									v3action.Instance{
 										Index: 0,
-										State: "DOWN",
+										State: constant.ProcessInstanceDown,
 									},
 									v3action.Instance{
 										Index: 1,
-										State: "DOWN",
+										State: constant.ProcessInstanceDown,
 									},
 								},
 							},
@@ -302,7 +302,7 @@ var _ = Describe("v3-apps Command", func() {
 						Application: v3action.Application{
 							GUID:  "app-guid",
 							Name:  "some-app",
-							State: "STARTED",
+							State: constant.ApplicationStarted,
 						},
 						ProcessSummaries: []v3action.ProcessSummary{},
 					},

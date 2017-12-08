@@ -6,12 +6,14 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+// Instance is a single process instance.
 type Instance struct {
 	Index       int
-	State       string
+	State       constant.ProcessInstanceState
 	Uptime      int
 	CPU         float64
 	MemoryUsage uint64
@@ -38,7 +40,7 @@ func (instance *Instance) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	instance.State = inputInstance.State
+	instance.State = constant.ProcessInstanceState(inputInstance.State)
 	instance.CPU = inputInstance.Usage.CPU
 	instance.MemoryUsage = inputInstance.Usage.Mem
 	instance.DiskUsage = inputInstance.Usage.Disk
@@ -51,6 +53,8 @@ func (instance *Instance) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// DeleteApplicationProcessInstance deletes/stops a particular application's
+// process instance.
 func (client *Client) DeleteApplicationProcessInstance(appGUID string, processType string, instanceIndex int) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteApplicationProcessInstanceRequest,

@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -248,7 +249,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(createApp).To(Equal(v3action.Application{
 						Name: "some-app",
 						Lifecycle: v3action.AppLifecycle{
-							Type: v3action.BuildpackAppLifecycleType,
+							Type: constant.BuildpackAppLifecycleType,
 						},
 					}))
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
@@ -535,7 +536,7 @@ var _ = Describe("v3-push Command", func() {
 										Expect(createApp).To(Equal(v3action.Application{
 											Name: "some-app",
 											Lifecycle: v3action.AppLifecycle{
-												Type: v3action.BuildpackAppLifecycleType,
+												Type: constant.BuildpackAppLifecycleType,
 												Data: v3action.AppLifecycleData{
 													Buildpacks: []string{"some-buildpack"},
 												},
@@ -556,7 +557,7 @@ var _ = Describe("v3-push Command", func() {
 										Expect(createApp).To(Equal(v3action.Application{
 											Name: "some-app",
 											Lifecycle: v3action.AppLifecycle{
-												Type: v3action.DockerAppLifecycleType,
+												Type: constant.DockerAppLifecycleType,
 												Data: v3action.AppLifecycleData{},
 											},
 										}))
@@ -725,7 +726,7 @@ var _ = Describe("v3-push Command", func() {
 															InstanceDetails: []v3action.Instance{
 																v3action.Instance{
 																	Index:       0,
-																	State:       "RUNNING",
+																	State:       constant.ProcessInstanceRunning,
 																	MemoryUsage: 4000000,
 																	DiskUsage:   4000000,
 																	MemoryQuota: 67108864,
@@ -858,7 +859,7 @@ var _ = Describe("v3-push Command", func() {
 					Expect(updateApp).To(Equal(v3action.Application{
 						GUID: "some-app-guid",
 						Lifecycle: v3action.AppLifecycle{
-							Type: v3action.DockerAppLifecycleType,
+							Type: constant.DockerAppLifecycleType,
 							Data: v3action.AppLifecycleData{},
 						},
 					}))
@@ -876,7 +877,7 @@ var _ = Describe("v3-push Command", func() {
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID: "some-app-guid",
 							Lifecycle: v3action.AppLifecycle{
-								Type: v3action.BuildpackAppLifecycleType,
+								Type: constant.BuildpackAppLifecycleType,
 								Data: v3action.AppLifecycleData{
 									Buildpacks: []string{},
 								},
@@ -895,7 +896,7 @@ var _ = Describe("v3-push Command", func() {
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID: "some-app-guid",
 							Lifecycle: v3action.AppLifecycle{
-								Type: v3action.BuildpackAppLifecycleType,
+								Type: constant.BuildpackAppLifecycleType,
 								Data: v3action.AppLifecycleData{
 									Buildpacks: []string{"some-buildpack"},
 								},
@@ -914,7 +915,7 @@ var _ = Describe("v3-push Command", func() {
 						Expect(appArg).To(Equal(v3action.Application{
 							GUID: "some-app-guid",
 							Lifecycle: v3action.AppLifecycle{
-								Type: v3action.BuildpackAppLifecycleType,
+								Type: constant.BuildpackAppLifecycleType,
 								Data: v3action.AppLifecycleData{
 									Buildpacks: []string{"some-buildpack-1", "some-buildpack-2"},
 								},
@@ -949,7 +950,7 @@ var _ = Describe("v3-push Command", func() {
 			Context("when updating the application succeeds", func() {
 				Context("when the application is stopped", func() {
 					BeforeEach(func() {
-						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: "STOPPED"}, v3action.Warnings{"update-warning"}, nil)
+						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStopped}, v3action.Warnings{"update-warning"}, nil)
 					})
 
 					It("skips stopping the application and pushes it", func() {
@@ -968,7 +969,7 @@ var _ = Describe("v3-push Command", func() {
 
 				Context("when the application is started", func() {
 					BeforeEach(func() {
-						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: "STARTED"}, nil, nil)
+						fakeActor.UpdateApplicationReturns(v3action.Application{GUID: "some-app-guid", State: constant.ApplicationStarted}, nil, nil)
 					})
 
 					It("stops the application and pushes it", func() {

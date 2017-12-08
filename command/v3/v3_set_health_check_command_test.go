@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -140,7 +141,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
 				v3action.Application{
-					State: "STARTED",
+					State: constant.ApplicationStarted,
 				},
 				v3action.Warnings{"warning-1", "warning-2"},
 				nil)
@@ -170,7 +171,7 @@ var _ = Describe("v3-set-health-check Command", func() {
 		BeforeEach(func() {
 			fakeActor.SetApplicationProcessHealthCheckTypeByNameAndSpaceReturns(
 				v3action.Application{
-					State: "STOPPED",
+					State: constant.ApplicationStopped,
 				},
 				v3action.Warnings{"warning-1", "warning-2"},
 				nil)

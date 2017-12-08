@@ -24,7 +24,7 @@ func (p ProcessSummary) TotalInstanceCount() int {
 func (p ProcessSummary) HealthyInstanceCount() int {
 	count := 0
 	for _, instance := range p.InstanceDetails {
-		if instance.State == "RUNNING" {
+		if instance.State == constant.ProcessInstanceRunning {
 			count++
 		}
 	}

@@ -6,13 +6,15 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-// Instance represents a V3 actor instance.
+// Instance represents a V3 process instance.
 type Instance ccv3.Instance
 
-func (i Instance) Running() bool {
-	return i.State == "RUNNING"
+// Running will return true if the instance is running.
+func (instance Instance) Running() bool {
+	return instance.State == constant.ProcessInstanceRunning
 }
 
 // StartTime returns the time that the instance started.

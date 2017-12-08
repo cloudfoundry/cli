@@ -69,7 +69,7 @@ var _ = Describe("app summary displayer", func() {
 							InstanceDetails: []v3action.Instance{
 								v3action.Instance{
 									Index:       0,
-									State:       "RUNNING",
+									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
 									DiskUsage:   1000000,
 									MemoryQuota: 33554432,
@@ -87,7 +87,7 @@ var _ = Describe("app summary displayer", func() {
 							InstanceDetails: []v3action.Instance{
 								v3action.Instance{
 									Index:       0,
-									State:       "RUNNING",
+									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
 									DiskUsage:   1000000,
 									MemoryQuota: 33554432,
@@ -96,7 +96,7 @@ var _ = Describe("app summary displayer", func() {
 								},
 								v3action.Instance{
 									Index:       1,
-									State:       "RUNNING",
+									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 2000000,
 									DiskUsage:   2000000,
 									MemoryQuota: 33554432,
@@ -105,7 +105,7 @@ var _ = Describe("app summary displayer", func() {
 								},
 								v3action.Instance{
 									Index:       2,
-									State:       "RUNNING",
+									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 3000000,
 									DiskUsage:   3000000,
 									MemoryQuota: 33554432,

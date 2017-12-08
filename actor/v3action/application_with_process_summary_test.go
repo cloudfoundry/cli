@@ -7,6 +7,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -31,12 +32,12 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						{
 							Name:  "some-app-name-1",
 							GUID:  "some-app-guid-1",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 						{
 							Name:  "some-app-name-2",
 							GUID:  "some-app-guid-2",
-							State: "STOPPED",
+							State: constant.ApplicationStopped,
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -72,19 +73,19 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					0,
-					[]ccv3.Instance{{State: "RUNNING"}, {State: "DOWN"}, {State: "RUNNING"}},
+					[]ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
 					ccv3.Warnings{"some-process-stats-warning-1"},
 					nil,
 				)
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					1,
-					[]ccv3.Instance{{State: "RUNNING"}, {State: "RUNNING"}},
+					[]ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
 					ccv3.Warnings{"some-process-stats-warning-2"},
 					nil,
 				)
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					2,
-					[]ccv3.Instance{{State: "DOWN"}},
+					[]ccv3.Instance{{State: constant.ProcessInstanceDown}},
 					ccv3.Warnings{"some-process-stats-warning-3"},
 					nil,
 				)
@@ -98,16 +99,16 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						Application: Application{
 							Name:  "some-app-name-1",
 							GUID:  "some-app-guid-1",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
 								Process:         Process{GUID: "some-process-guid-1", Type: "some-process-type-1"},
-								InstanceDetails: []Instance{{State: "RUNNING"}, {State: "DOWN"}, {State: "RUNNING"}},
+								InstanceDetails: []Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
 							},
 							{
 								Process:         Process{GUID: "some-process-guid-2", Type: "some-process-type-2"},
-								InstanceDetails: []Instance{{State: "RUNNING"}, {State: "RUNNING"}},
+								InstanceDetails: []Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
 							},
 						},
 					},
@@ -115,12 +116,12 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						Application: Application{
 							Name:  "some-app-name-2",
 							GUID:  "some-app-guid-2",
-							State: "STOPPED",
+							State: constant.ApplicationStopped,
 						},
 						ProcessSummaries: []ProcessSummary{
 							{
 								Process:         Process{GUID: "some-process-guid-3", Type: "some-process-type-3"},
-								InstanceDetails: []Instance{{State: "DOWN"}},
+								InstanceDetails: []Instance{{State: constant.ProcessInstanceDown}},
 							},
 						},
 					},
@@ -160,7 +161,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 					},
 					ccv3.Warnings{"some-warning"},
@@ -191,7 +192,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						{
 							Name:  "some-app-name",
 							GUID:  "some-app-guid",
-							State: "RUNNING",
+							State: constant.ApplicationStarted,
 						},
 					},
 					ccv3.Warnings{"some-warning"},
