@@ -7,19 +7,20 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 // Task represents a Cloud Controller V3 Task.
 type Task struct {
-	GUID       string `json:"guid,omitempty"`
-	SequenceID int    `json:"sequence_id,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Command    string `json:"command"`
-	State      string `json:"state,omitempty"`
-	CreatedAt  string `json:"created_at,omitempty"`
-	MemoryInMB uint64 `json:"memory_in_mb,omitempty"`
-	DiskInMB   uint64 `json:"disk_in_mb,omitempty"`
+	GUID       string             `json:"guid,omitempty"`
+	SequenceID int                `json:"sequence_id,omitempty"`
+	Name       string             `json:"name,omitempty"`
+	Command    string             `json:"command"`
+	State      constant.TaskState `json:"state,omitempty"`
+	CreatedAt  string             `json:"created_at,omitempty"`
+	MemoryInMB uint64             `json:"memory_in_mb,omitempty"`
+	DiskInMB   uint64             `json:"disk_in_mb,omitempty"`
 }
 
 // CreateApplicationTask runs a command in the Application environment

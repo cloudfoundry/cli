@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -117,7 +118,7 @@ var _ = Describe("Task Actions", func() {
 						GUID:       "task-1-guid",
 						SequenceID: 1,
 						Name:       "task-1",
-						State:      "SUCCEEDED",
+						State:      constant.TaskSucceeded,
 						CreatedAt:  "some-time",
 						Command:    "some-command",
 					}
@@ -125,7 +126,7 @@ var _ = Describe("Task Actions", func() {
 						GUID:       "task-2-guid",
 						SequenceID: 2,
 						Name:       "task-2",
-						State:      "FAILED",
+						State:      constant.TaskFailed,
 						CreatedAt:  "some-time",
 						Command:    "some-command",
 					}
@@ -133,7 +134,7 @@ var _ = Describe("Task Actions", func() {
 						GUID:       "task-3-guid",
 						SequenceID: 3,
 						Name:       "task-3",
-						State:      "RUNNING",
+						State:      constant.TaskRunning,
 						CreatedAt:  "some-time",
 						Command:    "some-command",
 					}

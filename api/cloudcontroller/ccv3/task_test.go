@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -233,7 +234,7 @@ var _ = Describe("Task", func() {
 						GUID:       "task-1-guid",
 						SequenceID: 1,
 						Name:       "task-1",
-						State:      "SUCCEEDED",
+						State:      constant.TaskSucceeded,
 						CreatedAt:  "2016-11-07T05:59:01Z",
 						Command:    "some-command",
 					},
@@ -241,7 +242,7 @@ var _ = Describe("Task", func() {
 						GUID:       "task-2-guid",
 						SequenceID: 2,
 						Name:       "task-2",
-						State:      "FAILED",
+						State:      constant.TaskFailed,
 						CreatedAt:  "2016-11-07T06:59:01Z",
 						Command:    "some-command",
 					},
@@ -249,7 +250,7 @@ var _ = Describe("Task", func() {
 						GUID:       "task-3-guid",
 						SequenceID: 3,
 						Name:       "task-3",
-						State:      "RUNNING",
+						State:      constant.TaskRunning,
 						CreatedAt:  "2016-11-07T07:59:01Z",
 						Command:    "some-command",
 					},
@@ -359,7 +360,7 @@ var _ = Describe("Task", func() {
 					SequenceID: 3,
 					Name:       "task-3",
 					Command:    "some-command",
-					State:      "CANCELING",
+					State:      constant.TaskCanceling,
 					CreatedAt:  "2016-11-07T07:59:01Z",
 				}))
 				Expect(warnings).To(ConsistOf("warning"))

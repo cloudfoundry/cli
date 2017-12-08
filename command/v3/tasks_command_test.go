@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -129,7 +130,7 @@ var _ = Describe("tasks Command", func() {
 								GUID:       "task-3-guid",
 								SequenceID: 3,
 								Name:       "task-3",
-								State:      "RUNNING",
+								State:      constant.TaskRunning,
 								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
@@ -137,7 +138,7 @@ var _ = Describe("tasks Command", func() {
 								GUID:       "task-2-guid",
 								SequenceID: 2,
 								Name:       "task-2",
-								State:      "FAILED",
+								State:      constant.TaskFailed,
 								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
@@ -145,7 +146,7 @@ var _ = Describe("tasks Command", func() {
 								GUID:       "task-1-guid",
 								SequenceID: 1,
 								Name:       "task-1",
-								State:      "SUCCEEDED",
+								State:      constant.TaskSucceeded,
 								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
@@ -188,7 +189,7 @@ get-tasks-warning-1`))
 									GUID:       "task-2-guid",
 									SequenceID: 2,
 									Name:       "task-2",
-									State:      "FAILED",
+									State:      constant.TaskFailed,
 									CreatedAt:  "2016-11-08T22:26:02Z",
 									Command:    "",
 								},
@@ -196,7 +197,7 @@ get-tasks-warning-1`))
 									GUID:       "task-1-guid",
 									SequenceID: 1,
 									Name:       "task-1",
-									State:      "SUCCEEDED",
+									State:      constant.TaskSucceeded,
 									CreatedAt:  "2016-11-08T22:26:02Z",
 									Command:    "",
 								},
