@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -138,12 +139,12 @@ var _ = Describe("v3-packages Command", func() {
 			packages := []v3action.Package{
 				{
 					GUID:      "some-package-guid-1",
-					State:     "READY",
+					State:     constant.PackageReady,
 					CreatedAt: package1UTC,
 				},
 				{
 					GUID:      "some-package-guid-2",
-					State:     "FAILED",
+					State:     constant.PackageFailed,
 					CreatedAt: package2UTC,
 				},
 			}

@@ -11,25 +11,8 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-)
-
-type PackageState string
-
-const (
-	PackageStateProcessingUpload PackageState = "PROCESSING_UPLOAD"
-	PackageStateReady            PackageState = "READY"
-	PackageStateFailed           PackageState = "FAILED"
-	PackageStateAwaitingUpload   PackageState = "AWAITING_UPLOAD"
-	PackageStateCopying          PackageState = "COPYING"
-	PackageStateExpired          PackageState = "EXPIRED"
-)
-
-type PackageType string
-
-const (
-	PackageTypeBits   PackageType = "bits"
-	PackageTypeDocker PackageType = "docker"
 )
 
 type Package struct {
@@ -37,8 +20,8 @@ type Package struct {
 	CreatedAt      string
 	Links          APILinks
 	Relationships  Relationships
-	State          PackageState
-	Type           PackageType
+	State          constant.PackageState
+	Type           constant.PackageType
 	DockerImage    string
 	DockerUsername string
 	DockerPassword string
@@ -51,13 +34,13 @@ func (p Package) MarshalJSON() ([]byte, error) {
 		Password string `json:"password,omitempty"`
 	}
 	var ccPackage struct {
-		GUID          string         `json:"guid,omitempty"`
-		CreatedAt     string         `json:"created_at,omitempty"`
-		Links         APILinks       `json:"links,omitempty"`
-		Relationships Relationships  `json:"relationships,omitempty"`
-		State         PackageState   `json:"state,omitempty"`
-		Type          PackageType    `json:"type,omitempty"`
-		Data          *ccPackageData `json:"data,omitempty"`
+		GUID          string                `json:"guid,omitempty"`
+		CreatedAt     string                `json:"created_at,omitempty"`
+		Links         APILinks              `json:"links,omitempty"`
+		Relationships Relationships         `json:"relationships,omitempty"`
+		State         constant.PackageState `json:"state,omitempty"`
+		Type          constant.PackageType  `json:"type,omitempty"`
+		Data          *ccPackageData        `json:"data,omitempty"`
 	}
 
 	ccPackage.GUID = p.GUID
@@ -79,12 +62,12 @@ func (p Package) MarshalJSON() ([]byte, error) {
 
 func (p *Package) UnmarshalJSON(data []byte) error {
 	var ccPackage struct {
-		GUID          string        `json:"guid,omitempty"`
-		CreatedAt     string        `json:"created_at,omitempty"`
-		Links         APILinks      `json:"links,omitempty"`
-		Relationships Relationships `json:"relationships,omitempty"`
-		State         PackageState  `json:"state,omitempty"`
-		Type          PackageType   `json:"type,omitempty"`
+		GUID          string                `json:"guid,omitempty"`
+		CreatedAt     string                `json:"created_at,omitempty"`
+		Links         APILinks              `json:"links,omitempty"`
+		Relationships Relationships         `json:"relationships,omitempty"`
+		State         constant.PackageState `json:"state,omitempty"`
+		Type          constant.PackageType  `json:"type,omitempty"`
 		Data          struct {
 			Image    string `json:"image"`
 			Username string `json:"username"`

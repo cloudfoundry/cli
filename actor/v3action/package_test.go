@@ -11,6 +11,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -47,12 +48,12 @@ var _ = Describe("Package Actions", func() {
 					[]ccv3.Package{
 						{
 							GUID:      "some-package-guid-1",
-							State:     ccv3.PackageStateReady,
+							State:     constant.PackageReady,
 							CreatedAt: "2017-08-14T21:16:42Z",
 						},
 						{
 							GUID:      "some-package-guid-2",
-							State:     ccv3.PackageStateFailed,
+							State:     constant.PackageFailed,
 							CreatedAt: "2017-08-16T00:18:24Z",
 						},
 					},
@@ -69,12 +70,12 @@ var _ = Describe("Package Actions", func() {
 				Expect(packages).To(Equal([]Package{
 					{
 						GUID:      "some-package-guid-1",
-						State:     "READY",
+						State:     constant.PackageReady,
 						CreatedAt: "2017-08-14T21:16:42Z",
 					},
 					{
 						GUID:      "some-package-guid-2",
-						State:     "FAILED",
+						State:     constant.PackageFailed,
 						CreatedAt: "2017-08-16T00:18:24Z",
 					},
 				}))
@@ -202,7 +203,7 @@ var _ = Describe("Package Actions", func() {
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
-						State:          ccv3.PackageStateReady,
+						State:          constant.PackageReady,
 						Relationships: ccv3.Relationships{
 							ccv3.ApplicationRelationship: ccv3.Relationship{
 								GUID: "some-app-guid",
@@ -226,7 +227,7 @@ var _ = Describe("Package Actions", func() {
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
 						GUID:           "some-pkg-guid",
-						State:          ccv3.PackageStateReady,
+						State:          constant.PackageReady,
 						Relationships: ccv3.Relationships{
 							ccv3.ApplicationRelationship: ccv3.Relationship{
 								GUID: "some-app-guid",
@@ -243,7 +244,7 @@ var _ = Describe("Package Actions", func() {
 					Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 					inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 					Expect(inputPackage).To(Equal(ccv3.Package{
-						Type:           ccv3.PackageTypeDocker,
+						Type:           constant.PackageTypeDocker,
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
@@ -272,7 +273,7 @@ var _ = Describe("Package Actions", func() {
 
 			// putting this here so the tests don't hang on polling
 			fakeCloudControllerClient.GetPackageReturns(
-				ccv3.Package{GUID: "some-pkg-guid", State: ccv3.PackageStateReady},
+				ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageReady},
 				ccv3.Warnings{},
 				nil,
 			)
@@ -379,10 +380,11 @@ var _ = Describe("Package Actions", func() {
 
 						Context("when creating the package succeeds", func() {
 							var createdPackage ccv3.Package
+
 							BeforeEach(func() {
 								createdPackage = ccv3.Package{
 									GUID:  "some-pkg-guid",
-									State: ccv3.PackageStateAwaitingUpload,
+									State: constant.PackageAwaitingUpload,
 									Relationships: ccv3.Relationships{
 										ccv3.ApplicationRelationship: ccv3.Relationship{
 											GUID: "some-app-guid",
@@ -469,7 +471,7 @@ var _ = Describe("Package Actions", func() {
 										Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
 										inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
 										Expect(inputPackage).To(Equal(ccv3.Package{
-											Type: ccv3.PackageTypeBits,
+											Type: constant.PackageTypeBits,
 											Relationships: ccv3.Relationships{
 												ccv3.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
 											},
@@ -481,7 +483,7 @@ var _ = Describe("Package Actions", func() {
 
 										expectedPackage := ccv3.Package{
 											GUID:  "some-pkg-guid",
-											State: ccv3.PackageStateReady,
+											State: constant.PackageReady,
 										}
 										Expect(pkg).To(Equal(Package(expectedPackage)))
 
@@ -490,9 +492,9 @@ var _ = Describe("Package Actions", func() {
 									})
 
 									DescribeTable("polls until terminal state is reached",
-										func(finalState ccv3.PackageState, expectedErr error) {
+										func(finalState constant.PackageState, expectedErr error) {
 											fakeCloudControllerClient.GetPackageReturns(
-												ccv3.Package{GUID: "some-pkg-guid", State: ccv3.PackageStateAwaitingUpload},
+												ccv3.Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload},
 												ccv3.Warnings{"poll-package-warning"},
 												nil,
 											)
@@ -519,9 +521,9 @@ var _ = Describe("Package Actions", func() {
 											Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(3))
 										},
 
-										Entry("READY", ccv3.PackageStateReady, nil),
-										Entry("FAILED", ccv3.PackageStateFailed, actionerror.PackageProcessingFailedError{}),
-										Entry("EXPIRED", ccv3.PackageStateExpired, actionerror.PackageProcessingExpiredError{}),
+										Entry("READY", constant.PackageReady, nil),
+										Entry("FAILED", constant.PackageFailed, actionerror.PackageProcessingFailedError{}),
+										Entry("EXPIRED", constant.PackageExpired, actionerror.PackageProcessingExpiredError{}),
 									)
 								})
 							})

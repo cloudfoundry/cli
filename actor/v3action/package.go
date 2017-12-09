@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 const (
@@ -29,7 +30,7 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 		return Package{}, allWarnings, err
 	}
 	inputPackage := ccv3.Package{
-		Type: ccv3.PackageTypeDocker,
+		Type: constant.PackageTypeDocker,
 		Relationships: ccv3.Relationships{
 			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
@@ -86,7 +87,7 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	}
 
 	inputPackage := ccv3.Package{
-		Type: ccv3.PackageTypeBits,
+		Type: constant.PackageTypeBits,
 		Relationships: ccv3.Relationships{
 			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
@@ -104,9 +105,9 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		return Package{}, allWarnings, err
 	}
 
-	for pkg.State != ccv3.PackageStateReady &&
-		pkg.State != ccv3.PackageStateFailed &&
-		pkg.State != ccv3.PackageStateExpired {
+	for pkg.State != constant.PackageReady &&
+		pkg.State != constant.PackageFailed &&
+		pkg.State != constant.PackageExpired {
 		time.Sleep(actor.Config.PollingInterval())
 		pkg, warnings, err = actor.CloudControllerClient.GetPackage(pkg.GUID)
 		allWarnings = append(allWarnings, warnings...)
@@ -115,9 +116,9 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 		}
 	}
 
-	if pkg.State == ccv3.PackageStateFailed {
+	if pkg.State == constant.PackageFailed {
 		return Package{}, allWarnings, actionerror.PackageProcessingFailedError{}
-	} else if pkg.State == ccv3.PackageStateExpired {
+	} else if pkg.State == constant.PackageExpired {
 		return Package{}, allWarnings, actionerror.PackageProcessingExpiredError{}
 	}
 

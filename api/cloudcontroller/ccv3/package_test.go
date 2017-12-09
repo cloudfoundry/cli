@@ -10,6 +10,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -50,7 +51,7 @@ var _ = Describe("Package", func() {
 
 				expectedPackage := Package{
 					GUID:  "some-pkg-guid",
-					State: PackageStateProcessingUpload,
+					State: constant.PackageProcessingUpload,
 					Links: map[string]APILink{
 						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 					},
@@ -155,7 +156,7 @@ var _ = Describe("Package", func() {
 
 				It("returns the created package and warnings", func() {
 					pkg, warnings, err := client.CreatePackage(Package{
-						Type: PackageTypeDocker,
+						Type: constant.PackageTypeDocker,
 						Relationships: Relationships{
 							ApplicationRelationship: Relationship{GUID: "some-app-guid"},
 						},
@@ -169,8 +170,8 @@ var _ = Describe("Package", func() {
 
 					expectedPackage := Package{
 						GUID:  "some-pkg-guid",
-						Type:  PackageTypeDocker,
-						State: PackageStateProcessingUpload,
+						Type:  constant.PackageTypeDocker,
+						State: constant.PackageProcessingUpload,
 						Links: map[string]APILink{
 							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 						},
@@ -216,7 +217,7 @@ var _ = Describe("Package", func() {
 
 				It("omits data, and returns the created package and warnings", func() {
 					pkg, warnings, err := client.CreatePackage(Package{
-						Type: PackageTypeBits,
+						Type: constant.PackageTypeBits,
 						Relationships: Relationships{
 							ApplicationRelationship: Relationship{GUID: "some-app-guid"},
 						},
@@ -227,8 +228,8 @@ var _ = Describe("Package", func() {
 
 					expectedPackage := Package{
 						GUID:  "some-pkg-guid",
-						Type:  PackageTypeBits,
-						State: PackageStateProcessingUpload,
+						Type:  constant.PackageTypeBits,
+						State: constant.PackageProcessingUpload,
 						Links: map[string]APILink{
 							"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 						},
@@ -345,7 +346,7 @@ var _ = Describe("Package", func() {
 
 			It("returns the created package and warnings", func() {
 				pkg, warnings, err := client.UploadPackage(Package{
-					State: PackageStateAwaitingUpload,
+					State: constant.PackageAwaitingUpload,
 					Links: map[string]APILink{
 						"upload": APILink{
 							HREF:   fmt.Sprintf("%s/v3/my-special-endpoint/some-pkg-guid/upload", server.URL()),
@@ -358,7 +359,7 @@ var _ = Describe("Package", func() {
 
 				expectedPackage := Package{
 					GUID:  "some-pkg-guid",
-					State: PackageStateProcessingUpload,
+					State: constant.PackageProcessingUpload,
 					Links: map[string]APILink{
 						"upload": APILink{HREF: "some-package-upload-url", Method: http.MethodPost},
 					},
@@ -370,7 +371,7 @@ var _ = Describe("Package", func() {
 
 		Context("when the package does not have an upload link", func() {
 			It("returns an UploadLinkNotFoundError", func() {
-				_, _, err := client.UploadPackage(Package{GUID: "some-pkg-guid", State: PackageStateAwaitingUpload}, "/path/to/foo")
+				_, _, err := client.UploadPackage(Package{GUID: "some-pkg-guid", State: constant.PackageAwaitingUpload}, "/path/to/foo")
 				Expect(err).To(MatchError(ccerror.UploadLinkNotFoundError{PackageGUID: "some-pkg-guid"}))
 			})
 		})
@@ -422,8 +423,8 @@ var _ = Describe("Package", func() {
 				Expect(packages).To(Equal([]Package{
 					{
 						GUID:      "some-pkg-guid-1",
-						Type:      "bits",
-						State:     PackageStateProcessingUpload,
+						Type:      constant.PackageTypeBits,
+						State:     constant.PackageProcessingUpload,
 						CreatedAt: "2017-08-14T21:16:12Z",
 						Links: map[string]APILink{
 							"upload": APILink{HREF: "some-pkg-upload-url-1", Method: http.MethodPost},
@@ -431,8 +432,8 @@ var _ = Describe("Package", func() {
 					},
 					{
 						GUID:      "some-pkg-guid-2",
-						Type:      "bits",
-						State:     PackageStateReady,
+						Type:      constant.PackageTypeBits,
+						State:     constant.PackageReady,
 						CreatedAt: "2017-08-14T21:20:13Z",
 						Links: map[string]APILink{
 							"upload": APILink{HREF: "some-pkg-upload-url-2", Method: http.MethodPost},
