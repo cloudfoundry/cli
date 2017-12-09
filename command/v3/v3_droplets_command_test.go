@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -136,12 +137,12 @@ var _ = Describe("v3-droplets Command", func() {
 			droplets := []v3action.Droplet{
 				{
 					GUID:      "some-droplet-guid-1",
-					State:     v3action.DropletStateStaged,
+					State:     constant.DropletStaged,
 					CreatedAt: createdAtOne,
 				},
 				{
 					GUID:      "some-droplet-guid-2",
-					State:     v3action.DropletStateFailed,
+					State:     constant.DropletFailed,
 					CreatedAt: createdAtTwo,
 				},
 			}

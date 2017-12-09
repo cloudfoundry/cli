@@ -8,6 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -86,7 +87,7 @@ var _ = Describe("Build Actions", func() {
 					Eventually(warningsStream).Should(Receive(ConsistOf("get-warnings-3", "get-warnings-4")))
 					// Eventually(warningsStream).Should(Receive(ConsistOf("droplet-warnings-1", "droplet-warnings-2")))
 
-					Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: DropletState(ccv3.BuildStateStaged), CreatedAt: "some-time"})))
+					Eventually(dropletStream).Should(Receive(Equal(Droplet{GUID: dropletGUID, State: constant.DropletStaged, CreatedAt: "some-time"})))
 					Consistently(errorStream).ShouldNot(Receive())
 
 					Expect(fakeCloudControllerClient.CreateBuildCallCount()).To(Equal(1))

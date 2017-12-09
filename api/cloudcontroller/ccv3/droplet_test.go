@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -93,7 +94,7 @@ var _ = Describe("Droplet", func() {
 				Expect(droplets[0]).To(Equal(Droplet{
 					GUID:  "some-guid-1",
 					Stack: "some-stack-1",
-					State: "STAGED",
+					State: constant.DropletStaged,
 					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack-1",
@@ -105,7 +106,7 @@ var _ = Describe("Droplet", func() {
 				Expect(droplets[1]).To(Equal(Droplet{
 					GUID:  "some-guid-2",
 					Stack: "some-stack-2",
-					State: "COPYING",
+					State: constant.DropletCopying,
 					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack-2",
@@ -117,7 +118,7 @@ var _ = Describe("Droplet", func() {
 				Expect(droplets[2]).To(Equal(Droplet{
 					GUID:  "some-guid-3",
 					Stack: "some-stack-3",
-					State: "FAILED",
+					State: constant.DropletFailed,
 					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack-3",
@@ -193,7 +194,7 @@ var _ = Describe("Droplet", func() {
 				Expect(droplet).To(Equal(Droplet{
 					GUID:  "some-guid",
 					Stack: "some-stack",
-					State: "STAGED",
+					State: constant.DropletStaged,
 					Buildpacks: []DropletBuildpack{
 						{
 							Name:         "some-buildpack",

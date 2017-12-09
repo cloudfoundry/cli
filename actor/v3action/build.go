@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Droplet, <-chan Warnings, <-chan error) {
@@ -56,7 +57,7 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 
 				ccv3Droplet := ccv3.Droplet{
 					GUID:      build.DropletGUID,
-					State:     ccv3.DropletState(build.State),
+					State:     constant.DropletState(build.State),
 					CreatedAt: build.CreatedAt,
 				}
 

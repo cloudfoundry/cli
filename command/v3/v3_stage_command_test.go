@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -151,7 +152,7 @@ var _ = Describe("v3-stage Command", func() {
 							dropletStream <- v3action.Droplet{
 								GUID:      "some-droplet-guid",
 								CreatedAt: dropletCreateTime,
-								State:     v3action.DropletStateStaged,
+								State:     constant.DropletStaged,
 							}
 						}()
 
@@ -272,7 +273,7 @@ var _ = Describe("v3-stage Command", func() {
 						dropletStream <- v3action.Droplet{
 							GUID:      "some-droplet-guid",
 							CreatedAt: "2017-08-14T21:16:42Z",
-							State:     v3action.DropletStateStaged,
+							State:     constant.DropletStaged,
 						}
 					}()
 

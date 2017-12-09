@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -142,7 +143,7 @@ var _ = Describe("Droplet Actions", func() {
 					[]ccv3.Droplet{
 						{
 							GUID:      "some-droplet-guid-1",
-							State:     ccv3.DropletStateStaged,
+							State:     constant.DropletStaged,
 							CreatedAt: "2017-08-14T21:16:42Z",
 							Buildpacks: []ccv3.DropletBuildpack{
 								{Name: "ruby"},
@@ -153,7 +154,7 @@ var _ = Describe("Droplet Actions", func() {
 						},
 						{
 							GUID:      "some-droplet-guid-2",
-							State:     ccv3.DropletStateFailed,
+							State:     constant.DropletFailed,
 							CreatedAt: "2017-08-16T00:18:24Z",
 							Buildpacks: []ccv3.DropletBuildpack{
 								{Name: "java"},
@@ -174,7 +175,7 @@ var _ = Describe("Droplet Actions", func() {
 				Expect(droplets).To(Equal([]Droplet{
 					{
 						GUID:      "some-droplet-guid-1",
-						State:     DropletStateStaged,
+						State:     constant.DropletStaged,
 						CreatedAt: "2017-08-14T21:16:42Z",
 						Buildpacks: []Buildpack{
 							{Name: "ruby"},
@@ -185,7 +186,7 @@ var _ = Describe("Droplet Actions", func() {
 					},
 					{
 						GUID:      "some-droplet-guid-2",
-						State:     DropletStateFailed,
+						State:     constant.DropletFailed,
 						CreatedAt: "2017-08-16T00:18:24Z",
 						Buildpacks: []Buildpack{
 							{Name: "java"},

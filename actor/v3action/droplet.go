@@ -6,21 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-)
-
-type DropletState string
-
-const (
-	DropletStateStaged  DropletState = "STAGED"
-	DropletStateFailed  DropletState = "FAILED"
-	DropletStateCopying DropletState = "COPYING"
-	DropletStateExpired DropletState = "EXPIRED"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 // Droplet represents a Cloud Controller droplet.
 type Droplet struct {
 	GUID       string
-	State      DropletState
+	State      constant.DropletState
 	CreatedAt  string
 	Stack      string
 	Image      string
@@ -80,7 +72,7 @@ func (actor Actor) convertCCToActorDroplet(ccv3Droplet ccv3.Droplet) Droplet {
 
 	return Droplet{
 		GUID:       ccv3Droplet.GUID,
-		State:      DropletState(ccv3Droplet.State),
+		State:      constant.DropletState(ccv3Droplet.State),
 		CreatedAt:  ccv3Droplet.CreatedAt,
 		Stack:      ccv3Droplet.Stack,
 		Buildpacks: buildpacks,

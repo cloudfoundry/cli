@@ -5,25 +5,17 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-type DropletState string
-
-const (
-	DropletStateStaged  DropletState = "STAGED"
-	DropletStateFailed  DropletState = "FAILED"
-	DropletStateCopying DropletState = "COPYING"
-	DropletStateExpired DropletState = "EXPIRED"
-)
-
 type Droplet struct {
-	GUID       string             `json:"guid"`
-	State      DropletState       `json:"state"`
-	CreatedAt  string             `json:"created_at"`
-	Stack      string             `json:"stack,omitempty"`
-	Buildpacks []DropletBuildpack `json:"buildpacks,omitempty"`
-	Image      string             `json:"image"`
+	GUID       string                `json:"guid"`
+	State      constant.DropletState `json:"state"`
+	CreatedAt  string                `json:"created_at"`
+	Stack      string                `json:"stack,omitempty"`
+	Buildpacks []DropletBuildpack    `json:"buildpacks,omitempty"`
+	Image      string                `json:"image"`
 }
 
 type DropletBuildpack struct {
