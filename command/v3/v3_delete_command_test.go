@@ -127,7 +127,7 @@ var _ = Describe("v3-delete Command", func() {
 				fakeActor.DeleteApplicationByNameAndSpaceReturns(v3action.Warnings{"some-warning"}, nil)
 			})
 
-			It("deletes the space", func() {
+			It("deletes the app", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(testUI.Err).To(Say("some-warning"))
