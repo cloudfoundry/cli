@@ -40,10 +40,10 @@ func (actor Actor) StagePackage(packageGUID string, appName string) (<-chan Drop
 			}
 
 			switch build.State {
-			case ccv3.BuildStateFailed:
+			case constant.BuildFailed:
 				errorStream <- errors.New(build.Error)
 				return
-			case ccv3.BuildStateStaging:
+			case constant.BuildStaging:
 				time.Sleep(actor.Config.PollingInterval())
 			default:
 

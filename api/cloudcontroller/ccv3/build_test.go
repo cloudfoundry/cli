@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -49,7 +50,7 @@ var _ = Describe("Build", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(build).To(Equal(Build{
 					GUID:        "some-build-guid",
-					State:       BuildStateStaging,
+					State:       constant.BuildStaging,
 					DropletGUID: "some-droplet-guid",
 				}))
 			})
@@ -130,7 +131,7 @@ var _ = Describe("Build", func() {
 				expectedBuild := Build{
 					CreatedAt:   "some-time",
 					GUID:        "some-build-guid",
-					State:       BuildStateFailed,
+					State:       constant.BuildFailed,
 					Error:       "some error",
 					DropletGUID: "some-droplet-guid",
 				}

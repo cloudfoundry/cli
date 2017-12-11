@@ -5,15 +5,8 @@ import (
 	"encoding/json"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-)
-
-type BuildState string
-
-const (
-	BuildStateFailed  BuildState = "FAILED"
-	BuildStateStaged  BuildState = "STAGED"
-	BuildStateStaging BuildState = "STAGING"
 )
 
 type Build struct {
@@ -21,7 +14,7 @@ type Build struct {
 	GUID        string
 	Error       string
 	PackageGUID string
-	State       BuildState
+	State       constant.BuildState
 	DropletGUID string
 }
 
@@ -45,7 +38,7 @@ func (b *Build) UnmarshalJSON(data []byte) error {
 		Package   struct {
 			GUID string `json:"guid"`
 		} `json:"package"`
-		State   BuildState `json:"state,omitempty"`
+		State   constant.BuildState `json:"state,omitempty"`
 		Droplet struct {
 			GUID string `json:"guid"`
 		} `json:"droplet"`

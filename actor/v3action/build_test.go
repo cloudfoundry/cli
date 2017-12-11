@@ -50,14 +50,14 @@ var _ = Describe("Build Actions", func() {
 			BeforeEach(func() {
 				buildGUID = "some-build-guid"
 				dropletGUID = "some-droplet-guid"
-				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, nil)
+				fakeCloudControllerClient.CreateBuildReturns(ccv3.Build{GUID: buildGUID, State: constant.BuildStaging}, ccv3.Warnings{"create-warnings-1", "create-warnings-2"}, nil)
 				fakeConfig.StagingTimeoutReturns(time.Minute)
 			})
 
 			Context("when the polling is successful", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
-					fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{CreatedAt: "some-time", GUID: buildGUID, State: ccv3.BuildStateStaged, DropletGUID: "some-droplet-guid"}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
+					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: constant.BuildStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
+					fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{CreatedAt: "some-time", GUID: buildGUID, State: constant.BuildStaged, DropletGUID: "some-droplet-guid"}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
 				})
 
 				//TODO: uncommend after #150569020
@@ -109,7 +109,7 @@ var _ = Describe("Build Actions", func() {
 							1,
 							ccv3.Build{
 								GUID:  buildGUID,
-								State: ccv3.BuildStateFailed,
+								State: constant.BuildFailed,
 								Error: "some staging error",
 							},
 							ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, nil)
@@ -151,7 +151,7 @@ var _ = Describe("Build Actions", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a banana")
-					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: ccv3.BuildStateStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
+					fakeCloudControllerClient.GetBuildReturnsOnCall(0, ccv3.Build{GUID: buildGUID, State: constant.BuildStaging}, ccv3.Warnings{"get-warnings-1", "get-warnings-2"}, nil)
 					fakeCloudControllerClient.GetBuildReturnsOnCall(1, ccv3.Build{}, ccv3.Warnings{"get-warnings-3", "get-warnings-4"}, expectedErr)
 				})
 
