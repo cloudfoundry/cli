@@ -286,8 +286,6 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 				PathToManifest: pathToManifest,
 			}
 		}
-
-		// TODO handle when not a dir
 	default:
 		log.Debug("searching for manifest file")
 		pathToManifest = filepath.Join(settings.CurrentDirectory, "manifest.yml")
