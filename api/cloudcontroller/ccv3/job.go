@@ -5,20 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
-)
-
-// JobState is the current state of a job.
-type JobState string
-
-const (
-	// JobStateFailed is when the job is no longer running due to a failure.
-	JobStateFailed JobState = "FAILED"
-
-	// JobStateFinished is when the job is no longer and it was successful.
-	JobStateComplete JobState = "COMPLETE"
-
-	// JobStateQueued is when the job is waiting to be run.
-	JobStateProcessing JobState = "PROCESSING"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ErrorDetails struct {
@@ -29,19 +16,19 @@ type ErrorDetails struct {
 
 // Job represents a Cloud Controller Job.
 type Job struct {
-	Errors []ErrorDetails `json:"errors"`
-	GUID   string         `json:"guid"`
-	State  JobState       `json:"state"`
+	Errors []ErrorDetails    `json:"errors"`
+	GUID   string            `json:"guid"`
+	State  constant.JobState `json:"state"`
 }
 
 // Complete returns true when the job has completed successfully.
 func (job Job) Complete() bool {
-	return job.State == JobStateComplete
+	return job.State == constant.JobComplete
 }
 
 // Failed returns true when the job has completed with an error/failure.
 func (job Job) Failed() bool {
-	return job.State == JobStateFailed
+	return job.State == constant.JobFailed
 }
 
 // GetJob returns a job for the provided GUID.

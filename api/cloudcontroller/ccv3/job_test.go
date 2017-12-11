@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -18,27 +19,28 @@ var _ = Describe("Job", func() {
 
 	Describe("Job", func() {
 		DescribeTable("Complete",
-			func(status JobState, expected bool) {
+			func(status constant.JobState, expected bool) {
 				job := Job{State: status}
 				Expect(job.Complete()).To(Equal(expected))
 			},
 
-			Entry("when failed, it returns false", JobStateFailed, false),
-			Entry("when complete, it returns true", JobStateComplete, true),
-			Entry("when processing, it returns false", JobStateProcessing, false),
+			Entry("when failed, it returns false", constant.JobFailed, false),
+			Entry("when complete, it returns true", constant.JobComplete, true),
+			Entry("when processing, it returns false", constant.JobProcessing, false),
 		)
 
 		DescribeTable("Failed",
-			func(status JobState, expected bool) {
+			func(status constant.JobState, expected bool) {
 				job := Job{State: status}
 				Expect(job.Failed()).To(Equal(expected))
 			},
 
-			Entry("when failed, it returns true", JobStateFailed, true),
-			Entry("when complete, it returns false", JobStateComplete, false),
-			Entry("when processing, it returns false", JobStateProcessing, false),
+			Entry("when failed, it returns true", constant.JobFailed, true),
+			Entry("when complete, it returns false", constant.JobComplete, false),
+			Entry("when processing, it returns false", constant.JobProcessing, false),
 		)
 	})
+
 	Describe("GetJob", func() {
 		var jobLocation string
 
@@ -76,7 +78,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.State).To(Equal(JobStateProcessing))
+				Expect(job.State).To(Equal(constant.JobProcessing))
 			})
 		})
 
@@ -116,7 +118,7 @@ var _ = Describe("Job", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 				Expect(job.GUID).To(Equal("job-guid"))
-				Expect(job.State).To(Equal(JobStateFailed))
+				Expect(job.State).To(Equal(constant.JobFailed))
 				Expect(job.Errors[0].Detail).To(Equal("blah blah"))
 				Expect(job.Errors[0].Title).To(Equal("CF-JobFail"))
 				Expect(job.Errors[0].Code).To(Equal(1234))
