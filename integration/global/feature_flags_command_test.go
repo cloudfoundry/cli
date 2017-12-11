@@ -14,7 +14,7 @@ var _ = Describe("feature-flags command", func() {
 			It("displays command usage to output", func() {
 				session := helpers.CF("feature-flags", "--help")
 				Eventually(session.Out).Should(Say("NAME:"))
-				Eventually(session.Out).Should(Say("\\s+feature-flags - Retrieve list of feature flags with status of each flag-able feature"))
+				Eventually(session.Out).Should(Say("\\s+feature-flags - Retrieve list of feature flags with status"))
 				Eventually(session.Out).Should(Say(""))
 				Eventually(session.Out).Should(Say("USAGE:"))
 				Eventually(session.Out).Should(Say("\\s+cf feature-flags"))
