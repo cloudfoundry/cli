@@ -49,7 +49,6 @@ var _ = Describe("Create Route Command", func() {
 		binaryName = "faceman"
 		fakeConfig.BinaryNameReturns(binaryName)
 		fakeActor.CloudControllerAPIVersionReturns(ccversion.MinVersionTCPRouting)
-		fakeConfig.ExperimentalReturns(true)
 	})
 
 	DescribeTable("argument combinations",

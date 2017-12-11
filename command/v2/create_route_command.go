@@ -48,11 +48,6 @@ func (cmd *CreateRouteCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd CreateRouteCommand) Execute(args []string) error {
-	if !cmd.Config.Experimental() {
-		return translatableerror.UnrefactoredCommandError{}
-	}
-
-	cmd.UI.DisplayWarning(command.ExperimentalWarning)
 	err := cmd.validateArguments()
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package experimental
+package isolated
 
 import (
 	"fmt"
