@@ -1,6 +1,5 @@
 CF_DIAL_TIMEOUT ?= 15
-GINKGO_UNIT_TEST_NODES ?= 4
-GINKGO_INTEGRATION_TEST_NODES ?= 4
+NODES ?= 4
 LC_ALL = "en_US.UTF-8"
 
 CF_BUILD_VERSION ?= $$(cat ci/VERSION)
@@ -55,27 +54,27 @@ integration-cleanup :
 	$(PWD)/bin/cleanup-integration
 
 integration-experimental : build integration-cleanup
-	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/experimental
+	CF_CLI_EXPERIMENTAL=true ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/experimental
 
 integration-global : build integration-cleanup
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 
 integration-isolated : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated
 
 integration-plugin : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/plugin
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/plugin
 
 integration-push : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/push
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/push
 
 integration-tests : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated integration/push
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
 integration-tests-full : build integration-cleanup
-	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(GINKGO_INTEGRATION_TEST_NODES) integration/isolated integration/push integration/plugin integration/experimental
+	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 -nodes $(NODES) integration/isolated integration/push integration/plugin integration/experimental
 	ginkgo -r -randomizeAllSpecs -slowSpecThreshold 60 integration/global
 	make integration-cleanup
 
@@ -103,14 +102,14 @@ out/cf-cli-_win32.exe : $(GOSRC)
 test : units
 
 units : format vet build
-	ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites \
+	ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites \
 		api actor command types util version
 	@echo "\nSWEET SUITE SUCCESS"
 
 units-full : format vet build
 	@rm -f $(wildcard fixtures/plugins/*.exe)
 	@ginkgo version
-	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(GINKGO_UNIT_TEST_NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration
+	CF_HOME=$(PWD)/fixtures ginkgo -r -nodes $(NODES) -randomizeAllSpecs -randomizeSuites -skipPackage integration
 	@echo "\nSWEET SUITE SUCCESS"
 
 version :
