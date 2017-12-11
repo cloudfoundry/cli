@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -262,8 +263,8 @@ var _ = Describe("v2-push Command", func() {
 
 						Context("when a manifest is provided", func() {
 							var (
-								tmpDir         string
-								pathToManifest string
+								tmpDir       string
+								providedPath string
 
 								originalDir string
 							)
@@ -295,8 +296,8 @@ var _ = Describe("v2-push Command", func() {
 									err := os.Chdir(tmpDir)
 									Expect(err).ToNot(HaveOccurred())
 
-									pathToManifest = filepath.Join(tmpDir, "manifest.yml")
-									err = ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
+									providedPath = filepath.Join(tmpDir, "manifest.yml")
+									err = ioutil.WriteFile(providedPath, []byte("some manifest file"), 0666)
 									Expect(err).ToNot(HaveOccurred())
 
 									expectedApps = []manifest.Application{{Name: "some-app"}, {Name: "some-other-app"}}
@@ -308,7 +309,7 @@ var _ = Describe("v2-push Command", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
 										Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
-										Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+										Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(providedPath))
 
 										Expect(fakeActor.MergeAndValidateSettingsAndManifestsCallCount()).To(Equal(1))
 										cmdSettings, manifestApps := fakeActor.MergeAndValidateSettingsAndManifestsArgsForCall(0)
@@ -322,7 +323,7 @@ var _ = Describe("v2-push Command", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
 										Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
-										Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(pathToManifest)))
+										Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
 									})
 								})
 
@@ -363,8 +364,8 @@ var _ = Describe("v2-push Command", func() {
 									err := os.Chdir(tmpDir)
 									Expect(err).ToNot(HaveOccurred())
 
-									pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
-									err = ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
+									providedPath = filepath.Join(tmpDir, "manifest.yaml")
+									err = ioutil.WriteFile(providedPath, []byte("some manifest file"), 0666)
 									Expect(err).ToNot(HaveOccurred())
 								})
 
@@ -372,31 +373,130 @@ var _ = Describe("v2-push Command", func() {
 									Expect(executeErr).ToNot(HaveOccurred())
 
 									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
-									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
+									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(providedPath))
 								})
 							})
 
 							Context("via the -f flag", func() {
-								BeforeEach(func() {
-									pathToManifest = filepath.Join(tmpDir, "manifest.yaml")
-									err := ioutil.WriteFile(pathToManifest, []byte("some manifest file"), 0666)
-									Expect(err).ToNot(HaveOccurred())
+								Context("given a path with filename 'manifest.yml'", func() {
+									BeforeEach(func() {
+										providedPath = filepath.Join(tmpDir, "manifest.yml")
+									})
 
-									cmd.PathToManifest = flag.PathWithExistenceCheck(pathToManifest)
+									Context("when the manifest.yml file does not exist", func() {
+										BeforeEach(func() {
+											cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
+										})
+
+										It("returns an error", func() {
+											Expect(executeErr).To(MatchError(fmt.Sprintf("stat %s: no such file or directory", providedPath)))
+
+											Expect(testUI.Out).ToNot(Say("Pushing from manifest"))
+											Expect(testUI.Out).ToNot(Say("Using manifest file"))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(0))
+										})
+									})
+
+									Context("when the manifest.yml file exists", func() {
+										BeforeEach(func() {
+											err := ioutil.WriteFile(providedPath, []byte(`key: "value"`), 0666)
+											Expect(err).ToNot(HaveOccurred())
+
+											cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
+										})
+
+										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
+
+											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(providedPath)))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+											Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(providedPath))
+										})
+									})
 								})
 
-								It("should read the manifest.yml", func() {
-									Expect(executeErr).ToNot(HaveOccurred())
+								Context("given a path that is a directory", func() {
 
-									Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
-									Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(pathToManifest))
-								})
+									var (
+										ymlFile  string
+										yamlFile string
+									)
 
-								It("outputs corresponding flavor text", func() {
-									Expect(executeErr).ToNot(HaveOccurred())
+									BeforeEach(func() {
+										providedPath = tmpDir
+										cmd.PathToManifest = flag.PathWithExistenceCheck(providedPath)
+									})
 
-									Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
-									Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(pathToManifest)))
+									Context("when the directory does not contain a 'manifest.y{a}ml' file", func() {
+										It("returns an error", func() {
+											Expect(executeErr).To(MatchError(translatableerror.ManifestFileNotFoundInDirectoryError{PathToManifest: providedPath}))
+											Expect(testUI.Out).ToNot(Say("Pushing from manifest"))
+											Expect(testUI.Out).ToNot(Say("Using manifest file"))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(0))
+										})
+									})
+
+									Context("when the directory contains a 'manifest.yml' file", func() {
+										BeforeEach(func() {
+											ymlFile = filepath.Join(providedPath, "manifest.yml")
+											err := ioutil.WriteFile(ymlFile, []byte(`key: "value"`), 0666)
+											Expect(err).ToNot(HaveOccurred())
+										})
+
+										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
+
+											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+											Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(ymlFile))
+										})
+									})
+
+									Context("when the directory contains a 'manifest.yaml' file", func() {
+										BeforeEach(func() {
+											yamlFile = filepath.Join(providedPath, "manifest.yaml")
+											err := ioutil.WriteFile(yamlFile, []byte(`key: "value"`), 0666)
+											Expect(err).ToNot(HaveOccurred())
+										})
+
+										It("should read the manifest.yaml file and outputs corresponding flavor text", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
+
+											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(yamlFile)))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+											Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(yamlFile))
+										})
+									})
+
+									Context("when the directory contains both a 'manifest.yml' and 'manifest.yaml' file", func() {
+										BeforeEach(func() {
+											ymlFile = filepath.Join(providedPath, "manifest.yml")
+											err := ioutil.WriteFile(ymlFile, []byte(`key: "value"`), 0666)
+											Expect(err).ToNot(HaveOccurred())
+
+											yamlFile = filepath.Join(providedPath, "manifest.yaml")
+											err = ioutil.WriteFile(yamlFile, []byte(`key: "value"`), 0666)
+											Expect(err).ToNot(HaveOccurred())
+										})
+
+										It("should read the manifest.yml file and outputs corresponding flavor text", func() {
+											Expect(executeErr).ToNot(HaveOccurred())
+
+											Expect(testUI.Out).To(Say("Pushing from manifest to org some-org / space some-space as some-user\\.\\.\\."))
+											Expect(testUI.Out).To(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
+
+											Expect(fakeActor.ReadManifestCallCount()).To(Equal(1))
+											Expect(fakeActor.ReadManifestArgsForCall(0)).To(Equal(ymlFile))
+										})
+									})
 								})
 							})
 						})
@@ -704,13 +804,13 @@ var _ = Describe("v2-push Command", func() {
 	Describe("GetCommandLineSettings", func() {
 		Context("valid flag combinations", func() {
 			var (
-				settings   pushaction.CommandLineSettings
-				executeErr error
+				settings               pushaction.CommandLineSettings
+				commandLineSettingsErr error
 			)
 
 			JustBeforeEach(func() {
-				settings, executeErr = cmd.GetCommandLineSettings()
-				Expect(executeErr).ToNot(HaveOccurred())
+				settings, commandLineSettingsErr = cmd.GetCommandLineSettings()
+				Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 			})
 
 			Context("when general app settings are given", func() {
@@ -726,7 +826,7 @@ var _ = Describe("v2-push Command", func() {
 				})
 
 				It("sets them on the command line settings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+					Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 					Expect(settings.Buildpack).To(Equal(types.FilteredString{Value: "some-buildpack", IsSet: true}))
 					Expect(settings.Command).To(Equal(types.FilteredString{IsSet: true, Value: "echo foo bar baz"}))
 					Expect(settings.DiskQuota).To(Equal(uint64(1024)))
@@ -775,7 +875,7 @@ var _ = Describe("v2-push Command", func() {
 					})
 
 					It("sets --random-route on the command line settings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 						Expect(settings.RandomRoute).To(BeTrue())
 					})
 				})
@@ -786,7 +886,7 @@ var _ = Describe("v2-push Command", func() {
 					})
 
 					It("sets --route-path on the command line settings", func() {
-						Expect(executeErr).ToNot(HaveOccurred())
+						Expect(commandLineSettingsErr).ToNot(HaveOccurred())
 						Expect(settings.RoutePath).To(Equal("/some-path"))
 					})
 				})
@@ -865,8 +965,8 @@ var _ = Describe("v2-push Command", func() {
 		DescribeTable("validation errors when flags are passed",
 			func(setup func(), expectedErr error) {
 				setup()
-				_, executeErr := cmd.GetCommandLineSettings()
-				Expect(executeErr).To(MatchError(expectedErr))
+				_, commandLineSettingsErr := cmd.GetCommandLineSettings()
+				Expect(commandLineSettingsErr).To(MatchError(expectedErr))
 			},
 
 			Entry("-o and -p",

@@ -17,85 +17,238 @@ import (
 
 var _ = Describe("push with a simple manifest and flags", func() {
 	var (
-		appName        string
-		pathToManifest string
+		appName string
 	)
 
 	BeforeEach(func() {
 		appName = helpers.NewAppName()
-
-		tmpFile, err := ioutil.TempFile("", "combination-manifest")
-		Expect(err).ToNot(HaveOccurred())
-		pathToManifest = tmpFile.Name()
-		Expect(tmpFile.Close()).ToNot(HaveOccurred())
-	})
-
-	AfterEach(func() {
-		Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
 	})
 
 	Context("when the app is new", func() {
 		Context("when pushing a single app from the manifest", func() {
-			Context("when the manifest is passed via '-f'", func() {
-				Context("when pushing the app from the current directory", func() {
+			Context("when the '-f' flag is provided", func() {
+				var (
+					pathToManifest string // Can be a filepath or a directory with a manifest.
+				)
+
+				Context("when the manifest file is passed", func() {
 					BeforeEach(func() {
-						helpers.WriteManifest(pathToManifest, map[string]interface{}{
-							"applications": []map[string]string{
-								{
-									"name": appName,
-								},
-							},
-						})
+						tmpFile, err := ioutil.TempFile("", "combination-manifest")
+						Expect(err).ToNot(HaveOccurred())
+						pathToManifest = tmpFile.Name()
+						Expect(tmpFile.Close()).ToNot(HaveOccurred())
 					})
 
-					It("pushes the app from the current directory and the manifest for app settings", func() {
-						helpers.WithHelloWorldApp(func(dir string) {
-							session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest)
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-							Eventually(session).Should(Say("\\s+routes:"))
-							Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
-							Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
-							Eventually(session).Should(Say("Uploading files\\.\\.\\."))
-							Eventually(session).Should(Say("100.00%"))
-							Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
-							helpers.ConfirmStagingLogs(session)
-							Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Exit(0))
-						})
-
-						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Exit(0))
+					AfterEach(func() {
+						Expect(os.Remove(pathToManifest)).ToNot(HaveOccurred())
 					})
-				})
 
-				Context("when the path to the application is provided in the manifest", func() {
-					It("pushes the app from the path specified in the manifest and uses the manifest for app settings", func() {
-						helpers.WithHelloWorldApp(func(dir string) {
+					Context("when pushing the app from the current directory", func() {
+						BeforeEach(func() {
 							helpers.WriteManifest(pathToManifest, map[string]interface{}{
 								"applications": []map[string]string{
 									{
 										"name": appName,
-										"path": filepath.Base(dir),
+									},
+								},
+							})
+						})
+
+						It("pushes the app from the current directory and the manifest for app settings", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest)
+								Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+								Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+								Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+								Eventually(session).Should(Say("\\s+routes:"))
+								Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
+								Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+								Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+								Eventually(session).Should(Say("100.00%"))
+								Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+								helpers.ConfirmStagingLogs(session)
+								Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
+								Eventually(session).Should(Say("requested state:\\s+started"))
+								Eventually(session).Should(Exit(0))
+							})
+
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the path to the application is provided in the manifest", func() {
+						It("pushes the app from the path specified in the manifest and uses the manifest for app settings", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								helpers.WriteManifest(pathToManifest, map[string]interface{}{
+									"applications": []map[string]string{
+										{
+											"name": appName,
+											"path": filepath.Base(dir),
+										},
+									},
+								})
+
+								session := helpers.CF(PushCommandName, "-f", pathToManifest)
+								Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+								Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+								Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+								Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
+								Eventually(session).Should(Say("requested state:\\s+started"))
+								Eventually(session).Should(Exit(0))
+							})
+
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+				})
+
+				Context("when a directory is passed", func() {
+					var (
+						ymlFile  string
+						yamlFile string
+					)
+
+					BeforeEach(func() {
+						var err error
+						pathToManifest, err = ioutil.TempDir("", "manifest-integration-")
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					AfterEach(func() {
+						Expect(os.RemoveAll(pathToManifest)).ToNot(HaveOccurred())
+					})
+
+					Context("when the directory contains a 'manifest.yml' file", func() {
+						BeforeEach(func() {
+							ymlFile = filepath.Join(pathToManifest, "manifest.yml")
+							helpers.WriteManifest(ymlFile, map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":      appName,
+										"instances": 2,
+									},
+								},
+							})
+						})
+
+						It("pushes the app from the given directory and the found 'manifest.yml' for app settings", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
+								Eventually(session).Should(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
+								Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+								Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+								Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+								Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", 2))
+								Eventually(session).Should(Say("\\s+routes:"))
+								Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
+								Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+								Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+								Eventually(session).Should(Say("100.00%"))
+								Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+								Eventually(session).Should(Exit(0))
+							})
+
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+					Context("when the directory contains a 'manifest.yaml' file", func() {
+						BeforeEach(func() {
+							yamlFile = filepath.Join(pathToManifest, "manifest.yaml")
+							helpers.WriteManifest(yamlFile, map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":      appName,
+										"instances": 2,
+									},
+								},
+							})
+						})
+
+						It("pushes the app from the given directory and the found 'manifest.yaml' for app settings", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
+								Eventually(session).Should(Say("Using manifest file %s", regexp.QuoteMeta(yamlFile)))
+								Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+								Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+								Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+								Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", 2))
+								Eventually(session).Should(Say("\\s+routes:"))
+								Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
+								Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+								Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+								Eventually(session).Should(Say("100.00%"))
+								Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+								Eventually(session).Should(Exit(0))
+							})
+
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the directory contains both a 'manifest.yml' file and a 'manifest.yaml' file", func() {
+						BeforeEach(func() {
+							ymlFile = filepath.Join(pathToManifest, "manifest.yml")
+							helpers.WriteManifest(ymlFile, map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":      appName,
+										"instances": 2,
 									},
 								},
 							})
 
-							session := helpers.CF(PushCommandName, "-f", pathToManifest)
-							Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-							Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
-							Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
-							Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
-							Eventually(session).Should(Say("requested state:\\s+started"))
-							Eventually(session).Should(Exit(0))
+							yamlFile = filepath.Join(pathToManifest, "manifest.yaml")
+							helpers.WriteManifest(yamlFile, map[string]interface{}{
+								"applications": []map[string]interface{}{
+									{
+										"name":      appName,
+										"instances": 4,
+									},
+								},
+							})
 						})
 
-						session := helpers.CF("app", appName)
-						Eventually(session).Should(Say("name:\\s+%s", appName))
-						Eventually(session).Should(Exit(0))
+						It("pushes the app from the given directory and the found 'manifest.yml' for app settings", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
+								Eventually(session).Should(Say("Using manifest file %s", regexp.QuoteMeta(ymlFile)))
+								Eventually(session).Should(Say("Getting app info\\.\\.\\."))
+								Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
+								Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
+								Eventually(session).Should(Say("\\+\\s+instances:\\s+%d", 2))
+								Eventually(session).Should(Say("\\s+routes:"))
+								Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
+								Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
+								Eventually(session).Should(Say("Uploading files\\.\\.\\."))
+								Eventually(session).Should(Say("100.00%"))
+								Eventually(session).Should(Say("Waiting for API to complete processing files\\.\\.\\."))
+								Eventually(session).Should(Exit(0))
+							})
+
+							session := helpers.CF("app", appName)
+							Eventually(session).Should(Say("name:\\s+%s", appName))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the directory contains no manifest file", func() {
+						It("returns a no manifest file error", func() {
+							helpers.WithHelloWorldApp(func(dir string) {
+								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
+								Eventually(session.Err).Should(Say("Could not find 'manifest.yml' file in %s", pathToManifest))
+								Eventually(session).Should(Say("FAILED"))
+								Eventually(session).Should(Exit(1))
+							})
+						})
+
 					})
 				})
 			})

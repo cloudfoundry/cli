@@ -66,6 +66,8 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("JobTimeoutError", JobTimeoutError{}),
 		Entry("JSONSyntaxError", JSONSyntaxError{Err: errors.New("some-error")}),
 		Entry("LifecycleMinimumAPIVersionNotMetError", LifecycleMinimumAPIVersionNotMetError{}),
+		Entry("ManifestCreationError", ManifestCreationError{}),
+		Entry("ManifestFileNotFoundInDirectoryError", ManifestFileNotFoundInDirectoryError{}),
 		Entry("MinimumAPIVersionNotMetError", MinimumAPIVersionNotMetError{}),
 		Entry("NetworkPolicyProtocolOrPortNotProvidedError", NetworkPolicyProtocolOrPortNotProvidedError{}),
 		Entry("NoAPISetError", NoAPISetError{}),
