@@ -260,7 +260,7 @@ func (cmd V2PushCommand) findAndReadManifestWithFlavorText(settings pushaction.C
 	case cmd.NoManifest:
 		log.Debug("skipping reading of manifest")
 	case cmd.PathToManifest != "":
-		log.Debug("using specified manifest file")
+		log.WithField("file", cmd.PathToManifest).Debug("using specified manifest file")
 		pathToManifest = string(cmd.PathToManifest)
 
 		fileInfo, err := os.Stat(pathToManifest)

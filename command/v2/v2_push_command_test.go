@@ -2,7 +2,6 @@ package v2_test
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -389,7 +388,7 @@ var _ = Describe("v2-push Command", func() {
 										})
 
 										It("returns an error", func() {
-											Expect(executeErr).To(MatchError(fmt.Sprintf("stat %s: no such file or directory", providedPath)))
+											Expect(os.IsNotExist(executeErr)).To(BeTrue())
 
 											Expect(testUI.Out).ToNot(Say("Pushing from manifest"))
 											Expect(testUI.Out).ToNot(Say("Using manifest file"))
