@@ -3,7 +3,6 @@ package v3
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v3action"
@@ -102,11 +101,6 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warningsV2)
 
 	if err != nil {
-		if _, ok := err.(actionerror.ServiceInstanceNotSharedToSpaceError); ok {
-			return translatableerror.ServiceInstanceNotSharedToSpaceError{
-				ServiceInstanceName: cmd.RequiredArgs.ServiceInstance,
-			}
-		}
 		return err
 	}
 

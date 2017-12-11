@@ -343,6 +343,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("calls GetSpaceServiceInstance with the correct service instance name and space guid", func() {
+				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 				spaceGUIDArg, _, queryArg := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 
 				Expect(spaceGUIDArg).To(Equal("some-source-space-guid"))
@@ -350,6 +351,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("calls GetServiceInstanceSharedTos with the correct service instance guid", func() {
+				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 				serviceInstanceGUIDArg := fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)
 
 				Expect(serviceInstanceGUIDArg).To(Equal("some-service-instance-guid"))
@@ -549,6 +551,21 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("returns an error and warnings", func() {
 				Expect(executeErr).To(MatchError(actionerror.ServiceInstanceNotFoundError{Name: serviceInstanceName, GUID: ""}))
+				Expect(warnings).To(Equal(Warnings{"get-space-service-instances-warning"}))
+			})
+		})
+
+		Context("when retrieving the service instance returns an error ", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
+					[]ccv2.ServiceInstance{},
+					ccv2.Warnings{"get-space-service-instances-warning"},
+					errors.New("oops"),
+				)
+			})
+
+			It("returns an error and warnings", func() {
+				Expect(executeErr).To(MatchError(errors.New("oops")))
 				Expect(warnings).To(Equal(Warnings{"get-space-service-instances-warning"}))
 			})
 		})

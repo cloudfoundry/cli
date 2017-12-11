@@ -141,6 +141,15 @@ var _ = Describe("unshare-service Command", func() {
 						nil)
 				})
 
+				It("calls GetSharedToSpaceGUID with the correct parameters", func() {
+					Expect(fakeActorV2.GetSharedToSpaceGUIDCallCount()).To(Equal(1))
+					serviceInstanceNameArg, sourceSpaceGUIDArg, sharedToOrgNameArg, sharedToSpaceNameArg := fakeActorV2.GetSharedToSpaceGUIDArgsForCall(0)
+					Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+					Expect(sourceSpaceGUIDArg).To(Equal("some-space-guid"))
+					Expect(sharedToOrgNameArg).To(Equal("some-org"))
+					Expect(sharedToSpaceNameArg).To(Equal("some-space"))
+				})
+
 				Context("when the unsharing is successful", func() {
 					BeforeEach(func() {
 						fakeActor.UnshareServiceInstanceFromSpaceReturns(
@@ -157,10 +166,10 @@ var _ = Describe("unshare-service Command", func() {
 						Expect(testUI.Err).To(Say("unshare-service-warning"))
 
 						Expect(fakeActor.UnshareServiceInstanceFromSpaceCallCount()).To(Equal(1))
-						serviceInstanceNameArg, sourceSpaceGUID, sharedToSpaceGUID := fakeActor.UnshareServiceInstanceFromSpaceArgsForCall(0)
+						serviceInstanceNameArg, sourceSpaceGUIDArg, sharedToSpaceGUIDArg := fakeActor.UnshareServiceInstanceFromSpaceArgsForCall(0)
 						Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
-						Expect(sourceSpaceGUID).To(Equal("some-space-guid"))
-						Expect(sharedToSpaceGUID).To(Equal("shared-to-space-guid"))
+						Expect(sourceSpaceGUIDArg).To(Equal("some-space-guid"))
+						Expect(sharedToSpaceGUIDArg).To(Equal("shared-to-space-guid"))
 					})
 				})
 
@@ -188,6 +197,15 @@ var _ = Describe("unshare-service Command", func() {
 						"shared-to-space-guid",
 						v2action.Warnings{"get-shared-to-space-guid-warning"},
 						nil)
+				})
+
+				It("calls GetSharedToSpaceGUID with the correct parameters", func() {
+					Expect(fakeActorV2.GetSharedToSpaceGUIDCallCount()).To(Equal(1))
+					serviceInstanceNameArg, sourceSpaceGUIDArg, sharedToOrgNameArg, sharedToSpaceNameArg := fakeActorV2.GetSharedToSpaceGUIDArgsForCall(0)
+					Expect(serviceInstanceNameArg).To(Equal("some-service-instance"))
+					Expect(sourceSpaceGUIDArg).To(Equal("some-space-guid"))
+					Expect(sharedToOrgNameArg).To(Equal("some-other-org"))
+					Expect(sharedToSpaceNameArg).To(Equal("some-space"))
 				})
 
 				Context("when the unsharing is successful", func() {
