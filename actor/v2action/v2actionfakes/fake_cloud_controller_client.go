@@ -486,6 +486,21 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	GetServiceInstanceSharedTosStub        func(serviceInstanceGUID string) ([]ccv2.ServiceInstanceSharedTo, ccv2.Warnings, error)
+	getServiceInstanceSharedTosMutex       sync.RWMutex
+	getServiceInstanceSharedTosArgsForCall []struct {
+		serviceInstanceGUID string
+	}
+	getServiceInstanceSharedTosReturns struct {
+		result1 []ccv2.ServiceInstanceSharedTo
+		result2 ccv2.Warnings
+		result3 error
+	}
+	getServiceInstanceSharedTosReturnsOnCall map[int]struct {
+		result1 []ccv2.ServiceInstanceSharedTo
+		result2 ccv2.Warnings
+		result3 error
+	}
 	GetUserProvidedServiceInstanceServiceBindingsStub        func(userProvidedServiceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
 	getUserProvidedServiceInstanceServiceBindingsMutex       sync.RWMutex
 	getUserProvidedServiceInstanceServiceBindingsArgsForCall []struct {
@@ -2615,6 +2630,60 @@ func (fake *FakeCloudControllerClient) GetServiceInstanceServiceBindingsReturnsO
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) GetServiceInstanceSharedTos(serviceInstanceGUID string) ([]ccv2.ServiceInstanceSharedTo, ccv2.Warnings, error) {
+	fake.getServiceInstanceSharedTosMutex.Lock()
+	ret, specificReturn := fake.getServiceInstanceSharedTosReturnsOnCall[len(fake.getServiceInstanceSharedTosArgsForCall)]
+	fake.getServiceInstanceSharedTosArgsForCall = append(fake.getServiceInstanceSharedTosArgsForCall, struct {
+		serviceInstanceGUID string
+	}{serviceInstanceGUID})
+	fake.recordInvocation("GetServiceInstanceSharedTos", []interface{}{serviceInstanceGUID})
+	fake.getServiceInstanceSharedTosMutex.Unlock()
+	if fake.GetServiceInstanceSharedTosStub != nil {
+		return fake.GetServiceInstanceSharedTosStub(serviceInstanceGUID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fake.getServiceInstanceSharedTosReturns.result1, fake.getServiceInstanceSharedTosReturns.result2, fake.getServiceInstanceSharedTosReturns.result3
+}
+
+func (fake *FakeCloudControllerClient) GetServiceInstanceSharedTosCallCount() int {
+	fake.getServiceInstanceSharedTosMutex.RLock()
+	defer fake.getServiceInstanceSharedTosMutex.RUnlock()
+	return len(fake.getServiceInstanceSharedTosArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetServiceInstanceSharedTosArgsForCall(i int) string {
+	fake.getServiceInstanceSharedTosMutex.RLock()
+	defer fake.getServiceInstanceSharedTosMutex.RUnlock()
+	return fake.getServiceInstanceSharedTosArgsForCall[i].serviceInstanceGUID
+}
+
+func (fake *FakeCloudControllerClient) GetServiceInstanceSharedTosReturns(result1 []ccv2.ServiceInstanceSharedTo, result2 ccv2.Warnings, result3 error) {
+	fake.GetServiceInstanceSharedTosStub = nil
+	fake.getServiceInstanceSharedTosReturns = struct {
+		result1 []ccv2.ServiceInstanceSharedTo
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetServiceInstanceSharedTosReturnsOnCall(i int, result1 []ccv2.ServiceInstanceSharedTo, result2 ccv2.Warnings, result3 error) {
+	fake.GetServiceInstanceSharedTosStub = nil
+	if fake.getServiceInstanceSharedTosReturnsOnCall == nil {
+		fake.getServiceInstanceSharedTosReturnsOnCall = make(map[int]struct {
+			result1 []ccv2.ServiceInstanceSharedTo
+			result2 ccv2.Warnings
+			result3 error
+		})
+	}
+	fake.getServiceInstanceSharedTosReturnsOnCall[i] = struct {
+		result1 []ccv2.ServiceInstanceSharedTo
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) GetUserProvidedServiceInstanceServiceBindings(userProvidedServiceInstanceGUID string) ([]ccv2.ServiceBinding, ccv2.Warnings, error) {
 	fake.getUserProvidedServiceInstanceServiceBindingsMutex.Lock()
 	ret, specificReturn := fake.getUserProvidedServiceInstanceServiceBindingsReturnsOnCall[len(fake.getUserProvidedServiceInstanceServiceBindingsArgsForCall)]
@@ -4213,6 +4282,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getServiceInstanceMutex.RUnlock()
 	fake.getServiceInstanceServiceBindingsMutex.RLock()
 	defer fake.getServiceInstanceServiceBindingsMutex.RUnlock()
+	fake.getServiceInstanceSharedTosMutex.RLock()
+	defer fake.getServiceInstanceSharedTosMutex.RUnlock()
 	fake.getUserProvidedServiceInstanceServiceBindingsMutex.RLock()
 	defer fake.getUserProvidedServiceInstanceServiceBindingsMutex.RUnlock()
 	fake.getServiceInstancesMutex.RLock()

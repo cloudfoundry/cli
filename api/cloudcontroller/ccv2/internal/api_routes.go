@@ -48,6 +48,7 @@ const (
 	GetServiceInstanceRequest                            = "GetServiceInstance"
 	GetServiceInstanceServiceBindingsRequest             = "GetServiceInstanceServiceBindings"
 	GetServiceInstancesRequest                           = "GetServiceInstances"
+	GetServiceInstanceSharedToRequest                    = "GetServiceInstanceSharedTo"
 	GetServicePlanRequest                                = "GetServicePlan"
 	GetServiceRequest                                    = "GetService"
 	GetSharedDomainRequest                               = "GetSharedDomain"
@@ -121,6 +122,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: GetServiceInstancesRequest},
 	{Path: "/v2/service_instances/:service_instance_guid", Method: http.MethodGet, Name: GetServiceInstanceRequest},
 	{Path: "/v2/service_instances/:service_instance_guid/service_bindings", Method: http.MethodGet, Name: GetServiceInstanceServiceBindingsRequest},
+	{Path: "/v2/service_instances/:service_instance_guid/shared_to", Method: http.MethodGet, Name: GetServiceInstanceSharedToRequest},
 	{Path: "/v2/service_plans/:service_plan_guid", Method: http.MethodGet, Name: GetServicePlanRequest},
 	{Path: "/v2/services/:service_guid", Method: http.MethodGet, Name: GetServiceRequest},
 	{Path: "/v2/shared_domains", Method: http.MethodGet, Name: GetSharedDomainsRequest},

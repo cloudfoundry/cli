@@ -48,6 +48,23 @@ func (actor Actor) ShareServiceInstanceInSpaceByOrganizationAndSpaceName(service
 	return allWarnings, err
 }
 
+func (actor Actor) UnshareServiceInstanceFromSpace(serviceInstanceName string, sourceSpaceGUID string, sharedToSpaceGUID string) (Warnings, error) {
+	serviceInstance, allWarnings, err := actor.GetServiceInstanceByNameAndSpace(serviceInstanceName, sourceSpaceGUID)
+
+	if _, ok := err.(actionerror.ServiceInstanceNotFoundError); ok == true {
+		return allWarnings, actionerror.SharedServiceInstanceNotFoundError{}
+	}
+
+	if err != nil {
+		return allWarnings, err
+	}
+
+	apiWarnings, err := actor.CloudControllerClient.UnshareServiceInstanceFromSpace(serviceInstance.GUID, sharedToSpaceGUID)
+	allWarnings = append(allWarnings, apiWarnings...)
+
+	return allWarnings, err
+}
+
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (ServiceInstance, Warnings, error) {
 	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(url.Values{
 		ccv3.NameFilter:      []string{serviceInstanceName},

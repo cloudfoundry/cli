@@ -246,6 +246,10 @@ var _ = Describe("ConvertToTranslatableError", func() {
 				CommandLineOptions: []string{"option-1", "option-2"},
 			}),
 
+		Entry("actionerror.ServiceInstanceNotSharedToSpaceError -> ServiceInstanceNotSharedToSpaceError",
+			actionerror.ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: "some-service-instance-name"},
+			ServiceInstanceNotSharedToSpaceError{ServiceInstanceName: "some-service-instance-name"}),
+
 		// CC Errors
 		Entry("ccerror.APINotFoundError -> APINotFoundError",
 			ccerror.APINotFoundError{URL: "some-url"},
