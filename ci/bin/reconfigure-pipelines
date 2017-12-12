@@ -33,8 +33,8 @@ pipelines_path=$(cd $(dirname $0)/.. && pwd)
 configure_pipeline cli \
   $pipelines_path/cli/pipeline.yml
 
-configure_pipeline hardknox \
+configure_pipeline inf-hardknox \
   $pipelines_path/infrastructure/hardknox.yml
 
-configure_pipeline beque \
+configure_pipeline inf-beque \
   $pipelines_path/infrastructure/beque.yml

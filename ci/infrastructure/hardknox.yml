@@ -22,7 +22,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
-    branch: master
+    tag_filter: v*
 - name: cli-ci
   type: git
   source:
@@ -33,12 +33,12 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    branch: master
+    tag_filter: v*
 - name: ops-files
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-deployment
-    branch: master
+    tag_filter: v*
 - name: state
   type: git
   source:
