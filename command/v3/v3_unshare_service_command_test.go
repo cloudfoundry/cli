@@ -158,7 +158,7 @@ var _ = Describe("unshare-service Command", func() {
 							It("unshares the service instance with the provided space and displays all warnings", func() {
 								Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Err).To(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+								Expect(testUI.Err).ToNot(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
 								Expect(testUI.Out).To(Say("Unsharing service instance some-service-instance from org some-org / space some-shared-to-space as some-user\\.\\.\\."))
 								Expect(testUI.Out).To(Say("OK"))
 								Expect(testUI.Err).To(Say("get-shared-to-space-guid-warning"))

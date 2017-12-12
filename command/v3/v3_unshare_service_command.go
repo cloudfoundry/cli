@@ -91,9 +91,9 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 		orgName = cmd.OrgName
 	}
 
-	cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.\n")
-
 	if !cmd.Force {
+		cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.\n")
+
 		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really unshare the service instance?", map[string]interface{}{
 			"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
 		})
