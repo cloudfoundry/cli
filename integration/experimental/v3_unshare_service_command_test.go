@@ -42,7 +42,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 				Eventually(session.Out).Should(Say("-o\\s+Org of the other space \\(Default: targeted org\\)"))
 				Eventually(session.Out).Should(Say("-s\\s+Space to unshare the service instance from"))
 				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("bind-service, service, services"))
+				Eventually(session.Out).Should(Say("bind-service, service, services, v3-share-service"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -210,7 +210,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 			Context("when a service instance has not been shared to a space", func() {
 				It("returns an error on an attempt to unshare it from that space", func() {
-					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
 					Eventually(session).Should(Say("FAILED"))
 					Eventually(session.Err).Should(Say("Failed to unshare service instance '%s'. Ensure the space and specified org exist and that the service instance has been shared to this space.", serviceInstance))
 					Eventually(session).Should(Exit(1))
@@ -225,7 +225,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 				Context("when the org I want to unshare from does not exist", func() {
 					It("fails with an org not found error", func() {
-						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", "missing-org")
+						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", "missing-org", "-f")
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Failed to unshare service instance '%s'. Ensure the space and specified org exist and that the service instance has been shared to this space.", serviceInstance))
 						Eventually(session).Should(Exit(1))
@@ -234,7 +234,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 				Context("when the space I want to unshare from does not exist", func() {
 					It("fails with a space not found error", func() {
-						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", "missing-space", "-o", sharedToOrgName)
+						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", "missing-space", "-o", sharedToOrgName, "-f")
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Failed to unshare service instance '%s'. Ensure the space and specified org exist and that the service instance has been shared to this space.", serviceInstance))
 						Eventually(session).Should(Exit(1))
@@ -243,7 +243,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 				Context("when I want to unshare my service instance from a space and org", func() {
 					It("successfully unshares the service instance", func() {
-						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)
+						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -260,7 +260,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 				Context("when the space I want to unshare from does not exist", func() {
 					It("fails with a space not found error", func() {
-						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", "missing-space")
+						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", "missing-space", "-f")
 						Eventually(session).Should(Say("FAILED"))
 						Eventually(session.Err).Should(Say("Failed to unshare service instance '%s'. Ensure the space and specified org exist and that the service instance has been shared to this space.", serviceInstance))
 						Eventually(session).Should(Exit(1))
@@ -269,7 +269,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 
 				Context("when I want to unshare my service instance from the space", func() {
 					It("successfully unshares the service instance when I am admin", func() {
-						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+						session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")
 						Eventually(session).Should(Say("OK"))
 						Eventually(session).Should(Exit(0))
 					})
@@ -298,7 +298,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 						})
 
 						It("successfully unshares the service instance", func() {
-							session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+							session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")
 							Eventually(session).Should(Say("OK"))
 							Eventually(session).Should(Exit(0))
 						})
@@ -308,11 +308,85 @@ var _ = PDescribe("v3-unshare-service command", func() {
 		})
 
 		Context("when the service instance does not exist", func() {
-			It("fails with a service instance not found error", func() {
-				session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
-				Eventually(session).Should(Exit(1))
+			Context("when the -f flag is provided", func() {
+				It("fails with a service instance not found error", func() {
+					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-f")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("when the -f flag not is provided", func() {
+				var buffer *Buffer
+
+				BeforeEach(func() {
+					buffer = NewBuffer()
+				})
+
+				Context("when the user enters 'y'", func() {
+					BeforeEach(func() {
+						buffer.Write([]byte("y\n"))
+					})
+
+					It("fails with a service instance not found error", func() {
+						username, _ := helpers.GetCredentials()
+						session := helpers.CFWithStdin(buffer, "v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+						Eventually(session.Err).Should(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Eventually(session.Out).Should(Say("Really unshare the service instance\\? \\[yN\\]"))
+						Eventually(session.Out).Should(Say("Unsharing service instance %s from org %s / space %s as %s...", serviceInstance, sourceOrgName, sharedToSpaceName, username))
+						Eventually(session.Out).Should(Say("FAILED"))
+						Eventually(session.Err).Should(Say("Service instance %s not found", serviceInstance))
+						Eventually(session).Should(Exit(1))
+					})
+				})
+
+				Context("when the user enters 'n'", func() {
+					BeforeEach(func() {
+						buffer.Write([]byte("n\n"))
+					})
+
+					It("does not attempt to unshare", func() {
+						session := helpers.CFWithStdin(buffer, "v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+						Eventually(session.Err).Should(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Eventually(session.Out).Should(Say("Really unshare the service instance\\? \\[yN\\]"))
+						Eventually(session.Out).Should(Say("Unshare cancelled"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when the user enters the default input (hits return)", func() {
+					BeforeEach(func() {
+						buffer.Write([]byte("\n"))
+					})
+
+					It("does not attempt to unshare", func() {
+						session := helpers.CFWithStdin(buffer, "v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+						Eventually(session.Err).Should(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Eventually(session.Out).Should(Say("Really unshare the service instance\\? \\[yN\\]"))
+						Eventually(session.Out).Should(Say("Unshare cancelled"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
+				Context("when the user enters an invalid answer", func() {
+					BeforeEach(func() {
+						// The second '\n' is intentional. Otherwise the buffer will be
+						// closed while the interaction is still waiting for input; it gets
+						// an EOF and causes an error.
+						buffer.Write([]byte("wat\n\n"))
+					})
+
+					It("asks again", func() {
+						session := helpers.CFWithStdin(buffer, "v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
+						Eventually(session.Err).Should(Say("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working."))
+						Eventually(session.Out).Should(Say("Really unshare the service instance\\? \\[yN\\]"))
+						Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
+						Eventually(session.Out).Should(Say("Really unshare the service instance\\? \\[yN\\]"))
+						Eventually(session.Out).Should(Say("Unshare cancelled"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
 			})
 		})
 	})

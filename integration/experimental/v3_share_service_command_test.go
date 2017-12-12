@@ -44,7 +44,7 @@ var _ = PDescribe("v3-share-service command", func() {
 				Eventually(session.Out).Should(Say("-o\\s+Org of the other space \\(Default: targeted org\\)"))
 				Eventually(session.Out).Should(Say("-s\\s+Space to share the service instance into"))
 				Eventually(session.Out).Should(Say("SEE ALSO:"))
-				Eventually(session.Out).Should(Say("bind-service, service, services"))
+				Eventually(session.Out).Should(Say("bind-service, service, services, v3-unshare-service"))
 				Eventually(session).Should(Exit(0))
 			})
 		})

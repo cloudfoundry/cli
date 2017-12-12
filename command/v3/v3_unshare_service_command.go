@@ -32,8 +32,9 @@ type V3UnshareServiceCommand struct {
 	RequiredArgs    flag.ServiceInstance `positional-args:"yes"`
 	OrgName         string               `short:"o" required:"false" description:"Org of the other space (Default: targeted org)"`
 	SpaceName       string               `short:"s" required:"true" description:"Space to unshare the service instance from"`
+	Force           bool                 `short:"f" description:"Force unshare without confirmation"`
 	usage           interface{}          `usage:"cf v3-unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
-	relatedCommands interface{}          `related_commands:"bind-service, service, services"`
+	relatedCommands interface{}          `related_commands:"bind-service, service, services, v3-share-service"`
 
 	UI          command.UI
 	Config      command.Config
@@ -88,6 +89,23 @@ func (cmd V3UnshareServiceCommand) Execute(args []string) error {
 
 	if cmd.OrgName != "" {
 		orgName = cmd.OrgName
+	}
+
+	if !cmd.Force {
+		cmd.UI.DisplayWarning("WARNING: Unsharing this service instance will remove any service bindings that exist in any spaces that this instance is shared into. This could cause applications to stop working.\n")
+
+		response, promptErr := cmd.UI.DisplayBoolPrompt(false, "Really unshare the service instance?", map[string]interface{}{
+			"ServiceInstanceName": cmd.RequiredArgs.ServiceInstance,
+		})
+
+		if promptErr != nil {
+			return promptErr
+		}
+
+		if !response {
+			cmd.UI.DisplayText("Unshare cancelled")
+			return nil
+		}
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Unsharing service instance {{.ServiceInstanceName}} from org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...", map[string]interface{}{
