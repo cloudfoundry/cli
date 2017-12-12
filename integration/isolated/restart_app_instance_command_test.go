@@ -16,7 +16,7 @@ var _ = XDescribe("restart command", func() {
 				session := helpers.CF("restart-app-instance", "--help")
 
 				Eventually(session).Should(Say("NAME:"))
-				Eventually(session).Should(Say("restart-app-instance - Terminate the running application instance at the given index and instantiate a new instance of the application with the same index"))
+				Eventually(session).Should(Say("restart-app-instance - Terminate, then restart an app instance"))
 				Eventually(session).Should(Say("USAGE:"))
 				Eventually(session).Should(Say("cf restart-app-instance APP_NAME INDEX"))
 				Eventually(session).Should(Say("SEE ALSO:"))

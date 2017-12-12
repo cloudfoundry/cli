@@ -510,6 +510,7 @@ var _ = Describe("help Command", func() {
 
 				Expect(testUI.Out).To(Say("APPS:"))
 				Expect(testUI.Out).To(Say("   apps\\s+List all apps in the target space"))
+				Expect(testUI.Out).To(Say("   restart-app-instance\\s+Terminate, then restart an app instance"))
 				Expect(testUI.Out).To(Say("   ssh-enabled\\s+Reports whether SSH is enabled on an application container instance"))
 
 				Expect(testUI.Out).To(Say("SERVICES:"))
