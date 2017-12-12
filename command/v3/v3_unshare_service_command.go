@@ -34,7 +34,7 @@ type V3UnshareServiceCommand struct {
 	SpaceName       string               `short:"s" required:"true" description:"Space to unshare the service instance from"`
 	Force           bool                 `short:"f" description:"Force unshare without confirmation"`
 	usage           interface{}          `usage:"cf v3-unshare-service SERVICE_INSTANCE -s OTHER_SPACE [-o OTHER_ORG]"`
-	relatedCommands interface{}          `related_commands:"bind-service, service, services"`
+	relatedCommands interface{}          `related_commands:"bind-service, service, services, v3-share-service"`
 
 	UI          command.UI
 	Config      command.Config
