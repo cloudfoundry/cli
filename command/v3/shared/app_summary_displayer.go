@@ -87,11 +87,11 @@ func (display AppSummaryDisplayer) displayAppInstancesTable(processSummary v3act
 			fmt.Sprintf("%.1f%%", instance.CPU*100),
 			display.UI.TranslateText("{{.MemUsage}} of {{.MemQuota}}", map[string]interface{}{
 				"MemUsage": bytefmt.ByteSize(instance.MemoryUsage),
-				"MemQuota": bytefmt.ByteSize(instance.MemoryQuota),
+				"MemQuota": instance.MemoryQuota.String(),
 			}),
 			display.UI.TranslateText("{{.DiskUsage}} of {{.DiskQuota}}", map[string]interface{}{
 				"DiskUsage": bytefmt.ByteSize(instance.DiskUsage),
-				"DiskQuota": bytefmt.ByteSize(instance.DiskQuota),
+				"DiskQuota": instance.DiskQuota.String(),
 			}),
 		})
 	}

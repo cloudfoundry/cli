@@ -720,7 +720,7 @@ var _ = Describe("v3-push Command", func() {
 													ProcessSummaries: []v3action.ProcessSummary{
 														{
 															Process: v3action.Process{
-																Type:       "worker",
+																Type:       constant.ProcessTypeWorker,
 																MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 															},
 															InstanceDetails: []v3action.Instance{
@@ -729,8 +729,8 @@ var _ = Describe("v3-push Command", func() {
 																	State:       constant.ProcessInstanceRunning,
 																	MemoryUsage: 4000000,
 																	DiskUsage:   4000000,
-																	MemoryQuota: 67108864,
-																	DiskQuota:   8000000,
+																	MemoryQuota: types.NullByteSizeInMb{Value: 64, IsSet: true},
+																	DiskQuota:   types.NullByteSizeInMb{Value: 64, IsSet: true},
 																	Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
 																},
 															},
@@ -783,7 +783,7 @@ var _ = Describe("v3-push Command", func() {
 
 													Expect(testUI.Out).To(Say("worker:1/1"))
 													Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-													Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 7.6M"))
+													Expect(testUI.Out).To(Say("#0\\s+running\\s+2013-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+3.8M of 64M\\s+3.8M of 64M"))
 
 													Expect(testUI.Err).To(Say("display-warning-1"))
 													Expect(testUI.Err).To(Say("display-warning-2"))

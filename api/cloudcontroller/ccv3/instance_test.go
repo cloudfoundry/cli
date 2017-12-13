@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
+	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -95,8 +96,6 @@ var _ = Describe("Instance", func() {
 								"mem": 8000000,
 								"disk": 16000000
 							},
-							"mem_quota": 16000000,
-							"disk_quota": 32000000,
 							"index": 1,
 							"uptime": 456
 						}
@@ -120,20 +119,32 @@ var _ = Describe("Instance", func() {
 						CPU:         0.01,
 						MemoryUsage: 1000000,
 						DiskUsage:   2000000,
-						MemoryQuota: 2000000,
-						DiskQuota:   4000000,
-						Index:       0,
-						Uptime:      123,
+						MemoryQuota: types.NullByteSizeInMb{
+							IsSet: true,
+							Value: 2000000,
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							IsSet: true,
+							Value: 4000000,
+						},
+						Index:  0,
+						Uptime: 123,
 					},
 					Instance{
 						State:       constant.ProcessInstanceRunning,
 						CPU:         0.02,
 						MemoryUsage: 8000000,
 						DiskUsage:   16000000,
-						MemoryQuota: 16000000,
-						DiskQuota:   32000000,
-						Index:       1,
-						Uptime:      456,
+						MemoryQuota: types.NullByteSizeInMb{
+							IsSet: false,
+							Value: 0,
+						},
+						DiskQuota: types.NullByteSizeInMb{
+							IsSet: false,
+							Value: 0,
+						},
+						Index:  1,
+						Uptime: 456,
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1"))
@@ -165,5 +176,4 @@ var _ = Describe("Instance", func() {
 			})
 		})
 	})
-
 })

@@ -62,7 +62,7 @@ var _ = Describe("app summary displayer", func() {
 					ProcessSummaries: v3action.ProcessSummaries{
 						{
 							Process: v3action.Process{
-								Type:       "console",
+								Type:       constant.ProcessTypeConsole,
 								MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 							},
@@ -72,8 +72,8 @@ var _ = Describe("app summary displayer", func() {
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
 									DiskUsage:   1000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   8000000,
+									MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
+									DiskQuota:   types.NullByteSizeInMb{Value: 64, IsSet: true},
 									Uptime:      int(time.Now().Sub(time.Unix(167572800, 0)).Seconds()),
 								},
 							},
@@ -90,8 +90,8 @@ var _ = Describe("app summary displayer", func() {
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
 									DiskUsage:   1000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   2000000,
+									MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
+									DiskQuota:   types.NullByteSizeInMb{Value: 64, IsSet: true},
 									Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
 								},
 								v3action.Instance{
@@ -99,8 +99,8 @@ var _ = Describe("app summary displayer", func() {
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 2000000,
 									DiskUsage:   2000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   4000000,
+									MemoryQuota: types.NullByteSizeInMb{Value: 64, IsSet: true},
+									DiskQuota:   types.NullByteSizeInMb{Value: 128, IsSet: true},
 									Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
 								},
 								v3action.Instance{
@@ -108,8 +108,8 @@ var _ = Describe("app summary displayer", func() {
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 3000000,
 									DiskUsage:   3000000,
-									MemoryQuota: 33554432,
-									DiskQuota:   6000000,
+									MemoryQuota: types.NullByteSizeInMb{Value: 128, IsSet: true},
+									DiskQuota:   types.NullByteSizeInMb{Value: 256, IsSet: true},
 									Uptime:      int(time.Now().Sub(time.Unix(1277164800, 0)).Seconds()),
 								},
 							},
@@ -133,22 +133,22 @@ var _ = Describe("app summary displayer", func() {
 				Expect(webProcessSummary.Title).To(Equal("web:3/3"))
 
 				Expect(webProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
-				Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 1.9M"))
+				Expect(webProcessSummary.Instances[0].Disk).To(Equal("976.6K of 64M"))
 				Expect(webProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
 
-				Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 32M"))
-				Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 3.8M"))
+				Expect(webProcessSummary.Instances[1].Memory).To(Equal("1.9M of 64M"))
+				Expect(webProcessSummary.Instances[1].Disk).To(Equal("1.9M of 128M"))
 				Expect(webProcessSummary.Instances[1].CPU).To(Equal("0.0%"))
 
-				Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 32M"))
-				Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 5.7M"))
+				Expect(webProcessSummary.Instances[2].Memory).To(Equal("2.9M of 128M"))
+				Expect(webProcessSummary.Instances[2].Disk).To(Equal("2.9M of 256M"))
 				Expect(webProcessSummary.Instances[2].CPU).To(Equal("0.0%"))
 
 				consoleProcessSummary := processTable.Processes[1]
 				Expect(consoleProcessSummary.Title).To(Equal("console:1/1"))
 
 				Expect(consoleProcessSummary.Instances[0].Memory).To(Equal("976.6K of 32M"))
-				Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 7.6M"))
+				Expect(consoleProcessSummary.Instances[0].Disk).To(Equal("976.6K of 64M"))
 				Expect(consoleProcessSummary.Instances[0].CPU).To(Equal("0.0%"))
 
 				Expect(testUI.Err).To(Say("get-app-summary-warning"))
