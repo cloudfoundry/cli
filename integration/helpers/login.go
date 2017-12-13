@@ -42,7 +42,7 @@ func GetAPI() string {
 
 func LoginCF() string {
 	username, password := GetCredentials()
-	Eventually(CF("auth", username, password)).Should(Exit(0))
+	Eventually(CF("auth", username, password, "-v")).Should(Exit(0))
 
 	return username
 }
