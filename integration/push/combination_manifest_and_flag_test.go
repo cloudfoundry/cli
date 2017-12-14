@@ -243,7 +243,7 @@ var _ = Describe("push with a simple manifest and flags", func() {
 						It("returns a no manifest file error", func() {
 							helpers.WithHelloWorldApp(func(dir string) {
 								session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "-f", pathToManifest, "--no-start")
-								Eventually(session.Err).Should(Say("Could not find 'manifest\\.yml' file"))
+								Eventually(session.Err).Should(Say("Could not find 'manifest\\.yml' file in %s", regexp.QuoteMeta(pathToManifest)))
 								Eventually(session).Should(Say("FAILED"))
 								Eventually(session).Should(Exit(1))
 							})
