@@ -3,6 +3,7 @@ package pushaction
 import (
 	"net/url"
 	"os"
+	"path/filepath"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -34,7 +35,11 @@ func (actor Actor) MergeAndValidateSettingsAndManifests(settings CommandLineSett
 		}
 	}
 
-	mergedApps = actor.setSaneDefaults(mergedApps)
+	mergedApps, err := actor.sanitizeAppPath(mergedApps)
+	if err != nil {
+		return nil, err
+	}
+	mergedApps = actor.setSaneEndpoint(mergedApps)
 
 	log.Debugf("merged app settings: %#v", mergedApps)
 	return mergedApps, actor.validateMergedSettings(mergedApps)
@@ -54,7 +59,7 @@ func (Actor) selectApp(appName string, apps []manifest.Application) ([]manifest.
 	return returnedApps, nil
 }
 
-func (Actor) setSaneDefaults(apps []manifest.Application) []manifest.Application {
+func (Actor) setSaneEndpoint(apps []manifest.Application) []manifest.Application {
 	for i, app := range apps {
 		if app.HealthCheckType == "http" && app.HealthCheckHTTPEndpoint == "" {
 			apps[i].HealthCheckHTTPEndpoint = "/"
@@ -62,6 +67,20 @@ func (Actor) setSaneDefaults(apps []manifest.Application) []manifest.Application
 	}
 
 	return apps
+}
+
+func (Actor) sanitizeAppPath(apps []manifest.Application) ([]manifest.Application, error) {
+	for i, app := range apps {
+		if app.Path != "" {
+			var err error
+			apps[i].Path, err = filepath.Abs(app.Path)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return apps, nil
 }
 
 func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []manifest.Application) error {

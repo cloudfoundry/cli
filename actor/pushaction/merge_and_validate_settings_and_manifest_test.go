@@ -1,6 +1,7 @@
 package pushaction_test
 
 import (
+	"io/ioutil"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -183,6 +184,56 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 				Expect(mergedApps[0].HealthCheckHTTPEndpoint).To(Equal("/"))
 				Expect(mergedApps[1].HealthCheckHTTPEndpoint).To(Equal("/banana"))
+			})
+		})
+	})
+
+	Describe("sanitizing values", func() {
+		var (
+			tempDir string
+
+			apps       []manifest.Application
+			mergedApps []manifest.Application
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			cmdSettings = CommandLineSettings{
+				CurrentDirectory: currentDirectory,
+			}
+
+			apps = []manifest.Application{
+				{Name: "app-1"},
+			}
+
+			var err error
+			tempDir, err = ioutil.TempDir("", "merge-push-settings-")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		JustBeforeEach(func() {
+			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
+		})
+
+		Context("when app path is set from the command line", func() {
+			BeforeEach(func() {
+				cmdSettings.ProvidedAppPath = tempDir
+			})
+
+			It("sets the app path to the provided path", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(mergedApps[0].Path).To(Equal(tempDir))
+			})
+		})
+
+		Context("when app path is set from the manifest", func() {
+			BeforeEach(func() {
+				apps[0].Path = tempDir
+			})
+
+			It("sets the app path to the provided path", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(mergedApps[0].Path).To(Equal(tempDir))
 			})
 		})
 	})
@@ -373,20 +424,9 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			}},
 			actionerror.InvalidRouteError{Route: "potato"}),
 
-		Entry("NonexistentAppPathError",
-			CommandLineSettings{
-				Name:            "some-name",
-				ProvidedAppPath: "does-not-exist",
-			}, nil,
-			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
-
-		Entry("NonexistentAppPathError",
-			CommandLineSettings{},
-			[]manifest.Application{{
-				Name: "some-name",
-				Path: "does-not-exist",
-			}},
-			actionerror.NonexistentAppPathError{Path: "does-not-exist"}),
+		// NonexistentAppPathError found in
+		// merge_and_validate_settings_and_manifest_unix_test.go and
+		// merge_and_validate_settings_and_manifest_windows_test.go
 
 		Entry("MissingNameError", CommandLineSettings{}, nil, actionerror.MissingNameError{}),
 		Entry("MissingNameError", CommandLineSettings{}, []manifest.Application{{}}, actionerror.MissingNameError{}),

@@ -2,7 +2,6 @@ package pushaction
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"code.cloudfoundry.org/cli/types"
 	"code.cloudfoundry.org/cli/util/manifest"
@@ -93,7 +92,7 @@ func (settings CommandLineSettings) OverrideManifestSettings(app manifest.Applic
 	}
 
 	if settings.ProvidedAppPath != "" {
-		app.Path = settings.absoluteProvidedAppPath()
+		app.Path = settings.ProvidedAppPath
 	}
 	if app.Path == "" && app.DockerImage == "" {
 		app.Path = settings.CurrentDirectory
@@ -136,11 +135,4 @@ func (settings CommandLineSettings) String() string {
 		settings.DefaultRouteDomain,
 		settings.DefaultRouteHostname,
 	)
-}
-
-func (settings CommandLineSettings) absoluteProvidedAppPath() string {
-	if !filepath.IsAbs(settings.ProvidedAppPath) {
-		return filepath.Join(settings.CurrentDirectory, settings.ProvidedAppPath)
-	}
-	return settings.ProvidedAppPath
 }
