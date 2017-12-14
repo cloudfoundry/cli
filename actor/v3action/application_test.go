@@ -699,6 +699,7 @@ var _ = Describe("Application Actions", func() {
 		Context("when there are no client errors", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.StopApplicationReturns(
+					ccv3.Application{GUID: "some-app-guid"},
 					ccv3.Warnings{"stop-application-warning"},
 					nil,
 				)
@@ -721,6 +722,7 @@ var _ = Describe("Application Actions", func() {
 			BeforeEach(func() {
 				expectedErr = errors.New("some set stop-application error")
 				fakeCloudControllerClient.StopApplicationReturns(
+					ccv3.Application{},
 					ccv3.Warnings{"stop-application-warning"},
 					expectedErr,
 				)

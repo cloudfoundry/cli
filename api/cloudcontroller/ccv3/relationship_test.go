@@ -231,17 +231,24 @@ var _ = Describe("Relationship", func() {
 						"guid": "some-isolation-segment-guid"
 					}
 				}`
+				responseBody := `{
+					"data": {
+						"guid": "some-isolation-segment-guid"
+					}
+				}`
+
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
 						VerifyJSON(expectedBody),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
 			It("patches the organization's default isolation segment", func() {
-				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				Expect(relationship).To(Equal(Relationship{GUID: "some-isolation-segment-guid"}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -252,17 +259,21 @@ var _ = Describe("Relationship", func() {
 				expectedBody := `{
 					"data": null
 				}`
+				responseBody := `{
+					"data": null
+				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPatch, "/v3/organizations/some-org-guid/relationships/default_isolation_segment"),
 						VerifyJSON(expectedBody),
-						RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
 
 			It("patches the organization's default isolation segment with nil guid", func() {
-				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "")
+				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "")
+				Expect(relationship).To(BeZero())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -288,8 +299,9 @@ var _ = Describe("Relationship", func() {
 				)
 			})
 
-			It("returns an error and warnings", func() {
-				warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+			It("returns the empty relationship, an error and warnings", func() {
+				relationship, warnings, err := client.PatchOrganizationDefaultIsolationSegment("some-org-guid", "some-isolation-segment-guid")
+				Expect(relationship).To(BeZero())
 				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "Organization not found",
 				}))

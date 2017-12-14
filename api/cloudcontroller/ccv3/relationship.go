@@ -134,10 +134,10 @@ func (client *Client) GetOrganizationDefaultIsolationSegment(orgGUID string) (Re
 // PatchOrganizationDefaultIsolationSegment sets the default isolation segment
 // for an organization on the controller.
 // If isoSegGuid is empty it will reset the default isolation segment.
-func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
+func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Relationship, Warnings, error) {
 	body, err := json.Marshal(Relationship{GUID: isoSegGUID})
 	if err != nil {
-		return nil, err
+		return Relationship{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -146,12 +146,15 @@ func (client *Client) PatchOrganizationDefaultIsolationSegment(orgGUID string, i
 		URIParams:   internal.Params{"organization_guid": orgGUID},
 	})
 	if err != nil {
-		return nil, err
+		return Relationship{}, nil, err
 	}
 
-	var response cloudcontroller.Response
+	var relationship Relationship
+	response := cloudcontroller.Response{
+		Result: &relationship,
+	}
 	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return relationship, response.Warnings, err
 }
 
 // UnshareServiceInstanceFromSpace will delete the sharing relationship between

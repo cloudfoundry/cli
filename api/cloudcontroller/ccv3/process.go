@@ -94,7 +94,7 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 }
 
 // PatchApplicationProcessHealthCheck updates application health check type
-func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (Warnings, error) {
+func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
 		HealthCheck: ProcessHealthCheck{
 			Type: processHealthCheckType,
@@ -102,7 +102,7 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 				Endpoint: processHealthCheckEndpoint,
 			}}})
 	if err != nil {
-		return nil, err
+		return Process{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -111,16 +111,19 @@ func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, pro
 		URIParams:   internal.Params{"process_guid": processGUID},
 	})
 	if err != nil {
-		return nil, err
+		return Process{}, nil, err
 	}
 
-	var response cloudcontroller.Response
+	var responceProcess Process
+	response := cloudcontroller.Response{
+		Result: &responceProcess,
+	}
 	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return responceProcess, response.Warnings, err
 }
 
 // CreateApplicationProcessScale updates process instances count, memory or disk
-func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Warnings, error) {
+func (client *Client) CreateApplicationProcessScale(appGUID string, process Process) (Process, Warnings, error) {
 	ccProcessScale := struct {
 		Instances  json.Number `json:"instances,omitempty"`
 		MemoryInMB json.Number `json:"memory_in_mb,omitempty"`
@@ -139,7 +142,7 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 
 	body, err := json.Marshal(ccProcessScale)
 	if err != nil {
-		return nil, err
+		return Process{}, nil, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -148,10 +151,13 @@ func (client *Client) CreateApplicationProcessScale(appGUID string, process Proc
 		URIParams:   internal.Params{"app_guid": appGUID, "type": process.Type},
 	})
 	if err != nil {
-		return nil, err
+		return Process{}, nil, err
 	}
 
-	var response cloudcontroller.Response
+	var responceProcess Process
+	response := cloudcontroller.Response{
+		Result: &responceProcess,
+	}
 	err = client.connection.Make(request, &response)
-	return response.Warnings, err
+	return responceProcess, response.Warnings, err
 }

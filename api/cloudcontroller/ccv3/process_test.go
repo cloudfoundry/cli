@@ -271,12 +271,13 @@ var _ = Describe("Process", func() {
 		var (
 			endpoint string
 
+			process  Process
 			warnings []string
 			err      error
 		)
 
 		JustBeforeEach(func() {
-			warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint)
+			process, warnings, err = client.PatchApplicationProcessHealthCheck("some-process-guid", "some-type", endpoint)
 		})
 
 		Context("when patching the process succeeds", func() {
@@ -291,16 +292,32 @@ var _ = Describe("Process", func() {
 						}
 					}
 				}`
+					expectedResponse := `{
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": "some-endpoint"
+						}
+					}
+				}`
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
 							VerifyJSON(expectedBody),
-							RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+							RespondWith(http.StatusOK, expectedResponse, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
 					)
 				})
 
 				It("patches this process's health check", func() {
+					Expect(process).To(Equal(Process{
+						HealthCheck: ProcessHealthCheck{
+							Type: "some-type",
+							Data: ProcessHealthCheckData{
+								Endpoint: "some-endpoint",
+							},
+						},
+					}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
@@ -317,16 +334,28 @@ var _ = Describe("Process", func() {
 						}
 					}
 				}`
+					responseBody := `{
+					"guid": "some-process-guid",
+					"health_check": {
+						"type": "some-type",
+						"data": {
+							"endpoint": null
+						}
+					}
+				}`
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest(http.MethodPatch, "/v3/processes/some-process-guid"),
 							VerifyJSON(expectedBody),
-							RespondWith(http.StatusOK, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+							RespondWith(http.StatusOK, responseBody, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 						),
 					)
 				})
 
 				It("patches this process's health check", func() {
+					Expect(process).To(Equal(Process{GUID: "some-process-guid", HealthCheck: ProcessHealthCheck{
+						Type: "some-type",
+					}}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})
@@ -436,8 +465,9 @@ var _ = Describe("Process", func() {
 				)
 			})
 
-			It("scales the application process; returns all warnings", func() {
-				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+			It("scales the application process; returns the scaled process and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -469,7 +499,8 @@ var _ = Describe("Process", func() {
 			})
 
 			It("scales the application process to 0 values; returns the scaled process and all warnings", func() {
-				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid"}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -483,6 +514,7 @@ var _ = Describe("Process", func() {
 				}`
 				response := `{
 					"guid": "some-process-guid",
+					"instances": 2
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
@@ -493,8 +525,9 @@ var _ = Describe("Process", func() {
 				)
 			})
 
-			It("scales the application process; returns all warnings", func() {
-				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+			It("scales the application process; returns the process object and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(Equal(Process{GUID: "some-process-guid", Instances: types.NullInt{Value: 2, IsSet: true}}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -525,8 +558,9 @@ var _ = Describe("Process", func() {
 				)
 			})
 
-			It("returns the error and all warnings", func() {
-				warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+			It("returns an empty process, the error and all warnings", func() {
+				process, warnings, err := client.CreateApplicationProcessScale("some-app-guid", passedProcess)
+				Expect(process).To(BeZero())
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

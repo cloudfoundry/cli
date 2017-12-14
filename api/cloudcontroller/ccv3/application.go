@@ -194,19 +194,22 @@ func (client *Client) SetApplicationDroplet(appGUID string, dropletGUID string) 
 }
 
 // StopApplication stops the given application.
-func (client *Client) StopApplication(appGUID string) (Warnings, error) {
+func (client *Client) StopApplication(appGUID string) (Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PostApplicationStopRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
 	})
 	if err != nil {
-		return nil, err
+		return Application{}, nil, err
 	}
 
-	response := cloudcontroller.Response{}
+	var responseApp Application
+	response := cloudcontroller.Response{
+		Result: &responseApp,
+	}
 	err = client.connection.Make(request, &response)
 
-	return response.Warnings, err
+	return responseApp, response.Warnings, err
 }
 
 // StartApplication starts the given application.

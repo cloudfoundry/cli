@@ -674,8 +674,13 @@ var _ = Describe("Application", func() {
 				)
 			})
 
-			It("returns warnings and no error", func() {
-				warnings, err := client.StopApplication("some-app-guid")
+			It("returns the application, warnings, and no error", func() {
+				responseApp, warnings, err := client.StopApplication("some-app-guid")
+				Expect(responseApp).To(Equal(Application{
+					GUID:  "some-app-guid",
+					Name:  "some-app",
+					State: constant.ApplicationStopped,
+				}))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
@@ -707,8 +712,9 @@ var _ = Describe("Application", func() {
 
 		})
 
-		It("returns the error and all warnings", func() {
-			warnings, err := client.StopApplication("no-such-app-guid")
+		It("returns no app, the error and all warnings", func() {
+			responseApp, warnings, err := client.StopApplication("no-such-app-guid")
+			Expect(responseApp).To(BeZero())
 			Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 				ResponseCode: http.StatusTeapot,
 				V3ErrorResponse: ccerror.V3ErrorResponse{

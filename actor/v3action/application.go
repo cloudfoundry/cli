@@ -137,7 +137,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 
 // StopApplication stops an application.
 func (actor Actor) StopApplication(appGUID string) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.StopApplication(appGUID)
+	_, warnings, err := actor.CloudControllerClient.StopApplication(appGUID)
 
 	return Warnings(warnings), err
 }

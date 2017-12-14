@@ -92,7 +92,7 @@ func (actor Actor) SetApplicationProcessHealthCheckTypeByNameAndSpace(appName st
 		return Application{}, allWarnings, err
 	}
 
-	warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
+	_, warnings, err = actor.CloudControllerClient.PatchApplicationProcessHealthCheck(
 		process.GUID,
 		healthCheckType,
 		httpEndpoint,

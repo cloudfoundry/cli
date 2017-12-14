@@ -156,7 +156,7 @@ func (actor Actor) GetIsolationSegmentsByOrganization(orgGUID string) ([]Isolati
 
 	isolationSegments := make([]IsolationSegment, len(ccv3IsolationSegments))
 
-	for i, _ := range ccv3IsolationSegments {
+	for i := range ccv3IsolationSegments {
 		isolationSegments[i] = IsolationSegment(ccv3IsolationSegments[i])
 	}
 
@@ -186,13 +186,13 @@ func (actor Actor) RevokeIsolationSegmentFromOrganizationByName(isolationSegment
 // SetOrganizationDefaultIsolationSegment sets a default isolation segment on
 // an organization.
 func (actor Actor) SetOrganizationDefaultIsolationSegment(orgGUID string, isoSegGUID string) (Warnings, error) {
-	apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, isoSegGUID)
+	_, apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, isoSegGUID)
 	return Warnings(apiWarnings), err
 }
 
 // ResetOrganizationDefaultIsolationSegment resets the default isolation segment fon
 // an organization.
 func (actor Actor) ResetOrganizationDefaultIsolationSegment(orgGUID string) (Warnings, error) {
-	apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, "")
+	_, apiWarnings, err := actor.CloudControllerClient.PatchOrganizationDefaultIsolationSegment(orgGUID, "")
 	return Warnings(apiWarnings), err
 }

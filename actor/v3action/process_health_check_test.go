@@ -284,6 +284,7 @@ var _ = Describe("Process Health Check Actions", func() {
 					BeforeEach(func() {
 						expectedErr = errors.New("some-error")
 						fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
+							ccv3.Process{},
 							ccv3.Warnings{"some-health-check-warning"},
 							expectedErr,
 						)
@@ -299,6 +300,7 @@ var _ = Describe("Process Health Check Actions", func() {
 				Context("when setting process health check type succeeds", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.PatchApplicationProcessHealthCheckReturns(
+							ccv3.Process{GUID: "some-process-guid"},
 							ccv3.Warnings{"some-health-check-warning"},
 							nil,
 						)

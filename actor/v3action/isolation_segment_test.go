@@ -687,6 +687,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		Context("when the assignment is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{GUID: "some-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -708,6 +709,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		Context("when the assignment fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{GUID: "some-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					errors.New("some-error"),
 				)
@@ -726,6 +728,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		Context("when the assignment is successful", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{GUID: "some-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					nil,
 				)
@@ -747,6 +750,7 @@ var _ = Describe("Isolation Segment Actions", func() {
 		Context("when the assignment fails", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.PatchOrganizationDefaultIsolationSegmentReturns(
+					ccv3.Relationship{GUID: "some-guid"},
 					ccv3.Warnings{"warning-1", "warning-2"},
 					errors.New("some-error"),
 				)

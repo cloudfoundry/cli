@@ -10,7 +10,7 @@ import (
 type Process ccv3.Process
 
 func (actor Actor) ScaleProcessByApplication(appGUID string, process Process) (Warnings, error) {
-	warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3.Process(process))
+	_, warnings, err := actor.CloudControllerClient.CreateApplicationProcessScale(appGUID, ccv3.Process(process))
 	allWarnings := Warnings(warnings)
 	if err != nil {
 		if _, ok := err.(ccerror.ProcessNotFoundError); ok {
