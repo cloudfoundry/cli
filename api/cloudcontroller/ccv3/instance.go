@@ -8,7 +8,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
-	"code.cloudfoundry.org/cli/types"
 )
 
 // Instance is a single process instance.
@@ -18,9 +17,9 @@ type Instance struct {
 	Uptime      int
 	CPU         float64
 	MemoryUsage uint64
-	MemoryQuota types.NullByteSizeInMb
+	MemoryQuota uint64
 	DiskUsage   uint64
-	DiskQuota   types.NullByteSizeInMb
+	DiskQuota   uint64
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.
@@ -32,10 +31,10 @@ func (instance *Instance) UnmarshalJSON(data []byte) error {
 			Mem  uint64  `json:"mem"`
 			Disk uint64  `json:"disk"`
 		} `json:"usage"`
-		MemQuota  *uint64 `json:"mem_quota"`
-		DiskQuota *uint64 `json:"disk_quota"`
-		Index     int     `json:"index"`
-		Uptime    int     `json:"uptime"`
+		MemQuota  uint64 `json:"mem_quota"`
+		DiskQuota uint64 `json:"disk_quota"`
+		Index     int    `json:"index"`
+		Uptime    int    `json:"uptime"`
 	}
 	if err := json.Unmarshal(data, &inputInstance); err != nil {
 		return err
@@ -46,8 +45,8 @@ func (instance *Instance) UnmarshalJSON(data []byte) error {
 	instance.MemoryUsage = inputInstance.Usage.Mem
 	instance.DiskUsage = inputInstance.Usage.Disk
 
-	instance.MemoryQuota.ParseUint64Value(inputInstance.MemQuota)
-	instance.DiskQuota.ParseUint64Value(inputInstance.DiskQuota)
+	instance.MemoryQuota = inputInstance.MemQuota
+	instance.DiskQuota = inputInstance.DiskQuota
 	instance.Index = inputInstance.Index
 	instance.Uptime = inputInstance.Uptime
 

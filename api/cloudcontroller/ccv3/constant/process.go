@@ -15,8 +15,4 @@ const (
 )
 
 // ProcessTypeWeb represents the "web" process type.
-const (
-	ProcessTypeConsole = "console"
-	ProcessTypeWeb     = "web"
-	ProcessTypeWorker  = "worker"
-)
+const ProcessTypeWeb = "web"

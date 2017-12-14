@@ -479,14 +479,14 @@ var _ = Describe("v3-app Command", func() {
 						ProcessSummaries: []v3action.ProcessSummary{
 							{
 								Process: v3action.Process{
-									Type:       constant.ProcessTypeConsole,
+									Type:       "console",
 									MemoryInMB: types.NullUint64{Value: 128, IsSet: true},
 								},
 								InstanceDetails: []v3action.Instance{},
 							},
 							{
 								Process: v3action.Process{
-									Type:       constant.ProcessTypeWorker,
+									Type:       "worker",
 									MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 								},
 								InstanceDetails: []v3action.Instance{
@@ -495,8 +495,8 @@ var _ = Describe("v3-app Command", func() {
 										State:       constant.ProcessInstanceDown,
 										MemoryUsage: 4000000,
 										DiskUsage:   4000000,
-										MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
-										DiskQuota:   types.NullByteSizeInMb{Value: 32, IsSet: true},
+										MemoryQuota: 67108864,
+										DiskQuota:   8000000,
 										Uptime:      int(time.Now().Sub(time.Unix(1371859200, 0)).Seconds()),
 									},
 								},
@@ -512,8 +512,8 @@ var _ = Describe("v3-app Command", func() {
 										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 1000000,
 										DiskUsage:   1000000,
-										MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
-										DiskQuota:   types.NullByteSizeInMb{Value: 32, IsSet: true},
+										MemoryQuota: 33554432,
+										DiskQuota:   2000000,
 										Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
 									},
 									v3action.Instance{
@@ -521,8 +521,8 @@ var _ = Describe("v3-app Command", func() {
 										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 2000000,
 										DiskUsage:   2000000,
-										MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
-										DiskQuota:   types.NullByteSizeInMb{Value: 32, IsSet: true},
+										MemoryQuota: 33554432,
+										DiskQuota:   4000000,
 										Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
 									},
 									v3action.Instance{
@@ -530,8 +530,8 @@ var _ = Describe("v3-app Command", func() {
 										State:       constant.ProcessInstanceRunning,
 										MemoryUsage: 3000000,
 										DiskUsage:   3000000,
-										MemoryQuota: types.NullByteSizeInMb{Value: 32, IsSet: true},
-										DiskQuota:   types.NullByteSizeInMb{Value: 32, IsSet: true},
+										MemoryQuota: 33554432,
+										DiskQuota:   6000000,
 										Uptime:      int(time.Now().Sub(time.Unix(1277164800, 0)).Seconds()),
 									},
 								},
@@ -554,9 +554,9 @@ var _ = Describe("v3-app Command", func() {
 					Expect(testUI.Out).To(Say("(?m)buildpacks:\\s+some-detect-output, some-buildpack\n\n"))
 					Expect(testUI.Out).To(Say("web:3/3"))
 					Expect(testUI.Out).To(Say("\\s+state\\s+since\\s+cpu\\s+memory\\s+disk"))
-					Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 32M"))
-					Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 32M"))
-					Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 32M"))
+					Expect(testUI.Out).To(Say("#0\\s+running\\s+1978-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+976.6K of 32M\\s+976.6K of 1.9M"))
+					Expect(testUI.Out).To(Say("#1\\s+running\\s+1980-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+1.9M of 32M\\s+1.9M of 3.8M"))
+					Expect(testUI.Out).To(Say("#2\\s+running\\s+2010-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2} [AP]M\\s+0.0%\\s+2.9M of 32M\\s+2.9M of 5.7M"))
 
 					Expect(testUI.Out).To(Say("console:0/0"))
 
