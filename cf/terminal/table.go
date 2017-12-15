@@ -70,7 +70,9 @@ func (t *Table) Add(row ...string) {
 // PrintTo is the core functionality for printing the table, placing
 // the formatted table into the writer given to it as argument. The
 // exported Print() is just a wrapper around this which redirects the
-// result into CF datastructures.
+// result into CF data structures.
+// Once a table has been printed onto a Writer, it cannot be printed
+// again.
 func (t *Table) PrintTo(result io.Writer) error {
 	t.rowHeight = make([]int, len(t.rows)+1)
 
@@ -111,7 +113,6 @@ func (t *Table) PrintTo(result io.Writer) error {
 		rowIndex++
 	}
 
-	// Note, printing a table clears it.
 	t.rows = [][]string{}
 	return nil
 }
