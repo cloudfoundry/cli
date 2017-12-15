@@ -73,19 +73,19 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					0,
-					[]ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
+					[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
 					ccv3.Warnings{"some-process-stats-warning-1"},
 					nil,
 				)
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					1,
-					[]ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
+					[]ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
 					ccv3.Warnings{"some-process-stats-warning-2"},
 					nil,
 				)
 				fakeCloudControllerClient.GetProcessInstancesReturnsOnCall(
 					2,
-					[]ccv3.Instance{{State: constant.ProcessInstanceDown}},
+					[]ccv3.ProcessInstance{{State: constant.ProcessInstanceDown}},
 					ccv3.Warnings{"some-process-stats-warning-3"},
 					nil,
 				)
@@ -212,7 +212,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetProcessInstancesReturns(
-					[]ccv3.Instance{},
+					[]ccv3.ProcessInstance{},
 					ccv3.Warnings{"some-process-stats-warning"},
 					expectedErr,
 				)

@@ -484,7 +484,7 @@ var _ = Describe("Application Actions", func() {
 						fakeConfig.StartupTimeoutReturns(time.Millisecond)
 						fakeConfig.PollingIntervalReturns(time.Millisecond * 2)
 						fakeCloudControllerClient.GetProcessInstancesReturns(
-							[]ccv3.Instance{{State: constant.ProcessInstanceStarting}},
+							[]ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}},
 							ccv3.Warnings{"get-process-warning-1", "get-process-warning-2"},
 							nil,
 						)
@@ -527,8 +527,8 @@ var _ = Describe("Application Actions", func() {
 
 				Context("when getting the process instances succeeds", func() {
 					var (
-						initialInstanceStates    []ccv3.Instance
-						eventualInstanceStates   []ccv3.Instance
+						initialInstanceStates    []ccv3.ProcessInstance
+						eventualInstanceStates   []ccv3.ProcessInstance
 						pollStartErr             error
 						processInstanceCallCount int
 					)
@@ -538,7 +538,7 @@ var _ = Describe("Application Actions", func() {
 					})
 
 					JustBeforeEach(func() {
-						fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.Instance, ccv3.Warnings, error) {
+						fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 							defer func() { processInstanceCallCount++ }()
 							if processInstanceCallCount == 0 {
 								return initialInstanceStates,
@@ -557,8 +557,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when there are no process instances", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{}
-							eventualInstanceStates = []ccv3.Instance{}
+							initialInstanceStates = []ccv3.ProcessInstance{}
+							eventualInstanceStates = []ccv3.ProcessInstance{}
 						})
 
 						It("should not return an error", func() {
@@ -576,8 +576,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when all instances become running by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}}
+							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}}
 						})
 
 						It("should not return an error", func() {
@@ -595,8 +595,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when at least one instance has become running by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceRunning}}
+							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceRunning}}
 						})
 
 						It("should not return an error", func() {
@@ -615,8 +615,8 @@ var _ = Describe("Application Actions", func() {
 
 					Context("when all of the instances have crashed by the second call", func() {
 						BeforeEach(func() {
-							initialInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
-							eventualInstanceStates = []ccv3.Instance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
+							initialInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}, {State: constant.ProcessInstanceStarting}}
+							eventualInstanceStates = []ccv3.ProcessInstance{{State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}, {State: constant.ProcessInstanceCrashed}}
 						})
 
 						It("should not return an error", func() {
@@ -648,12 +648,12 @@ var _ = Describe("Application Actions", func() {
 				})
 
 				JustBeforeEach(func() {
-					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.Instance, ccv3.Warnings, error) {
+					fakeCloudControllerClient.GetProcessInstancesStub = func(processGuid string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 						defer func() { processInstanceCallCount++ }()
 						if strings.HasPrefix(processGuid, "good") {
-							return []ccv3.Instance{ccv3.Instance{State: constant.ProcessInstanceRunning}}, nil, nil
+							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceRunning}}, nil, nil
 						} else {
-							return []ccv3.Instance{ccv3.Instance{State: constant.ProcessInstanceStarting}}, nil, nil
+							return []ccv3.ProcessInstance{ccv3.ProcessInstance{State: constant.ProcessInstanceStarting}}, nil, nil
 						}
 					}
 

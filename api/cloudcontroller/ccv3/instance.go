@@ -10,8 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
-// Instance is a single process instance.
-type Instance struct {
+type ProcessInstance struct {
 	Index       int
 	State       constant.ProcessInstanceState
 	Uptime      int
@@ -23,7 +22,7 @@ type Instance struct {
 }
 
 // UnmarshalJSON helps unmarshal a V3 Cloud Controller Instance response.
-func (instance *Instance) UnmarshalJSON(data []byte) error {
+func (instance *ProcessInstance) UnmarshalJSON(data []byte) error {
 	var inputInstance struct {
 		State string `json:"state"`
 		Usage struct {
@@ -75,7 +74,7 @@ func (client *Client) DeleteApplicationProcessInstance(appGUID string, processTy
 }
 
 // GetProcessInstances lists instance stats for a given process.
-func (client *Client) GetProcessInstances(processGUID string) ([]Instance, Warnings, error) {
+func (client *Client) GetProcessInstances(processGUID string) ([]ProcessInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetProcessInstancesRequest,
 		URIParams:   map[string]string{"process_guid": processGUID},
@@ -84,13 +83,13 @@ func (client *Client) GetProcessInstances(processGUID string) ([]Instance, Warni
 		return nil, nil, err
 	}
 
-	var fullInstancesList []Instance
-	warnings, err := client.paginate(request, Instance{}, func(item interface{}) error {
-		if instance, ok := item.(Instance); ok {
+	var fullInstancesList []ProcessInstance
+	warnings, err := client.paginate(request, ProcessInstance{}, func(item interface{}) error {
+		if instance, ok := item.(ProcessInstance); ok {
 			fullInstancesList = append(fullInstancesList, instance)
 		} else {
 			return ccerror.UnknownObjectInListError{
-				Expected:   Instance{},
+				Expected:   ProcessInstance{},
 				Unexpected: item,
 			}
 		}

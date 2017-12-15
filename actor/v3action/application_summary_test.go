@@ -54,7 +54,7 @@ var _ = Describe("Application Summary Actions", func() {
 				)
 
 				fakeCloudControllerClient.GetProcessInstancesReturns(
-					[]ccv3.Instance{
+					[]ccv3.ProcessInstance{
 						{
 							State:       constant.ProcessInstanceRunning,
 							CPU:         0.01,
@@ -328,7 +328,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				expectedErr = errors.New("some error")
 				fakeCloudControllerClient.GetProcessInstancesReturns(
-					[]ccv3.Instance{},
+					[]ccv3.ProcessInstance{},
 					ccv3.Warnings{"some-process-stats-warning"},
 					expectedErr,
 				)

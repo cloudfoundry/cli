@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Instance", func() {
+var _ = Describe("ProcessInstance", func() {
 	var client *Client
 
 	BeforeEach(func() {
@@ -115,7 +115,7 @@ var _ = Describe("Instance", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(processes).To(ConsistOf(
-					Instance{
+					ProcessInstance{
 						State:       constant.ProcessInstanceRunning,
 						CPU:         0.01,
 						MemoryUsage: 1000000,
@@ -125,7 +125,7 @@ var _ = Describe("Instance", func() {
 						Index:       0,
 						Uptime:      123,
 					},
-					Instance{
+					ProcessInstance{
 						State:       constant.ProcessInstanceRunning,
 						CPU:         0.02,
 						MemoryUsage: 8000000,

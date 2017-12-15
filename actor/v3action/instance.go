@@ -10,7 +10,7 @@ import (
 )
 
 // Instance represents a V3 process instance.
-type Instance ccv3.Instance
+type Instance ccv3.ProcessInstance
 
 // Running will return true if the instance is running.
 func (instance Instance) Running() bool {

@@ -446,18 +446,18 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
-	GetProcessInstancesStub        func(processGUID string) ([]ccv3.Instance, ccv3.Warnings, error)
+	GetProcessInstancesStub        func(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
 	getProcessInstancesMutex       sync.RWMutex
 	getProcessInstancesArgsForCall []struct {
 		processGUID string
 	}
 	getProcessInstancesReturns struct {
-		result1 []ccv3.Instance
+		result1 []ccv3.ProcessInstance
 		result2 ccv3.Warnings
 		result3 error
 	}
 	getProcessInstancesReturnsOnCall map[int]struct {
-		result1 []ccv3.Instance
+		result1 []ccv3.ProcessInstance
 		result2 ccv3.Warnings
 		result3 error
 	}
@@ -2278,7 +2278,7 @@ func (fake *FakeCloudControllerClient) GetPackageReturnsOnCall(i int, result1 cc
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetProcessInstances(processGUID string) ([]ccv3.Instance, ccv3.Warnings, error) {
+func (fake *FakeCloudControllerClient) GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error) {
 	fake.getProcessInstancesMutex.Lock()
 	ret, specificReturn := fake.getProcessInstancesReturnsOnCall[len(fake.getProcessInstancesArgsForCall)]
 	fake.getProcessInstancesArgsForCall = append(fake.getProcessInstancesArgsForCall, struct {
@@ -2307,26 +2307,26 @@ func (fake *FakeCloudControllerClient) GetProcessInstancesArgsForCall(i int) str
 	return fake.getProcessInstancesArgsForCall[i].processGUID
 }
 
-func (fake *FakeCloudControllerClient) GetProcessInstancesReturns(result1 []ccv3.Instance, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetProcessInstancesReturns(result1 []ccv3.ProcessInstance, result2 ccv3.Warnings, result3 error) {
 	fake.GetProcessInstancesStub = nil
 	fake.getProcessInstancesReturns = struct {
-		result1 []ccv3.Instance
+		result1 []ccv3.ProcessInstance
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeCloudControllerClient) GetProcessInstancesReturnsOnCall(i int, result1 []ccv3.Instance, result2 ccv3.Warnings, result3 error) {
+func (fake *FakeCloudControllerClient) GetProcessInstancesReturnsOnCall(i int, result1 []ccv3.ProcessInstance, result2 ccv3.Warnings, result3 error) {
 	fake.GetProcessInstancesStub = nil
 	if fake.getProcessInstancesReturnsOnCall == nil {
 		fake.getProcessInstancesReturnsOnCall = make(map[int]struct {
-			result1 []ccv3.Instance
+			result1 []ccv3.ProcessInstance
 			result2 ccv3.Warnings
 			result3 error
 		})
 	}
 	fake.getProcessInstancesReturnsOnCall[i] = struct {
-		result1 []ccv3.Instance
+		result1 []ccv3.ProcessInstance
 		result2 ccv3.Warnings
 		result3 error
 	}{result1, result2, result3}

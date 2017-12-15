@@ -40,7 +40,7 @@ type CloudControllerClient interface {
 	GetOrganizations(query url.Values) ([]ccv3.Organization, ccv3.Warnings, error)
 	GetPackages(query url.Values) ([]ccv3.Package, ccv3.Warnings, error)
 	GetPackage(guid string) (ccv3.Package, ccv3.Warnings, error)
-	GetProcessInstances(processGUID string) ([]ccv3.Instance, ccv3.Warnings, error)
+	GetProcessInstances(processGUID string) ([]ccv3.ProcessInstance, ccv3.Warnings, error)
 	GetServiceInstances(query url.Values) ([]ccv3.ServiceInstance, ccv3.Warnings, error)
 	ShareServiceInstanceToSpaces(serviceInstanceGUID string, spaceGUIDs []string) (ccv3.RelationshipList, ccv3.Warnings, error)
 	GetSpaces(query url.Values) ([]ccv3.Space, ccv3.Warnings, error)
