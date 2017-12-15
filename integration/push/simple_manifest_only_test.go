@@ -1,6 +1,7 @@
 package push
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 
@@ -33,7 +34,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 								{
 									"name":       appName,
 									"path":       dir,
-									"command":    "echo 'hi' && $HOME/boot.sh",
+									"command":    fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
 									"buildpack":  "staticfile_buildpack",
 									"disk_quota": "300M",
 									"env": map[string]interface{}{
@@ -58,7 +59,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 						Eventually(session).Should(Say("\\s+path:\\s+%s", regexp.QuoteMeta(dir)))
 						Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
-						Eventually(session).Should(Say("\\s+command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+						Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 						Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
 						Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
 						Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
@@ -79,7 +80,7 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						helpers.ConfirmStagingLogs(session)
 						Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 						Eventually(session).Should(Say("requested state:\\s+started"))
-						Eventually(session).Should(Say("start command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+						Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 						Eventually(session).Should(Exit(0))
 					})
 

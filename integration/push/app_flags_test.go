@@ -1,6 +1,7 @@
 package push
 
 import (
+	"fmt"
 	"regexp"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -25,7 +26,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 				PushCommandName, appName,
 				"-b", "staticfile_buildpack",
-				"-c", "echo 'hi' && $HOME/boot.sh",
+				"-c", fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
 				"-u", "port", //works if this stuff is commentted out
 				"-k", "300M",
 				"-i", "2",
@@ -37,7 +38,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 			Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 			Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
-			Eventually(session).Should(Say("\\s+command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+			Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 			Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
 			Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
 			Eventually(session).Should(Say("\\s+health check type:\\s+port"))
@@ -53,7 +54,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			helpers.ConfirmStagingLogs(session)
 			Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 			Eventually(session).Should(Say("requested state:\\s+started"))
-			Eventually(session).Should(Say("start command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+			Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 			Eventually(session).Should(Exit(0))
 		})
 
@@ -72,7 +73,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir},
 				PushCommandName, appName,
 				"-b", "staticfile_buildpack",
-				"-c", "echo 'hi' && $HOME/boot.sh",
+				"-c", fmt.Sprintf("echo 'hi' && %s", helpers.StaticfileBuildpackStartCommand),
 				"-u", "http",
 				"-k", "300M",
 				"-i", "2",
@@ -84,7 +85,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			Eventually(session).Should(Say("Creating app with these attributes\\.\\.\\."))
 			Eventually(session).Should(Say("\\+\\s+name:\\s+%s", appName))
 			Eventually(session).Should(Say("\\s+buildpack:\\s+staticfile_buildpack"))
-			Eventually(session).Should(Say("\\s+command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+			Eventually(session).Should(Say("\\s+command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 			Eventually(session).Should(Say("\\s+disk quota:\\s+300M"))
 			Eventually(session).Should(Say("\\s+health check http endpoint:\\s+/"))
 			Eventually(session).Should(Say("\\s+health check timeout:\\s+180"))
@@ -101,7 +102,7 @@ var _ = Describe("push with various flags and no manifest", func() {
 			helpers.ConfirmStagingLogs(session)
 			Eventually(session).Should(Say("Waiting for app to start\\.\\.\\."))
 			Eventually(session).Should(Say("requested state:\\s+started"))
-			Eventually(session).Should(Say("start command:\\s+%s", regexp.QuoteMeta("echo 'hi' && $HOME/boot.sh")))
+			Eventually(session).Should(Say("start command:\\s+echo 'hi' && %s", regexp.QuoteMeta(helpers.StaticfileBuildpackStartCommand)))
 			Eventually(session).Should(Exit(0))
 		})
 
