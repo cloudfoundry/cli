@@ -30,8 +30,8 @@ var _ = Describe("CommandLineSettings with provided path", func() {
 
 			Entry("path = current directory; provided and manifest paths are empty", "", "", currentDirectory),
 			Entry("path = manfiest path; provided is empty and manifest path is not empty", "", "some-manifest-path", "some-manifest-path"),
-			Entry("path = absolute provided path; provided relative path is not empty and manifest path is empty", "some-provided-path", "", "C:\\some\\current-directory\\some-provided-path"),
-			Entry("path = absolute provided path; provided relative path and manifest path are not empty", "some-provided-path", "some-manifest-path", "C:\\some\\current-directory\\some-provided-path"),
+			Entry("path = absolute provided path; provided relative path is not empty and manifest path is empty", "some-provided-path", "", "some-provided-path"),
+			Entry("path = absolute provided path; provided relative path and manifest path are not empty", "some-provided-path", "some-manifest-path", "some-provided-path"),
 			Entry("path = provided path; provided path is absolute", "C:\\some-provided-path", "", "C:\\some-provided-path"),
 		)
 
