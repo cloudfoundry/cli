@@ -53,7 +53,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 		return SSHAuthentication{}, warnings, actionerror.ApplicationNotStartedError{Name: appName}
 	}
 
-	var processInstance Instance
+	var processInstance ProcessInstance
 	for _, instance := range processSummary.InstanceDetails {
 		if uint(instance.Index) == processIndex {
 			processInstance = instance
@@ -61,7 +61,7 @@ func (actor Actor) GetSecureShellConfigurationByApplicationNameSpaceProcessTypeA
 		}
 	}
 
-	if processInstance == (Instance{}) {
+	if processInstance == (ProcessInstance{}) {
 		return SSHAuthentication{}, warnings, actionerror.ProcessInstanceNotFoundError{ProcessType: processType, InstanceIndex: processIndex}
 	}
 

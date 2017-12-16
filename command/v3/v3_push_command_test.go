@@ -723,8 +723,8 @@ var _ = Describe("v3-push Command", func() {
 																Type:       "worker",
 																MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
 															},
-															InstanceDetails: []v3action.Instance{
-																v3action.Instance{
+															InstanceDetails: []v3action.ProcessInstance{
+																v3action.ProcessInstance{
 																	Index:       0,
 																	State:       constant.ProcessInstanceRunning,
 																	MemoryUsage: 4000000,

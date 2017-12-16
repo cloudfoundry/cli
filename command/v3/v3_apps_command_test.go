@@ -208,13 +208,13 @@ var _ = Describe("v3-apps Command", func() {
 								Process: v3action.Process{
 									Type: "console",
 								},
-								InstanceDetails: []v3action.Instance{},
+								InstanceDetails: []v3action.ProcessInstance{},
 							},
 							{
 								Process: v3action.Process{
 									Type: "worker",
 								},
-								InstanceDetails: []v3action.Instance{
+								InstanceDetails: []v3action.ProcessInstance{
 									{
 										Index: 0,
 										State: constant.ProcessInstanceDown,
@@ -225,12 +225,12 @@ var _ = Describe("v3-apps Command", func() {
 								Process: v3action.Process{
 									Type: constant.ProcessTypeWeb,
 								},
-								InstanceDetails: []v3action.Instance{
-									v3action.Instance{
+								InstanceDetails: []v3action.ProcessInstance{
+									v3action.ProcessInstance{
 										Index: 0,
 										State: constant.ProcessInstanceRunning,
 									},
-									v3action.Instance{
+									v3action.ProcessInstance{
 										Index: 1,
 										State: constant.ProcessInstanceRunning,
 									},
@@ -249,12 +249,12 @@ var _ = Describe("v3-apps Command", func() {
 								Process: v3action.Process{
 									Type: constant.ProcessTypeWeb,
 								},
-								InstanceDetails: []v3action.Instance{
-									v3action.Instance{
+								InstanceDetails: []v3action.ProcessInstance{
+									v3action.ProcessInstance{
 										Index: 0,
 										State: constant.ProcessInstanceDown,
 									},
-									v3action.Instance{
+									v3action.ProcessInstance{
 										Index: 1,
 										State: constant.ProcessInstanceDown,
 									},

@@ -66,8 +66,8 @@ var _ = Describe("app summary displayer", func() {
 								MemoryInMB: types.NullUint64{Value: 16, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 512, IsSet: true},
 							},
-							InstanceDetails: []v3action.Instance{
-								v3action.Instance{
+							InstanceDetails: []v3action.ProcessInstance{
+								v3action.ProcessInstance{
 									Index:       0,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
@@ -84,8 +84,8 @@ var _ = Describe("app summary displayer", func() {
 								MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 								DiskInMB:   types.NullUint64{Value: 1024, IsSet: true},
 							},
-							InstanceDetails: []v3action.Instance{
-								v3action.Instance{
+							InstanceDetails: []v3action.ProcessInstance{
+								v3action.ProcessInstance{
 									Index:       0,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 1000000,
@@ -94,7 +94,7 @@ var _ = Describe("app summary displayer", func() {
 									DiskQuota:   2000000,
 									Uptime:      int(time.Now().Sub(time.Unix(267321600, 0)).Seconds()),
 								},
-								v3action.Instance{
+								v3action.ProcessInstance{
 									Index:       1,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 2000000,
@@ -103,7 +103,7 @@ var _ = Describe("app summary displayer", func() {
 									DiskQuota:   4000000,
 									Uptime:      int(time.Now().Sub(time.Unix(330480000, 0)).Seconds()),
 								},
-								v3action.Instance{
+								v3action.ProcessInstance{
 									Index:       2,
 									State:       constant.ProcessInstanceRunning,
 									MemoryUsage: 3000000,

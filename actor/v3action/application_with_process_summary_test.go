@@ -104,11 +104,11 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						ProcessSummaries: []ProcessSummary{
 							{
 								Process:         Process{GUID: "some-process-guid-1", Type: "some-process-type-1"},
-								InstanceDetails: []Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
+								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceDown}, {State: constant.ProcessInstanceRunning}},
 							},
 							{
 								Process:         Process{GUID: "some-process-guid-2", Type: "some-process-type-2"},
-								InstanceDetails: []Instance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
+								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceRunning}, {State: constant.ProcessInstanceRunning}},
 							},
 						},
 					},
@@ -121,7 +121,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 						ProcessSummaries: []ProcessSummary{
 							{
 								Process:         Process{GUID: "some-process-guid-3", Type: "some-process-type-3"},
-								InstanceDetails: []Instance{{State: constant.ProcessInstanceDown}},
+								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceDown}},
 							},
 						},
 					},

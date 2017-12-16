@@ -12,7 +12,7 @@ import (
 type ProcessSummary struct {
 	Process
 
-	InstanceDetails []Instance
+	InstanceDetails []ProcessInstance
 }
 
 type ProcessSummaries []ProcessSummary
@@ -90,7 +90,7 @@ func (actor Actor) getProcessSummariesForApp(appGUID string) (ProcessSummaries, 
 			Process: Process(ccv3Process),
 		}
 		for _, instance := range instances {
-			processSummary.InstanceDetails = append(processSummary.InstanceDetails, Instance(instance))
+			processSummary.InstanceDetails = append(processSummary.InstanceDetails, ProcessInstance(instance))
 		}
 
 		processSummaries = append(processSummaries, processSummary)

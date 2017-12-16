@@ -114,7 +114,7 @@ var _ = Describe("Application Summary Actions", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									Type:       "some-type",
 								},
-								InstanceDetails: []Instance{
+								InstanceDetails: []ProcessInstance{
 									{
 										State:       constant.ProcessInstanceRunning,
 										CPU:         0.01,
@@ -197,7 +197,7 @@ var _ = Describe("Application Summary Actions", func() {
 									MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
 									Type:       "some-type",
 								},
-								InstanceDetails: []Instance{
+								InstanceDetails: []ProcessInstance{
 									{
 										State:       constant.ProcessInstanceRunning,
 										CPU:         0.01,

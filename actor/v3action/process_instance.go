@@ -9,16 +9,15 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
-// Instance represents a V3 process instance.
-type Instance ccv3.ProcessInstance
+type ProcessInstance ccv3.ProcessInstance
 
 // Running will return true if the instance is running.
-func (instance Instance) Running() bool {
+func (instance ProcessInstance) Running() bool {
 	return instance.State == constant.ProcessInstanceRunning
 }
 
 // StartTime returns the time that the instance started.
-func (instance *Instance) StartTime() time.Time {
+func (instance *ProcessInstance) StartTime() time.Time {
 	uptimeDuration := time.Duration(instance.Uptime) * time.Second
 
 	return time.Now().Add(-uptimeDuration)

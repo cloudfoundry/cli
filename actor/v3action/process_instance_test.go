@@ -28,7 +28,7 @@ var _ = Describe("instance actions", func() {
 	Describe("Instance", func() {
 		Describe("StartTime", func() {
 			It("returns the time that the instance started", func() {
-				instance := Instance{Uptime: 86400}
+				instance := ProcessInstance{Uptime: 86400}
 				Expect(instance.StartTime()).To(BeTemporally("~", time.Now().Add(-24*time.Hour), 10*time.Second))
 			})
 		})
