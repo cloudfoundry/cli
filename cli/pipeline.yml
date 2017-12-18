@@ -42,7 +42,7 @@ resources:
 - name: cf-acceptance-tests
   type: git
   source:
-    uri: https://github.com/cloudfoundry/cf-acceptance-tests
+    uri: https://github.com/vitreuz/cf-acceptance-tests # Temporary fix until PR is merged
     branch: master
 
 - name: cf-cli-binaries
