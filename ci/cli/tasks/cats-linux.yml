@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
 - name: cf-acceptance-tests
-  path: gopath/src/github.com/vitreuz/cf-acceptance-tests
+  path: gopath/src/github.com/cloudfoundry/cf-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cats-config
@@ -39,7 +39,7 @@ run:
     export CF_PLUGIN_HOME=${PWD}
     cf install-plugin -f -r CF-Community "network-policy"
 
-    cd "${GOPATH}/src/github.com/vitreuz/cf-acceptance-tests"
+    cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
     # Redact passwords in output
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' ${CONFIG}
