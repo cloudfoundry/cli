@@ -21,7 +21,6 @@
 [![Command help pages](https://img.shields.io/badge/command-help-lightgrey.svg)](https://cli.cloudfoundry.org)
 [![Slack](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
-[![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
 
 ***Cloud Foundry CLI*** is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
