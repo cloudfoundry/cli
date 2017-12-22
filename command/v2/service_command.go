@@ -89,13 +89,15 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		return err
 	}
 
-	var table [][]string
 	serviceInstanceName := serviceInstanceSummary.Name
 	boundApps := strings.Join(serviceInstanceSummary.BoundApplications, ", ")
 
+	table := [][]string{{cmd.UI.TranslateText("name:"), serviceInstanceName}}
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
-		table = [][]string{
-			{cmd.UI.TranslateText("name:"), serviceInstanceName},
+		if serviceInstanceSummary.ServiceInstanceSharedFrom.SpaceGUID != "" {
+			table = append(table, []string{cmd.UI.TranslateText("shared from org/space:"), fmt.Sprintf("%s / %s", serviceInstanceSummary.ServiceInstanceSharedFrom.OrganizationName, serviceInstanceSummary.ServiceInstanceSharedFrom.SpaceName)})
+		}
+		table = append(table, [][]string{
 			{cmd.UI.TranslateText("service:"), serviceInstanceSummary.Service.Label},
 			{cmd.UI.TranslateText("bound apps:"), boundApps},
 			{cmd.UI.TranslateText("tags:"), strings.Join(serviceInstanceSummary.Tags, ", ")},
@@ -103,13 +105,13 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 			{cmd.UI.TranslateText("description:"), serviceInstanceSummary.Service.Description},
 			{cmd.UI.TranslateText("documentation:"), serviceInstanceSummary.Service.DocumentationURL},
 			{cmd.UI.TranslateText("dashboard:"), serviceInstanceSummary.DashboardURL},
-		}
+		}...)
 	} else {
-		table = [][]string{
+		table = append(table, [][]string{
 			{cmd.UI.TranslateText("name:"), serviceInstanceName},
 			{cmd.UI.TranslateText("service:"), cmd.UI.TranslateText("user-provided")},
 			{cmd.UI.TranslateText("bound apps:"), boundApps},
-		}
+		}...)
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)

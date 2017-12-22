@@ -261,6 +261,11 @@ var _ = Describe("service Command", func() {
 										Description:      "some-description",
 										DocumentationURL: "some-docs-url",
 									},
+									ServiceInstanceSharedFrom: v2action.ServiceInstanceSharedFrom{
+										SpaceGUID:        "some-space-guid",
+										SpaceName:        "some-space-name",
+										OrganizationName: "some-org-name",
+									},
 									BoundApplications: []string{"app-1", "app-2", "app-3"},
 								},
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
@@ -274,6 +279,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("\n\n"))
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+							Expect(testUI.Out).To(Say("shared from org/space:\\s+some-org-name / some-space-name"))
 							Expect(testUI.Out).To(Say("service:\\s+some-service"))
 							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 							Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
@@ -322,6 +328,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say(""))
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+							Expect(testUI.Out).ToNot(Say("shared from"))
 							Expect(testUI.Out).To(Say("service:\\s+user-provided"))
 							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 							Expect(testUI.Out).ToNot(Say("tags:"))

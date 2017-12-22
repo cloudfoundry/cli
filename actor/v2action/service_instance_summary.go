@@ -1,13 +1,17 @@
 package v2action
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 type ServiceInstanceSummary struct {
 	ServiceInstance
 
-	ServicePlan       ServicePlan
-	Service           Service
-	BoundApplications []string
+	ServicePlan               ServicePlan
+	Service                   Service
+	ServiceInstanceSharedFrom ServiceInstanceSharedFrom
+	BoundApplications         []string
 }
 
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
@@ -27,6 +31,17 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 	)
 
 	if ccv2.ServiceInstance(serviceInstance).Managed() {
+		serviceInstanceSharedFrom, sharedFromWarnings, shareFromErr := actor.GetServiceInstanceSharedFromByServiceInstance(serviceInstance.GUID)
+		allWarnings = append(allWarnings, sharedFromWarnings...)
+		if shareFromErr != nil {
+			if _, ok := shareFromErr.(ccerror.ResourceNotFoundError); ok {
+				serviceInstanceSharedFrom = ServiceInstanceSharedFrom{}
+			} else {
+				return serviceInstanceSummary, allWarnings, shareFromErr
+			}
+		}
+		serviceInstanceSummary.ServiceInstanceSharedFrom = serviceInstanceSharedFrom
+
 		servicePlan, planWarnings, planErr := actor.GetServicePlan(serviceInstance.ServicePlanGUID)
 		allWarnings = append(allWarnings, planWarnings...)
 		if planErr != nil {

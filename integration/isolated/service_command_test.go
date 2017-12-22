@@ -119,7 +119,7 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		Context("when the service instance exists", func() {
+		Context("when the service instance belongs to this space", func() {
 			Context("when the service instance is a user provided service instance", func() {
 				BeforeEach(func() {
 					Eventually(helpers.CF("create-user-provided-service", serviceInstanceName)).Should(Exit(0))
@@ -266,6 +266,120 @@ var _ = Describe("service command", func() {
 						Eventually(session.Out).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
 
 						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+		})
+	})
+
+	PDescribe("a user with SpaceDeveloperRole access can see where a service instance in the targeted space is shared from", func() {
+		var (
+			orgName         string
+			targetSpaceName string
+			sourceSpaceName string
+			username        string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+		})
+
+		AfterEach(func() {
+			helpers.QuickDeleteOrg(orgName)
+		})
+
+		Context("when there exists two spaces in the current org and a service broker", func() {
+			var (
+				domain      string
+				service     string
+				servicePlan string
+				broker      helpers.ServiceBroker
+			)
+			BeforeEach(func() {
+				targetSpaceName = helpers.NewSpaceName()
+				sourceSpaceName = helpers.NewSpaceName()
+				setupCF(orgName, targetSpaceName)
+				setupCF(orgName, sourceSpaceName)
+
+				domain = defaultSharedDomain()
+				service = helpers.PrefixedRandomName("SERVICE")
+				servicePlan = helpers.PrefixedRandomName("SERVICE-PLAN")
+
+				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+				broker.Push()
+				broker.Configure()
+				broker.Create()
+
+				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
+				broker.Destroy()
+			})
+
+			Context("when there is a user with SpaceDeveloperRole access to both spaces", func() {
+				BeforeEach(func() {
+					username = helpers.PrefixedRandomName("user")
+					password := helpers.RandomName()
+
+					Eventually(helpers.CF("create-user", username, password)).Should(Exit(0))
+					Eventually(helpers.CF("set-space-role", username, orgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
+					Eventually(helpers.CF("set-space-role", username, orgName, targetSpaceName, "SpaceDeveloper")).Should(Exit(0))
+					Eventually(helpers.CF("auth", username, password)).Should(Exit(0))
+				})
+
+				Context("when this user creates a service instance in the source space", func() {
+					BeforeEach(func() {
+						helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
+
+						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName, "-t", "database, email")).Should(Exit(0))
+					})
+
+					AfterEach(func() {
+						helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
+						Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
+					})
+
+					Context("when this user shares the service instance with the target space", func() {
+						BeforeEach(func() {
+							Eventually(helpers.CF("v3-share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
+						})
+
+						AfterEach(func() {
+							helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
+							Eventually(helpers.CF("v3-unshare-service", serviceInstanceName, "-s", targetSpaceName, "-f")).Should(Exit(0))
+						})
+
+						Context("when the user is targeted to the target space", func() {
+							BeforeEach(func() {
+								helpers.TargetOrgAndSpace(orgName, targetSpaceName)
+							})
+
+							It("the user should be able to see where the service instance is shared from", func() {
+								session := helpers.CF("service", serviceInstanceName)
+								Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, targetSpaceName, username))
+								Eventually(session.Out).Should(Say("\n\n"))
+								Eventually(session.Out).Should(Say("name:\\s+%s", serviceInstanceName))
+								Eventually(session.Out).Should(Say("shared from org/space:\\s+%s / %s", orgName, sourceSpaceName))
+								Eventually(session.Out).Should(Say("service:\\s+%s", service))
+								Eventually(session.Out).Should(Say("bound apps:"))
+								Eventually(session.Out).Should(Say("tags:\\s+database, email"))
+								Eventually(session.Out).Should(Say("plan:\\s+%s", servicePlan))
+								Eventually(session.Out).Should(Say("description:\\s+fake service"))
+								Eventually(session.Out).Should(Say("documentation:"))
+								Eventually(session.Out).Should(Say("dashboard:\\s+http://example\\.com"))
+								Eventually(session.Out).Should(Say("\n\n"))
+								Eventually(session.Out).Should(Say("Showing status of last operation from service %s\\.\\.\\.", serviceInstanceName))
+								Eventually(session.Out).Should(Say("\n\n"))
+								Eventually(session.Out).Should(Say("status:\\s+create succeeded"))
+								Eventually(session.Out).Should(Say("message:"))
+								Eventually(session.Out).Should(Say("started:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+								Eventually(session.Out).Should(Say("updated:\\s+\\d{4}-[01]\\d-[0-3]\\dT[0-2][0-9]:[0-5]\\d:[0-5]\\dZ"))
+								Eventually(session).Should(Exit(0))
+							})
+						})
 					})
 				})
 			})
