@@ -99,15 +99,19 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 		passedResponse.ResourceLocationURL = resourceLocationURL
 	}
 
-	rawBytes, err := ioutil.ReadAll(response.Body)
-	defer response.Body.Close()
-	if err != nil {
-		return err
+	if response.StatusCode == http.StatusNoContent {
+		passedResponse.RawResponse = []byte("{}")
+	} else {
+		rawBytes, err := ioutil.ReadAll(response.Body)
+		defer response.Body.Close()
+		if err != nil {
+			return err
+		}
+
+		passedResponse.RawResponse = rawBytes
 	}
 
-	passedResponse.RawResponse = rawBytes
-
-	err = connection.handleStatusCodes(response, passedResponse)
+	err := connection.handleStatusCodes(response, passedResponse)
 	if err != nil {
 		return err
 	}

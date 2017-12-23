@@ -28,23 +28,23 @@ var _ = Describe("Service Instance Shared From", func() {
 	})
 
 	Describe("GetServiceInstanceSharedFrom", func() {
-		Context("when the cc api returns a valid response", func() {
-			BeforeEach(func() {
-				response1 := `{
+		Context("when the cc api returns no errors", func() {
+			Context("when the response is not an http 204", func() {
+				BeforeEach(func() {
+					response1 := `{
 			  "space_guid": "some-space-guid",
 				"space_name": "some-space-name",
 			  "organization_name": "some-org-name"
 		 }`
 
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v2/service_instances/some-service-instance-guid/shared_from"),
-						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-					),
-				)
-			})
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/service_instances/some-service-instance-guid/shared_from"),
+							RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
 
-			Context("when the service instance exists", func() {
 				It("returns all the shared_from resources", func() {
 					Expect(err).NotTo(HaveOccurred())
 
@@ -53,6 +53,23 @@ var _ = Describe("Service Instance Shared From", func() {
 						SpaceName:        "some-space-name",
 						OrganizationName: "some-org-name",
 					}))
+					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+				})
+			})
+
+			Context("when the response is an http 204", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodGet, "/v2/service_instances/some-service-instance-guid/shared_from"),
+							RespondWith(http.StatusNoContent, "", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						),
+					)
+				})
+
+				It("returns an empty ServiceInstanceSharedFrom and no error", func() {
+					Expect(err).NotTo(HaveOccurred())
+					Expect(serviceInstance).To(Equal(ServiceInstanceSharedFrom{}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
 			})

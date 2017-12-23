@@ -108,7 +108,6 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 		}...)
 	} else {
 		table = append(table, [][]string{
-			{cmd.UI.TranslateText("name:"), serviceInstanceName},
 			{cmd.UI.TranslateText("service:"), cmd.UI.TranslateText("user-provided")},
 			{cmd.UI.TranslateText("bound apps:"), boundApps},
 		}...)
