@@ -3,20 +3,27 @@ These are high-level tests for the CLI that make assertions about the behavior o
 
 These tests require that a `cf` binary built from the latest source is available in your `PATH`.
 
-## How to run:
-These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed. Currently there are three suites of functionality, `isolated`, `global`, and `plugin`. The `isolated` suite can run it's tests in parallel, while the `global` and `plugin` suites cannot.
+## Explanation of test suites
+- `global` suite is for tests that affect an entire CF instance. *These tests do not run in parallel.*
+- `isolated` suite is for tests that are stand alone and do not affect each other. They are meant to run in their own organization and space, and will not affect system state. This is the most common type of integration tests.
+- `push` suite is for tests related to the `cf push` command only.
+- `experimental` suite is for tests that require the cf experimental flag to be set and/or an experimental feature for the CF CLI.
+- `plugin` suite is for tests that surround the CF CLI plugin framework. *These tests do not run in parallel.*
 
-Run command for the `isolated` suite:
+## How to run
+These tests rely on [ginkgo](https://github.com/onsi/ginkgo) to be installed.
+
+Run command for the `isolated`, `push` and `experimental` suite:
 ```
-ginkgo -p -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated
+ginkgo -p -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated integration/push integration/experimental
 ```
 
 Run command for the `global` and `plugin` suites:
 ```
-ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/isolated integration/plugin
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration/global integration/plugin
 ```
 
-### Customizations (based on environment variables):
+### Customizations (based on environment variables)
 
 - `CF_API` - Sets the CF API URL these tests will be using. Will default to `api.bosh-lite.com` if not set.
 - `SKIP_SSL_VALIDATION` - If true, will skip SSL Validation. Will default `--skip-ssl-validation` if not set.
