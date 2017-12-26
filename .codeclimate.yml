@@ -1,5 +1,6 @@
 ---
-engines:
+version: "2"
+plugins:
   fixme:
     enabled: true
   gofmt:
@@ -8,10 +9,7 @@ engines:
     enabled: true
   golint:
     enabled: true
-ratings:
-  paths:
-  - "**.go"
-exclude_paths:
+exclude_patterns:
 - vendor/
 - cf/
 - "**/fake*.go"
