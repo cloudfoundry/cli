@@ -14,4 +14,4 @@ ratings:
 exclude_paths:
 - vendor/
 - cf/
-- **/*fakes
+- "**/fake*.go"
