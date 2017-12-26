@@ -13,3 +13,4 @@ ratings:
   - "**.go"
 exclude_paths:
 - vendor/
+- cf/
