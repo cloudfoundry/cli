@@ -306,7 +306,7 @@ var _ = Describe("create-route command", func() {
 				It("warns the user that the route is already in use and then fails", func() {
 					session := helpers.CF("create-route", spaceName, domainName)
 					Eventually(session.Out).Should(Say(`Creating route %s for org %s / space %s as %s\.\.\.`, domainName, orgName, spaceName, userName))
-					Eventually(session.Err).Should(Say(`The route %s is already in use\.`, domainName))
+					Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because it is not in this space. Apps must be mapped to routes in the same space.", domainName))
 					Eventually(session.Out).Should(Say(`FAILED`))
 					Eventually(session).Should(Exit(1))
 				})

@@ -135,8 +135,7 @@ var _ = Describe("TCP routes in manifest", func() {
 
 						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
 						Eventually(session).Should(Say("Getting app info\\.\\.\\."))
-						Eventually(session.Err).Should(Say("The route %s is already in use.", route2))
-						Eventually(session.Err).Should(Say("TIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again."))
+						Eventually(session.Err).Should(Say("The app cannot be mapped to route %s because it is not in this space. Apps must be mapped to routes in the same space.", route2))
 						Eventually(session).Should(Exit(1))
 					})
 				})
