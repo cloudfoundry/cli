@@ -80,7 +80,7 @@ func NewServiceBroker(name string, path string, appsDomain string, serviceName s
 
 func (b ServiceBroker) Push() {
 	Eventually(CF(
-		"push", b.Name,
+		"v2-push", b.Name,
 		"--no-start",
 		"-m", DefaultMemoryLimit,
 		"-p", b.Path,
