@@ -99,23 +99,12 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 		passedResponse.ResourceLocationURL = resourceLocationURL
 	}
 
-	if response.StatusCode == http.StatusNoContent {
-		passedResponse.RawResponse = []byte("{}")
-	} else {
-		rawBytes, err := ioutil.ReadAll(response.Body)
-		defer response.Body.Close()
-		if err != nil {
-			return err
-		}
-
-		passedResponse.RawResponse = rawBytes
-	}
-
 	err := connection.handleStatusCodes(response, passedResponse)
 	if err != nil {
 		return err
 	}
 
+	// TODO: only unmarshal on 'application/json', skip otherwise
 	if passedResponse.Result != nil {
 		decoder := json.NewDecoder(bytes.NewBuffer(passedResponse.RawResponse))
 		decoder.UseNumber()
@@ -129,6 +118,18 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 }
 
 func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
+	if response.StatusCode == http.StatusNoContent {
+		passedResponse.RawResponse = []byte("{}")
+	} else {
+		rawBytes, err := ioutil.ReadAll(response.Body)
+		defer response.Body.Close()
+		if err != nil {
+			return err
+		}
+
+		passedResponse.RawResponse = rawBytes
+	}
+
 	if response.StatusCode >= 400 {
 		return ccerror.RawHTTPStatusError{
 			StatusCode:  response.StatusCode,
