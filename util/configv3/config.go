@@ -23,6 +23,9 @@ const (
 	// DefaultDialTimeout is the default timeout for the dail.
 	DefaultDialTimeout = 5 * time.Second
 
+	// DefaultNOAARetryCount is the default number of request retries.
+	DefaultNOAARetryCount = 5
+
 	// DefaultOverallPollingTimeout is the default maximum time that the CLI will
 	// poll a job running on the Cloud Controller. By default it's infinit, which
 	// is represented by MaxInt64.
@@ -54,6 +57,9 @@ const (
 	// DefaultUAAOAuthClientSecret is the default client secret for the CLI when
 	// communicating with the UAA.
 	DefaultUAAOAuthClientSecret = ""
+
+	// DefaultRetryCount is the default number of request retries.
+	DefaultRetryCount = 2
 )
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
@@ -679,4 +685,15 @@ func (config *Config) UnsetSpaceInformation() {
 // UnsetOrganizationInformation resets the organization values to default
 func (config *Config) UnsetOrganizationInformation() {
 	config.SetOrganizationInformation("", "")
+
+}
+
+// RequestRetryCount returns the number of request retries.
+func (*Config) RequestRetryCount() int {
+	return DefaultRetryCount
+}
+
+// NOAARequestRetryCount returns the number of request retries.
+func (*Config) NOAARequestRetryCount() int {
+	return DefaultNOAARetryCount
 }

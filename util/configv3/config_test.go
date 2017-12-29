@@ -643,6 +643,20 @@ var _ = Describe("Config", func() {
 			Entry("debug returns 5", "debug", 5),
 			Entry("dEbUg returns 5", "dEbUg", 5),
 		)
+
+		Describe("RequestRetryCount", func() {
+			It("returns the number of request retries", func() {
+				conf := Config{}
+				Expect(conf.RequestRetryCount()).To(Equal(2))
+			})
+		})
+
+		Describe("NOAARequestRetryCount", func() {
+			It("returns the number of request retries", func() {
+				conf := Config{}
+				Expect(conf.NOAARequestRetryCount()).To(Equal(5))
+			})
+		})
 	})
 
 	Describe("WriteConfig", func() {

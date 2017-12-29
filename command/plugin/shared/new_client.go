@@ -26,7 +26,7 @@ func NewClient(config command.Config, ui command.UI, skipSSLValidation bool) *pl
 		pluginClient.WrapConnection(wrapper.NewRequestLogger(ui.RequestLoggerFileWriter(location)))
 	}
 
-	pluginClient.WrapConnection(wrapper.NewRetryRequest(2))
+	pluginClient.WrapConnection(wrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	return pluginClient
 }

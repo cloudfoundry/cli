@@ -166,6 +166,15 @@ type FakeConfig struct {
 	minCLIVersionReturnsOnCall map[int]struct {
 		result1 string
 	}
+	NOAARequestRetryCountStub        func() int
+	nOAARequestRetryCountMutex       sync.RWMutex
+	nOAARequestRetryCountArgsForCall []struct{}
+	nOAARequestRetryCountReturns     struct {
+		result1 int
+	}
+	nOAARequestRetryCountReturnsOnCall map[int]struct {
+		result1 int
+	}
 	OverallPollingTimeoutStub        func() time.Duration
 	overallPollingTimeoutMutex       sync.RWMutex
 	overallPollingTimeoutArgsForCall []struct{}
@@ -224,6 +233,15 @@ type FakeConfig struct {
 	removePluginMutex       sync.RWMutex
 	removePluginArgsForCall []struct {
 		arg1 string
+	}
+	RequestRetryCountStub        func() int
+	requestRetryCountMutex       sync.RWMutex
+	requestRetryCountArgsForCall []struct{}
+	requestRetryCountReturns     struct {
+		result1 int
+	}
+	requestRetryCountReturnsOnCall map[int]struct {
+		result1 int
 	}
 	SetAccessTokenStub        func(token string)
 	setAccessTokenMutex       sync.RWMutex
@@ -1056,6 +1074,46 @@ func (fake *FakeConfig) MinCLIVersionReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) NOAARequestRetryCount() int {
+	fake.nOAARequestRetryCountMutex.Lock()
+	ret, specificReturn := fake.nOAARequestRetryCountReturnsOnCall[len(fake.nOAARequestRetryCountArgsForCall)]
+	fake.nOAARequestRetryCountArgsForCall = append(fake.nOAARequestRetryCountArgsForCall, struct{}{})
+	fake.recordInvocation("NOAARequestRetryCount", []interface{}{})
+	fake.nOAARequestRetryCountMutex.Unlock()
+	if fake.NOAARequestRetryCountStub != nil {
+		return fake.NOAARequestRetryCountStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.nOAARequestRetryCountReturns.result1
+}
+
+func (fake *FakeConfig) NOAARequestRetryCountCallCount() int {
+	fake.nOAARequestRetryCountMutex.RLock()
+	defer fake.nOAARequestRetryCountMutex.RUnlock()
+	return len(fake.nOAARequestRetryCountArgsForCall)
+}
+
+func (fake *FakeConfig) NOAARequestRetryCountReturns(result1 int) {
+	fake.NOAARequestRetryCountStub = nil
+	fake.nOAARequestRetryCountReturns = struct {
+		result1 int
+	}{result1}
+}
+
+func (fake *FakeConfig) NOAARequestRetryCountReturnsOnCall(i int, result1 int) {
+	fake.NOAARequestRetryCountStub = nil
+	if fake.nOAARequestRetryCountReturnsOnCall == nil {
+		fake.nOAARequestRetryCountReturnsOnCall = make(map[int]struct {
+			result1 int
+		})
+	}
+	fake.nOAARequestRetryCountReturnsOnCall[i] = struct {
+		result1 int
+	}{result1}
+}
+
 func (fake *FakeConfig) OverallPollingTimeout() time.Duration {
 	fake.overallPollingTimeoutMutex.Lock()
 	ret, specificReturn := fake.overallPollingTimeoutReturnsOnCall[len(fake.overallPollingTimeoutArgsForCall)]
@@ -1318,6 +1376,46 @@ func (fake *FakeConfig) RemovePluginArgsForCall(i int) string {
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
 	return fake.removePluginArgsForCall[i].arg1
+}
+
+func (fake *FakeConfig) RequestRetryCount() int {
+	fake.requestRetryCountMutex.Lock()
+	ret, specificReturn := fake.requestRetryCountReturnsOnCall[len(fake.requestRetryCountArgsForCall)]
+	fake.requestRetryCountArgsForCall = append(fake.requestRetryCountArgsForCall, struct{}{})
+	fake.recordInvocation("RequestRetryCount", []interface{}{})
+	fake.requestRetryCountMutex.Unlock()
+	if fake.RequestRetryCountStub != nil {
+		return fake.RequestRetryCountStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fake.requestRetryCountReturns.result1
+}
+
+func (fake *FakeConfig) RequestRetryCountCallCount() int {
+	fake.requestRetryCountMutex.RLock()
+	defer fake.requestRetryCountMutex.RUnlock()
+	return len(fake.requestRetryCountArgsForCall)
+}
+
+func (fake *FakeConfig) RequestRetryCountReturns(result1 int) {
+	fake.RequestRetryCountStub = nil
+	fake.requestRetryCountReturns = struct {
+		result1 int
+	}{result1}
+}
+
+func (fake *FakeConfig) RequestRetryCountReturnsOnCall(i int, result1 int) {
+	fake.RequestRetryCountStub = nil
+	if fake.requestRetryCountReturnsOnCall == nil {
+		fake.requestRetryCountReturnsOnCall = make(map[int]struct {
+			result1 int
+		})
+	}
+	fake.requestRetryCountReturnsOnCall[i] = struct {
+		result1 int
+	}{result1}
 }
 
 func (fake *FakeConfig) SetAccessToken(token string) {
@@ -2011,6 +2109,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.localeMutex.RUnlock()
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
+	fake.nOAARequestRetryCountMutex.RLock()
+	defer fake.nOAARequestRetryCountMutex.RUnlock()
 	fake.overallPollingTimeoutMutex.RLock()
 	defer fake.overallPollingTimeoutMutex.RUnlock()
 	fake.pluginHomeMutex.RLock()
@@ -2025,6 +2125,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.refreshTokenMutex.RUnlock()
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
+	fake.requestRetryCountMutex.RLock()
+	defer fake.requestRetryCountMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setOrganizationInformationMutex.RLock()

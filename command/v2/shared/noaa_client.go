@@ -47,7 +47,7 @@ func NewNOAAClient(apiURL string, config command.Config, uaaClient *uaa.Client, 
 		http.ProxyFromEnvironment,
 	)
 	client.RefreshTokenFrom(noaabridge.NewTokenRefresher(uaaClient, config))
-	client.SetMaxRetryCount(5)
+	client.SetMaxRetryCount(config.NOAARequestRetryCount())
 
 	noaaDebugPrinter := DebugPrinter{}
 

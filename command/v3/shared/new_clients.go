@@ -25,7 +25,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 	authWrapper := ccWrapper.NewUAAAuthentication(nil, config)
 
 	ccWrappers = append(ccWrappers, authWrapper)
-	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(2))
+	ccWrappers = append(ccWrappers, ccWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	ccClient := ccv3.NewClient(ccv3.Config{
 		AppName:            config.BinaryName(),
@@ -76,7 +76,7 @@ func NewClients(config command.Config, ui command.UI, targetCF bool) (*ccv3.Clie
 
 	uaaAuthWrapper := uaaWrapper.NewUAAAuthentication(uaaClient, config)
 	uaaClient.WrapConnection(uaaAuthWrapper)
-	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(2))
+	uaaClient.WrapConnection(uaaWrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	err = uaaClient.SetupResources(config, ccClient.UAA())
 	if err != nil {

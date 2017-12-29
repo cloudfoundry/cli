@@ -27,7 +27,7 @@ func NewNetworkingClient(apiURL string, config command.Config, uaaClient *uaa.Cl
 	authWrapper := wrapper.NewUAAAuthentication(uaaClient, config)
 	wrappers = append(wrappers, authWrapper)
 
-	wrappers = append(wrappers, wrapper.NewRetryRequest(2))
+	wrappers = append(wrappers, wrapper.NewRetryRequest(config.RequestRetryCount()))
 
 	return cfnetv1.NewClient(cfnetv1.Config{
 		AppName:           config.BinaryName(),

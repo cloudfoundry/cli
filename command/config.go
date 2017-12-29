@@ -27,6 +27,7 @@ type Config interface {
 	HasTargetedSpace() bool
 	Locale() string
 	MinCLIVersion() string
+	NOAARequestRetryCount() int
 	OverallPollingTimeout() time.Duration
 	PluginHome() string
 	PluginRepositories() []configv3.PluginRepository
@@ -34,6 +35,7 @@ type Config interface {
 	PollingInterval() time.Duration
 	RefreshToken() string
 	RemovePlugin(string)
+	RequestRetryCount() int
 	SetAccessToken(token string)
 	SetOrganizationInformation(guid string, name string)
 	SetRefreshToken(token string)
