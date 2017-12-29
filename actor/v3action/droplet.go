@@ -64,18 +64,29 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 	return droplets, allWarnings, err
 }
 
-func (actor Actor) convertCCToActorDroplet(ccv3Droplet ccv3.Droplet) Droplet {
+func (actor Actor) GetCurrentDropletByApplication(appGUID string) (Droplet, Warnings, error) {
+	droplet, warnings, err := actor.CloudControllerClient.GetApplicationDropletCurrent(appGUID)
+	switch err.(type) {
+	case ccerror.ApplicationNotFoundError:
+		return Droplet{}, Warnings(warnings), actionerror.ApplicationNotFoundError{GUID: appGUID}
+	case ccerror.DropletNotFoundError:
+		return Droplet{}, Warnings(warnings), actionerror.DropletNotFoundError{AppGUID: appGUID}
+	}
+	return actor.convertCCToActorDroplet(droplet), Warnings(warnings), err
+}
+
+func (actor Actor) convertCCToActorDroplet(ccDroplet ccv3.Droplet) Droplet {
 	var buildpacks []Buildpack
-	for _, ccv3Buildpack := range ccv3Droplet.Buildpacks {
-		buildpacks = append(buildpacks, Buildpack(ccv3Buildpack))
+	for _, ccBuildpack := range ccDroplet.Buildpacks {
+		buildpacks = append(buildpacks, Buildpack(ccBuildpack))
 	}
 
 	return Droplet{
-		GUID:       ccv3Droplet.GUID,
-		State:      constant.DropletState(ccv3Droplet.State),
-		CreatedAt:  ccv3Droplet.CreatedAt,
-		Stack:      ccv3Droplet.Stack,
+		GUID:       ccDroplet.GUID,
+		State:      constant.DropletState(ccDroplet.State),
+		CreatedAt:  ccDroplet.CreatedAt,
+		Stack:      ccDroplet.Stack,
 		Buildpacks: buildpacks,
-		Image:      ccv3Droplet.Image,
+		Image:      ccDroplet.Image,
 	}
 }

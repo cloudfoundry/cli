@@ -16,7 +16,7 @@ const (
 	DeleteIsolationSegmentRelationshipOrganizationRequest   = "DeleteIsolationSegmentRelationshipOrganization"
 	DeleteIsolationSegmentRequest                           = "DeleteIsolationSegment"
 	DeleteServiceInstanceRelationshipSharedSpacesRequest    = "DeleteServiceInstanceRelationshipSharedSpaces"
-	GetAppDropletsRequest                                   = "GetAppDroplets"
+	GetApplicationDropletCurrentRequest                     = "GetApplicationDropletCurrent"
 	GetApplicationEnvironmentVariables                      = "GetApplicationEnvironmentVariables"
 	GetApplicationProcessByTypeRequest                      = "GetApplicationProcessByType"
 	GetAppProcessesRequest                                  = "GetAppProcesses"
@@ -24,6 +24,7 @@ const (
 	GetAppTasksRequest                                      = "GetAppTasks"
 	GetBuildRequest                                         = "GetBuild"
 	GetDropletRequest                                       = "GetDroplet"
+	GetDropletsRequest                                      = "GetDroplets"
 	GetIsolationSegmentOrganizationsRequest                 = "GetIsolationSegmentRelationshipOrganizations"
 	GetIsolationSegmentRequest                              = "GetIsolationSegment"
 	GetIsolationSegmentsRequest                             = "GetIsolationSegments"
@@ -70,6 +71,7 @@ const (
 // APIRoutes is a list of routes used by the router to construct request URLs.
 var APIRoutes = []Route{
 	{Path: "/", Method: http.MethodGet, Name: GetAppsRequest, Resource: AppsResource},
+	{Path: "/", Method: http.MethodGet, Name: GetDropletsRequest, Resource: DropletsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetIsolationSegmentsRequest, Resource: IsolationSegmentsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetOrgsRequest, Resource: OrgsResource},
 	{Path: "/", Method: http.MethodGet, Name: GetPackagesRequest, Resource: PackagesResource},
@@ -83,7 +85,7 @@ var APIRoutes = []Route{
 	{Path: "/:app_guid", Method: http.MethodPatch, Name: PatchApplicationRequest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/start", Method: http.MethodPost, Name: PostApplicationStartRequest, Resource: AppsResource},
 	{Path: "/:app_guid/actions/stop", Method: http.MethodPost, Name: PostApplicationStopRequest, Resource: AppsResource},
-	{Path: "/:app_guid/droplets", Method: http.MethodGet, Name: GetAppDropletsRequest, Resource: AppsResource},
+	{Path: "/:app_guid/droplets/current", Method: http.MethodGet, Name: GetApplicationDropletCurrentRequest, Resource: AppsResource},
 	{Path: "/:app_guid/env", Method: http.MethodGet, Name: GetApplicationEnvironmentVariables, Resource: AppsResource},
 	{Path: "/:app_guid/environment_variables", Method: http.MethodPatch, Name: PatchApplicationUserProvidedEnvironmentVariablesRequest, Resource: AppsResource},
 	{Path: "/:app_guid/processes", Method: http.MethodGet, Name: GetAppProcessesRequest, Resource: AppsResource},

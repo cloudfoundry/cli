@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/url"
 
+	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -254,6 +255,77 @@ var _ = Describe("Droplet Actions", func() {
 
 				Expect(err).To(Equal(expectedErr))
 				Expect(warnings).To(ConsistOf("get-applications-warning", "get-application-droplets-warning"))
+			})
+		})
+	})
+
+	Describe("GetCurrentDropletByApplication", func() {
+		var (
+			appGUID string
+
+			currentDroplet Droplet
+			warnings       Warnings
+			executionErr   error
+		)
+
+		BeforeEach(func() {
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			currentDroplet, warnings, executionErr = actor.GetCurrentDropletByApplication(appGUID)
+		})
+
+		Context("when the current droplet exists", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetApplicationDropletCurrentReturns(ccv3.Droplet{GUID: "some-droplet-guid"}, ccv3.Warnings{"some-warning"}, nil)
+			})
+
+			It("returns the current droplet", func() {
+				Expect(executionErr).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("some-warning"))
+				Expect(currentDroplet).To(Equal(Droplet{GUID: "some-droplet-guid"}))
+
+				Expect(fakeCloudControllerClient.GetApplicationDropletCurrentCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)).To(Equal("some-app-guid"))
+			})
+		})
+
+		Context("when an error occurs", func() {
+			Context("when the app does not exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationDropletCurrentReturns(ccv3.Droplet{GUID: "some-droplet-guid"}, ccv3.Warnings{"some-warning"}, ccerror.ApplicationNotFoundError{})
+				})
+
+				It("returns an ApplicationNotFoundError and warnings", func() {
+					Expect(executionErr).To(MatchError(actionerror.ApplicationNotFoundError{GUID: appGUID}))
+					Expect(warnings).To(ConsistOf("some-warning"))
+				})
+			})
+
+			Context("when the current droplet does not exist", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationDropletCurrentReturns(ccv3.Droplet{}, ccv3.Warnings{"some-warning"}, ccerror.DropletNotFoundError{})
+				})
+
+				It("returns an DropletNotFoundError and warnings", func() {
+					Expect(executionErr).To(MatchError(actionerror.DropletNotFoundError{AppGUID: appGUID}))
+					Expect(warnings).To(ConsistOf("some-warning"))
+				})
+			})
+
+			Context("when a generic error occurs", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("some error")
+					fakeCloudControllerClient.GetApplicationDropletCurrentReturns(ccv3.Droplet{}, ccv3.Warnings{"some-warning"}, expectedErr)
+				})
+
+				It("returns the error and warnings", func() {
+					Expect(executionErr).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("some-warning"))
+				})
 			})
 		})
 	})

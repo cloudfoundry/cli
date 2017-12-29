@@ -9,6 +9,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
+// Droplet represents a cloud controller droplet's metadata. A droplet is a set of
+// compiled bits for a given application.
 type Droplet struct {
 	GUID       string                `json:"guid"`
 	State      constant.DropletState `json:"state"`
@@ -23,11 +25,35 @@ type DropletBuildpack struct {
 	DetectOutput string `json:"detect_output"`
 }
 
-// GetApplicationDroplets returns the Droplets for a given app
-func (client *Client) GetApplicationDroplets(appGUID string, query url.Values) ([]Droplet, Warnings, error) {
+// GetApplicationDropletCurrent returns the current droplet for a given
+// application.
+func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.GetAppDropletsRequest,
+		RequestName: internal.GetApplicationDropletCurrentRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
+	})
+	if err != nil {
+		return Droplet{}, nil, err
+	}
+
+	var responseDroplet Droplet
+	response := cloudcontroller.Response{
+		Result: &responseDroplet,
+	}
+	err = client.connection.Make(request, &response)
+	return responseDroplet, response.Warnings, err
+}
+
+// GetApplicationDroplets returns the Droplets for a given application.
+func (client *Client) GetApplicationDroplets(appGUID string, query url.Values) ([]Droplet, Warnings, error) {
+
+	if query == nil {
+		query = url.Values{}
+	}
+	query.Add(AppGUIDFilter, appGUID)
+
+	request, err := client.newHTTPRequest(requestOptions{
+		RequestName: internal.GetDropletsRequest,
 		Query:       query,
 	})
 	if err != nil {
@@ -50,6 +76,7 @@ func (client *Client) GetApplicationDroplets(appGUID string, query url.Values) (
 	return responseDroplets, warnings, err
 }
 
+// GetDroplet returns a droplet with the given GUID.
 func (client *Client) GetDroplet(dropletGUID string) (Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDropletRequest,
