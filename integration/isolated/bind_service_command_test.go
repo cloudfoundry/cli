@@ -45,6 +45,7 @@ var _ = Describe("bind-service command", func() {
 				Eventually(session.Out).Should(Say("-c      Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."))
 				Eventually(session.Out).Should(Say("SEE ALSO:"))
 				Eventually(session.Out).Should(Say("services"))
+				Eventually(session).Should(Exit(0))
 			})
 		})
 	})
