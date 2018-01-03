@@ -271,14 +271,12 @@ applications:
 
 			Context("when the app is a Docker app", func() {
 				var (
-					domainName string
-					tcpDomain  helpers.Domain
-					appName    string
+					tcpDomain helpers.Domain
+					appName   string
 				)
 
 				BeforeEach(func() {
 					appName = helpers.PrefixedRandomName("app")
-					domainName = defaultSharedDomain()
 					tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
 					tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 					Eventually(helpers.CF("push", appName, "-o", DockerImage)).Should(Exit())
