@@ -124,7 +124,7 @@ var _ = Describe("Org Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
 				Expect(query).To(Equal(
-					[]ccv2.Query{{
+					[]ccv2.QQuery{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-org"},
@@ -220,7 +220,7 @@ var _ = Describe("Org Actions", func() {
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
 				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
 				Expect(query).To(Equal(
-					[]ccv2.Query{{
+					[]ccv2.QQuery{{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-org"},

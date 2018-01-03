@@ -41,12 +41,12 @@ func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string
 // given an application GUID and and service instance GUID.
 func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (ServiceBinding, Warnings, error) {
 	serviceBindings, warnings, err := actor.CloudControllerClient.GetServiceBindings(
-		ccv2.Query{
+		ccv2.QQuery{
 			Filter:   ccv2.AppGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{appGUID},
 		},
-		ccv2.Query{
+		ccv2.QQuery{
 			Filter:   ccv2.ServiceInstanceGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{serviceInstanceGUID},

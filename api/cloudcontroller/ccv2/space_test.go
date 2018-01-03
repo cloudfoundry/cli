@@ -88,7 +88,7 @@ var _ = Describe("Space", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					spaces, warnings, err := client.GetSpaces(Query{
+					spaces, warnings, err := client.GetSpaces(QQuery{
 						Filter:   "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},

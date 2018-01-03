@@ -54,7 +54,7 @@ func (client *Client) GetStack(guid string) (Stack, Warnings, error) {
 }
 
 // GetStacks returns a list of Stacks based off of the provided queries.
-func (client *Client) GetStacks(queries ...Query) ([]Stack, Warnings, error) {
+func (client *Client) GetStacks(queries ...QQuery) ([]Stack, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetStacksRequest,
 		Query:       FormatQueryParameters(queries),

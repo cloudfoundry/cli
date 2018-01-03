@@ -563,12 +563,12 @@ var _ = Describe("Route Actions", func() {
 
 				Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
-					ccv2.Query{
+					ccv2.QQuery{
 						Filter:   ccv2.OrganizationGUIDFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-org-guid"},
 					},
-					ccv2.Query{
+					ccv2.QQuery{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-space"},
@@ -682,7 +682,7 @@ var _ = Describe("Route Actions", func() {
 						orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
 						Expect(orgGUID).To(Equal("some-org-guid"))
 						Expect(queries).To(HaveLen(1))
-						Expect(queries[0]).To(Equal(ccv2.Query{
+						Expect(queries[0]).To(Equal(ccv2.QQuery{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.InOperator,
 							Values:   []string{"some-domain"},
@@ -740,7 +740,7 @@ var _ = Describe("Route Actions", func() {
 							orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
 							Expect(orgGUID).To(Equal("some-org-guid"))
 							Expect(queries).To(HaveLen(1))
-							Expect(queries[0]).To(Equal(ccv2.Query{
+							Expect(queries[0]).To(Equal(ccv2.QQuery{
 								Filter:   ccv2.NameFilter,
 								Operator: ccv2.InOperator,
 								Values:   []string{"some-domain"},
@@ -786,7 +786,7 @@ var _ = Describe("Route Actions", func() {
 							orgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
 							Expect(orgGUID).To(Equal("some-org-guid"))
 							Expect(queries).To(HaveLen(1))
-							Expect(queries[0]).To(Equal(ccv2.Query{
+							Expect(queries[0]).To(Equal(ccv2.QQuery{
 								Filter:   ccv2.NameFilter,
 								Operator: ccv2.InOperator,
 								Values:   []string{"some-domain"},
@@ -879,7 +879,7 @@ var _ = Describe("Route Actions", func() {
 
 	Describe("GetOrphanedRoutesBySpace", func() {
 		BeforeEach(func() {
-			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string, queries ...ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
+			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string, queries ...ccv2.QQuery) ([]ccv2.Application, ccv2.Warnings, error) {
 				switch routeGUID {
 				case "orphaned-route-guid-1":
 					return []ccv2.Application{}, nil, nil
@@ -1417,7 +1417,7 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.QQuery{
 						{
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
@@ -1462,7 +1462,7 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.QQuery{
 						{
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
@@ -1507,7 +1507,7 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.QQuery{
 						{
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
@@ -1552,7 +1552,7 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.QQuery{
 						{
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,
@@ -1606,7 +1606,7 @@ var _ = Describe("Route Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetRoutesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.Query{
+					Expect(fakeCloudControllerClient.GetRoutesArgsForCall(0)).To(Equal([]ccv2.QQuery{
 						{
 							Filter:   ccv2.DomainGUIDFilter,
 							Operator: ccv2.EqualOperator,

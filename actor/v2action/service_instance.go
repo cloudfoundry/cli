@@ -23,7 +23,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 	serviceInstances, warnings, err := actor.CloudControllerClient.GetSpaceServiceInstances(
 		spaceGUID,
 		true,
-		ccv2.Query{
+		ccv2.QQuery{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{name},
@@ -44,7 +44,7 @@ func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID strin
 
 func (actor Actor) GetServiceInstancesByApplication(appGUID string) ([]ServiceInstance, Warnings, error) {
 	var allWarnings Warnings
-	bindings, apiWarnings, err := actor.CloudControllerClient.GetServiceBindings(ccv2.Query{
+	bindings, apiWarnings, err := actor.CloudControllerClient.GetServiceBindings(ccv2.QQuery{
 		Filter:   ccv2.AppGUIDFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{appGUID},

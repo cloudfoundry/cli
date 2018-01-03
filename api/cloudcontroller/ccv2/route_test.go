@@ -397,7 +397,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetRoutes(Query{
+				routes, warnings, err := client.GetRoutes(QQuery{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-org-guid"},
@@ -550,7 +550,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", Query{
+				routes, warnings, err := client.GetApplicationRoutes("some-app-guid", QQuery{
 					Filter:   OrganizationGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-org-guid"},
@@ -720,7 +720,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", Query{
+				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", QQuery{
 					Filter:   SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},

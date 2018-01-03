@@ -61,7 +61,7 @@ func (client *Client) GetOrganization(guid string) (Organization, Warnings, erro
 
 // GetOrganizations returns back a list of Organizations based off of the
 // provided queries.
-func (client *Client) GetOrganizations(queries ...Query) ([]Organization, Warnings, error) {
+func (client *Client) GetOrganizations(queries ...QQuery) ([]Organization, Warnings, error) {
 	allQueries := FormatQueryParameters(queries)
 	allQueries.Add("order-by", "name")
 	request, err := client.newHTTPRequest(requestOptions{

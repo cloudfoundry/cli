@@ -21,7 +21,7 @@ func (actor Actor) GetStack(guid string) (Stack, Warnings, error) {
 
 // GetStackByName returns the provided stack
 func (actor Actor) GetStackByName(stackName string) (Stack, Warnings, error) {
-	stacks, warnings, err := actor.CloudControllerClient.GetStacks(ccv2.Query{
+	stacks, warnings, err := actor.CloudControllerClient.GetStacks(ccv2.QQuery{
 		Filter:   ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{stackName},

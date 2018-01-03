@@ -108,7 +108,7 @@ func (client *Client) GetServiceInstance(serviceInstanceGUID string) (ServiceIns
 
 // GetServiceInstances returns back a list of *managed* Service Instances based
 // off of the provided queries.
-func (client *Client) GetServiceInstances(queries ...Query) ([]ServiceInstance, Warnings, error) {
+func (client *Client) GetServiceInstances(queries ...QQuery) ([]ServiceInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceInstancesRequest,
 		Query:       FormatQueryParameters(queries),
@@ -136,7 +136,7 @@ func (client *Client) GetServiceInstances(queries ...Query) ([]ServiceInstance, 
 // GetSpaceServiceInstances returns back a list of Service Instances based off
 // of the space and queries provided. User provided services will be included
 // if includeUserProvidedServices is set to true.
-func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries ...Query) ([]ServiceInstance, Warnings, error) {
+func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries ...QQuery) ([]ServiceInstance, Warnings, error) {
 	query := FormatQueryParameters(queries)
 
 	if includeUserProvidedServices {

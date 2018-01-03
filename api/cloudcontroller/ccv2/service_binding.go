@@ -80,7 +80,7 @@ func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID s
 
 // GetServiceBindings returns back a list of Service Bindings based off of the
 // provided queries.
-func (client *Client) GetServiceBindings(queries ...Query) ([]ServiceBinding, Warnings, error) {
+func (client *Client) GetServiceBindings(queries ...QQuery) ([]ServiceBinding, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceBindingsRequest,
 		Query:       FormatQueryParameters(queries),

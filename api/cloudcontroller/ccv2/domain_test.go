@@ -204,7 +204,7 @@ var _ = Describe("Domain", func() {
 			})
 
 			It("returns the shared domain and warnings", func() {
-				domains, warnings, err := client.GetSharedDomains(Query{
+				domains, warnings, err := client.GetSharedDomains(QQuery{
 					Filter:   NameFilter,
 					Operator: InOperator,
 					Values:   []string{"domain-name-1", "domain-name-2", "domain-name-3", "domain-name-4"},
@@ -372,7 +372,7 @@ var _ = Describe("Domain", func() {
 					),
 				)
 
-				client.GetOrganizationPrivateDomains("some-org-guid", Query{
+				client.GetOrganizationPrivateDomains("some-org-guid", QQuery{
 					Filter:   NameFilter,
 					Operator: EqualOperator,
 					Values:   []string{"private-domain-name"},

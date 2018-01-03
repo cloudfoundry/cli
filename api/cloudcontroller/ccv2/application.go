@@ -298,7 +298,7 @@ func (client *Client) GetApplication(guid string) (Application, Warnings, error)
 
 // GetApplications returns back a list of Applications based off of the
 // provided queries.
-func (client *Client) GetApplications(queries ...Query) ([]Application, Warnings, error) {
+func (client *Client) GetApplications(queries ...QQuery) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppsRequest,
 		Query:       FormatQueryParameters(queries),
@@ -370,7 +370,7 @@ func (client *Client) RestageApplication(app Application) (Application, Warnings
 
 // GetRouteApplications returns a list of Applications associated with a route
 // GUID, filtered by provided queries.
-func (client *Client) GetRouteApplications(routeGUID string, queryParams ...Query) ([]Application, Warnings, error) {
+func (client *Client) GetRouteApplications(routeGUID string, queryParams ...QQuery) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteAppsRequest,
 		URIParams:   map[string]string{"route_guid": routeGUID},

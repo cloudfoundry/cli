@@ -162,14 +162,14 @@ var _ = Describe("Space", func() {
 								Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
 
 								Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Query{{
+								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.QQuery{{
 									Filter:   ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
 									Values:   []string{"some-org"},
 								}}))
 
 								Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Query{{
+								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.QQuery{{
 									Filter:   ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
 									Values:   []string{"some-space"},
@@ -236,7 +236,7 @@ var _ = Describe("Space", func() {
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
-						[]ccv2.Query{
+						[]ccv2.QQuery{
 							{
 								Filter:   ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,
@@ -297,7 +297,7 @@ var _ = Describe("Space", func() {
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
-						[]ccv2.Query{
+						[]ccv2.QQuery{
 							{
 								Filter:   ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,

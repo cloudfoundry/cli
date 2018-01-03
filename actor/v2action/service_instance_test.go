@@ -114,8 +114,8 @@ var _ = Describe("Service Instance Actions", func() {
 				spaceGUID, includeUserProvidedServices, queries := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(includeUserProvidedServices).To(BeTrue())
-				Expect(queries).To(ConsistOf([]ccv2.Query{
-					ccv2.Query{
+				Expect(queries).To(ConsistOf([]ccv2.QQuery{
+					ccv2.QQuery{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-service-instance"},

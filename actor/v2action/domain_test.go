@@ -321,7 +321,7 @@ var _ = Describe("Domain Actions", func() {
 					))
 
 					Expect(fakeCloudControllerClient.GetSharedDomainsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetSharedDomainsArgsForCall(0)).To(ConsistOf(ccv2.Query{
+					Expect(fakeCloudControllerClient.GetSharedDomainsArgsForCall(0)).To(ConsistOf(ccv2.QQuery{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.InOperator,
 						Values:   domainNames,
@@ -329,7 +329,7 @@ var _ = Describe("Domain Actions", func() {
 
 					Expect(fakeCloudControllerClient.GetOrganizationPrivateDomainsCallCount()).To(Equal(1))
 					passedOrgGUID, queries := fakeCloudControllerClient.GetOrganizationPrivateDomainsArgsForCall(0)
-					Expect(queries).To(ConsistOf(ccv2.Query{
+					Expect(queries).To(ConsistOf(ccv2.QQuery{
 						Filter:   ccv2.NameFilter,
 						Operator: ccv2.InOperator,
 						Values:   domainNames,

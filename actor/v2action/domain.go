@@ -79,7 +79,7 @@ func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID
 	// TODO: If the following causes URI length problems, break domainNames into
 	// batched (based on character length?) and loop over them.
 
-	sharedDomains, warnings, err := actor.CloudControllerClient.GetSharedDomains(ccv2.Query{
+	sharedDomains, warnings, err := actor.CloudControllerClient.GetSharedDomains(ccv2.QQuery{
 		Filter:   ccv2.NameFilter,
 		Operator: ccv2.InOperator,
 		Values:   domainNames,
@@ -96,7 +96,7 @@ func (actor Actor) GetDomainsByNameAndOrganization(domainNames []string, orgGUID
 
 	privateDomains, warnings, err := actor.CloudControllerClient.GetOrganizationPrivateDomains(
 		orgGUID,
-		ccv2.Query{
+		ccv2.QQuery{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.InOperator,
 			Values:   domainNames,

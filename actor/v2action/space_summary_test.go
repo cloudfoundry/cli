@@ -272,12 +272,12 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
 					Expect(query).To(ConsistOf(
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space"},
 						},
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-org-guid"},
@@ -287,7 +287,7 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 					query = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(query).To(ConsistOf(
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space-guid"},
@@ -853,12 +853,12 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
 					Expect(query).To(ConsistOf(
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space"},
 						},
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-org-guid"},
@@ -868,7 +868,7 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 					query = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
 					Expect(query).To(ConsistOf(
-						ccv2.Query{
+						ccv2.QQuery{
 							Filter:   ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space-guid"},
