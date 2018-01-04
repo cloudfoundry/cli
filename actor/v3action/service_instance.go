@@ -1,8 +1,6 @@
 package v3action
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -66,10 +64,10 @@ func (actor Actor) UnshareServiceInstanceFromSpace(serviceInstanceName string, s
 }
 
 func (actor Actor) GetServiceInstanceByNameAndSpace(serviceInstanceName string, spaceGUID string) (ServiceInstance, Warnings, error) {
-	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(url.Values{
-		ccv3.NameFilter:      []string{serviceInstanceName},
-		ccv3.SpaceGUIDFilter: []string{spaceGUID},
-	})
+	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
 
 	if err != nil {
 		return ServiceInstance{}, Warnings(warnings), err

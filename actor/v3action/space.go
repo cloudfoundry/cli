@@ -1,8 +1,6 @@
 package v3action
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -42,10 +40,10 @@ func (actor Actor) ResetSpaceIsolationSegment(orgGUID string, spaceGUID string) 
 }
 
 func (actor Actor) GetSpaceByNameAndOrganization(spaceName string, orgGUID string) (Space, Warnings, error) {
-	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(url.Values{
-		ccv3.NameFilter:             []string{spaceName},
-		ccv3.OrganizationGUIDFilter: []string{orgGUID},
-	})
+	spaces, warnings, err := actor.CloudControllerClient.GetSpaces(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+	)
 
 	if err != nil {
 		return Space{}, Warnings(warnings), err

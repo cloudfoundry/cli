@@ -53,7 +53,7 @@ var _ = Describe("Error Wrapper", func() {
 				),
 			)
 
-			_, _, makeError = client.GetApplications(nil)
+			_, _, makeError = client.GetApplications()
 		})
 
 		Context("when we can't unmarshal the response successfully", func() {

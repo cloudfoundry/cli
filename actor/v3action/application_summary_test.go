@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -130,24 +129,19 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-process-stats-warning", "some-droplet-warning"}))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					expectedQuery := url.Values{
-						"names":       []string{"some-app-name"},
-						"space_guids": []string{"some-space-guid"},
-					}
-					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(Equal(expectedQuery))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					))
 
 					Expect(fakeCloudControllerClient.GetApplicationDropletCurrentCallCount()).To(Equal(1))
-					appGUID := fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-					appGUID = fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					processGUID := fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)
-					Expect(processGUID).To(Equal("some-process-guid"))
+					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
 				})
 
 				Context("when getting the current droplet returns an error", func() {
@@ -212,24 +206,19 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning", "some-process-stats-warning", "some-droplet-warning"}))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					expectedQuery := url.Values{
-						"names":       []string{"some-app-name"},
-						"space_guids": []string{"some-space-guid"},
-					}
-					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(Equal(expectedQuery))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					))
 
 					Expect(fakeCloudControllerClient.GetApplicationDropletCurrentCallCount()).To(Equal(1))
-					appGUID := fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationDropletCurrentArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(1))
-					appGUID = fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(1))
-					processGUID := fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)
-					Expect(processGUID).To(Equal("some-process-guid"))
+					Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid"))
 				})
 			})
 		})
@@ -297,7 +286,7 @@ var _ = Describe("Application Summary Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetApplicationDropletsReturns(
+				fakeCloudControllerClient.GetDropletsReturns(
 					[]ccv3.Droplet{
 						{
 							Stack: "some-stack",

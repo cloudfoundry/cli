@@ -3,7 +3,6 @@ package v3action_test
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -123,12 +122,10 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"some-warning"}))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					"names":       []string{"some-app-name"},
-					"space_guids": []string{"some-space-guid"},
-				}
-				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
 			})
 		})
 
@@ -147,13 +144,6 @@ var _ = Describe("Application Actions", func() {
 				_, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(expectedError))
-				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					"names":       []string{"some-app-name"},
-					"space_guids": []string{"some-space-guid"},
-				}
-				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
 			})
 		})
 
@@ -169,15 +159,7 @@ var _ = Describe("Application Actions", func() {
 			It("returns an ApplicationNotFoundError and the warnings", func() {
 				_, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
 				Expect(warnings).To(ConsistOf("some-warning"))
-				Expect(err).To(MatchError(
-					actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
-				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					"names":       []string{"some-app-name"},
-					"space_guids": []string{"some-space-guid"},
-				}
-				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
+				Expect(err).To(MatchError(actionerror.ApplicationNotFoundError{Name: "some-app-name"}))
 			})
 		})
 	})
@@ -217,9 +199,9 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal(url.Values{
-					"space_guids": []string{"some-space-guid"},
-				}))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
 			})
 		})
 
@@ -294,7 +276,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.CreateApplicationCallCount()).To(Equal(1))
-				expectedApp := ccv3.Application{
+				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(ccv3.Application{
 					Name: "some-app-name",
 					Relationships: ccv3.Relationships{
 						ccv3.SpaceRelationship: ccv3.Relationship{GUID: "some-space-guid"},
@@ -305,8 +287,7 @@ var _ = Describe("Application Actions", func() {
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
 					},
-				}
-				Expect(fakeCloudControllerClient.CreateApplicationArgsForCall(0)).To(Equal(expectedApp))
+				}))
 			})
 		})
 
@@ -394,7 +375,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("some-warning"))
 
 				Expect(fakeCloudControllerClient.UpdateApplicationCallCount()).To(Equal(1))
-				expectedApp := ccv3.Application{
+				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(ccv3.Application{
 					GUID: "some-app-guid",
 					Lifecycle: ccv3.AppLifecycle{
 						Type: constant.BuildpackAppLifecycleType,
@@ -402,8 +383,7 @@ var _ = Describe("Application Actions", func() {
 							Buildpacks: []string{"buildpack-1", "buildpack-2"},
 						},
 					},
-				}
-				Expect(fakeCloudControllerClient.UpdateApplicationArgsForCall(0)).To(Equal(expectedApp))
+				}))
 			})
 		})
 
@@ -712,8 +692,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("stop-application-warning"))
 
 				Expect(fakeCloudControllerClient.StopApplicationCallCount()).To(Equal(1))
-				appGUID := fakeCloudControllerClient.StopApplicationArgsForCall(0)
-				Expect(appGUID).To(Equal("some-app-guid"))
+				Expect(fakeCloudControllerClient.StopApplicationArgsForCall(0)).To(Equal("some-app-guid"))
 			})
 		})
 
@@ -755,8 +734,7 @@ var _ = Describe("Application Actions", func() {
 				Expect(app).To(Equal(Application{GUID: "some-app-guid"}))
 
 				Expect(fakeCloudControllerClient.StartApplicationCallCount()).To(Equal(1))
-				appGUID := fakeCloudControllerClient.StartApplicationArgsForCall(0)
-				Expect(appGUID).To(Equal("some-app-guid"))
+				Expect(fakeCloudControllerClient.StartApplicationArgsForCall(0)).To(Equal("some-app-guid"))
 			})
 		})
 

@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -140,10 +139,10 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the queried applications and all warnings", func() {
-				segments, warnings, err := client.GetIsolationSegments(url.Values{
-					"organization_guids": []string{"some-org-guid"},
-					"names":              []string{"iso1,iso2,iso3"},
-				})
+				segments, warnings, err := client.GetIsolationSegments(
+					Query{Key: OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+					Query{Key: NameFilter, Values: []string{"iso1,iso2,iso3"}},
+				)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(segments).To(ConsistOf(
@@ -180,7 +179,7 @@ var _ = Describe("Isolation Segments", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetIsolationSegments(url.Values{})
+				_, warnings, err := client.GetIsolationSegments()
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

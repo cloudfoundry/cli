@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
@@ -417,7 +416,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the queried packages and all warnings", func() {
-				packages, warnings, err := client.GetPackages(url.Values{"app_guids": []string{"some-app-guid"}})
+				packages, warnings, err := client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(packages).To(Equal([]Package{
@@ -469,7 +468,7 @@ var _ = Describe("Package", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetPackages(url.Values{"app_guids": []string{"some-app-guid"}})
+				_, warnings, err := client.GetPackages(Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}})
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

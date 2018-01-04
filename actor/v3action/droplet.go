@@ -1,8 +1,6 @@
 package v3action
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -49,7 +47,9 @@ func (actor Actor) GetApplicationDroplets(appName string, spaceGUID string) ([]D
 		return nil, allWarnings, err
 	}
 
-	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetApplicationDroplets(application.GUID, url.Values{})
+	ccv3Droplets, apiWarnings, err := actor.CloudControllerClient.GetDroplets(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{application.GUID}},
+	)
 	actorWarnings := Warnings(apiWarnings)
 	allWarnings = append(allWarnings, actorWarnings...)
 	if err != nil {

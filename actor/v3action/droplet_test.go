@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -51,9 +50,10 @@ var _ = Describe("Droplet Actions", func() {
 				Expect(warnings).To(ConsistOf("get-applications-warning", "set-application-droplet-warning"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
-				Expect(queryURL).To(Equal(query))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
 
 				Expect(fakeCloudControllerClient.SetApplicationDropletCallCount()).To(Equal(1))
 				appGUID, dropletGUID := fakeCloudControllerClient.SetApplicationDropletArgsForCall(0)
@@ -140,7 +140,7 @@ var _ = Describe("Droplet Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetApplicationDropletsReturns(
+				fakeCloudControllerClient.GetDropletsReturns(
 					[]ccv3.Droplet{
 						{
 							GUID:      "some-droplet-guid-1",
@@ -197,14 +197,15 @@ var _ = Describe("Droplet Actions", func() {
 				}))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
-				Expect(queryURL).To(Equal(query))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
 
-				Expect(fakeCloudControllerClient.GetApplicationDropletsCallCount()).To(Equal(1))
-				appGUID, query := fakeCloudControllerClient.GetApplicationDropletsArgsForCall(0)
-				Expect(appGUID).To(Equal("some-app-guid"))
-				Expect(query).To(Equal(url.Values{}))
+				Expect(fakeCloudControllerClient.GetDropletsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetDropletsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+				))
 			})
 		})
 
@@ -243,7 +244,7 @@ var _ = Describe("Droplet Actions", func() {
 					nil,
 				)
 
-				fakeCloudControllerClient.GetApplicationDropletsReturns(
+				fakeCloudControllerClient.GetDropletsReturns(
 					[]ccv3.Droplet{},
 					ccv3.Warnings{"get-application-droplets-warning"},
 					expectedErr,

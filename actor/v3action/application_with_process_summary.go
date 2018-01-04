@@ -1,8 +1,6 @@
 package v3action
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
@@ -15,10 +13,10 @@ type ApplicationWithProcessSummary struct {
 func (actor Actor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]ApplicationWithProcessSummary, Warnings, error) {
 	var allWarnings Warnings
 
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
-		ccv3.SpaceGUIDFilter: []string{spaceGUID},
-		ccv3.OrderBy:         []string{ccv3.NameOrder},
-	})
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+		ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+	)
 	allWarnings = Warnings(warnings)
 	if err != nil {
 		return nil, allWarnings, err

@@ -1,8 +1,6 @@
 package ccv3
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -14,7 +12,7 @@ type Organization struct {
 }
 
 // GetOrganizations lists organizations with optional filters.
-func (client *Client) GetOrganizations(query url.Values) ([]Organization, Warnings, error) {
+func (client *Client) GetOrganizations(query ...Query) ([]Organization, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrgsRequest,
 		Query:       query,

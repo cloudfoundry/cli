@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -20,13 +19,13 @@ var _ = Describe("Droplet", func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetApplicationDroplets", func() {
-		Context("when the application exists", func() {
+	Describe("GetDroplets", func() {
+		Context("when the CC returns back droplets", func() {
 			BeforeEach(func() {
 				response1 := fmt.Sprintf(`{
 					"pagination": {
 						"next": {
-							"href": "%s/v3/droplets?app_guids=some-app-guid&per_page=2&current=true&page=2"
+							"href": "%s/v3/droplets?app_guids=some-app-guid&per_page=2&page=2"
 						}
 					},
 					"resources": [
@@ -74,20 +73,23 @@ var _ = Describe("Droplet", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&current=true&per_page=2"),
+						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&per_page=2"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"warning-1"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&current=true&per_page=2&page=2"),
+						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid&per_page=2&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"warning-2"}}),
 					),
 				)
 			})
 
-			It("returns the current droplet for the given app and all warnings", func() {
-				droplets, warnings, err := client.GetApplicationDroplets("some-app-guid", url.Values{"per_page": []string{"2"}, "current": []string{"true"}})
+			It("returns the droplets and all warnings", func() {
+				droplets, warnings, err := client.GetDroplets(
+					Query{Key: AppGUIDFilter, Values: []string{"some-app-guid"}},
+					Query{Key: PerPage, Values: []string{"2"}},
+				)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(droplets).To(HaveLen(3))
 
@@ -144,14 +146,14 @@ var _ = Describe("Droplet", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodGet, "/v3/droplets", "app_guids=some-app-guid"),
+						VerifyRequest(http.MethodGet, "/v3/droplets"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)
 			})
 
 			It("returns the error", func() {
-				_, _, err := client.GetApplicationDroplets("some-app-guid", url.Values{})
+				_, _, err := client.GetDroplets()
 				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
 			})
 		})

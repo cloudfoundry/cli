@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -226,7 +225,10 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns a list of tasks associated with the application and all warnings", func() {
-				tasks, warnings, err := client.GetApplicationTasks("some-app-guid", url.Values{"per_page": []string{"2"}})
+				tasks, warnings, err := client.GetApplicationTasks(
+					"some-app-guid",
+					Query{Key: PerPage, Values: []string{"2"}},
+				)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(tasks).To(ConsistOf(
@@ -279,7 +281,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns a ResourceNotFoundError", func() {
-				_, _, err := client.GetApplicationTasks("some-app-guid", nil)
+				_, _, err := client.GetApplicationTasks("some-app-guid")
 				Expect(err).To(MatchError(ccerror.ApplicationNotFoundError{}))
 			})
 		})
@@ -309,7 +311,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.GetApplicationTasks("some-app-guid", nil)
+				_, warnings, err := client.GetApplicationTasks("some-app-guid")
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

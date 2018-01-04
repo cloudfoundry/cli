@@ -1,8 +1,6 @@
 package v3action
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -103,7 +101,9 @@ func (actor Actor) AssignIsolationSegmentToSpaceByNameAndSpace(isolationSegmentN
 
 // GetIsolationSegmentByName returns the requested isolation segment.
 func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, Warnings, error) {
-	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{ccv3.NameFilter: []string{name}})
+	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{name}},
+	)
 	if err != nil {
 		return IsolationSegment{}, Warnings(warnings), err
 	}
@@ -117,7 +117,7 @@ func (actor Actor) GetIsolationSegmentByName(name string) (IsolationSegment, War
 
 // GetIsolationSegmentSummaries returns all isolation segments and their entitled orgs
 func (actor Actor) GetIsolationSegmentSummaries() ([]IsolationSegmentSummary, Warnings, error) {
-	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(nil)
+	isolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments()
 	allWarnings := append(Warnings{}, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
@@ -147,9 +147,9 @@ func (actor Actor) GetIsolationSegmentSummaries() ([]IsolationSegmentSummary, Wa
 }
 
 func (actor Actor) GetIsolationSegmentsByOrganization(orgGUID string) ([]IsolationSegment, Warnings, error) {
-	ccv3IsolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(url.Values{
-		ccv3.OrganizationGUIDFilter: []string{orgGUID},
-	})
+	ccv3IsolationSegments, warnings, err := actor.CloudControllerClient.GetIsolationSegments(
+		ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+	)
 	if err != nil {
 		return []IsolationSegment{}, Warnings(warnings), err
 	}

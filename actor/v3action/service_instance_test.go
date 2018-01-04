@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -73,16 +72,16 @@ var _ = Describe("Service Instance Actions", func() {
 
 					It("calls to create a new service instance share", func() {
 						Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(Equal(url.Values{
-							ccv3.NameFilter:      []string{serviceInstanceName},
-							ccv3.SpaceGUIDFilter: []string{sourceSpaceGUID},
-						}))
+						Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf(
+							ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
+							ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{sourceSpaceGUID}},
+						))
 
 						Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(url.Values{
-							ccv3.NameFilter:             []string{spaceName},
-							ccv3.OrganizationGUIDFilter: []string{orgGUID},
-						}))
+						Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+							ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+							ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+						))
 
 						Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
 						si_guid, space_guids := fakeCloudControllerClient.ShareServiceInstanceToSpacesArgsForCall(0)
@@ -204,21 +203,21 @@ var _ = Describe("Service Instance Actions", func() {
 
 						It("calls to create a new service instance share", func() {
 							Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(Equal(url.Values{
-								ccv3.NameFilter:      []string{serviceInstanceName},
-								ccv3.SpaceGUIDFilter: []string{sourceSpaceGUID},
-							}))
+							Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf(
+								ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
+								ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{sourceSpaceGUID}},
+							))
 
 							Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal(url.Values{
-								ccv3.NameFilter: []string{orgName},
-							}))
+							Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(ConsistOf(
+								ccv3.Query{Key: ccv3.NameFilter, Values: []string{orgName}},
+							))
 
 							Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(url.Values{
-								ccv3.NameFilter:             []string{spaceName},
-								ccv3.OrganizationGUIDFilter: []string{orgGUID},
-							}))
+							Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+								ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+								ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+							))
 
 							Expect(fakeCloudControllerClient.ShareServiceInstanceToSpacesCallCount()).To(Equal(1))
 							si_guid, space_guids := fakeCloudControllerClient.ShareServiceInstanceToSpacesArgsForCall(0)
@@ -317,10 +316,10 @@ var _ = Describe("Service Instance Actions", func() {
 
 				It("calls to delete a service instance share", func() {
 					Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(Equal(url.Values{
-						ccv3.NameFilter:      []string{serviceInstanceName},
-						ccv3.SpaceGUIDFilter: []string{sourceSpaceGUID},
-					}))
+					Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{sourceSpaceGUID}},
+					))
 
 					Expect(fakeCloudControllerClient.UnshareServiceInstanceFromSpaceCallCount()).To(Equal(1))
 					service_instance_guid, space_guid := fakeCloudControllerClient.UnshareServiceInstanceFromSpaceArgsForCall(0)
@@ -405,10 +404,10 @@ var _ = Describe("Service Instance Actions", func() {
 					Expect(serviceInstance).To(Equal(ServiceInstance{Name: "some-service-instance", GUID: "some-service-instance-guid"}))
 					Expect(warnings).To(ConsistOf("some-service-instance-warning"))
 					Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(Equal(url.Values{
-						ccv3.NameFilter:      []string{serviceInstanceName},
-						ccv3.SpaceGUIDFilter: []string{sourceSpaceGUID},
-					}))
+					Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{serviceInstanceName}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{sourceSpaceGUID}},
+					))
 				})
 			})
 

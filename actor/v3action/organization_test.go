@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -49,11 +48,9 @@ var _ = Describe("Organization Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"some-warning"}))
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					ccv3.NameFilter: []string{"some-org-name"},
-				}
-				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
+				Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-org-name"}},
+				))
 			})
 		})
 
@@ -72,12 +69,6 @@ var _ = Describe("Organization Actions", func() {
 				_, warnings, err := actor.GetOrganizationByName("some-org-name")
 				Expect(warnings).To(ConsistOf("some-warning"))
 				Expect(err).To(MatchError(expectedError))
-				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					ccv3.NameFilter: []string{"some-org-name"},
-				}
-				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
 			})
 		})
 	})
@@ -95,12 +86,6 @@ var _ = Describe("Organization Actions", func() {
 			_, warnings, err := actor.GetOrganizationByName("some-org-name")
 			Expect(warnings).To(ConsistOf("some-warning"))
 			Expect(err).To(MatchError(actionerror.OrganizationNotFoundError{Name: "some-org-name"}))
-			Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-			expectedQuery := url.Values{
-				ccv3.NameFilter: []string{"some-org-name"},
-			}
-			query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-			Expect(query).To(Equal(expectedQuery))
 		})
 	})
 })

@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -167,10 +166,10 @@ var _ = Describe("SSH Actions", func() {
 								}))
 
 								Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(Equal(url.Values{
-									"space_guids": []string{"some-space-guid"},
-									"names":       []string{"some-app"},
-								}))
+								Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+									ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app"}},
+									ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+								))
 							})
 						})
 					})

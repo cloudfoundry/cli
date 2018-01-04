@@ -3,7 +3,6 @@ package v3action_test
 import (
 	"errors"
 	"io/ioutil"
-	"net/url"
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -81,13 +80,15 @@ var _ = Describe("Package Actions", func() {
 				}))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
-				Expect(queryURL).To(Equal(query))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+				))
 
 				Expect(fakeCloudControllerClient.GetPackagesCallCount()).To(Equal(1))
-				query = fakeCloudControllerClient.GetPackagesArgsForCall(0)
-				Expect(query).To(Equal(url.Values{"app_guids": []string{"some-app-guid"}}))
+				Expect(fakeCloudControllerClient.GetPackagesArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{"some-app-guid"}},
+				))
 			})
 		})
 
@@ -237,13 +238,13 @@ var _ = Describe("Package Actions", func() {
 					Expect(dockerPackage).To(Equal(Package(expectedPackage)))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					queryURL := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					query := url.Values{"names": []string{"some-app-name"}, "space_guids": []string{"some-space-guid"}}
-					Expect(queryURL).To(Equal(query))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					))
 
 					Expect(fakeCloudControllerClient.CreatePackageCallCount()).To(Equal(1))
-					inputPackage := fakeCloudControllerClient.CreatePackageArgsForCall(0)
-					Expect(inputPackage).To(Equal(ccv3.Package{
+					Expect(fakeCloudControllerClient.CreatePackageArgsForCall(0)).To(Equal(ccv3.Package{
 						Type:           constant.PackageTypeDocker,
 						DockerImage:    "some-docker-image",
 						DockerUsername: "some-username",
@@ -457,12 +458,10 @@ var _ = Describe("Package Actions", func() {
 										Expect(executeErr).ToNot(HaveOccurred())
 
 										Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-										expectedQuery := url.Values{
-											"names":       []string{"some-app-name"},
-											"space_guids": []string{"some-space-guid"},
-										}
-										query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-										Expect(query).To(Equal(expectedQuery))
+										Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+											ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+											ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+										))
 									})
 
 									It("successfully creates the Package", func() {

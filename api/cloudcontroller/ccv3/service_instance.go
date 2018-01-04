@@ -1,8 +1,6 @@
 package ccv3
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -13,7 +11,7 @@ type ServiceInstance struct {
 }
 
 // GetServiceInstances lists ServiceInstances with optional filters.
-func (client *Client) GetServiceInstances(query url.Values) ([]ServiceInstance, Warnings, error) {
+func (client *Client) GetServiceInstances(query ...Query) ([]ServiceInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetServiceInstancesRequest,
 		Query:       query,

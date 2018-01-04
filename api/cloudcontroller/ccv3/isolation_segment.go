@@ -3,7 +3,6 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -43,7 +42,7 @@ func (client *Client) CreateIsolationSegment(isolationSegment IsolationSegment) 
 }
 
 // GetIsolationSegments lists isolation segments with optional filters.
-func (client *Client) GetIsolationSegments(query url.Values) ([]IsolationSegment, Warnings, error) {
+func (client *Client) GetIsolationSegments(query ...Query) ([]IsolationSegment, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetIsolationSegmentsRequest,
 		Query:       query,

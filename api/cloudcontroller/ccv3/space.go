@@ -1,8 +1,6 @@
 package ccv3
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
@@ -14,7 +12,7 @@ type Space struct {
 }
 
 // GetSpaces lists spaces with optional filters.
-func (client *Client) GetSpaces(query url.Values) ([]Space, Warnings, error) {
+func (client *Client) GetSpaces(query ...Query) ([]Space, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpacesRequest,
 		Query:       query,

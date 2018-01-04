@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"net/url"
 	"os"
 	"time"
 
@@ -132,9 +131,9 @@ func (actor *Actor) GetApplicationPackages(appName string, spaceGUID string) ([]
 		return nil, allWarnings, err
 	}
 
-	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(url.Values{
-		ccv3.AppGUIDFilter: []string{app.GUID},
-	})
+	ccv3Packages, warnings, err := actor.CloudControllerClient.GetPackages(
+		ccv3.Query{Key: ccv3.AppGUIDFilter, Values: []string{app.GUID}},
+	)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err

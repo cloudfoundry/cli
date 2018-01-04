@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -65,8 +64,9 @@ var _ = Describe("Organizations", func() {
 			})
 
 			It("returns the queried organizations and all warnings", func() {
-				organizations, warnings, err := client.GetOrganizations(url.Values{
-					NameFilter: []string{"some-org-name"},
+				organizations, warnings, err := client.GetOrganizations(Query{
+					Key:    NameFilter,
+					Values: []string{"some-org-name"},
 				})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -104,7 +104,7 @@ var _ = Describe("Organizations", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetOrganizations(nil)
+				_, warnings, err := client.GetOrganizations()
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

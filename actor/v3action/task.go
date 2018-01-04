@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"net/url"
 	"strconv"
 
 	"sort"
@@ -30,9 +29,7 @@ func (actor Actor) RunTask(appGUID string, task Task) (Task, Warnings, error) {
 // GetApplicationTasks returns a list of tasks associated with the provided
 // appplication GUID.
 func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]Task, Warnings, error) {
-	query := url.Values{}
-
-	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, query)
+	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID)
 	actorWarnings := Warnings(warnings)
 	if err != nil {
 		return nil, actorWarnings, err
@@ -53,11 +50,10 @@ func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]T
 }
 
 func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (Task, Warnings, error) {
-	query := url.Values{
-		"sequence_ids": []string{strconv.Itoa(sequenceID)},
-	}
-
-	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, query)
+	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(
+		appGUID,
+		ccv3.Query{Key: ccv3.SequenceIDFilter, Values: []string{strconv.Itoa(sequenceID)}},
+	)
 	if err != nil {
 		return Task{}, Warnings(warnings), err
 	}

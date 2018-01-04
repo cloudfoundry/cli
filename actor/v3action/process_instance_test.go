@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -103,12 +102,10 @@ var _ = Describe("instance actions", func() {
 					Expect(warnings).To(ConsistOf("some-get-app-warning", "some-delete-warning"))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					expectedQuery := url.Values{
-						"names":       []string{"some-app-name"},
-						"space_guids": []string{"some-space-guid"},
-					}
-					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(Equal(expectedQuery))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-app-name"}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					))
 
 					Expect(fakeCloudControllerClient.DeleteApplicationProcessInstanceCallCount()).To(Equal(1))
 					appGUID, processType, instanceIndex := fakeCloudControllerClient.DeleteApplicationProcessInstanceArgsForCall(0)

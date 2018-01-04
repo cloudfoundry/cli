@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"mime/multipart"
-	"net/url"
 	"os"
 	"path/filepath"
 
@@ -169,7 +168,7 @@ func (client *Client) UploadPackage(pkg Package, fileToUpload string) (Package, 
 }
 
 // GetPackages returns the list of packages.
-func (client *Client) GetPackages(query url.Values) ([]Package, Warnings, error) {
+func (client *Client) GetPackages(query ...Query) ([]Package, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetPackagesRequest,
 		Query:       query,

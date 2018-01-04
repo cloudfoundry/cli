@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -177,10 +176,10 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the queried applications and all warnings", func() {
-				apps, warnings, err := client.GetApplications(url.Values{
-					SpaceGUIDFilter: []string{"some-space-guid"},
-					NameFilter:      []string{"some-app-name"},
-				})
+				apps, warnings, err := client.GetApplications(
+					Query{Key: SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					Query{Key: NameFilter, Values: []string{"some-app-name"}},
+				)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(apps).To(ConsistOf(
@@ -226,7 +225,7 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetApplications(nil)
+				_, warnings, err := client.GetApplications()
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

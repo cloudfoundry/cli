@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -185,10 +184,10 @@ var _ = Describe("Space", func() {
 					Expect(warnings).To(ConsistOf("some-space-warning"))
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(url.Values{
-						ccv3.NameFilter:             []string{spaceName},
-						ccv3.OrganizationGUIDFilter: []string{orgGUID},
-					}))
+					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{spaceName}},
+						ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{orgGUID}},
+					))
 				})
 			})
 

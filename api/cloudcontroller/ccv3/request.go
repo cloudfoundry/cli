@@ -3,7 +3,6 @@ package ccv3
 import (
 	"io"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
@@ -17,7 +16,7 @@ type requestOptions struct {
 	// Query is a list of HTTP query parameters. Query will overwrite any
 	// existing query string in the URI. If you want to preserve the query
 	// string in URI make sure Query is nil.
-	Query url.Values
+	Query []Query
 
 	// RequestName is the name of the request (see routes)
 	RequestName string
@@ -54,7 +53,7 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*cloudcontro
 	}
 
 	if passedRequest.Query != nil {
-		request.URL.RawQuery = passedRequest.Query.Encode()
+		request.URL.RawQuery = FormatQueryParameters(passedRequest.Query).Encode()
 	}
 
 	request.Header = http.Header{}

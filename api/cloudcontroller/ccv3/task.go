@@ -3,7 +3,6 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -53,7 +52,7 @@ func (client *Client) CreateApplicationTask(appGUID string, task Task) (Task, Wa
 
 // GetApplicationTasks returns a list of tasks associated with the provided
 // application GUID. Results can be filtered by providing URL queries.
-func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]Task, Warnings, error) {
+func (client *Client) GetApplicationTasks(appGUID string, query ...Query) ([]Task, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppTasksRequest,
 		URIParams: internal.Params{

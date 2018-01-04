@@ -3,7 +3,6 @@ package ccv3
 import (
 	"bytes"
 	"encoding/json"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
@@ -77,7 +76,7 @@ type DropletRelationship struct {
 }
 
 // GetApplications lists applications with optional filters.
-func (client *Client) GetApplications(query url.Values) ([]Application, Warnings, error) {
+func (client *Client) GetApplications(query ...Query) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppsRequest,
 		Query:       query,

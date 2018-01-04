@@ -1,8 +1,6 @@
 package ccv3
 
 import (
-	"net/url"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
@@ -44,14 +42,8 @@ func (client *Client) GetApplicationDropletCurrent(appGUID string) (Droplet, War
 	return responseDroplet, response.Warnings, err
 }
 
-// GetApplicationDroplets returns the Droplets for a given application.
-func (client *Client) GetApplicationDroplets(appGUID string, query url.Values) ([]Droplet, Warnings, error) {
-
-	if query == nil {
-		query = url.Values{}
-	}
-	query.Add(AppGUIDFilter, appGUID)
-
+// GetDroplets lists droplets with optional filters.
+func (client *Client) GetDroplets(query ...Query) ([]Droplet, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetDropletsRequest,
 		Query:       query,

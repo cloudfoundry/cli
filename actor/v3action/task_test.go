@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -161,9 +160,7 @@ var _ = Describe("Task Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationTasksCallCount()).To(Equal(2))
 					appGUID, query := fakeCloudControllerClient.GetApplicationTasksArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(query).To(Equal(
-						url.Values{},
-					))
+					Expect(query).To(BeNil())
 				})
 			})
 

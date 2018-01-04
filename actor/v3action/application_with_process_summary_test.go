@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	. "code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/actor/v3action/v3actionfakes"
@@ -94,8 +93,8 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 			It("returns app summaries and warnings", func() {
 				summaries, warnings, err := actor.GetApplicationsWithProcessesBySpace("some-space-guid")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(summaries).To(Equal([]ApplicationWithProcessSummary{
-					{
+				Expect(summaries).To(ConsistOf(
+					ApplicationWithProcessSummary{
 						Application: Application{
 							Name:  "some-app-name-1",
 							GUID:  "some-app-guid-1",
@@ -112,7 +111,7 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 							},
 						},
 					},
-					{
+					ApplicationWithProcessSummary{
 						Application: Application{
 							Name:  "some-app-name-2",
 							GUID:  "some-app-guid-2",
@@ -124,31 +123,23 @@ var _ = Describe("Application with ProcessSummary Actions", func() {
 								InstanceDetails: []ProcessInstance{{State: constant.ProcessInstanceDown}},
 							},
 						},
-					},
-				}))
-				Expect(warnings).To(Equal(Warnings{"some-warning", "some-process-warning-1", "some-process-stats-warning-1", "some-process-stats-warning-2", "some-process-warning-2", "some-process-stats-warning-3"}))
+					}))
+				Expect(warnings).To(ConsistOf("some-warning", "some-process-warning-1", "some-process-stats-warning-1", "some-process-stats-warning-2", "some-process-warning-2", "some-process-stats-warning-3"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				expectedQuery := url.Values{
-					"space_guids": []string{"some-space-guid"},
-					"order_by":    []string{"name"},
-				}
-				query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-				Expect(query).To(Equal(expectedQuery))
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{"some-space-guid"}},
+					ccv3.Query{Key: ccv3.OrderBy, Values: []string{ccv3.NameOrder}},
+				))
 
 				Expect(fakeCloudControllerClient.GetApplicationProcessesCallCount()).To(Equal(2))
-				appGUID := fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)
-				Expect(appGUID).To(Equal("some-app-guid-1"))
-				appGUID = fakeCloudControllerClient.GetApplicationProcessesArgsForCall(1)
-				Expect(appGUID).To(Equal("some-app-guid-2"))
+				Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(0)).To(Equal("some-app-guid-1"))
+				Expect(fakeCloudControllerClient.GetApplicationProcessesArgsForCall(1)).To(Equal("some-app-guid-2"))
 
 				Expect(fakeCloudControllerClient.GetProcessInstancesCallCount()).To(Equal(3))
-				processGUID := fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)
-				Expect(processGUID).To(Equal("some-process-guid-1"))
-				processGUID = fakeCloudControllerClient.GetProcessInstancesArgsForCall(1)
-				Expect(processGUID).To(Equal("some-process-guid-2"))
-				processGUID = fakeCloudControllerClient.GetProcessInstancesArgsForCall(2)
-				Expect(processGUID).To(Equal("some-process-guid-3"))
+				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(0)).To(Equal("some-process-guid-1"))
+				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(1)).To(Equal("some-process-guid-2"))
+				Expect(fakeCloudControllerClient.GetProcessInstancesArgsForCall(2)).To(Equal("some-process-guid-3"))
 			})
 		})
 

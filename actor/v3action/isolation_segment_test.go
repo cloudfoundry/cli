@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -108,7 +107,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "delete warning-1", "delete warning-2"))
 
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(Equal(url.Values{ccv3.NameFilter: []string{"some-iso-seg"}}))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+					))
 
 					Expect(fakeCloudControllerClient.DeleteIsolationSegmentCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.DeleteIsolationSegmentArgsForCall(0)).To(Equal("some-iso-guid"))
@@ -262,8 +263,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 					Expect(warnings).To(ConsistOf("I r warnings", "I are two warnings", "assignment-warnings-1", "assignment-warnings-2"))
 
 					Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
-					filter := fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)
-					Expect(filter).To(Equal(url.Values{ccv3.NameFilter: []string{"some-iso-seg"}}))
+					Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+					))
 
 					Expect(fakeCloudControllerClient.AssignSpaceToIsolationSegmentCallCount()).To(Equal(1))
 					spaceGUID, isoGUID := fakeCloudControllerClient.AssignSpaceToIsolationSegmentArgsForCall(0)
@@ -433,7 +435,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 				}))
 
 				Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(Equal(url.Values{ccv3.NameFilter: []string{"some-iso-seg"}}))
+				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.NameFilter, Values: []string{"some-iso-seg"}},
+				))
 			})
 		})
 
@@ -488,9 +492,9 @@ var _ = Describe("Isolation Segment Actions", func() {
 				Expect(warnings).To(ConsistOf("get isolation segments warning"))
 
 				Expect(fakeCloudControllerClient.GetIsolationSegmentsCallCount()).To(Equal(1))
-
-				expectedQuery := url.Values{ccv3.OrganizationGUIDFilter: []string{"some-org-guid"}}
-				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(Equal(expectedQuery))
+				Expect(fakeCloudControllerClient.GetIsolationSegmentsArgsForCall(0)).To(ConsistOf(
+					ccv3.Query{Key: ccv3.OrganizationGUIDFilter, Values: []string{"some-org-guid"}},
+				))
 			})
 		})
 

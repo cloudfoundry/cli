@@ -2,7 +2,6 @@ package v3action_test
 
 import (
 	"errors"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	. "code.cloudfoundry.org/cli/actor/v3action"
@@ -76,18 +75,16 @@ var _ = Describe("Environment Variable Actions", func() {
 						nil,
 					)
 				})
+
 				It("makes the API call to get the app environment variables and returns all warnings", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					expectedQuery := url.Values{
-						"names":       []string{"some-app"},
-						"space_guids": []string{"space-guid"},
-					}
-					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(Equal(expectedQuery))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					))
 
 					Expect(fakeCloudControllerClient.GetApplicationEnvironmentVariablesCallCount()).To(Equal(1))
-					appGUIDArg := fakeCloudControllerClient.GetApplicationEnvironmentVariablesArgsForCall(0)
-					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(fakeCloudControllerClient.GetApplicationEnvironmentVariablesArgsForCall(0)).To(Equal("some-app-guid"))
 					Expect(fetchedEnvVariables).To(Equal(EnvironmentVariableGroups{
 						SystemProvided:      map[string]interface{}{"system-var": "system-val"},
 						ApplicationProvided: map[string]interface{}{"app-var": "app-val"},
@@ -163,12 +160,10 @@ var _ = Describe("Environment Variable Actions", func() {
 				})
 				It("makes the API call to update the app environment variables and returns all warnings", func() {
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					expectedQuery := url.Values{
-						"names":       []string{"some-app"},
-						"space_guids": []string{"space-guid"},
-					}
-					query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(Equal(expectedQuery))
+					Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+						ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
+						ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+					))
 
 					Expect(fakeCloudControllerClient.PatchApplicationUserProvidedEnvironmentVariablesCallCount()).To(Equal(1))
 					appGUIDArg, envVarsArg := fakeCloudControllerClient.PatchApplicationUserProvidedEnvironmentVariablesArgsForCall(0)
@@ -278,12 +273,10 @@ var _ = Describe("Environment Variable Actions", func() {
 					})
 					It("makes the API call to update the app environment variables and returns all warnings", func() {
 						Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-						expectedQuery := url.Values{
-							"names":       []string{"some-app"},
-							"space_guids": []string{"space-guid"},
-						}
-						query := fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-						Expect(query).To(Equal(expectedQuery))
+						Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf(
+							ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
+							ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+						))
 
 						Expect(fakeCloudControllerClient.PatchApplicationUserProvidedEnvironmentVariablesCallCount()).To(Equal(1))
 						appGUIDArg, envVarsArg := fakeCloudControllerClient.PatchApplicationUserProvidedEnvironmentVariablesArgsForCall(0)

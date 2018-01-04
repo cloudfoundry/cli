@@ -3,7 +3,6 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -66,8 +65,9 @@ var _ = Describe("Spaces", func() {
 			})
 
 			It("returns the queried spaces and all warnings", func() {
-				spaces, warnings, err := client.GetSpaces(url.Values{
-					NameFilter: []string{"some-space-name"},
+				spaces, warnings, err := client.GetSpaces(Query{
+					Key:    NameFilter,
+					Values: []string{"some-space-name"},
 				})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -105,7 +105,7 @@ var _ = Describe("Spaces", func() {
 			})
 
 			It("returns the error and all warnings", func() {
-				_, warnings, err := client.GetSpaces(nil)
+				_, warnings, err := client.GetSpaces()
 				Expect(err).To(MatchError(ccerror.V3UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					V3ErrorResponse: ccerror.V3ErrorResponse{

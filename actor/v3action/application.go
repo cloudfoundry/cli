@@ -1,7 +1,6 @@
 package v3action
 
 import (
-	"net/url"
 	"time"
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
@@ -52,10 +51,10 @@ func (actor Actor) DeleteApplicationByNameAndSpace(name string, spaceGUID string
 // GetApplicationByNameAndSpace returns the application with the given
 // name in the given space.
 func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (Application, Warnings, error) {
-	apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
-		"space_guids": []string{spaceGUID},
-		"names":       []string{appName},
-	})
+	apps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.NameFilter, Values: []string{appName}},
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
 	if err != nil {
 		return Application{}, Warnings(warnings), err
 	}
@@ -64,38 +63,22 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 		return Application{}, Warnings(warnings), actionerror.ApplicationNotFoundError{Name: appName}
 	}
 
-	return Application{
-		Name:  apps[0].Name,
-		GUID:  apps[0].GUID,
-		State: apps[0].State,
-		Lifecycle: AppLifecycle{
-			Type: constant.AppLifecycleType(apps[0].Lifecycle.Type),
-			Data: AppLifecycleData(apps[0].Lifecycle.Data),
-		},
-	}, Warnings(warnings), nil
+	return actor.convertCCToActorApplication(apps[0]), Warnings(warnings), nil
 }
 
 // GetApplicationsBySpace returns all applications in a space.
 func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warnings, error) {
-	ccv3Apps, warnings, err := actor.CloudControllerClient.GetApplications(url.Values{
-		"space_guids": []string{spaceGUID},
-	})
+	ccApps, warnings, err := actor.CloudControllerClient.GetApplications(
+		ccv3.Query{Key: ccv3.SpaceGUIDFilter, Values: []string{spaceGUID}},
+	)
 
 	if err != nil {
 		return []Application{}, Warnings(warnings), err
 	}
 
-	apps := make([]Application, len(ccv3Apps))
-	for i, ccv3App := range ccv3Apps {
-		apps[i] = Application{
-			Name:  ccv3App.Name,
-			GUID:  ccv3App.GUID,
-			State: ccv3App.State,
-			Lifecycle: AppLifecycle{
-				Type: constant.AppLifecycleType(ccv3App.Lifecycle.Type),
-				Data: AppLifecycleData(ccv3App.Lifecycle.Data),
-			},
-		}
+	var apps []Application
+	for _, ccApp := range ccApps {
+		apps = append(apps, actor.convertCCToActorApplication(ccApp))
 	}
 	return apps, Warnings(warnings), nil
 }
@@ -124,15 +107,7 @@ func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (
 		return Application{}, Warnings(warnings), err
 	}
 
-	return Application{
-		Name:  createdApp.Name,
-		GUID:  createdApp.GUID,
-		State: createdApp.State,
-		Lifecycle: AppLifecycle{
-			Type: constant.AppLifecycleType(createdApp.Lifecycle.Type),
-			Data: AppLifecycleData(createdApp.Lifecycle.Data),
-		},
-	}, Warnings(warnings), nil
+	return actor.convertCCToActorApplication(createdApp), Warnings(warnings), nil
 }
 
 // StopApplication stops an application.
@@ -149,15 +124,7 @@ func (actor Actor) StartApplication(appGUID string) (Application, Warnings, erro
 		return Application{}, Warnings(warnings), err
 	}
 
-	return Application{
-		Name:  updatedApp.Name,
-		GUID:  updatedApp.GUID,
-		State: updatedApp.State,
-		Lifecycle: AppLifecycle{
-			Type: constant.AppLifecycleType(updatedApp.Lifecycle.Type),
-			Data: AppLifecycleData(updatedApp.Lifecycle.Data),
-		},
-	}, Warnings(warnings), nil
+	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
 }
 
 func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) error {
@@ -205,15 +172,19 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 		return Application{}, Warnings(warnings), err
 	}
 
+	return actor.convertCCToActorApplication(updatedApp), Warnings(warnings), nil
+}
+
+func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	return Application{
-		Name:  updatedApp.Name,
-		GUID:  updatedApp.GUID,
-		State: updatedApp.State,
+		GUID: app.GUID,
 		Lifecycle: AppLifecycle{
-			Type: constant.AppLifecycleType(updatedApp.Lifecycle.Type),
-			Data: AppLifecycleData(updatedApp.Lifecycle.Data),
+			Data: AppLifecycleData(app.Lifecycle.Data),
+			Type: constant.AppLifecycleType(app.Lifecycle.Type),
 		},
-	}, Warnings(warnings), nil
+		Name:  app.Name,
+		State: app.State,
+	}
 }
 
 func (actor Actor) processStatus(process ccv3.Process, warningsChannel chan<- Warnings) (bool, error) {
