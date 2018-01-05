@@ -239,47 +239,44 @@ var _ = Describe("service Command", func() {
 
 				Context("when no errors are encountered getting the service instance summary", func() {
 					Context("when the service instance is a managed service instance", func() {
+						var returnedSummary v2action.ServiceInstanceSummary
+
 						BeforeEach(func() {
-							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
-								v2action.ServiceInstanceSummary{
-									ServiceInstance: v2action.ServiceInstance{
-										Name:         "some-service-instance",
-										Type:         ccv2.ManagedService,
-										Tags:         []string{"tag-1", "tag-2", "tag-3"},
-										DashboardURL: "some-dashboard",
-										LastOperation: ccv2.LastOperation{
-											Type:        "some-type",
-											State:       "some-state",
-											Description: "some-last-operation-description",
-											UpdatedAt:   "some-updated-at-time",
-											CreatedAt:   "some-created-at-time",
-										},
+							returnedSummary = v2action.ServiceInstanceSummary{
+								ServiceInstance: v2action.ServiceInstance{
+									Name:         "some-service-instance",
+									Type:         ccv2.ManagedService,
+									Tags:         []string{"tag-1", "tag-2", "tag-3"},
+									DashboardURL: "some-dashboard",
+									LastOperation: ccv2.LastOperation{
+										Type:        "some-type",
+										State:       "some-state",
+										Description: "some-last-operation-description",
+										UpdatedAt:   "some-updated-at-time",
+										CreatedAt:   "some-created-at-time",
 									},
-									ServicePlan: v2action.ServicePlan{Name: "some-plan"},
-									Service: v2action.Service{
-										Label:            "some-service",
-										Description:      "some-description",
-										DocumentationURL: "some-docs-url",
-									},
-									ServiceInstanceSharedFrom: v2action.ServiceInstanceSharedFrom{
-										SpaceGUID:        "some-space-guid",
-										SpaceName:        "some-space-name",
-										OrganizationName: "some-org-name",
-									},
-									BoundApplications: []string{"app-1", "app-2", "app-3"},
 								},
+								ServicePlan: v2action.ServicePlan{Name: "some-plan"},
+								Service: v2action.Service{
+									Label:            "some-service",
+									Description:      "some-description",
+									DocumentationURL: "some-docs-url",
+								},
+								BoundApplications: []string{"app-1", "app-2", "app-3"},
+							}
+							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+								returnedSummary,
 								v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
-								nil,
-							)
+								nil)
 						})
 
-						It("displays the service instance summary", func() {
+						It("displays the service instance summary and all warnings", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
 							Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
 							Expect(testUI.Out).To(Say("\n\n"))
 							Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
-							Expect(testUI.Out).To(Say("shared from org/space:\\s+some-org-name / some-space-name"))
+							Expect(testUI.Out).ToNot(Say("shared from org/space:"))
 							Expect(testUI.Out).To(Say("service:\\s+some-service"))
 							Expect(testUI.Out).To(Say("bound apps:\\s+app-1, app-2, app-3"))
 							Expect(testUI.Out).To(Say("tags:\\s+tag-1, tag-2, tag-3"))
@@ -288,6 +285,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).To(Say("documentation:\\s+some-docs-url"))
 							Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
 							Expect(testUI.Out).To(Say("\n\n"))
+							Expect(testUI.Out).ToNot(Say("shared with spaces:"))
 							Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 							Expect(testUI.Out).To(Say("\n\n"))
 							Expect(testUI.Out).To(Say("status:\\s+some-type some-state"))
@@ -305,9 +303,75 @@ var _ = Describe("service Command", func() {
 
 							Expect(fakeActor.GetServiceInstanceByNameAndSpaceCallCount()).To(Equal(0))
 						})
+
+						Context("when the service instance is shared from another space", func() {
+							BeforeEach(func() {
+								returnedSummary.ServiceInstanceSharedFrom = v2action.ServiceInstanceSharedFrom{
+									SpaceGUID:        "some-space-guid",
+									SpaceName:        "some-space-name",
+									OrganizationName: "some-org-name",
+								}
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									returnedSummary,
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil)
+							})
+
+							It("displays the shared from info and does not display the shared to info", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).To(Say("name:\\s+some-service-instance"))
+								Expect(testUI.Out).To(Say("shared from org/space:\\s+some-org-name / some-space-name"))
+								Expect(testUI.Out).To(Say("service:\\s+some-service"))
+								Expect(testUI.Out).ToNot(Say("shared with spaces:"))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
+						})
+
+						Context("when the service instance is shared to other spaces", func() {
+							BeforeEach(func() {
+								returnedSummary.ServiceInstanceSharedTos = []v2action.ServiceInstanceSharedTo{
+									{
+										SpaceGUID:        "another-space-guid",
+										SpaceName:        "another-space-name",
+										OrganizationName: "another-org-name",
+										BoundAppCount:    2,
+									},
+									{
+										SpaceGUID:        "yet-another-space-guid",
+										SpaceName:        "yet-another-space-name",
+										OrganizationName: "yet-another-org-name",
+										BoundAppCount:    3,
+									},
+								}
+								fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+									returnedSummary,
+									v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+									nil)
+							})
+
+							It("displays the shared to info and does not display the shared from info", func() {
+								Expect(executeErr).ToNot(HaveOccurred())
+
+								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+								Expect(testUI.Out).ToNot(Say("shared from org/space:"))
+								Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+								Expect(testUI.Out).To(Say("shared with spaces:"))
+								Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
+								Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
+								Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
+								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+							})
+						})
 					})
 
-					Context("when the service instance is an user provided service instance", func() {
+					Context("when the service instance is a user provided service instance", func() {
 						BeforeEach(func() {
 							fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
 								v2action.ServiceInstanceSummary{
@@ -336,6 +400,7 @@ var _ = Describe("service Command", func() {
 							Expect(testUI.Out).ToNot(Say("description:"))
 							Expect(testUI.Out).ToNot(Say("documentation:"))
 							Expect(testUI.Out).ToNot(Say("dashboard:"))
+							Expect(testUI.Out).ToNot(Say("shared with spaces"))
 							Expect(testUI.Out).ToNot(Say("last operation"))
 							Expect(testUI.Out).ToNot(Say("status:"))
 							Expect(testUI.Out).ToNot(Say("message:"))

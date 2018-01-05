@@ -74,7 +74,7 @@ var _ = Describe("ServiceInstanceSharedFrom Actions", func() {
 				)
 			})
 
-			It("returns the service instance shared_from object and all warnings", func() {
+			It("returns the error and all warnings", func() {
 				Expect(getErr).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("get-service-instance-shared-from-warning"))
 

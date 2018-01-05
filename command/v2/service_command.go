@@ -93,10 +93,12 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	boundApps := strings.Join(serviceInstanceSummary.BoundApplications, ", ")
 
 	table := [][]string{{cmd.UI.TranslateText("name:"), serviceInstanceName}}
+
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
-		if serviceInstanceSummary.ServiceInstanceSharedFrom.SpaceGUID != "" {
+		if serviceInstanceSummary.IsSharedFrom() {
 			table = append(table, []string{cmd.UI.TranslateText("shared from org/space:"), fmt.Sprintf("%s / %s", serviceInstanceSummary.ServiceInstanceSharedFrom.OrganizationName, serviceInstanceSummary.ServiceInstanceSharedFrom.SpaceName)})
 		}
+
 		table = append(table, [][]string{
 			{cmd.UI.TranslateText("service:"), serviceInstanceSummary.Service.Label},
 			{cmd.UI.TranslateText("bound apps:"), boundApps},
@@ -114,6 +116,25 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	}
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
+
+	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() && serviceInstanceSummary.IsSharedTo() {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("shared with spaces:")
+
+		sharedTosTable := [][]string{
+			{cmd.UI.TranslateText("org"), cmd.UI.TranslateText("space"), cmd.UI.TranslateText("bindings")},
+		}
+
+		for _, sharedTo := range serviceInstanceSummary.ServiceInstanceSharedTos {
+			sharedTosTable = append(sharedTosTable, []string{
+				sharedTo.OrganizationName,
+				sharedTo.SpaceName,
+				fmt.Sprintf("%d", sharedTo.BoundAppCount),
+			})
+		}
+
+		cmd.UI.DisplayTableWithHeader("", sharedTosTable, 3)
+	}
 
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
 		cmd.UI.DisplayNewline()

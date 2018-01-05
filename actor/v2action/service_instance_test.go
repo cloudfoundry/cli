@@ -362,9 +362,9 @@ var _ = Describe("Service Instance Actions", func() {
 					fakeCloudControllerClient.GetServiceInstanceSharedTosReturns(
 						[]ccv2.ServiceInstanceSharedTo{
 							{
-								SpaceGUID: "shared-to-space-guid",
-								SpaceName: "shared-to-space-name",
-								OrgName:   "shared-to-org-name",
+								SpaceGUID:        "shared-to-space-guid",
+								SpaceName:        "shared-to-space-name",
+								OrganizationName: "shared-to-org-name",
 							},
 						},
 						ccv2.Warnings{"get-service-instance-shared-tos-warning"},
@@ -432,19 +432,19 @@ var _ = Describe("Service Instance Actions", func() {
 					fakeCloudControllerClient.GetServiceInstanceSharedTosReturns(
 						[]ccv2.ServiceInstanceSharedTo{
 							{
-								SpaceGUID: "shared-to-space-guid-first",
-								SpaceName: "shared-to-space-name-first",
-								OrgName:   "shared-to-org-name-first",
+								SpaceGUID:        "shared-to-space-guid-first",
+								SpaceName:        "shared-to-space-name-first",
+								OrganizationName: "shared-to-org-name-first",
 							},
 							{
-								SpaceGUID: "shared-to-space-guid",
-								SpaceName: "shared-to-space-name",
-								OrgName:   "shared-to-org-name",
+								SpaceGUID:        "shared-to-space-guid",
+								SpaceName:        "shared-to-space-name",
+								OrganizationName: "shared-to-org-name",
 							},
 							{
-								SpaceGUID: "shared-to-space-guid-last",
-								SpaceName: "shared-to-space-name-last",
-								OrgName:   "shared-to-org-name-last",
+								SpaceGUID:        "shared-to-space-guid-last",
+								SpaceName:        "shared-to-space-name-last",
+								OrganizationName: "shared-to-org-name-last",
 							},
 						},
 						ccv2.Warnings{"get-service-instance-shared-tos-warning"},

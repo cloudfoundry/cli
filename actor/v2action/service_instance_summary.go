@@ -11,7 +11,16 @@ type ServiceInstanceSummary struct {
 	ServicePlan               ServicePlan
 	Service                   Service
 	ServiceInstanceSharedFrom ServiceInstanceSharedFrom
+	ServiceInstanceSharedTos  []ServiceInstanceSharedTo
 	BoundApplications         []string
+}
+
+func (s ServiceInstanceSummary) IsSharedFrom() bool {
+	return s.ServiceInstanceSharedFrom.SpaceGUID != ""
+}
+
+func (s ServiceInstanceSummary) IsSharedTo() bool {
+	return len(s.ServiceInstanceSharedTos) > 0
 }
 
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
@@ -31,16 +40,11 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 	)
 
 	if ccv2.ServiceInstance(serviceInstance).Managed() {
-		serviceInstanceSharedFrom, sharedFromWarnings, shareFromErr := actor.GetServiceInstanceSharedFromByServiceInstance(serviceInstance.GUID)
-		allWarnings = append(allWarnings, sharedFromWarnings...)
-		if shareFromErr != nil {
-			if _, ok := shareFromErr.(ccerror.ResourceNotFoundError); ok {
-				serviceInstanceSharedFrom = ServiceInstanceSharedFrom{}
-			} else {
-				return serviceInstanceSummary, allWarnings, shareFromErr
-			}
+		sharedWarnings, sharedErr := actor.getAndSetSharedInformation(&serviceInstanceSummary, spaceGUID)
+		allWarnings = append(allWarnings, sharedWarnings...)
+		if sharedErr != nil {
+			return serviceInstanceSummary, allWarnings, sharedErr
 		}
-		serviceInstanceSummary.ServiceInstanceSharedFrom = serviceInstanceSharedFrom
 
 		servicePlan, planWarnings, planErr := actor.GetServicePlan(serviceInstance.ServicePlanGUID)
 		allWarnings = append(allWarnings, planWarnings...)
@@ -76,4 +80,46 @@ func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUI
 	}
 
 	return serviceInstanceSummary, allWarnings, nil
+}
+
+// getAndSetSharedInformation gets a service instance's shared from or shared to information,
+func (actor Actor) getAndSetSharedInformation(summary *ServiceInstanceSummary, spaceGUID string) (Warnings, error) {
+	var (
+		warnings Warnings
+		err      error
+	)
+
+	// Service instance is shared from if:
+	// 1. the source space of the service instance is empty (API returns json null)
+	// 2. the targeted space is not the same as the source space of the service instance AND
+	//    we call the shared_from url and it returns a non-empty resource
+	if summary.ServiceInstance.GUID == "" || summary.ServiceInstance.GUID != spaceGUID {
+		summary.ServiceInstanceSharedFrom, warnings, err = actor.GetServiceInstanceSharedFromByServiceInstance(summary.ServiceInstance.GUID)
+		if err != nil {
+			// if the API version does not support service instance sharing, ignore the 404
+			if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+				return warnings, err
+			}
+		}
+
+		return warnings, nil
+	}
+
+	// Service instance is shared to if:
+	// the targeted space is the same as the source space of the service instance AND
+	// we call the shared_to url and get a non-empty list
+	summary.ServiceInstanceSharedTos, warnings, err = actor.GetServiceInstanceSharedTosByServiceInstance(summary.ServiceInstance.GUID)
+	if err != nil {
+		// if the API version does not support service instance sharing, ignore the 404
+		if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
+			return warnings, err
+		}
+	}
+
+	return warnings, nil
+	// Sidenote: the service instance is NOT currently shared if (assuming it's shareable):
+	// 1. the targeted space is not the same as the source space of the service instance AND
+	//    we call the shared_from url and do not get anything back
+	// 2. the targeted space is the same as the source space of the service instance AND
+	//   	we call the shared_to url and get an empty list
 }

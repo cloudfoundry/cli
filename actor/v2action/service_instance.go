@@ -90,15 +90,15 @@ func (actor Actor) GetSharedToSpaceGUID(serviceInstanceName string, sourceSpaceG
 		return "", allWarnings, err
 	}
 
-	sharedTos, apiWarnings, err := actor.CloudControllerClient.GetServiceInstanceSharedTos(serviceInstance.GUID)
-	allWarnings = append(allWarnings, apiWarnings...)
+	sharedTos, warnings, err := actor.GetServiceInstanceSharedTosByServiceInstance(serviceInstance.GUID)
+	allWarnings = append(allWarnings, warnings...)
 
 	if err != nil {
 		return "", allWarnings, err
 	}
 
 	for _, sharedTo := range sharedTos {
-		if strings.EqualFold(sharedTo.SpaceName, sharedToSpaceName) && strings.EqualFold(sharedTo.OrgName, sharedToOrgName) {
+		if strings.EqualFold(sharedTo.SpaceName, sharedToSpaceName) && strings.EqualFold(sharedTo.OrganizationName, sharedToOrgName) {
 			return sharedTo.SpaceGUID, allWarnings, nil
 		}
 	}

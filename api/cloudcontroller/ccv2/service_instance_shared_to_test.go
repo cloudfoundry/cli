@@ -70,9 +70,9 @@ var _ = Describe("Service Instance Shared To", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstanceSharedTo{
-						{SpaceGUID: "some-space-guid", SpaceName: "some-space-name", OrgName: "some-org-name"},
-						{SpaceGUID: "some-space-guid-2", SpaceName: "some-space-name-2", OrgName: "some-org-name-2"},
-						{SpaceGUID: "some-space-guid-3", SpaceName: "some-space-name-3", OrgName: "some-org-name-3"},
+						{SpaceGUID: "some-space-guid", SpaceName: "some-space-name", OrganizationName: "some-org-name"},
+						{SpaceGUID: "some-space-guid-2", SpaceName: "some-space-name-2", OrganizationName: "some-org-name-2"},
+						{SpaceGUID: "some-space-guid-3", SpaceName: "some-space-name-3", OrganizationName: "some-org-name-3"},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 				})

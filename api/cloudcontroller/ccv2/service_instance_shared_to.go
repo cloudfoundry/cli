@@ -6,9 +6,10 @@ import (
 )
 
 type ServiceInstanceSharedTo struct {
-	SpaceGUID string `json:"space_guid"`
-	SpaceName string `json:"space_name"`
-	OrgName   string `json:"organization_name"`
+	SpaceGUID        string `json:"space_guid"`
+	SpaceName        string `json:"space_name"`
+	OrganizationName string `json:"organization_name"`
+	BoundAppCount    int    `json:"bound_app_count"`
 }
 
 func (client *Client) GetServiceInstanceSharedTos(serviceInstanceGUID string) ([]ServiceInstanceSharedTo, Warnings, error) {
