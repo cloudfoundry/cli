@@ -3,6 +3,7 @@ package clissh_test
 import (
 	"io/ioutil"
 	"path/filepath"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,6 +23,8 @@ func TestCmd(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
+	SetDefaultEventuallyTimeout(3 * time.Second)
+
 	hostKeyBytes, err := ioutil.ReadFile(filepath.Join("..", "..", "fixtures", "host-key"))
 	Expect(err).NotTo(HaveOccurred())
 	hostKey, err := ssh.ParsePrivateKey(hostKeyBytes)
