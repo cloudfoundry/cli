@@ -5,22 +5,23 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
+type ServiceInstanceShareType string
+
+const (
+	ServiceInstanceIsSharedFrom ServiceInstanceShareType = "SharedFrom"
+	ServiceInstanceIsSharedTo   ServiceInstanceShareType = "SharedTo"
+	ServiceInstanceIsNotShared  ServiceInstanceShareType = "NotShared"
+)
+
 type ServiceInstanceSummary struct {
 	ServiceInstance
 
 	ServicePlan               ServicePlan
 	Service                   Service
+	ServiceInstanceShareType  ServiceInstanceShareType
 	ServiceInstanceSharedFrom ServiceInstanceSharedFrom
 	ServiceInstanceSharedTos  []ServiceInstanceSharedTo
 	BoundApplications         []string
-}
-
-func (s ServiceInstanceSummary) IsSharedFrom() bool {
-	return s.ServiceInstanceSharedFrom.SpaceGUID != ""
-}
-
-func (s ServiceInstanceSummary) IsSharedTo() bool {
-	return len(s.ServiceInstanceSharedTos) > 0
 }
 
 func (actor Actor) GetServiceInstanceSummaryByNameAndSpace(name string, spaceGUID string) (ServiceInstanceSummary, Warnings, error) {
@@ -93,13 +94,19 @@ func (actor Actor) getAndSetSharedInformation(summary *ServiceInstanceSummary, s
 	// 1. the source space of the service instance is empty (API returns json null)
 	// 2. the targeted space is not the same as the source space of the service instance AND
 	//    we call the shared_from url and it returns a non-empty resource
-	if summary.ServiceInstance.GUID == "" || summary.ServiceInstance.GUID != spaceGUID {
+	if summary.ServiceInstance.SpaceGUID == "" || summary.ServiceInstance.SpaceGUID != spaceGUID {
 		summary.ServiceInstanceSharedFrom, warnings, err = actor.GetServiceInstanceSharedFromByServiceInstance(summary.ServiceInstance.GUID)
 		if err != nil {
 			// if the API version does not support service instance sharing, ignore the 404
 			if _, ok := err.(ccerror.ResourceNotFoundError); !ok {
 				return warnings, err
 			}
+		}
+
+		if summary.ServiceInstanceSharedFrom.SpaceGUID != "" {
+			summary.ServiceInstanceShareType = ServiceInstanceIsSharedFrom
+		} else {
+			summary.ServiceInstanceShareType = ServiceInstanceIsNotShared
 		}
 
 		return warnings, nil
@@ -116,10 +123,11 @@ func (actor Actor) getAndSetSharedInformation(summary *ServiceInstanceSummary, s
 		}
 	}
 
+	if len(summary.ServiceInstanceSharedTos) > 0 {
+		summary.ServiceInstanceShareType = ServiceInstanceIsSharedTo
+	} else {
+		summary.ServiceInstanceShareType = ServiceInstanceIsNotShared
+	}
+
 	return warnings, nil
-	// Sidenote: the service instance is NOT currently shared if (assuming it's shareable):
-	// 1. the targeted space is not the same as the source space of the service instance AND
-	//    we call the shared_from url and do not get anything back
-	// 2. the targeted space is the same as the source space of the service instance AND
-	//   	we call the shared_to url and get an empty list
 }

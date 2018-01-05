@@ -95,7 +95,7 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 	table := [][]string{{cmd.UI.TranslateText("name:"), serviceInstanceName}}
 
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
-		if serviceInstanceSummary.IsSharedFrom() {
+		if serviceInstanceSummary.ServiceInstanceShareType == v2action.ServiceInstanceIsSharedFrom {
 			table = append(table, []string{cmd.UI.TranslateText("shared from org/space:"), fmt.Sprintf("%s / %s", serviceInstanceSummary.ServiceInstanceSharedFrom.OrganizationName, serviceInstanceSummary.ServiceInstanceSharedFrom.SpaceName)})
 		}
 
@@ -117,7 +117,8 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 
-	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() && serviceInstanceSummary.IsSharedTo() {
+	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() &&
+		serviceInstanceSummary.ServiceInstanceShareType == v2action.ServiceInstanceIsSharedTo {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("shared with spaces:")
 

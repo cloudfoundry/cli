@@ -348,9 +348,11 @@ var _ = Describe("service command", func() {
 									})
 									Eventually(helpers.CF("bind-service", appName1, serviceInstanceName)).Should(Exit(0))
 									Eventually(helpers.CF("bind-service", appName2, serviceInstanceName)).Should(Exit(0))
+									helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
 								})
 
 								AfterEach(func() {
+									helpers.TargetOrgAndSpace(orgName, targetSpaceName)
 									Eventually(helpers.CF("unbind-service", appName1, serviceInstanceName)).Should(Exit(0))
 									Eventually(helpers.CF("unbind-service", appName2, serviceInstanceName)).Should(Exit(0))
 									Eventually(helpers.CF("delete", appName1, "-f")).Should(Exit(0))
@@ -359,7 +361,7 @@ var _ = Describe("service command", func() {
 
 								It("should display shared with information with the correct number of bound apps", func() {
 									session := helpers.CF("service", serviceInstanceName)
-									Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, targetSpaceName, username))
+									Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, sourceSpaceName, username))
 									Eventually(session.Out).Should(Say("name:\\s+%s", serviceInstanceName))
 									Consistently(session.Out).ShouldNot(Say("shared from org/space:"))
 									Eventually(session.Out).Should(Say("service:"))
@@ -378,9 +380,9 @@ var _ = Describe("service command", func() {
 								helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
 							})
 
-							It("should display which spaces the service instance is shared with and not see where it is shared from", func() {
+							It("should display which spaces the service instance is shared with and not display where it is shared from", func() {
 								session := helpers.CF("service", serviceInstanceName)
-								Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, targetSpaceName, username))
+								Eventually(session.Out).Should(Say("Showing info of service %s in org %s / space %s as %s\\.\\.\\.", serviceInstanceName, orgName, sourceSpaceName, username))
 								Eventually(session.Out).Should(Say("\n\n"))
 								Eventually(session.Out).Should(Say("name:\\s+%s", serviceInstanceName))
 								Consistently(session.Out).ShouldNot(Say("shared from org/space:"))

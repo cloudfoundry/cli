@@ -23,67 +23,6 @@ var _ = Describe("Service Instance Summary Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
-	Describe("ServiceInstanceSummary", func() {
-		var serviceInstanceSummary ServiceInstanceSummary
-
-		BeforeEach(func() {
-			serviceInstanceSummary = ServiceInstanceSummary{}
-		})
-
-		Describe("IsSharedFrom", func() {
-			Context("when the service instance is shared from another space", func() {
-				BeforeEach(func() {
-					serviceInstanceSummary.ServiceInstanceSharedFrom = ServiceInstanceSharedFrom{
-						SpaceGUID:        "some-space-guid",
-						SpaceName:        "some-space",
-						OrganizationName: "some-org",
-					}
-				})
-
-				It("returns true", func() {
-					Expect(serviceInstanceSummary.IsSharedFrom()).To(BeTrue())
-				})
-			})
-
-			Context("when the service instance is NOT shared from another space", func() {
-				It("returns false", func() {
-					Expect(serviceInstanceSummary.IsSharedFrom()).To(BeFalse())
-				})
-			})
-		})
-
-		Describe("IsSharedTo", func() {
-			Context("when the service instance is shared with another space", func() {
-				BeforeEach(func() {
-					serviceInstanceSummary.ServiceInstanceSharedTos = []ServiceInstanceSharedTo{
-						{
-							SpaceGUID:        "some-space-guid",
-							SpaceName:        "some-space",
-							OrganizationName: "some-org",
-							BoundAppCount:    2,
-						},
-						{
-							SpaceGUID:        "another-space-guid",
-							SpaceName:        "another-space",
-							OrganizationName: "another-org",
-							BoundAppCount:    3,
-						},
-					}
-				})
-
-				It("returns true", func() {
-					Expect(serviceInstanceSummary.IsSharedTo()).To(BeTrue())
-				})
-			})
-
-			Context("when the service instance is NOT shared with another space", func() {
-				It("returns false", func() {
-					Expect(serviceInstanceSummary.IsSharedTo()).To(BeFalse())
-				})
-			})
-		})
-	})
-
 	Describe("GetServiceInstanceSummaryByNameAndSpace", func() {
 		var (
 			summary         ServiceInstanceSummary
@@ -214,29 +153,39 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						})
 
 						Context("when no errors are encountered getting the shared_from information", func() {
-							var returnedServiceSharedFrom ccv2.ServiceInstanceSharedFrom
+							Context("when the shared_from info is NOT empty", func() {
+								var returnedServiceSharedFrom ccv2.ServiceInstanceSharedFrom
 
-							BeforeEach(func() {
-								returnedServiceSharedFrom = ccv2.ServiceInstanceSharedFrom{
-									SpaceGUID:        "some-space-guid",
-									SpaceName:        "some-space-name",
-									OrganizationName: "some-org-name",
-								}
-								fakeCloudControllerClient.GetServiceInstanceSharedFromReturns(
-									returnedServiceSharedFrom,
-									ccv2.Warnings{"get-service-instance-shared-from-warning"},
-									nil)
+								BeforeEach(func() {
+									returnedServiceSharedFrom = ccv2.ServiceInstanceSharedFrom{
+										SpaceGUID:        "some-space-guid",
+										SpaceName:        "some-space-name",
+										OrganizationName: "some-org-name",
+									}
+									fakeCloudControllerClient.GetServiceInstanceSharedFromReturns(
+										returnedServiceSharedFrom,
+										ccv2.Warnings{"get-service-instance-shared-from-warning"},
+										nil)
+								})
+
+								It("returns the service instance share type, shared_from info, and all warnings", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedFrom))
+									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(0))
+								})
 							})
 
-							It("returns the service instance shared_from info and all warnings", func() {
-								Expect(summaryErr).ToNot(HaveOccurred())
-								Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
-								Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
-								Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
-
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(0))
+							Context("when the shared_from info is empty", func() {
+								It("sets the share type to not shared", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsNotShared))
+								})
 							})
 						})
 					})
@@ -293,38 +242,48 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						})
 
 						Context("when no errors are encountered getting the shared_from information", func() {
-							var returnedServiceSharedFrom ccv2.ServiceInstanceSharedFrom
+							Context("when the shared_from info is NOT empty", func() {
+								var returnedServiceSharedFrom ccv2.ServiceInstanceSharedFrom
 
-							BeforeEach(func() {
-								returnedServiceSharedFrom = ccv2.ServiceInstanceSharedFrom{
-									SpaceGUID:        "some-space-guid",
-									SpaceName:        "some-space-name",
-									OrganizationName: "some-org-name",
-								}
-								fakeCloudControllerClient.GetServiceInstanceSharedFromReturns(
-									returnedServiceSharedFrom,
-									ccv2.Warnings{"get-service-instance-shared-from-warning"},
-									nil)
+								BeforeEach(func() {
+									returnedServiceSharedFrom = ccv2.ServiceInstanceSharedFrom{
+										SpaceGUID:        "some-space-guid",
+										SpaceName:        "some-space-name",
+										OrganizationName: "some-org-name",
+									}
+									fakeCloudControllerClient.GetServiceInstanceSharedFromReturns(
+										returnedServiceSharedFrom,
+										ccv2.Warnings{"get-service-instance-shared-from-warning"},
+										nil)
+								})
+
+								It("returns the service instance share type, shared_from info, and all warnings", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedFrom))
+									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(0))
+								})
 							})
 
-							It("returns the service instance shared_from info and all warnings", func() {
-								Expect(summaryErr).ToNot(HaveOccurred())
-								Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
-								Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
-								Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
-
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(0))
+							Context("when the shared_from info is empty", func() {
+								It("sets the share type to not shared", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsNotShared))
+								})
 							})
 						})
 					})
 				})
 
-				Context("when the service instance is shared with other spaces", func() {
+				Context("when the service instance is shared to other spaces", func() {
 					Context("when the source space of the service instance is the same as the currently targeted space", func() {
 						BeforeEach(func() {
-							returnedServiceInstance.GUID = "some-space-guid"
+							returnedServiceInstance.SpaceGUID = "some-space-guid"
 							fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 								[]ccv2.ServiceInstance{returnedServiceInstance},
 								ccv2.Warnings{"get-space-service-instance-warning"},
@@ -374,37 +333,47 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						})
 
 						Context("when no errors are encountered getting the shared_to information", func() {
-							var returnedServiceSharedTos []ccv2.ServiceInstanceSharedTo
+							Context("when the shared_to info is NOT an empty list", func() {
+								var returnedServiceSharedTos []ccv2.ServiceInstanceSharedTo
 
-							BeforeEach(func() {
-								returnedServiceSharedTos = []ccv2.ServiceInstanceSharedTo{
-									{
-										SpaceGUID:        "some-space-guid",
-										SpaceName:        "some-space-name",
-										OrganizationName: "some-org-name",
-									},
-									{
-										SpaceGUID:        "some-space-guid2",
-										SpaceName:        "some-space-name2",
-										OrganizationName: "some-org-name2",
-									},
-								}
+								BeforeEach(func() {
+									returnedServiceSharedTos = []ccv2.ServiceInstanceSharedTo{
+										{
+											SpaceGUID:        "some-space-guid",
+											SpaceName:        "some-space-name",
+											OrganizationName: "some-org-name",
+										},
+										{
+											SpaceGUID:        "some-space-guid2",
+											SpaceName:        "some-space-name2",
+											OrganizationName: "some-org-name2",
+										},
+									}
 
-								fakeCloudControllerClient.GetServiceInstanceSharedTosReturns(
-									returnedServiceSharedTos,
-									ccv2.Warnings{"get-service-instance-shared-tos-warning"},
-									nil)
+									fakeCloudControllerClient.GetServiceInstanceSharedTosReturns(
+										returnedServiceSharedTos,
+										ccv2.Warnings{"get-service-instance-shared-tos-warning"},
+										nil)
+								})
+
+								It("returns the service instance share type, shared_to info, and all warnings", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedTo))
+									Expect(summary.ServiceInstanceSharedTos).To(ConsistOf(ServiceInstanceSharedTo(returnedServiceSharedTos[0]), ServiceInstanceSharedTo(returnedServiceSharedTos[1])))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-space-service-instance-warning"))
+
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(1))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
+									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(0))
+								})
 							})
 
-							It("returns the service instance shared_to info and all warnings", func() {
-								Expect(summaryErr).ToNot(HaveOccurred())
-								Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
-								Expect(summary.ServiceInstanceSharedTos).To(ConsistOf(ServiceInstanceSharedTo(returnedServiceSharedTos[0]), ServiceInstanceSharedTo(returnedServiceSharedTos[1])))
-								Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-space-service-instance-warning"))
-
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
-								Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(0))
+							Context("when the shared_to info is an empty list", func() {
+								It("sets the share type to not shared", func() {
+									Expect(summaryErr).ToNot(HaveOccurred())
+									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsNotShared))
+								})
 							})
 						})
 					})
