@@ -31,43 +31,8 @@ var _ = Describe("spaces command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		Context("when an API endpoint is not set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("displays an error and exits 1", func() {
-				session := helpers.CF("spaces")
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when an API endpoint is set", func() {
-			Context("when the user is not logged in", func() {
-				It("displays an error and exits 1", func() {
-					session := helpers.CF("spaces")
-					Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
-
-			Context("when the user is logged in", func() {
-				BeforeEach(func() {
-					helpers.LoginCF()
-				})
-
-				Context("when an org is not targeted", func() {
-					It("displays an error and exits 1", func() {
-						session := helpers.CF("spaces")
-						Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org\\."))
-						Eventually(session).Should(Say("FAILED"))
-						Eventually(session).Should(Exit(1))
-					})
-				})
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "spaces")
 		})
 	})
 

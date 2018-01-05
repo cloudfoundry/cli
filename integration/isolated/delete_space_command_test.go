@@ -24,29 +24,15 @@ var _ = Describe("delete-space command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("delete-space", "banana")
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
-				Eventually(session).Should(Exit(1))
+		Context("when the org is provided", func() {
+			It("fails with the appropriate errors", func() {
+				helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "delete-space", "space-name", "-o", ReadOnlyOrg)
 			})
 		})
 
-		Context("when not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("delete-space", "banana")
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
-				Eventually(session).Should(Exit(1))
+		Context("when the org is not provided", func() {
+			It("fails with the appropriate errors", func() {
+				helpers.CheckEnvironmentTargetedCorrectly(true, false, ReadOnlyOrg, "delete-space", "space-name")
 			})
 		})
 	})

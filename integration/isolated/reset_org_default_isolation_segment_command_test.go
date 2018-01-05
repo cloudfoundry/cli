@@ -31,18 +31,9 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 		})
 	})
 
-	Context("when the environment is not set-up correctly", func() {
-		Context("when no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("reset-org-default-isolation-segment", orgName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
+	Context("when the environment is not setup correctly", func() {
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "reset-org-default-isolation-segment", "org-name")
 		})
 
 		Context("when the v3 api does not exist", func() {
@@ -79,19 +70,6 @@ var _ = Describe("reset-org-default-isolation-segment command", func() {
 				session := helpers.CF("reset-org-default-isolation-segment", orgName)
 				Eventually(session).Should(Say("FAILED"))
 				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.11\\.0 or higher\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("reset-org-default-isolation-segment", orgName)
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})

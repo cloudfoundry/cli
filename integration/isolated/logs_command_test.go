@@ -28,59 +28,8 @@ var _ = Describe("Logs Command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		Context("when no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint message", func() {
-				session := helpers.CF("logs", "dora")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session := helpers.CF("logs", "dora")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when no org is targeted", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF() // uses the "cf auth" command, which loses the targeted org and space (cf login does not)
-			})
-
-			It("fails with no org or space targeted message", func() {
-				session := helpers.CF("logs", "dora")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No org targeted, use 'cf target -o ORG' to target an org."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when no space is targeted", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-				helpers.LoginCF() // uses the "cf auth" command, which loses the targeted org and space (cf login does not)
-				helpers.TargetOrg(ReadOnlyOrg)
-			})
-
-			It("fails with no space targeted message", func() {
-				session := helpers.CF("logs", "dora")
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
-				Eventually(session).Should(Exit(1))
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(true, true, ReadOnlyOrg, "logs", "app-name")
 		})
 	})
 

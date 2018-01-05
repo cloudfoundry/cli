@@ -25,28 +25,8 @@ var _ = Describe("orgs command", func() {
 	})
 
 	Context("when the environment is not setup correctly", func() {
-		Context("when an API endpoint is not set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("displays an error and exits 1", func() {
-				session := helpers.CF("orgs")
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when an API endpoint is set", func() {
-			Context("when the user is not logged in", func() {
-				It("displays an error and exits 1", func() {
-					session := helpers.CF("orgs")
-					Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-					Eventually(session).Should(Say("FAILED"))
-					Eventually(session).Should(Exit(1))
-				})
-			})
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "orgs")
 		})
 	})
 
@@ -55,19 +35,6 @@ var _ = Describe("orgs command", func() {
 
 		BeforeEach(func() {
 			username = helpers.LoginCF()
-		})
-
-		// This test is skipped because we have remaining manual orgs that we do
-		// not want to remove. We can unskip this test when we create a dev
-		// environment for our manual testing in this story: #151187003
-		PContext("when there are no orgs", func() {
-			It("displays no orgs found", func() {
-				session := helpers.CF("orgs")
-				Eventually(session).Should(Say("Getting orgs as %s\\.\\.\\.", username))
-				Eventually(session).Should(Say(""))
-				Eventually(session).Should(Say("No orgs found\\."))
-				Eventually(session).Should(Exit(0))
-			})
 		})
 
 		Context("when there are multiple orgs", func() {

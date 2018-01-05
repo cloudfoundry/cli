@@ -28,46 +28,19 @@ var _ = Describe("security-groups command", func() {
 		})
 	})
 
-	Describe("everything but help", func() {
+	Context("when the environment is not setup correctly", func() {
+		It("fails with the appropriate errors", func() {
+			helpers.CheckEnvironmentTargetedCorrectly(false, false, ReadOnlyOrg, "security-groups")
+		})
+	})
+
+	Context("when the environment is set up correctly", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 		})
 
 		JustBeforeEach(func() {
 			session = helpers.CF("security-groups")
-		})
-
-		Context("when no API endpoint is set", func() {
-			BeforeEach(func() {
-				helpers.UnsetAPI()
-			})
-
-			It("fails with no API endpoint set message", func() {
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("No API endpoint set\\. Use 'cf login' or 'cf api' to target an endpoint\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when not logged in", func() {
-			BeforeEach(func() {
-				helpers.LogoutCF()
-			})
-
-			It("fails with not logged in message", func() {
-				session = helpers.CF("security-groups")
-				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-				Eventually(session).Should(Exit(1))
-			})
-		})
-
-		Context("when too many arguments are provided", func() {
-			It("succeeds and ignores the additional arguments", func() {
-				session = helpers.CF("security-groups", "foooo")
-				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session).Should(Exit(0))
-			})
 		})
 
 		Context("when there are security groups", func() {
