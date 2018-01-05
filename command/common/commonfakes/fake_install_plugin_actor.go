@@ -120,17 +120,6 @@ type FakeInstallPluginActor struct {
 	installPluginFromPathReturnsOnCall map[int]struct {
 		result1 error
 	}
-	IsPluginInstalledStub        func(pluginName string) bool
-	isPluginInstalledMutex       sync.RWMutex
-	isPluginInstalledArgsForCall []struct {
-		pluginName string
-	}
-	isPluginInstalledReturns struct {
-		result1 bool
-	}
-	isPluginInstalledReturnsOnCall map[int]struct {
-		result1 bool
-	}
 	UninstallPluginStub        func(uninstaller pluginaction.PluginUninstaller, name string) error
 	uninstallPluginMutex       sync.RWMutex
 	uninstallPluginArgsForCall []struct {
@@ -575,54 +564,6 @@ func (fake *FakeInstallPluginActor) InstallPluginFromPathReturnsOnCall(i int, re
 	}{result1}
 }
 
-func (fake *FakeInstallPluginActor) IsPluginInstalled(pluginName string) bool {
-	fake.isPluginInstalledMutex.Lock()
-	ret, specificReturn := fake.isPluginInstalledReturnsOnCall[len(fake.isPluginInstalledArgsForCall)]
-	fake.isPluginInstalledArgsForCall = append(fake.isPluginInstalledArgsForCall, struct {
-		pluginName string
-	}{pluginName})
-	fake.recordInvocation("IsPluginInstalled", []interface{}{pluginName})
-	fake.isPluginInstalledMutex.Unlock()
-	if fake.IsPluginInstalledStub != nil {
-		return fake.IsPluginInstalledStub(pluginName)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.isPluginInstalledReturns.result1
-}
-
-func (fake *FakeInstallPluginActor) IsPluginInstalledCallCount() int {
-	fake.isPluginInstalledMutex.RLock()
-	defer fake.isPluginInstalledMutex.RUnlock()
-	return len(fake.isPluginInstalledArgsForCall)
-}
-
-func (fake *FakeInstallPluginActor) IsPluginInstalledArgsForCall(i int) string {
-	fake.isPluginInstalledMutex.RLock()
-	defer fake.isPluginInstalledMutex.RUnlock()
-	return fake.isPluginInstalledArgsForCall[i].pluginName
-}
-
-func (fake *FakeInstallPluginActor) IsPluginInstalledReturns(result1 bool) {
-	fake.IsPluginInstalledStub = nil
-	fake.isPluginInstalledReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeInstallPluginActor) IsPluginInstalledReturnsOnCall(i int, result1 bool) {
-	fake.IsPluginInstalledStub = nil
-	if fake.isPluginInstalledReturnsOnCall == nil {
-		fake.isPluginInstalledReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.isPluginInstalledReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
-}
-
 func (fake *FakeInstallPluginActor) UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error {
 	fake.uninstallPluginMutex.Lock()
 	ret, specificReturn := fake.uninstallPluginReturnsOnCall[len(fake.uninstallPluginArgsForCall)]
@@ -740,8 +681,6 @@ func (fake *FakeInstallPluginActor) Invocations() map[string][][]interface{} {
 	defer fake.getPluginRepositoryMutex.RUnlock()
 	fake.installPluginFromPathMutex.RLock()
 	defer fake.installPluginFromPathMutex.RUnlock()
-	fake.isPluginInstalledMutex.RLock()
-	defer fake.isPluginInstalledMutex.RUnlock()
 	fake.uninstallPluginMutex.RLock()
 	defer fake.uninstallPluginMutex.RUnlock()
 	fake.validateFileChecksumMutex.RLock()

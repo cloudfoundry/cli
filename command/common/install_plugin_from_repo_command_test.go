@@ -205,11 +205,12 @@ var _ = Describe("install-plugin command", func() {
 
 					Context("when the plugin is already installed", func() {
 						BeforeEach(func() {
-							fakeConfig.GetPluginReturns(configv3.Plugin{
+							plugin := configv3.Plugin{
 								Name:    pluginName,
 								Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 2},
-							}, true)
-							fakeActor.IsPluginInstalledReturns(true)
+							}
+							fakeConfig.GetPluginReturns(plugin, true)
+							fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 						})
 
 						Context("when getting the binary errors", func() {
@@ -537,11 +538,12 @@ var _ = Describe("install-plugin command", func() {
 
 					Context("when the plugin is already installed", func() {
 						BeforeEach(func() {
-							fakeConfig.GetPluginReturns(configv3.Plugin{
+							plugin := configv3.Plugin{
 								Name:    pluginName,
 								Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 2},
-							}, true)
-							fakeActor.IsPluginInstalledReturns(true)
+							}
+							fakeConfig.GetPluginReturns(plugin, true)
+							fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 						})
 
 						Context("when the user chooses no", func() {
@@ -770,11 +772,12 @@ var _ = Describe("install-plugin command", func() {
 				BeforeEach(func() {
 					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{Name: pluginName, Version: downloadedVersionString, URL: pluginURL, Checksum: checksum}, []string{repoName}, nil)
 
-					fakeConfig.GetPluginReturns(configv3.Plugin{
+					plugin := configv3.Plugin{
 						Name:    pluginName,
 						Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 2},
-					}, true)
-					fakeActor.IsPluginInstalledReturns(true)
+					}
+					fakeConfig.GetPluginReturns(plugin, true)
+					fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 
 					execPath = helpers.PrefixedRandomName("some-path")
 					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)
@@ -925,11 +928,12 @@ var _ = Describe("install-plugin command", func() {
 				BeforeEach(func() {
 					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{Name: pluginName, Version: downloadedVersionString, URL: pluginURL, Checksum: checksum}, []string{repo2Name}, nil)
 
-					fakeConfig.GetPluginReturns(configv3.Plugin{
+					plugin := configv3.Plugin{
 						Name:    pluginName,
 						Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 2},
-					}, true)
-					fakeActor.IsPluginInstalledReturns(true)
+					}
+					fakeConfig.GetPluginReturns(plugin, true)
+					fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 
 					execPath = helpers.PrefixedRandomName("some-path")
 				})
@@ -950,6 +954,7 @@ var _ = Describe("install-plugin command", func() {
 						major := rand.Int()
 						minor := rand.Int()
 						build := rand.Int()
+
 						pluginVersion = configv3.PluginVersion{Major: major, Minor: minor, Build: build}
 
 						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
@@ -1000,11 +1005,12 @@ var _ = Describe("install-plugin command", func() {
 
 					fakeActor.GetPluginInfoFromRepositoriesForPlatformReturns(pluginaction.PluginInfo{Name: pluginName, Version: downloadedVersionString, URL: pluginURL, Checksum: checksum}, []string{repo2Name, repo3Name}, nil)
 
-					fakeConfig.GetPluginReturns(configv3.Plugin{
+					plugin := configv3.Plugin{
 						Name:    pluginName,
 						Version: configv3.PluginVersion{Major: 1, Minor: 2, Build: 2},
-					}, true)
-					fakeActor.IsPluginInstalledReturns(true)
+					}
+					fakeConfig.GetPluginReturns(plugin, true)
+					fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 
 					execPath = helpers.PrefixedRandomName("some-path")
 					fakeActor.DownloadExecutableBinaryFromURLReturns(execPath, nil)

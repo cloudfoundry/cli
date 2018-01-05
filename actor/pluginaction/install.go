@@ -165,11 +165,6 @@ func (actor Actor) InstallPluginFromPath(path string, plugin configv3.Plugin) er
 	return nil
 }
 
-func (actor Actor) IsPluginInstalled(pluginName string) bool {
-	_, isInstalled := actor.config.GetPlugin(pluginName)
-	return isInstalled
-}
-
 func makeTempFile(tempDir string) (*os.File, error) {
 	tempFile, err := ioutil.TempFile(tempDir, "")
 	if err != nil {

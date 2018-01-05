@@ -163,24 +163,6 @@ var _ = Describe("install actions", func() {
 		})
 	})
 
-	Describe("IsPluginInstalled", func() {
-		Context("when the plugin is installed", func() {
-			BeforeEach(func() {
-				fakeConfig.GetPluginReturns(configv3.Plugin{Name: "some-plugin"}, true)
-			})
-
-			It("returns true", func() {
-				Expect(actor.IsPluginInstalled("some-plugin")).To(BeTrue())
-			})
-		})
-
-		Context("when the plugin is NOT installed", func() {
-			It("returns false", func() {
-				Expect(actor.IsPluginInstalled("some-plugin")).To(BeFalse())
-			})
-		})
-	})
-
 	Describe("GetAndValidatePlugin", func() {
 		var (
 			fakePluginMetadata *pluginactionfakes.FakePluginMetadata

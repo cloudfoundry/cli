@@ -122,10 +122,20 @@ var _ = Describe("install-plugin command", func() {
 				})
 
 				Context("when the plugin is already installed", func() {
-					var plugin configv3.Plugin
-
+					var (
+						plugin    configv3.Plugin
+						newPlugin configv3.Plugin
+					)
 					BeforeEach(func() {
 						plugin = configv3.Plugin{
+							Name: "some-plugin",
+							Version: configv3.PluginVersion{
+								Major: 1,
+								Minor: 2,
+								Build: 2,
+							},
+						}
+						newPlugin = configv3.Plugin{
 							Name: "some-plugin",
 							Version: configv3.PluginVersion{
 								Major: 1,
@@ -133,8 +143,8 @@ var _ = Describe("install-plugin command", func() {
 								Build: 3,
 							},
 						}
-						fakeActor.GetAndValidatePluginReturns(plugin, nil)
-						fakeActor.IsPluginInstalledReturns(true)
+						fakeActor.GetAndValidatePluginReturns(newPlugin, nil)
+						fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 					})
 
 					Context("when an error is encountered uninstalling the existing plugin", func() {
@@ -156,7 +166,7 @@ var _ = Describe("install-plugin command", func() {
 
 							Expect(testUI.Out).To(Say("Attention: Plugins are binaries written by potentially untrusted authors\\."))
 							Expect(testUI.Out).To(Say("Install and use plugins at your own risk\\."))
-							Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.3 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
+							Expect(testUI.Out).To(Say("Plugin some-plugin 1\\.2\\.2 is already installed\\. Uninstalling existing plugin\\.\\.\\."))
 							Expect(testUI.Out).To(Say("OK"))
 							Expect(testUI.Out).To(Say("Plugin some-plugin successfully uninstalled\\."))
 							Expect(testUI.Out).To(Say("Installing plugin some-plugin\\.\\.\\."))
@@ -170,8 +180,8 @@ var _ = Describe("install-plugin command", func() {
 							_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
 							Expect(path).To(Equal("copy-path"))
 
-							Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
-							Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
+							Expect(fakeConfig.GetPluginCaseInsensitiveCallCount()).To(Equal(1))
+							Expect(fakeConfig.GetPluginCaseInsensitiveArgsForCall(0)).To(Equal("some-plugin"))
 
 							Expect(fakeActor.UninstallPluginCallCount()).To(Equal(1))
 							_, pluginName := fakeActor.UninstallPluginArgsForCall(0)
@@ -180,7 +190,7 @@ var _ = Describe("install-plugin command", func() {
 							Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 							path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
 							Expect(path).To(Equal("copy-path"))
-							Expect(installedPlugin).To(Equal(plugin))
+							Expect(installedPlugin).To(Equal(newPlugin))
 						})
 
 						Context("when an error is encountered installing the plugin", func() {
@@ -235,8 +245,8 @@ var _ = Describe("install-plugin command", func() {
 						_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
 						Expect(path).To(Equal("copy-path"))
 
-						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
-						Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
+						Expect(fakeConfig.GetPluginCaseInsensitiveCallCount()).To(Equal(1))
+						Expect(fakeConfig.GetPluginCaseInsensitiveArgsForCall(0)).To(Equal("some-plugin"))
 
 						Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 						path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
@@ -350,8 +360,8 @@ var _ = Describe("install-plugin command", func() {
 							_, _, path := fakeActor.GetAndValidatePluginArgsForCall(0)
 							Expect(path).To(Equal("copy-path"))
 
-							Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
-							Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal("some-plugin"))
+							Expect(fakeConfig.GetPluginCaseInsensitiveCallCount()).To(Equal(1))
+							Expect(fakeConfig.GetPluginCaseInsensitiveArgsForCall(0)).To(Equal("some-plugin"))
 
 							Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 							path, plugin := fakeActor.InstallPluginFromPathArgsForCall(0)
@@ -373,7 +383,7 @@ var _ = Describe("install-plugin command", func() {
 								},
 							}
 							fakeActor.GetAndValidatePluginReturns(plugin, nil)
-							fakeActor.IsPluginInstalledReturns(true)
+							fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 						})
 
 						It("returns PluginAlreadyInstalledError", func() {
@@ -505,13 +515,23 @@ var _ = Describe("install-plugin command", func() {
 					It("returns an error", func() {
 						Expect(executeErr).To(MatchError(returnedErr))
 
-						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(0))
+						Expect(fakeConfig.GetPluginCaseInsensitiveCallCount()).To(Equal(0))
 					})
 				})
 
 				Context("when the plugin is valid", func() {
+					var newPlugin configv3.Plugin
+
 					BeforeEach(func() {
 						plugin = configv3.Plugin{
+							Name: pluginName,
+							Version: configv3.PluginVersion{
+								Major: 1,
+								Minor: 2,
+								Build: 2,
+							},
+						}
+						newPlugin = configv3.Plugin{
 							Name: pluginName,
 							Version: configv3.PluginVersion{
 								Major: 1,
@@ -519,16 +539,16 @@ var _ = Describe("install-plugin command", func() {
 								Build: 3,
 							},
 						}
-						fakeActor.GetAndValidatePluginReturns(plugin, nil)
+						fakeActor.GetAndValidatePluginReturns(newPlugin, nil)
 					})
 
 					Context("when the plugin is already installed", func() {
 						BeforeEach(func() {
-							fakeActor.IsPluginInstalledReturns(true)
+							fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 						})
 
 						It("displays uninstall message", func() {
-							Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.3 is already installed\\. Uninstalling existing plugin\\.\\.\\.", pluginName))
+							Expect(testUI.Out).To(Say("Plugin %s 1\\.2\\.2 is already installed\\. Uninstalling existing plugin\\.\\.\\.", pluginName))
 						})
 
 						Context("when an error is encountered uninstalling the existing plugin", func() {
@@ -679,8 +699,8 @@ var _ = Describe("install-plugin command", func() {
 						_, _, path = fakeActor.GetAndValidatePluginArgsForCall(0)
 						Expect(path).To(Equal(executablePluginPath))
 
-						Expect(fakeActor.IsPluginInstalledCallCount()).To(Equal(1))
-						Expect(fakeActor.IsPluginInstalledArgsForCall(0)).To(Equal(pluginName))
+						Expect(fakeConfig.GetPluginCaseInsensitiveCallCount()).To(Equal(1))
+						Expect(fakeConfig.GetPluginCaseInsensitiveArgsForCall(0)).To(Equal(pluginName))
 
 						Expect(fakeActor.InstallPluginFromPathCallCount()).To(Equal(1))
 						path, installedPlugin := fakeActor.InstallPluginFromPathArgsForCall(0)
@@ -694,7 +714,7 @@ var _ = Describe("install-plugin command", func() {
 				Context("when the plugin is already installed", func() {
 					BeforeEach(func() {
 						fakeActor.GetAndValidatePluginReturns(plugin, nil)
-						fakeActor.IsPluginInstalledReturns(true)
+						fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
 					})
 
 					It("returns PluginAlreadyInstalledError", func() {

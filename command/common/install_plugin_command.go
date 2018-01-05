@@ -30,7 +30,6 @@ type InstallPluginActor interface {
 	GetPluginInfoFromRepositoriesForPlatform(pluginName string, pluginRepos []configv3.PluginRepository, platform string) (pluginaction.PluginInfo, []string, error)
 	GetPluginRepository(repositoryName string) (configv3.PluginRepository, error)
 	InstallPluginFromPath(path string, plugin configv3.Plugin) error
-	IsPluginInstalled(pluginName string) bool
 	UninstallPlugin(uninstaller pluginaction.PluginUninstaller, name string) error
 	ValidateFileChecksum(path string, checksum string) bool
 }
@@ -119,17 +118,18 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 	}
 	log.Info("validated plugin")
 
-	if cmd.Actor.IsPluginInstalled(plugin.Name) {
+	if installedPlugin, installed := cmd.Config.GetPluginCaseInsensitive(plugin.Name); installed {
+		log.WithField("version", installedPlugin.Version).Debug("uninstall plugin")
+
 		if !cmd.Force && pluginSource != PluginFromRepository {
 			return translatableerror.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
-				Name:       plugin.Name,
-				Version:    plugin.Version.String(),
+				Name:       installedPlugin.Name,
+				Version:    installedPlugin.Version.String(),
 			}
 		}
 
-		log.Info("uninstall plugin")
-		err = cmd.uninstallPlugin(plugin, rpcService)
+		err = cmd.uninstallPlugin(installedPlugin, rpcService)
 		if err != nil {
 			return err
 		}
