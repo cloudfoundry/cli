@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 const adjectives = `accountable
@@ -206,6 +207,7 @@ func (Generator) RandomNoun() string {
 }
 
 func randomElement(fullList string) string {
+	rand.Seed(time.Now().UnixNano())
 	wordList := strings.Split(fullList, "\n")
 	randomWordIndex := rand.Int() % len(wordList)
 
