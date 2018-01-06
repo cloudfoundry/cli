@@ -27,7 +27,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/util/words/generator"
 )
 
 type Push struct {
@@ -43,7 +42,7 @@ type Push struct {
 	serviceRepo   api.ServiceRepository
 	stackRepo     stacks.StackRepository
 	authRepo      authentication.Repository
-	wordGenerator generator.WordGenerator
+	wordGenerator commandregistry.RandomWordGenerator
 	actor         actors.PushActor
 	routeActor    actors.RouteActor
 	zipper        appfiles.Zipper

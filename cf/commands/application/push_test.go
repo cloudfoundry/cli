@@ -14,6 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/stacks/stacksfakes"
 	"code.cloudfoundry.org/cli/cf/appfiles/appfilesfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/commandregistry/commandregistryfakes"
 	"code.cloudfoundry.org/cli/cf/commands/application"
 	"code.cloudfoundry.org/cli/cf/commands/application/applicationfakes"
 	"code.cloudfoundry.org/cli/cf/commands/service/servicefakes"
@@ -30,7 +31,6 @@ import (
 	"code.cloudfoundry.org/cli/util/generic"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/util/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -50,7 +50,7 @@ var _ = Describe("Push Command", func() {
 		routeRepo                  *apifakes.FakeRouteRepository
 		stackRepo                  *stacksfakes.FakeStackRepository
 		serviceRepo                *apifakes.FakeServiceRepository
-		wordGenerator              *generatorfakes.FakeWordGenerator
+		wordGenerator              *commandregistryfakes.FakeRandomWordGenerator
 		requirementsFactory        *requirementsfakes.FakeFactory
 		authRepo                   *authenticationfakes.FakeRepository
 		actor                      *actorsfakes.FakePushActor
@@ -87,7 +87,7 @@ var _ = Describe("Push Command", func() {
 		ui = &testterm.FakeUI{} //new(terminalfakes.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		manifestRepo = new(manifestfakes.FakeRepository)
-		wordGenerator = new(generatorfakes.FakeWordGenerator)
+		wordGenerator = new(commandregistryfakes.FakeRandomWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 		actor = new(actorsfakes.FakePushActor)
 		routeActor = new(actorsfakes.FakeRouteActor)

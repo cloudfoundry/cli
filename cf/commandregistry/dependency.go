@@ -25,8 +25,14 @@ import (
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/plugin/models"
 	"code.cloudfoundry.org/cli/util"
-	"code.cloudfoundry.org/cli/util/words/generator"
+	"code.cloudfoundry.org/cli/util/randomword"
 )
+
+//go:generate counterfeiter . RandomWordGenerator
+
+type RandomWordGenerator interface {
+	Babble() string
+}
 
 type Dependency struct {
 	UI                 terminal.UI
@@ -44,7 +50,7 @@ type Dependency struct {
 	PlanBuilder        planbuilder.PlanBuilder
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
-	WordGenerator      generator.WordGenerator
+	WordGenerator      RandomWordGenerator
 	AppZipper          appfiles.Zipper
 	AppFiles           appfiles.AppFiles
 	PushActor          actors.PushActor
@@ -139,7 +145,7 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 		deps.ServiceBuilder,
 	)
 
-	deps.WordGenerator = generator.NewWordGenerator()
+	deps.WordGenerator = new(randomword.Generator)
 
 	deps.AppZipper = appfiles.ApplicationZipper{}
 	deps.AppFiles = appfiles.ApplicationFiles{}

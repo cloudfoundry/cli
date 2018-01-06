@@ -13,7 +13,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/formatters"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/util/generic"
-	"code.cloudfoundry.org/cli/util/words/generator"
+	"code.cloudfoundry.org/cli/util/randomword"
 )
 
 type Manifest struct {
@@ -26,7 +26,7 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func (m Manifest) Applications() ([]models.AppParams, error) {
-	rawData, err := expandProperties(m.Data, generator.NewWordGenerator())
+	rawData, err := expandProperties(m.Data, randomword.Generator{})
 	if err != nil {
 		return []models.AppParams{}, err
 	}
@@ -98,7 +98,7 @@ func (m Manifest) getAppMaps(data generic.Map) ([]generic.Map, error) {
 
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func expandProperties(input interface{}, babbler generator.WordGenerator) (interface{}, error) {
+func expandProperties(input interface{}, babbler randomword.Generator) (interface{}, error) {
 	var errs []error
 	var output interface{}
 

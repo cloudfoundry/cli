@@ -11,9 +11,11 @@ import (
 
 var _ = Describe("Generator", func() {
 	var gen Generator
+
 	BeforeEach(func() {
 		gen = Generator{}
 	})
+
 	Describe("RandomAdjective", func() {
 		It("generates a random adjective each time it is called", func() {
 			adj := gen.RandomAdjective()
@@ -29,6 +31,13 @@ var _ = Describe("Generator", func() {
 			// We wait for 1 millisecond because the seed we use to generate the randomness has a unit of 1 nanosecond
 			time.Sleep(1)
 			Expect(noun).ToNot(Equal(gen.RandomNoun()))
+		})
+	})
+
+	Describe("Babble", func() {
+		It("generates a random adjective noun pair each time it is called", func() {
+			wordPair := gen.Babble()
+			Expect(wordPair).To(MatchRegexp("^\\w+-\\w+$"))
 		})
 	})
 })
