@@ -374,16 +374,22 @@ var _ = Describe("install-plugin command", func() {
 
 					Context("when the plugin is already installed", func() {
 						BeforeEach(func() {
-							plugin := configv3.Plugin{
+							fakeConfig.GetPluginCaseInsensitiveReturns(configv3.Plugin{
+								Name: "some-plugin",
+								Version: configv3.PluginVersion{
+									Major: 1,
+									Minor: 2,
+									Build: 2,
+								},
+							}, true)
+							fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
 								Name: "some-plugin",
 								Version: configv3.PluginVersion{
 									Major: 1,
 									Minor: 2,
 									Build: 3,
 								},
-							}
-							fakeActor.GetAndValidatePluginReturns(plugin, nil)
-							fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
+							}, nil)
 						})
 
 						It("returns PluginAlreadyInstalledError", func() {
@@ -713,8 +719,22 @@ var _ = Describe("install-plugin command", func() {
 
 				Context("when the plugin is already installed", func() {
 					BeforeEach(func() {
-						fakeActor.GetAndValidatePluginReturns(plugin, nil)
-						fakeConfig.GetPluginCaseInsensitiveReturns(plugin, true)
+						fakeConfig.GetPluginCaseInsensitiveReturns(configv3.Plugin{
+							Name: "some-plugin",
+							Version: configv3.PluginVersion{
+								Major: 1,
+								Minor: 2,
+								Build: 2,
+							},
+						}, true)
+						fakeActor.GetAndValidatePluginReturns(configv3.Plugin{
+							Name: "some-plugin",
+							Version: configv3.PluginVersion{
+								Major: 1,
+								Minor: 2,
+								Build: 3,
+							},
+						}, nil)
 					})
 
 					It("returns PluginAlreadyInstalledError", func() {

@@ -124,8 +124,8 @@ func (cmd InstallPluginCommand) Execute([]string) error {
 		if !cmd.Force && pluginSource != PluginFromRepository {
 			return translatableerror.PluginAlreadyInstalledError{
 				BinaryName: cmd.Config.BinaryName(),
-				Name:       installedPlugin.Name,
-				Version:    installedPlugin.Version.String(),
+				Name:       plugin.Name,
+				Version:    plugin.Version.String(),
 			}
 		}
 
