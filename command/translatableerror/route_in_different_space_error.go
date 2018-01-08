@@ -5,7 +5,7 @@ type RouteInDifferentSpaceError struct {
 }
 
 func (e RouteInDifferentSpaceError) Error() string {
-	return "The app cannot be mapped to route {{.URL}} because it is not in this space. Apps must be mapped to routes in the same space."
+	return "The app cannot be mapped to route {{.URL}} because the route is not in this space. Apps must be mapped to routes in the same space."
 }
 
 func (e RouteInDifferentSpaceError) Translate(translate func(string, ...interface{}) string) string {
