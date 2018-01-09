@@ -434,27 +434,27 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
 			[]manifest.Application{{DeprecatedDomain: true}},
-			actionerror.TriggerLegacyPushError{DomainRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"domain"}}),
 
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
 			[]manifest.Application{{DeprecatedDomains: true}},
-			actionerror.TriggerLegacyPushError{DomainRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"domains"}}),
 
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
 			[]manifest.Application{{DeprecatedHost: true}},
-			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"host"}}),
 
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
 			[]manifest.Application{{DeprecatedHosts: true}},
-			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"hosts"}}),
 
 		Entry("TriggerLegacyPushError",
 			CommandLineSettings{},
 			[]manifest.Application{{DeprecatedNoHostname: true}},
-			actionerror.TriggerLegacyPushError{HostnameRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"no-hostname"}}),
 
 		// The following are premerge PropertyCombinationErrors
 		Entry("PropertyCombinationError",

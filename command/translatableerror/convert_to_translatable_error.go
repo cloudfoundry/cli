@@ -114,7 +114,7 @@ func ConvertToTranslatableError(err error) error {
 	case actionerror.TCPRouteOptionsNotProvidedError:
 		return TCPRouteOptionsNotProvidedError{}
 	case actionerror.TriggerLegacyPushError:
-		return TriggerLegacyPushError{DomainRelated: e.DomainRelated, HostnameRelated: e.HostnameRelated}
+		return TriggerLegacyPushError{DomainHostRelated: e.DomainHostRelated}
 	case actionerror.UploadFailedError:
 		return UploadFailedError{Err: ConvertToTranslatableError(e.Err)}
 	case actionerror.CommandLineOptionsAndManifestConflictError:

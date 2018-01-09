@@ -42,7 +42,8 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest has attributes promoted to the top level\\. Found: host\\."))
+				Eventually(session.Err).Should(Say("Deprecation warning: Specifying app manifest attributes at the top level is deprecated."))
+				Eventually(session.Err).Should(Say("Found: host\\."))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, defaultDomain))
 			})
 		})
@@ -86,8 +87,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'domain' or 'domains' attributes."))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push' and may be deprecated in the future."))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: domain."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", appName, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -108,8 +108,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'domain' or 'domains' attributes."))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push' and may be deprecated in the future."))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: domains."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", appName, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -130,8 +129,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'host', 'hosts', or 'no-hostname'"))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push'"))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: host."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", host, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -152,8 +150,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'host', 'hosts', or 'no-hostname'"))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push'"))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: hosts."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", host, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -175,8 +172,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start", "-d", privateDomain)
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'host', 'hosts', or 'no-hostname'"))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push'"))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: no-hostname."))
 				Eventually(session).Should(Say("(?i)Creating route %s", privateDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -210,7 +206,7 @@ var _ = Describe("triggering legacy push", func() {
 		})
 	})
 
-	Context("when there is a 'domain' property and a 'hostname' property in the manifest", func() {
+	Context("when there is a 'domain' property and a 'host' property in the manifest", func() {
 		It("triggering old push with deprecation warning", func() {
 			helpers.WithHelloWorldApp(func(dir string) {
 				helpers.WriteManifest(filepath.Join(dir, "manifest.yml"), map[string]interface{}{
@@ -224,8 +220,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest declares routes using 'domain' or 'domains' attributes."))
-				Eventually(session.Err).Should(Say("These attributes are not processed by 'v2-push' and may be deprecated in the future."))
+				Eventually(session.Err).Should(Say("Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: domain, host."))
 				Eventually(session).Should(Say("(?i)Creating route %s\\.%s", host, privateDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))

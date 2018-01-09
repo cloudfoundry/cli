@@ -225,8 +225,8 @@ var _ = Describe("ConvertToTranslatableError", func() {
 			TCPRouteOptionsNotProvidedError{}),
 
 		Entry("actionerror.TriggerLegacyPushError -> TriggerLegacyPushError",
-			actionerror.TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true},
-			TriggerLegacyPushError{DomainRelated: true, HostnameRelated: true}),
+			actionerror.TriggerLegacyPushError{DomainHostRelated: []string{"domain", "host"}},
+			TriggerLegacyPushError{DomainHostRelated: []string{"domain", "host"}}),
 
 		Entry("actionerror.UploadFailedError -> UploadFailedError",
 			actionerror.UploadFailedError{Err: actionerror.NoDomainsFoundError{}},

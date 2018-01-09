@@ -113,10 +113,24 @@ func (Actor) validatePremergedSettings(settings CommandLineSettings, apps []mani
 		switch {
 		case app.NoRoute && len(app.Routes) > 0:
 			return actionerror.PropertyCombinationError{AppName: app.Name, Properties: []string{"no-route", "routes"}}
-		case app.DeprecatedDomain != nil || app.DeprecatedDomains != nil:
-			return actionerror.TriggerLegacyPushError{DomainRelated: true}
-		case app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil:
-			return actionerror.TriggerLegacyPushError{HostnameRelated: true}
+		case app.DeprecatedDomain != nil || app.DeprecatedDomains != nil || app.DeprecatedHost != nil || app.DeprecatedHosts != nil || app.DeprecatedNoHostname != nil:
+			deprecatedFields := []string{}
+			if app.DeprecatedDomain != nil {
+				deprecatedFields = append(deprecatedFields, "domain")
+			}
+			if app.DeprecatedDomains != nil {
+				deprecatedFields = append(deprecatedFields, "domains")
+			}
+			if app.DeprecatedHost != nil {
+				deprecatedFields = append(deprecatedFields, "host")
+			}
+			if app.DeprecatedHosts != nil {
+				deprecatedFields = append(deprecatedFields, "hosts")
+			}
+			if app.DeprecatedNoHostname != nil {
+				deprecatedFields = append(deprecatedFields, "no-hostname")
+			}
+			return actionerror.TriggerLegacyPushError{DomainHostRelated: deprecatedFields}
 		case len(app.Routes) > 0:
 			commandLineOptionsAndManifestConflictErr := actionerror.CommandLineOptionsAndManifestConflictError{
 				ManifestAttribute:  "route",
