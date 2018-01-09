@@ -35,8 +35,8 @@ Promoted attributes are not processed by 'v2-push' and may be deprecated in the 
 Continuing processing using 'push' command...`, strings.Join(e.GlobalRelated, ", "))
 
 	case e.InheritanceRelated:
-		return `App manifest uses inheritance, which is not supported by 'v2-push'.
-Continuing processing using 'push' command...
+		return `Deprecation warning: App manifest inheritance is deprecated.
+Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated-app-manifest-features for details and other app manifest deprecations. This feature will be removed in the future.
 `
 
 	default:

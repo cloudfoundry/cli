@@ -18,13 +18,14 @@ func (manifest *Manifest) UnmarshalYAML(unmarshal func(interface{}) error) error
 		return err
 	}
 
+	if raw.containsInheritanceField() {
+		return InheritanceFieldError{}
+	}
+
 	if globals := raw.containsGlobalFields(); len(globals) > 0 {
 		return GlobalFieldsError{Fields: globals}
 	}
 
-	if raw.containsInheritanceField() {
-		return InheritanceFieldError{}
-	}
 	manifest.Applications = raw.Applications
 	return nil
 }

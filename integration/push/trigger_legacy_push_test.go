@@ -65,7 +65,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest uses inheritance, which is not supported by 'v2-push'"))
+				Eventually(session.Err).Should(Say("Deprecation warning: App manifest inheritance is deprecated."))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, defaultDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
@@ -202,7 +202,7 @@ var _ = Describe("triggering legacy push", func() {
 				})
 
 				session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, "--no-start")
-				Eventually(session.Err).Should(Say("App manifest uses inheritance, which is not supported by 'v2-push'"))
+				Eventually(session.Err).Should(Say("Deprecation warning: App manifest inheritance is deprecated."))
 				Eventually(session).Should(Say("Creating route %s\\.%s", host, privateDomain))
 				Eventually(session).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
