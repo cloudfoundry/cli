@@ -19,8 +19,9 @@ var _ = Describe("Generator", func() {
 	Describe("RandomAdjective", func() {
 		It("generates a random adjective each time it is called", func() {
 			adj := gen.RandomAdjective()
-			// We wait for 1 millisecond because the seed we use to generate the randomness has a unit of 1 nanosecond
-			time.Sleep(1)
+			// We wait for 3 millisecond because the seed we use to generate the
+			// randomness has a unit of 1 nanosecond plus random test flakiness
+			time.Sleep(3)
 			Expect(adj).ToNot(Equal(gen.RandomAdjective()))
 		})
 	})
@@ -28,8 +29,9 @@ var _ = Describe("Generator", func() {
 	Describe("RandomNoun", func() {
 		It("generates a random noun each time it is called", func() {
 			noun := gen.RandomNoun()
-			// We wait for 1 millisecond because the seed we use to generate the randomness has a unit of 1 nanosecond
-			time.Sleep(1)
+			// We wait for 3 millisecond because the seed we use to generate the
+			// randomness has a unit of 1 nanosecond plus random test flakiness
+			time.Sleep(3)
 			Expect(noun).ToNot(Equal(gen.RandomNoun()))
 		})
 	})
