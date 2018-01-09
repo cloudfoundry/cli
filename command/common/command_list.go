@@ -125,7 +125,7 @@ type commandList struct {
 	Plugins                            plugin.PluginsCommand                        `command:"plugins" description:"List commands of installed plugins"`
 	PurgeServiceInstance               v2.PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
 	PurgeServiceOffering               v2.PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
-	Push                               v2.PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	Push                               v2.V2PushCommand                             `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
 	Quotas                             v2.QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
 	Quota                              v2.QuotaCommand                              `command:"quota" description:"Show quota info"`
 	RemoveNetworkPolicy                v3.RemoveNetworkPolicyCommand                `command:"remove-network-policy" description:"Remove network traffic policy of an app"`

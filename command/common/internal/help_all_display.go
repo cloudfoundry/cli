@@ -163,7 +163,6 @@ var ExperimentalHelpCategoryList = []HelpCategory{
 			{"v3-set-env", "v3-unset-env"},
 			{"v3-get-health-check", "v3-set-health-check"},
 			{"v3-packages", "v3-create-package"},
-			{"v2-push"},
 		},
 	},
 }
