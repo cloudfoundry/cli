@@ -18,16 +18,16 @@ func (e TriggerLegacyPushError) Error() string {
 	switch {
 	case len(e.DomainHostRelated) > 0:
 		return fmt.Sprintf(`Deprecation warning: Route component attributes 'domain', 'domains', 'host', 'hosts' and 'no-hostname' are deprecated. Found: %s.
-Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated-app-manifest-features for the currently supported syntax and other app manifest deprecations. This feature will be removed in the future.
+Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for the currently supported syntax and other app manifest deprecations. This feature will be removed in the future.
 `, strings.Join(e.DomainHostRelated, ", "))
 	case len(e.GlobalRelated) > 0:
 		return fmt.Sprintf(`Deprecation warning: Specifying app manifest attributes at the top level is deprecated. Found: %s.
-Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated-app-manifest-features for alternatives and other app manifest deprecations. This feature will be removed in the future.
+Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated for alternatives and other app manifest deprecations. This feature will be removed in the future.
 `, strings.Join(e.GlobalRelated, ", "))
 
 	case e.InheritanceRelated:
 		return `Deprecation warning: App manifest inheritance is deprecated.
-Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated-app-manifest-features for details and other app manifest deprecations. This feature will be removed in the future.
+Please see http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#deprecated and other app manifest deprecations. This feature will be removed in the future.
 `
 
 	default:
