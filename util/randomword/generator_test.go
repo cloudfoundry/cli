@@ -31,7 +31,7 @@ var _ = Describe("Generator", func() {
 			noun := gen.RandomNoun()
 			// We wait for 3 millisecond because the seed we use to generate the
 			// randomness has a unit of 1 nanosecond plus random test flakiness
-			time.Sleep(3)
+			time.Sleep(10)
 			Expect(noun).ToNot(Equal(gen.RandomNoun()))
 		})
 	})
