@@ -24,6 +24,11 @@ var _ = Describe("Resource Actions", func() {
 		fakeConfig = &sharedactionfakes.FakeConfig{}
 		actor = NewActor(fakeConfig)
 
+		// Creates the following directory structure:
+		// level1/level2/tmpFile1
+		// tmpfile2
+		// tmpfile3
+
 		var err error
 		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())
@@ -236,20 +241,40 @@ var _ = Describe("Resource Actions", func() {
 			})
 
 			Context("when a .cfignore file exists in the sourceDir", func() {
-				BeforeEach(func() {
-					err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0666)
-					Expect(err).ToNot(HaveOccurred())
+				Context("with relative paths", func() {
+					BeforeEach(func() {
+						err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("level2"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("excludes all patterns of files mentioned in .cfignore", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(gatheredResources).To(Equal(
+							[]Resource{
+								{Filename: "level1", Mode: DefaultFolderPermissions},
+								{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
+								{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
+							}))
+					})
 				})
 
-				It("excludes all patterns of files mentioned in .cfignore", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				Context("with absolute paths - where '/' == sourceDir", func() {
+					BeforeEach(func() {
+						err := ioutil.WriteFile(filepath.Join(srcDir, ".cfignore"), []byte("/level1/level2"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+					})
 
-					Expect(gatheredResources).To(Equal(
-						[]Resource{
-							{Filename: "level1", Mode: DefaultFolderPermissions},
-							{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
-							{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
-						}))
+					It("excludes all patterns of files mentioned in .cfignore", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(gatheredResources).To(Equal(
+							[]Resource{
+								{Filename: "level1", Mode: DefaultFolderPermissions},
+								{Filename: "tmpFile2", SHA1: "e594bdc795bb293a0e55724137e53a36dc0d9e95", Size: 12, Mode: 0766},
+								{Filename: "tmpFile3", SHA1: "f4c9ca85f3e084ffad3abbdabbd2a890c034c879", Size: 10, Mode: 0766},
+							}))
+					})
 				})
 			})
 

@@ -24,6 +24,11 @@ var _ = Describe("Resource Actions", func() {
 		fakeConfig = new(sharedactionfakes.FakeConfig)
 		actor = NewActor(fakeConfig)
 
+		// Creates the following directory structure:
+		// level1/level2/tmpFile1
+		// tmpfile2
+		// tmpfile3
+
 		var err error
 		srcDir, err = ioutil.TempDir("", "v2-resource-actions")
 		Expect(err).ToNot(HaveOccurred())

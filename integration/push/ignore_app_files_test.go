@@ -47,24 +47,49 @@ var _ = Describe("ignoring files while gathering resources", func() {
 		})
 
 		Context("when the .cfignore file excludes some files", func() {
-			It("does not push those files", func() {
-				helpers.WithHelloWorldApp(func(dir string) {
-					file1 := filepath.Join(dir, "file1")
-					err := ioutil.WriteFile(file1, nil, 0666)
-					Expect(err).ToNot(HaveOccurred())
+			Context("ignored files are relative paths", func() {
+				It("does not push those files", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						file1 := filepath.Join(dir, "file1")
+						err := ioutil.WriteFile(file1, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-					file2 := filepath.Join(dir, "file2")
-					err = ioutil.WriteFile(file2, nil, 0666)
-					Expect(err).ToNot(HaveOccurred())
+						file2 := filepath.Join(dir, "file2")
+						err = ioutil.WriteFile(file2, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-					cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
-					err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
-					Expect(err).ToNot(HaveOccurred())
+						cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("file*"), 0666)
+						Expect(err).ToNot(HaveOccurred())
 
-					session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
 
-					Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
-					Eventually(session).Should(Exit(0))
+						Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+			})
+
+			Context("with absolute paths - where '/' == appDir", func() {
+				It("does not push those files", func() {
+					helpers.WithHelloWorldApp(func(dir string) {
+						file1 := filepath.Join(dir, "file1")
+						err := ioutil.WriteFile(file1, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						file2 := filepath.Join(dir, "file2")
+						err = ioutil.WriteFile(file2, nil, 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						cfIgnoreFilePath := filepath.Join(dir, ".cfignore")
+						err = ioutil.WriteFile(cfIgnoreFilePath, []byte("/file*"), 0666)
+						Expect(err).ToNot(HaveOccurred())
+
+						session := helpers.CustomCF(helpers.CFEnv{WorkingDirectory: dir}, PushCommandName, firstApp)
+
+						Eventually(session).Should(Say("28[0-9] B / 28[0-9] B"))
+						Eventually(session).Should(Exit(0))
+					})
 				})
 			})
 		})
