@@ -211,6 +211,10 @@ var _ = Describe("MergeAndValidateSettingsAndManifest", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
+		AfterEach(func() {
+			Expect(os.RemoveAll(tempDir)).ToNot(HaveOccurred())
+		})
+
 		JustBeforeEach(func() {
 			mergedApps, executeErr = actor.MergeAndValidateSettingsAndManifests(cmdSettings, apps)
 		})
