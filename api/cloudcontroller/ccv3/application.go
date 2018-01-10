@@ -12,60 +12,75 @@ import (
 
 // Application represents a Cloud Controller V3 Application.
 type Application struct {
-	Name          string                    `json:"name,omitempty"`
-	Relationships Relationships             `json:"relationships,omitempty"`
-	GUID          string                    `json:"guid,omitempty"`
-	State         constant.ApplicationState `json:"state,omitempty"`
-	Lifecycle     AppLifecycle              `json:"lifecycle,omitempty"`
-}
-
-type AppLifecycle struct {
-	Type constant.AppLifecycleType `json:"type,omitempty"`
-	Data AppLifecycleData          `json:"data,omitempty"`
-}
-
-type AppLifecycleData struct {
-	Buildpacks []string `json:"buildpacks,omitempty"`
+	Name                string                    `json:"name,omitempty"`
+	Relationships       Relationships             `json:"relationships,omitempty"`
+	GUID                string                    `json:"guid,omitempty"`
+	State               constant.ApplicationState `json:"state,omitempty"`
+	LifecycleType       constant.AppLifecycleType `json:"-"`
+	LifecycleBuildpacks []string                  `json:"-"`
 }
 
 func (a Application) MarshalJSON() ([]byte, error) {
+	type rawApp Application
 	var ccApp struct {
-		Name          string                 `json:"name,omitempty"`
-		Relationships Relationships          `json:"relationships,omitempty"`
-		Lifecycle     map[string]interface{} `json:"lifecycle,omitempty"`
+		Lifecycle map[string]interface{} `json:"lifecycle,omitempty"`
+
+		rawApp
 	}
 
-	ccApp.Name = a.Name
-	ccApp.Relationships = a.Relationships
+	ccApp.rawApp = (rawApp)(a)
 
-	switch a.Lifecycle.Type {
+	switch a.LifecycleType {
 	case constant.BuildpackAppLifecycleType:
-		if len(a.Lifecycle.Data.Buildpacks) > 0 {
-			switch a.Lifecycle.Data.Buildpacks[0] {
+		if len(a.LifecycleBuildpacks) > 0 {
+			ccApp.Lifecycle = map[string]interface{}{}
+			ccApp.Lifecycle["type"] = a.LifecycleType
+			ccApp.Lifecycle["data"] = map[string]interface{}{}
+			switch a.LifecycleBuildpacks[0] {
 			case "default", "null":
-				ccApp.Lifecycle = map[string]interface{}{
-					"type": a.Lifecycle.Type,
-					"data": map[string]interface{}{
-						"buildpacks": nil,
-					},
+				ccApp.Lifecycle["data"] = map[string][]string{
+					"buildpacks": nil,
 				}
 			default:
-				ccApp.Lifecycle = map[string]interface{}{
-					"type": a.Lifecycle.Type,
-					"data": map[string]interface{}{
-						"buildpacks": a.Lifecycle.Data.Buildpacks,
-					},
+				ccApp.Lifecycle["data"] = map[string][]string{
+					"buildpacks": a.LifecycleBuildpacks,
 				}
 			}
 		}
 	case constant.DockerAppLifecycleType:
-		ccApp.Lifecycle = map[string]interface{}{
-			"type": a.Lifecycle.Type,
-			"data": map[string]interface{}{},
+		ccApp.Lifecycle = map[string]interface{}{}
+		ccApp.Lifecycle["type"] = a.LifecycleType
+		ccApp.Lifecycle["data"] = map[string]interface{}{}
+	}
+
+	ccApp.GUID = ""
+	return json.Marshal(ccApp)
+}
+
+func (a *Application) UnmarshalJSON(data []byte) error {
+	type rawApp Application
+	var ccApp struct {
+		*rawApp
+
+		Lifecycle struct {
+			Type constant.AppLifecycleType
+			Data struct {
+				Buildpacks []string
+			}
 		}
 	}
 
-	return json.Marshal(ccApp)
+	ccApp.rawApp = (*rawApp)(a)
+
+	err := json.Unmarshal(data, &ccApp)
+	if err != nil {
+		return err
+	}
+
+	a.LifecycleType = ccApp.Lifecycle.Type
+	a.LifecycleBuildpacks = ccApp.Lifecycle.Data.Buildpacks
+
+	return nil
 }
 
 // DropletRelationship represents the relationship between a V3 Droplet and its

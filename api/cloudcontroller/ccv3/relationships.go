@@ -1,11 +1,6 @@
 package ccv3
 
-type RelationshipType string
-
-const (
-	ApplicationRelationship RelationshipType = "app"
-	SpaceRelationship       RelationshipType = "space"
-)
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 
 // Relationships is a map of RelationshipTypes to Relationship.
-type Relationships map[RelationshipType]Relationship
+type Relationships map[constant.RelationshipType]Relationship

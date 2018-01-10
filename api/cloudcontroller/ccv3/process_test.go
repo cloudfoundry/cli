@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -18,6 +19,111 @@ var _ = Describe("Process", func() {
 
 	BeforeEach(func() {
 		client = NewTestClient()
+	})
+	Describe("MarshalJSON", func() {
+		var (
+			process      Process
+			processBytes []byte
+			err          error
+		)
+
+		BeforeEach(func() {
+			process = Process{}
+		})
+
+		JustBeforeEach(func() {
+			processBytes, err = process.MarshalJSON()
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when health check type http is provided", func() {
+			BeforeEach(func() {
+				process = Process{
+					HealthCheckType:     "http",
+					HealthCheckEndpoint: "some-endpoint",
+				}
+			})
+
+			It("sets the health check type to http and has an endpoint", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`))
+			})
+		})
+
+		Context("when health check type port is provided", func() {
+			BeforeEach(func() {
+				process = Process{
+					HealthCheckType: "port",
+				}
+			})
+
+			It("sets the health check type to port", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`))
+			})
+		})
+
+		Context("when health check type process is provided", func() {
+			BeforeEach(func() {
+				process = Process{
+					HealthCheckType: "process",
+				}
+			})
+
+			It("sets the health check type to process", func() {
+				Expect(string(processBytes)).To(MatchJSON(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`))
+			})
+		})
+	})
+
+	Describe("UnmarshalJSON", func() {
+		var (
+			process      Process
+			processBytes []byte
+			err          error
+		)
+		BeforeEach(func() {
+			processBytes = []byte("{}")
+		})
+
+		JustBeforeEach(func() {
+			err = json.Unmarshal(processBytes, &process)
+			Expect(err).ToNot(HaveOccurred())
+		})
+		Context("when health check type http is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"health_check":{"type":"http", "data": {"endpoint": "some-endpoint"}}}`)
+			})
+
+			It("sets the health check type to http and has an endpoint", func() {
+				Expect(process).To(Equal(Process{
+					HealthCheckType:     "http",
+					HealthCheckEndpoint: "some-endpoint",
+				}))
+			})
+		})
+
+		Context("when health check type port is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"health_check":{"type":"port", "data": {"endpoint": null}}}`)
+			})
+
+			It("sets the health check type to port", func() {
+				Expect(process).To(Equal(Process{
+					HealthCheckType: "port",
+				}))
+			})
+		})
+
+		Context("when health check type process is provided", func() {
+			BeforeEach(func() {
+				processBytes = []byte(`{"health_check":{"type":"process", "data": {"endpoint": null}}}`)
+			})
+
+			It("sets the health check type to process", func() {
+				Expect(process).To(Equal(Process{
+					HealthCheckType: "process",
+				}))
+			})
+		})
 	})
 
 	Describe("GetApplicationProcesses", func() {
@@ -97,25 +203,23 @@ var _ = Describe("Process", func() {
 
 				Expect(processes).To(ConsistOf(
 					Process{
-						GUID:        "process-1-guid",
-						Type:        constant.ProcessTypeWeb,
-						MemoryInMB:  types.NullUint64{Value: 32, IsSet: true},
-						HealthCheck: ProcessHealthCheck{Type: "port"},
+						GUID:            "process-1-guid",
+						Type:            constant.ProcessTypeWeb,
+						MemoryInMB:      types.NullUint64{Value: 32, IsSet: true},
+						HealthCheckType: "port",
 					},
 					Process{
-						GUID:       "process-2-guid",
-						Type:       "worker",
-						MemoryInMB: types.NullUint64{Value: 64, IsSet: true},
-						HealthCheck: ProcessHealthCheck{
-							Type: "http",
-							Data: ProcessHealthCheckData{Endpoint: "/health"},
-						},
+						GUID:                "process-2-guid",
+						Type:                "worker",
+						MemoryInMB:          types.NullUint64{Value: 64, IsSet: true},
+						HealthCheckType:     "http",
+						HealthCheckEndpoint: "/health",
 					},
 					Process{
-						GUID:        "process-3-guid",
-						Type:        "console",
-						MemoryInMB:  types.NullUint64{Value: 128, IsSet: true},
-						HealthCheck: ProcessHealthCheck{Type: "process"},
+						GUID:            "process-3-guid",
+						Type:            "console",
+						MemoryInMB:      types.NullUint64{Value: 128, IsSet: true},
+						HealthCheckType: "process",
 					},
 				))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
@@ -185,12 +289,11 @@ var _ = Describe("Process", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf("this is a warning"))
 				Expect(process).To(Equal(Process{
-					GUID:       "process-1-guid",
-					Type:       "some-type",
-					MemoryInMB: types.NullUint64{Value: 32, IsSet: true},
-					HealthCheck: ProcessHealthCheck{
-						Type: "http",
-						Data: ProcessHealthCheckData{Endpoint: "/health"}},
+					GUID:                "process-1-guid",
+					Type:                "some-type",
+					MemoryInMB:          types.NullUint64{Value: 32, IsSet: true},
+					HealthCheckType:     "http",
+					HealthCheckEndpoint: "/health",
 				}))
 			})
 		})
@@ -311,12 +414,8 @@ var _ = Describe("Process", func() {
 
 				It("patches this process's health check", func() {
 					Expect(process).To(Equal(Process{
-						HealthCheck: ProcessHealthCheck{
-							Type: "some-type",
-							Data: ProcessHealthCheckData{
-								Endpoint: "some-endpoint",
-							},
-						},
+						HealthCheckType:     "some-type",
+						HealthCheckEndpoint: "some-endpoint",
 					}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
@@ -353,9 +452,7 @@ var _ = Describe("Process", func() {
 				})
 
 				It("patches this process's health check", func() {
-					Expect(process).To(Equal(Process{GUID: "some-process-guid", HealthCheck: ProcessHealthCheck{
-						Type: "some-type",
-					}}))
+					Expect(process).To(Equal(Process{GUID: "some-process-guid", HealthCheckType: "some-type"}))
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("this is a warning"))
 				})

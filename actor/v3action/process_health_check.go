@@ -58,8 +58,8 @@ func (actor Actor) GetApplicationProcessHealthChecksByNameAndSpace(appName strin
 	for _, ccv3Process := range ccv3Processes {
 		processHealthCheck := ProcessHealthCheck{
 			ProcessType:     ccv3Process.Type,
-			HealthCheckType: ccv3Process.HealthCheck.Type,
-			Endpoint:        ccv3Process.HealthCheck.Data.Endpoint,
+			HealthCheckType: ccv3Process.HealthCheckType,
+			Endpoint:        ccv3Process.HealthCheckEndpoint,
 		}
 		processHealthChecks = append(processHealthChecks, processHealthCheck)
 	}

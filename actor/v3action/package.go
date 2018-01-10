@@ -31,7 +31,7 @@ func (actor Actor) CreateDockerPackageByApplicationNameAndSpace(appName string, 
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeDocker,
 		Relationships: ccv3.Relationships{
-			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
+			constant.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
 		DockerImage:    dockerImageCredentials.Path,
 		DockerUsername: dockerImageCredentials.Username,
@@ -88,7 +88,7 @@ func (actor Actor) CreateAndUploadBitsPackageByApplicationNameAndSpace(appName s
 	inputPackage := ccv3.Package{
 		Type: constant.PackageTypeBits,
 		Relationships: ccv3.Relationships{
-			ccv3.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
+			constant.ApplicationRelationship: ccv3.Relationship{GUID: app.GUID},
 		},
 	}
 

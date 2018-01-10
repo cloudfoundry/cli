@@ -218,10 +218,10 @@ var _ = Describe("v3-app Command", func() {
 			fakeActor.GetApplicationSummaryByNameAndSpaceReturns(
 				v3action.ApplicationSummary{
 					Application: v3action.Application{
-						GUID:      "some-guid",
-						Name:      "some-app",
-						State:     constant.ApplicationStarted,
-						Lifecycle: v3action.AppLifecycle{Type: constant.DockerAppLifecycleType},
+						GUID:          "some-guid",
+						Name:          "some-app",
+						State:         constant.ApplicationStarted,
+						LifecycleType: constant.DockerAppLifecycleType,
 					},
 					CurrentDroplet: v3action.Droplet{
 						Image: "docker/some-image",

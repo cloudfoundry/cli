@@ -123,7 +123,7 @@ func (display AppSummaryDisplayer) displayAppTable(summary v3action.ApplicationS
 
 	var lifecycleInfo []string
 
-	if summary.Lifecycle.Type == constant.DockerAppLifecycleType {
+	if summary.LifecycleType == constant.DockerAppLifecycleType {
 		lifecycleInfo = []string{display.UI.TranslateText("docker image:"), summary.CurrentDroplet.Image}
 	} else {
 		lifecycleInfo = []string{display.UI.TranslateText("buildpacks:"), display.buildpackNames(summary.CurrentDroplet.Buildpacks)}

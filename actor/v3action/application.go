@@ -11,18 +11,12 @@ import (
 
 // Application represents a V3 actor application.
 type Application struct {
-	Name      string
-	GUID      string
-	State     constant.ApplicationState
-	Lifecycle AppLifecycle
+	Name                string
+	GUID                string
+	State               constant.ApplicationState
+	LifecycleType       constant.AppLifecycleType
+	LifecycleBuildpacks []string
 }
-
-type AppLifecycle struct {
-	Type constant.AppLifecycleType
-	Data AppLifecycleData
-}
-
-type AppLifecycleData ccv3.AppLifecycleData
 
 func (app Application) Started() bool {
 	return app.State == constant.ApplicationStarted
@@ -88,15 +82,11 @@ func (actor Actor) GetApplicationsBySpace(spaceGUID string) ([]Application, Warn
 func (actor Actor) CreateApplicationInSpace(app Application, spaceGUID string) (Application, Warnings, error) {
 	createdApp, warnings, err := actor.CloudControllerClient.CreateApplication(
 		ccv3.Application{
-			Name: app.Name,
+			LifecycleType:       app.LifecycleType,
+			LifecycleBuildpacks: app.LifecycleBuildpacks,
+			Name:                app.Name,
 			Relationships: ccv3.Relationships{
-				ccv3.SpaceRelationship: ccv3.Relationship{GUID: spaceGUID},
-			},
-			Lifecycle: ccv3.AppLifecycle{
-				Type: constant.AppLifecycleType(app.Lifecycle.Type),
-				Data: ccv3.AppLifecycleData{
-					Buildpacks: app.Lifecycle.Data.Buildpacks,
-				},
+				constant.SpaceRelationship: ccv3.Relationship{GUID: spaceGUID},
 			},
 		})
 
@@ -160,11 +150,9 @@ func (actor Actor) PollStart(appGUID string, warningsChannel chan<- Warnings) er
 // UpdateApplication updates the buildpacks on an application
 func (actor Actor) UpdateApplication(app Application) (Application, Warnings, error) {
 	ccApp := ccv3.Application{
-		GUID: app.GUID,
-		Lifecycle: ccv3.AppLifecycle{
-			Type: constant.AppLifecycleType(app.Lifecycle.Type),
-			Data: ccv3.AppLifecycleData(app.Lifecycle.Data),
-		},
+		GUID:                app.GUID,
+		LifecycleType:       app.LifecycleType,
+		LifecycleBuildpacks: app.LifecycleBuildpacks,
 	}
 
 	updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccApp)
@@ -177,13 +165,11 @@ func (actor Actor) UpdateApplication(app Application) (Application, Warnings, er
 
 func (Actor) convertCCToActorApplication(app ccv3.Application) Application {
 	return Application{
-		GUID: app.GUID,
-		Lifecycle: AppLifecycle{
-			Data: AppLifecycleData(app.Lifecycle.Data),
-			Type: constant.AppLifecycleType(app.Lifecycle.Type),
-		},
-		Name:  app.Name,
-		State: app.State,
+		GUID:                app.GUID,
+		LifecycleType:       app.LifecycleType,
+		LifecycleBuildpacks: app.LifecycleBuildpacks,
+		Name:                app.Name,
+		State:               app.State,
 	}
 }
 

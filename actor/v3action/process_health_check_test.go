@@ -128,22 +128,15 @@ var _ = Describe("Process Health Check Actions", func() {
 					fakeCloudControllerClient.GetApplicationProcessesReturns(
 						[]ccv3.Process{
 							{
-								GUID: "process-guid-1",
-								Type: "process-type-1",
-								HealthCheck: ccv3.ProcessHealthCheck{
-									Type: "health-check-type-1",
-									Data: ccv3.ProcessHealthCheckData{
-										Endpoint: "health-check-endpoint-1",
-									},
-								},
+								GUID:                "process-guid-1",
+								Type:                "process-type-1",
+								HealthCheckType:     "health-check-type-1",
+								HealthCheckEndpoint: "health-check-endpoint-1",
 							},
 							{
-								GUID: "process-guid-2",
-								Type: "process-type-2",
-								HealthCheck: ccv3.ProcessHealthCheck{
-									Type: "health-check-type-2",
-									Data: ccv3.ProcessHealthCheckData{},
-								},
+								GUID:            "process-guid-2",
+								Type:            "process-type-2",
+								HealthCheckType: "health-check-type-2",
 							},
 						},
 						ccv3.Warnings{"some-process-warning"},

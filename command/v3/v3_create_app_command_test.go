@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v3action"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -128,10 +129,8 @@ var _ = Describe("v3-create-app Command", func() {
 
 					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 					Expect(createApp).To(Equal(v3action.Application{
-						Name: app,
-						Lifecycle: v3action.AppLifecycle{
-							Type: "docker",
-						},
+						Name:          app,
+						LifecycleType: constant.DockerAppLifecycleType,
 					}))
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})

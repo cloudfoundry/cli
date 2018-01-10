@@ -254,16 +254,10 @@ func (cmd V3PushCommand) createApplication(userName string) (v3action.Applicatio
 	}
 
 	if cmd.DockerImage.Path != "" {
-		appToCreate.Lifecycle = v3action.AppLifecycle{
-			Type: constant.DockerAppLifecycleType,
-		}
+		appToCreate.LifecycleType = constant.DockerAppLifecycleType
 	} else {
-		appToCreate.Lifecycle = v3action.AppLifecycle{
-			Type: constant.BuildpackAppLifecycleType,
-			Data: v3action.AppLifecycleData{
-				Buildpacks: cmd.Buildpacks,
-			},
-		}
+		appToCreate.LifecycleType = constant.BuildpackAppLifecycleType
+		appToCreate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 
 	app, warnings, err := cmd.Actor.CreateApplicationInSpace(
@@ -310,16 +304,11 @@ func (cmd V3PushCommand) updateApplication(userName string, appGUID string) (v3a
 	}
 
 	if cmd.DockerImage.Path != "" {
-		appToUpdate.Lifecycle = v3action.AppLifecycle{
-			Type: constant.DockerAppLifecycleType,
-		}
+		appToUpdate.LifecycleType = constant.DockerAppLifecycleType
+
 	} else {
-		appToUpdate.Lifecycle = v3action.AppLifecycle{
-			Type: constant.BuildpackAppLifecycleType,
-			Data: v3action.AppLifecycleData{
-				Buildpacks: cmd.Buildpacks,
-			},
-		}
+		appToUpdate.LifecycleType = constant.BuildpackAppLifecycleType
+		appToUpdate.LifecycleBuildpacks = cmd.Buildpacks
 	}
 
 	app, warnings, err := cmd.Actor.UpdateApplication(appToUpdate)

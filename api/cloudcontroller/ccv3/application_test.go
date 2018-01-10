@@ -1,6 +1,7 @@
 package ccv3_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -26,6 +27,10 @@ var _ = Describe("Application", func() {
 			err      error
 		)
 
+		BeforeEach(func() {
+			app = Application{}
+		})
+
 		JustBeforeEach(func() {
 			appBytes, err = app.MarshalJSON()
 			Expect(err).ToNot(HaveOccurred())
@@ -44,9 +49,7 @@ var _ = Describe("Application", func() {
 		Context("when lifecycle type docker is provided", func() {
 			BeforeEach(func() {
 				app = Application{
-					Lifecycle: AppLifecycle{
-						Type: constant.DockerAppLifecycleType,
-					},
+					LifecycleType: constant.DockerAppLifecycleType,
 				}
 			})
 
@@ -56,15 +59,11 @@ var _ = Describe("Application", func() {
 		})
 
 		Context("when lifecycle type buildpack is provided", func() {
-			Context("when no buildpacks are provided", func() {
-				BeforeEach(func() {
-					app = Application{
-						Lifecycle: AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-						},
-					}
-				})
+			BeforeEach(func() {
+				app.LifecycleType = constant.BuildpackAppLifecycleType
+			})
 
+			Context("when no buildpacks are provided", func() {
 				It("omits the lifecycle from the JSON", func() {
 					Expect(string(appBytes)).To(Equal("{}"))
 				})
@@ -72,14 +71,7 @@ var _ = Describe("Application", func() {
 
 			Context("when default buildpack is provided", func() {
 				BeforeEach(func() {
-					app = Application{
-						Lifecycle: AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-							Data: AppLifecycleData{
-								Buildpacks: []string{"default"},
-							},
-						},
-					}
+					app.LifecycleBuildpacks = []string{"default"}
 				})
 
 				It("sets the lifecycle buildpack to be empty in the JSON", func() {
@@ -89,14 +81,7 @@ var _ = Describe("Application", func() {
 
 			Context("when null buildpack is provided", func() {
 				BeforeEach(func() {
-					app = Application{
-						Lifecycle: AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-							Data: AppLifecycleData{
-								Buildpacks: []string{"null"},
-							},
-						},
-					}
+					app.LifecycleBuildpacks = []string{"null"}
 				})
 
 				It("sets the Lifecycle buildpack to be empty in the JSON", func() {
@@ -106,18 +91,65 @@ var _ = Describe("Application", func() {
 
 			Context("when other buildpacks are provided", func() {
 				BeforeEach(func() {
-					app = Application{
-						Lifecycle: AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-							Data: AppLifecycleData{
-								Buildpacks: []string{"some-buildpack"},
-							},
-						},
-					}
+					app.LifecycleBuildpacks = []string{"some-buildpack"}
 				})
 
 				It("sets them in the JSON", func() {
 					Expect(string(appBytes)).To(Equal(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`))
+				})
+			})
+		})
+	})
+
+	Describe("UnmarshalJSON", func() {
+		var (
+			app      Application
+			appBytes []byte
+			err      error
+		)
+
+		BeforeEach(func() {
+			appBytes = []byte("{}")
+		})
+
+		JustBeforeEach(func() {
+			err = json.Unmarshal(appBytes, &app)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("when no lifecycle is provided", func() {
+			BeforeEach(func() {
+				appBytes = []byte("{}")
+			})
+
+			It("omits the lifecycle from the JSON", func() {
+				Expect(app).To(Equal(Application{}))
+			})
+		})
+
+		Context("when lifecycle type docker is provided", func() {
+			BeforeEach(func() {
+				appBytes = []byte(`{"lifecycle":{"type":"docker","data":{}}}`)
+			})
+			It("sets the lifecycle type to docker with empty data", func() {
+				Expect(app).To(Equal(Application{
+					LifecycleType: constant.DockerAppLifecycleType,
+				}))
+			})
+		})
+
+		Context("when lifecycle type buildpack is provided", func() {
+
+			Context("when other buildpacks are provided", func() {
+				BeforeEach(func() {
+					appBytes = []byte(`{"lifecycle":{"data":{"buildpacks":["some-buildpack"]},"type":"buildpack"}}`)
+				})
+
+				It("sets them in the JSON", func() {
+					Expect(app).To(Equal(Application{
+						LifecycleType:       constant.BuildpackAppLifecycleType,
+						LifecycleBuildpacks: []string{"some-buildpack"},
+					}))
 				})
 			})
 		})
@@ -184,14 +216,10 @@ var _ = Describe("Application", func() {
 
 				Expect(apps).To(ConsistOf(
 					Application{
-						Name: "app-name-1",
-						GUID: "app-guid-1",
-						Lifecycle: AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-							Data: AppLifecycleData{
-								Buildpacks: []string{"some-buildpack"},
-							},
-						},
+						Name:                "app-name-1",
+						GUID:                "app-guid-1",
+						LifecycleType:       constant.BuildpackAppLifecycleType,
+						LifecycleBuildpacks: []string{"some-buildpack"},
 					},
 					Application{Name: "app-name-2", GUID: "app-guid-2"},
 					Application{Name: "app-name-3", GUID: "app-guid-3"},
@@ -283,16 +311,12 @@ var _ = Describe("Application", func() {
 
 			It("returns the updated app and warnings", func() {
 				app, warnings, err := client.UpdateApplication(Application{
-					GUID: "some-app-guid",
-					Name: "some-app-name",
-					Lifecycle: AppLifecycle{
-						Type: constant.BuildpackAppLifecycleType,
-						Data: AppLifecycleData{
-							Buildpacks: []string{"some-buildpack"},
-						},
-					},
+					GUID:                "some-app-guid",
+					Name:                "some-app-name",
+					LifecycleType:       constant.BuildpackAppLifecycleType,
+					LifecycleBuildpacks: []string{"some-buildpack"},
 					Relationships: Relationships{
-						SpaceRelationship: Relationship{GUID: "some-space-guid"},
+						constant.SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
 				})
 
@@ -385,7 +409,7 @@ var _ = Describe("Application", func() {
 				app, warnings, err := client.CreateApplication(Application{
 					Name: "some-app-name",
 					Relationships: Relationships{
-						SpaceRelationship: Relationship{GUID: "some-space-guid"},
+						constant.SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
 				})
 
@@ -439,15 +463,11 @@ var _ = Describe("Application", func() {
 
 			It("returns the created app and warnings", func() {
 				app, warnings, err := client.CreateApplication(Application{
-					Name: "some-app-name",
-					Lifecycle: AppLifecycle{
-						Type: constant.BuildpackAppLifecycleType,
-						Data: AppLifecycleData{
-							Buildpacks: []string{"some-buildpack"},
-						},
-					},
+					Name:                "some-app-name",
+					LifecycleType:       constant.BuildpackAppLifecycleType,
+					LifecycleBuildpacks: []string{"some-buildpack"},
 					Relationships: Relationships{
-						SpaceRelationship: Relationship{GUID: "some-space-guid"},
+						constant.SpaceRelationship: Relationship{GUID: "some-space-guid"},
 					},
 				})
 
@@ -455,14 +475,10 @@ var _ = Describe("Application", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 
 				Expect(app).To(Equal(Application{
-					Name: "some-app-name",
-					GUID: "some-app-guid",
-					Lifecycle: AppLifecycle{
-						Type: constant.BuildpackAppLifecycleType,
-						Data: AppLifecycleData{
-							Buildpacks: []string{"some-buildpack"},
-						},
-					},
+					Name:                "some-app-name",
+					GUID:                "some-app-guid",
+					LifecycleType:       constant.BuildpackAppLifecycleType,
+					LifecycleBuildpacks: []string{"some-buildpack"},
 				}))
 			})
 		})

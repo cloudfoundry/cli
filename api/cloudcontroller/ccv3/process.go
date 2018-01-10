@@ -12,21 +12,13 @@ import (
 )
 
 type Process struct {
-	GUID        string             `json:"guid"`
-	Type        string             `json:"type"`
-	HealthCheck ProcessHealthCheck `json:"health_check"`
-	Instances   types.NullInt      `json:"instances"`
-	MemoryInMB  types.NullUint64   `json:"memory_in_mb"`
-	DiskInMB    types.NullUint64   `json:"disk_in_mb"`
-}
-
-type ProcessHealthCheck struct {
-	Type string                 `json:"type"`
-	Data ProcessHealthCheckData `json:"data"`
-}
-
-type ProcessHealthCheckData struct {
-	Endpoint string `json:"endpoint"`
+	GUID                string           `json:"guid"`
+	Type                string           `json:"type"`
+	HealthCheckType     string           `json:"-"`
+	HealthCheckEndpoint string           `json:"-"`
+	Instances           types.NullInt    `json:"instances"`
+	MemoryInMB          types.NullUint64 `json:"memory_in_mb"`
+	DiskInMB            types.NullUint64 `json:"disk_in_mb"`
 }
 
 func (p Process) MarshalJSON() ([]byte, error) {
@@ -39,11 +31,34 @@ func (p Process) MarshalJSON() ([]byte, error) {
 		} `json:"health_check"`
 	}
 
-	ccProcess.HealthCheck.Type = p.HealthCheck.Type
-	if p.HealthCheck.Data.Endpoint != "" {
-		ccProcess.HealthCheck.Data.Endpoint = p.HealthCheck.Data.Endpoint
+	ccProcess.HealthCheck.Type = p.HealthCheckType
+	if p.HealthCheckEndpoint != "" {
+		ccProcess.HealthCheck.Data.Endpoint = p.HealthCheckEndpoint
 	}
 	return json.Marshal(ccProcess)
+}
+
+func (p *Process) UnmarshalJSON(data []byte) error {
+	type rawProcess Process
+	var ccProcess struct {
+		*rawProcess
+
+		HealthCheck struct {
+			Type string `json:"type"`
+			Data struct {
+				Endpoint string `json:"endpoint"`
+			} `json:"data"`
+		} `json:"health_check"`
+	}
+
+	ccProcess.rawProcess = (*rawProcess)(p)
+	if err := json.Unmarshal(data, &ccProcess); err != nil {
+		return err
+	}
+
+	p.HealthCheckEndpoint = ccProcess.HealthCheck.Data.Endpoint
+	p.HealthCheckType = ccProcess.HealthCheck.Type
+	return nil
 }
 
 // GetApplicationProcesses lists processes for a given app
@@ -96,11 +111,9 @@ func (client *Client) GetApplicationProcessByType(appGUID string, processType st
 // PatchApplicationProcessHealthCheck updates application health check type
 func (client *Client) PatchApplicationProcessHealthCheck(processGUID string, processHealthCheckType string, processHealthCheckEndpoint string) (Process, Warnings, error) {
 	body, err := json.Marshal(Process{
-		HealthCheck: ProcessHealthCheck{
-			Type: processHealthCheckType,
-			Data: ProcessHealthCheckData{
-				Endpoint: processHealthCheckEndpoint,
-			}}})
+		HealthCheckType:     processHealthCheckType,
+		HealthCheckEndpoint: processHealthCheckEndpoint,
+	})
 	if err != nil {
 		return Process{}, nil, err
 	}

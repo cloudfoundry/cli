@@ -206,7 +206,7 @@ var _ = Describe("Package Actions", func() {
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
 						Relationships: ccv3.Relationships{
-							ccv3.ApplicationRelationship: ccv3.Relationship{
+							constant.ApplicationRelationship: ccv3.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -230,7 +230,7 @@ var _ = Describe("Package Actions", func() {
 						GUID:           "some-pkg-guid",
 						State:          constant.PackageReady,
 						Relationships: ccv3.Relationships{
-							ccv3.ApplicationRelationship: ccv3.Relationship{
+							constant.ApplicationRelationship: ccv3.Relationship{
 								GUID: "some-app-guid",
 							},
 						},
@@ -250,7 +250,7 @@ var _ = Describe("Package Actions", func() {
 						DockerUsername: "some-username",
 						DockerPassword: "some-password",
 						Relationships: ccv3.Relationships{
-							ccv3.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
+							constant.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
 						},
 					}))
 				})
@@ -387,7 +387,7 @@ var _ = Describe("Package Actions", func() {
 									GUID:  "some-pkg-guid",
 									State: constant.PackageAwaitingUpload,
 									Relationships: ccv3.Relationships{
-										ccv3.ApplicationRelationship: ccv3.Relationship{
+										constant.ApplicationRelationship: ccv3.Relationship{
 											GUID: "some-app-guid",
 										},
 									},
@@ -472,7 +472,7 @@ var _ = Describe("Package Actions", func() {
 										Expect(inputPackage).To(Equal(ccv3.Package{
 											Type: constant.PackageTypeBits,
 											Relationships: ccv3.Relationships{
-												ccv3.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
+												constant.ApplicationRelationship: ccv3.Relationship{GUID: "some-app-guid"},
 											},
 										}))
 									})

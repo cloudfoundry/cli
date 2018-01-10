@@ -2,7 +2,6 @@ package v3action
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/constant"
 )
 
 type ApplicationWithProcessSummary struct {
@@ -33,13 +32,11 @@ func (actor Actor) GetApplicationsWithProcessesBySpace(spaceGUID string) ([]Appl
 
 		appSummaries = append(appSummaries, ApplicationWithProcessSummary{
 			Application: Application{
-				Name:  app.Name,
-				GUID:  app.GUID,
-				State: app.State,
-				Lifecycle: AppLifecycle{
-					Type: constant.AppLifecycleType(app.Lifecycle.Type),
-					Data: AppLifecycleData(app.Lifecycle.Data),
-				},
+				Name:                app.Name,
+				GUID:                app.GUID,
+				State:               app.State,
+				LifecycleType:       app.LifecycleType,
+				LifecycleBuildpacks: app.LifecycleBuildpacks,
 			},
 			ProcessSummaries: processSummaries,
 		})

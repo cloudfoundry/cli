@@ -247,10 +247,8 @@ var _ = Describe("v3-push Command", func() {
 					Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
 					createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 					Expect(createApp).To(Equal(v3action.Application{
-						Name: "some-app",
-						Lifecycle: v3action.AppLifecycle{
-							Type: constant.BuildpackAppLifecycleType,
-						},
+						Name:          "some-app",
+						LifecycleType: constant.BuildpackAppLifecycleType,
 					}))
 					Expect(createSpaceGUID).To(Equal("some-space-guid"))
 				})
@@ -534,13 +532,9 @@ var _ = Describe("v3-push Command", func() {
 										Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
 										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 										Expect(createApp).To(Equal(v3action.Application{
-											Name: "some-app",
-											Lifecycle: v3action.AppLifecycle{
-												Type: constant.BuildpackAppLifecycleType,
-												Data: v3action.AppLifecycleData{
-													Buildpacks: []string{"some-buildpack"},
-												},
-											},
+											Name:                "some-app",
+											LifecycleType:       constant.BuildpackAppLifecycleType,
+											LifecycleBuildpacks: []string{"some-buildpack"},
 										}))
 										Expect(createSpaceGUID).To(Equal("some-space-guid"))
 									})
@@ -555,11 +549,8 @@ var _ = Describe("v3-push Command", func() {
 										Expect(fakeActor.CreateApplicationInSpaceCallCount()).To(Equal(1), "Expected CreateApplicationInSpace to be called once")
 										createApp, createSpaceGUID := fakeActor.CreateApplicationInSpaceArgsForCall(0)
 										Expect(createApp).To(Equal(v3action.Application{
-											Name: "some-app",
-											Lifecycle: v3action.AppLifecycle{
-												Type: constant.DockerAppLifecycleType,
-												Data: v3action.AppLifecycleData{},
-											},
+											Name:          "some-app",
+											LifecycleType: constant.DockerAppLifecycleType,
 										}))
 										Expect(createSpaceGUID).To(Equal("some-space-guid"))
 									})
@@ -857,11 +848,8 @@ var _ = Describe("v3-push Command", func() {
 					Expect(fakeActor.UpdateApplicationCallCount()).To(Equal(1), "Expected UpdateApplication to be called once")
 					updateApp := fakeActor.UpdateApplicationArgsForCall(0)
 					Expect(updateApp).To(Equal(v3action.Application{
-						GUID: "some-app-guid",
-						Lifecycle: v3action.AppLifecycle{
-							Type: constant.DockerAppLifecycleType,
-							Data: v3action.AppLifecycleData{},
-						},
+						GUID:          "some-app-guid",
+						LifecycleType: constant.DockerAppLifecycleType,
 					}))
 				})
 			})
@@ -875,13 +863,9 @@ var _ = Describe("v3-push Command", func() {
 					It("does not update the buildpack", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
-							GUID: "some-app-guid",
-							Lifecycle: v3action.AppLifecycle{
-								Type: constant.BuildpackAppLifecycleType,
-								Data: v3action.AppLifecycleData{
-									Buildpacks: []string{},
-								},
-							},
+							GUID:                "some-app-guid",
+							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleBuildpacks: []string{},
 						}))
 					})
 				})
@@ -894,13 +878,9 @@ var _ = Describe("v3-push Command", func() {
 					It("updates the buildpack", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
-							GUID: "some-app-guid",
-							Lifecycle: v3action.AppLifecycle{
-								Type: constant.BuildpackAppLifecycleType,
-								Data: v3action.AppLifecycleData{
-									Buildpacks: []string{"some-buildpack"},
-								},
-							},
+							GUID:                "some-app-guid",
+							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleBuildpacks: []string{"some-buildpack"},
 						}))
 					})
 				})
@@ -913,13 +893,9 @@ var _ = Describe("v3-push Command", func() {
 					It("updates the buildpacks", func() {
 						appArg := fakeActor.UpdateApplicationArgsForCall(0)
 						Expect(appArg).To(Equal(v3action.Application{
-							GUID: "some-app-guid",
-							Lifecycle: v3action.AppLifecycle{
-								Type: constant.BuildpackAppLifecycleType,
-								Data: v3action.AppLifecycleData{
-									Buildpacks: []string{"some-buildpack-1", "some-buildpack-2"},
-								},
-							},
+							GUID:                "some-app-guid",
+							LifecycleType:       constant.BuildpackAppLifecycleType,
+							LifecycleBuildpacks: []string{"some-buildpack-1", "some-buildpack-2"},
 						}))
 					})
 

@@ -79,10 +79,8 @@ func (cmd V3CreateAppCommand) Execute(args []string) error {
 
 	_, warnings, err := cmd.Actor.CreateApplicationInSpace(
 		v3action.Application{
-			Name: cmd.RequiredArgs.AppName,
-			Lifecycle: v3action.AppLifecycle{
-				Type: constant.AppLifecycleType(cmd.AppType),
-			},
+			Name:          cmd.RequiredArgs.AppName,
+			LifecycleType: constant.AppLifecycleType(cmd.AppType),
 		},
 		cmd.Config.TargetedSpace().GUID,
 	)
