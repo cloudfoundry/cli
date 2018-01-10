@@ -41,6 +41,8 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 										"key1": "val1",
 										"key2": 2,
 										"key3": true,
+										"key4": 123412341234,
+										"key5": 123456789.12345678,
 									},
 									"instances":                  2,
 									"memory":                     "70M",
@@ -71,6 +73,8 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 						Eventually(session).Should(Say("\\+\\s+key1"))
 						Eventually(session).Should(Say("\\+\\s+key2"))
 						Eventually(session).Should(Say("\\+\\s+key3"))
+						Eventually(session).Should(Say("\\+\\s+key4"))
+						Eventually(session).Should(Say("\\+\\s+key5"))
 						Eventually(session).Should(Say("\\s+routes:"))
 						Eventually(session).Should(Say("(?i)\\+\\s+%s.%s", appName, defaultSharedDomain()))
 						Eventually(session).Should(Say("Mapping routes\\.\\.\\."))
@@ -91,6 +95,14 @@ var _ = Describe("push with a simple manifest and no flags", func() {
 					Eventually(session).Should(Say("stack:\\s+cflinuxfs2"))
 					Eventually(session).Should(Say("buildpack:\\s+staticfile_buildpack"))
 					Eventually(session).Should(Say("#0.* of 70M"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("env", appName)
+					Eventually(session).Should(Say("key1:\\s+val1"))
+					Eventually(session).Should(Say("key2:\\s+2"))
+					Eventually(session).Should(Say("key3:\\s+true"))
+					Eventually(session).Should(Say("key4:\\s+123412341234"))
+					Eventually(session).Should(Say("key5:\\s+123456789.12345678"))
 					Eventually(session).Should(Exit(0))
 				})
 

@@ -44,7 +44,6 @@ var _ = Describe("ssh command", func() {
 			domainName       string
 			orgName          string
 			spaceName        string
-			tcpDomain        helpers.Domain
 		)
 
 		BeforeEach(func() {
@@ -56,8 +55,6 @@ var _ = Describe("ssh command", func() {
 			setupCF(orgName, spaceName)
 			appName = helpers.PrefixedRandomName("app")
 			domainName = defaultSharedDomain()
-			tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
-			tcpDomain.CreateWithRouterGroup(helpers.FindOrCreateTCPRouterGroup(GinkgoParallelNode()))
 			helpers.WithHelloWorldApp(func(appDir string) {
 				manifestContents := []byte(fmt.Sprintf(`
 ---
@@ -68,8 +65,7 @@ applications:
   disk_quota: 128M
   routes:
   - route: %s.%s
-  - route: %s:0
-`, appName, appName, domainName, tcpDomain.Name))
+`, appName, appName, domainName))
 				manifestPath := filepath.Join(appDir, "manifest.yml")
 				err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
 				Expect(err).ToNot(HaveOccurred())
