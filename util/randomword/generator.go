@@ -175,13 +175,13 @@ sable
 serval
 shark
 sitatunga
+snake
 springhare
 squirrel
-sugar-glider
 swan
-tasmanian-devil
 tiger
 topi
+toucan
 turtle
 wallaby
 warthog
