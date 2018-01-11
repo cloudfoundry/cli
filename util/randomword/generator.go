@@ -156,6 +156,7 @@ oribi
 oryx
 ostrich
 otter
+panda
 pangolin
 panther
 parrot
@@ -175,7 +176,6 @@ sable
 serval
 shark
 sitatunga
-snake
 springhare
 squirrel
 swan
