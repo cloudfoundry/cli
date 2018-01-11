@@ -50,7 +50,12 @@ var _ = Describe("Resource Actions", func() {
 		relativePath, err := filepath.Rel(srcDir, subDir)
 		Expect(err).ToNot(HaveOccurred())
 
+		// ./symlink -> ./level1/level2/tmpfile1
 		err = os.Symlink(filepath.Join(relativePath, "tmpFile1"), filepath.Join(srcDir, "symlink1"))
+		Expect(err).ToNot(HaveOccurred())
+
+		// ./level1/level2/symlink2 -> ../../tmpfile2
+		err = os.Symlink("../../tmpfile2", filepath.Join(subDir, "symlink2"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -144,6 +149,7 @@ var _ = Describe("Resource Actions", func() {
 						{Filename: "/level1/level2/"},
 						{Filename: "/level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
 						{Filename: "/symlink1", Mode: os.ModeSymlink | 0777},
+						{Filename: "/level1/level2/symlink2", Mode: os.ModeSymlink | 0777},
 					}
 				})
 
@@ -161,16 +167,20 @@ var _ = Describe("Resource Actions", func() {
 					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(reader.File).To(HaveLen(5))
+					Expect(reader.File).To(HaveLen(6))
 					Expect(reader.File[0].Name).To(Equal("/"))
 					Expect(reader.File[1].Name).To(Equal("/level1/"))
 					Expect(reader.File[2].Name).To(Equal("/level1/level2/"))
-					Expect(reader.File[3].Name).To(Equal("/level1/level2/tmpFile1"))
-					Expect(reader.File[4].Name).To(Equal("/symlink1"))
+					Expect(reader.File[3].Name).To(Equal("/level1/level2/symlink2"))
+					Expect(reader.File[4].Name).To(Equal("/level1/level2/tmpFile1"))
+					Expect(reader.File[5].Name).To(Equal("/symlink1"))
 
-					expectFileContentsToEqual(reader.File[3], "why hello")
-					Expect(reader.File[4].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
-					expectFileContentsToEqual(reader.File[4], filepath.FromSlash("level1/level2/tmpFile1"))
+					expectFileContentsToEqual(reader.File[4], "why hello")
+					Expect(reader.File[5].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
+					expectFileContentsToEqual(reader.File[5], filepath.FromSlash("level1/level2/tmpFile1"))
+
+					Expect(reader.File[3].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
+					expectFileContentsToEqual(reader.File[3], filepath.FromSlash("../../tmpfile2"))
 				})
 			})
 		})
@@ -258,6 +268,7 @@ var _ = Describe("Resource Actions", func() {
 						{Filename: "level1/level2"},
 						{Filename: "level1/level2/tmpFile1", SHA1: "9e36efec86d571de3a38389ea799a796fe4782f4"},
 						{Filename: "symlink1", Mode: os.ModeSymlink},
+						{Filename: "level1/level2/symlink2", Mode: os.ModeSymlink},
 					}
 				})
 
@@ -275,15 +286,19 @@ var _ = Describe("Resource Actions", func() {
 					reader, err := ykk.NewReader(zipFile, zipInfo.Size())
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(reader.File).To(HaveLen(4))
+					Expect(reader.File).To(HaveLen(5))
 					Expect(reader.File[0].Name).To(Equal("level1/"))
 					Expect(reader.File[1].Name).To(Equal("level1/level2/"))
 					Expect(reader.File[2].Name).To(Equal("level1/level2/tmpFile1"))
 					Expect(reader.File[3].Name).To(Equal("symlink1"))
+					Expect(reader.File[4].Name).To(Equal("level1/level2/symlink2"))
 
 					expectFileContentsToEqual(reader.File[2], "why hello")
 					Expect(reader.File[3].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
 					expectFileContentsToEqual(reader.File[3], filepath.FromSlash("level1/level2/tmpFile1"))
+
+					Expect(reader.File[4].Mode() & os.ModeSymlink).To(Equal(os.ModeSymlink))
+					expectFileContentsToEqual(reader.File[4], filepath.FromSlash("../../tmpfile2"))
 				})
 			})
 		})
