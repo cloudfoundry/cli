@@ -69,7 +69,7 @@ jobs:
   - task: setup-infrastructure
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
       ops-files: state
     params:
       BBL_IAAS: gcp
@@ -104,7 +104,7 @@ jobs:
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/hardknox
@@ -118,7 +118,7 @@ jobs:
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
       vars-store: cf-state
       vars-files: cf-state
       ops-files: combine_inputs_output
@@ -135,7 +135,7 @@ jobs:
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/hardknox
       CLEAN_ALL: true
@@ -151,7 +151,7 @@ jobs:
   - task: smoke-tests
     file: cli-ci/ci/infrastructure/tasks/cf-smoke-tests.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
       cli-infrastructure-tasks: cli-ci
     params:
       BBL_STATE_DIR: ci/infrastructure/hardknox
@@ -166,7 +166,7 @@ jobs:
   - task: delete-cf-deployment
     file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/hardknox
 
@@ -180,7 +180,7 @@ jobs:
   - task: destroy-infrastructure
     file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/hardknox
     ensure:

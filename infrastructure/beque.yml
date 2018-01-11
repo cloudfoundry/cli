@@ -69,7 +69,7 @@ jobs:
     file: cf-deployment-concourse-tasks/bbl-up/task.yml
     input_mapping:
       ops-files: state
-      bbl-state: state
+      env-repo: state
     params:
       BBL_IAAS: gcp
       BBL_GCP_SERVICE_ACCOUNT_KEY: {{google_account_creds}}
@@ -103,7 +103,7 @@ jobs:
   - task: upload-stemcell
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/beque
@@ -117,7 +117,7 @@ jobs:
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
       vars-store: cf-state
       vars-files: cf-state
       ops-files: combine_inputs_output
@@ -134,7 +134,7 @@ jobs:
   - task: bosh-cleanup
     file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/beque
       CLEAN_ALL: true
@@ -149,7 +149,7 @@ jobs:
   - task: delete-cf-deployment
     file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/beque
 
@@ -163,7 +163,7 @@ jobs:
   - task: destroy-infrastructure
     file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
     input_mapping:
-      bbl-state: state
+      env-repo: state
     params:
       BBL_STATE_DIR: ci/infrastructure/beque
     ensure:
