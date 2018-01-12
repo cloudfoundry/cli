@@ -179,13 +179,13 @@
   branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [".","config","extensions/table","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
-  revision = "652e15c9a27e1cec563e065568014f29eecf6bd9"
+  revision = "6c46eb8334b30dc55b42f1a1c725d5ce97375390"
 
 [[projects]]
-  branch = "master"
   name = "github.com/onsi/gomega"
   packages = [".","format","gbytes","gexec","ghttp","internal/assertion","internal/asyncassertion","internal/oraclematcher","internal/testingtsupport","matchers","matchers/support/goraph/bipartitegraph","matchers/support/goraph/edge","matchers/support/goraph/node","matchers/support/goraph/util","types"]
-  revision = "1eecca0ba8e6f5ea5a431ce21d3aee2af0b4c90b"
+  revision = "003f63b7f4cff3fc95357005358af2de0f5fe152"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/opencontainers/go-digest"
