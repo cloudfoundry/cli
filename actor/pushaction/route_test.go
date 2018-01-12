@@ -912,12 +912,16 @@ var _ = Describe("Routes", func() {
 				})
 
 				Context("when the app name is partially sanitized", func() {
+					BeforeEach(func() {
+						manifestApp.Name = "a--b"
+					})
+
 					It("generates a route whose hostname is a sanitized app name and two randomly generated words", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 						Expect(randomRoute).To(Equal(v2action.Route{
 							Domain:    domain,
 							SpaceGUID: spaceGUID,
-							Host:      "some-app-name-striped-apple",
+							Host:      "a--b-striped-apple",
 						}))
 						Expect(warnings).To(ConsistOf("some-organization-domain-warning"))
 					})

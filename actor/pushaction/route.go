@@ -452,10 +452,7 @@ func (Actor) sanitize(name string) string {
 	re = regexp.MustCompile("[^[:alnum:]\\-]")
 	name = re.ReplaceAllString(name, "")
 
-	re = regexp.MustCompile("-+")
-	name = re.ReplaceAllString(name, "-")
-
-	return strings.Trim(name, "-")
+	return strings.TrimLeft(name, "-")
 }
 
 func (actor Actor) splitExistingRoutes(routes []string, existingRoutes []v2action.Route) ([]v2action.Route, []string) {
