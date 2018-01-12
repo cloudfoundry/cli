@@ -8,7 +8,7 @@ image_resource:
     tag: v3.13.0
 
 inputs:
-- name: bbl-state  # - The Director's `bbl-state.json`
+- name: env-repo  # - The Director's `bbl-state.json`
 - name: cf-deployment-concourse-tasks  # - councourse helpers repo
 - name: cli-infrastructure-tasks  # - This repo
 
@@ -20,5 +20,5 @@ params:
   BBL_STATE_DIR:
   # - Optional
   # - Path to the directory containing the `bbl-state.json` file
-  # - The path is relative to root of the `bbl-state` input
-  # - Defaults to the root of the `bbl-state` input
+  # - The path is relative to root of the `env-repo` input
+  # - Defaults to the root of the `env-repo` input
