@@ -84,7 +84,7 @@ jobs:
     ensure:
       put: state
       params:
-        repository: updated-bbl-state
+        repository: updated-env-repo
         rebase: true
 
 - name: deploy-cf
@@ -169,5 +169,5 @@ jobs:
     ensure:
       put: state
       params:
-        repository: updated-bbl-state
+        repository: updated-env-repo
         rebase: true
