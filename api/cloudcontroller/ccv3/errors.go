@@ -30,32 +30,19 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 	err := e.connection.Make(request, passedResponse)
 
 	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {
-		return convert(rawHTTPStatusErr)
+		if rawHTTPStatusErr.StatusCode >= http.StatusInternalServerError {
+			return convert500(rawHTTPStatusErr)
+		}
+		return convert400(rawHTTPStatusErr)
 	}
 	return err
 }
 
-func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
-	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
-	// return the raw error.
-	var errorResponse ccerror.V3ErrorResponse
-	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
-	// error parsing json
+func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
+	firstErr, errorResponse, err := unmarshalFirstV3Error(rawHTTPStatusErr)
 	if err != nil {
-		return ccerror.UnknownHTTPSourceError{StatusCode: rawHTTPStatusErr.StatusCode, RawResponse: rawHTTPStatusErr.RawResponse}
+		return err
 	}
-
-	errors := errorResponse.Errors
-	if len(errors) == 0 {
-		return ccerror.V3UnexpectedResponseError{
-			ResponseCode:    rawHTTPStatusErr.StatusCode,
-			V3ErrorResponse: errorResponse,
-		}
-	}
-
-	// There could be multiple errors in the future but for now we only convert
-	// the first error.
-	firstErr := errors[0]
 
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized: // 401
@@ -81,6 +68,56 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 			V3ErrorResponse: errorResponse,
 		}
 	}
+}
+
+func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
+	switch rawHTTPStatusErr.StatusCode {
+	case http.StatusServiceUnavailable: // 503
+		firstErr, _, err := unmarshalFirstV3Error(rawHTTPStatusErr)
+		if err != nil {
+			return err
+		}
+		if firstErr.Title == "CF-TaskWorkersUnavailable" {
+			return ccerror.TaskWorkersUnavailableError{Message: firstErr.Detail}
+		}
+		return ccerror.ServiceUnavailableError{Message: firstErr.Detail}
+	default:
+		return ccerror.V3UnexpectedResponseError{
+			ResponseCode: rawHTTPStatusErr.StatusCode,
+			RequestIDs:   rawHTTPStatusErr.RequestIDs,
+			V3ErrorResponse: ccerror.V3ErrorResponse{
+				Errors: []ccerror.V3Error{{
+					Detail: string(rawHTTPStatusErr.RawResponse),
+				}},
+			},
+		}
+	}
+}
+
+func unmarshalFirstV3Error(rawHTTPStatusErr ccerror.RawHTTPStatusError) (ccerror.V3Error, ccerror.V3ErrorResponse, error) {
+	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
+	// return the raw error.
+	var errorResponse ccerror.V3ErrorResponse
+	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
+	// error parsing json
+	if err != nil {
+		return ccerror.V3Error{}, errorResponse, ccerror.UnknownHTTPSourceError{
+			StatusCode:  rawHTTPStatusErr.StatusCode,
+			RawResponse: rawHTTPStatusErr.RawResponse,
+		}
+	}
+
+	errors := errorResponse.Errors
+	if len(errors) == 0 {
+		return ccerror.V3Error{}, errorResponse, ccerror.V3UnexpectedResponseError{
+			ResponseCode:    rawHTTPStatusErr.StatusCode,
+			V3ErrorResponse: errorResponse,
+		}
+	}
+	// There could be multiple errors in the future but for now we only convert
+	// the first error.
+	firstErr := errors[0]
+	return firstErr, errorResponse, nil
 }
 
 func handleNotFound(errorResponse ccerror.V3Error) error {

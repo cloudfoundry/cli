@@ -254,7 +254,7 @@ var _ = Describe("Domain", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v2/shared_domains"),
-						RespondWith(http.StatusInternalServerError, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
@@ -267,7 +267,7 @@ var _ = Describe("Domain", func() {
 						Description: "some error description",
 						ErrorCode:   "CF-SomeError",
 					},
-					ResponseCode: http.StatusInternalServerError,
+					ResponseCode: http.StatusTeapot,
 				}))
 				Expect(domains).To(Equal([]Domain{}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

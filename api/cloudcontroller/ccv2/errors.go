@@ -30,12 +30,16 @@ func (e *errorWrapper) Make(request *cloudcontroller.Request, passedResponse *cl
 	err := e.connection.Make(request, passedResponse)
 
 	if rawHTTPStatusErr, ok := err.(ccerror.RawHTTPStatusError); ok {
-		return convert(rawHTTPStatusErr)
+		if passedResponse.HTTPResponse.StatusCode >= http.StatusInternalServerError {
+			return convert500(rawHTTPStatusErr)
+		}
+
+		return convert400(rawHTTPStatusErr)
 	}
 	return err
 }
 
-func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
+func convert400(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
 	// either we're not talking to a CC, or the CC returned invalid json.
 	var errorResponse ccerror.V2ErrorResponse
@@ -58,10 +62,20 @@ func convert(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
 		return ccerror.UnprocessableEntityError{Message: errorResponse.Description}
 	default:
 		return ccerror.V2UnexpectedResponseError{
-			V2ErrorResponse: errorResponse,
 			RequestIDs:      rawHTTPStatusErr.RequestIDs,
 			ResponseCode:    rawHTTPStatusErr.StatusCode,
+			V2ErrorResponse: errorResponse,
 		}
+	}
+}
+
+func convert500(rawHTTPStatusErr ccerror.RawHTTPStatusError) error {
+	return ccerror.V2UnexpectedResponseError{
+		ResponseCode: rawHTTPStatusErr.StatusCode,
+		RequestIDs:   rawHTTPStatusErr.RequestIDs,
+		V2ErrorResponse: ccerror.V2ErrorResponse{
+			Description: string(rawHTTPStatusErr.RawResponse),
+		},
 	}
 }
 

@@ -82,20 +82,21 @@ var _ = Describe("Error Wrapper", func() {
 				})
 			})
 
-			Context("(401) Unauthorized", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusUnauthorized
-				})
-
-				Context("generic 401", func() {
-					It("returns a UnauthorizedError", func() {
-						Expect(makeError).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
-					})
-				})
-
-				Context("invalid token", func() {
+			Context("when the error is a 4XX error", func() {
+				Context("(401) Unauthorized", func() {
 					BeforeEach(func() {
-						serverResponse = `{
+						serverResponseCode = http.StatusUnauthorized
+					})
+
+					Context("generic 401", func() {
+						It("returns a UnauthorizedError", func() {
+							Expect(makeError).To(MatchError(ccerror.UnauthorizedError{Message: "SomeCC Error Message"}))
+						})
+					})
+
+					Context("invalid token", func() {
+						BeforeEach(func() {
+							serverResponse = `{
 							"errors": [
 								{
 									"code": 1000,
@@ -104,32 +105,32 @@ var _ = Describe("Error Wrapper", func() {
 								}
 							]
 						}`
+						})
+
+						It("returns an InvalidAuthTokenError", func() {
+							Expect(makeError).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						})
 					})
-
-					It("returns an InvalidAuthTokenError", func() {
-						Expect(makeError).To(MatchError(ccerror.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
-					})
-				})
-			})
-
-			Context("(403) Forbidden", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusForbidden
 				})
 
-				It("returns a ForbiddenError", func() {
-					Expect(makeError).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
-				})
-			})
-
-			Context("(404) Not Found", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusNotFound
-				})
-
-				Context("when a process is not found", func() {
+				Context("(403) Forbidden", func() {
 					BeforeEach(func() {
-						serverResponse = `
+						serverResponseCode = http.StatusForbidden
+					})
+
+					It("returns a ForbiddenError", func() {
+						Expect(makeError).To(MatchError(ccerror.ForbiddenError{Message: "SomeCC Error Message"}))
+					})
+				})
+
+				Context("(404) Not Found", func() {
+					BeforeEach(func() {
+						serverResponseCode = http.StatusNotFound
+					})
+
+					Context("when a process is not found", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -139,16 +140,16 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns a ProcessNotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.ProcessNotFoundError{}))
+						})
 					})
 
-					It("returns a ProcessNotFoundError", func() {
-						Expect(makeError).To(MatchError(ccerror.ProcessNotFoundError{}))
-					})
-				})
-
-				Context("when an instance is not found", func() {
-					BeforeEach(func() {
-						serverResponse = `
+					Context("when an instance is not found", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -158,16 +159,16 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns an InstanceNotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.InstanceNotFoundError{}))
+						})
 					})
 
-					It("returns an InstanceNotFoundError", func() {
-						Expect(makeError).To(MatchError(ccerror.InstanceNotFoundError{}))
-					})
-				})
-
-				Context("when an application is not found", func() {
-					BeforeEach(func() {
-						serverResponse = `
+					Context("when an application is not found", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -177,16 +178,16 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns an AppNotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.ApplicationNotFoundError{}))
+						})
 					})
 
-					It("returns an AppNotFoundError", func() {
-						Expect(makeError).To(MatchError(ccerror.ApplicationNotFoundError{}))
-					})
-				})
-
-				Context("when a droplet is not found", func() {
-					BeforeEach(func() {
-						serverResponse = `
+					Context("when a droplet is not found", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -196,25 +197,25 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns a DropletNotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.DropletNotFoundError{}))
+						})
 					})
 
-					It("returns a DropletNotFoundError", func() {
-						Expect(makeError).To(MatchError(ccerror.DropletNotFoundError{}))
+					Context("generic not found", func() {
+
+						It("returns a ResourceNotFoundError", func() {
+							Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+						})
 					})
 				})
 
-				Context("generic not found", func() {
-
-					It("returns a ResourceNotFoundError", func() {
-						Expect(makeError).To(MatchError(ccerror.ResourceNotFoundError{Message: "SomeCC Error Message"}))
-					})
-				})
-			})
-
-			Context("(422) Unprocessable Entity", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusUnprocessableEntity
-					serverResponse = `
+				Context("(422) Unprocessable Entity", func() {
+					BeforeEach(func() {
+						serverResponseCode = http.StatusUnprocessableEntity
+						serverResponse = `
 {
   "errors": [
     {
@@ -224,11 +225,11 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
-				})
+					})
 
-				Context("when the name isn't unique to space", func() {
-					BeforeEach(func() {
-						serverResponse = `
+					Context("when the name isn't unique to space", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -238,16 +239,16 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns a NameNotUniqueInSpaceError", func() {
+							Expect(makeError).To(MatchError(ccerror.NameNotUniqueInSpaceError{}))
+						})
 					})
 
-					It("returns a NameNotUniqueInSpaceError", func() {
-						Expect(makeError).To(MatchError(ccerror.NameNotUniqueInSpaceError{}))
-					})
-				})
-
-				Context("when the buildpack is invalid", func() {
-					BeforeEach(func() {
-						serverResponse = `
+					Context("when the buildpack is invalid", func() {
+						BeforeEach(func() {
+							serverResponse = `
 {
   "errors": [
     {
@@ -257,32 +258,34 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns an InvalidBuildpackError", func() {
+							Expect(makeError).To(MatchError(ccerror.InvalidBuildpackError{}))
+						})
 					})
 
-					It("returns an InvalidBuildpackError", func() {
-						Expect(makeError).To(MatchError(ccerror.InvalidBuildpackError{}))
-					})
-				})
-
-				Context("when the detail describes something else", func() {
-					It("returns a UnprocessableEntityError", func() {
-						Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+					Context("when the detail describes something else", func() {
+						It("returns a UnprocessableEntityError", func() {
+							Expect(makeError).To(MatchError(ccerror.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+						})
 					})
 				})
 			})
 
-			Context("(503) Service Unavailable", func() {
-				BeforeEach(func() {
-					serverResponseCode = http.StatusServiceUnavailable
-				})
-
-				It("returns a ServiceUnavailableError", func() {
-					Expect(makeError).To(MatchError(ccerror.ServiceUnavailableError{Message: "SomeCC Error Message"}))
-				})
-
-				Context("when the title is 'CF-TaskWorkersUnavailable'", func() {
+			Context("when the error is a 5XX error", func() {
+				Context("(503) Service Unavailable", func() {
 					BeforeEach(func() {
-						serverResponse = `{
+						serverResponseCode = http.StatusServiceUnavailable
+					})
+
+					It("returns a ServiceUnavailableError", func() {
+						Expect(makeError).To(MatchError(ccerror.ServiceUnavailableError{Message: "SomeCC Error Message"}))
+					})
+
+					Context("when the title is 'CF-TaskWorkersUnavailable'", func() {
+						BeforeEach(func() {
+							serverResponse = `{
   "errors": [
     {
       "code": 170020,
@@ -291,10 +294,33 @@ var _ = Describe("Error Wrapper", func() {
     }
   ]
 }`
+						})
+
+						It("returns a TaskWorkersUnavailableError", func() {
+							Expect(makeError).To(MatchError(ccerror.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
+						})
+					})
+				})
+
+				Context("all other 5XX", func() {
+					BeforeEach(func() {
+						serverResponseCode = http.StatusBadGateway
+						serverResponse = "I am some text"
 					})
 
-					It("returns a TaskWorkersUnavailableError", func() {
-						Expect(makeError).To(MatchError(ccerror.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
+					It("returns a ServiceUnavailableError", func() {
+						Expect(makeError).To(MatchError(ccerror.V3UnexpectedResponseError{
+							ResponseCode: http.StatusBadGateway,
+							RequestIDs: []string{
+								"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95",
+								"6e0b4379-f5f7-4b2b-56b0-9ab7e96eed95::7445d9db-c31e-410d-8dc5-9f79ec3fc26f",
+							},
+							V3ErrorResponse: ccerror.V3ErrorResponse{
+								Errors: []ccerror.V3Error{{
+									Detail: serverResponse,
+								}},
+							},
+						}))
 					})
 				})
 			})
