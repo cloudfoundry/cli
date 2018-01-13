@@ -53,8 +53,8 @@ func (retry *RetryRequest) Make(request *cloudcontroller.Request, passedResponse
 	return err
 }
 
-// skipRetry if the request method is POST, or not one of the following http
-// status codes: 500, 502, 503, 504.
+// skipRetry will skip retry if the request method is POST or contains a status
+// code that is not one of following http status codes: 500, 502, 503, 504.
 func (*RetryRequest) skipRetry(httpMethod string, response *http.Response) bool {
 	return httpMethod == http.MethodPost ||
 		response != nil &&
