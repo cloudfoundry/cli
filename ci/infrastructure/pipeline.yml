@@ -1,0 +1,173 @@
+---
+groups:
+- name: create
+  jobs:
+  - setup-infrastructure
+  - deploy-cf
+- name: delete
+  jobs:
+  - delete-cf
+  - delete-infrastructure
+
+resources:
+- name: freshen-((stack_name))
+  type: time
+  source:
+    start: 09:00 PM
+    stop: 10:00 PM
+    location: America/Los_Angeles
+    days: [Saturday]
+- name: cf-deployment-concourse-tasks
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks
+    tag_filter: v*
+- name: cli-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cli
+    branch: master
+    path: ci
+- name: cf-deployment
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    tag_filter: v*
+- name: ops-files
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-deployment
+    tag_filter: v*
+- name: state
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: ((cli-private-github-private-key-write))
+    branch: master
+    paths:
+    - ci/infrastructure/((stack_name))/bbl-state.json
+- name: cf-state
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: ((cli-private-github-private-key-write))
+    branch: master
+    paths:
+    - ci/infrastructure/((stack_name))/deployment-vars.yml
+
+jobs:
+- name: setup-infrastructure
+  serial_groups: [((stack_name))]
+  build_logs_to_retain: 100
+  plan:
+  - get: freshen-((stack_name))
+    trigger: true
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: setup-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-up/task.yml
+    input_mapping:
+      ops-files: state
+      env-repo: state
+    params:
+      BBL_IAAS: gcp
+      BBL_GCP_SERVICE_ACCOUNT_KEY: ((google_account_creds))
+      BBL_GCP_PROJECT_ID: ((gcp_project))
+      BBL_GCP_REGION: us-central1
+      BBL_GCP_ZONE: us-central1-f
+      BBL_LB_CERT: ((ssl_cert))
+      BBL_LB_KEY: ((ssl_cert_private_key))
+      LB_DOMAIN: ((stack_name)).cli.fun
+      BBL_ENV_NAME: ((stack_name))
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+    ensure:
+      put: state
+      params:
+        repository: updated-env-repo
+        rebase: true
+
+- name: deploy-cf
+  serial_groups: [((stack_name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+      passed: [setup-infrastructure]
+      trigger: true
+    - get: cf-state
+    - get: cf-deployment
+    - get: ops-files
+    - get: cli-ci
+  - task: upload-stemcell
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      INFRASTRUCTURE: google
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+  - task: copy-ops-files
+    file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
+    input_mapping:
+      input1: ops-files
+      input2: cli-ci
+    params:
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/capi-release-override.yml"
+  - task: deploy-cf
+    file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
+    input_mapping:
+      env-repo: state
+      vars-store: cf-state
+      vars-files: cf-state
+      ops-files: combine_inputs_output
+    params:
+      SYSTEM_DOMAIN: ((stack_name)).cli.fun
+      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml capi-release-override.yml"
+      VARS_STORE_FILE: ci/infrastructure/((stack_name))/deployment-vars.yml
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+    ensure:
+      put: cf-state
+      params:
+        repository: updated-vars-store
+        rebase: true
+  - task: bosh-cleanup
+    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+      CLEAN_ALL: true
+
+- name: delete-cf
+  serial_groups: [((stack_name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: delete-cf-deployment
+    file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+
+- name: delete-infrastructure
+  serial_groups: [((stack_name))]
+  build_logs_to_retain: 100
+  plan:
+  - aggregate:
+    - get: cf-deployment-concourse-tasks
+    - get: state
+  - task: destroy-infrastructure
+    file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
+    input_mapping:
+      env-repo: state
+    params:
+      BBL_STATE_DIR: ci/infrastructure/((stack_name))
+    ensure:
+      put: state
+      params:
+        repository: updated-env-repo
+        rebase: true

@@ -22,6 +22,19 @@ configure_pipeline() {
     -l <(lpass show "Concourse Credentials" --notes)
 }
 
+configure_infrastructure_pipeline() {
+  local name=$1
+  local creds=$2
+
+  printf "configuring the $name pipeline...\n"
+
+  fly -t ci set-pipeline \
+    -p $name \
+    -c $pipelines_path/infrastructure/pipeline.yml \
+    -l <(lpass show "Concourse Credentials" --notes) \
+    -l <(lpass show "$creds" --notes)
+}
+
 check_installed lpass
 check_installed fly
 
@@ -33,8 +46,6 @@ pipelines_path=$(cd $(dirname $0)/.. && pwd)
 configure_pipeline cli \
   $pipelines_path/cli/pipeline.yml
 
-configure_pipeline inf-hardknox \
-  $pipelines_path/infrastructure/hardknox.yml
+configure_infrastructure_pipeline inf-hardknox hardknox-pipeline
 
-configure_pipeline inf-beque \
-  $pipelines_path/infrastructure/beque.yml
+configure_infrastructure_pipeline inf-beque beque-pipeline
