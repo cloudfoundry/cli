@@ -12,5 +12,5 @@ const (
 	MinVersionV3                 = "3.27.0"
 	MinVersionRunTaskV3          = "3.0.0"
 	MinVersionIsolationSegmentV3 = "3.11.0"
-	MinVersionShareServiceV3     = "3.34.0"
+	MinVersionShareServiceV3     = "3.36.0"
 )
