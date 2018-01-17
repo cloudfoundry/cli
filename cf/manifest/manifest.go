@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
-	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 
@@ -103,19 +102,6 @@ func expandProperties(input interface{}, babbler randomword.Generator) (interfac
 	var output interface{}
 
 	switch input := input.(type) {
-	case string:
-		match := propertyRegex.FindStringSubmatch(input)
-		if match != nil {
-			if match[0] == "${random-word}" {
-				output = strings.Replace(input, "${random-word}", strings.ToLower(babbler.Babble()), -1)
-			} else {
-				err := fmt.Errorf(T("Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
-					map[string]interface{}{"PropertyName": match[0]}))
-				errs = append(errs, err)
-			}
-		} else {
-			output = input
-		}
 	case []interface{}:
 		outputSlice := make([]interface{}, len(input))
 		for index, item := range input {

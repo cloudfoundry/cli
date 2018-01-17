@@ -364,47 +364,6 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].Hosts).To(ConsistOf([]string{"my-hostname", "host-1", "host-2"}))
 	})
 
-	Context("old-style property syntax", func() {
-		It("returns an error when the manifest contains non-whitelist properties", func() {
-			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-				"applications": []interface{}{
-					generic.NewMap(map[interface{}]interface{}{
-						"env": generic.NewMap(map[interface{}]interface{}{
-							"bar": "many-${some_property-name}-are-cool",
-						}),
-					}),
-				},
-			}))
-
-			_, err := m.Applications()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("'${some_property-name}'"))
-		})
-
-		It("replaces the '${random-word} with a combination of 2 random words", func() {
-			Skip("this is dumb - decide what to do with it in #154104917")
-			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-				"applications": []interface{}{
-					generic.NewMap(map[interface{}]interface{}{
-						"env": generic.NewMap(map[interface{}]interface{}{
-							"bar": "prefix_${random-word}_suffix",
-							"foo": "some-value",
-						}),
-					}),
-				},
-			}))
-
-			apps, err := m.Applications()
-			Expect(err).NotTo(HaveOccurred())
-			Expect((*apps[0].EnvironmentVars)["bar"]).To(MatchRegexp(`prefix_\w+-\w+_suffix`))
-			Expect((*apps[0].EnvironmentVars)["foo"]).To(Equal("some-value"))
-
-			apps2, _ := m.Applications()
-			Expect((*apps2[0].EnvironmentVars)["bar"]).To(MatchRegexp(`prefix_\w+-\w+_suffix`))
-			Expect((*apps2[0].EnvironmentVars)["bar"]).NotTo(Equal((*apps[0].EnvironmentVars)["bar"]))
-		})
-	})
-
 	It("sets the command and buildpack to blank when their values are null in the manifest", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
