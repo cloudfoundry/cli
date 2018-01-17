@@ -14,11 +14,12 @@ import (
 //go:generate counterfeiter . BindServiceActor
 
 type BindServiceActor interface {
-	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, parameters map[string]interface{}) (v2action.Warnings, error)
+	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error)
 }
 
 type BindServiceCommand struct {
 	RequiredArgs     flag.BindServiceArgs          `positional-args:"yes"`
+	BindingName      string                        `long:"name" description:"Name to expose service instance to app process with (Default: service instance name)"`
 	ParametersAsJSON flag.JSONOrFileWithValidation `short:"c" description:"Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."`
 	usage            interface{}                   `usage:"CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }\n\nEXAMPLES:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"`
 	relatedCommands  interface{}                   `related_commands:"services"`
@@ -62,7 +63,7 @@ func (cmd BindServiceCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.ParametersAsJSON)
+	warnings, err := cmd.Actor.BindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, cmd.Config.TargetedSpace().GUID, cmd.BindingName, cmd.ParametersAsJSON)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		if _, isTakenError := err.(ccerror.ServiceBindingTakenError); isTakenError {

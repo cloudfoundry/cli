@@ -42,6 +42,7 @@ var _ = Describe("bind-service Command", func() {
 
 		cmd.RequiredArgs.AppName = "some-app"
 		cmd.RequiredArgs.ServiceInstanceName = "some-service"
+		cmd.BindingName = "some-binding-name"
 		cmd.ParametersAsJSON = map[string]interface{}{
 			"some-parameter": "some-value",
 		}
@@ -164,10 +165,11 @@ var _ = Describe("bind-service Command", func() {
 						Expect(testUI.Err).To(Say("another-warning"))
 
 						Expect(fakeActor.BindServiceBySpaceCallCount()).To(Equal(1))
-						appName, serviceInstanceName, spaceGUID, parameters := fakeActor.BindServiceBySpaceArgsForCall(0)
+						appName, serviceInstanceName, spaceGUID, bindingName, parameters := fakeActor.BindServiceBySpaceArgsForCall(0)
 						Expect(appName).To(Equal("some-app"))
 						Expect(serviceInstanceName).To(Equal("some-service"))
 						Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(bindingName).To(Equal("some-binding-name"))
 						Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
 					})
 				})

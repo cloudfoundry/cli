@@ -28,6 +28,7 @@ var _ = Describe("Service Binding Actions", func() {
 		var (
 			applicationGUID     string
 			serviceInstanceGUID string
+			bindingName         string
 
 			executeErr error
 			warnings   Warnings
@@ -35,6 +36,7 @@ var _ = Describe("Service Binding Actions", func() {
 		BeforeEach(func() {
 			applicationGUID = "some-app-guid"
 			serviceInstanceGUID = "some-service-instance-guid"
+			bindingName = "some-binding-name"
 		})
 
 		JustBeforeEach(func() {
@@ -51,9 +53,10 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(warnings).To(ConsistOf("some-warnings"))
 
 				Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
-				inputAppGUID, inputServiceInstanceGUID, inputParameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+				inputAppGUID, inputServiceInstanceGUID, inputBindingName, inputParameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
 				Expect(inputAppGUID).To(Equal(applicationGUID))
 				Expect(inputServiceInstanceGUID).To(Equal(serviceInstanceGUID))
+				Expect(inputBindingName).To(Equal(""))
 				Expect(inputParameters).To(BeNil())
 			})
 		})
@@ -77,7 +80,7 @@ var _ = Describe("Service Binding Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", map[string]interface{}{"some-parameter": "some-value"})
+			warnings, executeErr = actor.BindServiceBySpace("some-app-name", "some-service-instance-name", "some-space-guid", "some-binding-name", map[string]interface{}{"some-parameter": "some-value"})
 		})
 
 		Context("when getting the application errors", func() {
@@ -160,8 +163,9 @@ var _ = Describe("Service Binding Actions", func() {
 						Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 
 						Expect(fakeCloudControllerClient.CreateServiceBindingCallCount()).To(Equal(1))
-						appGUID, serviceInstanceGUID, parameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
+						appGUID, serviceInstanceGUID, bindingName, parameters := fakeCloudControllerClient.CreateServiceBindingArgsForCall(0)
 						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(bindingName).To(Equal("some-binding-name"))
 						Expect(serviceInstanceGUID).To(Equal("some-service-instance-guid"))
 						Expect(parameters).To(Equal(map[string]interface{}{"some-parameter": "some-value"}))
 					})

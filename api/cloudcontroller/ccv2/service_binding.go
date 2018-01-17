@@ -17,6 +17,7 @@ type ServiceBinding struct {
 	AppGUID string
 	// ServiceInstanceGUID is the associated service GUID.
 	ServiceInstanceGUID string
+	Name                string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Service Binding response.
@@ -26,6 +27,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 		Entity   struct {
 			AppGUID             string `json:"app_guid"`
 			ServiceInstanceGUID string `json:"service_instance_guid"`
+			Name                string `json:"name"`
 		} `json:"entity"`
 	}
 	err := json.Unmarshal(data, &ccServiceBinding)
@@ -36,6 +38,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	serviceBinding.AppGUID = ccServiceBinding.Entity.AppGUID
 	serviceBinding.GUID = ccServiceBinding.Metadata.GUID
 	serviceBinding.ServiceInstanceGUID = ccServiceBinding.Entity.ServiceInstanceGUID
+	serviceBinding.Name = ccServiceBinding.Entity.Name
 	return nil
 }
 
@@ -44,15 +47,15 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 type serviceBindingRequestBody struct {
 	ServiceInstanceGUID string                 `json:"service_instance_guid"`
 	AppGUID             string                 `json:"app_guid"`
+	Name                string                 `json:"name"`
 	Parameters          map[string]interface{} `json:"parameters"`
 }
 
-// CreateServiceBinding creates a link between an application and a service
-// instance, also known as a Service Binding.
-func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
+func (client *Client) CreateServiceBinding(appGUID string, serviceInstanceGUID string, bindingName string, parameters map[string]interface{}) (ServiceBinding, Warnings, error) {
 	requestBody := serviceBindingRequestBody{
 		ServiceInstanceGUID: serviceInstanceGUID,
 		AppGUID:             appGUID,
+		Name:                bindingName,
 		Parameters:          parameters,
 	}
 

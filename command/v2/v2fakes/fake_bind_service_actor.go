@@ -9,12 +9,13 @@ import (
 )
 
 type FakeBindServiceActor struct {
-	BindServiceBySpaceStub        func(appName string, ServiceInstanceName string, spaceGUID string, parameters map[string]interface{}) (v2action.Warnings, error)
+	BindServiceBySpaceStub        func(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error)
 	bindServiceBySpaceMutex       sync.RWMutex
 	bindServiceBySpaceArgsForCall []struct {
 		appName             string
 		ServiceInstanceName string
 		spaceGUID           string
+		bindingName         string
 		parameters          map[string]interface{}
 	}
 	bindServiceBySpaceReturns struct {
@@ -29,19 +30,20 @@ type FakeBindServiceActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeBindServiceActor) BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, parameters map[string]interface{}) (v2action.Warnings, error) {
+func (fake *FakeBindServiceActor) BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error) {
 	fake.bindServiceBySpaceMutex.Lock()
 	ret, specificReturn := fake.bindServiceBySpaceReturnsOnCall[len(fake.bindServiceBySpaceArgsForCall)]
 	fake.bindServiceBySpaceArgsForCall = append(fake.bindServiceBySpaceArgsForCall, struct {
 		appName             string
 		ServiceInstanceName string
 		spaceGUID           string
+		bindingName         string
 		parameters          map[string]interface{}
-	}{appName, ServiceInstanceName, spaceGUID, parameters})
-	fake.recordInvocation("BindServiceBySpace", []interface{}{appName, ServiceInstanceName, spaceGUID, parameters})
+	}{appName, ServiceInstanceName, spaceGUID, bindingName, parameters})
+	fake.recordInvocation("BindServiceBySpace", []interface{}{appName, ServiceInstanceName, spaceGUID, bindingName, parameters})
 	fake.bindServiceBySpaceMutex.Unlock()
 	if fake.BindServiceBySpaceStub != nil {
-		return fake.BindServiceBySpaceStub(appName, ServiceInstanceName, spaceGUID, parameters)
+		return fake.BindServiceBySpaceStub(appName, ServiceInstanceName, spaceGUID, bindingName, parameters)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -55,10 +57,10 @@ func (fake *FakeBindServiceActor) BindServiceBySpaceCallCount() int {
 	return len(fake.bindServiceBySpaceArgsForCall)
 }
 
-func (fake *FakeBindServiceActor) BindServiceBySpaceArgsForCall(i int) (string, string, string, map[string]interface{}) {
+func (fake *FakeBindServiceActor) BindServiceBySpaceArgsForCall(i int) (string, string, string, string, map[string]interface{}) {
 	fake.bindServiceBySpaceMutex.RLock()
 	defer fake.bindServiceBySpaceMutex.RUnlock()
-	return fake.bindServiceBySpaceArgsForCall[i].appName, fake.bindServiceBySpaceArgsForCall[i].ServiceInstanceName, fake.bindServiceBySpaceArgsForCall[i].spaceGUID, fake.bindServiceBySpaceArgsForCall[i].parameters
+	return fake.bindServiceBySpaceArgsForCall[i].appName, fake.bindServiceBySpaceArgsForCall[i].ServiceInstanceName, fake.bindServiceBySpaceArgsForCall[i].spaceGUID, fake.bindServiceBySpaceArgsForCall[i].bindingName, fake.bindServiceBySpaceArgsForCall[i].parameters
 }
 
 func (fake *FakeBindServiceActor) BindServiceBySpaceReturns(result1 v2action.Warnings, result2 error) {

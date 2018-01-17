@@ -12,13 +12,13 @@ type ServiceBinding ccv2.ServiceBinding
 
 // BindServiceByApplicationAndServiceInstance binds the service instance to an application.
 func (actor Actor) BindServiceByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (Warnings, error) {
-	_, warnings, err := actor.CloudControllerClient.CreateServiceBinding(appGUID, serviceInstanceGUID, nil)
+	_, warnings, err := actor.CloudControllerClient.CreateServiceBinding(appGUID, serviceInstanceGUID, "", nil)
 
 	return Warnings(warnings), err
 }
 
 // BindServiceBySpace binds the service instance to an application for a given space.
-func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string, parameters map[string]interface{}) (Warnings, error) {
+func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (Warnings, error) {
 	var allWarnings Warnings
 	app, warnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	allWarnings = append(allWarnings, warnings...)
@@ -32,7 +32,7 @@ func (actor Actor) BindServiceBySpace(appName string, serviceInstanceName string
 		return allWarnings, err
 	}
 
-	_, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, parameters)
+	_, ccv2Warnings, err := actor.CloudControllerClient.CreateServiceBinding(app.GUID, serviceInstance.GUID, bindingName, parameters)
 	allWarnings = append(allWarnings, ccv2Warnings...)
 
 	return allWarnings, err
