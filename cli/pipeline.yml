@@ -235,7 +235,8 @@ groups:
   jobs:
   - units
   - build-binaries
-  - integration
+  - integration-linux
+  - integration-windows
   - cats
   - integration-experimental
   - create-installers
@@ -324,7 +325,7 @@ jobs:
     params:
       file: compiled/cf-cli-binaries.tgz
 
-- name: integration
+- name: integration-linux
   serial: true
   plan:
   - aggregate:
@@ -343,7 +344,7 @@ jobs:
   - do:
     - task: cleanup-integration
       file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: integration-linux
+    - task: integration
       file: cli-ci/ci/cli/tasks/integration-linux.yml
       on_failure:
         put: slack-alert
@@ -359,7 +360,31 @@ jobs:
         CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
         CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
         CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
-    - task: integration-windows
+  ensure:
+    put: gcp-bosh-pool
+    params:
+      release: bosh-lite-lock
+
+- name: integration-windows
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-cli-binaries
+      passed: [build-binaries]
+      trigger: true
+    - get: cli-ci
+    - get: cli-integration
+    - get: vars-store
+    - put: bosh-lite-lock
+      resource: gcp-bosh-pool
+      params:
+        acquire: true
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: integration
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       input_mapping:
         cf-credentials: cleanup-integration-outputs
@@ -445,9 +470,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental]
     - get: cf-cli-binaries
-      passed: [integration, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental]
       trigger: true
     - get: cli-ci
   - task: extract-binaries
@@ -526,10 +551,10 @@ jobs:
   plan:
   - aggregate:
     - get: cli
-      passed: [integration, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental]
     - get: cf-acceptance-tests
     - get: cf-cli-binaries
-      passed: [integration, integration-experimental]
+      passed: [integration-linux, integration-windows, integration-experimental]
       trigger: true
     - get: cli-ci
     - get: vars-store
@@ -548,17 +573,6 @@ jobs:
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
-    # - task: windows
-    #   file: cli-ci/ci/cli/tasks/cats-windows.yml
-    #   params:
-    #     NODES: 16
-    #   on_failure:
-    #      put: slack-alert
-    #      params:
-    #        channel: '#cli-eng'
-    #        text: |
-    #          CATs Windows failed :(
-    #          https://wings.concourse.ci/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
     - task: linux
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
