@@ -28,7 +28,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("v2-push Command", func() {
+var _ = Describe("push Command", func() {
 	var (
 		cmd              V2PushCommand
 		testUI           *ui.UI
@@ -270,7 +270,7 @@ var _ = Describe("v2-push Command", func() {
 
 							BeforeEach(func() {
 								var err error
-								tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
+								tmpDir, err = ioutil.TempDir("", "push-command-test")
 								Expect(err).ToNot(HaveOccurred())
 
 								// OS X uses weird symlinks that causes problems for some tests
@@ -510,7 +510,7 @@ var _ = Describe("v2-push Command", func() {
 
 							BeforeEach(func() {
 								var err error
-								tmpDir, err = ioutil.TempDir("", "v2-push-command-test")
+								tmpDir, err = ioutil.TempDir("", "push-command-test")
 								Expect(err).ToNot(HaveOccurred())
 
 								// OS X uses weird symlinks that causes problems for some tests

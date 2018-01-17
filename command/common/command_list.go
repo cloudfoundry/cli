@@ -13,8 +13,6 @@ var Commands commandList
 type commandList struct {
 	VerboseOrVersion bool `short:"v" long:"version" description:"verbose and version flag"`
 
-	V2Push v2.V2PushCommand `command:"v2-push" description:"Push a new app or sync changes to an existing app"`
-
 	V3App                v3.V3AppCommand                `command:"v3-app" description:"Display health and status for an app"`
 	V3Apps               v3.V3AppsCommand               `command:"v3-apps" description:"List all apps in the target space"`
 	V3CreateApp          v3.V3CreateAppCommand          `command:"v3-create-app" description:"Create a V3 App"`

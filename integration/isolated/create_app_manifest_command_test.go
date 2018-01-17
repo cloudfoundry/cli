@@ -159,7 +159,7 @@ var _ = Describe("create-app-manifest command", func() {
 			Context("when the app has routes", func() {
 				BeforeEach(func() {
 					helpers.WithHelloWorldApp(func(appDir string) {
-						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "v2-push", appName)).Should(Exit(0))
+						Eventually(helpers.CustomCF(helpers.CFEnv{WorkingDirectory: appDir}, "push", appName)).Should(Exit(0))
 					})
 				})
 
@@ -276,7 +276,7 @@ var _ = Describe("create-app-manifest command", func() {
 				oldDockerPassword = os.Getenv("CF_DOCKER_PASSWORD")
 				Expect(os.Setenv("CF_DOCKER_PASSWORD", "my-docker-password")).To(Succeed())
 
-				Eventually(helpers.CF("v2-push", appName, "-o", DockerImage, "--docker-username", "some-docker-username")).Should(Exit())
+				Eventually(helpers.CF("push", appName, "-o", DockerImage, "--docker-username", "some-docker-username")).Should(Exit())
 			})
 
 			AfterEach(func() {

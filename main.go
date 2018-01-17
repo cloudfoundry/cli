@@ -234,15 +234,15 @@ func handleError(passedErr error, commandUI UI) error {
 		}
 
 		// TODO: Replace this section with os.Args when v2-push has been replaced
-		var args []string
-		for _, arg := range os.Args {
-			if arg == "v2-push" {
-				args = append(args, "push")
-			} else {
-				args = append(args, arg)
-			}
-		}
-		cmd.Main(os.Getenv("CF_TRACE"), args)
+		// var args []string
+		// for _, arg := range os.Args {
+		// 	if arg == "v2-push" {
+		// 		args = append(args, "push")
+		// 	} else {
+		// 		args = append(args, arg)
+		// 	}
+		// }
+		cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	case *ssh.ExitError:
 		exitStatus := typedErr.ExitStatus()
 		if sig := typedErr.Signal(); sig != "" {
