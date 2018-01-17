@@ -49,3 +49,5 @@ configure_pipeline cli \
 configure_infrastructure_pipeline inf-hardknox hardknox-pipeline
 
 configure_infrastructure_pipeline inf-beque beque-pipeline
+
+configure_infrastructure_pipeline inf-tartine tartine-pipeline
