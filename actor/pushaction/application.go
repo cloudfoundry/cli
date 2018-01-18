@@ -36,7 +36,7 @@ func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfi
 		// For some versions of CC, sending state will always result in CC
 		// attempting to do perform that request (i.e. started -> start/restart).
 		// In order to prevent repeated unintended restarts in the middle of a
-		// push, don't send state.
+		// push, don't send state. This will be fixed in capi-release 1.48.0.
 		if config.CurrentApplication.State == config.DesiredApplication.State {
 			app.State = ""
 		}
