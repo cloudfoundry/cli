@@ -123,6 +123,25 @@ var _ = Describe("Applications", func() {
 				})
 			})
 
+			Context("when the state is not being updated", func() {
+				BeforeEach(func() {
+					config.CurrentApplication.State = "some-state"
+					config.DesiredApplication.State = "some-state"
+				})
+
+				It("does not send the state on update", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeV2Actor.UpdateApplicationCallCount()).To(Equal(1))
+					Expect(fakeV2Actor.UpdateApplicationArgsForCall(0)).To(Equal(v2action.Application{
+						Name:      "some-app-name",
+						GUID:      "some-app-guid",
+						SpaceGUID: "some-space-guid",
+						Buildpack: types.FilteredString{Value: "ruby", IsSet: true},
+					}))
+				})
+			})
+
 			Context("when the update errors", func() {
 				var expectedErr error
 				BeforeEach(func() {

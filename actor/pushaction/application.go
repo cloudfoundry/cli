@@ -32,6 +32,15 @@ func (actor Actor) CreateOrUpdateApp(config ApplicationConfig) (ApplicationConfi
 		if config.CurrentApplication.StackGUID == config.DesiredApplication.StackGUID {
 			app.StackGUID = ""
 		}
+
+		// For some versions of CC, sending state will always result in CC
+		// attempting to do perform that request (i.e. started -> start/restart).
+		// In order to prevent repeated unintended restarts in the middle of a
+		// push, don't send state.
+		if config.CurrentApplication.State == config.DesiredApplication.State {
+			app.State = ""
+		}
+
 		log.Debugf("updating application: %#v", app)
 		app, warnings, err := actor.V2Actor.UpdateApplication(app)
 		if err != nil {
