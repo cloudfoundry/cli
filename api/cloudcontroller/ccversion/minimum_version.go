@@ -9,6 +9,8 @@ const (
 	MinVersionTCPRouting                    = "2.53.0"
 	MinVersionNoHostInReservedRouteEndpoint = "2.55.0"
 
+	MinVersionProvideNameForServiceBinding = "2.99.0"
+
 	MinVersionV3                 = "3.27.0"
 	MinVersionRunTaskV3          = "3.0.0"
 	MinVersionIsolationSegmentV3 = "3.11.0"

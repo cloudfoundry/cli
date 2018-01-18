@@ -155,6 +155,17 @@ var _ = Describe("bind-service command", func() {
 					})
 				})
 
+				Context("when a name is provided for the binding", func() {
+					It("binds the service to the app, displays OK and TIP", func() {
+						session := helpers.CF("bind-service", appName, serviceInstance, "--name", "i-am-a-binding")
+						Eventually(session.Out).Should(Say("Binding service %s to app %s in org %s / space %s as %s...", serviceInstance, appName, org, space, username))
+
+						Eventually(session.Out).Should(Say("OK"))
+						Eventually(session.Out).Should(Say("TIP: Use 'cf restage %s' to ensure your env variable changes take effect", appName))
+						Eventually(session).Should(Exit(0))
+					})
+				})
+
 				Context("when configuration parameters are provided in a file", func() {
 					var configurationFile *os.File
 

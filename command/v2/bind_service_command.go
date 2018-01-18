@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -15,6 +16,7 @@ import (
 
 type BindServiceActor interface {
 	BindServiceBySpace(appName string, ServiceInstanceName string, spaceGUID string, bindingName string, parameters map[string]interface{}) (v2action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type BindServiceCommand struct {
@@ -45,7 +47,14 @@ func (cmd *BindServiceCommand) Setup(config command.Config, ui command.UI) error
 }
 
 func (cmd BindServiceCommand) Execute(args []string) error {
-	err := cmd.SharedActor.CheckTarget(true, true)
+	var err error
+
+	err = cmd.SharedActor.CheckTarget(true, true)
+	if err != nil {
+		return err
+	}
+
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), ccversion.MinVersionProvideNameForServiceBinding, "Option '--name'")
 	if err != nil {
 		return err
 	}
