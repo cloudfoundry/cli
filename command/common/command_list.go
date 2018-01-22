@@ -43,7 +43,7 @@ type commandList struct {
 	Api                                v2.ApiCommand                                `command:"api" description:"Set or view target api url"`
 	Apps                               v2.AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
 	App                                v2.AppCommand                                `command:"app" description:"Display health and status for an app"`
-	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate user non-interactively"`
+	Auth                               v2.AuthCommand                               `command:"auth" description:"Authenticate non-interactively"`
 	BindRouteService                   v2.BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
 	BindRunningSecurityGroup           v2.BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
 	BindSecurityGroup                  v2.BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`

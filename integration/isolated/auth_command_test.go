@@ -80,46 +80,95 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	Context("when the user provides an invalid username/password combo", func() {
-		BeforeEach(func() {
-			helpers.LoginCF()
-			helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+	Context("when no flags are set", func() {
+		Context("when the user provides an invalid username/password combo", func() {
+			BeforeEach(func() {
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+			})
+
+			It("clears the cached tokens and target info, then displays an error message", func() {
+				session := helpers.CF("auth", "some-username", "some-password")
+
+				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
+				Eventually(session).Should(Exit(1))
+
+				// Verify that the user is not logged-in
+				targetSession1 := helpers.CF("target")
+				Eventually(targetSession1.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(targetSession1.Out).Should(Say("FAILED"))
+				Eventually(targetSession1).Should(Exit(1))
+
+				// Verify that neither org nor space is targeted
+				helpers.LoginCF()
+				targetSession2 := helpers.CF("target")
+				Eventually(targetSession2.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				Eventually(targetSession2).Should(Exit(0))
+			})
 		})
 
-		It("clears the cached tokens and target info, then displays an error message", func() {
-			session := helpers.CF("auth", "some-username", "some-password")
+		Context("when the username and password are valid", func() {
+			It("authenticates the user", func() {
+				username, password := helpers.GetCredentials()
+				session := helpers.CF("auth", username, password)
 
-			Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-			Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-			Eventually(session.Out).Should(Say("FAILED"))
-			Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
-			Eventually(session).Should(Exit(1))
+				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Use 'cf target' to view or set your target org and space"))
 
-			// Verify that the user is not logged-in
-			targetSession1 := helpers.CF("target")
-			Eventually(targetSession1.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
-			Eventually(targetSession1.Out).Should(Say("FAILED"))
-			Eventually(targetSession1).Should(Exit(1))
-
-			// Verify that neither org nor space is targeted
-			helpers.LoginCF()
-			targetSession2 := helpers.CF("target")
-			Eventually(targetSession2.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
-			Eventually(targetSession2).Should(Exit(0))
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 
-	Context("when the username and password are valid", func() {
-		It("authenticates the user", func() {
-			username, password := helpers.GetCredentials()
-			session := helpers.CF("auth", username, password)
+	PContext("when the 'client-credentials' flag is set", func() {
+		Context("when the user provides an invalid client id/secret combo", func() {
+			BeforeEach(func() {
+				helpers.LoginCF()
+				helpers.TargetOrgAndSpace(ReadOnlyOrg, ReadOnlySpace)
+			})
 
-			Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
-			Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
-			Eventually(session.Out).Should(Say("OK"))
-			Eventually(session.Out).Should(Say("Use 'cf target' to view or set your target org and space"))
+			It("clears the cached tokens and target info, then displays an error message", func() {
+				session := helpers.CF("auth", "some-client-id", "some-client-secret", "--client-credentials")
 
-			Eventually(session).Should(Exit(0))
+				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("Credentials were rejected, please try again\\."))
+				Eventually(session).Should(Exit(1))
+
+				// Verify that the user is not logged-in
+				targetSession1 := helpers.CF("target")
+				Eventually(targetSession1.Err).Should(Say("Not logged in\\. Use 'cf login' to log in\\."))
+				Eventually(targetSession1.Out).Should(Say("FAILED"))
+				Eventually(targetSession1).Should(Exit(1))
+
+				// Verify that neither org nor space is targeted
+				helpers.LoginCF()
+				targetSession2 := helpers.CF("target")
+				Eventually(targetSession2.Out).Should(Say("No org or space targeted, use 'cf target -o ORG -s SPACE'"))
+				Eventually(targetSession2).Should(Exit(0))
+			})
+		})
+
+		Context("when the client id and client secret are valid", func() {
+			It("authenticates the user", func() {
+				username, password := helpers.GetCredentials()
+				// TODO: will this be the same or will we switch to a client id/secret
+				// combo
+				session := helpers.CF("auth", username, password)
+
+				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
+				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Use 'cf target' to view or set your target org and space"))
+
+				Eventually(session).Should(Exit(0))
+			})
 		})
 	})
 })
