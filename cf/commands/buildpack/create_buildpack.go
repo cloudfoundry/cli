@@ -94,6 +94,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 
 	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, buildpackFile, buildpackFileName)
 	if err != nil {
+		cmd.buildpackRepo.Delete(buildpack.GUID)
 		return err
 	}
 

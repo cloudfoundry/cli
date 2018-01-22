@@ -67,6 +67,8 @@ var _ = Describe("delete-buildpack command", func() {
 
 				runCommand("my-buildpack")
 
+				Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
+
 				Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete the buildpack my-buildpack"}))
@@ -91,6 +93,74 @@ var _ = Describe("delete-buildpack command", func() {
 			})
 		})
 
+		Context("when multiple buildpacks with the same name exist", func() {
+			Context("the stack is not specified", func() {
+				BeforeEach(func() {
+					ui = &testterm.FakeUI{Inputs: []string{"y"}}
+					buildpackRepo.FindByNameAmbiguous = true
+				})
+				It("warns the user to specify the stack if unspecified", func() {
+					runCommand("my-buildpack")
+
+					Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
+
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Multiple buildpacks named my-buildpack found"},
+						[]string{"Specify the stack (using -s) to disambiguate"},
+					))
+				})
+			})
+
+			Context("the stack is specified", func() {
+				Context("and is found", func() {
+					BeforeEach(func() {
+						buildpackRepo.FindByNameAndStackBuildpack = models.Buildpack{
+							Name:  "my-buildpack",
+							Stack: "my-stack",
+							GUID:  "my-buildpack-guid",
+						}
+					})
+					It("deletes the buildpack if the stack is specified", func() {
+						ui = &testterm.FakeUI{Inputs: []string{"y"}}
+
+						runCommand("my-buildpack", "-s", "my-stack")
+
+						Expect(buildpackRepo.FindByNameAndStackName).To(Equal("my-buildpack"))
+						Expect(buildpackRepo.FindByNameAndStackStack).To(Equal("my-stack"))
+
+						Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
+
+						Expect(ui.Prompts).To(ContainSubstrings([]string{"delete the buildpack my-buildpack"}))
+						Expect(ui.Outputs()).To(ContainSubstrings(
+							[]string{"Deleting buildpack", "my-buildpack", "my-stack"},
+							[]string{"OK"},
+						))
+					})
+				})
+				Context("buildpack not found", func() {
+					BeforeEach(func() {
+						ui = &testterm.FakeUI{Inputs: []string{"y"}}
+						buildpackRepo.FindByNameAndStackNotFound = true
+					})
+
+					It("warns the user", func() {
+						runCommand("my-buildpack", "-s", "my-stack")
+
+						Expect(buildpackRepo.FindByNameAndStackName).To(Equal("my-buildpack"))
+						Expect(buildpackRepo.FindByNameAndStackStack).To(Equal("my-stack"))
+
+						Expect(ui.Outputs()).To(ContainSubstrings(
+							[]string{"Deleting", "my-buildpack", "my-stack"},
+							[]string{"OK"},
+						))
+
+						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-buildpack", "does not exist"}))
+					})
+				})
+			})
+		})
+
 		Context("when the buildpack provided is not found", func() {
 			BeforeEach(func() {
 				ui = &testterm.FakeUI{Inputs: []string{"y"}}
@@ -101,7 +171,6 @@ var _ = Describe("delete-buildpack command", func() {
 				runCommand("my-buildpack")
 
 				Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
-				Expect(buildpackRepo.FindByNameNotFound).To(BeTrue())
 
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "my-buildpack"},

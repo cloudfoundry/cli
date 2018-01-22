@@ -126,10 +126,12 @@ var _ = Describe("create-buildpack command", func() {
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
 
-	It("alerts the user when uploading the buildpack bits fails", func() {
+	It("alerts the user when uploading the buildpack bits fails and rolls back the creation", func() {
 		bitsRepo.UploadBuildpackReturns(fmt.Errorf("upload error"))
 
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false, ui)
+
+		Expect(repo.DeleteBuildpackGUID).To(Equal(repo.CreateBuildpack.GUID))
 
 		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},

@@ -4,7 +4,11 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"path/filepath"
+
 	"code.cloudfoundry.org/cli/integration/helpers"
+
+	. "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

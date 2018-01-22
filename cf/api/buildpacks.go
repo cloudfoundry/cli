@@ -18,6 +18,7 @@ import (
 
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiErr error)
+	FindByNameAndStack(name, stack string) (buildpack models.Buildpack, apiErr error)
 	ListBuildpacks(func(models.Buildpack) bool) error
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
 	Delete(buildpackGUID string) (apiErr error)
@@ -46,10 +47,31 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 }
 
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
-	foundIt := false
+	found := 0
+
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
 		fmt.Sprintf("%s?q=%s", buildpacksPath, url.QueryEscape("name:"+name)),
+		resources.BuildpackResource{},
+		func(resource interface{}) bool {
+			found++
+			buildpack = resource.(resources.BuildpackResource).ToFields()
+			return true
+		})
+
+	if found == 0 {
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
+	} else if found > 1 {
+		apiErr = errors.NewAmbiguousModelError("Buildpack", name)
+	}
+	return
+}
+
+func (repo CloudControllerBuildpackRepository) FindByNameAndStack(name, stack string) (buildpack models.Buildpack, apiErr error) {
+	foundIt := false
+	apiErr = repo.gateway.ListPaginatedResources(
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("%s?q=%s", buildpacksPath, url.QueryEscape("name:"+name+";stack:"+stack)),
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
 			buildpack = resource.(resources.BuildpackResource).ToFields()

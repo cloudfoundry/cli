@@ -154,6 +154,90 @@ var _ = Describe("Buildpacks repo", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
+
+		It("returns a AmbiguousModelError when more than one buildpack with the same name exists", func() {
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/buildpacks?q=name%3ABuildpack1",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `{"resources": [
+					  {
+						  "metadata": {
+							  "guid": "buildpack1-guid"
+						  },
+						  "entity": {
+							  "name": "Buildpack1",
+								"stack": "Stack1",
+							  "position": 10
+						  }
+					  },
+					  {
+						  "metadata": {
+							  "guid": "buildpack1-guid2"
+						  },
+						  "entity": {
+							  "name": "Buildpack1",
+								"stack": "Stack2",
+							  "position": 11
+						  }
+					  }
+					  ]
+				  }`},
+			}))
+
+			_, apiErr := repo.FindByName("Buildpack1")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr.(*errors.AmbiguousModelError)).NotTo(BeNil())
+		})
+	})
+
+	Describe("finding buildpacks by name and stack", func() {
+		It("returns the buildpack with that name and stack", func() {
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/buildpacks?q=name%3ABuildpack1%3Bstack%3AStack1",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `{"resources": [
+					  {
+						  "metadata": {
+							  "guid": "buildpack1-guid"
+						  },
+						  "entity": {
+							  "name": "Buildpack1",
+								"stack": "Stack1",
+							  "position": 10
+						  }
+					  }
+					  ]
+				  }`}}))
+
+			buildpack, apiErr := repo.FindByNameAndStack("Buildpack1", "Stack1")
+
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+
+			Expect(buildpack.Name).To(Equal("Buildpack1"))
+			Expect(buildpack.Stack).To(Equal("Stack1"))
+			Expect(buildpack.GUID).To(Equal("buildpack1-guid"))
+			Expect(*buildpack.Position).To(Equal(10))
+		})
+
+		It("returns a ModelNotFoundError when the buildpack is not found", func() {
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/buildpacks?q=name%3ABuildpack1%3Bstack%3AStack1",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   `{"resources": []}`,
+				},
+			}))
+
+			_, apiErr := repo.FindByNameAndStack("Buildpack1", "Stack1")
+			Expect(handler).To(HaveAllRequestsCalled())
+			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+		})
 	})
 
 	Describe("creating buildpacks", func() {
