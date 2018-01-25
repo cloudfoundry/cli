@@ -182,6 +182,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 			Name                     string                 `json:"name"`
 			PackageState             string                 `json:"package_state"`
 			PackageUpdatedAt         *time.Time             `json:"package_updated_at"`
+			SpaceGUID                string                 `json:"space_guid"`
 			StackGUID                string                 `json:"stack_guid"`
 			StagingFailedDescription string                 `json:"staging_failed_description"`
 			StagingFailedReason      string                 `json:"staging_failed_reason"`
@@ -207,6 +208,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.Memory.ParseUint64Value(ccApp.Entity.Memory)
 	application.Name = ccApp.Entity.Name
 	application.PackageState = constant.ApplicationPackageState(ccApp.Entity.PackageState)
+	application.SpaceGUID = ccApp.Entity.SpaceGUID
 	application.StackGUID = ccApp.Entity.StackGUID
 	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason

@@ -55,8 +55,9 @@ var _ = Describe("Application", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						GUID: "some-app-guid",
-						Name: "some-app-name",
+						GUID:      "some-app-guid",
+						SpaceGUID: "some-space-guid",
+						Name:      "some-app-name",
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
@@ -200,6 +201,7 @@ var _ = Describe("Application", func() {
 							"name": "app-name-1",
 							"package_state": "FAILED",
 							"package_updated_at": "2015-03-10T23:11:54Z",
+							"space_guid": "some-space-guid",
 							"stack_guid": "some-stack-guid",
 							"staging_failed_reason": "some-reason",
 							"state": "STOPPED"
@@ -281,6 +283,7 @@ var _ = Describe("Application", func() {
 						Name:                    "app-name-1",
 						PackageState:            constant.ApplicationPackageFailed,
 						PackageUpdatedAt:        updatedAt,
+						SpaceGUID:               "some-space-guid",
 						StackGUID:               "some-stack-guid",
 						StagingFailedReason:     "some-reason",
 						State:                   constant.ApplicationStopped,

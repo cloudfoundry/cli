@@ -53,8 +53,9 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(app).To(Equal(Application{
-						GUID: "some-app-guid",
-						Name: "some-app-name",
+						GUID:      "some-app-guid",
+						Name:      "some-app-name",
+						SpaceGUID: "some-space-guid",
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
