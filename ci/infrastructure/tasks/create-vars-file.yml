@@ -7,7 +7,7 @@ image_resource:
     repository: busybox
 
 outputs:
-  vars_file
+- name: vars_file
 
 run:
   path: sh
