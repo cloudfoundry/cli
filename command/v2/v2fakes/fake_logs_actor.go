@@ -9,13 +9,12 @@ import (
 )
 
 type FakeLogsActor struct {
-	GetRecentLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) ([]v2action.LogMessage, v2action.Warnings, error)
+	GetRecentLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v2action.NOAAClient) ([]v2action.LogMessage, v2action.Warnings, error)
 	getRecentLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getRecentLogsForApplicationByNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
 		client    v2action.NOAAClient
-		config    v2action.Config
 	}
 	getRecentLogsForApplicationByNameAndSpaceReturns struct {
 		result1 []v2action.LogMessage
@@ -27,13 +26,12 @@ type FakeLogsActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	GetStreamingLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpaceStub        func(appName string, spaceGUID string, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error)
 	getStreamingLogsForApplicationByNameAndSpaceMutex       sync.RWMutex
 	getStreamingLogsForApplicationByNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
 		client    v2action.NOAAClient
-		config    v2action.Config
 	}
 	getStreamingLogsForApplicationByNameAndSpaceReturns struct {
 		result1 <-chan *v2action.LogMessage
@@ -51,19 +49,18 @@ type FakeLogsActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) ([]v2action.LogMessage, v2action.Warnings, error) {
+func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) ([]v2action.LogMessage, v2action.Warnings, error) {
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getRecentLogsForApplicationByNameAndSpaceReturnsOnCall[len(fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall)]
 	fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall = append(fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
 		client    v2action.NOAAClient
-		config    v2action.Config
-	}{appName, spaceGUID, client, config})
-	fake.recordInvocation("GetRecentLogsForApplicationByNameAndSpace", []interface{}{appName, spaceGUID, client, config})
+	}{appName, spaceGUID, client})
+	fake.recordInvocation("GetRecentLogsForApplicationByNameAndSpace", []interface{}{appName, spaceGUID, client})
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetRecentLogsForApplicationByNameAndSpaceStub != nil {
-		return fake.GetRecentLogsForApplicationByNameAndSpaceStub(appName, spaceGUID, client, config)
+		return fake.GetRecentLogsForApplicationByNameAndSpaceStub(appName, spaceGUID, client)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -77,10 +74,10 @@ func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpaceCallCount() 
 	return len(fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v2action.NOAAClient, v2action.Config) {
+func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v2action.NOAAClient) {
 	fake.getRecentLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getRecentLogsForApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].appName, fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].spaceGUID, fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].client, fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].config
+	return fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].appName, fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].spaceGUID, fake.getRecentLogsForApplicationByNameAndSpaceArgsForCall[i].client
 }
 
 func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpaceReturns(result1 []v2action.LogMessage, result2 v2action.Warnings, result3 error) {
@@ -108,19 +105,18 @@ func (fake *FakeLogsActor) GetRecentLogsForApplicationByNameAndSpaceReturnsOnCal
 	}{result1, result2, result3}
 }
 
-func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
+func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Lock()
 	ret, specificReturn := fake.getStreamingLogsForApplicationByNameAndSpaceReturnsOnCall[len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)]
 	fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall = append(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall, struct {
 		appName   string
 		spaceGUID string
 		client    v2action.NOAAClient
-		config    v2action.Config
-	}{appName, spaceGUID, client, config})
-	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{appName, spaceGUID, client, config})
+	}{appName, spaceGUID, client})
+	fake.recordInvocation("GetStreamingLogsForApplicationByNameAndSpace", []interface{}{appName, spaceGUID, client})
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.Unlock()
 	if fake.GetStreamingLogsForApplicationByNameAndSpaceStub != nil {
-		return fake.GetStreamingLogsForApplicationByNameAndSpaceStub(appName, spaceGUID, client, config)
+		return fake.GetStreamingLogsForApplicationByNameAndSpaceStub(appName, spaceGUID, client)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
@@ -134,10 +130,10 @@ func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpaceCallCount
 	return len(fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall)
 }
 
-func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v2action.NOAAClient, v2action.Config) {
+func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(i int) (string, string, v2action.NOAAClient) {
 	fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RLock()
 	defer fake.getStreamingLogsForApplicationByNameAndSpaceMutex.RUnlock()
-	return fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].appName, fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].spaceGUID, fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].client, fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].config
+	return fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].appName, fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].spaceGUID, fake.getStreamingLogsForApplicationByNameAndSpaceArgsForCall[i].client
 }
 
 func (fake *FakeLogsActor) GetStreamingLogsForApplicationByNameAndSpaceReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 v2action.Warnings, result4 error) {

@@ -4,15 +4,13 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
 type FakeAuthActor struct {
-	AuthenticateStub        func(config v2action.Config, username string, password string) error
+	AuthenticateStub        func(username string, password string) error
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
-		config   v2action.Config
 		username string
 		password string
 	}
@@ -26,18 +24,17 @@ type FakeAuthActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAuthActor) Authenticate(config v2action.Config, username string, password string) error {
+func (fake *FakeAuthActor) Authenticate(username string, password string) error {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
-		config   v2action.Config
 		username string
 		password string
-	}{config, username, password})
-	fake.recordInvocation("Authenticate", []interface{}{config, username, password})
+	}{username, password})
+	fake.recordInvocation("Authenticate", []interface{}{username, password})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(config, username, password)
+		return fake.AuthenticateStub(username, password)
 	}
 	if specificReturn {
 		return ret.result1
@@ -51,10 +48,10 @@ func (fake *FakeAuthActor) AuthenticateCallCount() int {
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeAuthActor) AuthenticateArgsForCall(i int) (v2action.Config, string, string) {
+func (fake *FakeAuthActor) AuthenticateArgsForCall(i int) (string, string) {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
-	return fake.authenticateArgsForCall[i].config, fake.authenticateArgsForCall[i].username, fake.authenticateArgsForCall[i].password
+	return fake.authenticateArgsForCall[i].username, fake.authenticateArgsForCall[i].password
 }
 
 func (fake *FakeAuthActor) AuthenticateReturns(result1 error) {

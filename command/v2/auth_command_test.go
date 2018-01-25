@@ -28,14 +28,15 @@ var _ = Describe("auth Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeAuthActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		binaryName = "faceman"
-		fakeConfig.BinaryNameReturns(binaryName)
 
 		cmd = AuthCommand{
 			UI:     testUI,
 			Config: fakeConfig,
 			Actor:  fakeActor,
 		}
+
+		binaryName = "faceman"
+		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
 	JustBeforeEach(func() {
@@ -68,8 +69,7 @@ var _ = Describe("auth Command", func() {
 			Expect(testUI.Out).To(Say("Use '%s target' to view or set your target org and space", binaryName))
 
 			Expect(fakeActor.AuthenticateCallCount()).To(Equal(1))
-			config, username, password := fakeActor.AuthenticateArgsForCall(0)
-			Expect(config).To(Equal(fakeConfig))
+			username, password := fakeActor.AuthenticateArgsForCall(0)
 			Expect(username).To(Equal(testUsername))
 			Expect(password).To(Equal(testPassword))
 		})

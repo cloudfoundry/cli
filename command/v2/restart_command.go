@@ -13,7 +13,7 @@ import (
 
 type RestartActor interface {
 	AppActor
-	RestartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	RestartApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 }
 
 type RestartCommand struct {
@@ -71,7 +71,7 @@ func (cmd RestartCommand) Execute(args []string) error {
 		return err
 	}
 
-	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.NOAAClient, cmd.Config)
+	messages, logErrs, appState, apiWarnings, errs := cmd.Actor.RestartApplication(app, cmd.NOAAClient)
 	err = shared.PollStart(cmd.UI, cmd.Config, messages, logErrs, appState, apiWarnings, errs)
 	if err != nil {
 		return err

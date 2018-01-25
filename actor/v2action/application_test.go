@@ -20,11 +20,13 @@ var _ = Describe("Application Actions", func() {
 	var (
 		actor                     *Actor
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
+		fakeConfig                *v2actionfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 	})
 
 	Describe("Application", func() {
@@ -656,7 +658,6 @@ var _ = Describe("Application Actions", func() {
 		var (
 			app            Application
 			fakeNOAAClient *v2actionfakes.FakeNOAAClient
-			fakeConfig     *v2actionfakes.FakeConfig
 
 			messages <-chan *LogMessage
 			logErrs  <-chan error
@@ -669,7 +670,6 @@ var _ = Describe("Application Actions", func() {
 		)
 
 		BeforeEach(func() {
-			fakeConfig = new(v2actionfakes.FakeConfig)
 			fakeConfig.StagingTimeoutReturns(time.Minute)
 			fakeConfig.StartupTimeoutReturns(time.Minute)
 
@@ -1019,7 +1019,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient, fakeConfig)
+				messages, logErrs, appState, warnings, errs = actor.StartApplication(app, fakeNOAAClient)
 			})
 
 			Context("when the app is already staged", func() {
@@ -1057,7 +1057,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient, fakeConfig)
+				messages, logErrs, appState, warnings, errs = actor.RestartApplication(app, fakeNOAAClient)
 			})
 
 			Context("when application is running", func() {
@@ -1178,7 +1178,7 @@ var _ = Describe("Application Actions", func() {
 
 		Describe("RestageApplication", func() {
 			JustBeforeEach(func() {
-				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient, fakeConfig)
+				messages, logErrs, appState, warnings, errs = actor.RestageApplication(app, fakeNOAAClient)
 			})
 
 			Context("when restaging succeeds", func() {

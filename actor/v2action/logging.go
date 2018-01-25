@@ -70,7 +70,7 @@ func (lm LogMessages) Swap(i, j int) {
 	lm[i], lm[j] = lm[j], lm[i]
 }
 
-func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error) {
+func (Actor) GetStreamingLogs(appGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error) {
 	// Do not pass in token because client should have a TokenRefresher set
 	eventStream, errStream := client.TailingLogs(appGUID, "")
 
@@ -127,7 +127,7 @@ func (Actor) GetStreamingLogs(appGUID string, client NOAAClient, config Config) 
 	return messages, errs
 }
 
-func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient, config Config) ([]LogMessage, Warnings, error) {
+func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient) ([]LogMessage, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return nil, allWarnings, err
@@ -155,13 +155,13 @@ func (actor Actor) GetRecentLogsForApplicationByNameAndSpace(appName string, spa
 	return logMessages, allWarnings, nil
 }
 
-func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient, config Config) (<-chan *LogMessage, <-chan error, Warnings, error) {
+func (actor Actor) GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client NOAAClient) (<-chan *LogMessage, <-chan error, Warnings, error) {
 	app, allWarnings, err := actor.GetApplicationByNameAndSpace(appName, spaceGUID)
 	if err != nil {
 		return nil, nil, allWarnings, err
 	}
 
-	messages, logErrs := actor.GetStreamingLogs(app.GUID, client, config)
+	messages, logErrs := actor.GetStreamingLogs(app.GUID, client)
 
 	return messages, logErrs, allWarnings, err
 }

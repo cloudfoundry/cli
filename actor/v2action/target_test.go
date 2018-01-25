@@ -21,7 +21,7 @@ var _ = Describe("Targeting", func() {
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		fakeConfig = new(v2actionfakes.FakeConfig)
-		actor = NewActor(fakeCloudControllerClient, nil, nil)
+		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 
 		settings = TargetSettings{
 			SkipSSLValidation: skipSSLValidation,
@@ -50,7 +50,7 @@ var _ = Describe("Targeting", func() {
 		})
 
 		It("targets the passed API", func() {
-			_, err := actor.SetTarget(fakeConfig, settings)
+			_, err := actor.SetTarget(settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
@@ -60,7 +60,7 @@ var _ = Describe("Targeting", func() {
 		})
 
 		It("sets all the target information", func() {
-			_, err := actor.SetTarget(fakeConfig, settings)
+			_, err := actor.SetTarget(settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
@@ -76,7 +76,7 @@ var _ = Describe("Targeting", func() {
 		})
 
 		It("clears all the token information", func() {
-			_, err := actor.SetTarget(fakeConfig, settings)
+			_, err := actor.SetTarget(settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
@@ -98,7 +98,7 @@ var _ = Describe("Targeting", func() {
 			})
 
 			It("does not make any API calls", func() {
-				warnings, err := actor.SetTarget(fakeConfig, settings)
+				warnings, err := actor.SetTarget(settings)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(BeNil())
 
@@ -109,8 +109,7 @@ var _ = Describe("Targeting", func() {
 
 	Describe("ClearTarget", func() {
 		It("clears all the target information", func() {
-			actor.ClearTarget(fakeConfig)
-
+			actor.ClearTarget()
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
 			api, apiVersion, auth, minCLIVersion, doppler, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
@@ -124,7 +123,7 @@ var _ = Describe("Targeting", func() {
 		})
 
 		It("clears all the token information", func() {
-			actor.ClearTarget(fakeConfig)
+			actor.ClearTarget()
 
 			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
 			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
@@ -137,7 +136,7 @@ var _ = Describe("Targeting", func() {
 
 	Describe("ClearOrganizationAndSpace", func() {
 		It("clears all organization and space information", func() {
-			actor.ClearOrganizationAndSpace(fakeConfig)
+			actor.ClearOrganizationAndSpace()
 
 			Expect(fakeConfig.UnsetOrganizationInformationCallCount()).To(Equal(1))
 			Expect(fakeConfig.UnsetSpaceInformationCallCount()).To(Equal(1))

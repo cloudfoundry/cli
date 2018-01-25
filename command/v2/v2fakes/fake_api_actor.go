@@ -8,16 +8,13 @@ import (
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
-type FakeAPIActor struct {
-	ClearTargetStub        func(config v2action.Config)
+type FakeApiActor struct {
+	ClearTargetStub        func()
 	clearTargetMutex       sync.RWMutex
-	clearTargetArgsForCall []struct {
-		config v2action.Config
-	}
-	SetTargetStub        func(config v2action.Config, settings v2action.TargetSettings) (v2action.Warnings, error)
-	setTargetMutex       sync.RWMutex
-	setTargetArgsForCall []struct {
-		config   v2action.Config
+	clearTargetArgsForCall []struct{}
+	SetTargetStub          func(settings v2action.TargetSettings) (v2action.Warnings, error)
+	setTargetMutex         sync.RWMutex
+	setTargetArgsForCall   []struct {
 		settings v2action.TargetSettings
 	}
 	setTargetReturns struct {
@@ -32,41 +29,32 @@ type FakeAPIActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAPIActor) ClearTarget(config v2action.Config) {
+func (fake *FakeApiActor) ClearTarget() {
 	fake.clearTargetMutex.Lock()
-	fake.clearTargetArgsForCall = append(fake.clearTargetArgsForCall, struct {
-		config v2action.Config
-	}{config})
-	fake.recordInvocation("ClearTarget", []interface{}{config})
+	fake.clearTargetArgsForCall = append(fake.clearTargetArgsForCall, struct{}{})
+	fake.recordInvocation("ClearTarget", []interface{}{})
 	fake.clearTargetMutex.Unlock()
 	if fake.ClearTargetStub != nil {
-		fake.ClearTargetStub(config)
+		fake.ClearTargetStub()
 	}
 }
 
-func (fake *FakeAPIActor) ClearTargetCallCount() int {
+func (fake *FakeApiActor) ClearTargetCallCount() int {
 	fake.clearTargetMutex.RLock()
 	defer fake.clearTargetMutex.RUnlock()
 	return len(fake.clearTargetArgsForCall)
 }
 
-func (fake *FakeAPIActor) ClearTargetArgsForCall(i int) v2action.Config {
-	fake.clearTargetMutex.RLock()
-	defer fake.clearTargetMutex.RUnlock()
-	return fake.clearTargetArgsForCall[i].config
-}
-
-func (fake *FakeAPIActor) SetTarget(config v2action.Config, settings v2action.TargetSettings) (v2action.Warnings, error) {
+func (fake *FakeApiActor) SetTarget(settings v2action.TargetSettings) (v2action.Warnings, error) {
 	fake.setTargetMutex.Lock()
 	ret, specificReturn := fake.setTargetReturnsOnCall[len(fake.setTargetArgsForCall)]
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
-		config   v2action.Config
 		settings v2action.TargetSettings
-	}{config, settings})
-	fake.recordInvocation("SetTarget", []interface{}{config, settings})
+	}{settings})
+	fake.recordInvocation("SetTarget", []interface{}{settings})
 	fake.setTargetMutex.Unlock()
 	if fake.SetTargetStub != nil {
-		return fake.SetTargetStub(config, settings)
+		return fake.SetTargetStub(settings)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -74,19 +62,19 @@ func (fake *FakeAPIActor) SetTarget(config v2action.Config, settings v2action.Ta
 	return fake.setTargetReturns.result1, fake.setTargetReturns.result2
 }
 
-func (fake *FakeAPIActor) SetTargetCallCount() int {
+func (fake *FakeApiActor) SetTargetCallCount() int {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	return len(fake.setTargetArgsForCall)
 }
 
-func (fake *FakeAPIActor) SetTargetArgsForCall(i int) (v2action.Config, v2action.TargetSettings) {
+func (fake *FakeApiActor) SetTargetArgsForCall(i int) v2action.TargetSettings {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
-	return fake.setTargetArgsForCall[i].config, fake.setTargetArgsForCall[i].settings
+	return fake.setTargetArgsForCall[i].settings
 }
 
-func (fake *FakeAPIActor) SetTargetReturns(result1 v2action.Warnings, result2 error) {
+func (fake *FakeApiActor) SetTargetReturns(result1 v2action.Warnings, result2 error) {
 	fake.SetTargetStub = nil
 	fake.setTargetReturns = struct {
 		result1 v2action.Warnings
@@ -94,7 +82,7 @@ func (fake *FakeAPIActor) SetTargetReturns(result1 v2action.Warnings, result2 er
 	}{result1, result2}
 }
 
-func (fake *FakeAPIActor) SetTargetReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
+func (fake *FakeApiActor) SetTargetReturnsOnCall(i int, result1 v2action.Warnings, result2 error) {
 	fake.SetTargetStub = nil
 	if fake.setTargetReturnsOnCall == nil {
 		fake.setTargetReturnsOnCall = make(map[int]struct {
@@ -108,7 +96,7 @@ func (fake *FakeAPIActor) SetTargetReturnsOnCall(i int, result1 v2action.Warning
 	}{result1, result2}
 }
 
-func (fake *FakeAPIActor) Invocations() map[string][][]interface{} {
+func (fake *FakeApiActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.clearTargetMutex.RLock()
@@ -122,7 +110,7 @@ func (fake *FakeAPIActor) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeAPIActor) recordInvocation(key string, args []interface{}) {
+func (fake *FakeApiActor) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -134,4 +122,4 @@ func (fake *FakeAPIActor) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ v2.APIActor = new(FakeAPIActor)
+var _ v2.ApiActor = new(FakeApiActor)

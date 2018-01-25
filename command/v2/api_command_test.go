@@ -18,22 +18,23 @@ var _ = Describe("api Command", func() {
 	var (
 		cmd        ApiCommand
 		testUI     *ui.UI
-		fakeActor  *v2fakes.FakeAPIActor
+		fakeActor  *v2fakes.FakeApiActor
 		fakeConfig *commandfakes.FakeConfig
 		err        error
 	)
 
 	BeforeEach(func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
-		fakeActor = new(v2fakes.FakeAPIActor)
+		fakeActor = new(v2fakes.FakeApiActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.BinaryNameReturns("faceman")
 
 		cmd = ApiCommand{
 			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
+
+		fakeConfig.BinaryNameReturns("faceman")
 	})
 
 	JustBeforeEach(func() {
@@ -105,7 +106,7 @@ var _ = Describe("api Command", func() {
 						Expect(err).ToNot(HaveOccurred())
 
 						Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-						_, settings := fakeActor.SetTargetArgsForCall(0)
+						settings := fakeActor.SetTargetArgsForCall(0)
 						Expect(settings.URL).To(Equal("https://" + CCAPI))
 						Expect(settings.SkipSSLValidation).To(BeFalse())
 
@@ -128,7 +129,7 @@ api version:    some-version`,
 							Expect(err).ToNot(HaveOccurred())
 
 							Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-							_, settings := fakeActor.SetTargetArgsForCall(0)
+							settings := fakeActor.SetTargetArgsForCall(0)
 							Expect(settings.URL).To(Equal("https://" + CCAPI))
 							Expect(settings.SkipSSLValidation).To(BeTrue())
 
@@ -167,7 +168,7 @@ api version:    some-version`,
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-				_, settings := fakeActor.SetTargetArgsForCall(0)
+				settings := fakeActor.SetTargetArgsForCall(0)
 				Expect(settings.URL).To(Equal(CCAPI))
 				Expect(settings.SkipSSLValidation).To(BeFalse())
 

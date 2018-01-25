@@ -7,17 +7,17 @@ import "fmt"
 //
 // It unsets the currently targeted org and space whether authentication
 // succeeds or not.
-func (actor Actor) Authenticate(config Config, username string, password string) error {
-	config.UnsetOrganizationInformation()
-	config.UnsetSpaceInformation()
+func (actor Actor) Authenticate(username string, password string) error {
+	actor.Config.UnsetOrganizationInformation()
+	actor.Config.UnsetSpaceInformation()
 
 	accessToken, refreshToken, err := actor.UAAClient.Authenticate(username, password)
 	if err != nil {
-		config.SetTokenInformation("", "", "")
+		actor.Config.SetTokenInformation("", "", "")
 		return err
 	}
 
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
-	config.SetTokenInformation(accessToken, refreshToken, "")
+	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
 	return nil
 }

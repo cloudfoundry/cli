@@ -13,8 +13,8 @@ import (
 //go:generate counterfeiter . LogsActor
 
 type LogsActor interface {
-	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) ([]v2action.LogMessage, v2action.Warnings, error)
-	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error)
+	GetRecentLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) ([]v2action.LogMessage, v2action.Warnings, error)
+	GetStreamingLogsForApplicationByNameAndSpace(appName string, spaceGUID string, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error)
 }
 
 type LogsCommand struct {
@@ -78,7 +78,6 @@ func (cmd LogsCommand) displayRecentLogs() error {
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.NOAAClient,
-		cmd.Config,
 	)
 
 	for _, message := range messages {
@@ -94,7 +93,6 @@ func (cmd LogsCommand) streamLogs() error {
 		cmd.RequiredArgs.AppName,
 		cmd.Config.TargetedSpace().GUID,
 		cmd.NOAAClient,
-		cmd.Config,
 	)
 
 	cmd.UI.DisplayWarnings(warnings)

@@ -12,7 +12,7 @@ import (
 //go:generate counterfeiter . AuthActor
 
 type AuthActor interface {
-	Authenticate(config v2action.Config, username string, password string) error
+	Authenticate(username string, password string) error
 }
 
 type AuthCommand struct {
@@ -51,7 +51,7 @@ func (cmd AuthCommand) Execute(args []string) error {
 		})
 	cmd.UI.DisplayText("Authenticating...")
 
-	err = cmd.Actor.Authenticate(cmd.Config, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
+	err = cmd.Actor.Authenticate(cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
 	if err != nil {
 		return err
 	}

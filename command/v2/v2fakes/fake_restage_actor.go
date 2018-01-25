@@ -41,12 +41,11 @@ type FakeRestageActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	RestageApplicationStub        func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	RestageApplicationStub        func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 	restageApplicationMutex       sync.RWMutex
 	restageApplicationArgsForCall []struct {
 		app    v2action.Application
 		client v2action.NOAAClient
-		config v2action.Config
 	}
 	restageApplicationReturns struct {
 		result1 <-chan *v2action.LogMessage
@@ -176,18 +175,17 @@ func (fake *FakeRestageActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestageActor) RestageApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+func (fake *FakeRestageActor) RestageApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 	fake.restageApplicationMutex.Lock()
 	ret, specificReturn := fake.restageApplicationReturnsOnCall[len(fake.restageApplicationArgsForCall)]
 	fake.restageApplicationArgsForCall = append(fake.restageApplicationArgsForCall, struct {
 		app    v2action.Application
 		client v2action.NOAAClient
-		config v2action.Config
-	}{app, client, config})
-	fake.recordInvocation("RestageApplication", []interface{}{app, client, config})
+	}{app, client})
+	fake.recordInvocation("RestageApplication", []interface{}{app, client})
 	fake.restageApplicationMutex.Unlock()
 	if fake.RestageApplicationStub != nil {
-		return fake.RestageApplicationStub(app, client, config)
+		return fake.RestageApplicationStub(app, client)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4, ret.result5
@@ -201,10 +199,10 @@ func (fake *FakeRestageActor) RestageApplicationCallCount() int {
 	return len(fake.restageApplicationArgsForCall)
 }
 
-func (fake *FakeRestageActor) RestageApplicationArgsForCall(i int) (v2action.Application, v2action.NOAAClient, v2action.Config) {
+func (fake *FakeRestageActor) RestageApplicationArgsForCall(i int) (v2action.Application, v2action.NOAAClient) {
 	fake.restageApplicationMutex.RLock()
 	defer fake.restageApplicationMutex.RUnlock()
-	return fake.restageApplicationArgsForCall[i].app, fake.restageApplicationArgsForCall[i].client, fake.restageApplicationArgsForCall[i].config
+	return fake.restageApplicationArgsForCall[i].app, fake.restageApplicationArgsForCall[i].client
 }
 
 func (fake *FakeRestageActor) RestageApplicationReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {
