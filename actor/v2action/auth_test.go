@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -26,7 +27,7 @@ var _ = Describe("Auth Actions", func() {
 		var actualErr error
 
 		JustBeforeEach(func() {
-			actualErr = actor.Authenticate(fakeConfig, "some-username", "some-password")
+			actualErr = actor.Authenticate(fakeConfig, "some-username", "some-password", constant.GrantTypePassword)
 		})
 
 		Context("when no API errors occur", func() {
@@ -42,9 +43,10 @@ var _ = Describe("Auth Actions", func() {
 				Expect(actualErr).NotTo(HaveOccurred())
 
 				Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-				username, password := fakeUAAClient.AuthenticateArgsForCall(0)
-				Expect(username).To(Equal("some-username"))
-				Expect(password).To(Equal("some-password"))
+				ID, secret, grantType := fakeUAAClient.AuthenticateArgsForCall(0)
+				Expect(ID).To(Equal("some-username"))
+				Expect(secret).To(Equal("some-password"))
+				Expect(grantType).To(Equal(constant.GrantTypePassword))
 
 				Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
 				accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
@@ -71,11 +73,6 @@ var _ = Describe("Auth Actions", func() {
 
 			It("returns the error", func() {
 				Expect(actualErr).To(MatchError(expectedErr))
-
-				Expect(fakeUAAClient.AuthenticateCallCount()).To(Equal(1))
-				username, password := fakeUAAClient.AuthenticateArgsForCall(0)
-				Expect(username).To(Equal("some-username"))
-				Expect(password).To(Equal("some-password"))
 
 				Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
 				accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)

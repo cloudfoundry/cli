@@ -18,8 +18,24 @@ var _ = Describe("Config", func() {
 		teardown(homeDir)
 	})
 
-	Describe("CurrentUser", func() {
-		Context("when the user token is set", func() {
+	PDescribe("CurrentUser", func() {
+		Context("when using client credentials and the user token is set", func() {
+			It("returns the user", func() {
+				config := Config{
+					ConfigFile: CFConfig{
+						AccessToken: "bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImtleS0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiI5MTExMzczOTRjYTg0NzQzOGUxZjQyOWY4OTQ2ZGZmMyIsInN1YiI6InBvdGF0by1mYWNlIiwiYXV0aG9yaXRpZXMiOlsicm91dGluZy5yb3V0ZXJfZ3JvdXBzLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLnJlYWQiLCJwYXNzd29yZC53cml0ZSIsImNsb3VkX2NvbnRyb2xsZXIud3JpdGUiLCJvcGVuaWQiLCJuZXR3b3JrLmFkbWluIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwidWFhLnVzZXIiXSwic2NvcGUiOlsicm91dGluZy5yb3V0ZXJfZ3JvdXBzLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLnJlYWQiLCJwYXNzd29yZC53cml0ZSIsImNsb3VkX2NvbnRyb2xsZXIud3JpdGUiLCJvcGVuaWQiLCJuZXR3b3JrLmFkbWluIiwicm91dGluZy5yb3V0ZXJfZ3JvdXBzLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwidWFhLnVzZXIiXSwiY2xpZW50X2lkIjoicG90YXRvLWZhY2UiLCJjaWQiOiJwb3RhdG8tZmFjZSIsImF6cCI6InBvdGF0by1mYWNlIiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsInJldl9zaWciOiJkMjU1NjdjYiIsImlhdCI6MTUxNjg0MTY4MCwiZXhwIjoxNTE2ODQxNzQwLCJpc3MiOiJodHRwczovL3VhYS5ib3NoLWxpdGUuY29tL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbImNsb3VkX2NvbnRyb2xsZXIiLCJzY2ltIiwicG90YXRvLWZhY2UiLCJwYXNzd29yZCIsInVhYSIsIm9wZW5pZCIsImRvcHBsZXIiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiLCJuZXR3b3JrIl19.I2flQSfAhWiCdhyd0414dZ0qmv0W-dPTGvj0pIXnaFPNae7gXSz79MPipTelSxCvdtigX8SoW8O7dWU5zt0O7VRkQX_YYElTHnQeWBfljoFvHhYPRMUv24I3lO6beeujKlYbUxVP5BXoyEdyfiDwzJjoX9lzxriBKdY_BO81oRUjItl7oI1VFhj1A_UwUcDwK2t-c7zDxSmh4P48r77QdqDoAjuweZPUU4PdzRlp99XYdmke52KeG7Xums6hrEJJBSDLbczd_308FAitaQKHgAQH1swLQXqcuD29-eoB4_nTSBwok2H5hoHicHWohSBkMOyFqD4HPb8ta8d_FOi8HA",
+					},
+				}
+
+				user, err := config.CurrentUser()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(user).To(Equal(User{
+					Name: "potato-face",
+				}))
+			})
+		})
+
+		Context("when using user/password and the user token is set", func() {
 			It("returns the user", func() {
 				config := Config{
 					ConfigFile: CFConfig{

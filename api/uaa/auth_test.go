@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,36 +22,75 @@ var _ = Describe("Auth", func() {
 	})
 
 	Describe("Authenticate", func() {
-		Context("when no errors occur", func() {
-			var (
-				username string
-				password string
-			)
+		var (
+			identity  string
+			secret    string
+			grantType constant.GrantType
 
-			BeforeEach(func() {
-				response := `{
+			accessToken  string
+			refreshToken string
+			executeErr   error
+		)
+
+		JustBeforeEach(func() {
+			accessToken, refreshToken, executeErr = client.Authenticate(identity, secret, grantType)
+		})
+
+		Context("when no errors occur", func() {
+			Context("when the grant type is password", func() {
+				BeforeEach(func() {
+					response := `{
 						"access_token":"some-access-token",
 						"refresh_token":"some-refresh-token"
 					}`
-				username = helpers.NewUsername()
-				password = helpers.NewPassword()
-				server.AppendHandlers(
-					CombineHandlers(
-						verifyRequestHost(TestAuthorizationResource),
-						VerifyRequest(http.MethodPost, "/oauth/token"),
-						VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
-						VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
-						VerifyBody([]byte(fmt.Sprintf("grant_type=password&password=%s&username=%s", password, username))),
-						RespondWith(http.StatusOK, response),
-					))
+					identity = helpers.NewUsername()
+					secret = helpers.NewPassword()
+					grantType = constant.GrantTypePassword
+					server.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestAuthorizationResource),
+							VerifyRequest(http.MethodPost, "/oauth/token"),
+							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+							VerifyBody([]byte(fmt.Sprintf("grant_type=%s&password=%s&username=%s", grantType, secret, identity))),
+							RespondWith(http.StatusOK, response),
+						))
+				})
+
+				It("authenticates with the credentials provided", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(accessToken).To(Equal("some-access-token"))
+					Expect(refreshToken).To(Equal("some-refresh-token"))
+				})
 			})
 
-			It("authenticates with the credentials provided", func() {
-				accessToken, refreshToken, err := client.Authenticate(username, password)
-				Expect(err).NotTo(HaveOccurred())
+			Context("when the grant type is client credentials", func() {
+				BeforeEach(func() {
+					response := `{
+						"access_token":"some-access-token"
+					}`
 
-				Expect(accessToken).To(Equal("some-access-token"))
-				Expect(refreshToken).To(Equal("some-refresh-token"))
+					identity = helpers.NewUsername()
+					secret = helpers.NewPassword()
+					grantType = constant.GrantTypeClientCredentials
+					server.AppendHandlers(
+						CombineHandlers(
+							verifyRequestHost(TestAuthorizationResource),
+							VerifyRequest(http.MethodPost, "/oauth/token"),
+							VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
+							VerifyHeaderKV("Authorization", "Basic Y2xpZW50LWlkOmNsaWVudC1zZWNyZXQ="),
+							VerifyBody([]byte(fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=%s", identity, secret, grantType))),
+							RespondWith(http.StatusOK, response),
+						))
+				})
+
+				It("authenticates with the credentials provided", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
+
+					Expect(accessToken).To(Equal("some-access-token"))
+					Expect(refreshToken).To(BeEmpty())
+				})
 			})
 		})
 
@@ -71,8 +111,7 @@ var _ = Describe("Auth", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := client.Authenticate("us3r", "pa55")
-				Expect(err).To(MatchError(RawHTTPStatusError{
+				Expect(executeErr).To(MatchError(RawHTTPStatusError{
 					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
 				}))

@@ -157,10 +157,10 @@ var _ = Describe("auth command", func() {
 
 		Context("when the client id and client secret are valid", func() {
 			It("authenticates the user", func() {
-				username, password := helpers.GetCredentials()
-				// TODO: will this be the same or will we switch to a client id/secret
-				// combo
-				session := helpers.CF("auth", username, password)
+				// username, password := helpers.GetCredentials()
+				// // TODO: will this be the same or will we switch to a client id/secret
+				// // combo
+				session := helpers.CF("auth", "potato-face", "acute", "--client-credentials")
 
 				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
 				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))

@@ -1,17 +1,21 @@
 package v2action
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.cloudfoundry.org/cli/api/uaa/constant"
+)
 
 // Authenticate authenticates the user in UAA and sets the returned tokens in
 // the config.
 //
 // It unsets the currently targeted org and space whether authentication
 // succeeds or not.
-func (actor Actor) Authenticate(config Config, username string, password string) error {
+func (actor Actor) Authenticate(config Config, ID string, secret string, grantType constant.GrantType) error {
 	config.UnsetOrganizationInformation()
 	config.UnsetSpaceInformation()
 
-	accessToken, refreshToken, err := actor.UAAClient.Authenticate(username, password)
+	accessToken, refreshToken, err := actor.UAAClient.Authenticate(ID, secret, grantType)
 	if err != nil {
 		config.SetTokenInformation("", "", "")
 		return err

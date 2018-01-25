@@ -6,14 +6,16 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 )
 
 type FakeUAAClient struct {
-	AuthenticateStub        func(username string, password string) (string, string, error)
+	AuthenticateStub        func(ID string, secret string, grantType constant.GrantType) (string, string, error)
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
-		username string
-		password string
+		ID        string
+		secret    string
+		grantType constant.GrantType
 	}
 	authenticateReturns struct {
 		result1 string
@@ -71,17 +73,18 @@ type FakeUAAClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) Authenticate(username string, password string) (string, string, error) {
+func (fake *FakeUAAClient) Authenticate(ID string, secret string, grantType constant.GrantType) (string, string, error) {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
-		username string
-		password string
-	}{username, password})
-	fake.recordInvocation("Authenticate", []interface{}{username, password})
+		ID        string
+		secret    string
+		grantType constant.GrantType
+	}{ID, secret, grantType})
+	fake.recordInvocation("Authenticate", []interface{}{ID, secret, grantType})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(username, password)
+		return fake.AuthenticateStub(ID, secret, grantType)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
@@ -95,10 +98,10 @@ func (fake *FakeUAAClient) AuthenticateCallCount() int {
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeUAAClient) AuthenticateArgsForCall(i int) (string, string) {
+func (fake *FakeUAAClient) AuthenticateArgsForCall(i int) (string, string, constant.GrantType) {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
-	return fake.authenticateArgsForCall[i].username, fake.authenticateArgsForCall[i].password
+	return fake.authenticateArgsForCall[i].ID, fake.authenticateArgsForCall[i].secret, fake.authenticateArgsForCall[i].grantType
 }
 
 func (fake *FakeUAAClient) AuthenticateReturns(result1 string, result2 string, result3 error) {

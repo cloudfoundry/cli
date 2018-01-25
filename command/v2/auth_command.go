@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -12,7 +13,7 @@ import (
 //go:generate counterfeiter . AuthActor
 
 type AuthActor interface {
-	Authenticate(config v2action.Config, username string, password string) error
+	Authenticate(config v2action.Config, ID string, secret string, grantType constant.GrantType) error
 }
 
 type AuthCommand struct {
@@ -52,7 +53,12 @@ func (cmd AuthCommand) Execute(args []string) error {
 		})
 	cmd.UI.DisplayText("Authenticating...")
 
-	err = cmd.Actor.Authenticate(cmd.Config, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
+	grantType := constant.GrantTypePassword
+	if cmd.ClientCredentials {
+		grantType = constant.GrantTypeClientCredentials
+	}
+
+	err = cmd.Actor.Authenticate(cmd.Config, cmd.RequiredArgs.Username, cmd.RequiredArgs.Password, grantType)
 	if err != nil {
 		return err
 	}

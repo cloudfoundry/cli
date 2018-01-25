@@ -1,6 +1,10 @@
 package configv3
 
-import "github.com/SermoDigital/jose/jws"
+import (
+	"fmt"
+
+	"github.com/SermoDigital/jose/jws"
+)
 
 // User represents the user information provided by the JWT access token
 type User struct {
@@ -24,7 +28,16 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 	}
 
 	claims := token.Claims()
+	ID := ""
+	if claims.Has("user_name") {
+		ID = claims.Get("user_name").(string)
+	} else if claims.Has("client_id") {
+		ID = claims.Get("client_id").(string)
+	} else {
+		//TODO
+		fmt.Printf("No user found in token")
+	}
 	return User{
-		Name: claims.Get("user_name").(string),
+		Name: ID,
 	}, nil
 }
