@@ -369,14 +369,15 @@
   version = "v1.0.18"
 
 [[projects]]
-  branch = "v2"
+  branch = "off_by_one_scanner_error_line"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
+  revision = "fd70c8694ac38cc10ed519e30c6309aa9cb7bbd9"
+  source = "github.com/vitreuz/yaml"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c480ed1565d51b8aa4d2e203620c3afffb5a8802ed3aacdd14cf82c50da1203b"
+  inputs-digest = "9f05711ab6131f5e0af88c22ffe6dbb94064b5ae3e2072c53508f383a2605079"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -156,5 +156,6 @@ required = ["github.com/gorilla/websocket"]
   version = "1.0.18"
 
 [[constraint]]
-  branch = "v2"
+  branch = "off_by_one_scanner_error_line"
   name = "gopkg.in/yaml.v2"
+  source = "github.com/vitreuz/yaml"

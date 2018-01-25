@@ -664,6 +664,8 @@ var unmarshalErrorTests = []struct {
 	{"v: !!float 'error'", "yaml: cannot decode !!str `error` as a !!float"},
 	{"v: [A,", "yaml: line 1: did not find expected node content"},
 	{"v:\n- [A,", "yaml: line 2: did not find expected node content"},
+	{"a:\n- b: *,", "yaml: line 2: did not find expected alphabetic or numeric character"},
+	{"a:\n- {b: c, d:e},", "yaml: line 2: found unexpected ':'"},
 	{"a: *b\n", "yaml: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", "yaml: anchor 'a' value contains itself"},
 	{"value: -", "yaml: block sequence entries are not allowed in this context"},
@@ -999,7 +1001,7 @@ func (s *S) TestUnmarshalStrict(c *C) {
 	err = yaml.Unmarshal([]byte("a: 1\nb: 2\nc: 3"), &v)
 	c.Check(err, IsNil)
 	err = yaml.UnmarshalStrict([]byte("a: 1\nb: 2\nc: 3"), &v)
-	c.Check(err, ErrorMatches, "yaml: unmarshal errors:\n  line 1: field c not found in struct struct { A int; B int }")
+	c.Check(err, ErrorMatches, "yaml: unmarshal errors:\n  line 3: field c not found in struct struct { A int; B int }")
 }
 
 //var data []byte
