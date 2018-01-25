@@ -10,12 +10,25 @@
 [[projects]]
   branch = "master"
   name = "code.cloudfoundry.org/cfnetworking-cli-api"
-  packages = ["cfnetworking","cfnetworking/cfnetv1","cfnetworking/cfnetv1/internal","cfnetworking/networkerror","cfnetworking/wrapper"]
+  packages = [
+    "cfnetworking",
+    "cfnetworking/cfnetv1",
+    "cfnetworking/cfnetv1/internal",
+    "cfnetworking/networkerror",
+    "cfnetworking/wrapper"
+  ]
   revision = "d500decdb202cc7669da28f388aa0fe6627e0281"
 
 [[projects]]
   name = "code.cloudfoundry.org/diego-ssh"
-  packages = ["server","server/fakes","test_helpers","test_helpers/fake_io","test_helpers/fake_net","test_helpers/fake_ssh"]
+  packages = [
+    "server",
+    "server/fakes",
+    "test_helpers",
+    "test_helpers/fake_io",
+    "test_helpers/fake_net",
+    "test_helpers/fake_ssh"
+  ]
   revision = "18cdb3586e7fca967680b3330d9c21e3f7d3e767"
 
 [[projects]]
@@ -27,7 +40,11 @@
 [[projects]]
   branch = "master"
   name = "code.cloudfoundry.org/lager"
-  packages = [".","lagerctx","lagertest"]
+  packages = [
+    ".",
+    "lagerctx",
+    "lagertest"
+  ]
   revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
 
 [[projects]]
@@ -39,12 +56,20 @@
 [[projects]]
   branch = "master"
   name = "github.com/Azure/go-ansiterm"
-  packages = [".","winterm"]
+  packages = [
+    ".",
+    "winterm"
+  ]
   revision = "d6e3b3328b783f23731bc4d058875b0371ff8109"
 
 [[projects]]
   name = "github.com/SermoDigital/jose"
-  packages = [".","crypto","jws","jwt"]
+  packages = [
+    ".",
+    "crypto",
+    "jws",
+    "jwt"
+  ]
   revision = "f6df55f235c24f236d11dbcf665249a59ac2021f"
   version = "1.1"
 
@@ -69,7 +94,12 @@
 [[projects]]
   branch = "master"
   name = "github.com/cloudfoundry/noaa"
-  packages = [".","consumer","consumer/internal","errors"]
+  packages = [
+    ".",
+    "consumer",
+    "consumer/internal",
+    "errors"
+  ]
   revision = "9d59e2b25abb53ee8907660061e12ef68bbb4503"
 
 [[projects]]
@@ -81,7 +111,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/docker/distribution"
-  packages = ["digestset","reference"]
+  packages = [
+    "digestset",
+    "reference"
+  ]
   revision = "e5b5e44386f7964a1f010a2b8b7687d073215bbb"
 
 [[projects]]
@@ -99,7 +132,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/gogo/protobuf"
-  packages = ["gogoproto","proto","protoc-gen-gogo/descriptor"]
+  packages = [
+    "gogoproto",
+    "proto",
+    "protoc-gen-gogo/descriptor"
+  ]
   revision = "616a82ed12d78d24d4839363e8f3c5d3f20627cf"
 
 [[projects]]
@@ -142,7 +179,12 @@
 [[projects]]
   branch = "master"
   name = "github.com/mailru/easyjson"
-  packages = [".","buffer","jlexer","jwriter"]
+  packages = [
+    ".",
+    "buffer",
+    "jlexer",
+    "jwriter"
+  ]
   revision = "32fa128f234d041f196a9f3e0fea5ac9772c08e1"
 
 [[projects]]
@@ -178,12 +220,48 @@
 [[projects]]
   branch = "master"
   name = "github.com/onsi/ginkgo"
-  packages = [".","config","extensions/table","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
+  packages = [
+    ".",
+    "config",
+    "extensions/table",
+    "internal/codelocation",
+    "internal/containernode",
+    "internal/failer",
+    "internal/leafnodes",
+    "internal/remote",
+    "internal/spec",
+    "internal/spec_iterator",
+    "internal/specrunner",
+    "internal/suite",
+    "internal/testingtproxy",
+    "internal/writer",
+    "reporters",
+    "reporters/stenographer",
+    "reporters/stenographer/support/go-colorable",
+    "reporters/stenographer/support/go-isatty",
+    "types"
+  ]
   revision = "6c46eb8334b30dc55b42f1a1c725d5ce97375390"
 
 [[projects]]
   name = "github.com/onsi/gomega"
-  packages = [".","format","gbytes","gexec","ghttp","internal/assertion","internal/asyncassertion","internal/oraclematcher","internal/testingtsupport","matchers","matchers/support/goraph/bipartitegraph","matchers/support/goraph/edge","matchers/support/goraph/node","matchers/support/goraph/util","types"]
+  packages = [
+    ".",
+    "format",
+    "gbytes",
+    "gexec",
+    "ghttp",
+    "internal/assertion",
+    "internal/asyncassertion",
+    "internal/oraclematcher",
+    "internal/testingtsupport",
+    "matchers",
+    "matchers/support/goraph/bipartitegraph",
+    "matchers/support/goraph/edge",
+    "matchers/support/goraph/node",
+    "matchers/support/goraph/util",
+    "types"
+  ]
   revision = "003f63b7f4cff3fc95357005358af2de0f5fe152"
   version = "v1.3.0"
 
@@ -220,32 +298,69 @@
 [[projects]]
   branch = "master"
   name = "github.com/vito/go-interact"
-  packages = ["interact","interact/terminal"]
+  packages = [
+    "interact",
+    "interact/terminal"
+  ]
   revision = "fa338ed9e9ecbb0e9c2e6c7a0160d9fc9b0efbd9"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["curve25519","ed25519","ed25519/internal/edwards25519","ssh","ssh/terminal"]
-  revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
+  packages = [
+    "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "internal/chacha20",
+    "poly1305",
+    "ssh",
+    "ssh/terminal"
+  ]
+  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["html","html/atom","html/charset","websocket"]
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  packages = [
+    "html",
+    "html/atom",
+    "html/charset",
+    "websocket"
+  ]
+  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "328643532ee3c60c099171d4ce2cad0ca0354ca9"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "03467258950d845cd1877eab69461b98e8c09219"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["encoding","encoding/charmap","encoding/htmlindex","encoding/internal","encoding/internal/identifier","encoding/japanese","encoding/korean","encoding/simplifiedchinese","encoding/traditionalchinese","encoding/unicode","internal/gen","internal/tag","internal/utf8internal","language","runes","transform","unicode/cldr"]
-  revision = "88f656faf3f37f690df1a32515b479415e1a6769"
+  packages = [
+    "encoding",
+    "encoding/charmap",
+    "encoding/htmlindex",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/japanese",
+    "encoding/korean",
+    "encoding/simplifiedchinese",
+    "encoding/traditionalchinese",
+    "encoding/unicode",
+    "internal/gen",
+    "internal/tag",
+    "internal/utf8internal",
+    "language",
+    "runes",
+    "transform",
+    "unicode/cldr"
+  ]
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
