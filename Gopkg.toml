@@ -22,6 +22,10 @@
 
 required = ["github.com/gorilla/websocket"]
 
+[prune]
+  non-go = true
+  go-tests = true
+
 [[constraint]]
   branch = "master"
   name = "code.cloudfoundry.org/bytefmt"

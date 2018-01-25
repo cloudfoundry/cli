@@ -1,9 +1,0 @@
-language: go
-go:
-  - 1.6
-install:
-  - go get -v github.com/onsi/ginkgo/ginkgo
-script: BINARY_VALIDATION=true bin/test --compilers=2
-branches:
-  only:
-  - master
