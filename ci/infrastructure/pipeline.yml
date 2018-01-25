@@ -121,12 +121,13 @@ jobs:
     input_mapping:
       env-repo: state
       vars-store: cf-state
-      vars-files: "cf-state vars_path/vars.yml"
+      vars-files: "cf-state vars_path"
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: ((stack_name)).cli.fun
       OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml"
       VARS_STORE_FILE: ci/infrastructure/((stack_name))/deployment-vars.yml
+      VARS_FILES: vars.yml
       BBL_STATE_DIR: ci/infrastructure/((stack_name))
     ensure:
       put: cf-state
