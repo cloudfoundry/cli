@@ -7,7 +7,7 @@ image_resource:
     repository: busybox
 
 outputs:
-- name: vars_file
+- name: vars_path
 
 run:
   path: sh
@@ -16,6 +16,6 @@ run:
   - |
     set -eux
 
-    cat << EOF > vars_file
+    cat << EOF > vars_path/vars.yml
     client_secret: ((client_secret))
     EOF
