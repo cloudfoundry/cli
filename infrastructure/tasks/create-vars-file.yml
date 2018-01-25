@@ -9,6 +9,9 @@ image_resource:
 outputs:
 - name: vars_path
 
+params:
+  CLIENT_SECRET:
+
 run:
   path: sh
   args:
@@ -17,5 +20,5 @@ run:
     set -eux
 
     cat << EOF > vars_path/vars.yml
-    client_secret: ((client_secret))
+    client_secret: $CLIENT_SECRET
     EOF
