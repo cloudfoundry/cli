@@ -121,7 +121,7 @@ jobs:
     input_mapping:
       env-repo: state
       vars-store: cf-state
-      vars-files: "cf-state vars_file"
+      vars-files: "cf-state vars_path/vars.yml"
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: ((stack_name)).cli.fun
