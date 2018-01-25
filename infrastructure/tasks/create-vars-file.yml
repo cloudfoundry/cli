@@ -1,0 +1,21 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: busybox
+
+outputs:
+  vars_file
+
+run:
+  path: sh
+  args:
+  - -c
+  - |
+    set -eux
+
+    cat << EOF > vars_file
+    client_secret: ((client_secret))
+    EOF
