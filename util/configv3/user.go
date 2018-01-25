@@ -1,8 +1,6 @@
 package configv3
 
 import (
-	"fmt"
-
 	"github.com/SermoDigital/jose/jws"
 )
 
@@ -28,14 +26,12 @@ func decodeUserFromJWT(accessToken string) (User, error) {
 	}
 
 	claims := token.Claims()
-	ID := ""
+
+	var ID string
 	if claims.Has("user_name") {
 		ID = claims.Get("user_name").(string)
-	} else if claims.Has("client_id") {
-		ID = claims.Get("client_id").(string)
 	} else {
-		//TODO
-		fmt.Printf("No user found in token")
+		ID = claims.Get("client_id").(string)
 	}
 	return User{
 		Name: ID,
