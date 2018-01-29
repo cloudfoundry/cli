@@ -17,13 +17,11 @@ var _ = Describe("Logging Actions", func() {
 	var (
 		actor                     *Actor
 		fakeNOAAClient            *v2actionfakes.FakeNOAAClient
-		fakeConfig                *v2actionfakes.FakeConfig
 		fakeCloudControllerClient *v2actionfakes.FakeCloudControllerClient
 	)
 
 	BeforeEach(func() {
 		fakeNOAAClient = new(v2actionfakes.FakeNOAAClient)
-		fakeConfig = new(v2actionfakes.FakeConfig)
 		fakeCloudControllerClient = new(v2actionfakes.FakeCloudControllerClient)
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
@@ -75,7 +73,7 @@ var _ = Describe("Logging Actions", func() {
 		})
 
 		JustBeforeEach(func() {
-			messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient, fakeConfig)
+			messages, errs = actor.GetStreamingLogs(expectedAppGUID, fakeNOAAClient)
 		})
 
 		Context("when receiving events", func() {
@@ -291,7 +289,7 @@ var _ = Describe("Logging Actions", func() {
 				})
 
 				It("returns all the recent logs and warnings", func() {
-					messages, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient, fakeConfig)
+					messages, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(warnings).To(ConsistOf("some-app-warnings"))
 					Expect(messages[0].Message()).To(Equal("message-1"))
@@ -317,7 +315,7 @@ var _ = Describe("Logging Actions", func() {
 				})
 
 				It("returns error and warnings", func() {
-					_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient, fakeConfig)
+					_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("some-app-warnings"))
 				})
@@ -337,7 +335,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			It("returns error and warnings", func() {
-				_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient, fakeConfig)
+				_, warnings, err := actor.GetRecentLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-app-warnings"))
 
@@ -422,7 +420,7 @@ var _ = Describe("Logging Actions", func() {
 			It("converts them to log messages and passes them through the messages channel", func() {
 				var err error
 				var warnings Warnings
-				messages, logErrs, warnings, err = actor.GetStreamingLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient, fakeConfig)
+				messages, logErrs, warnings, err = actor.GetStreamingLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(warnings).To(ConsistOf("some-app-warnings"))
@@ -456,7 +454,7 @@ var _ = Describe("Logging Actions", func() {
 			})
 
 			It("returns error and warnings", func() {
-				_, _, warnings, err := actor.GetStreamingLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient, fakeConfig)
+				_, _, warnings, err := actor.GetStreamingLogsForApplicationByNameAndSpace("some-app", "some-space-guid", fakeNOAAClient)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("some-app-warnings"))
 

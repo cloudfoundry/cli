@@ -19,15 +19,15 @@ var _ = Describe("Auth Actions", func() {
 
 	BeforeEach(func() {
 		fakeUAAClient = new(v2actionfakes.FakeUAAClient)
-		actor = NewActor(nil, fakeUAAClient, nil)
 		fakeConfig = new(v2actionfakes.FakeConfig)
+		actor = NewActor(nil, fakeUAAClient, fakeConfig)
 	})
 
 	Describe("Authenticate", func() {
 		var actualErr error
 
 		JustBeforeEach(func() {
-			actualErr = actor.Authenticate(fakeConfig, "some-username", "some-password", constant.GrantTypePassword)
+			actualErr = actor.Authenticate("some-username", "some-password", constant.GrantTypePassword)
 		})
 
 		Context("when no API errors occur", func() {

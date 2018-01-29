@@ -14,7 +14,7 @@ var _ = Describe("auth command", func() {
 		It("displays the help information", func() {
 			session := helpers.CF("auth", "--help")
 			Eventually(session.Out).Should(Say("NAME:"))
-			Eventually(session.Out).Should(Say("auth - Authenticate user non-interactively\n\n"))
+			Eventually(session.Out).Should(Say("auth - Authenticate non-interactively\n\n"))
 
 			Eventually(session.Out).Should(Say("USAGE:"))
 			Eventually(session.Out).Should(Say("cf auth USERNAME PASSWORD\n\n"))

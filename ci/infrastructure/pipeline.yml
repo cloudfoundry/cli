@@ -107,24 +107,29 @@ jobs:
     params:
       INFRASTRUCTURE: google
       BBL_STATE_DIR: ci/infrastructure/((stack_name))
+  - task: create-vars-file
+    file: cli-ci/ci/infrastructure/tasks/create-vars-file.yml
+    params:
+      CLIENT_SECRET: ((client_secret))
   - task: copy-ops-files
     file: cli-ci/ci/infrastructure/tasks/combine-inputs.yml
     input_mapping:
       input1: ops-files
       input2: cli-ci
     params:
-      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml"
+      COPY_PATHS: "input1/operations/scale-to-one-az.yml input1/operations/test/add-persistent-isolation-segment-diego-cell.yml input1/operations/use-compiled-releases.yml input2/ci/infrastructure/operations/cli-isolation-cell-overrides.yml input2/ci/infrastructure/operations/default-app-memory.yml input2/ci/infrastructure/operations/diego-cell-instances.yml input2/ci/infrastructure/operations/skip-ssl-override.yml input2/ci/infrastructure/operations/uaa-vm_type-override.yml input2/ci/infrastructure/operations/add-uaa-client-credentials.yml"
   - task: deploy-cf
     file: cf-deployment-concourse-tasks/bosh-deploy/task.yml
     input_mapping:
       env-repo: state
       vars-store: cf-state
-      vars-files: cf-state
+      vars-files: vars_path
       ops-files: combine_inputs_output
     params:
       SYSTEM_DOMAIN: ((stack_name)).cli.fun
-      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml"
+      OPS_FILES: "add-persistent-isolation-segment-diego-cell.yml use-compiled-releases.yml cli-isolation-cell-overrides.yml default-app-memory.yml skip-ssl-override.yml scale-to-one-az.yml diego-cell-instances.yml uaa-vm_type-override.yml add-uaa-client-credentials.yml"
       VARS_STORE_FILE: ci/infrastructure/((stack_name))/deployment-vars.yml
+      VARS_FILES: vars.yml
       BBL_STATE_DIR: ci/infrastructure/((stack_name))
     ensure:
       put: cf-state

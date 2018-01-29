@@ -56,6 +56,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.DestroyHomeDir(homeDir)
 
 	helpers.EnableDockerSupport()
+	// helpers.EnableFeatureFlag("service_instance_sharing")
 
 	var err error
 	realDir, err = ioutil.TempDir("", "push-real-dir")

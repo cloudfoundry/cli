@@ -11,17 +11,17 @@ import (
 //
 // It unsets the currently targeted org and space whether authentication
 // succeeds or not.
-func (actor Actor) Authenticate(config Config, ID string, secret string, grantType constant.GrantType) error {
-	config.UnsetOrganizationInformation()
-	config.UnsetSpaceInformation()
+func (actor Actor) Authenticate(ID string, secret string, grantType constant.GrantType) error {
+	actor.Config.UnsetOrganizationInformation()
+	actor.Config.UnsetSpaceInformation()
 
 	accessToken, refreshToken, err := actor.UAAClient.Authenticate(ID, secret, grantType)
 	if err != nil {
-		config.SetTokenInformation("", "", "")
+		actor.Config.SetTokenInformation("", "", "")
 		return err
 	}
 
 	accessToken = fmt.Sprintf("bearer %s", accessToken)
-	config.SetTokenInformation(accessToken, refreshToken, "")
+	actor.Config.SetTokenInformation(accessToken, refreshToken, "")
 	return nil
 }

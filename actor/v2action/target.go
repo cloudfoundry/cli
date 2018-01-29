@@ -6,8 +6,8 @@ type TargetSettings ccv2.TargetSettings
 
 // SetTarget targets the Cloud Controller using the client and sets target
 // information in the actor based on the response.
-func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, error) {
-	if config.Target() == settings.URL && config.SkipSSLValidation() == settings.SkipSSLValidation {
+func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
+	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
 
@@ -16,7 +16,7 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 		return Warnings(warnings), err
 	}
 
-	config.SetTargetInformation(
+	actor.Config.SetTargetInformation(
 		actor.CloudControllerClient.API(),
 		actor.CloudControllerClient.APIVersion(),
 		actor.CloudControllerClient.AuthorizationEndpoint(),
@@ -25,19 +25,19 @@ func (actor Actor) SetTarget(config Config, settings TargetSettings) (Warnings, 
 		actor.CloudControllerClient.RoutingEndpoint(),
 		settings.SkipSSLValidation,
 	)
-	config.SetTokenInformation("", "", "")
+	actor.Config.SetTokenInformation("", "", "")
 
 	return Warnings(warnings), nil
 }
 
 // ClearTarget clears target information from the actor.
-func (Actor) ClearTarget(config Config) {
-	config.SetTargetInformation("", "", "", "", "", "", false)
-	config.SetTokenInformation("", "", "")
+func (actor Actor) ClearTarget() {
+	actor.Config.SetTargetInformation("", "", "", "", "", "", false)
+	actor.Config.SetTokenInformation("", "", "")
 }
 
 // ClearTarget clears the targeted org and space in the config.
-func (Actor) ClearOrganizationAndSpace(config Config) {
-	config.UnsetOrganizationInformation()
-	config.UnsetSpaceInformation()
+func (actor Actor) ClearOrganizationAndSpace() {
+	actor.Config.UnsetOrganizationInformation()
+	actor.Config.UnsetSpaceInformation()
 }

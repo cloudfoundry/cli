@@ -41,12 +41,11 @@ type FakeRestartActor struct {
 		result2 v2action.Warnings
 		result3 error
 	}
-	RestartApplicationStub        func(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
+	RestartApplicationStub        func(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error)
 	restartApplicationMutex       sync.RWMutex
 	restartApplicationArgsForCall []struct {
 		app    v2action.Application
 		client v2action.NOAAClient
-		config v2action.Config
 	}
 	restartApplicationReturns struct {
 		result1 <-chan *v2action.LogMessage
@@ -176,18 +175,17 @@ func (fake *FakeRestartActor) GetApplicationSummaryByNameAndSpaceReturnsOnCall(i
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRestartActor) RestartApplication(app v2action.Application, client v2action.NOAAClient, config v2action.Config) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
+func (fake *FakeRestartActor) RestartApplication(app v2action.Application, client v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, <-chan v2action.ApplicationStateChange, <-chan string, <-chan error) {
 	fake.restartApplicationMutex.Lock()
 	ret, specificReturn := fake.restartApplicationReturnsOnCall[len(fake.restartApplicationArgsForCall)]
 	fake.restartApplicationArgsForCall = append(fake.restartApplicationArgsForCall, struct {
 		app    v2action.Application
 		client v2action.NOAAClient
-		config v2action.Config
-	}{app, client, config})
-	fake.recordInvocation("RestartApplication", []interface{}{app, client, config})
+	}{app, client})
+	fake.recordInvocation("RestartApplication", []interface{}{app, client})
 	fake.restartApplicationMutex.Unlock()
 	if fake.RestartApplicationStub != nil {
-		return fake.RestartApplicationStub(app, client, config)
+		return fake.RestartApplicationStub(app, client)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4, ret.result5
@@ -201,10 +199,10 @@ func (fake *FakeRestartActor) RestartApplicationCallCount() int {
 	return len(fake.restartApplicationArgsForCall)
 }
 
-func (fake *FakeRestartActor) RestartApplicationArgsForCall(i int) (v2action.Application, v2action.NOAAClient, v2action.Config) {
+func (fake *FakeRestartActor) RestartApplicationArgsForCall(i int) (v2action.Application, v2action.NOAAClient) {
 	fake.restartApplicationMutex.RLock()
 	defer fake.restartApplicationMutex.RUnlock()
-	return fake.restartApplicationArgsForCall[i].app, fake.restartApplicationArgsForCall[i].client, fake.restartApplicationArgsForCall[i].config
+	return fake.restartApplicationArgsForCall[i].app, fake.restartApplicationArgsForCall[i].client
 }
 
 func (fake *FakeRestartActor) RestartApplicationReturns(result1 <-chan *v2action.LogMessage, result2 <-chan error, result3 <-chan v2action.ApplicationStateChange, result4 <-chan string, result5 <-chan error) {

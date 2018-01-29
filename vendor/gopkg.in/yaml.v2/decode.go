@@ -81,6 +81,10 @@ func (p *parser) fail() {
 	var line int
 	if p.parser.problem_mark.line != 0 {
 		line = p.parser.problem_mark.line
+		// Scanner errors don't iterate line before returning error
+		if p.parser.error == yaml_SCANNER_ERROR {
+			line++
+		}
 	} else if p.parser.context_mark.line != 0 {
 		line = p.parser.context_mark.line
 	}
@@ -641,7 +645,7 @@ func (d *decoder) mappingStruct(n *node, out reflect.Value) (good bool) {
 			d.unmarshal(n.children[i+1], value)
 			inlineMap.SetMapIndex(name, value)
 		} else if d.strict {
-			d.terrors = append(d.terrors, fmt.Sprintf("line %d: field %s not found in struct %s", n.line+1, name.String(), out.Type()))
+			d.terrors = append(d.terrors, fmt.Sprintf("line %d: field %s not found in struct %s", ni.line+1, name.String(), out.Type()))
 		}
 	}
 	return true

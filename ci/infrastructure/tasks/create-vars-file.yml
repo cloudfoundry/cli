@@ -1,0 +1,24 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: busybox
+
+outputs:
+- name: vars_path
+
+params:
+  CLIENT_SECRET:
+
+run:
+  path: sh
+  args:
+  - -c
+  - |
+    set -eux
+
+    cat << EOF > vars_path/vars.yml
+    client_secret: $CLIENT_SECRET
+    EOF

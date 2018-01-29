@@ -4,16 +4,14 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa/constant"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
 type FakeAuthActor struct {
-	AuthenticateStub        func(config v2action.Config, ID string, secret string, grantType constant.GrantType) error
+	AuthenticateStub        func(ID string, secret string, grantType constant.GrantType) error
 	authenticateMutex       sync.RWMutex
 	authenticateArgsForCall []struct {
-		config    v2action.Config
 		ID        string
 		secret    string
 		grantType constant.GrantType
@@ -28,19 +26,18 @@ type FakeAuthActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAuthActor) Authenticate(config v2action.Config, ID string, secret string, grantType constant.GrantType) error {
+func (fake *FakeAuthActor) Authenticate(ID string, secret string, grantType constant.GrantType) error {
 	fake.authenticateMutex.Lock()
 	ret, specificReturn := fake.authenticateReturnsOnCall[len(fake.authenticateArgsForCall)]
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
-		config    v2action.Config
 		ID        string
 		secret    string
 		grantType constant.GrantType
-	}{config, ID, secret, grantType})
-	fake.recordInvocation("Authenticate", []interface{}{config, ID, secret, grantType})
+	}{ID, secret, grantType})
+	fake.recordInvocation("Authenticate", []interface{}{ID, secret, grantType})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
-		return fake.AuthenticateStub(config, ID, secret, grantType)
+		return fake.AuthenticateStub(ID, secret, grantType)
 	}
 	if specificReturn {
 		return ret.result1
@@ -54,10 +51,10 @@ func (fake *FakeAuthActor) AuthenticateCallCount() int {
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeAuthActor) AuthenticateArgsForCall(i int) (v2action.Config, string, string, constant.GrantType) {
+func (fake *FakeAuthActor) AuthenticateArgsForCall(i int) (string, string, constant.GrantType) {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
-	return fake.authenticateArgsForCall[i].config, fake.authenticateArgsForCall[i].ID, fake.authenticateArgsForCall[i].secret, fake.authenticateArgsForCall[i].grantType
+	return fake.authenticateArgsForCall[i].ID, fake.authenticateArgsForCall[i].secret, fake.authenticateArgsForCall[i].grantType
 }
 
 func (fake *FakeAuthActor) AuthenticateReturns(result1 error) {

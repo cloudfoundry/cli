@@ -138,12 +138,11 @@ var _ = Describe("logs command", func() {
 					Expect(testUI.Out).To(Say("i am message 2"))
 
 					Expect(fakeActor.GetRecentLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID, client, config := fakeActor.GetRecentLogsForApplicationByNameAndSpaceArgsForCall(0)
+					appName, spaceGUID, client := fakeActor.GetRecentLogsForApplicationByNameAndSpaceArgsForCall(0)
 
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(client).To(Equal(noaaClient))
-					Expect(config).To(Equal(fakeConfig))
 				})
 			})
 		})
@@ -174,7 +173,7 @@ var _ = Describe("logs command", func() {
 				BeforeEach(func() {
 					expectedErr = errors.New("some-error")
 
-					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient, _ v2action.Config) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
+					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
 						messages := make(chan *v2action.LogMessage)
 						logErrs := make(chan error)
 
@@ -197,7 +196,7 @@ var _ = Describe("logs command", func() {
 
 			Context("when the logs actor returns logs", func() {
 				BeforeEach(func() {
-					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient, _ v2action.Config) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
+					fakeActor.GetStreamingLogsForApplicationByNameAndSpaceStub = func(_ string, _ string, _ v2action.NOAAClient) (<-chan *v2action.LogMessage, <-chan error, v2action.Warnings, error) {
 						messages := make(chan *v2action.LogMessage)
 						logErrs := make(chan error)
 						message1 := v2action.NewLogMessage(
@@ -239,12 +238,11 @@ var _ = Describe("logs command", func() {
 					Expect(testUI.Out).To(Say("i am message 2"))
 
 					Expect(fakeActor.GetStreamingLogsForApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID, client, config := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
+					appName, spaceGUID, client := fakeActor.GetStreamingLogsForApplicationByNameAndSpaceArgsForCall(0)
 
 					Expect(appName).To(Equal("some-app"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(client).To(Equal(noaaClient))
-					Expect(config).To(Equal(fakeConfig))
 				})
 			})
 		})

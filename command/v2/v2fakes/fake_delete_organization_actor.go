@@ -22,13 +22,11 @@ type FakeDeleteOrganizationActor struct {
 		result1 v2action.Warnings
 		result2 error
 	}
-	ClearOrganizationAndSpaceStub        func(config v2action.Config)
+	ClearOrganizationAndSpaceStub        func()
 	clearOrganizationAndSpaceMutex       sync.RWMutex
-	clearOrganizationAndSpaceArgsForCall []struct {
-		config v2action.Config
-	}
-	invocations      map[string][][]interface{}
-	invocationsMutex sync.RWMutex
+	clearOrganizationAndSpaceArgsForCall []struct{}
+	invocations                          map[string][][]interface{}
+	invocationsMutex                     sync.RWMutex
 }
 
 func (fake *FakeDeleteOrganizationActor) DeleteOrganization(orgName string) (v2action.Warnings, error) {
@@ -82,15 +80,13 @@ func (fake *FakeDeleteOrganizationActor) DeleteOrganizationReturnsOnCall(i int, 
 	}{result1, result2}
 }
 
-func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpace(config v2action.Config) {
+func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpace() {
 	fake.clearOrganizationAndSpaceMutex.Lock()
-	fake.clearOrganizationAndSpaceArgsForCall = append(fake.clearOrganizationAndSpaceArgsForCall, struct {
-		config v2action.Config
-	}{config})
-	fake.recordInvocation("ClearOrganizationAndSpace", []interface{}{config})
+	fake.clearOrganizationAndSpaceArgsForCall = append(fake.clearOrganizationAndSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("ClearOrganizationAndSpace", []interface{}{})
 	fake.clearOrganizationAndSpaceMutex.Unlock()
 	if fake.ClearOrganizationAndSpaceStub != nil {
-		fake.ClearOrganizationAndSpaceStub(config)
+		fake.ClearOrganizationAndSpaceStub()
 	}
 }
 
@@ -98,12 +94,6 @@ func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpaceCallCount() in
 	fake.clearOrganizationAndSpaceMutex.RLock()
 	defer fake.clearOrganizationAndSpaceMutex.RUnlock()
 	return len(fake.clearOrganizationAndSpaceArgsForCall)
-}
-
-func (fake *FakeDeleteOrganizationActor) ClearOrganizationAndSpaceArgsForCall(i int) v2action.Config {
-	fake.clearOrganizationAndSpaceMutex.RLock()
-	defer fake.clearOrganizationAndSpaceMutex.RUnlock()
-	return fake.clearOrganizationAndSpaceArgsForCall[i].config
 }
 
 func (fake *FakeDeleteOrganizationActor) Invocations() map[string][][]interface{} {
