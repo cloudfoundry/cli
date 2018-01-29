@@ -17,7 +17,8 @@ var _ = Describe("auth command", func() {
 			Eventually(session.Out).Should(Say("auth - Authenticate non-interactively\n\n"))
 
 			Eventually(session.Out).Should(Say("USAGE:"))
-			Eventually(session.Out).Should(Say("cf auth USERNAME PASSWORD\n\n"))
+			Eventually(session.Out).Should(Say("cf auth USERNAME PASSWORD\n"))
+			Eventually(session.Out).Should(Say("cf auth CLIENT_ID CLIENT_SECRET --client-credentials\n\n"))
 
 			Eventually(session.Out).Should(Say("WARNING:"))
 			Eventually(session.Out).Should(Say("Providing your password as a command line option is highly discouraged"))
