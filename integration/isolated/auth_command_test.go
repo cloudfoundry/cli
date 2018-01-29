@@ -125,7 +125,7 @@ var _ = Describe("auth command", func() {
 		})
 	})
 
-	PContext("when the 'client-credentials' flag is set", func() {
+	Context("when the 'client-credentials' flag is set", func() {
 		Context("when the user provides an invalid client id/secret combo", func() {
 			BeforeEach(func() {
 				helpers.LoginCF()
@@ -157,10 +157,8 @@ var _ = Describe("auth command", func() {
 
 		Context("when the client id and client secret are valid", func() {
 			It("authenticates the user", func() {
-				// username, password := helpers.GetCredentials()
-				// // TODO: will this be the same or will we switch to a client id/secret
-				// // combo
-				session := helpers.CF("auth", "potato-face", "acute", "--client-credentials")
+				clientID, clientSecret := helpers.SkipIfClientCredentialsNotSet()
+				session := helpers.CF("auth", clientID, clientSecret, "--client-credentials")
 
 				Eventually(session.Out).Should(Say("API endpoint: %s", helpers.GetAPI()))
 				Eventually(session.Out).Should(Say("Authenticating\\.\\.\\."))

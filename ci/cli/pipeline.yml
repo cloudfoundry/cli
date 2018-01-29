@@ -357,6 +357,8 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client_secret))
         CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
         CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
         CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
@@ -399,6 +401,8 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client_secret))
         CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
         CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
         CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
@@ -441,6 +445,8 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client_secret))
         CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
         CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
         CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
@@ -457,6 +463,8 @@ jobs:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       params:
+        CF_INT_CLIENT_ID: 'potato-face'
+        CF_INT_CLIENT_SECRET: ((client_secret))
         CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
         CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
         CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}

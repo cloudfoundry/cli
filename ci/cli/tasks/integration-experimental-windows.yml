@@ -11,6 +11,8 @@ inputs:
 - name: cf-credentials
 
 params:
+  CF_INT_CLIENT_ID:
+  CF_INT_CLIENT_SECRET:
   CF_INT_DOCKER_IMAGE:
   CF_INT_DOCKER_USERNAME:
   CF_INT_DOCKER_PASSWORD:
