@@ -45,7 +45,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	helpers.TurnOffColors()
 
 	helpers.EnableDockerSupport()
-	// helpers.EnableFeatureFlag("service_instance_sharing")
+	helpers.EnableFeatureFlag("service_instance_sharing")
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 })
 
