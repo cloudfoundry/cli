@@ -1,4 +1,4 @@
-package isolated
+package global
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
@@ -224,7 +224,7 @@ var _ = Describe("service command", func() {
 		})
 	})
 
-	PDescribe("a user with SpaceDeveloperRole access can see a service instance's sharing information", func() {
+	Describe("a user with SpaceDeveloperRole access can see a service instance's sharing information", func() {
 		Context("when there are two spaces in the current org and a service broker", func() {
 			var (
 				orgName         string
@@ -264,11 +264,14 @@ var _ = Describe("service command", func() {
 			})
 
 			Context("when there is a user with SpaceDeveloperRole access to both spaces", func() {
-				var username string
+				var (
+					username string
+					password string
+				)
 
 				BeforeEach(func() {
 					username = helpers.PrefixedRandomName("user")
-					password := helpers.RandomName()
+					password = helpers.RandomName()
 
 					Eventually(helpers.CF("create-user", username, password)).Should(Exit(0))
 					Eventually(helpers.CF("set-space-role", username, orgName, sourceSpaceName, "SpaceDeveloper")).Should(Exit(0))
@@ -276,7 +279,7 @@ var _ = Describe("service command", func() {
 					Eventually(helpers.CF("auth", username, password)).Should(Exit(0))
 				})
 
-				Context("when the user creates a service instance in the source space", func() {
+				Context("when the user creates a service instance in the source space and has not shared it", func() {
 					BeforeEach(func() {
 						helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
 						Eventually(helpers.CF("create-service", service, servicePlan, serviceInstanceName, "-t", "database, email")).Should(Exit(0))
@@ -287,14 +290,44 @@ var _ = Describe("service command", func() {
 						Eventually(helpers.CF("delete-service", serviceInstanceName, "-f")).Should(Exit(0))
 					})
 
-					It("should not display shared from or shared with information", func() {
-						session := helpers.CF("service", serviceInstanceName)
-						Consistently(session.Out).ShouldNot(Say("shared from:"))
-						Consistently(session.Out).ShouldNot(Say("shared with spaces:"))
-						Eventually(session).Should(Exit(0))
+					Context("when the service instance is shareable", func() {
+						// By default, the test suite's BeforeEach has enabled the 'service_instance_sharing' feature flag and our service broker has sharing enabled
+
+						It("should not display shared from or shared with information, but DOES display not currently shared info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Consistently(session.Out).ShouldNot(Say("shared from:"))
+							Consistently(session.Out).ShouldNot(Say("shared with spaces:"))
+							Consistently(session.Out).ShouldNot(Say("org\\s+space\\s+bindings"))
+							Eventually(session.Out).Should(Say("This service is not currently shared."))
+							Eventually(session).Should(Exit(0))
+						})
 					})
 
-					Context("when this user shares the service instance with the target space", func() {
+					Context("when the service instance is not shareable", func() {
+						BeforeEach(func() {
+							helpers.LoginCF()
+							helpers.DisableFeatureFlag("service_instance_sharing")
+							Eventually(helpers.CF("auth", username, password)).Should(Exit(0))
+							helpers.TargetOrgAndSpace(orgName, sourceSpaceName)
+						})
+
+						AfterEach(func() {
+							helpers.LoginCF()
+							helpers.EnableFeatureFlag("service_instance_sharing")
+							Eventually(helpers.CF("auth", username, password)).Should(Exit(0))
+						})
+
+						It("does not display shared from, shared with, and not currently shared info", func() {
+							session := helpers.CF("service", serviceInstanceName)
+							Consistently(session.Out).ShouldNot(Say("shared from:"))
+							Consistently(session.Out).ShouldNot(Say("shared with spaces:"))
+							Consistently(session.Out).ShouldNot(Say("org\\s+space\\s+bindings"))
+							Consistently(session.Out).ShouldNot(Say("This service is not currently shared."))
+							Eventually(session).Should(Exit(0))
+						})
+					})
+
+					Context("when the user shares the service instance with the target space", func() {
 						BeforeEach(func() {
 							Eventually(helpers.CF("v3-share-service", serviceInstanceName, "-s", targetSpaceName)).Should(Exit(0))
 						})

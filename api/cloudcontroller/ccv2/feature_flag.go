@@ -5,6 +5,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+type FeatureFlagName string
+
+const (
+	FeatureFlagServiceInstanceSharing FeatureFlagName = "service_instance_sharing"
+)
+
 // FeatureFlag represents a Cloud Controller feature flag.
 type FeatureFlag struct {
 	Name    string `json:"name"`

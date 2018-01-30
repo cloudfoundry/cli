@@ -28,6 +28,14 @@ func SetHomeDir() string {
 	return homeDir
 }
 
+func SetupSynchronizedSuite(setup func()) {
+	homeDir := SetHomeDir()
+	SetAPI()
+	LoginCF()
+	setup()
+	DestroyHomeDir(homeDir)
+}
+
 func DestroyHomeDir(homeDir string) {
 	if homeDir != "" {
 		Expect(os.RemoveAll(homeDir)).To(Succeed())

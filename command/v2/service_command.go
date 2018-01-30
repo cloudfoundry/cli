@@ -117,24 +117,31 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 
 	cmd.UI.DisplayKeyValueTable("", table, 3)
 
-	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() &&
-		serviceInstanceSummary.ServiceInstanceShareType == v2action.ServiceInstanceIsSharedTo {
-		cmd.UI.DisplayNewline()
-		cmd.UI.DisplayText("shared with spaces:")
+	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {
+		switch serviceInstanceSummary.ServiceInstanceShareType {
+		case v2action.ServiceInstanceIsNotShared:
+			if serviceInstanceSummary.IsShareable() {
+				cmd.UI.DisplayNewline()
+				cmd.UI.DisplayText("This service is not currently shared.")
+			}
+		case v2action.ServiceInstanceIsSharedTo:
+			cmd.UI.DisplayNewline()
+			cmd.UI.DisplayText("shared with spaces:")
 
-		sharedTosTable := [][]string{
-			{cmd.UI.TranslateText("org"), cmd.UI.TranslateText("space"), cmd.UI.TranslateText("bindings")},
+			sharedTosTable := [][]string{
+				{cmd.UI.TranslateText("org"), cmd.UI.TranslateText("space"), cmd.UI.TranslateText("bindings")},
+			}
+
+			for _, sharedTo := range serviceInstanceSummary.ServiceInstanceSharedTos {
+				sharedTosTable = append(sharedTosTable, []string{
+					sharedTo.OrganizationName,
+					sharedTo.SpaceName,
+					fmt.Sprintf("%d", sharedTo.BoundAppCount),
+				})
+			}
+
+			cmd.UI.DisplayTableWithHeader("", sharedTosTable, 3)
 		}
-
-		for _, sharedTo := range serviceInstanceSummary.ServiceInstanceSharedTos {
-			sharedTosTable = append(sharedTosTable, []string{
-				sharedTo.OrganizationName,
-				sharedTo.SpaceName,
-				fmt.Sprintf("%d", sharedTo.BoundAppCount),
-			})
-		}
-
-		cmd.UI.DisplayTableWithHeader("", sharedTosTable, 3)
 	}
 
 	if ccv2.ServiceInstance(serviceInstanceSummary.ServiceInstance).Managed() {

@@ -44,8 +44,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	helpers.TurnOffColors()
 
-	helpers.EnableDockerSupport()
-	helpers.EnableFeatureFlag("service_instance_sharing")
+	helpers.SetupSynchronizedSuite(func() {
+		helpers.EnableFeatureFlag("diego_docker")
+		helpers.EnableFeatureFlag("service_instance_sharing")
+	})
+
 	ReadOnlyOrg, ReadOnlySpace = helpers.SetupReadOnlyOrgAndSpace()
 })
 

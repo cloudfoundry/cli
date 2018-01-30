@@ -26,14 +26,6 @@ func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) 
 	return env
 }
 
-func EnableDockerSupport() {
-	tempHome := SetHomeDir()
-	SetAPI()
-	LoginCF()
-	Eventually(CF("enable-feature-flag", "diego_docker")).Should(Exit(0))
-	DestroyHomeDir(tempHome)
-}
-
 func CheckEnvironmentTargetedCorrectly(targetedOrganizationRequired bool, targetedSpaceRequired bool, testOrg string, command ...string) {
 	LoginCF()
 

@@ -23,6 +23,64 @@ var _ = Describe("Service Instance Summary Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, nil)
 	})
 
+	Describe("ServiceInstanceSummary", func() {
+		var summary ServiceInstanceSummary
+
+		Describe("IsShareable", func() {
+			Context("when the 'service_instance_sharing' feature flag is enabled", func() {
+				BeforeEach(func() {
+					summary.ServiceInstanceSharingFeatureFlag = true
+				})
+
+				Context("when the service broker has enabled sharing", func() {
+					BeforeEach(func() {
+						summary.Service.Extra.Shareable = true
+					})
+
+					It("returns true", func() {
+						Expect(summary.IsShareable()).To(BeTrue())
+					})
+				})
+
+				Context("when the service broker has not enabled sharing", func() {
+					BeforeEach(func() {
+						summary.Service.Extra.Shareable = false
+					})
+
+					It("returns true", func() {
+						Expect(summary.IsShareable()).To(BeFalse())
+					})
+				})
+			})
+
+			Context("when the 'service_instance_sharing' feature flag is not enabled", func() {
+				BeforeEach(func() {
+					summary.ServiceInstanceSharingFeatureFlag = false
+				})
+
+				Context("when the service broker has enabled sharing", func() {
+					BeforeEach(func() {
+						summary.Service.Extra.Shareable = true
+					})
+
+					It("returns true", func() {
+						Expect(summary.IsShareable()).To(BeFalse())
+					})
+				})
+
+				Context("when the service broker has not enabled sharing", func() {
+					BeforeEach(func() {
+						summary.Service.Extra.Shareable = false
+					})
+
+					It("returns true", func() {
+						Expect(summary.IsShareable()).To(BeFalse())
+					})
+				})
+			})
+		})
+	})
+
 	Describe("GetServiceInstanceSummaryByNameAndSpace", func() {
 		var (
 			summary         ServiceInstanceSummary
@@ -63,7 +121,10 @@ var _ = Describe("Service Instance Summary Actions", func() {
 		})
 
 		Context("when no errors are encountered getting the service instance", func() {
-			var returnedServiceInstance ccv2.ServiceInstance
+			var (
+				returnedServiceInstance ccv2.ServiceInstance
+				returnedFeatureFlag     ccv2.FeatureFlag
+			)
 
 			Context("when the service instance is a managed service instance", func() {
 				BeforeEach(func() {
@@ -79,12 +140,21 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						[]ccv2.ServiceInstance{returnedServiceInstance},
 						ccv2.Warnings{"get-space-service-instance-warning"},
 						nil)
+
+					returnedFeatureFlag = ccv2.FeatureFlag{
+						Name:    "service_instance_sharing",
+						Enabled: true,
+					}
+					fakeCloudControllerClient.GetConfigFeatureFlagsReturns(
+						[]ccv2.FeatureFlag{returnedFeatureFlag},
+						ccv2.Warnings{"get-feature-flags-warning"},
+						nil)
 				})
 
 				It("returns the service instance info and all warnings", func() {
 					Expect(summaryErr).ToNot(HaveOccurred())
 					Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
-					Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning"))
+					Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning"))
 
 					Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
 					spaceGUIDArg, getUserProvidedServicesArg, queriesArg := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
@@ -123,7 +193,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("returns the error and all warnings", func() {
 									Expect(summaryErr).To(MatchError(expectedErr))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -143,7 +213,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("ignores the 404 error and continues without shared_from information", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom{}))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -171,9 +241,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								It("returns the service instance share type, shared_from info, and all warnings", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
 									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceSharingFeatureFlag).To(BeTrue())
 									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedFrom))
 									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
+
+									Expect(fakeCloudControllerClient.GetConfigFeatureFlagsCallCount()).To(Equal(1))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -215,7 +288,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("returns the error and all warnings", func() {
 									Expect(summaryErr).To(MatchError(expectedErr))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
 								})
@@ -233,7 +306,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("ignores the 404 error and continues without shared_from information", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom{}))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -260,9 +333,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								It("returns the service instance share type, shared_from info, and all warnings", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
 									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceSharingFeatureFlag).To(BeTrue())
 									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedFrom))
 									Expect(summary.ServiceInstanceSharedFrom).To(Equal(ServiceInstanceSharedFrom(returnedServiceSharedFrom)))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-from-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-instance-shared-from-warning"))
+
+									Expect(fakeCloudControllerClient.GetConfigFeatureFlagsCallCount()).To(Equal(1))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -305,7 +381,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("returns the error and all warnings", func() {
 									Expect(summaryErr).To(MatchError(expectedErr))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(0))
@@ -324,7 +400,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("ignores the 404 error and continues without shared_to information", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedFromCallCount()).To(Equal(0))
@@ -359,9 +435,12 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								It("returns the service instance share type, shared_to info, and all warnings", func() {
 									Expect(summaryErr).ToNot(HaveOccurred())
 									Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
+									Expect(summary.ServiceInstanceSharingFeatureFlag).To(BeTrue())
 									Expect(summary.ServiceInstanceShareType).To(Equal(ServiceInstanceIsSharedTo))
 									Expect(summary.ServiceInstanceSharedTos).To(ConsistOf(ServiceInstanceSharedTo(returnedServiceSharedTos[0]), ServiceInstanceSharedTo(returnedServiceSharedTos[1])))
-									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-space-service-instance-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-service-instance-shared-tos-warning", "get-feature-flags-warning", "get-space-service-instance-warning"))
+
+									Expect(fakeCloudControllerClient.GetConfigFeatureFlagsCallCount()).To(Equal(1))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceSharedTosArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -392,7 +471,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 					It("returns the error and all warnings", func() {
 						Expect(summaryErr).To(MatchError(expectedErr))
-						Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning"))
+						Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning"))
 
 						Expect(fakeCloudControllerClient.GetServicePlanCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetServicePlanArgsForCall(0)).To(Equal(returnedServiceInstance.ServicePlanGUID))
@@ -418,7 +497,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 						Expect(summaryErr).ToNot(HaveOccurred())
 						Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
 						Expect(summary.ServicePlan).To(Equal(ServicePlan(returnedServicePlan)))
-						Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning"))
+						Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning"))
 
 						Expect(fakeCloudControllerClient.GetServicePlanCallCount()).To(Equal(1))
 						Expect(fakeCloudControllerClient.GetServicePlanArgsForCall(0)).To(Equal(returnedServiceInstance.ServicePlanGUID))
@@ -437,7 +516,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 						It("returns the error and all warnings", func() {
 							Expect(summaryErr).To(MatchError(expectedErr))
-							Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning", "get-service-warning"))
+							Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning"))
 
 							Expect(fakeCloudControllerClient.GetServiceCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetServiceArgsForCall(0)).To(Equal(returnedServicePlan.ServiceGUID))
@@ -453,6 +532,9 @@ var _ = Describe("Service Instance Summary Actions", func() {
 								Label:            "some-service",
 								Description:      "some-description",
 								DocumentationURL: "some-url",
+								Extra: ccv2.ServiceExtra{
+									Shareable: true,
+								},
 							}
 							fakeCloudControllerClient.GetServiceReturns(
 								returnedService,
@@ -465,7 +547,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 							Expect(summary.ServiceInstance).To(Equal(ServiceInstance(returnedServiceInstance)))
 							Expect(summary.ServicePlan).To(Equal(ServicePlan(returnedServicePlan)))
 							Expect(summary.Service).To(Equal(Service(returnedService)))
-							Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning", "get-service-warning"))
+							Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning"))
 
 							Expect(fakeCloudControllerClient.GetServiceCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetServiceArgsForCall(0)).To(Equal(returnedServicePlan.ServiceGUID))
@@ -484,7 +566,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 							It("returns the error and all warnings", func() {
 								Expect(summaryErr).To(MatchError(expectedErr))
-								Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning"))
+								Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning"))
 
 								Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
 								Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
@@ -524,7 +606,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 
 								It("returns the error", func() {
 									Expect(summaryErr).To(MatchError(expectedErr))
-									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning"))
+									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning"))
 
 									Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetApplicationArgsForCall(0)).To(Equal(returnedServiceBindings[0].AppGUID))
@@ -557,7 +639,7 @@ var _ = Describe("Service Instance Summary Actions", func() {
 									Expect(summary.ServicePlan).To(Equal(ServicePlan(returnedServicePlan)))
 									Expect(summary.Service).To(Equal(Service(returnedService)))
 									Expect(summary.BoundApplications).To(Equal([]string{"some-app-1", "some-app-2"}))
-									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning-1", "get-application-warning-2"))
+									Expect(summaryWarnings).To(ConsistOf("get-space-service-instance-warning", "get-feature-flags-warning", "get-service-plan-warning", "get-service-warning", "get-service-bindings-warning", "get-application-warning-1", "get-application-warning-2"))
 
 									Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsCallCount()).To(Equal(1))
 									Expect(fakeCloudControllerClient.GetServiceInstanceServiceBindingsArgsForCall(0)).To(Equal(returnedServiceInstance.GUID))
