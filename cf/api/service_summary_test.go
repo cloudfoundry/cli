@@ -81,6 +81,7 @@ var _ = Describe("ServiceSummaryRepository", func() {
 
 		instance1 := serviceInstances[0]
 		Expect(instance1.Name).To(Equal("my-service-instance"))
+		Expect(instance1.GUID).To(Equal("my-service-instance-guid"))
 		Expect(instance1.LastOperation.Type).To(Equal("create"))
 		Expect(instance1.LastOperation.State).To(Equal("in progress"))
 		Expect(instance1.LastOperation.Description).To(Equal("50% done"))

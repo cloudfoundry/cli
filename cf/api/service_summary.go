@@ -31,6 +31,7 @@ func (resource ServiceInstancesSummaries) ToModels() []models.ServiceInstance {
 
 		instance := models.ServiceInstance{}
 		instance.Name = instanceSummary.Name
+		instance.GUID = instanceSummary.GUID
 		instance.LastOperation.Type = instanceSummary.LastOperation.Type
 		instance.LastOperation.State = instanceSummary.LastOperation.State
 		instance.LastOperation.Description = instanceSummary.LastOperation.Description
@@ -70,6 +71,7 @@ type LastOperationSummary struct {
 
 type ServiceInstanceSummary struct {
 	Name          string
+	GUID          string               `json:"guid"`
 	LastOperation LastOperationSummary `json:"last_operation"`
 	ServicePlan   ServicePlanSummary   `json:"service_plan"`
 }
