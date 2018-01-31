@@ -389,5 +389,63 @@ var _ = PDescribe("v3-unshare-service command", func() {
 				})
 			})
 		})
+
+		Context("when there is a shared service instance in my current targeted space", func() {
+			var broker helpers.ServiceBroker
+			var user string
+			var password string
+
+			BeforeEach(func() {
+				broker = helpers.NewServiceBroker(helpers.NewServiceBrokerName(), helpers.NewAssets().ServiceBroker, domain, service, servicePlan)
+				broker.Push()
+				broker.Configure()
+				broker.Create()
+				user = helpers.NewUsername()
+				password = helpers.NewPassword()
+
+				setupCF(sourceOrgName, sourceSpaceName)
+				Eventually(helpers.CF("enable-service-access", service)).Should(Exit(0))
+				Eventually(helpers.CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+				Eventually(helpers.CF("v3-share-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName)).Should(Exit(0))
+
+				Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
+				Eventually(helpers.CF("set-space-role", user, sharedToOrgName, sharedToSpaceName, "SpaceDeveloper")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				setupCF(sourceOrgName, sourceSpaceName)
+				Eventually(helpers.CF("delete-user", user)).Should(Exit(0))
+				broker.Destroy()
+			})
+
+			Context("and I have no access to the source space", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
+				})
+
+				It("returns a permission error on an attempt to unshare the service", func() {
+					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("You are not authorized to perform the requested action"))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+
+			Context("and I have SpaceAuditor access to the source space", func() {
+				BeforeEach(func() {
+					Eventually(helpers.CF("set-space-role", user, sourceOrgName, sourceSpaceName, "SpaceAuditor")).Should(Exit(0))
+					Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
+					Eventually(helpers.CF("target", "-o", sharedToOrgName, "-s", sharedToSpaceName)).Should(Exit(0))
+				})
+
+				It("returns a permission error on an attempt to unshare the service", func() {
+					session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName, "-o", sharedToOrgName, "-f")
+					Eventually(session).Should(Say("FAILED"))
+					Eventually(session.Err).Should(Say("Specified instance not found or not a managed service instance. Sharing is not supported for user provided services."))
+					Eventually(session).Should(Exit(1))
+				})
+			})
+		})
 	})
 })
