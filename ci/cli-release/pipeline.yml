@@ -22,15 +22,15 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/homebrew-tap
-    private_key: {{homebrew-tap-github-private-key}}
+    private_key: ((homebrew-tap-github-private-key))
     branch: master
 
 - name: edge-linux-binary-32
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_i686.tgz
     region_name: us-west-1
 
@@ -38,8 +38,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_x86-64.tgz
     region_name: us-west-1
 
@@ -47,8 +47,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli_edge_osx.tgz
     region_name: us-west-1
 
@@ -56,8 +56,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli_edge_win32.zip
     region_name: us-west-1
 
@@ -65,8 +65,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli_edge_winx64.zip
     region_name: us-west-1
 
@@ -74,8 +74,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.deb
     region_name: us-west-1
 
@@ -83,8 +83,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.deb
     region_name: us-west-1
 
@@ -92,8 +92,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.rpm
     region_name: us-west-1
 
@@ -101,8 +101,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.rpm
     region_name: us-west-1
 
@@ -110,8 +110,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-release-access-key-id}}
-    secret_access_key: {{cli-production-release-secret-access-key}}
+    access_key_id: ((cli-production-release-access-key-id))
+    secret_access_key: ((cli-production-release-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_osx.pkg
     region_name: us-west-1
 
@@ -136,7 +136,7 @@ jobs:
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
     params:
-      CERT_PATH: {{osx-certificate-store}}
+      CERT_PATH: ((osx-certificate-store))
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
 
@@ -147,34 +147,34 @@ jobs:
     - task: sign-osx-installer
       file: cli-ci/ci/cli-release/tasks/sign-osx-installer.yml
       params:
-        CERT_COMMON_NAME: {{osx-certificate-common-name}}
-        CERT_LOCATION: {{osx-certificate-location}}
-        CERT_PASSWORD_LOCATION: {{osx-certificate-password-location}}
+        CERT_COMMON_NAME: ((osx-certificate-common-name))
+        CERT_LOCATION: ((osx-certificate-location))
+        CERT_PASSWORD_LOCATION: ((osx-certificate-password-location))
 
     - task: sign-redhat-installers
       file: cli-ci/ci/cli-release/tasks/sign-redhat-installers.yml
       params:
-        GPG_KEY_LOCATION: {{gpg-key-location}}
+        GPG_KEY_LOCATION: ((gpg-key-location))
 
     - do:
       - task: sign-windows-binaries
         file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
         params:
-          CERT_LOCATION: {{windows-certificate-location}}
-          CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
+          CERT_LOCATION: ((windows-certificate-location))
+          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
       - task: create-windows-installers
         file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       - task: sign-and-repackage-installers-and-binaries
         file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
-          CERT_LOCATION: {{windows-certificate-location}}
-          CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
+          CERT_LOCATION: ((windows-certificate-location))
+          CERT_PASSWORD_LOCATION: ((windows-certificate-password-location))
 
   - task: upload-releases
     file: cli-ci/ci/cli-release/tasks/upload-releases.yml
     params:
-      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
 
 - name: update-claw
   serial: true
@@ -190,19 +190,19 @@ jobs:
     - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
       params:
-        CF_API: {{cf-api}}
-        CF_USERNAME: {{cf-username}}
-        CF_PASSWORD: {{cf-password}}
-        CF_ORGANIZATION: {{pivotal-organization}}
-        CF_SPACE: {{pivotal-space}}
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cf-username))
+        CF_PASSWORD: ((cf-password))
+        CF_ORGANIZATION: ((pivotal-organization))
+        CF_SPACE: ((pivotal-space))
     - task: packages.cloudfoundry.org
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
       params:
-        CF_API: {{cf-api}}
-        CF_USERNAME: {{cf-username}}
-        CF_PASSWORD: {{cf-password}}
-        CF_ORGANIZATION: {{oss-organization}}
-        CF_SPACE: {{oss-space}}
+        CF_API: ((cf-api))
+        CF_USERNAME: ((cf-username))
+        CF_PASSWORD: ((cf-password))
+        CF_ORGANIZATION: ((oss-organization))
+        CF_SPACE: ((oss-space))
 
 - name: update-debian-repo
   serial: true
@@ -215,17 +215,17 @@ jobs:
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
     params:
-      CERT_PATH: {{osx-certificate-store}}
+      CERT_PATH: ((osx-certificate-store))
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
   - task: publish-debian
     file: cli-ci/ci/cli-release/tasks/publish-debian.yml
     params:
-      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
       AWS_BUCKET_NAME: cf-cli-debian-repo
-      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
-      GPG_KEY_LOCATION: {{gpg-key-location}}
-      KEY_ID_LOCATION: {{gpg-key-id-location}}
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      GPG_KEY_LOCATION: ((gpg-key-location))
+      KEY_ID_LOCATION: ((gpg-key-id-location))
 
 - name: update-homebrew
   serial: true
@@ -253,12 +253,12 @@ jobs:
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
     params:
-      CERT_PATH: {{osx-certificate-store}}
+      CERT_PATH: ((osx-certificate-store))
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
   - task: publish-rpm
     file: cli-ci/ci/cli-release/tasks/publish-rpm.yml
     params:
-      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
-      GPG_KEY_LOCATION: {{gpg-key-location}}
+      AWS_ACCESS_KEY_ID: ((cli-production-release-access-key-id))
+      AWS_SECRET_ACCESS_KEY: ((cli-production-release-secret-access-key))
+      GPG_KEY_LOCATION: ((gpg-key-location))
