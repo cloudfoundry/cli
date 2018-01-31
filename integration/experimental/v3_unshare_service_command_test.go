@@ -103,7 +103,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.34\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.36\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -122,7 +122,7 @@ var _ = PDescribe("v3-unshare-service command", func() {
 			It("fails with error message that the minimum version is not met", func() {
 				session := helpers.CF("v3-unshare-service", serviceInstance, "-s", sharedToSpaceName)
 				Eventually(session).Should(Say("FAILED"))
-				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.34\\.0 or higher\\."))
+				Eventually(session.Err).Should(Say("This command requires CF API version 3\\.36\\.0 or higher\\."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
