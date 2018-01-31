@@ -23,7 +23,9 @@ _cgo_export.*
 
 _testmain.go
 
+# Built binaries
 *.exe
+cli
 
 out/
 release/*
