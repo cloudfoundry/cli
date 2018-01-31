@@ -48,17 +48,17 @@ resources:
 - name: cf-cli-binaries
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    bucket: ((staging-bucket-name))
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: cf-cli-binaries.tgz
 
 - name: edge-linux-binary-32
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_i686.tgz
     region_name: us-west-1
 
@@ -66,8 +66,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli_edge_linux_x86-64.tgz
     region_name: us-west-1
 
@@ -75,8 +75,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli_edge_osx.tgz
     region_name: us-west-1
 
@@ -84,8 +84,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli_edge_win32.zip
     region_name: us-west-1
 
@@ -93,8 +93,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli_edge_winx64.zip
     region_name: us-west-1
 
@@ -102,8 +102,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.deb
     region_name: us-west-1
 
@@ -111,8 +111,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.deb
     region_name: us-west-1
 
@@ -120,8 +120,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_i686.rpm
     region_name: us-west-1
 
@@ -129,8 +129,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_x86-64.rpm
     region_name: us-west-1
 
@@ -138,8 +138,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_osx.pkg
     region_name: us-west-1
 
@@ -147,8 +147,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_win32.zip
     region_name: us-west-1
 
@@ -156,8 +156,8 @@ resources:
   type: s3
   source:
     bucket: cf-cli-releases
-    access_key_id: {{cli-production-access-key-id}}
-    secret_access_key: {{cli-production-secret-access-key}}
+    access_key_id: ((cli-production-access-key-id))
+    secret_access_key: ((cli-production-secret-access-key))
     versioned_file: master/cf-cli-installer_edge_winx64.zip
     region_name: us-west-1
 
@@ -165,15 +165,15 @@ resources:
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
-    private_key: {{cli-pools-github-private-key}}
+    private_key: ((cli-pools-github-private-key))
     branch: master
     pool: bosh-lites-diego
 
 - name: cf-cli-tracker
   type: tracker
   source:
-    token: {{cf-cli-public-tracker-token}}
-    project_id: {{cf-cli-public-tracker-project-id}}
+    token: ((cf-cli-public-tracker-token))
+    project_id: ((cf-cli-public-tracker-project-id))
     tracker_url: https://www.pivotaltracker.com
 
 - name: golang
@@ -206,28 +206,28 @@ resources:
   type: docker-image
   source:
     repository: cfcli/cli-base
-    username: {{dockerhub-username}}
-    email: {{dockerhub-email}}
-    password: {{dockerhub-password}}
+    username: ((dockerhub-username))
+    email: ((dockerhub-email))
+    password: ((dockerhub-password))
 
 - name: cf-cli-package-image
   type: docker-image
   source:
     repository: cfcli/cli-package
-    username: {{dockerhub-username}}
-    email: {{dockerhub-email}}
-    password: {{dockerhub-password}}
+    username: ((dockerhub-username))
+    email: ((dockerhub-email))
+    password: ((dockerhub-password))
 
 - name: slack-alert
   type: slack-notification
   source:
-    url: {{slack-webhook-url}}
+    url: ((slack-webhook-url))
 
 - name: vars-store
   type: git
   source:
     uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cli-private-github-private-key-write}}
+    private_key: ((cli-private-github-private-key-write))
     branch: master
 
 groups:
@@ -359,9 +359,9 @@ jobs:
       params:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client_secret))
-        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
-        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
-        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
   ensure:
     put: gcp-bosh-pool
     params:
@@ -403,9 +403,9 @@ jobs:
       params:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client_secret))
-        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
-        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
-        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
   ensure:
     put: gcp-bosh-pool
     params:
@@ -447,9 +447,9 @@ jobs:
       params:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client_secret))
-        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
-        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
-        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
     - task: integration-linux
       file: cli-ci/ci/cli/tasks/integration-experimental-linux.yml
       on_failure:
@@ -465,9 +465,9 @@ jobs:
       params:
         CF_INT_CLIENT_ID: 'potato-face'
         CF_INT_CLIENT_SECRET: ((client_secret))
-        CF_INT_DOCKER_IMAGE: {{dockerhub-private-image}}
-        CF_INT_DOCKER_USERNAME: {{dockerhub-username}}
-        CF_INT_DOCKER_PASSWORD: {{dockerhub-password}}
+        CF_INT_DOCKER_IMAGE: ((dockerhub-private-image))
+        CF_INT_DOCKER_USERNAME: ((dockerhub-username))
+        CF_INT_DOCKER_PASSWORD: ((dockerhub-password))
   ensure:
     put: gcp-bosh-pool
     params:
