@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -88,7 +89,7 @@ var _ = Describe("Application Instance Status", func() {
 					IsolationSegment: "some-isolation-segment",
 					Memory:           29880320,
 					MemoryQuota:      536870912,
-					State:            ApplicationInstanceRunning,
+					State:            constant.ApplicationInstanceRunning,
 					Uptime:           65007,
 				},
 				))
@@ -101,7 +102,7 @@ var _ = Describe("Application Instance Status", func() {
 					IsolationSegment: "some-isolation-segment",
 					Memory:           29880320,
 					MemoryQuota:      536870912,
-					State:            ApplicationInstanceStarting,
+					State:            constant.ApplicationInstanceStarting,
 					Uptime:           65007,
 				},
 				))

@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -33,14 +34,14 @@ var _ = Describe("Application Instance Actions", func() {
 		Describe("Crashed", func() {
 			Context("instance is crashed", func() {
 				It("returns true", func() {
-					instance.State = ccv2.ApplicationInstanceCrashed
+					instance.State = constant.ApplicationInstanceCrashed
 					Expect(instance.Crashed()).To(BeTrue())
 				})
 			})
 
 			Context("instance is *not* crashed", func() {
 				It("returns false", func() {
-					instance.State = ccv2.ApplicationInstanceRunning
+					instance.State = constant.ApplicationInstanceRunning
 					Expect(instance.Crashed()).To(BeFalse())
 				})
 			})
@@ -49,14 +50,14 @@ var _ = Describe("Application Instance Actions", func() {
 		Describe("Flapping", func() {
 			Context("instance is flapping", func() {
 				It("returns true", func() {
-					instance.State = ccv2.ApplicationInstanceFlapping
+					instance.State = constant.ApplicationInstanceFlapping
 					Expect(instance.Flapping()).To(BeTrue())
 				})
 			})
 
 			Context("instance is *not* flapping", func() {
 				It("returns false", func() {
-					instance.State = ccv2.ApplicationInstanceCrashed
+					instance.State = constant.ApplicationInstanceCrashed
 					Expect(instance.Flapping()).To(BeFalse())
 				})
 			})
@@ -65,14 +66,14 @@ var _ = Describe("Application Instance Actions", func() {
 		Describe("Running", func() {
 			Context("instance is running", func() {
 				It("returns true", func() {
-					instance.State = ccv2.ApplicationInstanceRunning
+					instance.State = constant.ApplicationInstanceRunning
 					Expect(instance.Running()).To(BeTrue())
 				})
 			})
 
 			Context("instance is *not* running", func() {
 				It("returns false", func() {
-					instance.State = ccv2.ApplicationInstanceCrashed
+					instance.State = constant.ApplicationInstanceCrashed
 					Expect(instance.Running()).To(BeFalse())
 				})
 			})
@@ -84,7 +85,7 @@ var _ = Describe("Application Instance Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
 					map[int]ccv2.ApplicationInstance{
-						0: {ID: 0, Details: "hello", Since: 1485985587.12345, State: ccv2.ApplicationInstanceRunning},
+						0: {ID: 0, Details: "hello", Since: 1485985587.12345, State: constant.ApplicationInstanceRunning},
 						1: {ID: 1, Details: "hi", Since: 1485985587.567},
 					},
 					ccv2.Warnings{"instance-warning-1", "instance-warning-2"},
@@ -99,7 +100,7 @@ var _ = Describe("Application Instance Actions", func() {
 						ID:      0,
 						Details: "hello",
 						Since:   1485985587.12345,
-						State:   ccv2.ApplicationInstanceRunning,
+						State:   constant.ApplicationInstanceRunning,
 					},
 					ApplicationInstance{
 						ID:      1,

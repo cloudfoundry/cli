@@ -19,12 +19,12 @@ var _ = Describe("Application Summary Actions", func() {
 			It("only counts the running and starting instances", func() {
 				app := ApplicationSummary{
 					RunningInstances: []ApplicationInstanceWithStats{
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceCrashed)},
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceDown)},
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceFlapping)},
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceRunning)},
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceStarting)},
-						{State: ApplicationInstanceState(ccv2.ApplicationInstanceUnknown)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceCrashed)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceDown)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceFlapping)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceRunning)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceStarting)},
+						{State: ApplicationInstanceState(constant.ApplicationInstanceUnknown)},
 					},
 				}
 				Expect(app.StartingOrRunningInstanceCount()).To(Equal(2))

@@ -2,7 +2,6 @@ package v2action
 
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
@@ -17,8 +16,8 @@ type ApplicationSummary struct {
 func (app ApplicationSummary) StartingOrRunningInstanceCount() int {
 	count := 0
 	for _, instance := range app.RunningInstances {
-		if instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceStarting) ||
-			instance.State == ApplicationInstanceState(ccv2.ApplicationInstanceRunning) {
+		if instance.State == ApplicationInstanceState(constant.ApplicationInstanceStarting) ||
+			instance.State == ApplicationInstanceState(constant.ApplicationInstanceRunning) {
 			count++
 		}
 	}

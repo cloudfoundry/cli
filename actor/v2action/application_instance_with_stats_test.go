@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -60,7 +61,7 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 
 				fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
 					map[int]ccv2.ApplicationInstance{
-						0: {ID: 0, Details: "hello", Since: 1485985587.12345, State: ccv2.ApplicationInstanceRunning},
+						0: {ID: 0, Details: "hello", Since: 1485985587.12345, State: constant.ApplicationInstanceRunning},
 						1: {ID: 1, Details: "hi", Since: 1485985587.567},
 					},
 					ccv2.Warnings{"instance-warning-1", "instance-warning-2"},
@@ -81,7 +82,7 @@ var _ = Describe("Application Instance With Stats Actions", func() {
 						Details:          "hello",
 						IsolationSegment: "some-isolation-segment",
 						Since:            1485985587.12345,
-						State:            ApplicationInstanceState(ccv2.ApplicationInstanceRunning),
+						State:            ApplicationInstanceState(constant.ApplicationInstanceRunning),
 					},
 					ApplicationInstanceWithStats{ID: 1, CPU: 200, Details: "hi", Since: 1485985587.567}))
 				Expect(warnings).To(ConsistOf(

@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -50,7 +51,7 @@ var _ = Describe("Application Instance", func() {
 
 				Expect(instances[0]).To(Equal(ApplicationInstance{
 					ID:      0,
-					State:   ApplicationInstanceRunning,
+					State:   constant.ApplicationInstanceRunning,
 					Since:   1403140717.984577,
 					Details: "some detail",
 				},
@@ -58,7 +59,7 @@ var _ = Describe("Application Instance", func() {
 
 				Expect(instances[1]).To(Equal(ApplicationInstance{
 					ID:      1,
-					State:   ApplicationInstanceCrashed,
+					State:   constant.ApplicationInstanceCrashed,
 					Since:   2514251828.984577,
 					Details: "more details",
 				},

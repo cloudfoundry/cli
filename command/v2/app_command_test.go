@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
@@ -239,7 +239,7 @@ var _ = Describe("App Command", func() {
 							applicationSummary.RunningInstances = []v2action.ApplicationInstanceWithStats{
 								{
 									ID:          0,
-									State:       v2action.ApplicationInstanceState(ccv2.ApplicationInstanceRunning),
+									State:       v2action.ApplicationInstanceState(constant.ApplicationInstanceRunning),
 									Since:       1403140717.984577,
 									CPU:         0.73,
 									Disk:        50 * bytefmt.MEGABYTE,
@@ -250,7 +250,7 @@ var _ = Describe("App Command", func() {
 								},
 								{
 									ID:          1,
-									State:       v2action.ApplicationInstanceState(ccv2.ApplicationInstanceCrashed),
+									State:       v2action.ApplicationInstanceState(constant.ApplicationInstanceCrashed),
 									Since:       1403100000.900000,
 									CPU:         0.37,
 									Disk:        50 * bytefmt.MEGABYTE,

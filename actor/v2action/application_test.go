@@ -722,14 +722,14 @@ var _ = Describe("Application Actions", func() {
 				if instanceCount == 0 {
 					instanceCount++
 					return map[int]ccv2.ApplicationInstance{
-						0: {State: ccv2.ApplicationInstanceStarting},
-						1: {State: ccv2.ApplicationInstanceStarting},
+						0: {State: constant.ApplicationInstanceStarting},
+						1: {State: constant.ApplicationInstanceStarting},
 					}, ccv2.Warnings{"app-instance-warnings-1"}, nil
 				}
 
 				return map[int]ccv2.ApplicationInstance{
-					0: {State: ccv2.ApplicationInstanceStarting},
-					1: {State: ccv2.ApplicationInstanceRunning},
+					0: {State: constant.ApplicationInstanceStarting},
+					1: {State: constant.ApplicationInstanceRunning},
 				}, ccv2.Warnings{"app-instance-warnings-2"}, nil
 			}
 		})
@@ -887,7 +887,7 @@ var _ = Describe("Application Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
-								0: {State: ccv2.ApplicationInstanceCrashed},
+								0: {State: constant.ApplicationInstanceCrashed},
 							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
 						}
 					})
@@ -911,7 +911,7 @@ var _ = Describe("Application Actions", func() {
 					BeforeEach(func() {
 						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
-								0: {State: ccv2.ApplicationInstanceFlapping},
+								0: {State: constant.ApplicationInstanceFlapping},
 							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
 						}
 					})

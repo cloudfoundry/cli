@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -32,7 +33,7 @@ type ApplicationInstanceStatus struct {
 	MemoryQuota int
 
 	// State is the instance's state.
-	State ApplicationInstanceState
+	State constant.ApplicationInstanceState
 
 	// Uptime is the number of seconds the instance has been running.
 	Uptime int
@@ -65,7 +66,7 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	instance.IsolationSegment = ccInstance.IsolationSegment
 	instance.Memory = ccInstance.Stats.Usage.Memory
 	instance.MemoryQuota = ccInstance.Stats.MemoryQuota
-	instance.State = ApplicationInstanceState(ccInstance.State)
+	instance.State = constant.ApplicationInstanceState(ccInstance.State)
 	instance.Uptime = ccInstance.Stats.Uptime
 
 	return nil

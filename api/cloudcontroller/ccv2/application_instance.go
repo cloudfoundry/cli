@@ -5,20 +5,8 @@ import (
 	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
-)
-
-// ApplicationInstanceState reflects the state of the individual app
-// instance.
-type ApplicationInstanceState string
-
-const (
-	ApplicationInstanceCrashed  ApplicationInstanceState = "CRASHED"
-	ApplicationInstanceDown     ApplicationInstanceState = "DOWN"
-	ApplicationInstanceFlapping ApplicationInstanceState = "FLAPPING"
-	ApplicationInstanceRunning  ApplicationInstanceState = "RUNNING"
-	ApplicationInstanceStarting ApplicationInstanceState = "STARTING"
-	ApplicationInstanceUnknown  ApplicationInstanceState = "UNKNOWN"
 )
 
 // ApplicationInstance represents a Cloud Controller Application Instance.
@@ -34,7 +22,7 @@ type ApplicationInstance struct {
 	Since float64
 
 	// State is the instance's state.
-	State ApplicationInstanceState
+	State constant.ApplicationInstanceState
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller application instance
@@ -50,7 +38,7 @@ func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
 	}
 
 	instance.Details = ccInstance.Details
-	instance.State = ApplicationInstanceState(ccInstance.State)
+	instance.State = constant.ApplicationInstanceState(ccInstance.State)
 	instance.Since = ccInstance.Since
 
 	return nil
