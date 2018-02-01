@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 
 	"github.com/cloudfoundry/sonde-go/events"
@@ -121,14 +122,14 @@ var _ = Describe("Application Actions", func() {
 		Describe("StagingCompleted", func() {
 			Context("when staging the application completes", func() {
 				It("returns true", func() {
-					app.PackageState = ccv2.ApplicationPackageStaged
+					app.PackageState = constant.ApplicationPackageStaged
 					Expect(app.StagingCompleted()).To(BeTrue())
 				})
 			})
 
 			Context("when the application is *not* staged", func() {
 				It("returns false", func() {
-					app.PackageState = ccv2.ApplicationPackageFailed
+					app.PackageState = constant.ApplicationPackageFailed
 					Expect(app.StagingCompleted()).To(BeFalse())
 				})
 			})
@@ -137,14 +138,14 @@ var _ = Describe("Application Actions", func() {
 		Describe("StagingFailed", func() {
 			Context("when staging the application fails", func() {
 				It("returns true", func() {
-					app.PackageState = ccv2.ApplicationPackageFailed
+					app.PackageState = constant.ApplicationPackageFailed
 					Expect(app.StagingFailed()).To(BeTrue())
 				})
 			})
 
 			Context("when staging the application does *not* fail", func() {
 				It("returns false", func() {
-					app.PackageState = ccv2.ApplicationPackageStaged
+					app.PackageState = constant.ApplicationPackageStaged
 					Expect(app.StagingFailed()).To(BeFalse())
 				})
 			})
@@ -191,13 +192,13 @@ var _ = Describe("Application Actions", func() {
 		Describe("Started", func() {
 			Context("when app is started", func() {
 				It("returns true", func() {
-					Expect(Application{State: ccv2.ApplicationStarted}.Started()).To(BeTrue())
+					Expect(Application{State: constant.ApplicationStarted}.Started()).To(BeTrue())
 				})
 			})
 
 			Context("when app is stopped", func() {
 				It("returns false", func() {
-					Expect(Application{State: ccv2.ApplicationStopped}.Started()).To(BeFalse())
+					Expect(Application{State: constant.ApplicationStopped}.Started()).To(BeFalse())
 				})
 			})
 		})
@@ -205,13 +206,13 @@ var _ = Describe("Application Actions", func() {
 		Describe("Stopped", func() {
 			Context("when app is started", func() {
 				It("returns true", func() {
-					Expect(Application{State: ccv2.ApplicationStopped}.Stopped()).To(BeTrue())
+					Expect(Application{State: constant.ApplicationStopped}.Stopped()).To(BeTrue())
 				})
 			})
 
 			Context("when app is stopped", func() {
 				It("returns false", func() {
-					Expect(Application{State: ccv2.ApplicationStarted}.Stopped()).To(BeFalse())
+					Expect(Application{State: constant.ApplicationStarted}.Stopped()).To(BeFalse())
 				})
 			})
 		})
@@ -704,7 +705,7 @@ var _ = Describe("Application Actions", func() {
 						GUID:         "some-app-guid",
 						Instances:    types.NullInt{Value: 2, IsSet: true},
 						Name:         "some-app",
-						PackageState: ccv2.ApplicationPackagePending,
+						PackageState: constant.ApplicationPackagePending,
 					}, ccv2.Warnings{"app-warnings-1"}, nil
 				}
 
@@ -712,7 +713,7 @@ var _ = Describe("Application Actions", func() {
 					GUID:         "some-app-guid",
 					Name:         "some-app",
 					Instances:    types.NullInt{Value: 2, IsSet: true},
-					PackageState: ccv2.ApplicationPackageStaged,
+					PackageState: constant.ApplicationPackageStaged,
 				}, ccv2.Warnings{"app-warnings-2"}, nil
 			}
 
@@ -772,7 +773,7 @@ var _ = Describe("Application Actions", func() {
 									GUID:                "some-app-guid",
 									Name:                "some-app",
 									Instances:           types.NullInt{Value: 2, IsSet: true},
-									PackageState:        ccv2.ApplicationPackageFailed,
+									PackageState:        constant.ApplicationPackageFailed,
 									StagingFailedReason: "NoAppDetectedError",
 								}, ccv2.Warnings{"app-warnings-1"}, nil
 							}
@@ -798,7 +799,7 @@ var _ = Describe("Application Actions", func() {
 									GUID:                "some-app-guid",
 									Name:                "some-app",
 									Instances:           types.NullInt{Value: 2, IsSet: true},
-									PackageState:        ccv2.ApplicationPackageFailed,
+									PackageState:        constant.ApplicationPackageFailed,
 									StagingFailedReason: "OhNoes",
 								}, ccv2.Warnings{"app-warnings-1"}, nil
 							}
@@ -949,7 +950,7 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
@@ -979,7 +980,7 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
@@ -1024,7 +1025,7 @@ var _ = Describe("Application Actions", func() {
 
 			Context("when the app is already staged", func() {
 				BeforeEach(func() {
-					app.PackageState = ccv2.ApplicationPackageStaged
+					app.PackageState = constant.ApplicationPackageStaged
 				})
 
 				It("does not send ApplicationStateStaging", func() {
@@ -1040,7 +1041,7 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 				})
 			})
@@ -1062,7 +1063,7 @@ var _ = Describe("Application Actions", func() {
 
 			Context("when application is running", func() {
 				BeforeEach(func() {
-					app.State = ccv2.ApplicationStarted
+					app.State = constant.ApplicationStarted
 				})
 
 				It("stops, starts and polls for an app instance", func() {
@@ -1082,13 +1083,13 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStopped,
+						State: constant.ApplicationStopped,
 					}))
 
 					passedApp = fakeCloudControllerClient.UpdateApplicationArgsForCall(1)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
@@ -1129,7 +1130,7 @@ var _ = Describe("Application Actions", func() {
 
 			Context("when the app is not running", func() {
 				BeforeEach(func() {
-					app.State = ccv2.ApplicationStopped
+					app.State = constant.ApplicationStopped
 				})
 
 				It("does not stop an app instance", func() {
@@ -1145,14 +1146,14 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 				})
 			})
 
 			Context("when the app is already staged", func() {
 				BeforeEach(func() {
-					app.PackageState = ccv2.ApplicationPackageStaged
+					app.PackageState = constant.ApplicationPackageStaged
 				})
 
 				It("does not send ApplicationStateStaging", func() {
@@ -1168,7 +1169,7 @@ var _ = Describe("Application Actions", func() {
 					passedApp := fakeCloudControllerClient.UpdateApplicationArgsForCall(0)
 					Expect(passedApp).To(Equal(ccv2.Application{
 						GUID:  "some-app-guid",
-						State: ccv2.ApplicationStarted,
+						State: constant.ApplicationStarted,
 					}))
 				})
 			})

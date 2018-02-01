@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -72,7 +73,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			Context("when the application is STARTED", func() {
 				BeforeEach(func() {
-					app.State = ccv2.ApplicationStarted
+					app.State = constant.ApplicationStarted
 					fakeCloudControllerClient.GetApplicationsReturns(
 						[]ccv2.Application{app},
 						ccv2.Warnings{"app-warning"},
@@ -104,7 +105,7 @@ var _ = Describe("Application Summary Actions", func() {
 							Application: Application{
 								GUID:  "some-app-guid",
 								Name:  "some-app",
-								State: ccv2.ApplicationStarted,
+								State: constant.ApplicationStarted,
 							},
 							RunningInstances: []ApplicationInstanceWithStats{
 								{ID: 0, IsolationSegment: "isolation-segment-1"},
@@ -135,7 +136,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 			Context("when the application is not STARTED", func() {
 				BeforeEach(func() {
-					app.State = ccv2.ApplicationStopped
+					app.State = constant.ApplicationStopped
 				})
 
 				It("does not try and get application instance information", func() {

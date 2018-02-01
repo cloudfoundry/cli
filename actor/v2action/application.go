@@ -51,12 +51,12 @@ func (application Application) CalculatedHealthCheckEndpoint() string {
 
 // StagingCompleted returns true if the application has been staged.
 func (application Application) StagingCompleted() bool {
-	return application.PackageState == ccv2.ApplicationPackageStaged
+	return application.PackageState == constant.ApplicationPackageStaged
 }
 
 // StagingFailed returns true if staging the application failed.
 func (application Application) StagingFailed() bool {
-	return application.PackageState == ccv2.ApplicationPackageFailed
+	return application.PackageState == constant.ApplicationPackageFailed
 }
 
 // StagingFailedMessage returns the verbose description of the failure or
@@ -77,12 +77,12 @@ func (application Application) StagingFailedNoAppDetected() bool {
 
 // Started returns true when the application is started.
 func (application Application) Started() bool {
-	return application.State == ccv2.ApplicationStarted
+	return application.State == constant.ApplicationStarted
 }
 
 // Stopped returns true when the application is stopped.
 func (application Application) Stopped() bool {
-	return application.State == ccv2.ApplicationStopped
+	return application.State == constant.ApplicationStopped
 }
 
 func (application Application) String() string {
@@ -243,13 +243,13 @@ func (actor Actor) StartApplication(app Application, client NOAAClient) (<-chan 
 		defer close(errs)
 		defer client.Close() // automatic close to prevent stale clients
 
-		if app.PackageState != ccv2.ApplicationPackageStaged {
+		if app.PackageState != constant.ApplicationPackageStaged {
 			appState <- ApplicationStateStaging
 		}
 
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
-			State: ccv2.ApplicationStarted,
+			State: constant.ApplicationStarted,
 		})
 
 		for _, warning := range warnings {
@@ -284,7 +284,7 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient) (<-cha
 			appState <- ApplicationStateStopping
 			updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 				GUID:  app.GUID,
-				State: ccv2.ApplicationStopped,
+				State: constant.ApplicationStopped,
 			})
 			for _, warning := range warnings {
 				allWarnings <- warning
@@ -296,12 +296,12 @@ func (actor Actor) RestartApplication(app Application, client NOAAClient) (<-cha
 			app = Application(updatedApp)
 		}
 
-		if app.PackageState != ccv2.ApplicationPackageStaged {
+		if app.PackageState != constant.ApplicationPackageStaged {
 			appState <- ApplicationStateStaging
 		}
 		updatedApp, warnings, err := actor.CloudControllerClient.UpdateApplication(ccv2.Application{
 			GUID:  app.GUID,
-			State: ccv2.ApplicationStarted,
+			State: constant.ApplicationStarted,
 		})
 
 		for _, warning := range warnings {

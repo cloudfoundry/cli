@@ -13,24 +13,6 @@ import (
 	"code.cloudfoundry.org/cli/types"
 )
 
-// ApplicationState is the running state of an application.
-type ApplicationState string
-
-const (
-	ApplicationStarted ApplicationState = "STARTED"
-	ApplicationStopped ApplicationState = "STOPPED"
-)
-
-// ApplicationPackageState is the staging state of application bits.
-type ApplicationPackageState string
-
-const (
-	ApplicationPackageStaged  ApplicationPackageState = "STAGED"
-	ApplicationPackagePending ApplicationPackageState = "PENDING"
-	ApplicationPackageFailed  ApplicationPackageState = "FAILED"
-	ApplicationPackageUnknown ApplicationPackageState = "UNKNOWN"
-)
-
 // Application represents a Cloud Controller Application.
 type Application struct {
 	// Buildpack is the buildpack set by the user.
@@ -81,7 +63,7 @@ type Application struct {
 	Name string
 
 	// PackageState represents the staging state of the application bits.
-	PackageState ApplicationPackageState
+	PackageState constant.ApplicationPackageState
 
 	// PackageUpdatedAt is the last time the app bits were updated. In RFC3339.
 	PackageUpdatedAt time.Time
@@ -100,7 +82,7 @@ type Application struct {
 	StagingFailedReason string
 
 	// State is the desired state of the application.
-	State ApplicationState
+	State constant.ApplicationState
 }
 
 // DockerCredentials are the authentication credentials to pull a docker image
@@ -131,7 +113,7 @@ func (application Application) MarshalJSON() ([]byte, error) {
 		Name                    string                              `json:"name,omitempty"`
 		SpaceGUID               string                              `json:"space_guid,omitempty"`
 		StackGUID               string                              `json:"stack_guid,omitempty"`
-		State                   ApplicationState                    `json:"state,omitempty"`
+		State                   constant.ApplicationState           `json:"state,omitempty"`
 	}{
 		DockerImage:          application.DockerImage,
 		EnvironmentVariables: application.EnvironmentVariables,
@@ -227,11 +209,11 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	application.HealthCheckType = constant.ApplicationHealthCheckType(ccApp.Entity.HealthCheckType)
 	application.Memory.ParseUint64Value(ccApp.Entity.Memory)
 	application.Name = ccApp.Entity.Name
-	application.PackageState = ApplicationPackageState(ccApp.Entity.PackageState)
+	application.PackageState = constant.ApplicationPackageState(ccApp.Entity.PackageState)
 	application.StackGUID = ccApp.Entity.StackGUID
 	application.StagingFailedDescription = ccApp.Entity.StagingFailedDescription
 	application.StagingFailedReason = ccApp.Entity.StagingFailedReason
-	application.State = ApplicationState(ccApp.Entity.State)
+	application.State = constant.ApplicationState(ccApp.Entity.State)
 
 	if len(ccApp.Entity.EnvironmentVariables) > 0 {
 		envVariableValues := map[string]string{}

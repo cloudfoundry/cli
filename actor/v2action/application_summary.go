@@ -3,6 +3,7 @@ package v2action
 import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 )
 
 type ApplicationSummary struct {
@@ -37,7 +38,7 @@ func (actor Actor) GetApplicationSummaryByNameAndSpace(name string, spaceGUID st
 
 	// cloud controller calls the instance reporter only when the desired
 	// application state is STARTED
-	if app.State == ccv2.ApplicationStarted {
+	if app.State == constant.ApplicationStarted {
 		var instances []ApplicationInstanceWithStats
 		instances, warnings, err = actor.GetApplicationInstancesWithStatsByApplication(app.GUID)
 		allWarnings = append(allWarnings, warnings...)

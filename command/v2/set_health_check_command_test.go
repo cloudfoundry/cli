@@ -5,7 +5,6 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccversion"
 	"code.cloudfoundry.org/cli/command/commandfakes"
@@ -195,7 +194,7 @@ var _ = Describe("set-health-check Command", func() {
 			cmd.RequiredArgs.HealthCheck.Type = "some-health-check-type"
 
 			fakeActor.SetApplicationHealthCheckTypeByNameAndSpaceReturns(
-				v2action.Application{State: ccv2.ApplicationStarted}, v2action.Warnings{"warning-1"}, nil)
+				v2action.Application{State: constant.ApplicationStarted}, v2action.Warnings{"warning-1"}, nil)
 		})
 
 		It("displays a tip to restart the app", func() {

@@ -54,10 +54,8 @@
 //
 // All error handling that requires parsing the error_code/code returned back
 // from the Cloud Controller should be placed in the errorWrapper. Everything
-// else can be handled in the individual operations. All parsed cloud
-// controller errors should exist in errors.go, all generic HTTP errors should
-// exist in the cloudcontroller's errors.go. Errors related to the individaul
-// operation should exist at the top of that operation's file.
+// else can be handled in the individual operations. All errors structs should
+// be placed in individual files in the ccerror package.
 //
 // No inline-relations-depth And summary Endpoints
 //
@@ -65,7 +63,13 @@
 // '/summary' endpoints for any operations. These requests can be extremely
 // taxing on the Cloud Controller and are avoided at all costs. Additionally,
 // the objects returned back from these requests can become extremely
-// inconsistant across versions and are problematic to deal with in general.
+// inconsistent across versions and are problematic to deal with in general.
+//
+// An additional problem that occurs with these endpoints is that lists of 51+
+// objects do not get returned by the CC. Example: Summary of Organizations
+// includes a list of spaces. If there are 50 spaces, the endpoint returns
+// these spaces under the 'spaces' field; if there are 51+, spaces, the
+// 'spaces' field is missing from the CC return.
 package ccv2
 
 import (

@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccerror"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/types"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -165,12 +166,12 @@ var _ = Describe("Application", func() {
 					Instances:                types.NullInt{Value: 13, IsSet: true},
 					Memory:                   types.NullByteSizeInMb{IsSet: true, Value: 1024},
 					Name:                     "app-name-1",
-					PackageState:             ApplicationPackageFailed,
+					PackageState:             constant.ApplicationPackageFailed,
 					PackageUpdatedAt:         updatedAt,
 					StackGUID:                "some-stack-guid",
 					StagingFailedDescription: "some-staging-failed-description",
 					StagingFailedReason:      "some-reason",
-					State:                    ApplicationStopped,
+					State:                    constant.ApplicationStopped,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
@@ -278,11 +279,11 @@ var _ = Describe("Application", func() {
 						Instances:               types.NullInt{Value: 13, IsSet: true},
 						Memory:                  types.NullByteSizeInMb{IsSet: true, Value: 1024},
 						Name:                    "app-name-1",
-						PackageState:            ApplicationPackageFailed,
+						PackageState:            constant.ApplicationPackageFailed,
 						PackageUpdatedAt:        updatedAt,
 						StackGUID:               "some-stack-guid",
 						StagingFailedReason:     "some-reason",
-						State:                   ApplicationStopped,
+						State:                   constant.ApplicationStopped,
 					},
 					{
 						Name:              "app-name-2",
@@ -386,7 +387,7 @@ var _ = Describe("Application", func() {
 						Instances:               types.NullInt{Value: 0, IsSet: true},
 						Memory:                  types.NullByteSizeInMb{IsSet: true},
 						StackGUID:               "some-stack-guid",
-						State:                   ApplicationStarted,
+						State:                   constant.ApplicationStarted,
 					})
 					Expect(err).NotTo(HaveOccurred())
 
@@ -417,7 +418,7 @@ var _ = Describe("Application", func() {
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,
 						StackGUID:               "some-stack-guid",
-						State:                   ApplicationStarted,
+						State:                   constant.ApplicationStarted,
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
@@ -477,7 +478,7 @@ var _ = Describe("Application", func() {
 						Name:                    "app-name-1",
 						PackageUpdatedAt:        updatedAt,
 						StackGUID:               "some-stack-guid",
-						State:                   ApplicationStopped,
+						State:                   constant.ApplicationStopped,
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})
@@ -552,7 +553,7 @@ var _ = Describe("Application", func() {
 					GUID:                    "some-app-guid",
 					HealthCheckType:         "some-health-check-type",
 					HealthCheckHTTPEndpoint: "/anything",
-					State: ApplicationStarted,
+					State: constant.ApplicationStarted,
 				})
 				Expect(err).NotTo(HaveOccurred())
 
@@ -573,7 +574,7 @@ var _ = Describe("Application", func() {
 					Name:                    "app-name-1",
 					PackageUpdatedAt:        updatedAt,
 					StackGUID:               "some-stack-guid",
-					State:                   ApplicationStarted,
+					State:                   constant.ApplicationStarted,
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})

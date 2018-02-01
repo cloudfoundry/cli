@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/translatableerror"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -127,7 +128,7 @@ var _ = Describe("Start Command", func() {
 			Context("when the app is already started", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v2action.Application{State: ccv2.ApplicationStarted},
+						v2action.Application{State: constant.ApplicationStarted},
 						v2action.Warnings{"warning-1", "warning-2"},
 						nil,
 					)
@@ -148,7 +149,7 @@ var _ = Describe("Start Command", func() {
 			Context("when the app is not already started", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v2action.Application{GUID: "app-guid", State: ccv2.ApplicationStopped},
+						v2action.Application{GUID: "app-guid", State: constant.ApplicationStopped},
 						v2action.Warnings{"warning-1", "warning-2"},
 						nil,
 					)

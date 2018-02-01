@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/actionerror"
 	"code.cloudfoundry.org/cli/actor/pushaction"
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/constant"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/translatableerror"
@@ -121,7 +121,7 @@ var _ = Describe("push Command", func() {
 					BeforeEach(func() {
 						appConfigs = []pushaction.ApplicationConfig{
 							{
-								CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, State: ccv2.ApplicationStarted}},
+								CurrentApplication: pushaction.Application{Application: v2action.Application{Name: appName, State: constant.ApplicationStarted}},
 								DesiredApplication: pushaction.Application{Application: v2action.Application{Name: appName}},
 								CurrentRoutes: []v2action.Route{
 									{Host: "route1", Domain: v2action.Domain{Name: "example.com"}},
