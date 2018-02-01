@@ -416,20 +416,108 @@ var _ = Describe("service Command", func() {
 									nil)
 							})
 
-							It("displays the shared to info and does not display the shared from info", func() {
-								Expect(executeErr).ToNot(HaveOccurred())
+							Context("when the service instance is still shareable", func() {
+								It("displays the shared to info and does not display the shared from info", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
 
-								Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
-								Expect(testUI.Out).ToNot(Say("shared from org/space:"))
-								Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
-								Expect(testUI.Out).To(Say("shared with spaces:"))
-								Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
-								Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
-								Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
-								Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).ToNot(Say("shared from org/space:"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("shared with spaces:"))
+									Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
+									Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
+									Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
 
-								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
-								Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+								})
+							})
+
+							Context("when the service instance is no longer shareable due to global settings only", func() {
+								BeforeEach(func() {
+									returnedSummary.ServiceInstanceSharingFeatureFlag = false
+									returnedSummary.Service.Extra.Shareable = true
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										returnedSummary,
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil)
+								})
+
+								It("displays the shared to info and message that the service instance feature flag is disabled", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).ToNot(Say("shared from org/space:"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("shared with spaces:"))
+									Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
+									Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
+									Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+								})
+							})
+
+							Context("when the service instance is no longer shareable due to service broker settings only", func() {
+								BeforeEach(func() {
+									returnedSummary.ServiceInstanceSharingFeatureFlag = true
+									returnedSummary.Service.Extra.Shareable = false
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										returnedSummary,
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil)
+								})
+
+								It("displays the shared to info and message that service instance sharing is disabled for the service", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).ToNot(Say("shared from org/space:"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("Service instance sharing is disabled for this service."))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("shared with spaces:"))
+									Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
+									Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
+									Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+								})
+							})
+							Context("when the service instance is no longer shareable due to  global settings AND service broker settings", func() {
+								BeforeEach(func() {
+									returnedSummary.ServiceInstanceSharingFeatureFlag = false
+									returnedSummary.Service.Extra.Shareable = false
+									fakeActor.GetServiceInstanceSummaryByNameAndSpaceReturns(
+										returnedSummary,
+										v2action.Warnings{"get-service-instance-summary-warning-1", "get-service-instance-summary-warning-2"},
+										nil)
+								})
+
+								It("displays the shared to info, the message that the service instance feature flag is disabled and that service instance sharing is disabled for the service", func() {
+									Expect(executeErr).ToNot(HaveOccurred())
+									Expect(testUI.Out).To(Say("Showing info of service some-service-instance in org some-org / space some-space as some-user\\.\\.\\."))
+									Expect(testUI.Out).ToNot(Say("shared from org/space:"))
+									Expect(testUI.Out).To(Say("dashboard:\\s+some-dashboard"))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform. Also, service instance sharing is disabled for this service.`))
+									Expect(testUI.Out).To(Say("\n\n"))
+									Expect(testUI.Out).To(Say("shared with spaces:"))
+									Expect(testUI.Out).To(Say("org\\s+space\\s+bindings"))
+									Expect(testUI.Out).To(Say("another-org-name\\s+another-space-name\\s+2"))
+									Expect(testUI.Out).To(Say("yet-another-org-name\\s+yet-another-space-name\\s+3"))
+									Expect(testUI.Out).To(Say("Showing status of last operation from service some-service-instance\\.\\.\\."))
+
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-1"))
+									Expect(testUI.Err).To(Say("get-service-instance-summary-warning-2"))
+								})
 							})
 						})
 					})

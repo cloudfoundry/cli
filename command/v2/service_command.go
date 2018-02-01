@@ -125,6 +125,16 @@ func (cmd ServiceCommand) displayServiceInstanceSummary() error {
 				cmd.UI.DisplayText("This service is not currently shared.")
 			}
 		case v2action.ServiceInstanceIsSharedTo:
+			if !serviceInstanceSummary.Service.Extra.Shareable && serviceInstanceSummary.ServiceInstanceSharingFeatureFlag {
+				cmd.UI.DisplayNewline()
+				cmd.UI.DisplayText("Service instance sharing is disabled for this service.")
+			} else if serviceInstanceSummary.Service.Extra.Shareable && !serviceInstanceSummary.ServiceInstanceSharingFeatureFlag {
+				cmd.UI.DisplayNewline()
+				cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform.`)
+			} else if !serviceInstanceSummary.IsShareable() {
+				cmd.UI.DisplayNewline()
+				cmd.UI.DisplayText(`The "service_instance_sharing" feature flag is disabled for this Cloud Foundry platform. Also, service instance sharing is disabled for this service.`)
+			}
 			cmd.UI.DisplayNewline()
 			cmd.UI.DisplayText("shared with spaces:")
 
