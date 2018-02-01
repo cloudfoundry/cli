@@ -106,9 +106,9 @@ var _ = Describe("Stack Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetStacksCallCount()).To(Equal(1))
-					Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(Equal([]ccv2.QQuery{
+					Expect(fakeCloudControllerClient.GetStacksArgsForCall(0)).To(Equal([]ccv2.Filter{
 						{
-							Filter:   ccv2.NameFilter,
+							Type:     ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-stack"},
 						},

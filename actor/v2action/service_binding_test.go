@@ -192,14 +192,14 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"foo"}))
 
 				Expect(fakeCloudControllerClient.GetServiceBindingsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]ccv2.QQuery{
-					ccv2.QQuery{
-						Filter:   ccv2.AppGUIDFilter,
+				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
+					ccv2.Filter{
+						Type:     ccv2.AppGUIDFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-app-guid"},
 					},
-					ccv2.QQuery{
-						Filter:   ccv2.ServiceInstanceGUIDFilter,
+					ccv2.Filter{
+						Type:     ccv2.ServiceInstanceGUIDFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-service-instance-guid"},
 					},

@@ -145,8 +145,8 @@ var _ = Describe("Organization", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					orgs, warnings, err := client.GetOrganizations(QQuery{
-						Filter:   "some-query",
+					orgs, warnings, err := client.GetOrganizations(Filter{
+						Type:     "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
 					})

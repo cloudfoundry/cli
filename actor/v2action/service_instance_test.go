@@ -114,9 +114,9 @@ var _ = Describe("Service Instance Actions", func() {
 				spaceGUID, includeUserProvidedServices, queries := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 				Expect(spaceGUID).To(Equal("some-space-guid"))
 				Expect(includeUserProvidedServices).To(BeTrue())
-				Expect(queries).To(ConsistOf([]ccv2.QQuery{
-					ccv2.QQuery{
-						Filter:   ccv2.NameFilter,
+				Expect(queries).To(ConsistOf([]ccv2.Filter{
+					ccv2.Filter{
+						Type:     ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-service-instance"},
 					},
@@ -344,10 +344,10 @@ var _ = Describe("Service Instance Actions", func() {
 
 			It("calls GetSpaceServiceInstance with the correct service instance name and space guid", func() {
 				Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
-				spaceGUIDArg, _, queryArg := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
+				spaceGUIDArg, _, filters := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 
 				Expect(spaceGUIDArg).To(Equal("some-source-space-guid"))
-				Expect(queryArg[0].Values[0]).To(Equal("some-service-instance"))
+				Expect(filters[0].Values[0]).To(Equal("some-service-instance"))
 			})
 
 			It("calls GetServiceInstanceSharedTos with the correct service instance guid", func() {

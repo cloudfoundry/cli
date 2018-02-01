@@ -53,11 +53,11 @@ func (client *Client) GetStack(guid string) (Stack, Warnings, error) {
 	return stack, response.Warnings, err
 }
 
-// GetStacks returns a list of Stacks based off of the provided queries.
-func (client *Client) GetStacks(queries ...QQuery) ([]Stack, Warnings, error) {
+// GetStacks returns a list of Stacks based off of the provided filters.
+func (client *Client) GetStacks(filters ...Filter) ([]Stack, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetStacksRequest,
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err

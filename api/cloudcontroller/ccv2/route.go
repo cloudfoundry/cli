@@ -124,12 +124,12 @@ func (client *Client) CreateRoute(route Route, generatePort bool) (Route, Warnin
 }
 
 // GetApplicationRoutes returns a list of Routes associated with the provided
-// Application GUID, and filtered by the provided queries.
-func (client *Client) GetApplicationRoutes(appGUID string, queryParams ...QQuery) ([]Route, Warnings, error) {
+// Application GUID, and filtered by the provided filters.
+func (client *Client) GetApplicationRoutes(appGUID string, filters ...Filter) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppRoutesRequest,
 		URIParams:   map[string]string{"app_guid": appGUID},
-		Query:       FormatQueryParameters(queryParams),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -152,12 +152,12 @@ func (client *Client) GetApplicationRoutes(appGUID string, queryParams ...QQuery
 }
 
 // GetSpaceRoutes returns a list of Routes associated with the provided Space
-// GUID, and filtered by the provided queries.
-func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams ...QQuery) ([]Route, Warnings, error) {
+// GUID, and filtered by the provided filters.
+func (client *Client) GetSpaceRoutes(spaceGUID string, filters ...Filter) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSpaceRoutesRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
-		Query:       FormatQueryParameters(queryParams),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -179,11 +179,11 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams ...QQuery) ([
 	return fullRoutesList, warnings, err
 }
 
-// GetRoutes returns a list of Routes based off of the provided queries.
-func (client *Client) GetRoutes(queryParams ...QQuery) ([]Route, Warnings, error) {
+// GetRoutes returns a list of Routes based off of the provided filters.
+func (client *Client) GetRoutes(filters ...Filter) ([]Route, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRoutesRequest,
-		Query:       FormatQueryParameters(queryParams),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err

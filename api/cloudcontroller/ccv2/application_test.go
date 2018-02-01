@@ -257,8 +257,8 @@ var _ = Describe("Application", func() {
 
 		Context("when apps exist", func() {
 			It("returns all the queried apps", func() {
-				apps, warnings, err := client.GetApplications(QQuery{
-					Filter:   SpaceGUIDFilter,
+				apps, warnings, err := client.GetApplications(Filter{
+					Type:     SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
@@ -697,8 +697,8 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns all the applications and all warnings", func() {
-				apps, warnings, err := client.GetRouteApplications("some-route-guid", QQuery{
-					Filter:   SpaceGUIDFilter,
+				apps, warnings, err := client.GetRouteApplications("some-route-guid", Filter{
+					Type:     SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})

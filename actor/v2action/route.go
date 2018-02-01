@@ -289,25 +289,25 @@ func (actor Actor) GetRouteByComponents(route Route) (Route, Warnings, error) {
 		return Route{}, nil, actionerror.NoHostnameAndSharedDomainError{}
 	}
 
-	queries := []ccv2.QQuery{
+	queries := []ccv2.Filter{
 		{
-			Filter:   ccv2.DomainGUIDFilter,
+			Type:     ccv2.DomainGUIDFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Domain.GUID},
 		}, {
-			Filter:   ccv2.HostFilter,
+			Type:     ccv2.HostFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Host},
 		}, {
-			Filter:   ccv2.PathFilter,
+			Type:     ccv2.PathFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{route.Path},
 		},
 	}
 
 	if route.Port.IsSet {
-		queries = append(queries, ccv2.QQuery{
-			Filter:   ccv2.PortFilter,
+		queries = append(queries, ccv2.Filter{
+			Type:     ccv2.PortFilter,
 			Operator: ccv2.EqualOperator,
 			Values:   []string{fmt.Sprint(route.Port.Value)},
 		})

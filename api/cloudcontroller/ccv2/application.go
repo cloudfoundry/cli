@@ -279,11 +279,11 @@ func (client *Client) GetApplication(guid string) (Application, Warnings, error)
 }
 
 // GetApplications returns back a list of Applications based off of the
-// provided queries.
-func (client *Client) GetApplications(queries ...QQuery) ([]Application, Warnings, error) {
+// provided filters.
+func (client *Client) GetApplications(filters ...Filter) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppsRequest,
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -350,13 +350,13 @@ func (client *Client) RestageApplication(app Application) (Application, Warnings
 	return restagedApp, response.Warnings, err
 }
 
-// GetRouteApplications returns a list of Applications associated with a route
-// GUID, filtered by provided queries.
-func (client *Client) GetRouteApplications(routeGUID string, queryParams ...QQuery) ([]Application, Warnings, error) {
+// GetRouteApplications returns a list of Applications based off a route
+// GUID and the provided filters.
+func (client *Client) GetRouteApplications(routeGUID string, filters ...Filter) ([]Application, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetRouteAppsRequest,
 		URIParams:   map[string]string{"route_guid": routeGUID},
-		Query:       FormatQueryParameters(queryParams),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err

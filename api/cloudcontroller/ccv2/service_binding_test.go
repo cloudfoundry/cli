@@ -146,8 +146,8 @@ var _ = Describe("Service Binding", func() {
 
 		Context("when service bindings exist", func() {
 			It("returns all the queried service bindings", func() {
-				serviceBindings, warnings, err := client.GetServiceBindings(QQuery{
-					Filter:   AppGUIDFilter,
+				serviceBindings, warnings, err := client.GetServiceBindings(Filter{
+					Type:     AppGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-app-guid"},
 				})

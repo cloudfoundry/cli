@@ -328,14 +328,14 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"foo"}))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.QQuery{
-					ccv2.QQuery{
-						Filter:   ccv2.NameFilter,
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
+					ccv2.Filter{
+						Type:     ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-app"},
 					},
-					ccv2.QQuery{
-						Filter:   ccv2.SpaceGUIDFilter,
+					ccv2.Filter{
+						Type:     ccv2.SpaceGUIDFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-space-guid"},
 					},
@@ -404,9 +404,9 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.QQuery{
-					ccv2.QQuery{
-						Filter:   ccv2.SpaceGUIDFilter,
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Filter{
+					ccv2.Filter{
+						Type:     ccv2.SpaceGUIDFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-space-guid"},
 					},

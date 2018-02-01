@@ -112,8 +112,8 @@ var _ = Describe("Service Instance Summary Actions", func() {
 				Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 				Expect(getUserProvidedServicesArg).To(BeTrue())
 				Expect(queriesArg).To(HaveLen(1))
-				Expect(queriesArg[0]).To(Equal(ccv2.QQuery{
-					Filter:   ccv2.NameFilter,
+				Expect(queriesArg[0]).To(Equal(ccv2.Filter{
+					Type:     ccv2.NameFilter,
 					Operator: ccv2.EqualOperator,
 					Values:   []string{"some-service-instance"},
 				}))
@@ -161,8 +161,8 @@ var _ = Describe("Service Instance Summary Actions", func() {
 					Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 					Expect(getUserProvidedServicesArg).To(BeTrue())
 					Expect(queriesArg).To(HaveLen(1))
-					Expect(queriesArg[0]).To(Equal(ccv2.QQuery{
-						Filter:   ccv2.NameFilter,
+					Expect(queriesArg[0]).To(Equal(ccv2.Filter{
+						Type:     ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-service-instance"},
 					}))
@@ -722,8 +722,8 @@ var _ = Describe("Service Instance Summary Actions", func() {
 							Expect(spaceGUIDArg).To(Equal("some-space-guid"))
 							Expect(getUserProvidedServicesArg).To(BeTrue())
 							Expect(queriesArg).To(HaveLen(1))
-							Expect(queriesArg[0]).To(Equal(ccv2.QQuery{
-								Filter:   ccv2.NameFilter,
+							Expect(queriesArg[0]).To(Equal(ccv2.Filter{
+								Type:     ccv2.NameFilter,
 								Operator: ccv2.EqualOperator,
 								Values:   []string{"some-service-instance"},
 							}))

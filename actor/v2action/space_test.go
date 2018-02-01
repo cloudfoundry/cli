@@ -162,20 +162,20 @@ var _ = Describe("Space", func() {
 								Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3", "warning-4", "warning-5", "warning-6", "warning-7", "warning-8"))
 
 								Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.QQuery{{
-									Filter:   ccv2.NameFilter,
+								Expect(fakeCloudControllerClient.GetOrganizationsArgsForCall(0)).To(Equal([]ccv2.Filter{{
+									Type:     ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
 									Values:   []string{"some-org"},
 								}}))
 
 								Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.QQuery{{
-									Filter:   ccv2.NameFilter,
+								Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal([]ccv2.Filter{{
+									Type:     ccv2.NameFilter,
 									Operator: ccv2.EqualOperator,
 									Values:   []string{"some-space"},
 								},
 									{
-										Filter:   ccv2.OrganizationGUIDFilter,
+										Type:     ccv2.OrganizationGUIDFilter,
 										Operator: ccv2.EqualOperator,
 										Values:   []string{"some-org-guid"},
 									},
@@ -236,9 +236,9 @@ var _ = Describe("Space", func() {
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(Equal(
-						[]ccv2.QQuery{
+						[]ccv2.Filter{
 							{
-								Filter:   ccv2.OrganizationGUIDFilter,
+								Type:     ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,
 								Values:   []string{"some-org-guid"},
 							},
@@ -297,14 +297,14 @@ var _ = Describe("Space", func() {
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
 					Expect(fakeCloudControllerClient.GetSpacesArgsForCall(0)).To(ConsistOf(
-						[]ccv2.QQuery{
+						[]ccv2.Filter{
 							{
-								Filter:   ccv2.OrganizationGUIDFilter,
+								Type:     ccv2.OrganizationGUIDFilter,
 								Operator: ccv2.EqualOperator,
 								Values:   []string{"some-org-guid"},
 							},
 							{
-								Filter:   ccv2.NameFilter,
+								Type:     ccv2.NameFilter,
 								Operator: ccv2.EqualOperator,
 								Values:   []string{"some-space"},
 							},

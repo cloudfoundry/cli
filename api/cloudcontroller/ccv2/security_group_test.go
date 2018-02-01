@@ -170,8 +170,8 @@ var _ = Describe("Security Groups", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					securityGroups, warnings, err := client.GetSecurityGroups(QQuery{
-						Filter:   "some-query",
+					securityGroups, warnings, err := client.GetSecurityGroups(Filter{
+						Type:     "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
 					})
@@ -325,8 +325,8 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the running security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", QQuery{
-					Filter:   "some-query",
+				securityGroups, warnings, err := client.GetSpaceRunningSecurityGroupsBySpace("some-space-guid", Filter{
+					Type:     "some-query",
 					Operator: EqualOperator,
 					Values:   []string{"some-value"},
 				})
@@ -514,8 +514,8 @@ var _ = Describe("Security Groups", func() {
 			})
 
 			It("returns the staging security groups and all warnings", func() {
-				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", QQuery{
-					Filter:   "some-query",
+				securityGroups, warnings, err := client.GetSpaceStagingSecurityGroupsBySpace("some-space-guid", Filter{
+					Type:     "some-query",
 					Operator: EqualOperator,
 					Values:   []string{"some-value"},
 				})

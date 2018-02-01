@@ -250,8 +250,8 @@ var _ = Describe("Service Instance", func() {
 
 		Context("when service instances exist", func() {
 			It("returns all the queried service instances", func() {
-				serviceInstances, warnings, err := client.GetServiceInstances(QQuery{
-					Filter:   SpaceGUIDFilter,
+				serviceInstances, warnings, err := client.GetServiceInstances(Filter{
+					Type:     SpaceGUIDFilter,
 					Operator: EqualOperator,
 					Values:   []string{"some-space-guid"},
 				})
@@ -360,8 +360,8 @@ var _ = Describe("Service Instance", func() {
 
 			Context("when service instances exist", func() {
 				It("returns all the queried service instances", func() {
-					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", true, QQuery{
-						Filter:   NameFilter,
+					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", true, Filter{
+						Type:     NameFilter,
 						Operator: EqualOperator,
 						Values:   []string{"foobar"},
 					})
@@ -416,8 +416,8 @@ var _ = Describe("Service Instance", func() {
 
 			Context("when service instances exist", func() {
 				It("returns all the queried service instances", func() {
-					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", false, QQuery{
-						Filter:   NameFilter,
+					serviceInstances, warnings, err := client.GetSpaceServiceInstances("some-space-guid", false, Filter{
+						Type:     NameFilter,
 						Operator: EqualOperator,
 						Values:   []string{"foobar"},
 					})

@@ -90,10 +90,10 @@ func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, err
 }
 
 // GetSharedDomains returns the global shared domains.
-func (client *Client) GetSharedDomains(queries ...QQuery) ([]Domain, Warnings, error) {
+func (client *Client) GetSharedDomains(filters ...Filter) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSharedDomainsRequest,
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return []Domain{}, nil, err
@@ -117,10 +117,10 @@ func (client *Client) GetSharedDomains(queries ...QQuery) ([]Domain, Warnings, e
 }
 
 // GetOrganizationPrivateDomains returns the private domains associated with an organization.
-func (client *Client) GetOrganizationPrivateDomains(orgGUID string, queries ...QQuery) ([]Domain, Warnings, error) {
+func (client *Client) GetOrganizationPrivateDomains(orgGUID string, filters ...Filter) ([]Domain, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetOrganizationPrivateDomainsRequest,
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 		URIParams:   map[string]string{"organization_guid": orgGUID},
 	})
 	if err != nil {

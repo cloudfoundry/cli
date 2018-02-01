@@ -22,8 +22,8 @@ func (actor Actor) GetOrganization(guid string) (Organization, Warnings, error) 
 
 // GetOrganizationByName returns an Organization based off of the name given.
 func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings, error) {
-	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(ccv2.QQuery{
-		Filter:   ccv2.NameFilter,
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations(ccv2.Filter{
+		Type:     ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{orgName},
 	})

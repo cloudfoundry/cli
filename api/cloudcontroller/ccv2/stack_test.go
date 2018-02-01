@@ -138,8 +138,8 @@ var _ = Describe("Stack", func() {
 				})
 
 				It("returns paginated results and all warnings", func() {
-					stacks, warnings, err := client.GetStacks(QQuery{
-						Filter:   "some-query",
+					stacks, warnings, err := client.GetStacks(Filter{
+						Type:     "some-query",
 						Operator: EqualOperator,
 						Values:   []string{"some-value"},
 					})

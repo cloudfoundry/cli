@@ -39,8 +39,8 @@ func (actor Actor) BindSecurityGroupToSpace(securityGroupGUID string, spaceGUID 
 }
 
 func (actor Actor) GetSecurityGroupByName(securityGroupName string) (SecurityGroup, Warnings, error) {
-	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv2.QQuery{
-		Filter:   ccv2.NameFilter,
+	securityGroups, warnings, err := actor.CloudControllerClient.GetSecurityGroups(ccv2.Filter{
+		Type:     ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{securityGroupName},
 	})
@@ -373,8 +373,8 @@ func processSecurityGroups(spaceGUID string, ccv2SecurityGroups []ccv2.SecurityG
 }
 
 func (actor Actor) isRunningSecurityGroupBoundToSpace(securityGroupName string, spaceGUID string) (bool, Warnings, error) {
-	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceRunningSecurityGroupsBySpace(spaceGUID, ccv2.QQuery{
-		Filter:   ccv2.NameFilter,
+	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceRunningSecurityGroupsBySpace(spaceGUID, ccv2.Filter{
+		Type:     ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{securityGroupName},
 	})
@@ -382,8 +382,8 @@ func (actor Actor) isRunningSecurityGroupBoundToSpace(securityGroupName string, 
 }
 
 func (actor Actor) isStagingSecurityGroupBoundToSpace(securityGroupName string, spaceGUID string) (bool, Warnings, error) {
-	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceStagingSecurityGroupsBySpace(spaceGUID, ccv2.QQuery{
-		Filter:   ccv2.NameFilter,
+	ccv2SecurityGroups, warnings, err := actor.CloudControllerClient.GetSpaceStagingSecurityGroupsBySpace(spaceGUID, ccv2.Filter{
+		Type:     ccv2.NameFilter,
 		Operator: ccv2.EqualOperator,
 		Values:   []string{securityGroupName},
 	})

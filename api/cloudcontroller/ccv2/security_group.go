@@ -109,10 +109,10 @@ func (client *Client) AssociateSpaceWithStagingSecurityGroup(securityGroupGUID s
 	return response.Warnings, err
 }
 
-func (client *Client) GetSecurityGroups(queries ...QQuery) ([]SecurityGroup, Warnings, error) {
+func (client *Client) GetSecurityGroups(filters ...Filter) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetSecurityGroupsRequest,
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 	})
 
 	if err != nil {
@@ -137,21 +137,21 @@ func (client *Client) GetSecurityGroups(queries ...QQuery) ([]SecurityGroup, War
 
 // GetSpaceRunningSecurityGroupsBySpace returns the running Security Groups
 // associated with the provided Space GUID.
-func (client *Client) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, queries ...QQuery) ([]SecurityGroup, Warnings, error) {
-	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceRunningSecurityGroupsRequest, queries)
+func (client *Client) GetSpaceRunningSecurityGroupsBySpace(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
+	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceRunningSecurityGroupsRequest, filters)
 }
 
 // GetSpaceStagingSecurityGroupsBySpace returns the staging Security Groups
 // associated with the provided Space GUID.
-func (client *Client) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, queries ...QQuery) ([]SecurityGroup, Warnings, error) {
-	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceStagingSecurityGroupsRequest, queries)
+func (client *Client) GetSpaceStagingSecurityGroupsBySpace(spaceGUID string, filters ...Filter) ([]SecurityGroup, Warnings, error) {
+	return client.getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID, internal.GetSpaceStagingSecurityGroupsRequest, filters)
 }
 
-func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string, lifecycle string, queries []QQuery) ([]SecurityGroup, Warnings, error) {
+func (client *Client) getSpaceSecurityGroupsBySpaceAndLifecycle(spaceGUID string, lifecycle string, filters []Filter) ([]SecurityGroup, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: lifecycle,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
-		Query:       FormatQueryParameters(queries),
+		Query:       ConvertFilterParameters(filters),
 	})
 	if err != nil {
 		return nil, nil, err

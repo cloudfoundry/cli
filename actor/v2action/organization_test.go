@@ -122,10 +122,10 @@ var _ = Describe("Org Actions", func() {
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-				Expect(query).To(Equal(
-					[]ccv2.QQuery{{
-						Filter:   ccv2.NameFilter,
+				filters := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(filters).To(Equal(
+					[]ccv2.Filter{{
+						Type:     ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-org"},
 					}}))
@@ -218,10 +218,10 @@ var _ = Describe("Org Actions", func() {
 				Expect(deleteOrgErr).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
-				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
-				Expect(query).To(Equal(
-					[]ccv2.QQuery{{
-						Filter:   ccv2.NameFilter,
+				filters := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(filters).To(Equal(
+					[]ccv2.Filter{{
+						Type:     ccv2.NameFilter,
 						Operator: ccv2.EqualOperator,
 						Values:   []string{"some-org"},
 					}}))

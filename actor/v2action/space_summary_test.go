@@ -270,35 +270,35 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("some-org-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
-					Expect(query).To(ConsistOf(
-						ccv2.QQuery{
-							Filter:   ccv2.NameFilter,
+					filters := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+					Expect(filters).To(ConsistOf(
+						ccv2.Filter{
+							Type:     ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space"},
 						},
-						ccv2.QQuery{
-							Filter:   ccv2.OrganizationGUIDFilter,
+						ccv2.Filter{
+							Type:     ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-org-guid"},
 						},
 					))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					query = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(ConsistOf(
-						ccv2.QQuery{
-							Filter:   ccv2.SpaceGUIDFilter,
+					filters = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+					Expect(filters).To(ConsistOf(
+						ccv2.Filter{
+							Type:     ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space-guid"},
 						},
 					))
 
 					Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
-					spaceGUID, includeUserProvidedServices, query := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
+					spaceGUID, includeUserProvidedServices, filters := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(includeUserProvidedServices).To(BeTrue())
-					Expect(query).To(BeNil())
+					Expect(filters).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
 					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
@@ -851,44 +851,44 @@ var _ = Describe("Space Summary Actions", func() {
 					Expect(fakeCloudControllerClient.GetOrganizationArgsForCall(0)).To(Equal("some-org-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpacesCallCount()).To(Equal(1))
-					query := fakeCloudControllerClient.GetSpacesArgsForCall(0)
-					Expect(query).To(ConsistOf(
-						ccv2.QQuery{
-							Filter:   ccv2.NameFilter,
+					filters := fakeCloudControllerClient.GetSpacesArgsForCall(0)
+					Expect(filters).To(ConsistOf(
+						ccv2.Filter{
+							Type:     ccv2.NameFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space"},
 						},
-						ccv2.QQuery{
-							Filter:   ccv2.OrganizationGUIDFilter,
+						ccv2.Filter{
+							Type:     ccv2.OrganizationGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-org-guid"},
 						},
 					))
 
 					Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-					query = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
-					Expect(query).To(ConsistOf(
-						ccv2.QQuery{
-							Filter:   ccv2.SpaceGUIDFilter,
+					filters = fakeCloudControllerClient.GetApplicationsArgsForCall(0)
+					Expect(filters).To(ConsistOf(
+						ccv2.Filter{
+							Type:     ccv2.SpaceGUIDFilter,
 							Operator: ccv2.EqualOperator,
 							Values:   []string{"some-space-guid"},
 						},
 					))
 
 					Expect(fakeCloudControllerClient.GetSpaceServiceInstancesCallCount()).To(Equal(1))
-					spaceGUID, includeUserProvidedServices, query := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
+					spaceGUID, includeUserProvidedServices, filters := fakeCloudControllerClient.GetSpaceServiceInstancesArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 					Expect(includeUserProvidedServices).To(BeTrue())
-					Expect(query).To(BeNil())
+					Expect(filters).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceQuotaCallCount()).To(Equal(1))
 					spaceQuotaGUID := fakeCloudControllerClient.GetSpaceQuotaArgsForCall(0)
 					Expect(spaceQuotaGUID).To(Equal("some-space-quota-guid"))
 
 					Expect(fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceCallCount()).To(Equal(1))
-					spaceGUID, queries := fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
+					spaceGUID, filters = fakeCloudControllerClient.GetSpaceRunningSecurityGroupsBySpaceArgsForCall(0)
 					Expect(spaceGUID).To(Equal("some-space-guid"))
-					Expect(queries).To(BeNil())
+					Expect(filters).To(BeNil())
 
 					Expect(fakeCloudControllerClient.GetSpaceStagingSecurityGroupsBySpaceCallCount()).To(Equal(0))
 				})
