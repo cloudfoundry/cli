@@ -718,7 +718,7 @@ var _ = Describe("Application Actions", func() {
 			}
 
 			instanceCount := 0
-			fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+			fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 				if instanceCount == 0 {
 					instanceCount++
 					return map[int]ccv2.ApplicationInstance{
@@ -761,7 +761,7 @@ var _ = Describe("Application Actions", func() {
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 					})
 				})
 
@@ -788,7 +788,7 @@ var _ = Describe("Application Actions", func() {
 							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+							Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 						})
 					})
 
@@ -814,7 +814,7 @@ var _ = Describe("Application Actions", func() {
 							Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 							Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(1))
 							Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(1))
-							Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+							Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 						})
 					})
 				})
@@ -822,7 +822,7 @@ var _ = Describe("Application Actions", func() {
 				Context("when the application takes too long to stage", func() {
 					BeforeEach(func() {
 						fakeConfig.StagingTimeoutReturns(0)
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = nil
+						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = nil
 					})
 
 					It("sends a timeout error and stops polling", func() {
@@ -833,7 +833,7 @@ var _ = Describe("Application Actions", func() {
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 						Expect(fakeConfig.StagingTimeoutCallCount()).To(Equal(2))
 						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 					})
 				})
 			})
@@ -845,7 +845,7 @@ var _ = Describe("Application Actions", func() {
 					var expectedErr error
 					BeforeEach(func() {
 						expectedErr = errors.New("I am a banana!!!!")
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return nil, ccv2.Warnings{"app-instance-warnings-1"}, expectedErr
 						}
 					})
@@ -860,7 +860,7 @@ var _ = Describe("Application Actions", func() {
 						Eventually(errs).Should(Receive(MatchError(expectedErr)))
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(1))
 					})
 				})
 
@@ -879,13 +879,13 @@ var _ = Describe("Application Actions", func() {
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 					})
 				})
 
 				Context("when the application crashes", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
 								0: {State: constant.ApplicationInstanceCrashed},
 							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
@@ -903,13 +903,13 @@ var _ = Describe("Application Actions", func() {
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(1))
 					})
 				})
 
 				Context("when the application flaps", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
+						fakeCloudControllerClient.GetApplicationApplicationInstancesStub = func(guid string) (map[int]ccv2.ApplicationInstance, ccv2.Warnings, error) {
 							return map[int]ccv2.ApplicationInstance{
 								0: {State: constant.ApplicationInstanceFlapping},
 							}, ccv2.Warnings{"app-instance-warnings-1"}, nil
@@ -927,7 +927,7 @@ var _ = Describe("Application Actions", func() {
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(1))
 						Expect(fakeConfig.StartupTimeoutCallCount()).To(Equal(1))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(1))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(1))
 					})
 				})
 			})
@@ -954,7 +954,7 @@ var _ = Describe("Application Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
 					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 			})
@@ -984,7 +984,7 @@ var _ = Describe("Application Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 				})
 			})
 
@@ -1002,7 +1002,7 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 				})
 			})
 
@@ -1093,7 +1093,7 @@ var _ = Describe("Application Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
 					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
@@ -1123,7 +1123,7 @@ var _ = Describe("Application Actions", func() {
 
 						Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 						Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
-						Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+						Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 					})
 				})
 			})
@@ -1208,7 +1208,7 @@ var _ = Describe("Application Actions", func() {
 					}))
 
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(2))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(2))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(2))
 					Eventually(fakeNOAAClient.CloseCallCount).Should(Equal(2))
 				})
 
@@ -1232,7 +1232,7 @@ var _ = Describe("Application Actions", func() {
 
 					Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(0))
 					Expect(fakeCloudControllerClient.GetApplicationCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 				})
 			})
 		})

@@ -18,7 +18,23 @@ var _ = Describe("Application Instance Status", func() {
 		client = NewTestClient()
 	})
 
-	Describe("GetApplicationInstanceStatusesByApplication", func() {
+	Describe("GetApplicationApplicationInstanceStatuses", func() {
+		var (
+			appGUID string
+
+			instances  map[int]ApplicationInstanceStatus
+			warnings   Warnings
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			appGUID = "some-app-guid"
+		})
+
+		JustBeforeEach(func() {
+			instances, warnings, executeErr = client.GetApplicationApplicationInstanceStatuses(appGUID)
+		})
+
 		Context("when the app is found", func() {
 			BeforeEach(func() {
 				response := `{
@@ -77,34 +93,32 @@ var _ = Describe("Application Instance Status", func() {
 			})
 
 			It("returns the app instances and warnings", func() {
-				instances, warnings, err := client.GetApplicationInstanceStatusesByApplication("some-app-guid")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(instances).To(HaveLen(2))
-
-				Expect(instances[0]).To(Equal(ApplicationInstanceStatus{
-					CPU:              0.13511219703079957,
-					Disk:             66392064,
-					DiskQuota:        1073741824,
-					ID:               0,
-					IsolationSegment: "some-isolation-segment",
-					Memory:           29880320,
-					MemoryQuota:      536870912,
-					State:            constant.ApplicationInstanceRunning,
-					Uptime:           65007,
-				},
-				))
-
-				Expect(instances[1]).To(Equal(ApplicationInstanceStatus{
-					CPU:              0.13511219703079957,
-					Disk:             66392064,
-					DiskQuota:        1073741824,
-					ID:               1,
-					IsolationSegment: "some-isolation-segment",
-					Memory:           29880320,
-					MemoryQuota:      536870912,
-					State:            constant.ApplicationInstanceStarting,
-					Uptime:           65007,
-				},
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(instances).To(Equal(
+					map[int]ApplicationInstanceStatus{
+						0: {
+							CPU:              0.13511219703079957,
+							Disk:             66392064,
+							DiskQuota:        1073741824,
+							ID:               0,
+							IsolationSegment: "some-isolation-segment",
+							Memory:           29880320,
+							MemoryQuota:      536870912,
+							State:            constant.ApplicationInstanceRunning,
+							Uptime:           65007,
+						},
+						1: {
+							CPU:              0.13511219703079957,
+							Disk:             66392064,
+							DiskQuota:        1073741824,
+							ID:               1,
+							IsolationSegment: "some-isolation-segment",
+							Memory:           29880320,
+							MemoryQuota:      536870912,
+							State:            constant.ApplicationInstanceStarting,
+							Uptime:           65007,
+						},
+					},
 				))
 
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
@@ -127,8 +141,7 @@ var _ = Describe("Application Instance Status", func() {
 			})
 
 			It("returns the error and warnings", func() {
-				_, warnings, err := client.GetApplicationInstanceStatusesByApplication("some-app-guid")
-				Expect(err).To(MatchError(ccerror.ResourceNotFoundError{
+				Expect(executeErr).To(MatchError(ccerror.ResourceNotFoundError{
 					Message: "The app could not be found: some-app-guid",
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))

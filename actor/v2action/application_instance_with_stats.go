@@ -76,7 +76,7 @@ func (instance *ApplicationInstanceWithStats) incomplete() {
 func (actor Actor) GetApplicationInstancesWithStatsByApplication(guid string) ([]ApplicationInstanceWithStats, Warnings, error) {
 	var allWarnings Warnings
 
-	appInstanceStats, apiWarnings, err := actor.CloudControllerClient.GetApplicationInstanceStatusesByApplication(guid)
+	appInstanceStats, apiWarnings, err := actor.CloudControllerClient.GetApplicationApplicationInstanceStatuses(guid)
 	allWarnings = append(allWarnings, apiWarnings...)
 
 	switch err.(type) {

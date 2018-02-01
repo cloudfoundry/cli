@@ -82,14 +82,14 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Context("when instance information is available", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationReturns(
+						fakeCloudControllerClient.GetApplicationApplicationInstanceStatusesReturns(
 							map[int]ccv2.ApplicationInstanceStatus{
 								0: {ID: 0, IsolationSegment: "isolation-segment-1"},
 								1: {ID: 1, IsolationSegment: "isolation-segment-2"}, // should never happen; iso segs for 2 instances of the same app should match.
 							},
 							ccv2.Warnings{"stats-warning"},
 							nil)
-						fakeCloudControllerClient.GetApplicationInstancesByApplicationReturns(
+						fakeCloudControllerClient.GetApplicationApplicationInstancesReturns(
 							map[int]ccv2.ApplicationInstance{
 								0: {ID: 0},
 								1: {ID: 1},
@@ -119,7 +119,7 @@ var _ = Describe("Application Summary Actions", func() {
 
 				Context("when instance information is not available", func() {
 					BeforeEach(func() {
-						fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationReturns(
+						fakeCloudControllerClient.GetApplicationApplicationInstanceStatusesReturns(
 							nil,
 							ccv2.Warnings{"stats-warning"},
 							ccerror.ApplicationStoppedStatsError{})
@@ -144,8 +144,8 @@ var _ = Describe("Application Summary Actions", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(app.RunningInstances).To(BeEmpty())
 
-					Expect(fakeCloudControllerClient.GetApplicationInstanceStatusesByApplicationCallCount()).To(Equal(0))
-					Expect(fakeCloudControllerClient.GetApplicationInstancesByApplicationCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstanceStatusesCallCount()).To(Equal(0))
+					Expect(fakeCloudControllerClient.GetApplicationApplicationInstancesCallCount()).To(Equal(0))
 				})
 			})
 

@@ -44,10 +44,10 @@ func (instance *ApplicationInstance) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GetApplicationInstancesByApplication returns a list of ApplicationInstance
-// for a given application. Given the state of an application, it might skip
+// GetApplicationApplicationInstances returns a list of ApplicationInstance for
+// a given application. Depending on the state of an application, it might skip
 // some application instances.
-func (client *Client) GetApplicationInstancesByApplication(guid string) (map[int]ApplicationInstance, Warnings, error) {
+func (client *Client) GetApplicationApplicationInstances(guid string) (map[int]ApplicationInstance, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppInstancesRequest,
 		URIParams:   Params{"app_guid": guid},

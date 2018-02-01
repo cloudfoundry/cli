@@ -72,10 +72,10 @@ func (instance *ApplicationInstanceStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// GetApplicationInstanceStatusesByApplication returns a list of
-// ApplicationInstance for a given application. Given the state of an
-// application, it might skip some application instances.
-func (client *Client) GetApplicationInstanceStatusesByApplication(guid string) (map[int]ApplicationInstanceStatus, Warnings, error) {
+// GetApplicationApplicationInstanceStatuses returns a list of
+// ApplicationInstanceStatus for a given application. Depending on the state of
+// an application, it might skip some application instance statuses.
+func (client *Client) GetApplicationApplicationInstanceStatuses(guid string) (map[int]ApplicationInstanceStatus, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.GetAppStatsRequest,
 		URIParams:   Params{"app_guid": guid},

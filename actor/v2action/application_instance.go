@@ -24,7 +24,7 @@ func (instance ApplicationInstance) Running() bool {
 }
 
 func (actor Actor) GetApplicationInstancesByApplication(guid string) (map[int]ApplicationInstance, Warnings, error) {
-	ccAppInstances, warnings, err := actor.CloudControllerClient.GetApplicationInstancesByApplication(guid)
+	ccAppInstances, warnings, err := actor.CloudControllerClient.GetApplicationApplicationInstances(guid)
 
 	switch err.(type) {
 	case ccerror.ResourceNotFoundError, ccerror.NotStagedError, ccerror.InstancesError:
